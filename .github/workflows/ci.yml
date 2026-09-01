@@ -1,0 +1,56 @@
+name: ci
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          lfs: false          # fetched explicitly below so the size is visible in the log
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Report LFS payload size before fetching
+        run: make lfs-size
+
+      - name: Fetch benchmark LFS objects
+        run: cd third_party/InventoryBench && git lfs pull
+
+      - name: Sync environment
+        run: uv sync --all-extras
+
+      - name: Lint
+        run: make lint
+
+      # Both artefacts are committed and both are regenerable from the pinned benchmark.
+      # If either drifts, the recorded facts no longer describe the data being tested.
+      - name: Assert the audit manifest is current
+        run: |
+          uv run python -m tools.audit_benchmark --out /tmp/benchmark_check.json --quiet
+          diff -q manifests/benchmark_v1.json /tmp/benchmark_check.json
+
+      - name: Assert the equivalence instance set is current
+        run: uv run python -m tools.select_equivalence_set --check
+
+      # Gate 1: collie/contracts.py is frozen. Changing it requires a declared deviation.
+      - name: Assert the frozen core contracts have not drifted
+        run: uv run python -m tools.freeze_contracts --check
+
+      - name: Test
+        run: uv run pytest --cov=collie --cov-report=term-missing
+
+      - name: Assert the benchmark submodule was not modified
+        run: |
+          dirty=$(git -C third_party/InventoryBench status --porcelain)
+          if [ -n "$dirty" ]; then
+            echo "benchmark submodule modified:"; echo "$dirty"; exit 1
+          fi

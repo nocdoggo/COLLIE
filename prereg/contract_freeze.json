@@ -1,0 +1,13 @@
+{
+  "files": {
+    "collie/contracts.py": {
+      "bytes": 22232,
+      "lines": 673,
+      "sha256": "727bb3e50d7f808374b600bceaed0456070241fdfdc78b5d5aa82419360eaee8"
+    }
+  },
+  "frozen_at": "2026-09-01",
+  "gate": "gate1",
+  "rule": "A frozen file may change, but not quietly. Log a dated entry in prereg/deviations.md naming the file and quoting the new sha256, then re-run tools.freeze_contracts.",
+  "schema_version": 1
+}

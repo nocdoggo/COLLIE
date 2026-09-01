@@ -217,3 +217,11 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 .kiro/settings/mcp.json
+
+# Kiro per-branch specs: kept local to this machine, never published.
+.kiro/specs/
+
+# COLLIE
+#   Generated submission directories: 2,640 order CSVs per full run, regenerable with
+#   `make arm1`. The scored summary that we actually cite lives in reports/ and is committed.
+/results/
