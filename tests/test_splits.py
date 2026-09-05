@@ -127,6 +127,16 @@ def test_seed_for_stays_inside_its_pool(family: int, split: Split, index: int) -
             assert seed not in pool
 
 
+def test_seed_for_rejects_a_split_with_no_family_indexed_pool() -> None:
+    """``Split.NULL_AUDIT`` is real but not family-indexed, so it must fail with an explanation.
+
+    The bank draws from the reserved ``NULL_BANK_BASE`` range instead. A bare ``KeyError`` here
+    would send the next reader looking for a missing dict entry rather than the right generator.
+    """
+    with pytest.raises(ValueError, match="no family-indexed seed pool"):
+        seed_for(1, Split.NULL_AUDIT, 0)
+
+
 def test_seed_for_rejects_out_of_pool_indices() -> None:
     with pytest.raises(ValueError, match="outside the dev pool"):
         seed_for(1, Split.DEV, 6)

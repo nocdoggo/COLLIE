@@ -214,6 +214,14 @@ def combo_of_params(params: FamilyParams) -> Combo:
 def seed_for(family: int, split: Split, index: int) -> int:
     if family not in FAMILY_SHOCK:
         raise ValueError(f"family must be one of {FAMILIES}, got {family}")
+    if split not in SEEDS_PER_FAMILY:
+        raise ValueError(
+            f"{split.value!r} has no family-indexed seed pool; seed_for covers "
+            f"{sorted(sp.value for sp in SEEDS_PER_FAMILY)}. The null-audit split draws from the "
+            f"reserved NULL_BANK_BASE ({NULL_BANK_BASE}) range through collie.data.nullbank, and "
+            f"the test null controls from NULL_CONTROL_BASE ({NULL_CONTROL_BASE}); neither is "
+            "indexed by family, so neither belongs here."
+        )
     if not 0 <= index < SEEDS_PER_FAMILY[split]:
         raise ValueError(f"index {index} outside the {split} pool of {SEEDS_PER_FAMILY[split]}")
     return family * 1_000_000 + _SPLIT_BASE[split] + index

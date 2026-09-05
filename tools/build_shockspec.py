@@ -1,7 +1,8 @@
 """Task 6.3 / Task 8 — build COLLIE-ShockSpec instance directories and the manifest.
 
 ``--split dev --limit N`` writes instance pairs (shocked + twin) seed-index-major so every
-family is covered before any family repeats: a limit cuts seeds, never families. Seeds come from
+family is covered before any family repeats: a limit cuts seeds, never families (it is
+floored to a whole number of family cycles). Seeds come from
 the frozen registry (``collie/data/splits.py``); the wave-3 provisional scheme is exactly the
 registry's, so early outputs regenerate unchanged.
 
@@ -52,15 +53,26 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 HORIZON = 50  # official synthetic horizon (docs/env_contract.md §1)
 
 
+def effective_dev_limit(limit: int) -> int:
+    """Floor ``limit`` to a whole number of family cycles, capped by the frozen dev pool.
+
+    The demo exists to show one shocked series against its twin per family, so a sample that
+    carried four episodes of one family and two of another would undercut the comparison it is
+    meant to support. Cutting whole cycles keeps the families balanced.
+    """
+    cycles = min(max(limit, 0) // len(FAMILIES), SEEDS_PER_FAMILY[Split.DEV])
+    return cycles * len(FAMILIES)
+
+
 def dev_episodes(limit: int) -> Iterator[tuple[int, int, int]]:
-    """Yield ``(family, seed_index, seed)`` from the frozen dev pool."""
-    emitted = 0
-    for index in range(SEEDS_PER_FAMILY[Split.DEV]):
+    """Yield ``(family, seed_index, seed)`` from the frozen dev pool.
+
+    Seed-index-major, so every family is covered before any family repeats and the limit cuts
+    *seeds* rather than families. ``limit`` is floored by :func:`effective_dev_limit`.
+    """
+    for index in range(effective_dev_limit(limit) // len(FAMILIES)):
         for family in FAMILIES:
-            if emitted >= limit:
-                return
             yield family, index, seed_for(family, Split.DEV, index)
-            emitted += 1
 
 
 def render_comparison(ep: GeneratedEpisode) -> str:
@@ -285,6 +297,12 @@ def main(argv: list[str] | None = None) -> int:
         ap.error("--split mode needs --out <directory>")
 
     written: list[tuple[str, GeneratedEpisode]] = []
+    effective = effective_dev_limit(args.limit)
+    if effective != args.limit:
+        print(
+            f"note: --limit {args.limit} floored to {effective} so all {len(FAMILIES)} families "
+            "stay balanced"
+        )
     for family, _index, seed in dev_episodes(args.limit):
         ep = generate_episode(seed=seed, horizon=HORIZON, params=FamilyParams(family))
         relpath = f"{args.split}/f{family}/s{seed}"

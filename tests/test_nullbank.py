@@ -27,14 +27,16 @@ from collie.data.nullbank import (
     generate_null_episode,
 )
 from collie.data.splits import (
+    FAMILIES,
     HELD_OUT_COMBO,
     NULL_BANK_BASE,
+    SEEDS_PER_FAMILY,
     build_rollouts,
     seed_pools,
 )
 from collie.data.writer import write_null
 from collie.sim.loader import load_instance
-from tools.build_shockspec import render_manifest
+from tools.build_shockspec import dev_episodes, effective_dev_limit, render_manifest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
@@ -265,3 +267,29 @@ def test_manifest_records_the_combo_per_rollout() -> None:
     # held-out-combo discipline is auditable from the artifact alone
     held = [r for r in main_rows if r["held_out_combo"]]
     assert held and all(tuple(r["combo"]) == HELD_OUT_COMBO[r["family"]] for r in held)
+
+
+# ---------------------------------------------------------------------------
+# the dev demo sample stays balanced across families
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("limit", [0, 1, 5, 6, 7, 13, 17, 18, 19, 36, 40])
+def test_dev_limit_cuts_seeds_never_families(limit: int) -> None:
+    """Whatever the limit, every family carries the same number of episodes.
+
+    The demo compares one shocked series against its twin per family, so an unbalanced sample
+    would undercut the comparison it exists to support.
+    """
+    emitted = list(dev_episodes(limit))
+    assert len(emitted) == effective_dev_limit(limit)
+    assert len(emitted) <= limit, "the limit is a cap, never a floor to grow into"
+    counts = Counter(family for family, _index, _seed in emitted)
+    assert len(set(counts.values())) <= 1, f"families unbalanced at limit {limit}: {dict(counts)}"
+    if emitted:
+        assert set(counts) == set(FAMILIES), "a non-empty sample must cover every family"
+
+
+def test_dev_limit_is_capped_by_the_frozen_pool() -> None:
+    assert effective_dev_limit(10_000) == len(FAMILIES) * SEEDS_PER_FAMILY[Split.DEV]
+    assert len({seed for _f, _i, seed in dev_episodes(10_000)}) == effective_dev_limit(10_000)
