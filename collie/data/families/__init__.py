@@ -9,12 +9,11 @@ __all__ = ["demand", "generate_episode", "supply"]
 
 
 def generate_episode(*, seed: int, horizon: int, params: FamilyParams) -> GeneratedEpisode:
-    """Dispatch to the family module. Families 1-3 perturb demand, 4-6 perturb supply."""
+    """Dispatch to the family module. Families 1-3 perturb demand, 4-6 perturb supply.
+
+    ``FamilyParams`` already constrains the number to 1-6, and ``supply.generate`` validates
+    its own range, so the dispatch needs no third branch.
+    """
     if params.family in demand.DEMAND_FAMILIES:
         return demand.generate(seed=seed, horizon=horizon, params=params)
-    if params.family in supply.SUPPLY_FAMILIES:
-        return supply.generate(seed=seed, horizon=horizon, params=params)
-    raise ValueError(
-        f"family {params.family} is not implemented; implemented families are "
-        f"{(*demand.DEMAND_FAMILIES, *supply.SUPPLY_FAMILIES)}"
-    )
+    return supply.generate(seed=seed, horizon=horizon, params=params)

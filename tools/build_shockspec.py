@@ -7,6 +7,10 @@ so nothing regenerates differently when it does:
 
     seed(family, split, i) = family * 1_000_000 + SPLIT_BASE[split] + i
 
+Promised lead time: generated paths carry no ``lead_time_*`` component, so the frozen loader
+cannot derive one from the path. The manifest records ``promised_lead_time`` per rollout (the
+twin's constant baseline lead time; research notes §6) and consumers pass it explicitly.
+
 Usage::
 
     uv run python -m tools.build_shockspec --split dev --limit 18 --out /tmp/shockspec_dev
@@ -26,7 +30,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 HORIZON = 50  # official synthetic horizon (docs/env_contract.md §1)
 
 SPLIT_BASE = {"test": 0, "dev": 50_000, "cal": 60_000}
-IMPLEMENTED_FAMILIES = (1, 2, 3, 4, 5)  # family 6 lands in wave 4
+IMPLEMENTED_FAMILIES = (1, 2, 3, 4, 5, 6)
 PROVISIONAL_SEEDS_PER_FAMILY = 6  # the dev pool size the registry will freeze
 
 

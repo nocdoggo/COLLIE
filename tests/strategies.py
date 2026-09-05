@@ -26,6 +26,17 @@ family_numbers = st.sampled_from(sorted(base.FAMILY_SHOCK))
 # for the pre-onset invariance to mean something, and at least one period after it.
 shock_horizons = st.integers(min_value=base.ONSET_HI + 2, max_value=60)
 
+# Family 6 must fit a full registered duration (6-10) after the latest onset (22).
+compound_horizons = st.integers(min_value=27, max_value=60)
+
+
+@st.composite
+def family_and_horizon(draw: st.DrawFn) -> tuple[int, int]:
+    """A family paired with a horizon that family can actually occupy."""
+    family = draw(st.sampled_from(sorted(base.FAMILY_SHOCK)))
+    horizon = draw(compound_horizons if family == 6 else shock_horizons)
+    return family, horizon
+
 
 @st.composite
 def baseline_specs(draw: st.DrawFn) -> base.BaselineSpec:

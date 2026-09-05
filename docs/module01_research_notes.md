@@ -154,7 +154,18 @@ Per NEP 19 (<https://numpy.org/neps/nep-0019-rng-policy.html>):
 - `hypothesis` (dev dependency, added this wave) supplies the property tests; `@example` pins any
   counterexample it finds.
 
-## 6. Hypothesis usage notes
+## 6. Promised lead time for generated episodes **[registered]**
+
+Our generated instance paths carry no `lead_time_*` component, so `promised_lead_time_for`
+cannot (and must not) derive a promise from the path. Decision: the promised lead time of a
+generated episode is **the twin's constant baseline lead time** — 2 by default, or the drawn
+`{1,2}` baseline for family 4. Note that 1 is outside the official promised set `{0, 2, 4}`;
+that is legitimate for project-owned episodes and is registered here deliberately (Module 04's
+`l_eff` grid accepts 1). Consumers resolve it per rollout: `manifests/shockspec_v1.json`
+records `promised_lead_time` for every rollout, and callers pass it to
+`load_instance(..., promised_lead_time=...)` explicitly. Do not infer it from the path.
+
+## 7. Hypothesis usage notes
 
 Current API as of hypothesis 6.167: `@given` with `st.integers`, `st.floats`, `st.lists`,
 `st.composite`, `st.sampled_from`; `@settings(max_examples=..., deadline=..., suppress_health_check=...)`;

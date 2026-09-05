@@ -23,10 +23,10 @@ from collie.data.families.base import FamilyParams, GeneratedEpisode
 from collie.data.writer import DEFAULT_ITEM_ID, TWIN_SUFFIX, write_pair
 from collie.sim.loader import load_instance
 from collie.sim.runner import EpisodeRunner
-from tests.strategies import seeds, shock_horizons
+from tests.strategies import family_and_horizon, seeds
 from tests.test_episode_runner import ConstantController
 
-IMPLEMENTED = (1, 2, 3, 4, 5)  # family 6 lands in wave 4
+IMPLEMENTED = (1, 2, 3, 4, 5, 6)
 
 
 def _promised_lead_time(ep: GeneratedEpisode) -> int:
@@ -44,9 +44,10 @@ def _tree_bytes(root: Path) -> dict[str, bytes]:
     }
 
 
-@given(seed=seeds, horizon=shock_horizons, family=st.sampled_from(IMPLEMENTED))
+@given(seed=seeds, config=family_and_horizon())
 @settings(max_examples=100, deadline=None)
-def test_round_trips_through_loader(seed: int, horizon: int, family: int) -> None:
+def test_round_trips_through_loader(seed: int, config: tuple[int, int]) -> None:
+    family, horizon = config
     with tempfile.TemporaryDirectory() as tmp:
         tmp_path = Path(tmp)
         ep = generate_episode(seed=seed, horizon=horizon, params=FamilyParams(family))
@@ -58,7 +59,7 @@ def test_round_trips_through_loader(seed: int, horizon: int, family: int) -> Non
         assert loaded.spec.horizon == horizon
         assert loaded.demand == ep.demand
         assert loaded.supply.lead_times == ep.lead_times
-        assert loaded.supply.pause_active == ()
+        assert loaded.supply.pause_active == ep.pause_active
         assert loaded.spec.train_demand == ep.train_demand
         assert loaded.spec.item_id == DEFAULT_ITEM_ID
         assert loaded.spec.source == "collie-shockspec"
@@ -108,10 +109,20 @@ def test_neutral_sidecar_changes_nothing(seed: int, family: int) -> None:
         instance = write_pair(tmp_path, ep, relpath="dev/f/s")
         before = load_instance(instance, promised_lead_time=_promised_lead_time(ep))
 
-        # A sidecar restating test.csv's lead-time column exactly.
-        rows = ["period,lead_time"] + [
-            f"{t},{'inf' if math.isinf(lt) else int(lt)}" for t, lt in enumerate(ep.lead_times, 1)
-        ]
+        # A sidecar restating exactly what the episode already carries: test.csv's lead-time
+        # column, plus the pause column when the episode has one (family 6).
+        if ep.pause_active:
+            rows = ["period,lead_time,pause_active"] + [
+                f"{t},{'inf' if math.isinf(lt) else int(lt)},{str(p).lower()}"
+                for t, (lt, p) in enumerate(
+                    zip(ep.lead_times, ep.pause_active, strict=True), start=1
+                )
+            ]
+        else:
+            rows = ["period,lead_time"] + [
+                f"{t},{'inf' if math.isinf(lt) else int(lt)}"
+                for t, lt in enumerate(ep.lead_times, 1)
+            ]
         (instance / "supply.csv").write_text("\n".join(rows) + "\n", encoding="utf-8")
         after = load_instance(instance, promised_lead_time=_promised_lead_time(ep))
 
@@ -138,13 +149,18 @@ def test_hidden_truth_is_unreachable_from_observables(seed: int, family: int) ->
             assert find_hidden_state(obs) == []
 
 
-@pytest.mark.parametrize("family", IMPLEMENTED)
-def test_conditional_independence_flag(tmp_path: Path, family: int) -> None:
+@pytest.mark.parametrize(
+    ("family", "expected"),
+    [(1, True), (2, True), (3, True), (4, True), (5, True), (6, False)],
+)
+def test_conditional_independence_flag(tmp_path: Path, family: int, expected: bool) -> None:
     ep = generate_episode(seed=77, horizon=50, params=FamilyParams(family))
     instance = write_pair(tmp_path, ep, relpath="dev/f/s")
     loaded = load_instance(instance, promised_lead_time=_promised_lead_time(ep))
     assert loaded.incident is not None
-    assert loaded.incident.conditional_independence is True  # families 1-5
+    # True for families 1-5; False for the compound family, where one incident drives both
+    # streams and multiplying marginal likelihood ratios is prohibited (derivation note §7).
+    assert loaded.incident.conditional_independence is expected
 
 
 @pytest.mark.parametrize("family", IMPLEMENTED)
@@ -230,3 +246,76 @@ def test_shock_family_names_cover_the_writer(tmp_path: Path) -> None:
     instance = write_pair(tmp_path, ep, relpath="dev/f3/s")
     payload = json.loads((instance / "incident.json").read_text(encoding="utf-8"))
     assert payload["family"] == ShockFamily.TEMPORARY_PULSE.value
+
+
+@pytest.mark.needs_benchmark
+def test_the_official_loader_reads_generated_instances_unchanged(tmp_path: Path) -> None:
+    """Task 6.3 is about the *official* loader, not just ours (audit note F2)."""
+    from collie.adapter.inventorybench import official_load_instance
+
+    for family in IMPLEMENTED:
+        ep = generate_episode(seed=5, horizon=50, params=FamilyParams(family))
+        instance = write_pair(tmp_path / f"f{family}", ep, relpath="dev/f/s")
+        train_df, test_df, item_id = official_load_instance(instance)
+        assert item_id == DEFAULT_ITEM_ID
+        assert len(test_df) == 50 and len(train_df) == 5
+        assert list(test_df[f"demand_{item_id}"]) == [int(v) for v in ep.demand]
+        twin = official_load_instance(tmp_path / f"f{family}" / f"dev/f/s{TWIN_SUFFIX}")
+        assert list(twin[1][f"demand_{item_id}"]) == [int(v) for v in ep.twin_demand]
+
+
+def test_writer_rejects_a_ragged_twin(tmp_path: Path) -> None:
+    ep = generate_episode(seed=5, horizon=50, params=FamilyParams(1))
+    broken = GeneratedEpisode(
+        demand=ep.demand,
+        lead_times=ep.lead_times,
+        pause_active=ep.pause_active,
+        incident=ep.incident,
+        twin_demand=ep.twin_demand[:-1],
+        twin_lead_times=ep.twin_lead_times,
+    )
+    with pytest.raises(ValueError, match="same horizon"):
+        write_pair(tmp_path, broken, relpath="dev/f1/s")
+
+
+def test_writer_rejects_a_misaligned_pause(tmp_path: Path) -> None:
+    ep = generate_episode(seed=5, horizon=50, params=FamilyParams(1))
+    broken = GeneratedEpisode(
+        demand=ep.demand,
+        lead_times=ep.lead_times,
+        pause_active=(False,) * 10,
+        incident=ep.incident,
+        twin_demand=ep.twin_demand,
+        twin_lead_times=ep.twin_lead_times,
+    )
+    with pytest.raises(ValueError, match="pause_active must align"):
+        write_pair(tmp_path, broken, relpath="dev/f1/s")
+
+
+def test_writer_rejects_misaligned_lead_times(tmp_path: Path) -> None:
+    ep = generate_episode(seed=5, horizon=50, params=FamilyParams(1))
+    broken = GeneratedEpisode(
+        demand=ep.demand,
+        lead_times=ep.lead_times[:-1],
+        pause_active=ep.pause_active,
+        incident=ep.incident,
+        twin_demand=ep.twin_demand,
+        twin_lead_times=ep.twin_lead_times,
+    )
+    with pytest.raises(ValueError, match="lead_times has 49"):
+        write_pair(tmp_path, broken, relpath="dev/f1/s")
+
+
+def test_family6_emits_a_pause_only_sidecar_and_the_twin_none(tmp_path: Path) -> None:
+    ep = generate_episode(seed=5, horizon=50, params=FamilyParams(6))
+    instance = write_pair(tmp_path, ep, relpath="dev/f6/s")
+    sidecar = (instance / "supply.csv").read_text(encoding="utf-8").splitlines()
+    assert sidecar[0] == "period,pause_active"
+    assert len(sidecar) == 51, "every period covered"
+    onset = ep.incident.onset_period
+    effect = ep.incident.supply_effect
+    assert effect is not None
+    for t in range(1, 51):
+        expected = "true" if onset <= t < onset + effect.length else "false"
+        assert sidecar[t] == f"{t},{expected}"
+    assert not (tmp_path / f"dev/f6/s{TWIN_SUFFIX}" / "supply.csv").exists()

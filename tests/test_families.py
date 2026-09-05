@@ -16,7 +16,7 @@ import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from collie.contracts import SupplyEffectKind, SupplyRealization
+from collie.contracts import ShockFamily, SupplyEffectKind, SupplyRealization
 from collie.data.families import demand, supply
 from collie.data.families.base import (
     ONSET_HI,
@@ -24,13 +24,15 @@ from collie.data.families.base import (
     BaselineKind,
     BaselineSpec,
     FamilyParams,
+    GeneratedEpisode,
     as_demand_cells,
     draw_baseline,
     draw_onset,
     episode_rngs,
     generate_baseline,
 )
-from collie.sim.supply import LeadTimeSupply
+from collie.data.families.supply import COMPOUND_DURATION, COMPOUND_MAGNITUDES, COMPOUND_PAUSE
+from collie.sim.supply import ArrivalKeyedSupply, LeadTimeSupply
 from tests.strategies import (
     baseline_specs,
     dispatch_seqs,
@@ -435,3 +437,190 @@ def test_conditional_independence_true_for_supply_families() -> None:
         ep = supply.generate(seed=5, horizon=50, params=FamilyParams(family))
         assert ep.incident.conditional_independence is True
         assert ep.incident.supply_effect is not None
+
+
+# ---------------------------------------------------------------------------
+# family 6: compound demand shift with transit pause
+# ---------------------------------------------------------------------------
+
+
+def _run_arrivals(
+    lead_times: tuple[float, ...], pause: tuple[bool, ...], orders: list[float]
+) -> tuple[list[float], LeadTimeSupply]:
+    proc = LeadTimeSupply(SupplyRealization(lead_times=lead_times, pause_active=pause))
+    arrivals = []
+    for t, qty in enumerate(orders, start=1):
+        proc.dispatch(t, qty)
+        arrivals.append(proc.receive(t))
+    return arrivals, proc
+
+
+def _compound(seed: int = 404, horizon: int = 50, **kw: object) -> GeneratedEpisode:
+    params = FamilyParams(6, onset=17, **kw)
+    return supply.generate(seed=seed, horizon=horizon, params=params)
+
+
+def test_compound_shape_and_flag() -> None:
+    ep = _compound(magnitude=1.5, duration=8, pause_length=4)
+    assert ep.incident.family is ShockFamily.COMPOUND
+    assert ep.incident.conditional_independence is False, (
+        "one incident drives both streams; multiplying marginal ratios is prohibited"
+    )
+    assert ep.incident.duration == 8
+    effect = ep.incident.supply_effect
+    assert effect is not None
+    assert effect.kind is SupplyEffectKind.TRANSIT_PAUSE
+    assert effect.start_period == ep.incident.onset_period
+    assert effect.length == 4
+    # demand scaled on periods 17..24, pause active on 17..20
+    assert ep.demand[:16] == ep.twin_demand[:16]
+    assert ep.demand[16:24] != ep.twin_demand[16:24]
+    assert ep.demand[24:] == ep.twin_demand[24:]
+    assert ep.pause_active == tuple(17 <= t <= 20 for t in range(1, 51))
+    assert ep.lead_times == ep.twin_lead_times == (2.0,) * 50
+
+
+# Family 6 needs room for the full registered duration past the latest onset.
+compound_horizons = st.integers(min_value=27, max_value=60)
+
+
+@given(seed=seeds, horizon=compound_horizons)
+@settings(max_examples=200)
+def test_compound_draws_stay_in_the_registered_ranges(seed: int, horizon: int) -> None:
+    ep = supply.generate(seed=seed, horizon=horizon, params=FamilyParams(6))
+    assert ep.incident.magnitude in COMPOUND_MAGNITUDES
+    assert COMPOUND_DURATION[0] <= ep.incident.duration <= COMPOUND_DURATION[1]
+    effect = ep.incident.supply_effect
+    assert effect is not None and COMPOUND_PAUSE[0] <= effect.length <= COMPOUND_PAUSE[1]
+
+
+@given(seed=seeds, dispatches=dispatch_seqs)
+@settings(max_examples=200)
+def test_pause_conservation(seed: int, dispatches: list[int]) -> None:
+    horizon = max(len(dispatches), 27)
+    orders = [float(q) for q in dispatches] + [0.0] * (horizon - len(dispatches))
+    ep = supply.generate(seed=seed, horizon=horizon, params=FamilyParams(6))
+    proc = LeadTimeSupply(SupplyRealization(lead_times=ep.lead_times, pause_active=ep.pause_active))
+    for t in range(1, horizon + 1):
+        proc.dispatch(t, orders[t - 1])
+        proc.receive(t)
+        assert proc.dispatched_total == pytest.approx(
+            proc.delivered_total + proc.in_transit_total(t) + proc.lost_total
+        ), f"period {t}: dispatched != delivered + in transit + lost"
+    assert proc.lost_total == 0.0, "a pause never loses units"
+
+
+@given(seed=seeds, dispatches=dispatch_seqs)
+@settings(max_examples=200)
+def test_zero_arrivals_during_pause_and_correct_resumption(
+    seed: int, dispatches: list[int]
+) -> None:
+    horizon = max(len(dispatches), 27)
+    orders = [float(q) for q in dispatches] + [0.0] * (horizon - len(dispatches))
+    ep = supply.generate(seed=seed, horizon=horizon, params=FamilyParams(6))
+    effect = ep.incident.supply_effect
+    assert effect is not None
+    start, length = effect.start_period, effect.length
+    arrivals, proc = _run_arrivals(ep.lead_times, ep.pause_active, orders)
+    # A cohort whose transit completes exactly at the first paused period still lands
+    # (frozen semantics, env contract §8.3); strictly inside the pause nothing can arrive.
+    for t in range(start + 1, min(start + length, horizon + 1)):
+        assert arrivals[t - 1] == 0.0, f"arrival of {arrivals[t - 1]} during pause period {t}"
+    # Resumption: every dispatched unit eventually lands; nothing vanishes into the pause.
+    assert proc.delivered_total + proc.in_transit_total(horizon) == pytest.approx(
+        proc.dispatched_total
+    )
+
+
+def test_pause_delays_by_exactly_the_pause_length() -> None:
+    horizon, onset, baseline_lt, pause_k = 40, 17, 2, 4
+    ep = supply.generate(
+        seed=404,
+        horizon=horizon,
+        params=FamilyParams(6, onset=onset, pause_length=pause_k, baseline_lead_time=baseline_lt),
+    )
+
+    def landing(order_period: int, pause: tuple[bool, ...]) -> int:
+        orders = [1.0 if t == order_period else 0.0 for t in range(1, horizon + 1)]
+        arrivals, _ = _run_arrivals(ep.lead_times, pause, orders)
+        return next(t for t, a in enumerate(arrivals, start=1) if a > 0)
+
+    no_pause = (False,) * horizon
+    for t0 in range(1, horizon - baseline_lt - pause_k):
+        normal = landing(t0, no_pause)
+        paused = landing(t0, ep.pause_active)
+        assert normal == t0 + baseline_lt
+        if normal <= onset:
+            # transit already complete at pause start: never held back (§8.3)
+            assert paused == normal
+        elif t0 < onset:
+            # still moving when the pause starts: delayed by exactly the pause length
+            assert paused == normal + pause_k
+        else:
+            # launched into (or after) the frozen pipeline: only the paused receives between
+            # dispatch and recovery freeze it (research notes §3)
+            assert paused == normal + max(0, onset + pause_k - t0)
+
+
+def test_pause_matches_arrival_keyed_reference_when_inactive() -> None:
+    # With pause_active all False the cohort model must be indistinguishable from the
+    # arrival-keyed reference — the property the whole sidecar argument rests on.
+    ep = supply.generate(seed=404, horizon=40, params=FamilyParams(6, onset=17, pause_length=4))
+    orders = [float((37 * t) % 23) for t in range(1, 41)]
+    paused_arrivals, _ = _run_arrivals(ep.lead_times, (False,) * 40, orders)
+    ref = ArrivalKeyedSupply(SupplyRealization(lead_times=ep.lead_times))
+    reference = []
+    for t, qty in enumerate(orders, start=1):
+        ref.dispatch(t, qty)
+        reference.append(ref.receive(t))
+    assert paused_arrivals == reference
+
+
+def test_compound_needs_runway_for_the_registered_ranges() -> None:
+    with pytest.raises(ValueError, match="periods of runway"):
+        supply.generate(seed=0, horizon=26, params=FamilyParams(6, onset=22))
+
+
+def test_compound_validation() -> None:
+    with pytest.raises(ValueError, match="pipeline to freeze"):
+        supply.generate(seed=0, horizon=50, params=FamilyParams(6, baseline_lead_time=0))
+    with pytest.raises(ValueError, match="magnitude must exceed 1"):
+        supply.generate(seed=0, horizon=50, params=FamilyParams(6, magnitude=0.8))
+    with pytest.raises(ValueError, match="pause length must be"):
+        supply.generate(seed=0, horizon=50, params=FamilyParams(6, pause_length=0))
+
+
+# ---------------------------------------------------------------------------
+# guard coverage (audit note F4)
+# ---------------------------------------------------------------------------
+
+
+def test_horizon_must_be_positive() -> None:
+    with pytest.raises(ValueError, match="horizon must be >= 1"):
+        draw_baseline(episode_rngs(0).baseline, BaselineSpec(), 0)
+
+
+def test_params_onset_out_of_range_is_refused() -> None:
+    with pytest.raises(ValueError, match="onset must lie in"):
+        FamilyParams(1, onset=5)
+
+
+def test_supply_rejects_demand_families() -> None:
+    with pytest.raises(ValueError, match=r"supply\.generate handles"):
+        supply.generate(seed=0, horizon=50, params=FamilyParams(1))
+
+
+def test_negative_baseline_lead_time_is_refused() -> None:
+    with pytest.raises(ValueError, match="non-negative"):
+        supply.generate(seed=0, horizon=50, params=FamilyParams(5, baseline_lead_time=-1))
+    with pytest.raises(ValueError, match="non-negative"):
+        demand.generate(seed=0, horizon=50, params=FamilyParams(1, baseline_lead_time=-1))
+
+
+def test_zero_lengths_are_refused() -> None:
+    with pytest.raises(ValueError, match="at least one period"):
+        supply.generate(seed=0, horizon=50, params=FamilyParams(5, loss_length=0))
+    with pytest.raises(ValueError, match="pulse duration must be"):
+        demand.generate(seed=0, horizon=50, params=FamilyParams(3, duration=0))
+    with pytest.raises(ValueError, match="compound duration must be"):
+        supply.generate(seed=0, horizon=50, params=FamilyParams(6, duration=0))

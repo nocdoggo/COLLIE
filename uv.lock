@@ -98,7 +98,7 @@ provides-extras = ["analysis", "llm"]
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "hypothesis", specifier = ">=6.167.1" },
+    { name = "hypothesis", specifier = ">=6.167.1,<7" },
     { name = "pytest", specifier = ">=8.3,<9" },
     { name = "pytest-cov", specifier = ">=5.0,<7" },
     { name = "ruff", specifier = ">=0.15,<0.16" },
