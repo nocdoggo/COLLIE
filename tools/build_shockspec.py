@@ -1,11 +1,9 @@
 """Task 6.3 / Task 8 — build COLLIE-ShockSpec instance directories and the manifest.
 
-Wave 3 scope: ``--split dev --limit N`` writes instance pairs (shocked + twin) for the
-implemented families in a fixed round-robin order. The seed registry is provisional until
-wave 5 lands ``collie/data/splits.py``; the scheme below is the one the registry will adopt,
-so nothing regenerates differently when it does:
-
-    seed(family, split, i) = family * 1_000_000 + SPLIT_BASE[split] + i
+``--split dev --limit N`` writes instance pairs (shocked + twin) seed-index-major so every
+family is covered before any family repeats: a limit cuts seeds, never families. Seeds come from
+the frozen registry (``collie/data/splits.py``); the wave-3 provisional scheme is exactly the
+registry's, so early outputs regenerate unchanged.
 
 Promised lead time: generated paths carry no ``lead_time_*`` component, so the frozen loader
 cannot derive one from the path. The manifest records ``promised_lead_time`` per rollout (the
@@ -22,31 +20,24 @@ import argparse
 from collections.abc import Iterator
 from pathlib import Path
 
+from collie.contracts import Split
 from collie.data.families import generate_episode
 from collie.data.families.base import FamilyParams, GeneratedEpisode
+from collie.data.splits import FAMILIES, SEEDS_PER_FAMILY, seed_for
 from collie.data.writer import TWIN_SUFFIX, write_pair
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 HORIZON = 50  # official synthetic horizon (docs/env_contract.md §1)
 
-SPLIT_BASE = {"test": 0, "dev": 50_000, "cal": 60_000}
-IMPLEMENTED_FAMILIES = (1, 2, 3, 4, 5, 6)
-PROVISIONAL_SEEDS_PER_FAMILY = 6  # the dev pool size the registry will freeze
-
-
-def seed_for(family: int, split: str, index: int) -> int:
-    return family * 1_000_000 + SPLIT_BASE[split] + index
-
 
 def dev_episodes(limit: int) -> Iterator[tuple[int, int, int]]:
-    """Yield ``(family, seed_index, seed)`` seed-index-major so every family is covered before
-    any family repeats: a limit cuts seeds, never families."""
+    """Yield ``(family, seed_index, seed)`` from the frozen dev pool."""
     emitted = 0
-    for index in range(PROVISIONAL_SEEDS_PER_FAMILY):
-        for family in IMPLEMENTED_FAMILIES:
+    for index in range(SEEDS_PER_FAMILY[Split.DEV]):
+        for family in FAMILIES:
             if emitted >= limit:
                 return
-            yield family, index, seed_for(family, "dev", index)
+            yield family, index, seed_for(family, Split.DEV, index)
             emitted += 1
 
 
