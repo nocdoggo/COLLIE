@@ -27,6 +27,7 @@ import numpy as np
 from collie.contracts import HiddenIncident, ShockFamily
 
 __all__ = [
+    "DEFAULT_BASELINE_LEAD_TIME",
     "FAMILY_SHOCK",
     "ONSET_HI",
     "ONSET_LO",
@@ -50,6 +51,10 @@ ONSET_HI = 22
 
 TRAIN_PERIODS = 5
 """Every official synthetic train.csv carries exactly five rows (research notes §1)."""
+
+DEFAULT_BASELINE_LEAD_TIME = 2
+"""Fallback when ``params.baseline_lead_time`` is left to the seed. Matches the promised lead
+time of the official stochastic subtree, whose actual law is centred on 2."""
 
 
 class BaselineKind(StrEnum):
@@ -194,7 +199,7 @@ class FamilyParams:
     onset: int | None = None
     magnitude: float | None = None
     duration: int | None = None
-    baseline_lead_time: int = 2
+    baseline_lead_time: int | None = None
     disrupted_lead_time: int | None = None
     loss_length: int | None = None
     pause_length: int | None = None

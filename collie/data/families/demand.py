@@ -16,6 +16,7 @@ import numpy as np
 
 from collie.contracts import HiddenIncident
 from collie.data.families.base import (
+    DEFAULT_BASELINE_LEAD_TIME,
     FAMILY_SHOCK,
     TRAIN_PERIODS,
     FamilyParams,
@@ -87,7 +88,14 @@ def generate(*, seed: int, horizon: int, params: FamilyParams) -> GeneratedEpiso
     scaled = as_demand_cells(np.asarray(baseline[onset - 1 : last]) * magnitude)
     demand = (*baseline[: onset - 1], *scaled, *baseline[last:])
 
-    lead_times = (float(params.baseline_lead_time),) * horizon
+    baseline_lt = (
+        params.baseline_lead_time
+        if params.baseline_lead_time is not None
+        else DEFAULT_BASELINE_LEAD_TIME
+    )
+    if baseline_lt < 0:
+        raise ValueError(f"baseline lead time must be non-negative, got {baseline_lt}")
+    lead_times = (float(baseline_lt),) * horizon
     incident = HiddenIncident(
         family=FAMILY_SHOCK[params.family],
         onset_period=onset,

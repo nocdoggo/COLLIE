@@ -3,7 +3,8 @@
 Wave 1 covers the baseline harness: determinism, twin construction, integer cells, and
 statistical sanity against the official patterns the baselines are anchored to
 (``docs/module01_research_notes.md`` §1). Wave 2 adds demand families 1-3: the pre-onset
-invariance, post-onset divergence, and parameter recovery.
+invariance, post-onset divergence, and parameter recovery. Wave 3 adds supply families
+4-5 and unit conservation under the frozen supply physics.
 """
 
 from __future__ import annotations
@@ -15,7 +16,8 @@ import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from collie.data.families import demand
+from collie.contracts import SupplyEffectKind, SupplyRealization
+from collie.data.families import demand, supply
 from collie.data.families.base import (
     ONSET_HI,
     ONSET_LO,
@@ -28,7 +30,14 @@ from collie.data.families.base import (
     episode_rngs,
     generate_baseline,
 )
-from tests.strategies import baseline_specs, horizons, seeds, shock_horizons
+from collie.sim.supply import LeadTimeSupply
+from tests.strategies import (
+    baseline_specs,
+    dispatch_seqs,
+    horizons,
+    seeds,
+    shock_horizons,
+)
 
 # ---------------------------------------------------------------------------
 # rounding rule
@@ -311,3 +320,118 @@ def test_wrong_direction_magnitude_is_refused() -> None:
 def test_unknown_family_number_is_refused() -> None:
     with pytest.raises(ValueError, match="family must be one of"):
         FamilyParams(7)
+
+
+# ---------------------------------------------------------------------------
+# supply families 4-5
+# ---------------------------------------------------------------------------
+
+
+@given(
+    seed=seeds,
+    horizon=shock_horizons,
+    family=st.sampled_from((4, 5)),
+    spec=baseline_specs(),
+)
+@settings(max_examples=200)
+def test_supply_twin_identical_before_onset(
+    seed: int, horizon: int, family: int, spec: BaselineSpec
+) -> None:
+    ep = supply.generate(seed=seed, horizon=horizon, params=FamilyParams(family, baseline=spec))
+    onset = ep.incident.onset_period
+    assert ep.lead_times[: onset - 1] == ep.twin_lead_times[: onset - 1]
+    assert ep.demand == ep.twin_demand, "supply families never touch the demand path"
+    assert ep.pause_active == ()
+
+
+@given(seed=seeds, horizon=shock_horizons, family=st.sampled_from((4, 5)))
+@settings(max_examples=200)
+def test_supply_twin_diverges_after_onset(seed: int, horizon: int, family: int) -> None:
+    ep = supply.generate(seed=seed, horizon=horizon, params=FamilyParams(family))
+    onset = ep.incident.onset_period
+    assert ep.lead_times[onset - 1 :] != ep.twin_lead_times[onset - 1 :]
+
+
+def test_lead_time_shift_parameter_recovery() -> None:
+    ep = supply.generate(
+        seed=202,
+        horizon=50,
+        params=FamilyParams(4, onset=15, baseline_lead_time=1, disrupted_lead_time=4),
+    )
+    assert ep.lead_times[:14] == (1.0,) * 14
+    assert ep.lead_times[14:] == (4.0,) * 36
+    assert ep.twin_lead_times == (1.0,) * 50
+    effect = ep.incident.supply_effect
+    assert effect is not None
+    assert effect.kind is SupplyEffectKind.LEAD_TIME_SHIFT
+    assert effect.start_period == 15
+    assert effect.length == 36
+    assert effect.disrupted_lead_time == 4
+    assert ep.incident.duration == 36
+
+
+def test_lead_time_shift_draws_stay_in_the_registered_sets() -> None:
+    for seed in range(100):
+        ep = supply.generate(seed=seed, horizon=50, params=FamilyParams(4))
+        baseline = ep.twin_lead_times[0]
+        effect = ep.incident.supply_effect
+        assert baseline in (1.0, 2.0)
+        assert effect is not None and effect.disrupted_lead_time in (3, 4)
+
+
+def test_lead_time_shift_validation() -> None:
+    with pytest.raises(ValueError, match="baseline lead time must be in"):
+        supply.generate(seed=0, horizon=50, params=FamilyParams(4, baseline_lead_time=3))
+    with pytest.raises(ValueError, match=r"must be in .* and exceed"):
+        supply.generate(
+            seed=0,
+            horizon=50,
+            params=FamilyParams(4, baseline_lead_time=2, disrupted_lead_time=2),
+        )
+
+
+def test_shipment_loss_marks_exactly_the_burst() -> None:
+    ep = supply.generate(seed=303, horizon=50, params=FamilyParams(5, onset=18, loss_length=3))
+    expected = tuple(math.inf if 18 <= t <= 20 else 2.0 for t in range(1, 51))
+    assert ep.lead_times == expected
+    assert SupplyRealization(lead_times=ep.lead_times).n_lost == 3
+    effect = ep.incident.supply_effect
+    assert effect is not None
+    assert effect.kind is SupplyEffectKind.SHIPMENT_LOSS
+    assert effect.length == 3
+
+
+def test_shipment_loss_burst_truncates_at_the_horizon() -> None:
+    ep = supply.generate(seed=303, horizon=23, params=FamilyParams(5, onset=22, loss_length=3))
+    assert ep.incident.duration == 2
+    assert SupplyRealization(lead_times=ep.lead_times).n_lost == 2
+
+
+def test_shipment_loss_draws_cover_the_registered_range() -> None:
+    seen = {
+        supply.generate(seed=s, horizon=50, params=FamilyParams(5)).incident.duration
+        for s in range(200)
+    }
+    assert seen == {1, 2, 3}
+
+
+@given(seed=seeds, dispatches=dispatch_seqs, family=st.sampled_from((4, 5)))
+@settings(max_examples=200)
+def test_supply_unit_conservation(seed: int, dispatches: list[int], family: int) -> None:
+    horizon = max(len(dispatches), 24)
+    orders = [float(q) for q in dispatches] + [0.0] * (horizon - len(dispatches))
+    ep = supply.generate(seed=seed, horizon=horizon, params=FamilyParams(family))
+    proc = LeadTimeSupply(SupplyRealization(lead_times=ep.lead_times))
+    for t in range(1, horizon + 1):
+        proc.dispatch(t, orders[t - 1])
+        proc.receive(t)
+        assert proc.dispatched_total == pytest.approx(
+            proc.delivered_total + proc.in_transit_total(t) + proc.lost_total
+        ), f"period {t}: dispatched != delivered + in transit + lost"
+
+
+def test_conditional_independence_true_for_supply_families() -> None:
+    for family in (4, 5):
+        ep = supply.generate(seed=5, horizon=50, params=FamilyParams(family))
+        assert ep.incident.conditional_independence is True
+        assert ep.incident.supply_effect is not None
