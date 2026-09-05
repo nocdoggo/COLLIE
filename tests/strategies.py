@@ -20,6 +20,7 @@ multipliers = st.sampled_from([0.6, 0.75, 1.25, 1.5, 2.0])
 lead_times = st.sampled_from([0, 1, 2, 3, 4, math.inf])
 dispatch_seqs = st.lists(st.integers(min_value=0, max_value=500), min_size=1, max_size=60)
 families = st.sampled_from(list(ShockFamily))
+family_numbers = st.sampled_from(sorted(base.FAMILY_SHOCK))
 
 # A shock needs periods on both sides of its onset to be observable: enough runway before onset
 # for the pre-onset invariance to mean something, and at least one period after it.
@@ -48,12 +49,12 @@ def baseline_specs(draw: st.DrawFn) -> base.BaselineSpec:
 def family_params(
     draw: st.DrawFn,
     *,
-    family: ShockFamily | None = None,
+    family: int | None = None,
     baseline: base.BaselineSpec | None = None,
 ) -> base.FamilyParams:
     """Whole-episode configurations. ``None`` fields stay undrawn so the seed decides them."""
     return base.FamilyParams(
-        family=family or draw(st.sampled_from(list(ShockFamily))),
+        family=family or draw(family_numbers),
         baseline=baseline or draw(baseline_specs()),
         onset=draw(st.one_of(st.none(), onsets)),
     )

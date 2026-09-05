@@ -2,27 +2,33 @@
 
 Wave 1 covers the baseline harness: determinism, twin construction, integer cells, and
 statistical sanity against the official patterns the baselines are anchored to
-(``docs/module01_research_notes.md`` §1).
+(``docs/module01_research_notes.md`` §1). Wave 2 adds demand families 1-3: the pre-onset
+invariance, post-onset divergence, and parameter recovery.
 """
 
 from __future__ import annotations
 
+import math
+
 import numpy as np
 import pytest
 from hypothesis import given, settings
+from hypothesis import strategies as st
 
+from collie.data.families import demand
 from collie.data.families.base import (
     ONSET_HI,
     ONSET_LO,
     BaselineKind,
     BaselineSpec,
+    FamilyParams,
     as_demand_cells,
     draw_baseline,
     draw_onset,
     episode_rngs,
     generate_baseline,
 )
-from tests.strategies import baseline_specs, horizons, seeds
+from tests.strategies import baseline_specs, horizons, seeds, shock_horizons
 
 # ---------------------------------------------------------------------------
 # rounding rule
@@ -161,3 +167,147 @@ def test_baseline_specs_are_validated() -> None:
             BaselineSpec(kind=BaselineKind.OVERDISPERSED, mean=100.0, sd=9.0),
             10,
         )
+
+
+# ---------------------------------------------------------------------------
+# demand families 1-3
+# ---------------------------------------------------------------------------
+
+DEMAND = (1, 2, 3)
+
+
+@given(
+    seed=seeds,
+    horizon=shock_horizons,
+    family=st.sampled_from(DEMAND),
+    spec=baseline_specs(),
+)
+@settings(max_examples=200)
+def test_twin_identical_before_onset(
+    seed: int, horizon: int, family: int, spec: BaselineSpec
+) -> None:
+    ep = demand.generate(seed=seed, horizon=horizon, params=FamilyParams(family, baseline=spec))
+    onset = ep.incident.onset_period
+    assert ep.demand[: onset - 1] == ep.twin_demand[: onset - 1]
+    assert ep.lead_times == ep.twin_lead_times, "demand families never touch the supply path"
+    assert ep.pause_active == ()
+
+
+@given(
+    seed=seeds,
+    horizon=shock_horizons,
+    family=st.sampled_from(DEMAND),
+    spec=baseline_specs(),
+)
+@settings(max_examples=200)
+def test_twin_differs_after_onset(seed: int, horizon: int, family: int, spec: BaselineSpec) -> None:
+    ep = demand.generate(seed=seed, horizon=horizon, params=FamilyParams(family, baseline=spec))
+    onset, duration = ep.incident.onset_period, ep.incident.duration
+    window = slice(onset - 1, onset - 1 + duration)
+    assert ep.demand[window] != ep.twin_demand[window], "the shock must be visible somewhere"
+
+
+@given(seed=seeds, horizon=shock_horizons, family=st.sampled_from(DEMAND))
+@settings(max_examples=200)
+def test_onset_recorded_is_in_range_and_applies_the_multiplier(
+    seed: int, horizon: int, family: int
+) -> None:
+    ep = demand.generate(seed=seed, horizon=horizon, params=FamilyParams(family))
+    onset = ep.incident.onset_period
+    assert ONSET_LO <= onset <= ONSET_HI
+    # Every post-onset cell in the shock window is the twin cell scaled by m, half-up rounded.
+    last = onset - 1 + ep.incident.duration
+    for twin_cell, shocked_cell in zip(
+        ep.twin_demand[onset - 1 : last], ep.demand[onset - 1 : last], strict=True
+    ):
+        assert shocked_cell == float(max(0, math.floor(twin_cell * ep.incident.magnitude + 0.5)))
+
+
+@pytest.mark.parametrize(
+    ("family", "magnitude"),
+    [(1, 1.25), (1, 1.5), (2, 0.6), (2, 0.75), (3, 1.5), (3, 2.0)],
+)
+def test_parameter_recovery(family: int, magnitude: float) -> None:
+    ep = demand.generate(
+        seed=101,
+        horizon=50,
+        params=FamilyParams(
+            family, onset=17, magnitude=magnitude, duration=3 if family == 3 else None
+        ),
+    )
+    assert ep.incident.magnitude == magnitude
+    onset, duration = ep.incident.onset_period, ep.incident.duration
+    shocked = np.asarray(ep.demand[onset - 1 : onset - 1 + duration])
+    twin = np.asarray(ep.twin_demand[onset - 1 : onset - 1 + duration])
+    ratios = shocked[twin > 0] / twin[twin > 0]
+    # Rounding moves each ratio by at most ~0.5/cell; the mean is far tighter.
+    assert abs(float(ratios.mean()) - magnitude) < 0.01
+    assert bool(np.all(np.abs(ratios - magnitude) < 0.03))
+
+
+def test_persistent_families_run_to_the_horizon() -> None:
+    for family in (1, 2):
+        ep = demand.generate(
+            seed=7,
+            horizon=50,
+            params=FamilyParams(family, onset=17, magnitude=1.25 if family == 1 else 0.75),
+        )
+        assert ep.incident.duration == 50 - 17 + 1
+        assert ep.demand[16:] != ep.twin_demand[16:]
+        assert ep.demand[:16] == ep.twin_demand[:16]
+
+
+def test_pulse_truncates_at_the_horizon() -> None:
+    ep = demand.generate(
+        seed=7, horizon=24, params=FamilyParams(3, onset=22, magnitude=2.0, duration=4)
+    )
+    assert ep.incident.duration == 3, "22, 23, 24 — the fourth period falls off the end"
+    assert ep.demand[21:] != ep.twin_demand[21:]
+
+
+def test_onset_invisible_same_seed_different_onset() -> None:
+    # The onset stream is independent of the baseline stream: two episodes that differ only in
+    # onset must coincide on every period before the earlier onset.
+    early = demand.generate(seed=42, horizon=50, params=FamilyParams(1, onset=14))
+    late = demand.generate(seed=42, horizon=50, params=FamilyParams(1, onset=22))
+    assert early.demand[:13] == late.demand[:13] == early.twin_demand[:13]
+
+
+def test_conditional_independence_true_for_demand_families() -> None:
+    for family in DEMAND:
+        ep = demand.generate(seed=5, horizon=50, params=FamilyParams(family))
+        assert ep.incident.conditional_independence is True
+        assert ep.incident.supply_effect is None
+
+
+def test_monotone_severity() -> None:
+    kw = {"seed": 9, "horizon": 50}
+    mild = demand.generate(**kw, params=FamilyParams(1, onset=17, magnitude=1.25))
+    strong = demand.generate(**kw, params=FamilyParams(1, onset=17, magnitude=1.5))
+
+    def deviation(ep: object) -> float:
+        return float(np.sum(np.asarray(ep.demand) - np.asarray(ep.twin_demand)))
+
+    assert deviation(strong) > deviation(mild) > 0.0
+
+
+def test_demand_generate_rejects_supply_families() -> None:
+    with pytest.raises(ValueError, match=r"demand\.generate handles"):
+        demand.generate(seed=0, horizon=50, params=FamilyParams(4))
+
+
+def test_onset_beyond_horizon_is_refused() -> None:
+    with pytest.raises(ValueError, match="beyond the horizon"):
+        demand.generate(seed=0, horizon=20, params=FamilyParams(1, onset=22))
+
+
+def test_wrong_direction_magnitude_is_refused() -> None:
+    with pytest.raises(ValueError, match="must exceed 1"):
+        demand.generate(seed=0, horizon=50, params=FamilyParams(1, magnitude=0.75))
+    with pytest.raises(ValueError, match=r"lie in \(0, 1\)"):
+        demand.generate(seed=0, horizon=50, params=FamilyParams(2, magnitude=1.25))
+
+
+def test_unknown_family_number_is_refused() -> None:
+    with pytest.raises(ValueError, match="family must be one of"):
+        FamilyParams(7)

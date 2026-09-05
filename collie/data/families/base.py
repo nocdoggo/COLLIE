@@ -27,6 +27,7 @@ import numpy as np
 from collie.contracts import HiddenIncident, ShockFamily
 
 __all__ = [
+    "FAMILY_SHOCK",
     "ONSET_HI",
     "ONSET_LO",
     "TRAIN_PERIODS",
@@ -164,15 +165,31 @@ def draw_onset(rng: np.random.Generator) -> int:
     return int(rng.integers(ONSET_LO, ONSET_HI + 1))
 
 
+FAMILY_SHOCK: dict[int, ShockFamily] = {
+    1: ShockFamily.DEMAND_LEVEL,
+    2: ShockFamily.DEMAND_LEVEL,
+    3: ShockFamily.TEMPORARY_PULSE,
+    4: ShockFamily.LEAD_TIME_SHIFT,
+    5: ShockFamily.SHIPMENT_LOSS,
+    6: ShockFamily.COMPOUND,
+}
+"""The numbered families of the brief (§3.5) map onto ``ShockFamily``. Families 1 and 2 share
+``DEMAND_LEVEL`` and are distinguished by direction: 1 is always an increase, 2 always a
+decrease. Splits and null-strata counts are stated per *numbered* family, so the number is the
+primary key everywhere in this module."""
+
+
 @dataclass(frozen=True, slots=True)
 class FamilyParams:
     """Everything a family's ``generate`` needs besides the seed and horizon.
 
     Any field left ``None`` is drawn from the family's registered range on the params stream,
     so a seed alone reproduces the full episode; tests pin fields explicitly to recover them.
+    Explicit values outside the registered sets are legitimate — the extrapolation slice
+    (brief §3.6) is built from exactly such values — but they must keep the family's direction.
     """
 
-    family: ShockFamily
+    family: int
     baseline: BaselineSpec = BaselineSpec()
     onset: int | None = None
     magnitude: float | None = None
@@ -183,6 +200,8 @@ class FamilyParams:
     pause_length: int | None = None
 
     def __post_init__(self) -> None:
+        if self.family not in FAMILY_SHOCK:
+            raise ValueError(f"family must be one of {sorted(FAMILY_SHOCK)}, got {self.family}")
         if self.onset is not None and not ONSET_LO <= self.onset <= ONSET_HI:
             raise ValueError(f"onset must lie in {{{ONSET_LO}..{ONSET_HI}}}, got {self.onset}")
 
