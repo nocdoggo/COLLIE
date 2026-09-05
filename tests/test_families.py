@@ -624,3 +624,10 @@ def test_zero_lengths_are_refused() -> None:
         demand.generate(seed=0, horizon=50, params=FamilyParams(3, duration=0))
     with pytest.raises(ValueError, match="compound duration must be"):
         supply.generate(seed=0, horizon=50, params=FamilyParams(6, duration=0))
+
+
+def test_remaining_guards() -> None:
+    with pytest.raises(ValueError, match="seasonal_period"):
+        BaselineSpec(kind=BaselineKind.SEASONAL, seasonal_period=1)
+    with pytest.raises(ValueError, match="beyond the horizon"):
+        supply.generate(seed=0, horizon=20, params=FamilyParams(4, onset=22))

@@ -188,6 +188,24 @@ def combo_params(family: int, combo: Combo) -> dict[str, float | int]:
             raise ValueError(f"no combo vocabulary for family {family}")
 
 
+def combo_of_params(params: FamilyParams) -> Combo:
+    """Invert :func:`combo_params`: the combo a params object encodes. The manifest records
+    this per rollout so held-out-combo discipline is auditable from the artifact alone."""
+    match params.family:
+        case 1 | 2:
+            return (params.magnitude,)
+        case 3:
+            return (params.magnitude, float(params.duration))
+        case 4:
+            return (float(params.baseline_lead_time), float(params.disrupted_lead_time))
+        case 5:
+            return (float(params.loss_length), float(params.baseline_lead_time))
+        case 6:
+            return (params.magnitude, float(params.duration), float(params.pause_length))
+        case _:  # pragma: no cover - FamilyParams validates 1-6
+            raise ValueError(f"no combo vocabulary for family {params.family}")
+
+
 # ---------------------------------------------------------------------------
 # registry
 # ---------------------------------------------------------------------------

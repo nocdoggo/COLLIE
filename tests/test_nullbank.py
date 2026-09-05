@@ -26,7 +26,12 @@ from collie.data.nullbank import (
     build_nullbank,
     generate_null_episode,
 )
-from collie.data.splits import NULL_BANK_BASE, build_rollouts, seed_pools
+from collie.data.splits import (
+    HELD_OUT_COMBO,
+    NULL_BANK_BASE,
+    build_rollouts,
+    seed_pools,
+)
 from collie.data.writer import write_null
 from collie.sim.loader import load_instance
 from tools.build_shockspec import render_manifest
@@ -251,3 +256,12 @@ def test_manifest_counts_and_required_fields() -> None:
     assert nulls and all(r["onset"] is None for r in nulls)
     onsets = {r["onset"] for r in shocked}
     assert min(onsets) >= 14 and max(onsets) <= 22
+
+
+def test_manifest_records_the_combo_per_rollout() -> None:
+    manifest = json.loads(render_manifest())
+    main_rows = [r for r in manifest["rollouts"] if r["slice"] in ("main", "held_out_combo")]
+    assert main_rows and all(r["combo"] is not None for r in main_rows)
+    # held-out-combo discipline is auditable from the artifact alone
+    held = [r for r in main_rows if r["held_out_combo"]]
+    assert held and all(tuple(r["combo"]) == HELD_OUT_COMBO[r["family"]] for r in held)

@@ -41,6 +41,7 @@ from collie.data.splits import (
     RolloutSlice,
     build_rollouts,
     build_units,
+    combo_of_params,
     generate_ood_episode,
     seed_for,
 )
@@ -172,6 +173,7 @@ def render_manifest() -> str:
                 "slice": str(r.slice),
                 "template_id": r.template_id,
                 "held_out_combo": r.slice is RolloutSlice.HELD_OUT_COMBO,
+                "combo": (list(combo_of_params(r.params)) if r.params is not None else None),
                 "promised_lead_time": r.promised_lead_time,
                 "instance": instance,
                 "twin": (
@@ -242,7 +244,11 @@ def main(argv: list[str] | None = None) -> int:
         help="with --all: fail if --out differs from a fresh render, and write nothing",
     )
     ap.add_argument("--limit", type=int, default=18)
-    ap.add_argument("--out", type=Path, required=True)
+    ap.add_argument(
+        "--out",
+        type=Path,
+        help="defaults to manifests/shockspec_v1.json in --all mode; required with --split",
+    )
     ap.add_argument(
         "--show",
         action="store_true",
@@ -260,20 +266,23 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.all:
+        out = args.out or REPO_ROOT / "manifests" / "shockspec_v1.json"
         text = render_manifest()
         if args.check:
-            current = args.out.read_text(encoding="utf-8") if args.out.is_file() else ""
+            current = out.read_text(encoding="utf-8") if out.is_file() else ""
             if current != text:
-                raise SystemExit(f"{args.out} is stale. Re-run without --check.")
-            print(f"{args.out} is up to date")
+                raise SystemExit(f"{out} is stale. Re-run without --check.")
+            print(f"{out} is up to date")
             return 0
-        args.out.parent.mkdir(parents=True, exist_ok=True)
-        args.out.write_text(text, encoding="utf-8")
-        print(f"wrote {args.out}")
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(text, encoding="utf-8")
+        print(f"wrote {out}")
         return 0
 
     if args.split is None:
         ap.error("one of --split or --all is required")
+    if args.out is None:
+        ap.error("--split mode needs --out <directory>")
 
     written: list[tuple[str, GeneratedEpisode]] = []
     for family, _index, seed in dev_episodes(args.limit):

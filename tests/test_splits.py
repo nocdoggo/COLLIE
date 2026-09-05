@@ -37,6 +37,7 @@ from collie.data.splits import (
     assert_units_resolve,
     build_rollouts,
     build_units,
+    combo_of_params,
     generate_ood_episode,
     required_confirmatory_seeds,
     seed_for,
@@ -178,21 +179,7 @@ def test_held_out_combos_absent_from_dev_and_cal() -> None:
             assert combo != EXTRAPOLATION_COMBO[r.params.family]
 
 
-def _combo_of(params) -> tuple[float, ...]:
-    """Invert combo_params for the assertion: the combo a params object encodes."""
-    f = params.family
-    match f:
-        case 1 | 2:
-            return (params.magnitude,)
-        case 3:
-            return (params.magnitude, float(params.duration))
-        case 4:
-            return (float(params.baseline_lead_time), float(params.disrupted_lead_time))
-        case 5:
-            return (float(params.loss_length), float(params.baseline_lead_time))
-        case 6:
-            return (params.magnitude, float(params.duration), float(params.pause_length))
-    raise AssertionError(f"unknown family {f}")
+_combo_of = combo_of_params  # the manifest and this suite share one inverse
 
 
 # ---------------------------------------------------------------------------
