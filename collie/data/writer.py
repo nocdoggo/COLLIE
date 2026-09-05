@@ -25,7 +25,7 @@ from pathlib import Path
 
 from collie.data.families.base import GeneratedEpisode
 
-__all__ = ["DEFAULT_ITEM_ID", "write_pair"]
+__all__ = ["DEFAULT_ITEM_ID", "write_null", "write_pair"]
 
 DEFAULT_ITEM_ID = "chips(Regular)"
 """The official synthetic item id. Carrying it keeps generated instances format-identical to the
@@ -121,6 +121,37 @@ def _incident_payload(ep: GeneratedEpisode, twin_relpath: str, held_out_combo: b
         "seed": incident.seed,
         "held_out_combo": held_out_combo,
     }
+
+
+def write_null(
+    root: Path,
+    *,
+    relpath: str,
+    demand: tuple[float, ...],
+    lead_times: tuple[float, ...],
+    train: tuple[float, ...],
+    profit: float = 4.0,
+    holding: float = 1.0,
+    item_id: str = DEFAULT_ITEM_ID,
+) -> Path:
+    """Write one unshocked null-audit instance: no ``incident.json``, no ``supply.csv``.
+
+    A null episode is indistinguishable in format from an official instance, which is the
+    point — the pipeline's false-activation rate is measured on exactly the file shape the
+    official loader already reads.
+    """
+    instance_dir = root / relpath
+    instance_dir.mkdir(parents=True, exist_ok=True)
+    _write_train_csv(instance_dir / "train.csv", item_id=item_id, train=train)
+    _write_test_csv(
+        instance_dir / "test.csv",
+        item_id=item_id,
+        demand=demand,
+        lead_times=lead_times,
+        profit=profit,
+        holding=holding,
+    )
+    return instance_dir
 
 
 def write_pair(
