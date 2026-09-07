@@ -2,12 +2,16 @@
 
 The reproducibility contract (research notes §4): deterministic decoding is `temperature=0` with
 a recorded decoding hash, and the **disk cache** — not re-issuing seeded requests — is the
-reproducibility mechanism. The Gemini OpenAI-compatible endpoint empirically rejects the OpenAI
-``seed`` parameter (400 INVALID_ARGUMENT, verified 2026-09-06), so ``EndpointConfig`` carries an
-explicit ``supports_seed`` flag and the client raises rather than silently dropping a seed.
+reproducibility mechanism. Endpoint seed support is verified live and recorded on
+``EndpointConfig.supports_seed``: the Gemini OpenAI-compatible endpoint rejects the OpenAI
+``seed`` parameter (400 INVALID_ARGUMENT, verified 2026-09-06), the xAI endpoint honours it
+(identical completions on a seeded repeat, verified 2026-09-07). The client raises rather than
+silently dropping a seed an endpoint cannot honour.
 
-Two serving paths, both operator-confirmed 2026-09-06 as Gemini via the OpenAI-compatible
-endpoint: the primary sweep path and the hosted confirmation path. A missing key raises
+Two serving paths, both operator-confirmed: the primary sweep path is Gemini via its
+OpenAI-compatible endpoint (2026-09-06); the hosted confirmation path is xAI Grok via
+``https://api.x.ai/v1`` (2026-09-07, Checkpoint-1 audit ruling — a confirmation subset on the
+same provider as the primary confirms nothing). A missing key raises
 :class:`MissingCredentialsError`; there is no fallback to any other provider or model, because a
 silent substitution would make the confirmation subset meaningless.
 """
@@ -17,7 +21,7 @@ from __future__ import annotations
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
 
 from collie.contracts import ParseOutcome, Split
 
@@ -36,14 +40,19 @@ __all__ = [
     "RawResponse",
     "Transport",
     "UnsupportedDecodingError",
-    "gemini_hosted_confirmation",
     "gemini_primary",
+    "grok_hosted_confirmation",
     "resolve_decoding",
+    "zai_endpoint",
 ]
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_KEY_FILE = REPO_ROOT / "cloud_endpoint" / "gemini.key"
+GROK_KEY_FILE = REPO_ROOT / "cloud_endpoint" / "grok.key"
+ZAI_KEY_FILE = REPO_ROOT / "cloud_endpoint" / "zai.key"
 GEMINI_OPENAI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai/"
+XAI_BASE_URL = "https://api.x.ai/v1"
+ZAI_BASE_URL = "https://api.z.ai/api/coding/paas/v4"
 
 
 class MissingCredentialsError(RuntimeError):
@@ -66,8 +75,10 @@ class MissingUsageError(RuntimeError):
 class EndpointConfig:
     """One serving path: where, which model, how it is paid for, what it can honour.
 
-    ``bills_thinking_as_output`` selects the billable-output rule: Gemini bills thinking tokens
-    as output ("Output price (including thinking tokens)", pricing page), so billable output is
+    ``bills_thinking_as_output`` selects the billable-output rule: both configured providers
+    include thinking/reasoning tokens in ``total_tokens`` but not in ``completion_tokens``
+    (Gemini "Output price (including thinking tokens)"; xAI ``usage.completion_tokens_details.
+    reasoning_tokens``, verified 2026-09-07), so billable output is
     ``total_tokens - prompt_tokens``; a plain OpenAI-compatible endpoint bills
     ``completion_tokens``. Raw usage fields are stored in the cache payload either way, so the
     rule can be re-derived.
@@ -84,6 +95,10 @@ class EndpointConfig:
     price_output_per_mtok: float
     price_date: str
     """The retrieval date of the price figures (research notes §5). Cost is dated, not live."""
+    extra_body: dict[str, Any] | None = None
+    """Provider extensions merged verbatim into the request body (e.g. Z.ai's
+    ``thinking={"type": "disabled"}``, without which reasoning tokens consume the completion
+    budget and content returns empty — verified live 2026-09-07).``None`` sends nothing extra."""
 
     def resolve_key(self) -> str:
         """The API key, from the environment first, then the key file. Missing raises."""
@@ -119,24 +134,57 @@ def gemini_primary(model_id: str = "gemini-3.8-flash") -> EndpointConfig:
     )
 
 
-def gemini_hosted_confirmation(model_id: str = "gemini-3.8-flash") -> EndpointConfig:
+def grok_hosted_confirmation(model_id: str = "grok-4.20-0309-non-reasoning") -> EndpointConfig:
     """The hosted confirmation path, used only on the preregistered confirmation subset.
 
-    Same provider as the primary path per the operator's 2026-09-06 decision; the distinct name
-    keeps confirmation accounting separable. When the operator names a second model for the
-    confirmation subset, this factory's default changes and nothing else does.
+    xAI Grok, per the operator's 2026-09-07 decision after the Checkpoint-1 audit ruled a
+    same-provider confirmation circular. The default model is a pinned dated snapshot: the
+    published baseline's ``grok-4.1-fast`` is retired on the direct API, and a non-reasoning
+    variant keeps the token accounting clean (``reasoning_tokens`` is 0). ``seed`` is honoured
+    here (verified live 2026-09-07), so this path can run the robustness mode; prices are the
+    dated list prices, research notes §5, cross-checked against the server-side
+    ``cost_in_usd_ticks`` field.
     """
     return EndpointConfig(
-        name="gemini-hosted-confirmation",
-        base_url=GEMINI_OPENAI_BASE_URL,
+        name="grok-hosted-confirmation",
+        base_url=XAI_BASE_URL,
         model_id=model_id,
-        key_env="GEMINI_API_KEY",
-        key_file=DEFAULT_KEY_FILE,
-        supports_seed=False,
+        key_env="XAI_API_KEY",
+        key_file=GROK_KEY_FILE,
+        supports_seed=True,  # verified live 2026-09-07: accepted and reproducible
         bills_thinking_as_output=True,
-        price_input_per_mtok=0.75,
-        price_output_per_mtok=3.75,
-        price_date="2026-09-06",
+        price_input_per_mtok=1.25,
+        price_output_per_mtok=2.50,
+        price_date="2026-09-07",
+    )
+
+
+def zai_endpoint(model_id: str = "glm-5.3-flash") -> EndpointConfig:
+    """Z.ai GLM via the coding plan's OpenAI chat-completions endpoint.
+
+    Registered as a third provider for later benchmarking (operator decision 2026-09-07); not
+    the confirmation path. Live findings of 2026-09-07, all recorded in the model registry: the
+    plan currently *serves* ``glm-5.3-flash`` regardless of the requested id (the response echo
+    proves it), so treat ``model_id`` as a label until per-model routing exists; ``seed`` is
+    accepted but not honoured (a seeded repeat returned different content); ``completion_tokens``
+    already includes reasoning tokens, so billable output is ``completion_tokens``; and requests
+    must disable thinking explicitly or reasoning consumes the completion budget and the content
+    returns empty. Prices are the paas list prices used as a dated shadow price over the flat
+    subscription (a 50% promo expires 2026-09-09; the ledger prices at list so post-promo runs
+    are correct).
+    """
+    return EndpointConfig(
+        name="zai-coding-plan",
+        base_url=ZAI_BASE_URL,
+        model_id=model_id,
+        key_env="ZAI_API_KEY",
+        key_file=ZAI_KEY_FILE,
+        supports_seed=False,  # accepted but not honoured, verified live 2026-09-07
+        bills_thinking_as_output=False,
+        price_input_per_mtok=0.15,
+        price_output_per_mtok=0.50,
+        price_date="2026-09-07",
+        extra_body={"thinking": {"type": "disabled"}},
     )
 
 
@@ -260,6 +308,8 @@ class OpenAICompatClient:
         }
         if decoding.seed is not None:
             kwargs["seed"] = decoding.seed
+        if self._endpoint.extra_body is not None:
+            kwargs["extra_body"] = dict(self._endpoint.extra_body)
         response = self._client.chat.completions.create(**kwargs)
         if response.usage is None:
             raise MissingUsageError(

@@ -21,9 +21,10 @@ from collie.llm import (
     MissingUsageError,
     OpenAICompatClient,
     UnsupportedDecodingError,
-    gemini_hosted_confirmation,
     gemini_primary,
+    grok_hosted_confirmation,
     resolve_decoding,
+    zai_endpoint,
 )
 from collie.llm.demo import ScriptedTransport, scripted_endpoint
 
@@ -52,10 +53,46 @@ def _endpoint(**overrides) -> EndpointConfig:
 
 def test_missing_hosted_key_raises(monkeypatch, tmp_path) -> None:
     """The hosted path raises on a missing key; there is no local fallback to take."""
-    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
-    monkeypatch.setattr(client_mod, "DEFAULT_KEY_FILE", tmp_path / "absent.key")
+    monkeypatch.delenv("XAI_API_KEY", raising=False)
+    monkeypatch.setattr(client_mod, "GROK_KEY_FILE", tmp_path / "absent.key")
     with pytest.raises(MissingCredentialsError, match="never falls back"):
-        gemini_hosted_confirmation().resolve_key()
+        grok_hosted_confirmation().resolve_key()
+
+
+def test_grok_confirmation_factory_fields() -> None:
+    """The confirmation path is xAI Grok: seed honoured, dated prices, xAI key material."""
+    endpoint = grok_hosted_confirmation()
+    assert endpoint.name == "grok-hosted-confirmation"
+    assert endpoint.base_url == "https://api.x.ai/v1"
+    assert endpoint.model_id == "grok-4.20-0309-non-reasoning"
+    assert endpoint.key_env == "XAI_API_KEY"
+    assert endpoint.key_file == client_mod.GROK_KEY_FILE
+    assert endpoint.supports_seed is True  # verified live 2026-09-07
+    assert endpoint.bills_thinking_as_output is True  # total - prompt; reasoning is separate
+    assert (endpoint.price_input_per_mtok, endpoint.price_output_per_mtok) == (1.25, 2.50)
+    assert endpoint.price_date == "2026-09-07"
+    assert endpoint.extra_body is None
+
+
+def test_zai_factory_fields() -> None:
+    """Z.ai is registered for later benchmarking with its live-verified quirks attached."""
+    endpoint = zai_endpoint()
+    assert endpoint.name == "zai-coding-plan"
+    assert endpoint.base_url == "https://api.z.ai/api/coding/paas/v4"
+    assert endpoint.model_id == "glm-5.3-flash"  # the model the plan actually serves
+    assert endpoint.key_env == "ZAI_API_KEY"
+    assert endpoint.key_file == client_mod.ZAI_KEY_FILE
+    assert endpoint.supports_seed is False  # accepted but not honoured, verified live
+    assert endpoint.bills_thinking_as_output is False  # completion already includes reasoning
+    assert (endpoint.price_input_per_mtok, endpoint.price_output_per_mtok) == (0.15, 0.50)
+    assert endpoint.extra_body == {"thinking": {"type": "disabled"}}
+
+
+def test_confirmation_path_is_a_different_provider_than_the_primary() -> None:
+    """The Checkpoint-1 ruling: confirming Gemini with Gemini would demonstrate nothing."""
+    primary, confirmation = gemini_primary(), grok_hosted_confirmation()
+    assert primary.base_url != confirmation.base_url
+    assert primary.model_id != confirmation.model_id
 
 
 def test_key_resolution_prefers_env_then_file(monkeypatch, tmp_path) -> None:
@@ -96,6 +133,14 @@ def test_robustness_mode_requires_seed_support() -> None:
     """Gemini rejects ``seed`` (verified live), so the robustness mode cannot run there."""
     with pytest.raises(UnsupportedDecodingError, match="does not honour a seed"):
         resolve_decoding("robustness", split=Split.DEV, endpoint=gemini_primary())
+    with pytest.raises(UnsupportedDecodingError, match="does not honour a seed"):
+        resolve_decoding("robustness", split=Split.DEV, endpoint=zai_endpoint())
+
+
+def test_robustness_mode_runs_on_the_grok_path() -> None:
+    """Grok honours ``seed`` (verified live 2026-09-07), so R2.2's robustness mode lives there."""
+    configs = resolve_decoding("robustness", split=Split.DEV, endpoint=grok_hosted_confirmation())
+    assert [c.seed for c in configs] == [1, 2, 3]
 
 
 def test_robustness_mode_yields_three_seeds_where_honoured() -> None:
@@ -196,6 +241,18 @@ def test_seed_raises_on_an_endpoint_that_rejects_it(stub_openai) -> None:
     assert stub_openai.create_kwargs == []  # no request was ever sent
 
 
+def test_extra_body_is_sent_for_zai_and_omitted_otherwise(stub_openai) -> None:
+    """Z.ai needs ``thinking`` disabled or reasoning eats the completion budget (live finding)."""
+    OpenAICompatClient(zai_endpoint()).complete_metered(
+        "hello", decoding=DECODING_REGISTRY["det-v1"]
+    )
+    assert stub_openai.create_kwargs[0]["extra_body"] == {"thinking": {"type": "disabled"}}
+    OpenAICompatClient(gemini_primary()).complete_metered(
+        "hello", decoding=DECODING_REGISTRY["det-v1"]
+    )
+    assert "extra_body" not in stub_openai.create_kwargs[1]
+
+
 def test_system_and_user_messages_rendered_in_order(stub_openai) -> None:
     client = OpenAICompatClient(_endpoint())
     client.complete_metered("user text", decoding=DECODING_REGISTRY["det-v1"], system="sys text")
@@ -244,6 +301,8 @@ def test_unregistered_decoding_hash_raises(tmp_path) -> None:
 # ---------------------------------------------------------------------------
 
 _KEY_FILE = client_mod.DEFAULT_KEY_FILE
+_GROK_KEY_FILE = client_mod.GROK_KEY_FILE
+_ZAI_KEY_FILE = client_mod.ZAI_KEY_FILE
 
 
 @pytest.mark.needs_llm
@@ -259,4 +318,41 @@ def test_live_gemini_smoke() -> None:
         decoding=DECODING_REGISTRY["det-v1"],
     )
     assert raw.text.strip()
+    assert raw.prompt_tokens > 0 and raw.total_tokens >= raw.prompt_tokens
+
+
+@pytest.mark.needs_llm
+@pytest.mark.skipif(
+    not _GROK_KEY_FILE.is_file() and not __import__("os").environ.get("XAI_API_KEY"),
+    reason="no xAI key material present",
+)
+def test_live_grok_smoke() -> None:
+    """One real call to the confirmation path: text, usage, and the pinned model echo.
+
+    The prompt is the plain-word form on purpose: the JSON-shaped prompt used for the Gemini
+    smoke test trips xAI's server-side moderation (403, SAFETY_CHECK_TYPE_BIO, observed
+    2026-09-07) — a provider behaviour worth knowing before the sweep prompts go out.
+    """
+    client = OpenAICompatClient(grok_hosted_confirmation(), timeout=60.0, max_retries=0)
+    raw = client.complete_metered(
+        "Reply with the single word: ok",
+        decoding=DECODING_REGISTRY["det-v1"],
+    )
+    assert raw.text.strip()
+    assert raw.prompt_tokens > 0 and raw.total_tokens >= raw.prompt_tokens
+
+
+@pytest.mark.needs_llm
+@pytest.mark.skipif(
+    not _ZAI_KEY_FILE.is_file() and not __import__("os").environ.get("ZAI_API_KEY"),
+    reason="no Z.ai key material present",
+)
+def test_live_zai_smoke() -> None:
+    """One real call to the Z.ai coding plan: thinking disabled, content non-empty."""
+    client = OpenAICompatClient(zai_endpoint(), timeout=60.0, max_retries=0)
+    raw = client.complete_metered(
+        'Reply with exactly the JSON object {"ok": true} and nothing else.',
+        decoding=DECODING_REGISTRY["det-v1"],
+    )
+    assert raw.text.strip()  # empty content is the live failure mode this guards
     assert raw.prompt_tokens > 0 and raw.total_tokens >= raw.prompt_tokens

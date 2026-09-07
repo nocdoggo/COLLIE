@@ -14,9 +14,10 @@ from collie.llm.client import (
     RawResponse,
     Transport,
     UnsupportedDecodingError,
-    gemini_hosted_confirmation,
     gemini_primary,
+    grok_hosted_confirmation,
     resolve_decoding,
+    zai_endpoint,
 )
 from collie.llm.ledger import ArmTotals, CallLedger, LedgerSummary
 
@@ -38,7 +39,8 @@ __all__ = [
     "Transport",
     "UnsupportedDecodingError",
     "cache_key",
-    "gemini_hosted_confirmation",
     "gemini_primary",
+    "grok_hosted_confirmation",
     "resolve_decoding",
+    "zai_endpoint",
 ]

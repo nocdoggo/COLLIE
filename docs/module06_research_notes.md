@@ -186,15 +186,52 @@ output:   p_disrupted = alpha_t[1]
 
 ## 4. Serving and transport **[registered]**
 
-**Operator decision (2026-09-06): cloud-only.** No local vLLM endpoint. The primary sweep path and
-the hosted confirmation path are both **Google Gemini via the OpenAI-compatible endpoint**
-(`https://generativelanguage.googleapis.com/v1beta/openai/`), so one client shape serves both. The
-brief's "local primary" language is superseded; this is declared as a checkpoint deviation.
-Credentials live in `cloud_endpoint/` (gitignored): `gemini.key` (operator-supplied key, file mode
-600) and `models.json` (model registry, live-verified against `v1beta/models` on 2026-09-06:
-`gemini-3.8-flash` exists with 1,048,576 input / 65,536 output token limits, and is the registered
-default per operator instruction; 18 chat-capable models recorded). The client raises on a missing
-key and never substitutes another provider or model.
+**Update 2026-09-07 — confirmation provider split.** The Checkpoint-1 audit ruled the original
+two-paths-one-provider arrangement circular (confirming Gemini with Gemini demonstrates nothing)
+and the operator named **xAI Grok** as the second provider, with **Z.ai GLM** added as a third
+provider for later benchmarking. What follows below is the 2026-09-06 Gemini record, still
+accurate for the primary path; the new providers' live findings:
+
+- **xAI Grok** (`https://api.x.ai/v1`). The published baseline's `x-ai/grok-4.1-fast` is an
+  OpenRouter id retired on the direct API; the live catalog (12 models, `GET /models`) offers the
+  pinned dated snapshot `grok-4.20-0309-non-reasoning` (1M context, docs.x.ai model page), which
+  becomes the confirmation default — a pinned snapshot cannot drift mid-sweep, and the
+  non-reasoning variant keeps token accounting clean. **`seed` is honoured**: accepted without
+  error and an identical seeded repeat returned byte-identical content. Usage algebra differs
+  from Gemini: `total_tokens = prompt + completion + reasoning` with reasoning *disjoint* from
+  `completion_tokens` (observed on `grok-4.6`: 643 + 1 + 164 = 808), so the billable-output rule
+  `total − prompt` covers reasoning exactly. A server-side `cost_in_usd_ticks` field (1 tick =
+  1e-10 USD) matched the dated list prices to the micro-dollar on a probe call (63 uncached ×
+  $1.25 + 128 cached × $0.20 + 1 out × $2.50 per 1M = $106.85e-6 = 1,068,500 ticks). One hazard:
+  xAI applies server-side prompt moderation that 403s (`SAFETY_CHECK_TYPE_BIO`) on at least one
+  innocuous JSON-shaped control prompt; a 403 surfaces as `openai.PermissionDeniedError`, not a
+  parse failure, so transport error handling must not treat it as a retryable parse problem.
+- **Z.ai GLM** (`https://api.z.ai/api/coding/paas/v4`, the OpenAI chat-completions variant of the
+  three offered endpoints — chosen so one client shape serves all providers; the Anthropic
+  Messages and OpenAI Responses variants would each need a second transport). Three live
+  findings, each load-bearing: (a) the coding plan **serves `glm-5.3-flash` regardless of the
+  requested model id** (requesting `glm-4.5` or `glm-4.6` echoes `glm-5.3-flash` in the response)
+  — treat the model id as a label and record the echo; (b) **`seed` is accepted but not
+  honoured** (identical seeded repeats returned `472819` then `427619`), so
+  `supports_seed=False`; (c) requests must carry `thinking={"type": "disabled"}` (sent via the
+  client's `extra_body`) or reasoning tokens consume the completion budget and content returns
+  empty. Usage algebra: `total = prompt + completion` with reasoning *inside* `completion_tokens`
+  (19 + 8 = 27, reasoning 4 ⊂ 8), so billable output is `completion_tokens` — the opposite flag
+  value from Grok, which is exactly why the flag exists.
+
+**Operator decision (2026-09-06): cloud-only.** No local vLLM endpoint. The primary sweep path is
+**Google Gemini via the OpenAI-compatible endpoint**
+(`https://generativelanguage.googleapis.com/v1beta/openai/`); the hosted confirmation path was
+initially the same provider and is now xAI Grok (see the update above). One client shape serves
+all providers. The brief's "local primary" language is superseded; this is declared as a
+checkpoint deviation and logged in `prereg/deviations.md`. Credentials live in `cloud_endpoint/`:
+key files `gemini.key` / `grok.key` / `zai.key` (operator-supplied, file mode 600, gitignored)
+and `models.json` (the model registry, committed — the Checkpoint-1 audit note that a gitignored
+registry is not reproducible from a clean clone). The client raises on a missing key and never
+substitutes another provider or model. Gemini registry detail, live-verified against
+`v1beta/models` on 2026-09-06: `gemini-3.8-flash` exists with 1,048,576 input / 65,536 output
+token limits, and is the registered default per operator instruction; 18 chat-capable models
+recorded.
 
 **Determinism — empirically verified 2026-09-06 against the live endpoint.** `temperature=0`
 returns stable text (two identical calls, byte-identical JSON reply — one observation, not a
@@ -231,21 +268,30 @@ cost rule for Gemini models is `input_price * prompt_tokens + output_price *
 
 ## 5. Dated cost accounting **[registered]**
 
-Cost basis: **Google paid-tier list prices** for the model used, recorded with a retrieval date,
-from <https://ai.google.dev/gemini-api/docs/pricing> (retrieved 2026-09-06; page dated 2026-09-04).
+Cost basis: **dated list prices** for the model used, recorded with a retrieval date and source.
 
-| Model | Input $/1M | Output $/1M (incl. thinking) | Window |
+| Model | Input $/1M | Output $/1M | Source, retrieved |
 |---|---|---|---|
-| gemini-3.8-flash (default) | 0.75 | 3.75 | through 2026-12-31; 1.50 / 7.50 from 2027-01-01 |
+| gemini-3.8-flash (primary default) | 0.75 | 3.75 (incl. thinking) | ai.google.dev/gemini-api/docs/pricing, 2026-09-06; through 2026-12-31, then 1.50 / 7.50 from 2027-01-01 |
+| grok-4.20-0309-non-reasoning (confirmation default) | 1.25 | 2.50 | docs.x.ai model page, 2026-09-07 |
+| glm-5.3-flash (Z.ai, benchmarking) | 0.15 | 0.50 | docs.z.ai pricing, 2026-09-07; list prices — a 50% promo (0.075 / 0.25) expires 2026-09-09 24:00 UTC+8 and the ledger prices at list so post-promo runs stay correct |
 
-The Gemini 3.x Flash sections of the pricing page share this price; the page's section headings did
-not survive text extraction, so attribution was cross-checked against the model-registry retrieval
-and the family-uniform pricing. Caveats recorded: (a) the operator's key may be on the free tier,
-where list cost is zero — the ledger prices every call at the dated **list** price regardless of
-tier, so the ledger answers "what would this cost at list" and says so; (b) no GPU-hours accrue
-because there is no local serving (operator decision, §4). OpenRouter list prices for the same
-models (retrieved 2026-09-06 from <https://openrouter.ai/api/v1/models>) match the shape of
-Google's list (e.g. google/gemini-2.5-flash $0.30 / $2.50), corroborating the extraction.
+Provider-specific caveats, all live-verified:
+
+- **Gemini**: the operator's key may be on the free tier, where list cost is zero — the ledger
+  prices every call at the dated **list** price regardless of tier, so the ledger answers "what
+  would this cost at list" and says so. No GPU-hours accrue because there is no local serving
+  (operator decision, §4). OpenRouter list prices for the same models (retrieved 2026-09-06 from
+  <https://openrouter.ai/api/v1/models>) match the shape of Google's list, corroborating the
+  extraction.
+- **xAI**: the usage response carries a server-side `cost_in_usd_ticks` (1 tick = 1e-10 USD) that
+  matched the dated list prices to the micro-dollar on a probe call, including the cached-input
+  discount ($0.20/1M). The ledger does not model the cached-input discount — it prices all input
+  at list, a slight over-count, deliberately uniform across providers.
+- **Z.ai**: the coding plan is a flat subscription, so no per-token bill accrues; the ledger
+  prices calls at the paas **list** prices above as a shadow price, so cross-provider cost
+  comparisons stay apples-to-apples. Reasoning tokens sit inside `completion_tokens` (§4), so the
+  billable-output rule for this provider is `completion_tokens`.
 
 ## 6. Hypothesis, including the stateful layer
 
