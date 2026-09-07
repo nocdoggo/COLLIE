@@ -4,6 +4,20 @@ Every departure from a frozen artefact is recorded here, dated, with a reason. T
 ceremony: it is that a reviewer can reconstruct what was decided when, and that no frozen file can
 change without leaving a trace.
 
+### 2026-09-07 — rounded dependent demand remains empirical-only
+
+- **Artefact:** `collie/verify/demand.py`
+- **Current sha256:** `4f5027c75d5255af14da98f21edba9802668e292993899374104c213df57bf11`
+- **Departure:** The dependent AR(1) null is exercised in reduced calibration but labelled
+  `no_finite_sample_guarantee`; it is not included in the theorem-backed demand claim.
+- **Reason:** Module 01 exposes only rounded/clipped AR(1) observations. The exact conditional mass
+  given that quantized history requires a latent-state filter that neither `docs/derivation_note.md`
+  nor the frozen public contracts specify. Substituting the previous rounded observation for the
+  latent Gaussian state would silently violate the registered null.
+- **Impact:** Stationary IID, seasonal, and overdispersed demand retain the anytime-valid label.
+  Dependent-demand activation rates are reported separately as empirical-only until an exact filter
+  and its calibration are registered. No held-out or test data informed this restriction.
+
 Two guards read this file:
 
 - `tests/test_contract_freeze.py` (Gate 1) fails if `collie/contracts.py` differs from

@@ -44,7 +44,7 @@ class EProcessPoint:
     validity_label: str
 
 
-@dataclass(slots=True)
+@dataclass(frozen=True, slots=True)
 class MixtureEProcess:
     """Discrete mixture of component likelihood-ratio test martingales."""
 
@@ -70,9 +70,9 @@ class MixtureEProcess:
         total = math.fsum(self.weights)
         if not math.isclose(total, 1.0, rel_tol=0.0, abs_tol=1e-12):
             raise ValueError(f"mixture weights must sum to one, got {total}")
-        self._log_weights = tuple(math.log(weight) for weight in self.weights)
-        self._log_wealth = [0.0] * len(self.weights)
-        self._last_period = self.tau_j
+        object.__setattr__(self, "_log_weights", tuple(math.log(weight) for weight in self.weights))
+        object.__setattr__(self, "_log_wealth", [0.0] * len(self.weights))
+        object.__setattr__(self, "_last_period", self.tau_j)
 
     @property
     def threshold(self) -> float:
@@ -131,10 +131,10 @@ class MixtureEProcess:
 
         for index, increment in enumerate(log_likelihood_ratios):
             self._log_wealth[index] += increment
-        self._last_period = period
+        object.__setattr__(self, "_last_period", period)
 
         if self._activation_period is None and self.log_e_value >= math.log(self.threshold):
-            self._activation_period = period
+            object.__setattr__(self, "_activation_period", period)
         point = EProcessPoint(
             period=period,
             e_value=self.e_value,

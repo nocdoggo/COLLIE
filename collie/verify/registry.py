@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from collie.contracts import ShockFamily, TargetStream
+from collie.contracts import Direction, ShockFamily, TargetStream
 
 __all__ = ["CONSTRUCTIONS", "Construction", "resolve_construction", "resolve_spec_shape"]
 
@@ -20,6 +20,7 @@ class Construction:
     family: ShockFamily
     signature: str
     stream: TargetStream
+    direction: Direction
     construction: str
     validity: str
 
@@ -30,6 +31,7 @@ _REGISTERED = (
         ShockFamily.DEMAND_LEVEL,
         "sig_demand_level_up",
         TargetStream.DEMAND,
+        Direction.DEMAND_UP,
         "discrete_mixture_lr",
         "anytime_valid",
     ),
@@ -38,6 +40,7 @@ _REGISTERED = (
         ShockFamily.DEMAND_LEVEL,
         "sig_demand_level_down",
         TargetStream.DEMAND,
+        Direction.DEMAND_DOWN,
         "discrete_mixture_lr",
         "anytime_valid",
     ),
@@ -46,6 +49,7 @@ _REGISTERED = (
         ShockFamily.TEMPORARY_PULSE,
         "sig_demand_pulse",
         TargetStream.DEMAND,
+        Direction.DEMAND_UP,
         "bounded_duration_mixture_lr",
         "anytime_valid_low_power",
     ),
@@ -54,6 +58,7 @@ _REGISTERED = (
         ShockFamily.LEAD_TIME_SHIFT,
         "sig_arrival_delay",
         TargetStream.ARRIVAL,
+        Direction.ARRIVAL_DELAYED,
         "finite_state_forward",
         "collie_shockspec_only",
     ),
@@ -62,6 +67,7 @@ _REGISTERED = (
         ShockFamily.SHIPMENT_LOSS,
         "sig_arrival_loss",
         TargetStream.ARRIVAL,
+        Direction.ARRIVAL_INTERRUPTED,
         "finite_state_forward_absorbing_loss",
         "collie_shockspec_only",
     ),
@@ -70,6 +76,7 @@ _REGISTERED = (
         ShockFamily.TRANSIT_PAUSE,
         "sig_arrival_stall",
         TargetStream.ARRIVAL,
+        Direction.ARRIVAL_INTERRUPTED,
         "finite_state_forward_frozen_counters",
         "collie_shockspec_only",
     ),
@@ -78,6 +85,7 @@ _REGISTERED = (
         ShockFamily.COMPOUND,
         "sig_compound",
         TargetStream.BOTH,
+        Direction.MIXED,
         "separate_eprocesses_alpha_split",
         "anytime_valid_via_splitting",
     ),

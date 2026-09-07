@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import math
+from dataclasses import FrozenInstanceError
 
+import numpy as np
 import pytest
 
 from collie.contracts import (
@@ -55,6 +57,10 @@ def test_no_observation_at_or_before_tau_j_enters_the_product() -> None:
             verifier.observe(period, 150.0)
         assert verifier.e_value == pytest.approx(1.0)
         assert verifier.trace == ()
+    first_future_point = verifier.observe(11, 150.0)
+    assert first_future_point.period == 11
+    assert len(verifier.trace) == 1
+    assert first_future_point.e_value != pytest.approx(1.0)
 
 
 def test_mixture_integral_is_exact() -> None:
@@ -86,6 +92,26 @@ def test_overdispersed_null_is_a_probability_distribution() -> None:
 
 
 def test_e_process_is_a_supermartingale_under_the_null() -> None:
+    rng = np.random.default_rng(20260907)
+    null = RegisteredDemandLaw(BaselineSpec(mean=100.0, sd=25.0))
+    alternative = RegisteredDemandLaw(
+        BaselineSpec(mean=100.0, sd=25.0), multiplier=1.5, active_from=1
+    )
+    draws = np.floor(rng.normal(100.0, 25.0, 50_000) + 0.5).clip(min=0.0)
+    ratios = np.fromiter(
+        (
+            math.exp(
+                alternative.log_pmf(float(y), period=1, history=())
+                - null.log_pmf(float(y), period=1, history=())
+            )
+            for y in draws
+        ),
+        dtype=float,
+    )
+    assert float(ratios.mean()) == pytest.approx(1.0, abs=0.025)
+
+
+def test_registered_component_has_exact_unit_null_mean() -> None:
     null = RegisteredDemandLaw(BaselineSpec(mean=100.0, sd=25.0))
     alternative = RegisteredDemandLaw(
         BaselineSpec(mean=100.0, sd=25.0), multiplier=1.5, active_from=1
@@ -101,11 +127,21 @@ def test_e_process_is_a_supermartingale_under_the_null() -> None:
     assert expectation == pytest.approx(1.0, abs=1e-10)
 
 
-def test_construction_registry_resolves_both_registered_keys() -> None:
-    assert len(CONSTRUCTIONS) == 7
-    by_compiler = resolve_construction("demand_level_up")
-    by_spec = resolve_spec_shape(by_compiler.family, by_compiler.signature)
-    assert by_compiler is by_spec
+def test_construction_registry_resolves_every_key_by_both_paths() -> None:
+    assert set(CONSTRUCTIONS) == {
+        "demand_level_up",
+        "demand_level_down",
+        "demand_pulse",
+        "arrival_delay",
+        "arrival_loss",
+        "arrival_stall",
+        "compound_split",
+    }
+    for predictive_model, expected in CONSTRUCTIONS.items():
+        by_compiler = resolve_construction(predictive_model)
+        by_spec = resolve_spec_shape(expected.family, expected.signature)
+        assert by_compiler is expected
+        assert by_spec is expected
     with pytest.raises(KeyError, match="unregistered predictive_model"):
         resolve_construction("model_selected_its_own_test")
 
@@ -133,7 +169,7 @@ def test_shockspec_compiles_to_a_fixed_demand_mixture() -> None:
 
 
 def test_demand_verifier_rejects_an_arrival_spec() -> None:
-    with pytest.raises(ValueError, match="target stream"):
+    with pytest.raises(ValueError, match="registered stream"):
         DemandEProcess.from_spec(
             _spec(
                 target_stream=TargetStream.ARRIVAL,
@@ -141,6 +177,24 @@ def test_demand_verifier_rejects_an_arrival_spec() -> None:
                 direction=Direction.ARRIVAL_DELAYED,
                 prospective_signature="sig_arrival_delay",
             ),
+            baseline=BaselineSpec(),
+            alpha_episode=0.05,
+        )
+
+
+def test_demand_verifier_rejects_mismatched_registered_signature() -> None:
+    with pytest.raises(KeyError, match="no verifier construction"):
+        DemandEProcess.from_spec(
+            _spec(prospective_signature="sig_arrival_stall"),
+            baseline=BaselineSpec(),
+            alpha_episode=0.05,
+        )
+
+
+def test_registered_direction_cannot_be_reinterpreted() -> None:
+    with pytest.raises(ValueError, match="does not match registered signature"):
+        DemandEProcess.from_spec(
+            _spec(direction=Direction.DEMAND_DOWN),
             baseline=BaselineSpec(),
             alpha_episode=0.05,
         )
@@ -166,6 +220,27 @@ def test_evidence_periods_must_be_strictly_increasing() -> None:
     process.update(3, (0.0,))
     with pytest.raises(ValueError, match="increase strictly"):
         process.update(3, (0.0,))
+
+
+def test_eprocess_configuration_is_frozen_after_proposal() -> None:
+    process = MixtureEProcess(tau_j=2, alpha_j=0.025, weights=(1.0,))
+    with pytest.raises(FrozenInstanceError):
+        process.alpha_j = 0.5
+    with pytest.raises(FrozenInstanceError):
+        process.weights = (0.5, 0.5)
+
+
+def test_demand_densities_and_mixture_are_frozen_after_proposal() -> None:
+    verifier = DemandEProcess.for_level_change(
+        baseline=BaselineSpec(),
+        direction=Direction.DEMAND_UP,
+        tau_j=2,
+        alpha_episode=0.05,
+    )
+    with pytest.raises(FrozenInstanceError):
+        verifier.null = RegisteredDemandLaw(BaselineSpec(mean=200.0))
+    with pytest.raises(FrozenInstanceError):
+        verifier.alternatives = (verifier.alternatives[0],)
 
 
 def test_plug_in_variant_is_labelled_unguaranteed() -> None:

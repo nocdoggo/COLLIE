@@ -16,8 +16,8 @@ from pathlib import Path
 import numpy as np
 from scipy.special import gammaln, log_ndtr
 
-from collie.contracts import Direction, ShockFamily, ShockSpec, TargetStream
-from collie.data.families.base import BaselineKind, BaselineSpec, draw_baseline
+from collie.contracts import Direction, ShockFamily, ShockSpec, TargetStream, assert_no_hidden_state
+from collie.data.families.base import BaselineKind, BaselineSpec, as_demand_cells, draw_baseline
 from collie.data.families.demand import MAGNITUDE_SETS, PULSE_DURATION
 from collie.verify.alpha import alpha_for_proposal
 from collie.verify.eprocess import (
@@ -26,6 +26,7 @@ from collie.verify.eprocess import (
     EProcessPoint,
     MixtureEProcess,
 )
+from collie.verify.registry import resolve_spec_shape
 
 __all__ = [
     "CalibrationSummary",
@@ -130,7 +131,7 @@ class RegisteredDemandLaw:
         return _log_rounded_normal_mass(value, mean, sd)
 
 
-@dataclass(slots=True)
+@dataclass(frozen=True, slots=True)
 class DemandEProcess:
     """Demand observation adapter around the shared discrete-mixture e-process."""
 
@@ -143,17 +144,25 @@ class DemandEProcess:
     _history: list[float] = field(init=False, repr=False)
 
     def __post_init__(self) -> None:
+        assert_no_hidden_state(
+            (self.null, self.alternatives, self.history_before_proposal),
+            context="demand verifier inputs",
+        )
         if not self.alternatives:
             raise ValueError("a demand e-process needs at least one registered alternative")
         weight = 1.0 / len(self.alternatives)
         validity = ANYTIME_VALID if self.null.theorem_backed else NO_FINITE_SAMPLE_GUARANTEE
-        self._engine = MixtureEProcess(
-            tau_j=self.tau_j,
-            alpha_j=self.alpha_j,
-            weights=(weight,) * len(self.alternatives),
-            validity_label=validity,
+        object.__setattr__(
+            self,
+            "_engine",
+            MixtureEProcess(
+                tau_j=self.tau_j,
+                alpha_j=self.alpha_j,
+                weights=(weight,) * len(self.alternatives),
+                validity_label=validity,
+            ),
         )
-        self._history = list(self.history_before_proposal)
+        object.__setattr__(self, "_history", list(self.history_before_proposal))
 
     @classmethod
     def for_level_change(
@@ -205,8 +214,20 @@ class DemandEProcess:
         plug_in: bool = False,
     ) -> DemandEProcess:
         """Compile a legal demand ShockSpec into its fixed discrete mixture."""
-        if spec.target_stream is not TargetStream.DEMAND:
-            raise ValueError(f"demand verifier cannot consume target stream {spec.target_stream}")
+        construction = resolve_spec_shape(spec.shock_family, spec.prospective_signature)
+        if (
+            construction.stream is not TargetStream.DEMAND
+            or spec.target_stream is not TargetStream.DEMAND
+        ):
+            raise ValueError(
+                "demand verifier cannot consume registered stream "
+                f"{construction.stream} with spec stream {spec.target_stream}"
+            )
+        if spec.direction is not construction.direction:
+            raise ValueError(
+                f"direction {spec.direction} does not match registered signature "
+                f"{spec.prospective_signature!r}"
+            )
         if spec.onset_window is None:
             raise ValueError("a non-abstaining demand spec needs an onset window")
         if spec.shock_family is ShockFamily.DEMAND_LEVEL:
@@ -289,6 +310,7 @@ class CalibrationSummary:
     activations: int
     alpha_episode: float
     proposal_alpha: float
+    validity_label: str
     rate: float
     wilson_low: float
     wilson_high: float
@@ -317,17 +339,16 @@ def run_null_calibration(
     seed: int,
     baseline: BaselineSpec | None = None,
 ) -> CalibrationSummary:
-    """Reduced Monte Carlo calibration under one registered theorem-backed demand null."""
+    """Reduced Monte Carlo calibration under one registered demand null.
+
+    The dependent rounded AR(1) row is deliberately retained as an empirical-only diagnostic so
+    every registered uncensored null is exercised without implying an unavailable theorem.
+    """
     if replications < 1:
         raise ValueError("replications must be positive")
     if not 0 <= tau_j < horizon:
         raise ValueError(f"tau_j must lie in [0, horizon), got {tau_j} for horizon {horizon}")
     baseline = baseline if baseline is not None else BaselineSpec(BaselineKind.STATIONARY_IID)
-    if baseline.kind is BaselineKind.DEPENDENT:
-        raise ValueError(
-            "the rounded dependent observable needs a latent-state filter; its current kernel is "
-            "empirical-only and cannot enter theorem-backed calibration"
-        )
     rng = np.random.default_rng(seed)
     activations = 0
     for _ in range(replications):
@@ -352,6 +373,11 @@ def run_null_calibration(
         activations=activations,
         alpha_episode=alpha_episode,
         proposal_alpha=proposal_alpha,
+        validity_label=(
+            ANYTIME_VALID
+            if baseline.kind is not BaselineKind.DEPENDENT
+            else NO_FINITE_SAMPLE_GUARANTEE
+        ),
         rate=activations / replications,
         wilson_low=low,
         wilson_high=high,
@@ -360,17 +386,27 @@ def run_null_calibration(
 
 def _demo(plot: Path | None) -> None:
     baseline = BaselineSpec(BaselineKind.STATIONARY_IID)
-    history = (100.0,) * 12
+    seed = 1
+    horizon = 32
+    tau_j = 12
+    onset = 14
+    multiplier = 1.5
+    unshocked = draw_baseline(np.random.default_rng(seed), baseline, horizon)
+    observations = (
+        *unshocked[: onset - 1],
+        *as_demand_cells(np.asarray(unshocked[onset - 1 :]) * multiplier),
+    )
     verifier = DemandEProcess.for_level_change(
         baseline=baseline,
         direction=Direction.DEMAND_UP,
-        tau_j=12,
+        tau_j=tau_j,
         alpha_episode=0.05,
-        history_before_proposal=history,
+        onset_window=(1, 3),
+        history_before_proposal=observations[:tau_j],
     )
-    observations = (130.0, 145.0, 160.0, 175.0, 175.0, 180.0, 185.0, 190.0)
+    print(f"registered episode: seed={seed}, onset={onset}, multiplier={multiplier}, tau_j={tau_j}")
     print(f"{'period':>6} {'demand':>8} {'e_value':>14} {'threshold':>12}  state")
-    for period, value in enumerate(observations, start=13):
+    for period, value in enumerate(observations[tau_j:], start=tau_j + 1):
         point = verifier.observe(period, value)
         state = "active" if point.activated else "proposed"
         print(f"{period:>6} {value:>8.0f} {point.e_value:>14.6f} {point.threshold:>12.3f}  {state}")
@@ -386,6 +422,7 @@ def _demo(plot: Path | None) -> None:
         axis.axhline(
             verifier.trace[0].threshold, color="firebrick", linestyle="--", label="1/alpha_j"
         )
+        axis.axvline(tau_j, color="slategray", linestyle="-.", label="proposal tau_j")
         if verifier.activation_period is not None:
             axis.axvline(
                 verifier.activation_period, color="darkgreen", linestyle=":", label="activation"
