@@ -37,6 +37,7 @@ from hypothesis import strategies as st
 from collie.arms.prompts import (
     PeriodConclusion,
     PromptSpec,
+    build_llm_to_or_system_prompt,
     build_or_to_llm_system_prompt,
     build_system_prompt,
     build_user_prompt,
@@ -47,6 +48,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 BENCH_ROOT = REPO_ROOT / "third_party" / "InventoryBench"
 RUN_LLM_PATH = BENCH_ROOT / "scripts" / "run_llm.py"
 RUN_OR_TO_LLM_PATH = BENCH_ROOT / "scripts" / "run_or_to_llm.py"
+RUN_LLM_TO_OR_PATH = BENCH_ROOT / "scripts" / "run_llm_to_or.py"
 
 FENCE = "=" * 70
 
@@ -129,6 +131,14 @@ def upstream_run_or_to_llm() -> ModuleType:
     with pytest.MonkeyPatch.context() as mp:
         mp.syspath_prepend(str(BENCH_ROOT))
         module = _load_upstream(RUN_OR_TO_LLM_PATH, "collie_upstream_run_or_to_llm")
+    return module
+
+
+@pytest.fixture(scope="module")
+def upstream_run_llm_to_or() -> ModuleType:
+    with pytest.MonkeyPatch.context() as mp:
+        mp.syspath_prepend(str(BENCH_ROOT))
+        module = _load_upstream(RUN_LLM_TO_OR_PATH, "collie_upstream_run_llm_to_or")
     return module
 
 
@@ -313,8 +323,39 @@ def test_or_to_llm_system_prompt_matches_live_upstream(
     assert ours == agent.system_prompt
 
 
+def _upstream_llm_to_or_agent(run_llm_to_or: ModuleType, spec: PromptSpec, **kwargs: Any) -> Any:
+    """Call ``make_llm_to_or_agent`` the way upstream ``main()`` does (run_llm_to_or.py:1450-1468):
+    ``current_configs`` carries the item's config dict, but the builder only reads its keys."""
+    samples = [(date, int(demand)) for date, demand in spec.train_samples]
+    return run_llm_to_or.make_llm_to_or_agent(
+        initial_samples={spec.item_id: samples},
+        current_configs={
+            spec.item_id: {
+                "lead_time": spec.promised_lead_time,
+                "profit": 19.0,
+                "holding_cost": 1.0,
+                "description": spec.description if spec.description is not None else spec.item_id,
+            }
+        },
+        promised_lead_time=spec.promised_lead_time,
+        **kwargs,
+    )
+
+
+@pytest.mark.parametrize("spec", [SYNTHETIC_SPEC, REAL_SPEC], ids=["synthetic", "real"])
+def test_llm_to_or_system_prompt_matches_live_upstream(
+    upstream_run_llm_to_or: ModuleType, spec: PromptSpec
+) -> None:
+    agent = _upstream_llm_to_or_agent(upstream_run_llm_to_or, spec)
+    ours = build_llm_to_or_system_prompt(spec)
+    assert _sha256(ours) == _sha256(agent.system_prompt)
+    assert ours == agent.system_prompt
+
+
 def test_upstream_feedback_and_guidance_blocks_are_conditional(
-    upstream_run_llm: ModuleType, upstream_run_or_to_llm: ModuleType
+    upstream_run_llm: ModuleType,
+    upstream_run_or_to_llm: ModuleType,
+    upstream_run_llm_to_or: ModuleType,
 ) -> None:
     """Justifies omitting those blocks: upstream itself adds them only when enabled, and
     the benchmark configuration enables neither."""
@@ -331,6 +372,17 @@ def test_upstream_feedback_and_guidance_blocks_are_conditional(
         )
         assert "HUMAN-IN-THE-LOOP MODE" in with_feedback.system_prompt
         assert "STRATEGIC GUIDANCE" in with_guidance.system_prompt
+    # make_llm_to_or_agent has a different signature (current_configs); same claim holds.
+    mini = replace(MINI_SPEC, train_samples=(("Period_1", 10.0),))
+    base = _upstream_llm_to_or_agent(upstream_run_llm_to_or, mini)
+    assert "HUMAN-IN-THE-LOOP MODE" not in base.system_prompt
+    assert "STRATEGIC GUIDANCE" not in base.system_prompt
+    with_feedback = _upstream_llm_to_or_agent(
+        upstream_run_llm_to_or, mini, human_feedback_enabled=True
+    )
+    with_guidance = _upstream_llm_to_or_agent(upstream_run_llm_to_or, mini, guidance_enabled=True)
+    assert "HUMAN-IN-THE-LOOP MODE" in with_feedback.system_prompt
+    assert "STRATEGIC GUIDANCE" in with_guidance.system_prompt
 
 
 # ---------------------------------------------------------------------------
@@ -546,6 +598,51 @@ def test_system_prompts_end_without_trailing_newline() -> None:
     assert or_prompt.endswith("No extra commentary outside the JSON.")
 
 
+def test_llm_to_or_system_prompt_ends_WITH_trailing_newline() -> None:
+    """Unlike its two siblings, the llm_to_or prompt's final literal carries a ``\\n``
+    (run_llm_to_or.py:1344)."""
+    prompt = build_llm_to_or_system_prompt(REAL_SPEC)
+    assert prompt.endswith("\n")
+    lines = prompt.split("\n")
+    assert lines[-1] == ""
+    assert lines[-2] == (
+        "- The method field must be an exact match to one of the valid strings listed above."
+    )
+
+
+def test_llm_to_or_typo_each_total_periods_is_verbatim() -> None:
+    """run_llm_to_or.py:1110 says ``each total periods`` where the sibling prompts say
+    ``over total periods`` — the typo is part of the bytes."""
+    line = next(
+        ln
+        for ln in build_llm_to_or_system_prompt(MINI_SPEC).split("\n")
+        if "each total periods" in ln
+    )
+    assert line == (
+        'You run an LLM→OR controller for a single SKU "chips(Regular)". '
+        "Your job is to translate the observation into OR parameters so the backend can "
+        "compute the order. Maximize total reward R_t = Profit × units_sold − HoldingCost × "
+        "ending_inventory each total periods."
+    )
+
+
+def test_llm_to_or_parameters_example_keeps_literal_double_brace() -> None:
+    """run_llm_to_or.py:1297 is the plain string ``"    }}\\n"`` — NOT an f-string escape —
+    so the rendered example shows the model invalid JSON. Reproduce literally."""
+    lines = build_llm_to_or_system_prompt(MINI_SPEC).split("\n")
+    start = lines.index('  "parameters": {')
+    assert lines[start : start + 8] == [
+        '  "parameters": {',
+        '    "chips(Regular)": {',
+        '      "L": {"method": "..."},',
+        '      "mu_hat": {"method": "..."},',
+        '      "sigma_hat": {"method": "..."}',
+        "    }}",
+        "  }",
+        "}",
+    ]
+
+
 def test_golden_three_period_user_prompt() -> None:
     """Period 3 with two conclusions and one insight; expected string built by hand."""
     expected = (
@@ -653,11 +750,14 @@ def test_no_historical_demand_section_without_train_samples() -> None:
     spec = replace(MINI_SPEC, train_samples=())
     assert "HISTORICAL DEMAND DATA" not in build_system_prompt(spec)
     assert "HISTORICAL DEMAND DATA" not in build_or_to_llm_system_prompt(spec)
+    assert "HISTORICAL DEMAND DATA" not in build_llm_to_or_system_prompt(spec)
 
 
 def test_non_integer_inputs_raise_value_error() -> None:
     with pytest.raises(ValueError, match="integer-valued"):
         build_system_prompt(replace(MINI_SPEC, train_samples=(("Period_1", 280.5),)))
+    with pytest.raises(ValueError, match="integer-valued"):
+        build_llm_to_or_system_prompt(replace(MINI_SPEC, train_samples=(("Period_1", 280.5),)))
     base: dict[str, Any] = {
         "date": "Period_1",
         "profit": 4.0,
@@ -794,3 +894,4 @@ def test_system_prompts_are_deterministic(case: tuple[PromptSpec, dict[str, Any]
     spec, _ = case
     assert build_system_prompt(spec) == build_system_prompt(spec)
     assert build_or_to_llm_system_prompt(spec) == build_or_to_llm_system_prompt(spec)
+    assert build_llm_to_or_system_prompt(spec) == build_llm_to_or_system_prompt(spec)

@@ -48,8 +48,8 @@ import re
 from dataclasses import dataclass, field
 
 from collie.arms.base_stock import PUBLISHED_PARAMS, base_stock_order
+from collie.arms.history import BenchmarkHistory
 from collie.arms.prompts import (
-    PeriodConclusion,
     PromptSpec,
     build_or_to_llm_system_prompt,
     build_system_prompt,
@@ -247,13 +247,7 @@ class DirectActionArm:
     trigger: Trigger | None = None
     fallback: Controller | None = None
     or_to_llm: bool = False
-    _conclusions: list[PeriodConclusion] = field(default_factory=list, repr=False)
-    _insights: dict[int, str] = field(default_factory=dict, repr=False)
-    _queue: list[list[float | int]] = field(default_factory=list, repr=False)
-    _demands: list[float] = field(default_factory=list, repr=False)
-    _last_order: float = field(default=0.0, repr=False)
-    _prev_on_hand: float = field(default=0.0, repr=False)
-    _prev_date: str = field(default="", repr=False)
+    _history: BenchmarkHistory = field(init=False, repr=False)
 
     def __post_init__(self) -> None:
         if self.trigger is not None and self.fallback is None:
@@ -266,22 +260,17 @@ class DirectActionArm:
                 f"{self.arm_id!r}: the or_to_llm arm is every-period by design (Checkpoint-1 "
                 "ruling); a triggered variant is a different arm, not this one"
             )
+        self._history = BenchmarkHistory(arm_id=self.arm_id)
 
     def reset(self) -> None:
-        self._conclusions = []
-        self._insights = {}
-        self._queue = []
-        self._demands = []
-        self._last_order = 0.0
-        self._prev_on_hand = 0.0
-        self._prev_date = ""
+        self._history.reset()
         if self.fallback is not None:
             self.fallback.reset()
 
     def order(self, obs: PeriodObservation) -> Decision:
         self.channel.set_period(obs.period)
-        self._bookkeep(obs)
-        self._record_demand(obs)
+        self._history.observe(obs)
+        self._history.record_demand(obs)
 
         fallback_qty = 0.0
         if self.fallback is not None:
@@ -311,7 +300,7 @@ class DirectActionArm:
                 base_stock_order(
                     samples=[
                         *(d for _, d in self.prompt_spec.train_samples),
-                        *self._demands,
+                        *self._history.demands,
                     ],
                     on_hand=obs.on_hand,
                     in_transit=obs.in_transit_total,
@@ -329,8 +318,8 @@ class DirectActionArm:
             in_transit=obs.in_transit_total,
             profit=obs.profit_per_unit,
             holding=obs.holding_cost_per_unit,
-            conclusions=tuple(self._conclusions),
-            insights=tuple(sorted(self._insights.items())),
+            conclusions=self._history.conclusions,
+            insights=self._history.insights,
             or_recommendation=or_recommendation,
         )
 
@@ -372,71 +361,19 @@ class DirectActionArm:
         )
         return orders, raw_text
 
-    # -- bookkeeping: history, insights, order book ---------------------------
-
-    def _bookkeep(self, obs: PeriodObservation) -> None:
-        """Close out period ``obs.period - 1`` into the history the next prompt renders."""
-        if obs.period == 1:
-            self._prev_on_hand = obs.on_hand
-            self._prev_date = obs.date
-            return
-        arrivals = obs.prev_arrivals
-        parts: list[tuple[float, int]] = []
-        remaining = arrivals
-        # FIFO attribution over the arm's own dispatch book (module docstring, limit 1). The
-        # queue can only exceed true outstanding (a lost cohort never pops), never underflow.
-        while remaining > 0 and self._queue:
-            head_period, head_qty = self._queue[0]
-            take = min(head_qty, remaining)
-            parts.append((take, int(head_period)))
-            remaining -= take
-            if take == head_qty:
-                self._queue.pop(0)
-            else:
-                self._queue[0] = [head_period, head_qty - take]
-        demand = obs.prev_demand
-        if demand is None:
-            raise ValueError(
-                f"{self.arm_id!r} renders the benchmark's verbatim history, which needs true "
-                f"demand; period {obs.period} carries none. These arms run UNCENSORED only."
-            )
-        self._conclusions.append(
-            PeriodConclusion(
-                period=obs.period - 1,
-                ordered=self._last_order,
-                arrivals=tuple(parts),
-                start_on_hand=self._prev_on_hand,
-                demand=demand,
-                sold=self._prev_on_hand + obs.prev_arrivals - obs.on_hand,
-                end_on_hand=obs.on_hand,
-                date=self._prev_date,
-            )
-        )
-        self._prev_on_hand = obs.on_hand
-        self._prev_date = obs.date
-
-    def _record_demand(self, obs: PeriodObservation) -> None:
-        """Arm 1's record-then-decide discipline for the arm-11 OR recommendation."""
-        if obs.period > 1:
-            assert obs.prev_demand is not None  # _bookkeep already enforced uncensored
-            self._demands.append(obs.prev_demand)
+    # -- bookkeeping: delegated to BenchmarkHistory ---------------------------
 
     def _update_insights(self, period: int, raw_text: str) -> None:
         """``run_llm.py:879-890``: the memo counts only from a full JSON parse of the response."""
         cleaned = raw_text.strip()
         cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned)
         cleaned = re.sub(r"\s*```$", "", cleaned)
-        memo: str | None
         try:
             data = json.loads(cleaned)
         except (ValueError, TypeError):
             return
-        candidate = data.get("carry_over_insight") if isinstance(data, dict) else None
-        memo = candidate.strip() if isinstance(candidate, str) else None
-        if memo:
-            self._insights[period] = memo
-        elif period in self._insights:
-            del self._insights[period]
+        if isinstance(data, dict):
+            self._history.update_insights(period, data)
 
     def _quantity_from(self, orders: dict[str, int] | None) -> float:
         """Upstream's move validation (``env.py:289-296``): unknown item or negative -> invalid."""
@@ -452,8 +389,7 @@ class DirectActionArm:
     def _decide(
         self, obs: PeriodObservation, quantity: float, *, llm_called: bool, triggered: bool
     ) -> Decision:
-        self._queue.append([obs.period, quantity])
-        self._last_order = quantity
+        self._history.note_dispatch(obs.period, quantity)
         return Decision(
             period=obs.period,
             order_quantity=quantity,

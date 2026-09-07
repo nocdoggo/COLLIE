@@ -126,6 +126,18 @@ prompt, the response schema, and a backend that converts parameters to an order 
   benchmark harness that aborts the sweep on a parseable-but-out-of-range response cannot serve a
   640-rollout study; the fallback is counted, which upstream's crash never could be. Declared at
   both checkpoints.
+- **[registered] arm 7's fixed expiry** is 5 periods including the call period
+  (`PERSISTENCE_EXPIRY` in `collie/arms/llm_to_or.py`), set equal to the frozen refractory window
+  (`collie/trigger/calibration.py`): a persisted parameter set covers exactly the silence the
+  trigger imposes, so arm 7 measures persistence itself, not a longer invocation budget. The
+  brief and spec name a "fixed expiry" without a value; this is the registration.
+- **[registered] the ledger's weak-gate dichotomy for arms 5-7.** Upstream's retry gate looks for
+  braces or menu keywords, and its regex salvage can only recover parameter content when those
+  keywords exist — so a gate-failing response yields exactly the default parameters and the model
+  contributed nothing. The final attempt therefore settles `FALLBACK` whenever the gate never
+  passed, and the order that period uses upstream's own default-substitution path. The counted
+  `FALLBACK` also covers validation failure (defaults substituted, as upstream does silently) and
+  the compute crash (`sys.exit(1)` upstream).
 
 ## 2. Page-Hinkley and CUSUM — formulations and calibration
 

@@ -20,6 +20,13 @@ from collie.arms.direct import (
     ARM11_ARM_ID,
     DirectActionArm,
 )
+from collie.arms.llm_to_or import (
+    ARM5_ARM_ID,
+    ARM6_ARM_ID,
+    ARM7_ARM_ID,
+    PERSISTENCE_EXPIRY,
+    LlmToOrArm,
+)
 from collie.arms.protocols import (
     ActivationPolicy,
     ProposalPayload,
@@ -31,11 +38,16 @@ __all__ = [
     "ARM1_ARM_ID",
     "ARM3_ARM_ID",
     "ARM4_ARM_ID",
+    "ARM5_ARM_ID",
+    "ARM6_ARM_ID",
+    "ARM7_ARM_ID",
     "ARM11_ARM_ID",
+    "PERSISTENCE_EXPIRY",
     "ActivationPolicy",
     "BaseStockParams",
     "CappedBaseStockController",
     "DirectActionArm",
+    "LlmToOrArm",
     "ProposalPayload",
     "SpecCompiler",
     "SpecParser",

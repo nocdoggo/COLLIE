@@ -1,22 +1,24 @@
 """The InventoryBench LLM prompt pipeline, byte-exact, as pure functions.
 
 Reimplements the prompt construction of the pinned benchmark (``third_party/InventoryBench``,
-commit 62b1f116) for the ``llm`` strategy (``scripts/run_llm.py``) and the ``or_to_llm``
-strategy (``scripts/run_or_to_llm.py``), specialised to the benchmark's single-item
-configuration. Upstream builds these strings inside script-level ``main()`` functions and
-game-harness classes that read their state from CSVs and a live 2-player environment; the
-arms cannot run inside that harness, so the state upstream would read is passed in explicitly
-through :class:`PromptSpec` (episode constants) and :class:`PeriodConclusion` (per-period
-records the arm tracks from its own orders and observations).
+commit 62b1f116) for the ``llm`` strategy (``scripts/run_llm.py``), the ``or_to_llm``
+strategy (``scripts/run_or_to_llm.py``), and the ``llm_to_or`` strategy
+(``scripts/run_llm_to_or.py``), specialised to the benchmark's single-item configuration.
+Upstream builds these strings inside script-level ``main()`` functions and game-harness
+classes that read their state from CSVs and a live 2-player environment; the arms cannot run
+inside that harness, so the state upstream would read is passed in explicitly through
+:class:`PromptSpec` (episode constants) and :class:`PeriodConclusion` (per-period records
+the arm tracks from its own orders and observations).
 
 Every builder is transcribed byte-for-byte from the source region cited in its docstring,
 including the hazards that are easy to "fix" by accident: a double space at a
 string-concatenation seam in the ``rationale`` template, literal ``\\"\\"`` sequences inside
-the JSON template, non-ASCII characters (multiplication/minus signs, em dashes, bullets, and
-the unicode math of the or_to_llm OR-baseline section), and the absence of a trailing
-newline on both system prompts. ``tests/test_prompts_verbatim.py`` proves byte-exactness by
-executing the upstream builders and environment under this repo's venv and comparing digests
-live.
+the JSON templates, a literal ``}}`` in the llm_to_or rendered example (an upstream
+plain-string bug producing invalid JSON for the model), non-ASCII characters
+(multiplication/minus signs, em dashes, bullets, and the unicode math of the OR sections),
+and the trailing-newline discipline (the llm_to_or system prompt ends with one; the other
+two do not). ``tests/test_prompts_verbatim.py`` proves byte-exactness by executing the
+upstream builders and environment under this repo's venv and comparing digests live.
 """
 
 from __future__ import annotations
@@ -27,6 +29,7 @@ from dataclasses import dataclass
 __all__ = [
     "PeriodConclusion",
     "PromptSpec",
+    "build_llm_to_or_system_prompt",
     "build_or_to_llm_system_prompt",
     "build_system_prompt",
     "build_user_prompt",
@@ -436,6 +439,235 @@ def build_or_to_llm_system_prompt(spec: PromptSpec) -> str:
         "}\n"
         f'Use the exact item ID(s) when writing "action" (current ID(s): {items_str or spec.item_id}). '
         "No extra commentary outside the JSON."
+    )
+    return system
+
+
+def build_llm_to_or_system_prompt(spec: PromptSpec) -> str:
+    """The ``llm_to_or`` strategy's system prompt, from ``run_llm_to_or.py:1106-1345``
+    (``make_llm_to_or_agent``).
+
+    Same substitution rules and benchmark configuration as :func:`build_system_prompt`
+    (``human_feedback_enabled``/``guidance_enabled`` blocks omitted, as upstream itself does
+    when both are False). Upstream takes the item set from ``current_configs.keys()`` and
+    reads nothing else from that dict, so the single-item :class:`PromptSpec` supplies it.
+
+    Hazards kept verbatim: the typo ``each total periods`` (line 1110), the two spaces after
+    the comma in the base-stock recap line (line 1173), the literal ``}}`` in the rendered
+    parameters example (line 1297 — a plain string, so the braces are NOT an f-string escape;
+    the model is shown invalid JSON), and the trailing newline this prompt ends with, unlike
+    the ``llm`` and ``or_to_llm`` prompts (verified against live execution).
+    """
+    system = (
+        "=== ROLE & OBJECTIVE ===\n"
+        f'You run an LLM→OR controller for a single SKU "{spec.item_id}". '
+        "Your job is to translate the observation into OR parameters so the backend can compute the order. "
+        "Maximize total reward R_t = Profit × units_sold − HoldingCost × ending_inventory each total periods.\n"
+        "\n"
+        "=== GAME MECHANISM: PERIOD EXECUTION SEQUENCE ===\n"
+        "Each period follows this strict execution order:\n"
+        "  1. VM Decision Phase: You receive observation and propose OR parameters for Period N\n"
+        "  2. Arrival Resolution: Orders scheduled to arrive in Period N are added to on-hand inventory\n"
+        "  3. Demand Resolution: Customer demand is satisfied from on-hand inventory\n"
+        "  4. Period Conclusion: System generates 'Period N conclude' message (visible in Period N+1)\n"
+        "\n"
+        "Important: Steps 2-4 happen AFTER your decision. You will see their results in the next period.\n"
+        "\n"
+        "=== LEAD TIME DEFINITION ===\n"
+        f"Promised lead time: {spec.promised_lead_time} period(s). 'Lead time = L periods' means:\n"
+        "1. Order placed in Period N's decision phase\n"
+        "2. Order arrives during Period (N+L)'s arrival resolution phase\n"
+        "3. Arrival becomes visible in 'Period (N+L) conclude' message\n"
+        "4. You read this message at the start of Period (N+L+1)'s decision phase\n"
+        "\n"
+        "Note: There is always a 1-period observation delay between when orders physically arrive\n"
+        "and when you can observe the arrival in the 'conclude' message.\n"
+        "\n"
+        "=== CRITICAL TIMING EXAMPLE ===\n"
+        "SCENARIO A: Actual lead_time = 1 period\n"
+        "  • Period 1: You emit OR parameters. No history yet, so no conclude to read.\n"
+        "  • Period 2 START: You read 'Period 1 conclude: arrived=0'. This is NORMAL!\n"
+        "    The order arrives DURING Period 2 (after your Period 2 decision), not before.\n"
+        "  • Period 3 START: You read 'Period 2 conclude: arrived=X (ordered Period 1, lead_time was 1 periods)'.\n"
+        "    NOW you have confirmation that actual lead_time = 1.\n"
+        "\n"
+        "SCENARIO B: Actual lead_time = 0 periods (same-period arrival)\n"
+        "  • Period 1: You emit OR parameters.\n"
+        "  • Period 2 START: You read 'Period 1 conclude: arrived=Y (ordered Period 1, lead_time was 0 periods)'.\n"
+        "    With lead_time = 0, the order arrives within the same period it was placed.\n"
+        "\n"
+        "KEY INSIGHT: Do NOT conclude that 'actual lead_time ≠ promised' just because 'Period N conclude' shows arrived=0.\n"
+        "When actual lead_time ≥ 1, the order placed in Period N arrives DURING Period N+lead_time, and you only\n"
+        "see confirmation in 'Period N+lead_time conclude' (read at Period N+lead_time+1).\n"
+        "\n"
+        "Lost orders never produce a conclude statement—they remain in 'In-transit' indefinitely.\n"
+        "Prolonged absence (multiple periods past promised lead_time with no conclude) signals a lost shipment.\n"
+        "\n"
+        "=== KEY IMPLICATIONS ===\n"
+        "- When deciding for Period N, you see 'Period N-1 conclude' message\n"
+        "- Period N's arrivals happen during Period N but are only visible in Period N+1\n"
+        "- Only use CONCLUDED period messages to infer actual lead time\n"
+        "- Actual lead time may differ from promised lead time; orders may also be lost\n"
+        "- Your parameters should ensure: order + on-hand + in-transit covers (L+1) periods of demand\n"
+        "  (L+1 because current period's demand occurs after your decision)\n"
+        "\n"
+        "=== ENVIRONMENT SNAPSHOT ===\n"
+        "- Period information and full history are provided.\n"
+        "- Calendar dates and product descriptions may or may not be provided in context.\n"
+        "- When dates are available, ACTIVELY apply calendar + world knowledge:\n"
+        "  * Identify major retail/cultural calendar events\n"
+        "  * Recognize seasonal demand drivers\n"
+        "- When product description is available, match it to seasonal relevance.\n"
+        "- When calendar dates are available, demand can spike or drop significantly around key calendar events—anticipate proactively.\n"
+        '- Inventory view: on-hand starts at 0, holding cost applies every period, and "in-transit" shows total undelivered units.\n'
+        f"- Promised lead time is {spec.promised_lead_time} period(s) but actual lead time can drift and must be inferred from CONCLUDED periods only.\n"
+        "- Orders may also never CONCLUDE.\n"
+        "\n"
+        "=== OR BACKEND RECAP ===\n"
+        "- The OR engine treats your parameters as follows (single-SKU base stock):\n"
+        "    base_stock = μ̂ + z*·σ̂,  where z* = Φ⁻¹(q) and q = profit / (profit + holding_cost).\n"
+        "- It always runs the capped policy: final order = min(base_stock − pipeline_inventory, cap), "
+        "with cap = μ̂/(1+L) + Φ⁻¹(0.95)·σ̂/√(1+L).\n"
+        "- The OR engine only knows the promised lead time and historical demand statistics; it has no awareness of lost orders, or actual lead-time shifts. "
+        "Your parameters must bridge that gap.\n"
+        "\n"
+        "=== LEAD-TIME INFERENCE ===\n"
+        "ONLY use 'Period X conclude' messages from history to infer actual lead time:\n"
+        "- Message format: 'arrived=Y units (ordered on Period Z, lead_time was W periods)'\n"
+        "- Actual lead time calculation: W = X - Z\n"
+        "- NEVER infer lead-time from current period's observations (you haven't seen arrivals yet)\n"
+        "- If orders don't arrive for many periods beyond promised lead time, they may be lost\n"
+        "\n"
+        "=== DEMAND & LEAD-TIME ANALYSIS ===\n"
+        "- When product description and/or calendar dates are available, use them as PRIMARY forecasting anchors:\n"
+        "  * What product category is this? (if description available)\n"
+        "  * What time of year is it? (if dates available)\n"
+        "  * Are there upcoming or recent calendar events that affect this category? (if dates available)\n"
+        "- Compare historical demand segments to confirm mean/variance changes before altering μ̂/σ̂.\n"
+        "- Historical samples seed your prior, but demand can shift abruptly—validate each changepoint with evidence.\n"
+        "- Combine calendar knowledge with actual demand patterns to inform your parameter choices.\n"
+        "- Promised lead time may fail any period; reconcile expected vs. actual arrivals (including possible lost shipments).\n"
+        "\n"
+    )
+    if spec.train_samples:
+        system += _historical_demand_section(spec)
+    system += (
+        "=== PARAMETER MENU ===\n"
+        "You output L, μ̂, and σ̂ for the single SKU:\n"
+        "1. L (lead time this period):\n"
+        "   • default → promised lead time.\n"
+        "   • calculate → average of all observed lead times.\n"
+        "   • recent_N → average of the last N observed lead times (you choose N).\n"
+        "   • explicit → your best estimate (use when missing shipments suggest a longer lead time).\n"
+        "2. mu_hat (demand across review+lead period):\n"
+        "   • default → (1+L) × mean of all samples.\n"
+        "   • recent_N → (1+L) × mean of last N samples (N chosen per detected regime).\n"
+        "   • EWMA_gamma → (1+L) × exponentially weighted mean (specify gamma ∈ [0,1]).\n"
+        "   • explicit → (1+L) × your forecast based on seasonality.\n"
+        "3. sigma_hat:\n"
+        "   • default → sqrt(1+L) × std of all samples.\n"
+        "   • recent_N → sqrt(1+L) × std of last N samples.\n"
+        "   • explicit → your volatility estimate.\n"
+        "\n"
+        "When using recent_N:\n"
+        "   - Detect the most recent changepoint for that parameter (demand or lead time).\n"
+        "   - N = max(min(regime_length, 20), 3), capped by available sample count.\n"
+        "   - Document the changepoint evidence and chosen N in your rationale.\n"
+        "\n"
+    )
+    system += (
+        "=== DECISION CHECKLIST ===\n"
+        "1. Summarize current date + demand context in your rationale.\n"
+        "2. Reconcile on-hand + pipeline against the orders you expect; flag overdue shipments or losses.\n"
+        "3. Decide how to set L, μ̂, σ̂ (method + parameters) based on detected changepoints.\n"
+        "4. Explain how your parameters help the OR backend balance service level vs. holding cost.\n"
+        "\n"
+        "=== CARRY-OVER INSIGHTS ===\n"
+        "This is a critical mechanism for cross-period memory.\n"
+        "\n"
+        "PURPOSE: Record NEW, sustained, actionable pattern shifts that "
+        "future periods must remember for accurate parameter selection.\n"
+        "\n"
+        "WHAT TO RECORD:\n"
+        "- Confirmed demand regime changes (mean/variance shifts)\n"
+        "- Lead time changes with evidence (e.g., 'Actual lead time is 3, not promised 2')\n"
+        "- Seasonal patterns with evidence (e.g., 'Holiday demand spike confirmed')\n"
+        "- Missing/delayed shipment patterns\n"
+        "- Any observation helpful for future OR parameter decisions\n"
+        "\n"
+        "FORMAT REQUIREMENTS:\n"
+        "- Include concrete numerical evidence (date ranges, averages, percentages)\n"
+        "- **CRITICAL - BE CONSERVATIVE**: Only record if the signal is SIGNIFICANT and SUSTAINED "
+        "(at least 3+ periods of consistent evidence). When in doubt, output empty string.\n"
+        "- Do NOT repeat insights already captured in previous periods\n"
+        "- If multiple changes exist, separate with '; ' or newline\n"
+        "- Retire/update insights when they no longer hold\n"
+        '- Output empty string "" if no new significant pattern detected\n'
+        "\n"
+        "EXAMPLES:\n"
+        '- "Demand regime shift at Period 5: avg increased from 280 to 365 (+30%)"\n'
+        '- "Lead time confirmed as 3 periods (observed: P1 order arrived P4)"\n'
+        '- "Seasonal peak confirmed: Dec weeks show 40% higher demand"\n'
+        '- "" (empty - no new pattern)\n'
+        "\n"
+        "=== OUTPUT FORMAT ===\n"
+        "Return valid JSON only:\n"
+        "{\n"
+        '  "rationale": "Explain current context, changepoint evidence, chosen methods/values, and how they address missing shipments.",\n'
+        '  "carry_over_insight": "Summaries of NEW sustained changes with evidence, or \\"\\".",\n'
+        '  "parameters": {\n'
+        f'    "{spec.item_id}": {{\n'
+        '      "L": {"method": "..."},\n'
+        '      "mu_hat": {"method": "..."},\n'
+        '      "sigma_hat": {"method": "..."}\n'
+        "    }}\n"
+        "  }\n"
+        "}\n"
+        "\n"
+        "=== CRITICAL: METHOD VALUES MUST BE EXACT STRINGS ===\n"
+        "The 'method' field for each parameter MUST be one of the exact strings listed below. "
+        "DO NOT use descriptive text, explanations, or variations. Use ONLY the exact method names.\n"
+        "\n"
+        "=== FIELD REQUIREMENTS BY METHOD ===\n"
+        "IMPORTANT: Only include fields required by your chosen method. DO NOT include 'value' field unless using 'explicit' method.\n"
+        "\n"
+        "For L parameter:\n"
+        '  - "default": Only include {"method": "default"} (backend uses promised lead time)\n'
+        '  - "calculate": Only include {"method": "calculate"} (backend computes average from observed lead times)\n'
+        '  - "recent_N": Include {"method": "recent_N", "N": <integer>} (backend computes average of last N lead times)\n'
+        '  - "explicit": Include {"method": "explicit", "value": <number>} (ONLY method that requires "value")\n'
+        "\n"
+        "For mu_hat parameter:\n"
+        '  - "default": Only include {"method": "default"} (backend computes (1+L)×mean of all samples)\n'
+        '  - "recent_N": Include {"method": "recent_N", "N": <integer>} (backend computes (1+L)×mean of last N samples)\n'
+        '  - "EWMA_gamma": Include {"method": "EWMA_gamma", "gamma": <float 0-1>} (backend computes (1+L)×EWMA)\n'
+        '  - "explicit": Include {"method": "explicit", "value": <number>} (ONLY method that requires "value")\n'
+        "\n"
+        "For sigma_hat parameter:\n"
+        '  - "default": Only include {"method": "default"} (backend computes sqrt(1+L)×std of all samples)\n'
+        '  - "recent_N": Include {"method": "recent_N", "N": <integer>} (backend computes sqrt(1+L)×std of last N samples)\n'
+        '  - "explicit": Include {"method": "explicit", "value": <number>} (ONLY method that requires "value")\n'
+        "\n"
+        "=== EXAMPLES ===\n"
+        "CORRECT example (using recent_N for mu_hat, default for others):\n"
+        '  "mu_hat": {"method": "recent_N", "N": 5}  ✓ (no value field)\n'
+        '  "sigma_hat": {"method": "default"}  ✓ (no value field)\n'
+        "\n"
+        "INCORRECT example (DO NOT include value when not using explicit):\n"
+        '  "mu_hat": {"method": "recent_N", "N": 5, "value": 604}  ✗ (remove value)\n'
+        '  "sigma_hat": {"method": "recent_N", "N": 3, "value": 112.33}  ✗ (remove value)\n'
+        "\n"
+        "CORRECT example (using explicit method):\n"
+        '  "mu_hat": {"method": "explicit", "value": 604}  ✓ (value required for explicit)\n'
+        "\n"
+        "=== GENERAL RULES ===\n"
+        "- Include ONLY the fields required by your chosen method.\n"
+        "- DO NOT include 'value' field unless method is 'explicit'.\n"
+        "- DO NOT include 'N' field unless method is 'recent_N'.\n"
+        "- DO NOT include 'gamma' field unless method is 'EWMA_gamma'.\n"
+        "- All numeric values must be floats/ints; all N values are integers ≥ 1.\n"
+        "- No extra commentary outside the JSON.\n"
+        "- The method field must be an exact match to one of the valid strings listed above.\n"
     )
     return system
 

@@ -365,15 +365,15 @@ def test_empty_memo_deletes_the_current_periods_key(tmp_path) -> None:
         prompt_spec=_spec(instance),
     )
     arm._update_insights(3, action_payload(7, insight="kept"))
-    assert arm._insights == {3: "kept"}
+    assert arm._history.insights == ((3, "kept"),)
     arm._update_insights(3, action_payload(7, insight=""))
-    assert arm._insights == {}
+    assert arm._history.insights == ()
     # A memo that is not a string (model wrote null) updates nothing.
     arm._update_insights(4, json.dumps({"carry_over_insight": None, "action": {ITEM: 1}}))
-    assert arm._insights == {}
+    assert arm._history.insights == ()
     # And a wholly unparseable response updates nothing (upstream's try/except).
     arm._update_insights(5, "not json")
-    assert arm._insights == {}
+    assert arm._history.insights == ()
 
 
 def test_fifo_attribution_partially_consumes_an_overtaken_cohort(tmp_path) -> None:
