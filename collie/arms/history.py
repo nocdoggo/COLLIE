@@ -40,6 +40,7 @@ class BenchmarkHistory:
     _insights: dict[int, str] = field(default_factory=dict, repr=False)
     _queue: list[list[float | int]] = field(default_factory=list, repr=False)
     _demands: list[float] = field(default_factory=list, repr=False)
+    _arrivals: list[float] = field(default_factory=list, repr=False)
     _observed_lead_times: list[int] = field(default_factory=list, repr=False)
     _last_order: float = field(default=0.0, repr=False)
     _prev_on_hand: float = field(default=0.0, repr=False)
@@ -50,6 +51,7 @@ class BenchmarkHistory:
         self._insights = {}
         self._queue = []
         self._demands = []
+        self._arrivals = []
         self._observed_lead_times = []
         self._last_order = 0.0
         self._prev_on_hand = 0.0
@@ -65,8 +67,13 @@ class BenchmarkHistory:
 
     @property
     def demands(self) -> tuple[float, ...]:
-        """Train-free observed demand history; callers prepend train samples themselves."""
+        """Observed demand history: ``demands[j]`` is period ``j + 1``'s demand."""
         return tuple(self._demands)
+
+    @property
+    def arrivals(self) -> tuple[float, ...]:
+        """Observed arrival history: ``arrivals[j]`` is the arrivals during period ``j + 1``."""
+        return tuple(self._arrivals)
 
     @property
     def observed_lead_times(self) -> tuple[int, ...]:
@@ -107,6 +114,7 @@ class BenchmarkHistory:
             )
         concluded = obs.period - 1
         self._observed_lead_times.extend(concluded - order_period for _, order_period in parts)
+        self._arrivals.append(obs.prev_arrivals)
         self._conclusions.append(
             PeriodConclusion(
                 period=concluded,

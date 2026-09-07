@@ -21,6 +21,7 @@ from collie.contracts import (
     DurationBin,
     LifecycleState,
     MagnitudeBin,
+    PeriodObservation,
     Persistence,
     ShockFamily,
     ShockSpec,
@@ -32,6 +33,7 @@ __all__ = [
     "ProposalPayload",
     "SpecCompiler",
     "SpecParser",
+    "SpecPrompter",
 ]
 
 
@@ -67,6 +69,21 @@ class SpecParser(Protocol):
 
 
 @runtime_checkable
+class SpecPrompter(Protocol):
+    """Module 02's other seam: the proposal prompt for one decision point.
+
+    The arm owns *when* a proposal happens (the shared trigger); module 02 owns what the model
+    is asked and how the answer is validated. Keeping the prompt behind this protocol is what
+    lets arms 8/9/10 share one physical call set: identical prompt bytes at the same decision
+    point hit the same cache entry regardless of which arm asked.
+    """
+
+    def prompt(self, obs: PeriodObservation) -> str:
+        """The proposal prompt text for this observation. Deterministic in its inputs."""
+        ...
+
+
+@runtime_checkable
 class SpecCompiler(Protocol):
     """Module 04's seam: a ShockSpec to a ControlConfig, given what is currently running."""
 
@@ -83,6 +100,10 @@ class ActivationPolicy(Protocol):
     observable stream, strictly after ``tau_j``. The three arms 8/9/10 differ *only* in the
     injected implementation of this protocol (brief §6.4).
     """
+
+    def reset(self) -> None:
+        """Drop all episode state. The runner resets arms between episodes; policies follow."""
+        ...
 
     def register(self, spec: ShockSpec) -> None:
         """Freeze a proposal. Evidence may only come from periods strictly after ``tau_j``."""
