@@ -413,8 +413,11 @@ class ArmCallChannel:
     ``complete(prompt, decoding_hash=...) -> str`` is the protocol method parsers use. The
     channel stamps each call with the arm, episode, and current period; the caller settles the
     entry with its parse outcome via :meth:`settle`. The ``state`` cache-key component is the
-    decision-point identity (``episode_id#period``): identical prompts at the same decision
-    point share one call; across decision points they never merge.
+    decision-point identity (``episode_id#period``) plus the attempt index for repairs
+    (``#a1``, ``#a2``): identical prompts at the same decision point share one call, a repair
+    attempt is a *distinct* cached call — under deterministic decoding a byte-identical re-issue
+    would return the failure it was meant to repair, and upstream's retries only ever varied
+    because it ran without temperature control (research notes §1.3).
     """
 
     def __init__(self, metered: MeteredClient, *, arm_id: str, episode_id: str) -> None:
@@ -459,10 +462,13 @@ class ArmCallChannel:
                 f"unregistered decoding hash {decoding_hash!r}; register it in "
                 "DECODING_REGISTRY so the sweep's decoding is auditable"
             )
+        state = f"{self.episode_id}#{self._period}"
+        if attempt_index:
+            state = f"{state}#a{attempt_index}"
         self._last_call_id, text = self._metered._complete(
             prompt,
             decoding=decoding,
-            state=f"{self.episode_id}#{self._period}",
+            state=state,
             arm_id=self.arm_id,
             episode_id=self.episode_id,
             period=self._period,
