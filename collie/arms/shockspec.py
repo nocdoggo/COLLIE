@@ -355,9 +355,14 @@ class ShockSpecArm:
         return True
 
     def _activate(self, spec: ShockSpec) -> None:
-        """Compile once and create the experimental controller once, with the demand history."""
+        """Compile once and create the experimental controller once, with the demand history.
+
+        The factory receives demands through period ``t-2``: the experimental controller
+        records ``t-1``'s demand itself when its ``order`` is called at the switch period
+        ``t``, so handing it the full history would count that cell twice.
+        """
         self._compiled = self.compiler.compile(spec, current=self.baseline_config)
-        self._experimental = self.controller_factory(self._compiled, self._history.demands)
+        self._experimental = self.controller_factory(self._compiled, self._history.demands[:-1])
 
     def _baseline_stats(self, spec: ShockSpec) -> tuple[float, float]:
         """Pre-proposal (mean, std) of the spec-relevant stream, for the rollback guard."""

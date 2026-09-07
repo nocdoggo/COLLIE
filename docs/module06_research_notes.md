@@ -326,3 +326,27 @@ exists** as of 2026-09-06: zero GitHub repositories name it, and the paper text 
 availability statement (the only repository link is to a third-party RL framework it used).
 Deferred this sprint per the cut line; when implemented it must be labelled a faithful
 reimplementation and never presented as the authors' result.
+
+## 8. The arm-9 guard, the switch seam, and the dev headroom band **[registered]**
+
+- **Arm 9's rollback guard [registered]:** a post-activation observation contradicts the spec
+  when it lands more than `CONTRADICTION_Z = 1.0` baseline standard deviations on the wrong side
+  of the pre-proposal baseline mean for the spec's direction; `CONTRADICTION_PERIODS = 2`
+  consecutive contradictions refute (constants in `collie/arms/shockspec.py`, reviewed at Gate
+  2). The baseline statistics are the (mean, std) of the spec-relevant stream over the
+  pre-proposal history, computed once per proposal.
+- **The switch seam [registered]:** when any arm compiles a spec and creates its experimental
+  controller (arms 8-10 and the compiler-switch controls), the controller factory receives the
+  train samples plus the demand history through period `t-2`; the new controller records
+  `t-1`'s demand itself at the switch period `t`, so every demand cell enters the estimator
+  exactly once. Shared verbatim between `ShockSpecArm._activate` and `CompilerSwitchArm._switch`
+  so the verification contrast is never an estimator-bookkeeping artifact.
+- **Dev headroom band, placeholder content:** with the reference compiler's placeholder mapping
+  the arm-1-to-oracle band on 18 dev episodes is narrow (+0.0119 mean normalized reward, oracle
+  0.7743 vs arm 1 0.7624; the AlertSpec upper bound 0.7748 sits at the same height). The oracle
+  only beats arm 1 on about half of arbitrary noisy episodes under the placeholder mapping — the
+  band is real but thin, and whether it widens is a module-04 question (the real 72-point grid),
+  not something this module should paper over. Reported at Checkpoint 2 per the brief's
+  instruction. Compound episodes are excluded from the oracle and AlertSpec-UB rows because the
+  oracle refuses `ShockFamily.COMPOUND` by construction (the joint demand+supply construction
+  belongs to module 05); the exclusion is printed on the table.
