@@ -18,6 +18,7 @@ from collie.contracts import (
     TargetStream,
 )
 from collie.data.families.base import BaselineKind, BaselineSpec
+from collie.data.families.base import as_demand_cells as generator_round_and_clip
 from collie.verify.demand import DemandEProcess, RegisteredDemandLaw
 from collie.verify.eprocess import NO_FINITE_SAMPLE_GUARANTEE, MixtureEProcess
 from collie.verify.registry import CONSTRUCTIONS, resolve_construction, resolve_spec_shape
@@ -91,11 +92,33 @@ def test_overdispersed_null_is_a_probability_distribution() -> None:
     assert mass == pytest.approx(1.0, abs=1e-11)
 
 
+@pytest.mark.parametrize("multiplier", [0.6, 0.75, 1.25, 1.5, 2.0])
+def test_registered_shock_matches_generator_observable_transform(multiplier: float) -> None:
+    baseline = RegisteredDemandLaw(BaselineSpec(mean=20.0, sd=5.0))
+    shocked = RegisteredDemandLaw(
+        BaselineSpec(mean=20.0, sd=5.0), multiplier=multiplier, active_from=1
+    )
+    expected: dict[int, float] = {}
+    for source in range(100):
+        exposed = int(generator_round_and_clip((source * multiplier,))[0])
+        expected[exposed] = expected.get(exposed, 0.0) + math.exp(
+            baseline.log_pmf(source, period=1, history=())
+        )
+    for exposed, probability in expected.items():
+        assert math.exp(shocked.log_pmf(exposed, period=1, history=())) == pytest.approx(
+            probability, abs=1e-12
+        )
+    total = math.fsum(
+        math.exp(shocked.log_pmf(exposed, period=1, history=())) for exposed in range(200)
+    )
+    assert total == pytest.approx(1.0, abs=1e-11)
+
+
 def test_e_process_is_a_supermartingale_under_the_null() -> None:
     rng = np.random.default_rng(20260907)
     null = RegisteredDemandLaw(BaselineSpec(mean=100.0, sd=25.0))
     alternative = RegisteredDemandLaw(
-        BaselineSpec(mean=100.0, sd=25.0), multiplier=1.5, active_from=1
+        BaselineSpec(mean=100.0, sd=25.0), multiplier=1.25, active_from=1
     )
     draws = np.floor(rng.normal(100.0, 25.0, 50_000) + 0.5).clip(min=0.0)
     ratios = np.fromiter(
@@ -108,7 +131,9 @@ def test_e_process_is_a_supermartingale_under_the_null() -> None:
         ),
         dtype=float,
     )
-    assert float(ratios.mean()) == pytest.approx(1.0, abs=0.025)
+    standard_error = float(ratios.std(ddof=1) / math.sqrt(len(ratios)))
+    assert standard_error < 0.02
+    assert abs(float(ratios.mean()) - 1.0) <= 4.0 * standard_error
 
 
 def test_registered_component_has_exact_unit_null_mean() -> None:

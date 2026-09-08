@@ -14,7 +14,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 import numpy as np
-from scipy.special import gammaln, log_ndtr
+from scipy.special import gammaln, log_ndtr, logsumexp
 
 from collie.contracts import Direction, ShockFamily, ShockSpec, TargetStream, assert_no_hidden_state
 from collie.data.families.base import BaselineKind, BaselineSpec, as_demand_cells, draw_baseline
@@ -74,8 +74,8 @@ class RegisteredDemandLaw:
     plug_in: bool = False
 
     def __post_init__(self) -> None:
-        if self.multiplier <= 0.0:
-            raise ValueError(f"multiplier must be positive, got {self.multiplier}")
+        if not math.isfinite(self.multiplier) or self.multiplier <= 0.0:
+            raise ValueError(f"multiplier must be finite and positive, got {self.multiplier}")
         if self.active_duration is not None and self.active_duration < 1:
             raise ValueError(f"active_duration must be positive, got {self.active_duration}")
 
@@ -106,12 +106,8 @@ class RegisteredDemandLaw:
             return spec.mean + spec.ar_phi * (previous - spec.mean), spec.sd
         return spec.mean, spec.sd
 
-    def log_pmf(self, value: float, *, period: int, history: Sequence[float]) -> float:
-        """Log mass of the exact exposed integer-valued observable for this kernel."""
+    def _base_log_pmf(self, value: float, *, period: int, history: Sequence[float]) -> float:
         mean, sd = self._mean_sd(period, history)
-        if self._active(period):
-            mean *= self.multiplier
-
         if self.baseline.kind is BaselineKind.OVERDISPERSED and not self.plug_in:
             numeric = float(value)
             if not math.isfinite(numeric) or numeric < 0.0 or not numeric.is_integer():
@@ -129,6 +125,32 @@ class RegisteredDemandLaw:
                 + numeric * math.log1p(-probability)
             )
         return _log_rounded_normal_mass(value, mean, sd)
+
+    def log_pmf(self, value: float, *, period: int, history: Sequence[float]) -> float:
+        """Log mass of the exact exposed integer-valued observable for this kernel.
+
+        Module 01 shocks an already rounded/clipped baseline cell ``X`` and exposes
+        ``floor(multiplier * X + 0.5)``. Summing the baseline masses over that integer map's
+        preimage matches the generator exactly; merely shifting a Gaussian mean would not.
+        """
+        numeric = float(value)
+        if not math.isfinite(numeric) or numeric < 0.0 or not numeric.is_integer():
+            return -math.inf
+        if not self._active(period) or self.multiplier == 1.0:
+            return self._base_log_pmf(numeric, period=period, history=history)
+
+        lower = max(0, math.ceil((numeric - 0.5) / self.multiplier))
+        upper = math.ceil((numeric + 0.5) / self.multiplier) - 1
+        if upper < lower:
+            return -math.inf
+        return float(
+            logsumexp(
+                [
+                    self._base_log_pmf(source, period=period, history=history)
+                    for source in range(lower, upper + 1)
+                ]
+            )
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -289,6 +311,12 @@ class DemandEProcess:
         return self._engine.validity_label
 
     def observe(self, period: int, value: float) -> EProcessPoint:
+        # Reject the post-selection boundary before even evaluating a density.  The shared engine
+        # repeats this guard so direct users receive the same protection.
+        if period <= self.tau_j:
+            raise ValueError(
+                f"future-only violation: period {period} is not strictly after tau_j={self.tau_j}"
+            )
         log_null = self.null.log_pmf(value, period=period, history=self._history)
         if log_null == -math.inf:
             raise ValueError(

@@ -7,7 +7,7 @@ change without leaving a trace.
 ### 2026-09-07 — rounded dependent demand remains empirical-only
 
 - **Artefact:** `collie/verify/demand.py`
-- **Current sha256:** `4f5027c75d5255af14da98f21edba9802668e292993899374104c213df57bf11`
+- **Current sha256:** `7ed910df354d3e4e90f82087f43408a30f8e93a0e9b12ff9e3d10a2f48680175`
 - **Departure:** The dependent AR(1) null is exercised in reduced calibration but labelled
   `no_finite_sample_guarantee`; it is not included in the theorem-backed demand claim.
 - **Reason:** Module 01 exposes only rounded/clipped AR(1) observations. The exact conditional mass

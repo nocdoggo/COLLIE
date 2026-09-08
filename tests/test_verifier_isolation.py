@@ -35,12 +35,18 @@ def test_verifier_reads_no_forbidden_input() -> None:
         for node in ast.walk(tree):
             if isinstance(node, ast.Name) and node.id in FORBIDDEN_SYMBOLS:
                 offenders.append(f"{path.name}:{node.lineno}:{node.id}")
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    if alias.name == "collie.control.ledger":
+                        offenders.append(f"{path.name}:{node.lineno}:{alias.name}")
             if isinstance(node, ast.ImportFrom):
                 if node.module == "collie.control.ledger":
                     offenders.append(f"{path.name}:{node.lineno}:{node.module}")
                 for alias in node.names:
                     if alias.name in FORBIDDEN_SYMBOLS:
                         offenders.append(f"{path.name}:{node.lineno}:{alias.name}")
+                    if node.module == "collie.control" and alias.name == "ledger":
+                        offenders.append(f"{path.name}:{node.lineno}:collie.control.ledger")
             if isinstance(node, ast.Attribute) and node.attr in FORBIDDEN_ATTRIBUTES:
                 offenders.append(f"{path.name}:{node.lineno}:{node.attr}")
             if isinstance(node, ast.Constant) and isinstance(node.value, str):
