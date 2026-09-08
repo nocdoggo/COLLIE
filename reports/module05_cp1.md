@@ -4,7 +4,7 @@ Module: `05-verifier`, Checkpoint 1
 
 Command: `uv run pytest tests/test_alpha.py tests/test_eprocess_demand.py tests/test_verifier_isolation.py -v`
 
-Result: `37 passed`
+Result: `38 passed`
 
 Command: `uv run pytest tests/test_calibration.py -k demand --replications 200`
 
@@ -16,8 +16,9 @@ stamped `analysis_class = exploratory` because this is checkpoint evidence, not 
 Built:
 
 - One-based geometric alpha allocation with a hard two-proposal cap and a budget property test.
-- Frozen, log-space discrete-mixture likelihood-ratio e-processes starting strictly after `tau_j`,
-  with sticky activation only at `E >= 1/alpha_j`; future-length history is rejected.
+- Frozen, log-space discrete-mixture likelihood-ratio e-processes starting at exactly `tau_j + 1`
+  and consuming every subsequent period without gaps, with sticky activation only at
+  `E >= 1/alpha_j`; future-length history is rejected.
 - A construction registry plus rejection of mismatched family/signature, stream, and direction.
 - Exact exposed-observable masses for rounded/clipped Gaussian and negative-binomial demand nulls,
   plus exact alternative masses under Module 01's round-scale-round shock transform for all five

@@ -114,12 +114,13 @@ class MixtureEProcess:
     def trace(self) -> tuple[EProcessPoint, ...]:
         return tuple(self._trace)
 
-    def update(self, period: int, log_likelihood_ratios: Sequence[float]) -> EProcessPoint:
-        """Consume exactly one strictly post-proposal observation.
+    @property
+    def next_period(self) -> int:
+        """The only period that can extend the complete prospective product."""
+        return self._last_period + 1
 
-        ``log_likelihood_ratios[k]`` is the current observation's log alternative/null ratio for
-        mixture component ``k``.  Passing log ratios keeps long episodes away from underflow.
-        """
+    def validate_period(self, period: int) -> None:
+        """Reject pre-proposal, repeated, out-of-order, and skipped observations."""
         if period <= self.tau_j:
             raise ValueError(
                 f"future-only violation: period {period} is not strictly after tau_j={self.tau_j}"
@@ -128,6 +129,19 @@ class MixtureEProcess:
             raise ValueError(
                 f"evidence periods must increase strictly: got {period} after {self._last_period}"
             )
+        if period != self.next_period:
+            raise ValueError(
+                "evidence periods must be consecutive from tau_j + 1: "
+                f"expected {self.next_period}, got {period}"
+            )
+
+    def update(self, period: int, log_likelihood_ratios: Sequence[float]) -> EProcessPoint:
+        """Consume exactly one strictly post-proposal observation.
+
+        ``log_likelihood_ratios[k]`` is the current observation's log alternative/null ratio for
+        mixture component ``k``.  Passing log ratios keeps long episodes away from underflow.
+        """
+        self.validate_period(period)
         if len(log_likelihood_ratios) != len(self.weights):
             raise ValueError(
                 f"expected {len(self.weights)} component ratios, got {len(log_likelihood_ratios)}"

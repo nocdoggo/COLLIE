@@ -342,12 +342,9 @@ class DemandEProcess:
 
     def observe(self, period: int, value: float) -> EProcessPoint:
         assert_no_hidden_state((period, value), context="demand verifier observation")
-        # Reject the post-selection boundary before even evaluating a density.  The shared engine
-        # repeats this guard so direct users receive the same protection.
-        if period <= self.tau_j:
-            raise ValueError(
-                f"future-only violation: period {period} is not strictly after tau_j={self.tau_j}"
-            )
+        # Reject boundary violations and skipped periods before even evaluating a density.  The
+        # shared engine repeats this guard so direct users receive the same protection.
+        self._engine.validate_period(period)
         log_null = self.null.log_pmf(value, period=period, history=self._history)
         if log_null == -math.inf:
             raise ValueError(

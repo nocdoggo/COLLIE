@@ -249,6 +249,19 @@ def test_evidence_periods_must_be_strictly_increasing() -> None:
         process.update(3, (0.0,))
 
 
+def test_evidence_product_cannot_skip_a_post_proposal_period() -> None:
+    process = MixtureEProcess(tau_j=10, alpha_j=0.025, weights=(1.0,))
+    with pytest.raises(ValueError, match=r"consecutive from tau_j \+ 1: expected 11, got 12"):
+        process.update(12, (0.0,))
+    assert process.e_value == pytest.approx(1.0)
+    assert process.trace == ()
+
+    process.update(11, (0.0,))
+    with pytest.raises(ValueError, match="expected 12, got 13"):
+        process.update(13, (0.0,))
+    assert len(process.trace) == 1
+
+
 def test_history_before_proposal_cannot_include_future_observations() -> None:
     with pytest.raises(ValueError, match="more observations than tau_j"):
         DemandEProcess.for_level_change(
