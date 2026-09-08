@@ -34,7 +34,8 @@ Deviations:
   recorded in `prereg/deviations.md`; stationary IID, seasonal, and overdispersed rows retain the
   theorem-backed label.
 
-Blocked on: the Module 04 CP1 joint test proving every emitted `predictive_model` key resolves in
-this registry cannot run until that compiler implementation is available. Module 5's registry is
-locally complete, but this cross-module claim is not reported as passed. Arrival recursion,
-lifecycle, and the full 2,000-replication calibration remain stopped until this audit passes.
+Blocked on: nothing for Module 5 Checkpoint 1. The registry is implemented and tested against the
+frozen/documented key space without waiting for another branch. The real Module 04-to-05 joint test
+will be rerun as a convergence check when branches merge; it is not a Module 5 development blocker.
+Arrival recursion, lifecycle, and the full 2,000-replication calibration remain stopped until this
+audit passes.
