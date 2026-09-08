@@ -211,12 +211,25 @@ class _DemoParser:
 
 
 def dev_instances(root: Path, episodes: int) -> list[tuple[LoadedInstance, int]]:
-    """Materialise ``episodes`` dev episodes (one per family per cycle) and load them."""
+    """Materialise ``episodes`` dev episodes (one per family per cycle) and load them.
+
+    The dev pool is finite (``build_units(Split.DEV)`` units per family); asking for more
+    cycles than the pool holds must fail loudly, not fall off the end of the registry with a
+    bare ``IndexError``.
+    """
     units = build_units(Split.DEV)
     by_family = {f: [u for u in units if u.family == f] for f in FAMILIES}
     cycles = episodes // len(FAMILIES)
     if cycles < 1 or episodes % len(FAMILIES) != 0:
         raise ValueError(f"--episodes must be a positive multiple of 6, got {episodes}")
+    per_family = min(len(by_family[f]) for f in FAMILIES)
+    pool = per_family * len(FAMILIES)
+    if episodes > pool:
+        raise ValueError(
+            f"--episodes {episodes} exceeds the dev episode pool of {pool} "
+            f"({per_family} units x {len(FAMILIES)} families); "
+            "the dev split is finite by design and larger sweeps are for the pilot, not the demo"
+        )
     out = []
     for i in range(cycles):
         for family in FAMILIES:
