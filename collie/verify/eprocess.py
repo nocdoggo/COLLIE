@@ -11,8 +11,11 @@ import math
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 
+from collie.contracts import AnalysisClass
+
 __all__ = [
     "ANYTIME_VALID",
+    "EMPIRICAL_ONLY",
     "NO_FINITE_SAMPLE_GUARANTEE",
     "EProcessPoint",
     "MixtureEProcess",
@@ -20,6 +23,7 @@ __all__ = [
 
 
 ANYTIME_VALID = "anytime_valid"
+EMPIRICAL_ONLY = "empirical_only"
 NO_FINITE_SAMPLE_GUARANTEE = "no_finite_sample_guarantee"
 
 
@@ -42,6 +46,7 @@ class EProcessPoint:
     activated: bool
     activation_period: int | None
     validity_label: str
+    analysis_class: AnalysisClass
 
 
 @dataclass(frozen=True, slots=True)
@@ -52,6 +57,7 @@ class MixtureEProcess:
     alpha_j: float
     weights: tuple[float, ...]
     validity_label: str = ANYTIME_VALID
+    analysis_class: AnalysisClass = AnalysisClass.EXPLORATORY
     _log_wealth: list[float] = field(init=False, repr=False)
     _log_weights: tuple[float, ...] = field(init=False, repr=False)
     _last_period: int = field(init=False, repr=False)
@@ -142,6 +148,7 @@ class MixtureEProcess:
             activated=self.activated,
             activation_period=self._activation_period,
             validity_label=self.validity_label,
+            analysis_class=self.analysis_class,
         )
         self._trace.append(point)
         return point

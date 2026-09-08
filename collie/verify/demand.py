@@ -16,12 +16,20 @@ from pathlib import Path
 import numpy as np
 from scipy.special import gammaln, log_ndtr, logsumexp
 
-from collie.contracts import Direction, ShockFamily, ShockSpec, TargetStream, assert_no_hidden_state
+from collie.contracts import (
+    AnalysisClass,
+    Direction,
+    ShockFamily,
+    ShockSpec,
+    TargetStream,
+    assert_no_hidden_state,
+)
 from collie.data.families.base import BaselineKind, BaselineSpec, as_demand_cells, draw_baseline
 from collie.data.families.demand import MAGNITUDE_SETS, PULSE_DURATION
 from collie.verify.alpha import alpha_for_proposal
 from collie.verify.eprocess import (
     ANYTIME_VALID,
+    EMPIRICAL_ONLY,
     NO_FINITE_SAMPLE_GUARANTEE,
     EProcessPoint,
     MixtureEProcess,
@@ -85,6 +93,14 @@ class RegisteredDemandLaw:
         # contract.  Keeping it out of the formal path is more honest than treating the last
         # rounded observation as the latent state.
         return not self.plug_in and self.baseline.kind is not BaselineKind.DEPENDENT
+
+    @property
+    def validity_label(self) -> str:
+        if self.plug_in:
+            return NO_FINITE_SAMPLE_GUARANTEE
+        if self.baseline.kind is BaselineKind.DEPENDENT:
+            return EMPIRICAL_ONLY
+        return ANYTIME_VALID
 
     def _active(self, period: int) -> bool:
         if self.active_from is None or period < self.active_from:
@@ -162,6 +178,7 @@ class DemandEProcess:
     tau_j: int
     alpha_j: float
     history_before_proposal: tuple[float, ...] = ()
+    analysis_class: AnalysisClass = AnalysisClass.EXPLORATORY
     _engine: MixtureEProcess = field(init=False, repr=False)
     _history: list[float] = field(init=False, repr=False)
 
@@ -172,8 +189,15 @@ class DemandEProcess:
         )
         if not self.alternatives:
             raise ValueError("a demand e-process needs at least one registered alternative")
+        if len(self.history_before_proposal) > self.tau_j:
+            raise ValueError(
+                "history_before_proposal contains more observations than tau_j permits: "
+                f"{len(self.history_before_proposal)} > {self.tau_j}"
+            )
         weight = 1.0 / len(self.alternatives)
-        validity = ANYTIME_VALID if self.null.theorem_backed else NO_FINITE_SAMPLE_GUARANTEE
+        validity = self.null.validity_label
+        if validity != ANYTIME_VALID and self.analysis_class is AnalysisClass.CONFIRMATORY:
+            raise ValueError(f"{validity} demand verifier cannot be labelled confirmatory")
         object.__setattr__(
             self,
             "_engine",
@@ -182,6 +206,7 @@ class DemandEProcess:
                 alpha_j=self.alpha_j,
                 weights=(weight,) * len(self.alternatives),
                 validity_label=validity,
+                analysis_class=self.analysis_class,
             ),
         )
         object.__setattr__(self, "_history", list(self.history_before_proposal))
@@ -198,6 +223,7 @@ class DemandEProcess:
         onset_window: tuple[int, int] = (0, 0),
         history_before_proposal: Sequence[float] = (),
         plug_in: bool = False,
+        analysis_class: AnalysisClass = AnalysisClass.EXPLORATORY,
     ) -> DemandEProcess:
         if direction is Direction.DEMAND_UP:
             multipliers = MAGNITUDE_SETS[1]
@@ -223,6 +249,7 @@ class DemandEProcess:
             tau_j=tau_j,
             alpha_j=allocation.alpha_j,
             history_before_proposal=tuple(history_before_proposal),
+            analysis_class=analysis_class,
         )
 
     @classmethod
@@ -234,6 +261,7 @@ class DemandEProcess:
         alpha_episode: float,
         history_before_proposal: Sequence[float] = (),
         plug_in: bool = False,
+        analysis_class: AnalysisClass = AnalysisClass.EXPLORATORY,
     ) -> DemandEProcess:
         """Compile a legal demand ShockSpec into its fixed discrete mixture."""
         construction = resolve_spec_shape(spec.shock_family, spec.prospective_signature)
@@ -262,6 +290,7 @@ class DemandEProcess:
                 onset_window=spec.onset_window,
                 history_before_proposal=history_before_proposal,
                 plug_in=plug_in,
+                analysis_class=analysis_class,
             )
         if spec.shock_family is not ShockFamily.TEMPORARY_PULSE:
             raise ValueError(f"unsupported demand shock family {spec.shock_family}")
@@ -288,6 +317,7 @@ class DemandEProcess:
             tau_j=spec.tau_j,
             alpha_j=allocation.alpha_j,
             history_before_proposal=tuple(history_before_proposal),
+            analysis_class=analysis_class,
         )
 
     @property
@@ -311,6 +341,7 @@ class DemandEProcess:
         return self._engine.validity_label
 
     def observe(self, period: int, value: float) -> EProcessPoint:
+        assert_no_hidden_state((period, value), context="demand verifier observation")
         # Reject the post-selection boundary before even evaluating a density.  The shared engine
         # repeats this guard so direct users receive the same protection.
         if period <= self.tau_j:
@@ -342,6 +373,7 @@ class CalibrationSummary:
     rate: float
     wilson_low: float
     wilson_high: float
+    analysis_class: AnalysisClass
 
 
 def _wilson_interval(
@@ -402,13 +434,12 @@ def run_null_calibration(
         alpha_episode=alpha_episode,
         proposal_alpha=proposal_alpha,
         validity_label=(
-            ANYTIME_VALID
-            if baseline.kind is not BaselineKind.DEPENDENT
-            else NO_FINITE_SAMPLE_GUARANTEE
+            ANYTIME_VALID if baseline.kind is not BaselineKind.DEPENDENT else EMPIRICAL_ONLY
         ),
         rate=activations / replications,
         wilson_low=low,
         wilson_high=high,
+        analysis_class=AnalysisClass.EXPLORATORY,
     )
 
 

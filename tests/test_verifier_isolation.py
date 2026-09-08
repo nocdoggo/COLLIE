@@ -21,9 +21,15 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 FORBIDDEN_SYMBOLS = {"HiddenIncident", "HiddenAlertSpec", "SupplyRealization"}
 FORBIDDEN_ATTRIBUTES = {
     "actual_lead_time",
+    "article_id",
+    "future_demand",
     "incident",
+    "instance_id",
+    "latent_parameters",
+    "pattern_name",
     "shipment_ages",
     "supply_realization",
+    "test_label",
 }
 FORBIDDEN_PATHS = {"incident.json", "supply.csv", "collie.control.ledger"}
 
@@ -47,7 +53,9 @@ def test_verifier_reads_no_forbidden_input() -> None:
                         offenders.append(f"{path.name}:{node.lineno}:{alias.name}")
                     if node.module == "collie.control" and alias.name == "ledger":
                         offenders.append(f"{path.name}:{node.lineno}:collie.control.ledger")
-            if isinstance(node, ast.Attribute) and node.attr in FORBIDDEN_ATTRIBUTES:
+            if isinstance(node, ast.Attribute) and node.attr in (
+                FORBIDDEN_ATTRIBUTES | FORBIDDEN_SYMBOLS
+            ):
                 offenders.append(f"{path.name}:{node.lineno}:{node.attr}")
             if isinstance(node, ast.Constant) and isinstance(node.value, str):
                 for forbidden in FORBIDDEN_PATHS:
@@ -92,6 +100,24 @@ def test_runtime_input_walk_rejects_a_deliberate_hidden_state_leak() -> None:
             alpha_episode=0.05,
             history_before_proposal=(incident,),  # type: ignore[arg-type]
         )
+
+
+def test_runtime_observation_walk_rejects_a_deliberate_hidden_state_leak() -> None:
+    verifier = DemandEProcess.for_level_change(
+        baseline=BaselineSpec(),
+        direction=Direction.DEMAND_UP,
+        tau_j=10,
+        alpha_episode=0.05,
+    )
+    incident = HiddenIncident(
+        family=ShockFamily.DEMAND_LEVEL,
+        onset_period=14,
+        magnitude=1.5,
+        duration=20,
+        conditional_independence=True,
+    )
+    with pytest.raises(HiddenStateLeak, match="demand verifier observation"):
+        verifier.observe(11, incident)  # type: ignore[arg-type]
 
 
 def test_verifier_package_never_imports_control_ledger() -> None:

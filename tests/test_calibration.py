@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import pytest
 
+from collie.contracts import AnalysisClass
 from collie.data.families.base import BaselineKind, BaselineSpec
 from collie.verify.demand import run_null_calibration
-from collie.verify.eprocess import ANYTIME_VALID, NO_FINITE_SAMPLE_GUARANTEE
+from collie.verify.eprocess import ANYTIME_VALID, EMPIRICAL_ONLY
 
 
 @pytest.mark.slow
@@ -35,7 +36,6 @@ def test_demand_false_activation_calibration(
     assert summary.rate <= summary.proposal_alpha
     assert summary.proposal_alpha == pytest.approx(summary.alpha_episode / 2.0)
     assert summary.wilson_low <= summary.rate <= summary.wilson_high
-    expected_label = (
-        NO_FINITE_SAMPLE_GUARANTEE if baseline.kind is BaselineKind.DEPENDENT else ANYTIME_VALID
-    )
+    expected_label = EMPIRICAL_ONLY if baseline.kind is BaselineKind.DEPENDENT else ANYTIME_VALID
     assert summary.validity_label == expected_label
+    assert summary.analysis_class is AnalysisClass.EXPLORATORY

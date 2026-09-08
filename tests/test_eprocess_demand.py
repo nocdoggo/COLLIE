@@ -9,6 +9,7 @@ import numpy as np
 import pytest
 
 from collie.contracts import (
+    AnalysisClass,
     Direction,
     DurationBin,
     MagnitudeBin,
@@ -20,7 +21,7 @@ from collie.contracts import (
 from collie.data.families.base import BaselineKind, BaselineSpec
 from collie.data.families.base import as_demand_cells as generator_round_and_clip
 from collie.verify.demand import DemandEProcess, RegisteredDemandLaw
-from collie.verify.eprocess import NO_FINITE_SAMPLE_GUARANTEE, MixtureEProcess
+from collie.verify.eprocess import EMPIRICAL_ONLY, NO_FINITE_SAMPLE_GUARANTEE, MixtureEProcess
 from collie.verify.registry import CONSTRUCTIONS, resolve_construction, resolve_spec_shape
 
 
@@ -228,6 +229,7 @@ def test_registered_direction_cannot_be_reinterpreted() -> None:
 def test_activation_requires_crossing_one_over_alpha() -> None:
     process = MixtureEProcess(tau_j=2, alpha_j=0.1, weights=(1.0,))
     before = process.update(3, (math.log(9.99),))
+    assert before.analysis_class is AnalysisClass.EXPLORATORY
     assert not before.activated
     assert before.e_value < before.threshold
     crossing = process.update(4, (math.log(10.0 / 9.99),))
@@ -245,6 +247,17 @@ def test_evidence_periods_must_be_strictly_increasing() -> None:
     process.update(3, (0.0,))
     with pytest.raises(ValueError, match="increase strictly"):
         process.update(3, (0.0,))
+
+
+def test_history_before_proposal_cannot_include_future_observations() -> None:
+    with pytest.raises(ValueError, match="more observations than tau_j"):
+        DemandEProcess.for_level_change(
+            baseline=BaselineSpec(),
+            direction=Direction.DEMAND_UP,
+            tau_j=2,
+            alpha_episode=0.05,
+            history_before_proposal=(100.0, 101.0, 102.0),
+        )
 
 
 def test_eprocess_configuration_is_frozen_after_proposal() -> None:
@@ -280,6 +293,25 @@ def test_plug_in_variant_is_labelled_unguaranteed() -> None:
     point = verifier.observe(3, 100.0)
     assert verifier.validity_label == NO_FINITE_SAMPLE_GUARANTEE
     assert point.validity_label == NO_FINITE_SAMPLE_GUARANTEE
+    assert point.analysis_class is AnalysisClass.EXPLORATORY
+    low_history = RegisteredDemandLaw(BaselineSpec(), plug_in=True).log_pmf(
+        100.0, period=3, history=(80.0, 90.0)
+    )
+    high_history = RegisteredDemandLaw(BaselineSpec(), plug_in=True).log_pmf(
+        100.0, period=3, history=(100.0, 110.0)
+    )
+    assert high_history > low_history, "the plug-in null must actually re-estimate from history"
+
+    with pytest.raises(ValueError, match="cannot be labelled confirmatory"):
+        DemandEProcess.for_level_change(
+            baseline=BaselineSpec(),
+            direction=Direction.DEMAND_UP,
+            tau_j=2,
+            alpha_episode=0.05,
+            history_before_proposal=(90.0, 110.0),
+            plug_in=True,
+            analysis_class=AnalysisClass.CONFIRMATORY,
+        )
 
 
 def test_dependent_rounded_null_is_not_overclaimed() -> None:
@@ -290,7 +322,9 @@ def test_dependent_rounded_null_is_not_overclaimed() -> None:
         alpha_episode=0.05,
         history_before_proposal=(100.0, 105.0),
     )
-    assert verifier.observe(3, 103.0).validity_label == NO_FINITE_SAMPLE_GUARANTEE
+    point = verifier.observe(3, 103.0)
+    assert point.validity_label == EMPIRICAL_ONLY
+    assert point.analysis_class is AnalysisClass.EXPLORATORY
 
 
 def test_genuine_persistent_shift_has_power() -> None:
