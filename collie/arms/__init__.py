@@ -11,10 +11,14 @@ from collie.arms.base_stock import (
     CappedBaseStockController,
     base_stock_order,
 )
+from collie.arms.oracle import ORACLE_ARM_ID, oracle_config_for, oracle_controller_for
 
 __all__ = [
     "ARM1_ARM_ID",
+    "ORACLE_ARM_ID",
     "BaseStockParams",
     "CappedBaseStockController",
     "base_stock_order",
+    "oracle_config_for",
+    "oracle_controller_for",
 ]

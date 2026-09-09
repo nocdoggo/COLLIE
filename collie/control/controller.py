@@ -25,6 +25,15 @@ passes the loaded instance's ``spec.order_cap``) and never a literal in this mod
 (``collie/sim/accounting.py::clamp_order``) after any controller speaks; the controller clamping
 too is what makes ``0 <= q_t <= C_t`` a property of this class in isolation, not just of the
 runner wrapped around it.
+
+**Age-binned telemetry** (``ledger`` below) is an *ablation flag*, never a per-arm feature: any
+``OrCompilerController``, regardless of ``arm_id``, records identically into whatever
+:class:`~collie.control.ledger.FIFOLedger` its caller attaches. Handing a richer, ledger-derived
+observation to one arm and not another would let an apparent hypothesis-driven profit advantage
+actually come from the observation being richer — a confound the harness (module 06) must not
+introduce (``docs/implementation/04-or-compiler.md``, Checkpoint 2). The order rule itself never
+reads the ledger back; it only feeds it, so attaching one changes what telemetry is available
+after the fact and never changes an order.
 """
 
 from __future__ import annotations
@@ -36,6 +45,7 @@ from scipy.stats import norm
 
 from collie.contracts import ControlConfig, Decision, PeriodObservation
 from collie.control.forecast import DemandForecaster
+from collie.control.ledger import FIFOLedger
 
 __all__ = ["OrCompilerController", "base_stock_target", "critical_fractile"]
 
@@ -74,6 +84,9 @@ class OrCompilerController:
     config: ControlConfig
     arm_id: str = "or_compiler"
     train_demand: tuple[float, ...] = ()
+    ledger: FIFOLedger | None = None
+    """``None`` by default (the ablation is off). When attached, every arm wrapping this class
+    records into it identically; see the module docstring."""
     _forecaster: DemandForecaster = field(init=False, repr=False)
 
     def __post_init__(self) -> None:
@@ -88,11 +101,15 @@ class OrCompilerController:
         # Record first, decide second: the estimator at period t must have already seen t-1's
         # demand (docs/env_contract.md §8.5), matching arm 1's convention exactly.
         self._forecaster.record(obs.prev_demand)
+        if self.ledger is not None and obs.period > 1:
+            self.ledger.record_receipt(obs.period, obs.prev_arrivals)
         stats = self._forecaster.stats()
         fractile = critical_fractile(obs.profit_per_unit, obs.holding_cost_per_unit)
         target = base_stock_target(self.config, mean=stats.mean, std=stats.std, fractile=fractile)
         position = obs.on_hand + self.config.gamma * obs.in_transit_total
         quantity = min(max(0.0, target - position), self.order_cap)
+        if self.ledger is not None:
+            self.ledger.record_order(obs.period, quantity)
         return Decision(
             period=obs.period,
             order_quantity=quantity,

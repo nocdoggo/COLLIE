@@ -81,24 +81,37 @@ _M_DOWN: dict[int, float] = {1: 0.75, 2: 0.6, 3: 0.6}
 
 # (l_eff, gamma) by severity rank, one map per supply family. Lead-time-shift moves l_eff alone
 # (arrivals are just later; the pipeline is still trusted). Shipment-loss moves gamma alone
-# (arrivals are on time; fewer of them can be trusted to still be real). Transit-pause moves both,
-# at the same rank-driven values the pure families use individually, since a stalled pipeline is
-# both symptoms of a lead-time-shift and a shipment-loss belief at once.
+# (arrivals are on time; fewer of them can be trusted to still be real).
+#
+# Transit-pause is deliberately *not* symmetric with the other two. Reducing gamma while a pause
+# is active tells the controller to discount in-transit inventory that InventoryBench's
+# authoritative `eval/` harness already reports accurately (`docs/env_contract.md` §5): under
+# that harness a lost order is simply never added to in-transit, so nothing is silently inflating
+# the pipeline count for gamma to correct for. Discounting it anyway just makes the controller
+# double-order against stock that is, in fact, still coming, and when a *paused* (as opposed to
+# lost) shipment later arrives all at once, that double order and the delayed shipment land
+# together — a bullwhip spike this project's own oracle-headroom probe caught directly
+# (`grid.py --oracle-headroom`; see `04-or-compiler.md`'s Checkpoint 2 pass criteria). So
+# transit-pause moves mostly l_eff, like a lead-time-shift, and reserves a gamma cut for the
+# high-severity case only, where genuine conversion to a loss is plausible enough to hedge for.
 _SUPPLY_BY_FAMILY: dict[ShockFamily, dict[int, tuple[int, float]]] = {
     ShockFamily.LEAD_TIME_SHIFT: {1: (2, 1.0), 2: (3, 1.0), 3: (4, 1.0)},
     ShockFamily.SHIPMENT_LOSS: {1: (1, 0.5), 2: (1, 0.0), 3: (1, 0.0)},
-    ShockFamily.TRANSIT_PAUSE: {1: (2, 0.5), 2: (3, 0.5), 3: (4, 0.0)},
+    ShockFamily.TRANSIT_PAUSE: {1: (2, 1.0), 2: (2, 1.0), 3: (3, 0.5)},
 }
 
-# Compound moves m and the supply pair together, at the same rank. The direction enum has no
+# Compound moves m and the supply pair together, at the same rank, and for the same reason the
+# transit-pause map above avoids gamma: the oracle-headroom probe showed a gamma cut compounding
+# with an m increase overshoots badly once both streams recover simultaneously. Kept mild and
+# gamma-preserving through medium severity, escalating only at high. The direction enum has no
 # "mixed, but demand down" member, so compound is registered as the up-and-worse case; a model
 # believing demand fell *and* the pipeline is unreliable has to express that as two proposals
 # under this schema, which the lifecycle already supports (04's controller does not need to know
 # about that; it is a module 05/06 concern).
 _COMPOUND_BY_RANK: dict[int, tuple[float, int, float]] = {
-    1: (1.25, 2, 0.0),
-    2: (1.5, 3, 0.0),
-    3: (2.0, 4, 0.5),
+    1: (1.25, 2, 1.0),
+    2: (1.25, 2, 1.0),
+    3: (1.5, 3, 1.0),
 }
 
 CANONICAL_SHAPES: frozenset[tuple[ShockFamily, Direction, TargetStream]] = frozenset(

@@ -1,9 +1,9 @@
 """Branch E (P1). Deterministic compiler, 72-config grid, capped base-stock, FIFO ledger.
 
-``mapping.compile_spec`` is the only path from a ``ShockSpec`` to a ``ControlConfig``, and
-``controller.OrCompilerController`` is the only controller every OR-compiler arm wraps
-(``docs/implementation/04-or-compiler.md``). The FIFO ledger is a Checkpoint 2 deliverable and
-lands in a later commit.
+``mapping.compile_spec`` is the only path from a ``ShockSpec`` to a ``ControlConfig``,
+``controller.OrCompilerController`` is the only controller every OR-compiler arm wraps, and
+``ledger.FIFOLedger`` is control-side telemetry that must never reach ``collie/verify/``
+(``docs/implementation/04-or-compiler.md``).
 """
 
 from collie.control.controller import OrCompilerController, base_stock_target, critical_fractile
@@ -17,6 +17,15 @@ from collie.control.grid import (
     predictive_model_for,
     predictive_model_keys,
 )
+from collie.control.ledger import (
+    AgedUnits,
+    FIFOLedger,
+    LedgerInconsistency,
+    LedgerLeak,
+    assert_no_ledger_state,
+    find_ledger_state,
+    scan_for_ledger_references,
+)
 from collie.control.mapping import CANONICAL_SHAPES, compile_spec, iter_legal_specs, mapping_table
 
 __all__ = [
@@ -25,16 +34,23 @@ __all__ = [
     "GAMMA_VALUES",
     "L_EFF_VALUES",
     "M_VALUES",
+    "AgedUnits",
     "DemandForecaster",
+    "FIFOLedger",
     "ForecastStats",
+    "LedgerInconsistency",
+    "LedgerLeak",
     "OrCompilerController",
     "all_configs",
+    "assert_no_ledger_state",
     "base_stock_target",
     "compile_spec",
     "critical_fractile",
+    "find_ledger_state",
     "forecast_stats",
     "iter_legal_specs",
     "mapping_table",
     "predictive_model_for",
     "predictive_model_keys",
+    "scan_for_ledger_references",
 ]

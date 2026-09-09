@@ -17,6 +17,7 @@ which is what keeps this module honest about not encoding per-family knowledge t
 from __future__ import annotations
 
 import itertools
+from typing import Any
 
 from collie.contracts import ControlConfig
 
@@ -124,7 +125,112 @@ def _print_table() -> None:  # pragma: no cover - CLI only
     )
 
 
+def _loaded_instance_from_fixture(fx: Any) -> Any:  # pragma: no cover - CLI only
+    """Adapt a fixture episode into a ``LoadedInstance`` for the demo scripts below.
+
+    Fixture episodes carry one scalar profit/holding pair on ``spec`` rather than the per-period
+    columns ``LoadedInstance`` expects, so this repeats them across the horizon; every shipped
+    instance does the same thing in practice (``docs/env_contract.md`` §8.2).
+    """
+    from collie.sim.loader import LoadedInstance
+
+    spec = fx.spec
+    horizon = spec.horizon
+    return LoadedInstance(
+        spec=spec,
+        demand=fx.demand,
+        supply=fx.supply,
+        profits=(spec.profit_per_unit,) * horizon,
+        holding_costs=(spec.holding_cost_per_unit,) * horizon,
+        dates=tuple(f"t{i}" for i in range(1, horizon + 1)),
+        incident=fx.incident,
+    )
+
+
+def _regret_sweep(family_name: str, *, seeds: int = 6) -> None:  # pragma: no cover - CLI only
+    """Run every one of the 72 configs against several seeds of one family's fixture episode and
+    report which region of the grid the family actually rewards. Registered as exploratory: it
+    informs the Checkpoint 2 audit, not a paper claim."""
+    from collie.contracts import ShockFamily
+    from collie.control.controller import OrCompilerController
+    from collie.fakes import fixture_episode
+    from collie.sim.runner import EpisodeRunner
+
+    family = ShockFamily(family_name)
+    instances = [
+        _loaded_instance_from_fixture(fixture_episode(family, seed=seed)) for seed in range(seeds)
+    ]
+
+    scored: list[tuple[float, ControlConfig]] = []
+    for config in all_configs():
+        rewards = []
+        for inst in instances:
+            controller = OrCompilerController(order_cap=inst.spec.order_cap, config=config)
+            outcome = EpisodeRunner(instance=inst, strict_isolation=True).run(controller)
+            rewards.append(outcome.result.total_reward)
+        scored.append((sum(rewards) / len(rewards), config))
+    scored.sort(key=lambda pair: pair[0], reverse=True)
+
+    print(f"regret sweep: family={family.value}, seeds={seeds}, {len(scored)} configs")
+    print(f"\n{'rank':>4}  {'mean_reward':>12}  m  l_eff  gamma  predictive_model")
+    for rank, (reward, c) in enumerate(scored[:5], start=1):
+        print(f"{rank:>4}  {reward:>12.2f}  {c.m}  {c.l_eff}  {c.gamma}  {c.predictive_model}")
+    print("  ...")
+    for rank, (reward, c) in enumerate(scored[-5:], start=len(scored) - 4):
+        print(f"{rank:>4}  {reward:>12.2f}  {c.m}  {c.l_eff}  {c.gamma}  {c.predictive_model}")
+
+
+def _oracle_headroom(*, seeds_per_family: int = 3) -> None:  # pragma: no cover - CLI only
+    """The oracle-ShockSpec arm against stationary OR on the fixture's dev episodes.
+
+    6 families * 3 seeds = 18 episodes, matching the Checkpoint 2 pass criterion. This is the
+    headroom number: if the oracle barely beats stationary OR here, the shocks module 01
+    generates are too mild for anything downstream to detect."""
+    from collie.arms.oracle import oracle_controller_for
+    from collie.contracts import ShockFamily
+    from collie.control.controller import OrCompilerController
+    from collie.fakes import fixture_episode
+    from collie.sim.runner import EpisodeRunner
+
+    families = [f for f in ShockFamily if f is not ShockFamily.NO_CHANGE]
+    oracle_total = 0.0
+    stationary_total = 0.0
+    n = 0
+    for family in families:
+        for seed in range(seeds_per_family):
+            inst = _loaded_instance_from_fixture(fixture_episode(family, seed=seed))
+            oracle = oracle_controller_for(inst.incident, order_cap=inst.spec.order_cap)
+            stationary = OrCompilerController(order_cap=inst.spec.order_cap, config=BASELINE_CONFIG)
+            oracle_reward = EpisodeRunner(instance=inst).run(oracle).result.total_reward
+            stationary_reward = EpisodeRunner(instance=inst).run(stationary).result.total_reward
+            oracle_total += oracle_reward
+            stationary_total += stationary_reward
+            n += 1
+
+    print(
+        f"oracle-ShockSpec headroom over stationary OR, {n} dev episodes ({len(families)} "
+        f"families x {seeds_per_family} seeds)"
+    )
+    print(f"  oracle mean reward:      {oracle_total / n:.2f}")
+    print(f"  stationary mean reward:  {stationary_total / n:.2f}")
+    print(f"  gap:                     {(oracle_total - stationary_total) / n:.2f}")
+
+
 if __name__ == "__main__":  # pragma: no cover - CLI only
-    # The regret sweep and oracle-headroom demos are Checkpoint 2 deliverables; not expected yet
-    # (docs/implementation/04-or-compiler.md, Checkpoint 1's "Not expected yet" list).
-    _print_table()
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--print-table", action="store_true")
+    parser.add_argument("--regret-sweep", action="store_true")
+    parser.add_argument("--family", default=None)
+    parser.add_argument("--oracle-headroom", action="store_true")
+    args = parser.parse_args()
+
+    if args.regret_sweep:
+        if not args.family:
+            parser.error("--regret-sweep requires --family")
+        _regret_sweep(args.family)
+    elif args.oracle_headroom:
+        _oracle_headroom()
+    else:
+        _print_table()
