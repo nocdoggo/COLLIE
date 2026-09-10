@@ -195,7 +195,10 @@ def stub_openai(monkeypatch):
     _StubOpenAI.init_kwargs = {}
     _StubOpenAI.create_kwargs = []
     _StubOpenAI.usage_result = _StubOpenAI._DEFAULT
-    monkeypatch.setenv("COLLIE_TEST_KEY", "stub-key")
+    # Stub keys for every endpoint a test may construct: env beats the key file, so these
+    # hold on machines without cloud_endpoint/ populated (CI) and change nothing locally.
+    for env_var in ("COLLIE_TEST_KEY", "GEMINI_API_KEY", "XAI_API_KEY", "ZAI_API_KEY"):
+        monkeypatch.setenv(env_var, "stub-key")
     monkeypatch.setattr("openai.OpenAI", _StubOpenAI)
     return _StubOpenAI
 
