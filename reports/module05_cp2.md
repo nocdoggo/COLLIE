@@ -14,8 +14,8 @@ uv run python -m collie.verify.arrival --demo
 Result:
 
 ```text
-37 passed in 0.67s
-9 passed in 174.22s (0:02:54)
+37 passed in 0.96s
+9 passed in 166.36s (0:02:46)
 
 lost-shipment burst: activated=True at=17 e=12289.867
 noisy registered null: activated=False at=None e=0.118

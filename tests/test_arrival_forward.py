@@ -13,6 +13,8 @@ from collie.contracts import (
     AnalysisClass,
     Direction,
     DurationBin,
+    HiddenIncident,
+    HiddenStateLeak,
     MagnitudeBin,
     ObservationMode,
     Persistence,
@@ -221,6 +223,19 @@ def test_no_fifo_identity_used() -> None:
                 if "collie.control.ledger" in {module, *names}:
                     offenders.append(f"{path.name}:{node.lineno}:forbidden control import")
     assert not offenders
+
+    # The public forward step also walks its runtime input graph.  A hidden incident cannot be
+    # smuggled through a nominally numeric dispatch field to bypass the static ledger scan.
+    hidden = HiddenIncident(
+        family=ShockFamily.SHIPMENT_LOSS,
+        onset_period=2,
+        magnitude=1.0,
+        duration=2,
+        conditional_independence=True,
+    )
+    forward = ArrivalForwardFilter(ArrivalModel(RegisteredArrivalLaw((0.5, 0.5), 0.0)))
+    with pytest.raises(HiddenStateLeak, match="arrival verifier observation"):
+        forward.step(period=1, dispatch_quantity=hidden, receipt=0.0)  # type: ignore[arg-type]
 
 
 def test_validity_flags_match_the_note() -> None:
