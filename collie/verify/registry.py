@@ -9,9 +9,18 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from collie.contracts import Direction, ShockFamily, TargetStream
+from collie.contracts import Direction, ShockFamily, ShockSpec, TargetStream
 
-__all__ = ["CONSTRUCTIONS", "Construction", "resolve_construction", "resolve_spec_shape"]
+__all__ = [
+    "CONSTRUCTIONS",
+    "REGISTERED_ONSET_WINDOWS",
+    "Construction",
+    "resolve_construction",
+    "resolve_spec",
+    "resolve_spec_shape",
+]
+
+REGISTERED_ONSET_WINDOWS = ((-2, 0), (-1, 1), (0, 2), (-2, 2))
 
 
 @dataclass(frozen=True, slots=True)
@@ -114,3 +123,17 @@ def resolve_spec_shape(family: ShockFamily, signature: str) -> Construction:
         return _BY_SPEC_SHAPE[(family, signature)]
     except KeyError as exc:
         raise KeyError(f"no verifier construction for {(family, signature)!r}") from exc
+
+
+def resolve_spec(spec: ShockSpec) -> Construction:
+    """Validate the frozen Module 02 surface before selecting one verifier construction."""
+    if spec.is_abstention:
+        raise ValueError("no_change is an abstention and has no verifier construction")
+    if spec.onset_window not in REGISTERED_ONSET_WINDOWS:
+        raise ValueError(f"unregistered onset_window {spec.onset_window!r}")
+    construction = resolve_spec_shape(spec.shock_family, spec.prospective_signature)
+    if construction.stream is not spec.target_stream:
+        raise ValueError("spec target_stream does not match its registered construction")
+    if construction.direction is not spec.direction:
+        raise ValueError("spec direction does not match registered signature")
+    return construction

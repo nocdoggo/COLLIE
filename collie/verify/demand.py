@@ -26,6 +26,8 @@ from collie.contracts import (
 )
 from collie.data.families.base import BaselineKind, BaselineSpec, as_demand_cells, draw_baseline
 from collie.data.families.demand import MAGNITUDE_SETS, PULSE_DURATION
+from collie.data.families.supply import COMPOUND_DURATION, COMPOUND_MAGNITUDES
+from collie.data.nullbank import PROPOSAL_PERIODS, build_nullbank
 from collie.verify.alpha import alpha_for_proposal
 from collie.verify.eprocess import (
     ANYTIME_VALID,
@@ -34,7 +36,7 @@ from collie.verify.eprocess import (
     EProcessPoint,
     MixtureEProcess,
 )
-from collie.verify.registry import resolve_spec_shape
+from collie.verify.registry import resolve_spec
 
 __all__ = [
     "CalibrationSummary",
@@ -264,7 +266,44 @@ class DemandEProcess:
         analysis_class: AnalysisClass = AnalysisClass.EXPLORATORY,
     ) -> DemandEProcess:
         """Compile a legal demand ShockSpec into its fixed discrete mixture."""
-        construction = resolve_spec_shape(spec.shock_family, spec.prospective_signature)
+        construction = resolve_spec(spec)
+        if spec.shock_family is ShockFamily.COMPOUND:
+            if (
+                construction.stream is not TargetStream.BOTH
+                or spec.target_stream is not TargetStream.BOTH
+            ):
+                raise ValueError("compound demand verifier requires a registered both-stream spec")
+            if spec.direction is not construction.direction:
+                raise ValueError(
+                    "compound spec direction does not match its registered construction"
+                )
+            if spec.onset_window is None:
+                raise ValueError("a compound spec needs an onset window")
+            starts = tuple(
+                spec.tau_j + offset
+                for offset in range(spec.onset_window[0], spec.onset_window[1] + 1)
+            )
+            alternatives = tuple(
+                RegisteredDemandLaw(
+                    baseline,
+                    multiplier=multiplier,
+                    active_from=start,
+                    active_duration=duration,
+                    plug_in=plug_in,
+                )
+                for multiplier in COMPOUND_MAGNITUDES
+                for start in starts
+                for duration in range(COMPOUND_DURATION[0], COMPOUND_DURATION[1] + 1)
+            )
+            proposal_alpha = alpha_for_proposal(alpha_episode, spec.proposal_index).alpha_j
+            return cls(
+                null=RegisteredDemandLaw(baseline, plug_in=plug_in),
+                alternatives=alternatives,
+                tau_j=spec.tau_j,
+                alpha_j=proposal_alpha / 2.0,
+                history_before_proposal=tuple(history_before_proposal),
+                analysis_class=analysis_class,
+            )
         if (
             construction.stream is not TargetStream.DEMAND
             or spec.target_stream is not TargetStream.DEMAND
@@ -443,10 +482,10 @@ def run_null_calibration(
 def _demo(plot: Path | None) -> None:
     baseline = BaselineSpec(BaselineKind.STATIONARY_IID)
     seed = 1
-    horizon = 32
-    tau_j = 12
-    onset = 14
-    multiplier = 1.5
+    horizon = build_nullbank()[0].horizon
+    tau_j = PROPOSAL_PERIODS[0]
+    onset = tau_j + 2
+    multiplier = MAGNITUDE_SETS[1][-1]
     unshocked = draw_baseline(np.random.default_rng(seed), baseline, horizon)
     observations = (
         *unshocked[: onset - 1],
@@ -457,7 +496,7 @@ def _demo(plot: Path | None) -> None:
         direction=Direction.DEMAND_UP,
         tau_j=tau_j,
         alpha_episode=0.05,
-        onset_window=(1, 3),
+        onset_window=(0, 2),
         history_before_proposal=observations[:tau_j],
     )
     print(f"registered episode: seed={seed}, onset={onset}, multiplier={multiplier}, tau_j={tau_j}")
