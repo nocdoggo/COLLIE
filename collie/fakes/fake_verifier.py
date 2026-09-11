@@ -49,8 +49,8 @@ class FakeVerifier:
         self.activation_period = None
         self.history.clear()
 
-    def register(self, spec: ShockSpec) -> None:
-        """Freeze a proposal at ``tau_j``. Evidence may only come from strictly later periods."""
+    def register(self, spec: ShockSpec, *, baseline: tuple[float, float] | None = None) -> None:
+        """Freeze a proposal (``baseline`` is accepted and ignored: this stand-in has no null model) at ``tau_j``. Evidence may only come from strictly later periods."""
         self.spec = spec
         self.tau_j = spec.tau_j
         self.state = LifecycleState.PROPOSED

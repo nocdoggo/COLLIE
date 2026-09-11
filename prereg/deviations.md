@@ -41,7 +41,25 @@ Two guards read this file:
 
 Not yet frozen. Task 19 establishes `prereg/freeze_manifest.json` at the end of week 3.
 
-*No deviations recorded.*
+### 2026-09-07 — LLM serving moved to cloud providers; confirmation provider split from primary
+
+- **Artefact:** the serving assumptions of `docs/implementation/06-arms-and-harness.md` §0.6
+  (local vLLM primary, hosted confirmation TBD) and R2.2's three-seed robustness mode. No frozen
+  file changes hash.
+- **New sha256:** n/a — no frozen artefact is edited.
+- **What changed:** (1) the primary sweep runs on Google Gemini via its OpenAI-compatible
+  endpoint (operator decision 2026-09-06), replacing the assumed local vLLM open-weight primary;
+  (2) the hosted confirmation path is xAI Grok `grok-4.20-0309-non-reasoning` (operator decision
+  2026-09-07) after the Checkpoint-1 audit ruled a same-provider confirmation circular; (3) Z.ai
+  GLM (`glm-5.3-flash`, coding-plan endpoint) is registered as a third provider for later
+  benchmarking; (4) `EndpointConfig.supports_seed` records live-verified seed behaviour — Gemini
+  rejects `seed` outright (400), Z.ai accepts but does not honour it, Grok honours it — and the
+  three-seed robustness mode raises on endpoints that cannot honour a seed.
+- **Why:** no local serving was available; a confirmation subset on the primary's own provider
+  demonstrates nothing; seed behaviour could only be established by live calls.
+- **Blast radius:** the paper can no longer claim an open-weight primary; R2.2's decoding-seed
+  robustness subset runs on the Grok path only. No published number exists yet, so nothing is
+  invalidated. Evidence in `docs/module06_research_notes.md` §4–§5.
 
 ## Gate 3 — pilot decision
 
