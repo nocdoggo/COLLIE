@@ -43,3 +43,62 @@ def test_no_arm_imports_the_reference_control_stand_in() -> None:
                 if name == STAND_IN or name.startswith(STAND_IN + "."):
                     offenders.append(f"{py.relative_to(REPO_ROOT)} imports {name}")
     assert offenders == [], f"arms must not import the stand-in: {offenders}"
+
+
+# ---------------------------------------------------------------------------
+# protocol signature conformance
+# ---------------------------------------------------------------------------
+
+
+def test_activation_policies_match_the_protocol_signature() -> None:
+    """Every activation policy must accept exactly what the Protocol declares.
+
+    A Protocol is not signature-checked at runtime, and ``isinstance`` against a
+    ``runtime_checkable`` Protocol only tests method *presence*. So a policy whose ``register``
+    takes different arguments than the Protocol advertises passes every test and every coverage
+    check, and then raises ``TypeError`` the first time an arm registers a proposal. Module 05
+    implements ``ActivationPolicy`` from the Protocol, so the Protocol is the contract and this
+    test is what keeps it honest.
+    """
+    import inspect
+
+    from collie.arms.protocols import ActivationPolicy
+    from collie.arms.shockspec import (
+        EProcessActivation,
+        HeuristicRollbackActivation,
+        ImmediateActivation,
+    )
+    from collie.fakes import FakeVerifier
+
+    declared = inspect.signature(ActivationPolicy.register).parameters
+    mismatches: list[str] = []
+    for impl in (
+        ImmediateActivation,
+        HeuristicRollbackActivation,
+        EProcessActivation,
+        FakeVerifier,
+    ):
+        actual = inspect.signature(impl.register).parameters
+        if set(declared) != set(actual):
+            mismatches.append(
+                f"{impl.__name__}.register{inspect.signature(impl.register)} "
+                f"!= Protocol register{inspect.signature(ActivationPolicy.register)}"
+            )
+    assert not mismatches, "activation policies diverge from their Protocol:\n  " + "\n  ".join(
+        mismatches
+    )
+
+
+def test_a_protocol_conformant_policy_can_actually_be_registered() -> None:
+    """The end-to-end form: the documented stand-in must survive the arm's real call.
+
+    ``FakeVerifier`` is what module 05's consumers develop against, so if the arm's call breaks
+    it, the seam is wrong no matter what the type annotations say.
+    """
+    from collie.contracts import LifecycleState
+    from collie.fakes import FakeVerifier
+    from tests.test_arms_shockspec import _spec  # the suite's ShockSpec builder
+
+    verifier = FakeVerifier()
+    verifier.register(_spec(), baseline=(100.0, 25.0))
+    assert verifier.state is LifecycleState.PROPOSED

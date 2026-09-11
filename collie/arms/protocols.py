@@ -105,8 +105,15 @@ class ActivationPolicy(Protocol):
         """Drop all episode state. The runner resets arms between episodes; policies follow."""
         ...
 
-    def register(self, spec: ShockSpec) -> None:
-        """Freeze a proposal. Evidence may only come from periods strictly after ``tau_j``."""
+    def register(self, spec: ShockSpec, *, baseline: tuple[float, float] | None = None) -> None:
+        """Freeze a proposal. Evidence may only come from periods strictly after ``tau_j``.
+
+        ``baseline`` is the ``(mean, sd)`` of the pre-proposal demand history, supplied by the
+        arm because only the arm has the observation stream. It is keyword-only and optional so
+        a policy that needs no null estimate can ignore it. Declaring it here is not cosmetic:
+        ``ShockSpecArm`` passes it, so a policy written to a signature without it raises
+        ``TypeError`` on the first proposal.
+        """
         ...
 
     def observe(self, period: int, value: float) -> LifecycleState:
