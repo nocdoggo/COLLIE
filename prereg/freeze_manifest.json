@@ -1,0 +1,90 @@
+{
+  "complete": false,
+  "files": {
+    "collie/contracts.py": {
+      "bytes": 22232,
+      "lines": 673,
+      "missing": false,
+      "sha256": "727bb3e50d7f808374b600bceaed0456070241fdfdc78b5d5aa82419360eaee8"
+    },
+    "collie/control/forecast.py": {
+      "bytes": 0,
+      "lines": 0,
+      "missing": true,
+      "sha256": null
+    },
+    "collie/control/grid.py": {
+      "bytes": 0,
+      "lines": 0,
+      "missing": true,
+      "sha256": null
+    },
+    "collie/control/mapping.py": {
+      "bytes": 0,
+      "lines": 0,
+      "missing": true,
+      "sha256": null
+    },
+    "collie/spec/registry.py": {
+      "bytes": 0,
+      "lines": 0,
+      "missing": true,
+      "sha256": null
+    },
+    "collie/spec/schema.py": {
+      "bytes": 0,
+      "lines": 0,
+      "missing": true,
+      "sha256": null
+    },
+    "collie/trigger/detectors.py": {
+      "bytes": 0,
+      "lines": 0,
+      "missing": true,
+      "sha256": null
+    },
+    "collie/verify/alpha.py": {
+      "bytes": 0,
+      "lines": 0,
+      "missing": true,
+      "sha256": null
+    },
+    "collie/verify/registry.py": {
+      "bytes": 0,
+      "lines": 0,
+      "missing": true,
+      "sha256": null
+    },
+    "manifests/shockspec_v1.json": {
+      "bytes": 1164231,
+      "lines": 45518,
+      "missing": false,
+      "sha256": "bdc6502786d2891150f5a7697b180f40d0c40012f03557afa35d7c9dee15e41d"
+    },
+    "prereg/prereg_v1.yaml": {
+      "bytes": 3879,
+      "lines": 140,
+      "missing": false,
+      "sha256": "0eb0ae3971751559aaf2edf172bb4427c652592f29931ee5e67a88ba9455aabc"
+    }
+  },
+  "frozen_at": "2026-09-11",
+  "gate": "gate2",
+  "git_sha": "f88fba1d98d9a1040c0ae468ce6cc580716c1641",
+  "manifest_sha256": "8ad6e7f88972dd9ea0f9b6dc47f2159b0c7eb8495b6d685cc7bf45dc8c9d6362",
+  "registered_files": [
+    "collie/contracts.py",
+    "collie/spec/registry.py",
+    "collie/spec/schema.py",
+    "collie/control/mapping.py",
+    "collie/control/grid.py",
+    "collie/control/forecast.py",
+    "collie/verify/registry.py",
+    "collie/verify/alpha.py",
+    "collie/trigger/detectors.py",
+    "prereg/prereg_v1.yaml",
+    "manifests/shockspec_v1.json"
+  ],
+  "rule": "A registered method file may change, but not quietly. Log a dated entry in prereg/deviations.md naming the file and quoting the new sha256, then re-run tools.freeze.",
+  "schema_version": 1
+}

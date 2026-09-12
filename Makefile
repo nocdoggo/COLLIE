@@ -6,6 +6,8 @@
 SHELL := /bin/bash
 BENCH := third_party/InventoryBench
 UV    := uv
+TABLE_RECORDS ?= reports/dev_records.jsonl
+TABLE_OUT ?= reports/eval
 
 .DEFAULT_GOAL := help
 .PHONY: help setup lfs-size lint fmt test test-fast equivalence equivalence-set arm1 bench-or audit freeze-contracts check-freeze freeze table-main artifact clean gate1
@@ -84,13 +86,11 @@ freeze-contracts:  ## Gate 1: record the hash of collie/contracts.py in prereg/c
 check-freeze:  ## Gate 1 guard: fail if a frozen contract changed without a declared deviation
 	$(UV) run python -m tools.freeze_contracts --check
 
-freeze:  ## Task 19 (Gate 2, not yet implemented): hash every registered method file
-	@echo "Not yet implemented. Gate 2 artefact, owned by collie-eval-prereg (Task 19)."
-	@echo "For the Gate 1 core-contract freeze use: make freeze-contracts"
-	@exit 1
+freeze:  ## Task 19: hash every registered method file
+	$(UV) run python -m tools.freeze
 
 table-main:  ## Task 24: render the main table and Pareto frontiers
-	$(UV) run python -m collie.eval.report --table main
+	$(UV) run python -m collie.eval.report --table main --records $(TABLE_RECORDS) --out-dir $(TABLE_OUT)
 
 artifact:  ## Task 32: build the release bundle and reproducibility audit log
 	$(UV) run python -m tools.package_artifact

@@ -1,0 +1,140 @@
+metadata:
+  version: 1
+  draft: true
+  status: OWNER_VALUE_REQUIRED before method freeze
+  frozen_before_test_runs: false
+
+primary_endpoints:
+  - cumulative_undiscounted_profit
+  - total_lost_sales_units
+
+stratum_weights:
+  family:
+    demand_level: 0.16666666666666666
+    temporary_pulse: 0.16666666666666666
+    lead_time_shift: 0.16666666666666666
+    shipment_loss: 0.16666666666666666
+    transit_pause: 0.16666666666666666
+    compound: 0.16666666666666666
+  information_condition:
+    no_alert: 0.25
+    early_accurate: 0.25
+    late_accurate: 0.25
+    unreliable: 0.25
+  null_controls:
+    silent_null: 0.5
+    false_alert_null: 0.5
+
+confirmatory_contrasts:
+  - id: arm10_vs_arm1
+    treatment: arm10_shockspec_eprocess
+    control: arm1_capped_base_stock
+  - id: arm10_vs_arm7
+    treatment: arm10_shockspec_eprocess
+    control: arm7_persistent_fixed_expiry
+  - id: arm10_vs_arm9
+    treatment: arm10_shockspec_eprocess
+    control: arm9_shockspec_heuristic_rollback
+
+holm_family:
+  members:
+    - id: arm10_vs_arm1:profit
+      contrast: arm10_vs_arm1
+      endpoint: cumulative_undiscounted_profit
+    - id: arm10_vs_arm1:lost_sales
+      contrast: arm10_vs_arm1
+      endpoint: total_lost_sales_units
+    - id: arm10_vs_arm7:profit
+      contrast: arm10_vs_arm7
+      endpoint: cumulative_undiscounted_profit
+    - id: arm10_vs_arm7:lost_sales
+      contrast: arm10_vs_arm7
+      endpoint: total_lost_sales_units
+    - id: arm10_vs_arm9:profit
+      contrast: arm10_vs_arm9
+      endpoint: cumulative_undiscounted_profit
+    - id: arm10_vs_arm9:lost_sales
+      contrast: arm10_vs_arm9
+      endpoint: total_lost_sales_units
+
+alpha_allocation:
+  episode_alpha: 0.05
+  proposal_split: alpha_j = alpha * 2^-j
+  max_proposals: 2
+
+trigger_thresholds:
+  source: OWNER_VALUE_REQUIRED from dev and cal only
+  alert_or_detector: null
+  cusum: null
+  page_hinkley: null
+
+controller_grid:
+  source: OWNER_VALUE_REQUIRED from collie.control.grid
+  order_cap: null
+  labelled_as_ours: true
+
+compiler_mapping_table:
+  source: OWNER_VALUE_REQUIRED from collie.control.mapping
+  entries: []
+
+schema_thresholds:
+  source: OWNER_VALUE_REQUIRED from collie.spec.schema and collie.verify
+  minimum_evidence_refs: null
+  trust_region_overlap: null
+
+oracle_mappings:
+  source: OWNER_VALUE_REQUIRED from oracle/control owners
+  entries: []
+
+trust_region:
+  source: OWNER_VALUE_REQUIRED
+  definition: null
+
+power_rule:
+  function: collie.data.splits.required_confirmatory_seeds
+  calibration_only: true
+  alpha: 0.05
+  power: 0.8
+
+go_criteria:
+  - id: profit_lift
+    threshold: OWNER_VALUE_REQUIRED
+  - id: lost_sales_reduction
+    threshold: OWNER_VALUE_REQUIRED
+  - id: false_activation_control
+    threshold: OWNER_VALUE_REQUIRED
+  - id: wrong_family_exposure
+    threshold: OWNER_VALUE_REQUIRED
+  - id: fill_rate_floor
+    threshold: OWNER_VALUE_REQUIRED
+  - id: cost_frontier
+    threshold: OWNER_VALUE_REQUIRED
+  - id: recovery_time
+    threshold: OWNER_VALUE_REQUIRED
+
+kill_thresholds:
+  insufficient_headroom: OWNER_VALUE_REQUIRED
+  detector_indistinguishable: OWNER_VALUE_REQUIRED
+  false_activation_rate: OWNER_VALUE_REQUIRED
+  wrong_family_activation_rate: OWNER_VALUE_REQUIRED
+  parser_failure_rate: OWNER_VALUE_REQUIRED
+  budget_overrun_rate: OWNER_VALUE_REQUIRED
+  negative_profit_lift: OWNER_VALUE_REQUIRED
+
+kill_triggers:
+  - id: insufficient_headroom
+    threshold: insufficient_headroom
+  - id: detector_indistinguishable
+    threshold: detector_indistinguishable
+  - id: false_activation_rate
+    threshold: false_activation_rate
+  - id: wrong_family_activation_rate
+    threshold: wrong_family_activation_rate
+  - id: parser_failure_rate
+    threshold: parser_failure_rate
+  - id: budget_overrun_rate
+    threshold: budget_overrun_rate
+  - id: negative_profit_lift
+    threshold: negative_profit_lift
+  - id: method_freeze_or_quarantine_violation
+    threshold: none
