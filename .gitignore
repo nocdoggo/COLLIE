@@ -225,3 +225,8 @@ __marimo__/
 #   Generated submission directories: 2,640 order CSVs per full run, regenerable with
 #   `make arm1`. The scored summary that we actually cite lives in reports/ and is committed.
 /results/
+
+#   Cloud endpoint credentials and model registry (Module 06). Contains the API key;
+#   never commit anything under this directory.
+/cloud_endpoint/*
+!/cloud_endpoint/models.json

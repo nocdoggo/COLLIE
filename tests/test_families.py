@@ -172,7 +172,7 @@ def test_baseline_specs_are_validated() -> None:
         BaselineSpec(sd=0.0)
     with pytest.raises(ValueError, match="ar_phi"):
         BaselineSpec(ar_phi=1.0)
-    with pytest.raises(ValueError, match="sd\*\*2 > mean"):
+    with pytest.raises(ValueError, match=r"sd\*\*2 > mean"):
         draw_baseline(
             episode_rngs(0).baseline,
             BaselineSpec(kind=BaselineKind.OVERDISPERSED, mean=100.0, sd=9.0),
