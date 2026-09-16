@@ -105,3 +105,27 @@ def test_runtime_check_catches_a_ledger_nested_several_levels_deep() -> None:
     nested = {"a": [1, 2, {"b": (FIFOLedger(),)}]}
     leaks = find_ledger_state(nested)
     assert leaks == ["obj['a'][2]['b'][0]"]
+
+
+class _PlainBox:
+    """Not a dataclass: the runtime walk must still descend through a plain ``__dict__``."""
+
+    def __init__(self, held) -> None:
+        self.held = held
+
+
+def test_runtime_check_catches_a_ledger_behind_a_plain_object() -> None:
+    """A leak hidden in a non-dataclass attribute is the same leak; the ``__dict__`` branch of
+    the object-graph walk is what stands between it and the verifier."""
+    box = _PlainBox(FIFOLedger())
+    assert find_ledger_state(box) == ["obj.held"]
+    with pytest.raises(LedgerLeak):
+        assert_no_ledger_state(box, context="verifier construction input")
+
+
+def test_runtime_walk_reports_a_shared_ledger_once() -> None:
+    """The same object reachable twice is one leak, not two — the walk's seen-set short-circuits
+    the second visit, so leak paths never duplicate."""
+    shared = _PlainBox(FIFOLedger())
+    leaks = find_ledger_state([shared, shared])
+    assert leaks == ["obj[0].held"]
