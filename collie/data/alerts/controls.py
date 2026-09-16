@@ -18,7 +18,7 @@ class ContentVariantSet:
     texts: tuple[tuple[str, str], ...]
 
     def __post_init__(self):
-        # 值对象使用不可变字段; 验证结构后, 共享的实验条件才能在后续比较中保持稳定。
+        # Value objects use immutable fields; once the structure is validated, the shared experimental condition stays stable across later comparisons.
         if type(self.timestamp) is not int or self.timestamp < 1:
             raise ValueError("invalid shared timestamp")
         if not isinstance(self.trigger_trace_hash, str) or len(self.trigger_trace_hash) != 64:
@@ -38,12 +38,12 @@ class ContentVariantSet:
             raise ValueError("expected exactly five content variants")
 
     def message(self, variant):
-        # 所有变体都从集合的唯一时间戳构造消息, 不为每种文本单独保留调用时间。
+        # Every variant builds its message from the set's single timestamp; no per-text call time is kept.
         return AlertMessage("operational-alert", self.timestamp, dict(self.texts)[variant])
 
     @classmethod
     def from_messages(cls, messages, trace_hashes):
-        # 从外部消息组装时再次核对时间戳和触发轨迹, 避免把调用时机变化误解释成语义收益。
+        # Re-check timestamps and trigger traces when assembling from external messages, so a call-timing change is not mistaken for a semantic gain.
         if set(messages) != set(VARIANTS) or set(trace_hashes) != set(VARIANTS):
             raise ValueError("expected exactly five content variants")
         times = {m.period for m in messages.values()}
@@ -54,7 +54,7 @@ class ContentVariantSet:
 
 
 def content_contrast(variants, left="true", right="neutral"):
-    # 只接受一个完整集合, 禁止调用方自由拼接来自不同时间或触发轨迹的消息。
+    # Accept only one complete set; callers must not freely mix messages from different times or trigger traces.
     if not isinstance(variants, ContentVariantSet):
         raise TypeError("content contrast requires one ContentVariantSet")
     return variants.message(left), variants.message(right)
@@ -63,7 +63,7 @@ def content_contrast(variants, left="true", right="neutral"):
 def render_content_controls(
     message, *, trigger_trace, wrong_text, true_family, wrong_family, seed, length_tolerance=0
 ):
-    # true 为参照, 另外四种变体只改变文本; wrong 的家族信息由分析侧调用方提供。
+    # true is the reference and the other four variants change only the text; wrong's family information is supplied by the analysis-side caller.
     if true_family == wrong_family or not wrong_text.strip() or wrong_text == message.text:
         raise ValueError("wrong text must come from a different family")
     if type(length_tolerance) is not int or length_tolerance < 0:
@@ -104,7 +104,7 @@ class PromptChannels:
     numeric_history: tuple[str, ...]
 
     def __post_init__(self):
-        # 值对象使用不可变字段; 验证结构后, 共享的实验条件才能在后续比较中保持稳定。
+        # Value objects use immutable fields; once the structure is validated, the shared experimental condition stays stable across later comparisons.
         if not isinstance(self.numeric_history, tuple) or any(
             not isinstance(row, str) for row in self.numeric_history
         ):
@@ -115,10 +115,10 @@ class PromptChannels:
 
 
 def numeric_history_removed(channels: PromptChannels):
-    # 只移除提示中的数值历史, 保留告警; 不改模拟器状态或遥测触发器。
+    # Remove only the numeric history from the prompt and keep the alert; simulator state and telemetry triggers are untouched.
     return PromptChannels(channels.alert, ())
 
 
 def no_alert(channels: PromptChannels):
-    # 移除整个告警通道, 保留数值历史; 这是通道消融, 不属于固定告警时机的内容对照。
+    # Remove the entire alert channel and keep the numeric history; this is a channel ablation, not a content contrast at fixed alert timing.
     return PromptChannels(None, channels.numeric_history)

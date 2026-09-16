@@ -40,7 +40,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def review_sample(templates, count):
     # Round-robin over family/kind cells; rotate split priority across cells.
     # The review sheet is deterministic and carries actual template IDs.
-    # 按 family/kind 轮流抽取并轮换 split 起点, 让人工展示覆盖不同类别且每次结果可复现。
+    # Round-robin over family/kind cells and rotate the split starting point, so the human review covers distinct categories and stays reproducible.
     groups = defaultdict(list)
     for template in templates:
         groups[(template.family.value, template.kind.value)].append(template)
@@ -58,7 +58,7 @@ def review_sample(templates, count):
 
 
 def main(argv=None):
-    # CP1 路径校验完整模板库并输出展示表; CP2 路径通过参数切换到单种子的配对回放。
+    # The CP1 path validates the full bank and prints the review sheet; the CP2 path switches via flags to a paired replay of one seed.
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--templates", type=Path, default=ROOT / "collie/data/alerts/templates")
     parser.add_argument("--render-sheet", type=int, default=24)
@@ -142,7 +142,7 @@ def main(argv=None):
 
 
 def replay_one_seed(show_diff=False):
-    # 这是 fake 支持的工程演示, 不代表真实生成器集成完成, 也不用于报告 LLM 效果。
+    # This is a fake-backed engineering demo; it does not mean real generator integration is complete, and it is not used to report LLM effects.
     manifest = load_manifest(ROOT / "manifests/shockspec_v1.json")
     config = default_audit_config()
     row = next(
@@ -182,7 +182,7 @@ def replay_one_seed(show_diff=False):
     )
 
     def run_rollout(rollout, message):
-        # 每次运行使用同一份外生输入和独立控制器实例; 隐藏 incident 留在 runner 一侧。
+        # Every run uses the same exogenous inputs and a fresh controller instance; the hidden incident stays on the runner side.
         spec = replace(
             episode.spec,
             independent_unit_id=rollout.independent_unit_id,
@@ -213,7 +213,7 @@ def replay_one_seed(show_diff=False):
     runs = 1
 
     def check_runner(rollout, message):
-        # 固定控制器不会响应告警, 因此去掉 alert 后的观测、订单和收益都应与基准回放完全一致。
+        # The constant controller never reacts to alerts, so observations, orders and reward with alert stripped must match the baseline replay exactly.
         nonlocal runs
         outcome = run_rollout(rollout, message)
         runs += 1

@@ -32,7 +32,7 @@ class ExogenousDraws:
     slot_draws: tuple[tuple[str, str], ...]
 
     def __post_init__(self):
-        # 外生轨迹使用不可变元组, 防止某个条件修改共享轨迹后破坏配对关系。
+        # Exogenous trajectories use immutable tuples, so one condition cannot modify the shared trajectory and break the pairing.
         if not isinstance(self.demand, tuple) or not isinstance(self.lead_times, tuple):
             raise ValueError("draws must be immutable tuples")
         if not self.demand or len(self.demand) != len(self.lead_times):
@@ -55,12 +55,12 @@ class ExogenousDraws:
 
     @property
     def losses(self):
-        # 沿用模拟器语义: 实际提前期为正无穷表示该批货物丢失。
+        # Follow simulator semantics: an infinite actual lead time means the shipment is lost.
         return tuple(math.isinf(v) for v in self.lead_times)
 
     def fingerprint_bytes(self):
         """IEEE bytes detect changes even where float equality hides signed zero."""
-        # 比较浮点数原始字节而非近似数值; 连正负零的差异也能被配对检查发现。
+        # Compare raw float bytes rather than approximate values, so even signed-zero differences are caught by the pairing check.
         return (
             struct.pack(f"!{len(self.demand)}d", *self.demand)
             + struct.pack(f"!{len(self.lead_times)}d", *self.lead_times)
@@ -83,14 +83,14 @@ class ConditionRollout:
 
     def runner_alerts(self):
         """Return the runner's two separate maps, excluding hidden truth."""
-        # 消息和模板 ID 分两条通道: 策略只看 AlertMessage, 模板 ID 仅供记录与语言分析。
+        # Messages and template IDs travel on two channels: the policy sees only AlertMessage, and template IDs are for logging and language analysis only.
         if self.message is None:
             return {}, {}
         return {self.message.period: self.message}, {self.message.period: self.template_id}
 
 
 def manifest_unit(manifest, unit_id):
-    # 四种条件必须回到同一个 seed; 否则评估会把配对重放误算成四个独立样本。
+    # All four conditions must resolve to the same seed; otherwise evaluation miscounts the paired replays as four independent samples.
     rows = [r for r in manifest["rollouts"] if r["independent_unit_id"] == unit_id]
     if not rows:
         raise ValueError(f"unknown independent unit: {unit_id}")
@@ -118,7 +118,7 @@ def render_conditions(
     unreliable: AlertTemplate,
     unreliable_offset: int = -1,
 ):
-    # 先校验 manifest 与模板绑定, 再复用同一条轨迹; 这里只改变消息及发送时间, 不重新抽取需求或供给。
+    # Validate manifest and template bindings before reusing one trajectory; only the message and its send time change here, demand and supply are never redrawn.
     row = manifest_unit(manifest, independent_unit_id)
     if row["onset"] != onset or len(demand) != manifest["horizon"]:
         raise ValueError("trajectory onset/horizon disagrees with manifest")
@@ -185,7 +185,7 @@ def load_manifest(path):
 
 def render_condition_batch(requests):
     """Validate the finite allocation before treating texts as independent stimuli."""
-    # 单次渲染只能保证一个 unit 的配对; 批量分配还要检查不同 unit 是否重复使用了同一段文本。
+    # A single render guarantees pairing within one unit only; batch allocation must also check whether different units reuse the same text.
     from collie.data.alerts.bank import RenderedAlert, validate_rollout_renderings
 
     requests = tuple(requests)

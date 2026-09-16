@@ -81,7 +81,7 @@ _REQUIRED_ALERT_SPEC_FIELDS = {
 
 
 def _require_fields(data: Any, required: set[str], *, where: str) -> None:
-    # 同时拒绝缺字段和多余字段, 防止 YAML 中的拼写错误被静默忽略。
+    # Reject missing and extra fields alike, so a typo in YAML is never silently ignored.
     if not isinstance(data, dict) or any(not isinstance(k, str) for k in data):
         raise ValueError(f"{where}: expected a mapping with string keys")
     missing = required - data.keys()
@@ -97,7 +97,7 @@ def _text(value: Any, *, where: str) -> str:
 
 
 def _parse_alert_spec(raw: dict[str, Any]) -> HiddenAlertSpec:
-    # 隐藏标签使用冻结 contracts 的枚举; 这里只验证通用约束, 合法签名配对另行注入 registry 校验。
+    # Hidden labels use the frozen contracts enums; only universal constraints are checked here, and legal signature pairings are validated by a separately injected registry.
     _require_fields(raw, _REQUIRED_ALERT_SPEC_FIELDS, where="alert_spec")
     for key in _REQUIRED_ALERT_SPEC_FIELDS - {"onset_window", "magnitude_bin"}:
         _text(raw[key], where=f"alert_spec.{key}")
@@ -145,7 +145,7 @@ def _parse_alert_spec(raw: dict[str, Any]) -> HiddenAlertSpec:
 
 
 def _placeholders(text: str) -> set[str]:
-    # 只允许简单槽位名, 禁止属性访问、格式转换等超出模板替换范围的表达式。
+    # Allow only simple slot names; attribute access or format conversion exceed the scope of template substitution.
     names = set()
     for _, name, format_spec, conversion in Formatter().parse(text):
         if name is None:
@@ -157,7 +157,7 @@ def _placeholders(text: str) -> set[str]:
 
 
 def _parse_template(raw: dict[str, Any]) -> AlertTemplate:
-    # 外层 family 用于模板库分组; distractor 的隐藏真值必须是 no_change, 不能直接复制外层分类。
+    # The outer family is for bank grouping; a distractor's hidden truth must be no_change, not a copy of the outer classification.
     _require_fields(raw, _REQUIRED_TEMPLATE_FIELDS, where="template")
     for key in _REQUIRED_TEMPLATE_FIELDS - {"slots", "alert_spec"}:
         _text(raw[key], where=key)
@@ -213,7 +213,7 @@ class _UniqueKeyLoader(yaml.SafeLoader):
 
 
 def _unique_mapping(loader, node, deep=False):
-    # 普通 YAML 加载会覆盖重复键; 这里主动报错, 避免前一份标签被悄悄替换。
+    # Plain YAML loading overwrites duplicate keys; raise instead, so an earlier label is never silently replaced.
     loader.flatten_mapping(node)
     result = {}
     for key_node, value_node in node.value:
@@ -246,7 +246,7 @@ def load_template_file(path: str | Path) -> tuple[AlertTemplate, ...]:
 
 
 def load_alert_bank(directory: str | Path) -> tuple[AlertTemplate, ...]:
-    # 文件内和跨文件的 ID 都必须唯一, 后续 RunRecord 才能追溯到唯一模板。
+    # IDs must be unique within and across files, so later RunRecord entries can trace back to one template.
     directory = Path(directory)
     if not directory.is_dir():
         raise ValueError(f"bank directory does not exist: {directory}")
@@ -264,7 +264,7 @@ def load_alert_bank(directory: str | Path) -> tuple[AlertTemplate, ...]:
 
 def draw_slots(template: AlertTemplate, seed: int) -> tuple[tuple[str, str], ...]:
     """Render stable choices for unchanged template content and integer seed."""
-    # 固定槽位顺序并使用 SHA256, 避免 Python 随机哈希或字典插入顺序影响跨进程复现。
+    # Fix the slot order and use SHA256, so Python's randomized hashing or dict insertion order cannot break cross-process reproduction.
     if isinstance(seed, bool) or not isinstance(seed, int):
         raise ValueError("seed must be an integer")
     chosen: dict[str, str] = {}
@@ -284,7 +284,7 @@ def draw_slots(template: AlertTemplate, seed: int) -> tuple[tuple[str, str], ...
 
 
 def render_alert(template: AlertTemplate, seed: int) -> RenderedAlert:
-    # 返回值仍含分析侧标签; 交给策略或 LLM 时只能取可见文本, 不能直接传整个对象。
+    # The return value still carries analysis-side labels; hand only the visible text to a policy or LLM, never the whole object.
     chosen = dict(draw_slots(template, seed))
     return RenderedAlert(
         template_id=template.template_id,
@@ -390,7 +390,7 @@ def assert_no_text_leakage(
 
 def all_rendered_texts(template: AlertTemplate, *, max_combinations: int = 100_000):
     """Enumerate all authored slot combinations; refuse rather than sample on overflow."""
-    # 枚举全部槽位组合; 组合数超限时拒绝运行, 不能抽样后声称已完成完整泄漏扫描。
+    # Enumerate all slot combinations; refuse to run past the limit rather than sample and claim a complete leakage scan.
     names = sorted(template.slots)
     count = prod(len(template.slots[name]) for name in names)
     if type(max_combinations) is not int or max_combinations < 1:
@@ -410,7 +410,7 @@ def validate_template_leakage(
     max_combinations: int = 100_000,
 ) -> None:
     """Scan every possible rendered text, including leaks spanning slot boundaries."""
-    # 扫描拼接后的完整句子, 才能发现分别位于两个槽位、组合后才形成的泄漏内容。
+    # Scan the fully assembled sentence, so leakage that forms only when two slots combine is detected.
     for text in all_rendered_texts(template, max_combinations=max_combinations):
         try:
             assert_no_text_leakage(text, forbidden_literals=forbidden_literals)
@@ -420,7 +420,7 @@ def validate_template_leakage(
 
 def validate_bank_composition(templates: tuple[AlertTemplate, ...]) -> None:
     """Require six non-no_change enum families, three splits, and 4/2/2/2 per cell."""
-    # 总数正确还不够: 六个 family 与三个 split 的每个格子都必须满足 4/2/2/2。
+    # A correct total is not enough: every cell of the six families by three splits must satisfy 4/2/2/2.
     families = set(ShockFamily) - {ShockFamily.NO_CHANGE}
     splits = {Split.DEV, Split.CAL, Split.TEST}
     expected = Counter(
@@ -446,7 +446,7 @@ def validate_bank_composition(templates: tuple[AlertTemplate, ...]) -> None:
 
 def validate_wording_holdout(templates: tuple[AlertTemplate, ...]) -> None:
     """The document forbids test wording families in dev/cal; dev-cal sharing is allowed."""
-    # 隔离的是措辞家族, 不只是字符串; test 的措辞家族不能出现在 dev 或 cal。
+    # Isolation applies to wording families, not just strings; test wording families must not appear in dev or cal.
     test = {t.wording_family for t in templates if t.split is Split.TEST}
     other = {t.wording_family for t in templates if t.split in {Split.DEV, Split.CAL}}
     overlap = test & other
@@ -464,7 +464,7 @@ def validate_no_repeated_renderings(
     Replaying the same template/seed is deliberately allowed. Finite slot pools
     cannot guarantee unique text for arbitrarily many seeds of the same template.
     """
-    # 检查同一 split 内不同模板之间的文本碰撞; 跨独立实验单元的复用由下方 rollout 检查处理。
+    # Check text collisions between different templates within one split; reuse across independent experimental units is handled by the rollout check below.
     seen = {}
     for template in templates:
         for text in all_rendered_texts(template, max_combinations=max_combinations):
@@ -480,7 +480,7 @@ def validate_rollout_renderings(rows):
 
     Enforce uniqueness on the actual finite allocation, not on an unbounded seed space.
     """
-    # 同一个 independent unit 的配对条件允许共享文本; 不同 unit 不能据此冒充不同刺激。
+    # Paired conditions of the same independent unit may share text; different units must not use this to pose as distinct stimuli.
     seen = {}
     for unit_id, rendered in rows:
         key = (rendered.split, rendered.text)
@@ -491,7 +491,7 @@ def validate_rollout_renderings(rows):
 
 def validate_registry(templates, *, onset_windows, family_signatures):
     """Inject Module 02's registry; absence is not silently treated as validation."""
-    # 接入模块 02 提供的真实映射后才算签名验证, 不能把占位签名视为正式注册结果。
+    # Signature validation counts only with the real mappings injected by Module 02; placeholder signatures are not a formal registration result.
     for template in templates:
         spec = template.alert_spec
         if spec.onset_window is not None and spec.onset_window not in onset_windows:
@@ -518,7 +518,7 @@ def scalar_literals(value):
 
 def forbidden_from_metadata(benchmark_path, shock_path, incident_paths=()):
     """Use the audited manifest seam; never reach into the benchmark checkout."""
-    # 只读取 manifest 和明确传入的 sidecar; 不直接访问上游 benchmark 目录, 也不把隐藏值传给策略。
+    # Read only the manifest and explicitly supplied sidecars; never touch the upstream benchmark directory or pass hidden values to the policy.
     benchmark = json.loads(Path(benchmark_path).read_text())
     shocks = json.loads(Path(shock_path).read_text())
     values = set()
