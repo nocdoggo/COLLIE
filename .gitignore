@@ -226,10 +226,10 @@ __marimo__/
 #   `make arm1`. The scored summary that we actually cite lives in reports/ and is committed.
 /results/
 
-#   Cloud endpoint credentials and model registry (Module 06). Contains the API key;
-#   never commit anything under this directory.
-/cloud_endpoint/*
-!/cloud_endpoint/models.json
+#   Cloud endpoint credentials (Module 06). Contains the API keys; never commit anything
+#   under this directory. The non-secret model registry lives at
+#   docs/module06_model_registry.json instead.
+/cloud_endpoint/
 
 #   Raw key material anywhere in the tree, not only under cloud_endpoint/ — a stray
 #   provider key must never be committable regardless of where it is dropped.

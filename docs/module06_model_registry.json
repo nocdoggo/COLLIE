@@ -1,5 +1,5 @@
 {
-  "notes": "Committed model registry (the keys stay gitignored in this folder). Every entry live-verified against the provider's /models listing on its retrieval date. Default models set per operator instruction: gemini-3.8-flash for testing first; grok-4.20-0309-non-reasoning is the hosted-confirmation default (Checkpoint-1 audit ruling: the confirmation provider must differ from the primary); glm-5.3-flash is what the Z.ai coding plan actually serves.",
+  "notes": "Committed model registry; moved from cloud_endpoint/ on 2026-09-16 when that directory became fully untracked (operator instruction). The keys remain gitignored under cloud_endpoint/. Every entry live-verified against the provider's /models listing on its retrieval date. Default models set per operator instruction: gemini-3.8-flash for testing first; grok-4.20-0309-non-reasoning is the hosted-confirmation default (Checkpoint-1 audit ruling: the confirmation provider must differ from the primary); glm-5.3-flash is what the Z.ai coding plan actually serves.",
   "providers": {
     "google-gemini": {
       "base_url_native": "https://generativelanguage.googleapis.com/v1beta",
