@@ -53,6 +53,9 @@ from collie.contracts import (
 )
 from collie.control.grid import (
     BASELINE_CONFIG,
+    BASELINE_GAMMA,
+    BASELINE_L_EFF,
+    BASELINE_M,
     GAMMA_VALUES,
     L_EFF_VALUES,
     M_VALUES,
@@ -295,18 +298,45 @@ def mapping_table() -> tuple[tuple[ShockSpec, ControlConfig], ...]:
 class GridCompiler:
     """The ``collie.arms.protocols.SpecCompiler`` seam, satisfied structurally by the grid.
 
-    The grid is absolute: a non-abstaining spec compiles to the same config regardless of what
-    is currently running. An abstention instead returns ``current`` unchanged — "no_change maps
-    to the baseline" means *carry on as before* (``docs/implementation/04-or-compiler.md``), and
-    what was running is the caller's per-instance baseline descriptor, whose ``l_eff`` matches
-    the instance's promised lead time rather than the grid reference point. Arms never import
-    this module — the harness wires one instance in (``tests/conftest.py``).
+    ``compile_spec`` is absolute around the grid reference point (m=1, l_eff=1, gamma=1), but
+    the arms run per-instance baselines whose promised lead time is 0, 2, or 4 — applying the
+    absolute point wholesale would change axes the hypothesis does not concern (a demand-up
+    spec compiled to l_eff=1 silently cuts pipeline coverage below a promised 2, which exactly
+    cancels the demand signal at ``m*(1+l_eff)``; measured on dev fixtures, the oracle's
+    headroom collapsed to ~0 from this alone). The seam therefore composes, per the tier-1
+    docstring's own axis semantics and the protocol's "given what is currently running":
+
+    * abstention returns ``current`` unchanged ("carry on as before");
+    * an axis the grid point leaves at the reference value is inherited from ``current`` —
+      a demand hypothesis never touches the pipeline, a supply hypothesis never touches the
+      demand multiplier, and the composition reduces to the static mapping exactly when
+      ``current`` is ``BASELINE_CONFIG``;
+    * an axis the grid point moves is applied relative to ``current``: ``m`` as the absolute
+      belief multiplier, ``l_eff`` as the reference offset added to the running value,
+      ``gamma`` as the reference ratio against the running value — "lengthen the pipeline"
+      means longer than what is running, not the reference-anchored point the instance
+      already sits at.
+
+    ``predictive_model`` stays the registered key of the absolute grid point: it names the
+    *hypothesis* the verifier will test, which is instance-independent, so it is deliberately
+    not recomputed from the composed axes. Arms never import this module — the harness wires
+    one instance in (``tests/conftest.py``).
     """
 
     def compile(self, spec: ShockSpec, *, current: ControlConfig) -> ControlConfig:
         if spec.is_abstention:
             return current
-        return compile_spec(spec)
+        cfg = compile_spec(spec)
+        m = cfg.m if cfg.m != BASELINE_M else current.m
+        if cfg.l_eff != BASELINE_L_EFF:
+            l_eff = current.l_eff + (cfg.l_eff - BASELINE_L_EFF)
+        else:
+            l_eff = current.l_eff
+        if cfg.gamma != BASELINE_GAMMA:
+            gamma = current.gamma * (cfg.gamma / BASELINE_GAMMA)
+        else:
+            gamma = current.gamma
+        return ControlConfig(m=m, l_eff=l_eff, gamma=gamma, predictive_model=cfg.predictive_model)
 
 
 def _print_table() -> None:  # pragma: no cover - CLI only

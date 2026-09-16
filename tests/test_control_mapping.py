@@ -167,14 +167,72 @@ def test_grid_compiler_abstention_returns_current_unchanged() -> None:
     )
 
 
-def test_grid_compiler_matches_compile_spec_on_every_real_spec() -> None:
-    """Non-abstaining specs are absolute: the seam must not consult ``current`` for them."""
+def test_grid_compiler_matches_compile_spec_at_the_registered_baseline() -> None:
+    """At the grid reference point the seam's composition reduces to the static mapping: inherit
+    and offset are both identities when ``current`` is ``BASELINE_CONFIG``."""
     from collie.control.grid import BASELINE_CONFIG
     from collie.control.mapping import GridCompiler
 
-    probe = next(s for s in iter_legal_specs() if not s.is_abstention)
-    off_grid = BASELINE_CONFIG.__class__(m=0.6, l_eff=3, gamma=0.0, predictive_model="probe")
-    assert GridCompiler().compile(probe, current=off_grid) == compile_spec(probe)
     for spec in iter_legal_specs():
         if not spec.is_abstention:
             assert GridCompiler().compile(spec, current=BASELINE_CONFIG) == compile_spec(spec)
+
+
+def test_grid_compiler_demand_spec_moves_only_m() -> None:
+    """A demand hypothesis must never touch the pipeline axes: ``l_eff``/``gamma`` come from the
+    running config, not the reference-anchored grid point. Regression: with an absolute
+    (m=1.5, l_eff=1) point applied to a promised-2 baseline, m*(1+l_eff) exactly cancels the
+    demand signal and the oracle orders *less* during a demand-up shock."""
+    from collie.contracts import ControlConfig, Direction, TargetStream
+    from collie.control.mapping import GridCompiler
+
+    spec = next(
+        s
+        for s in iter_legal_specs()
+        if s.target_stream is TargetStream.DEMAND and s.direction is Direction.DEMAND_UP
+    )
+    current = ControlConfig(m=0.75, l_eff=4, gamma=0.5, predictive_model="probe")
+    out = GridCompiler().compile(spec, current=current)
+    assert out.m == compile_spec(spec).m  # the belief multiplier is absolute
+    assert (out.l_eff, out.gamma) == (4, 0.5)  # the pipeline is inherited
+    assert out.predictive_model == compile_spec(spec).predictive_model
+
+
+def test_grid_compiler_arrival_spec_shifts_supply_axes_relative_to_current() -> None:
+    """ "Lengthen the pipeline" means longer than what is running: the grid's offset from the
+    reference point is added to ``current.l_eff``, and ``gamma`` scales by the grid's ratio,
+    so a supply hypothesis lands on beliefs the instance does not already hold."""
+    from collie.contracts import ControlConfig, Direction, TargetStream
+    from collie.control.mapping import GridCompiler
+
+    spec = next(
+        s
+        for s in iter_legal_specs()
+        if (s.shock_family, s.direction, s.target_stream)
+        == (ShockFamily.LEAD_TIME_SHIFT, Direction.ARRIVAL_DELAYED, TargetStream.ARRIVAL)
+    )
+    cfg = compile_spec(spec)
+    current = ControlConfig(m=1.25, l_eff=2, gamma=0.5, predictive_model="probe")
+    out = GridCompiler().compile(spec, current=current)
+    assert out.m == 1.25  # the demand axis is inherited
+    assert out.l_eff == 2 + (cfg.l_eff - 1)  # offset from the reference point
+    assert out.gamma == 0.5 * cfg.gamma  # distrust compounds
+    assert out.predictive_model == cfg.predictive_model
+
+
+def test_grid_compiler_compound_spec_takes_m_absolute_and_supply_relative() -> None:
+    from collie.contracts import ControlConfig, Direction, TargetStream
+    from collie.control.mapping import GridCompiler
+
+    spec = next(
+        s
+        for s in iter_legal_specs()
+        if (s.shock_family, s.direction, s.target_stream)
+        == (ShockFamily.COMPOUND, Direction.MIXED, TargetStream.BOTH)
+    )
+    cfg = compile_spec(spec)
+    current = ControlConfig(m=0.6, l_eff=3, gamma=0.5, predictive_model="probe")
+    out = GridCompiler().compile(spec, current=current)
+    assert out.m == cfg.m
+    assert out.l_eff == 3 + (cfg.l_eff - 1)
+    assert out.gamma == 0.5 * cfg.gamma

@@ -218,6 +218,10 @@ def _oracle_headroom(*, seeds_per_family: int = 3) -> None:  # pragma: no cover 
         for seed in range(seeds_per_family):
             inst = _loaded_instance_from_fixture(fixture_episode(family, seed=seed))
             cap = inst.spec.order_cap
+            # The baseline both sides sit on is arm 1 exactly: the descriptor carries the
+            # instance's promised lead time, and the shared controller at that config reproduces
+            # CappedBaseStockController bit for bit (test_baseline_config_reproduces_arm1).
+            baseline = baseline_config_for(inst.spec.promised_lead_time)
 
             def factory(config, history, *, _cap=cap):
                 return OrCompilerController(order_cap=_cap, config=config, train_demand=history)
@@ -225,11 +229,11 @@ def _oracle_headroom(*, seeds_per_family: int = 3) -> None:  # pragma: no cover 
             oracle = OracleShockSpecArm(
                 incident=inst.incident,
                 compiler=GridCompiler(),
-                baseline=OrCompilerController(order_cap=cap, config=BASELINE_CONFIG),
+                baseline=OrCompilerController(order_cap=cap, config=baseline),
                 controller_factory=factory,
-                baseline_config=BASELINE_CONFIG,
+                baseline_config=baseline,
             )
-            stationary = OrCompilerController(order_cap=cap, config=BASELINE_CONFIG)
+            stationary = OrCompilerController(order_cap=cap, config=baseline)
             # The oracle reads hidden truth by definition; the runner exempts it from the
             # controller-isolation walk (run_arms.py does the same for the ladder).
             oracle_reward = (

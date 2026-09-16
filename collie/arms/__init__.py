@@ -4,8 +4,11 @@ Arm 1 is the OR baseline: a faithful reimplementation of the published "OR (capp
 entry, verified to reproduce all 1,320 published order sequences bit for bit
 (``reports/arm1_or_baseline.md``). Arms 3, 4, and 11 are the direct-action LLM arms on the
 benchmark's own prompts (``docs/module06_research_notes.md`` §1); ``protocols.py`` holds the
-injection seams to modules 02/04/05, and ``reference_control.py`` is the temporary module-04
-stand-in that no arm may import (``tests/test_arms_isolation.py`` enforces it).
+injection seams to modules 02/04/05. Module 04's real implementation
+(``collie.control.mapping.GridCompiler`` and
+``collie.control.controller.OrCompilerController``) is wired into the arms by injection in
+``tests/conftest.py`` and ``tools/run_arms.py`` — no arm may import it
+(``tests/test_arms_isolation.py`` enforces it).
 """
 
 from collie.arms.base_stock import (

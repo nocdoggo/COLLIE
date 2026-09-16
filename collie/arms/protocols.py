@@ -1,10 +1,12 @@
 """Injection seams between the arms (module 06) and modules 02, 04, and 05.
 
 The arm ladder is built against these protocols and receives every collaborator by injection
-(module brief §3): no arm imports a concrete compiler, controller, parser, or verifier. When the
-owning modules land, their implementations must satisfy these protocols unchanged; until then
-``tests/conftest.py`` wires the temporary stand-ins in ``reference_control.py`` and the fakes in
-``collie/fakes/``.
+(module brief §3): no arm imports a concrete compiler, controller, parser, or verifier. Module
+04 has landed: its ``collie.control.mapping.GridCompiler`` and
+``collie.control.controller.OrCompilerController`` satisfy ``SpecCompiler`` and the shared
+``Controller`` seam unchanged, and are wired in ``tests/conftest.py`` and
+``tools/run_arms.py``. Modules 02 and 05 are still stood in for — by test-local
+prompters/parsers and the fakes in ``collie/fakes/`` — until their real implementations land.
 
 The shapes are deliberately minimal — they state what the *arms* need, not what the owning
 module will offer, so neither side guesses at the other's design decisions.
