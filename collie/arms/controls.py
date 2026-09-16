@@ -397,7 +397,7 @@ class CompilerSwitchArm:
                 self._switch(obs, payload)
 
         baseline_decision = self.baseline.order(obs)
-        if self._experimental is not None:
+        if self._experimental is not None and self._dispatch_active(obs):
             quantity = self._experimental.order(obs).order_quantity
             active_spec_id = f"spec-1@tau{self._switch_period}"
             config = self._compiled
@@ -419,6 +419,14 @@ class CompilerSwitchArm:
         )
 
     # -- internals -----------------------------------------------------------
+
+    def _dispatch_active(self, obs: PeriodObservation) -> bool:
+        """Whether the compiled controller governs this period's dispatch. Always true here:
+        switch-and-hold is precisely what these arms are controls *against*. The oracle
+        overrides this to stand down at the end of the hazard window it is privileged to know
+        (``collie/arms/oracle.py``), which is a use of ground truth, not a lifecycle."""
+        del obs
+        return True
 
     def _switch_payload(self, obs: PeriodObservation) -> ProposalPayload | None:
         """The subclass-owned switch condition. The base's answer is "never"."""

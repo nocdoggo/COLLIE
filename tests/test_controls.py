@@ -919,6 +919,24 @@ def test_oracle_margin_is_sensitive_to_the_onset() -> None:
     assert 0.0 < margin_late < margin_true
 
 
+def test_oracle_stands_down_when_the_hazard_window_closes() -> None:
+    """Module 04's checkpoint finding, pinned: a hazard config held past a short-lived shock
+    manufactures losses, so the oracle — privileged to know the true duration — reverts to the
+    baseline dispatch after ``onset + duration - 1``. With duration 2 the compiled config
+    governs periods 12-13 only; from period 14 on every decision carries no config and orders
+    exactly what a baseline-only controller orders (its estimator never skipped a period)."""
+    instance, incident = _step_instance()
+    outcome = EpisodeRunner(instance).run(_oracle(replace(incident, duration=2)))
+    assert all(d.control_config is None for d in outcome.decisions[:11])
+    assert [d.active_spec_id for d in outcome.decisions[11:13]] == ["spec-1@tau12"] * 2
+    assert all(
+        d.control_config is None and d.active_spec_id is None and not d.triggered
+        for d in outcome.decisions[13:]
+    )
+    reference = _baseline_reference(outcome)
+    assert [d.order_quantity for d in outcome.decisions[13:]] == reference[13:]
+
+
 def test_oracle_arrival_stream_switch_hands_over_arrival_stats() -> None:
     """A supply-family oracle switch reads the arrival stream for the baseline handoff."""
     incident = HiddenIncident(
