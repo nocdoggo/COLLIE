@@ -1,0 +1,1174 @@
+# DEVELOPMENT DRAFT — authored stimuli, not final CP1 approval.
+# Each family has 4 accurate, 2 overstated, 2 ambiguous, 2 distractor entries.
+# Non-distractor labels follow the supplied foundation fake, not a verified registry.
+# PENDING_NO_CHANGE_SIGNATURE is deliberately unregistered; resolve with Module 02.
+# Do not treat a successful structural load as signature validation.
+# Compound persistence/duration follow the fake labels; check their semantics at integration.
+# Texts are synthetic messages, not reports of real events. They need human realism review.
+# Slots are empty deliberately: these are 60 distinct authored base messages per split.
+# Do not replace registry validation or real incident/benchmark leakage checks with these drafts.
+
+- id: tpl_dev_demand_level_01
+  family: demand_level
+  split: dev
+  kind: accurate
+  wording_family: wf_advisory_demand_level
+  text: The sales desk reports a broader customer base for this range and expects the heavier ordering
+    to continue beyond the current busy spell.
+  slots: {}
+  alert_spec:
+    family: demand_level
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_demand_level_up
+    kind: accurate
+- id: tpl_dev_demand_level_02
+  family: demand_level
+  split: dev
+  kind: accurate
+  wording_family: wf_advisory_demand_level
+  text: Our account manager says customers are placing larger routine replenishment requests and are keeping
+    those requirements in their ongoing plans.
+  slots: {}
+  alert_spec:
+    family: demand_level
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_demand_level_up
+    kind: accurate
+- id: tpl_dev_demand_level_03
+  family: demand_level
+  split: dev
+  kind: accurate
+  wording_family: wf_advisory_demand_level
+  text: The commercial team advises that recent additions to the customer roster are bringing sustained
+    extra purchasing rather than a brief promotional rush.
+  slots: {}
+  alert_spec:
+    family: demand_level
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_demand_level_up
+    kind: accurate
+- id: tpl_dev_demand_level_04
+  family: demand_level
+  split: dev
+  kind: accurate
+  wording_family: wf_advisory_demand_level
+  text: Distributors report that stronger everyday take-up is becoming established, with no return to
+    the earlier ordering pace currently expected.
+  slots: {}
+  alert_spec:
+    family: demand_level
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_demand_level_up
+    kind: accurate
+- id: tpl_dev_demand_level_05
+  family: demand_level
+  split: dev
+  kind: overstated
+  wording_family: wf_advisory_demand_level
+  text: The sales director warns that customer orders are about to overwhelm our normal capacity and remain
+    exceptionally heavy for the foreseeable future.
+  slots: {}
+  alert_spec:
+    family: demand_level
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_demand_level_up
+    kind: overstated
+- id: tpl_dev_demand_level_06
+  family: demand_level
+  split: dev
+  kind: overstated
+  wording_family: wf_advisory_demand_level
+  text: The account team describes the new buying pace as a dramatic and lasting surge across the customer
+    base, with little prospect of any easing.
+  slots: {}
+  alert_spec:
+    family: demand_level
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_demand_level_up
+    kind: overstated
+- id: tpl_dev_demand_level_07
+  family: demand_level
+  split: dev
+  kind: ambiguous
+  wording_family: wf_advisory_demand_level
+  text: The sales desk has flagged a change in routine customer requests, although the scale and staying
+    power of the change are still unclear.
+  slots: {}
+  alert_spec:
+    family: demand_level
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_demand_level_up
+    kind: ambiguous
+- id: tpl_dev_demand_level_08
+  family: demand_level
+  split: dev
+  kind: ambiguous
+  wording_family: wf_advisory_demand_level
+  text: Our account manager thinks the usual purchasing rhythm may be different now; the update does not
+    establish how much or for how long.
+  slots: {}
+  alert_spec:
+    family: demand_level
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_demand_level_up
+    kind: ambiguous
+- id: tpl_dev_demand_level_09
+  family: demand_level
+  split: dev
+  kind: distractor
+  wording_family: wf_advisory_demand_level
+  text: The sales administrator has circulated a revised customer contact directory.
+  slots: {}
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_dev_demand_level_10
+  family: demand_level
+  split: dev
+  kind: distractor
+  wording_family: wf_advisory_demand_level
+  text: The commercial team is refreshing the layout of its catalogue cover.
+  slots: {}
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_dev_temporary_pulse_01
+  family: temporary_pulse
+  split: dev
+  kind: accurate
+  wording_family: wf_advisory_temporary_pulse
+  text: The promotions desk expects an extra burst of orders around the current campaign, followed by
+    a return to the usual purchasing pace.
+  slots: {}
+  alert_spec:
+    family: temporary_pulse
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_demand_pulse
+    kind: accurate
+- id: tpl_dev_temporary_pulse_02
+  family: temporary_pulse
+  split: dev
+  kind: accurate
+  wording_family: wf_advisory_temporary_pulse
+  text: The sales team reports a brief rush of event-related customer requests and expects it to ease
+    once the event business is cleared.
+  slots: {}
+  alert_spec:
+    family: temporary_pulse
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_demand_pulse
+    kind: accurate
+- id: tpl_dev_temporary_pulse_03
+  family: temporary_pulse
+  split: dev
+  kind: accurate
+  wording_family: wf_advisory_temporary_pulse
+  text: Our account manager advises that customers are stocking up for a limited occasion rather than
+    increasing their continuing requirements.
+  slots: {}
+  alert_spec:
+    family: temporary_pulse
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_demand_pulse
+    kind: accurate
+- id: tpl_dev_temporary_pulse_04
+  family: temporary_pulse
+  split: dev
+  kind: accurate
+  wording_family: wf_advisory_temporary_pulse
+  text: The commercial desk expects a short-lived flurry of purchasing tied to a launch, with routine
+    ordering resuming afterwards.
+  slots: {}
+  alert_spec:
+    family: temporary_pulse
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_demand_pulse
+    kind: accurate
+- id: tpl_dev_temporary_pulse_05
+  family: temporary_pulse
+  split: dev
+  kind: overstated
+  wording_family: wf_advisory_temporary_pulse
+  text: The promotions team warns that the campaign rush will be overwhelming, with exceptionally heavy
+    orders crowding out ordinary business.
+  slots: {}
+  alert_spec:
+    family: temporary_pulse
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_demand_pulse
+    kind: overstated
+- id: tpl_dev_temporary_pulse_06
+  family: temporary_pulse
+  split: dev
+  kind: overstated
+  wording_family: wf_advisory_temporary_pulse
+  text: The sales manager says the event rush is likely to keep orders elevated well beyond the occasion
+    and become the new routine.
+  slots: {}
+  alert_spec:
+    family: temporary_pulse
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_demand_pulse
+    kind: overstated
+- id: tpl_dev_temporary_pulse_07
+  family: temporary_pulse
+  split: dev
+  kind: ambiguous
+  wording_family: wf_advisory_temporary_pulse
+  text: The promotions desk has mentioned an unusual pocket of buying activity, but its size and likely
+    finishing point have not been established.
+  slots: {}
+  alert_spec:
+    family: temporary_pulse
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_demand_pulse
+    kind: ambiguous
+- id: tpl_dev_temporary_pulse_08
+  family: temporary_pulse
+  split: dev
+  kind: ambiguous
+  wording_family: wf_advisory_temporary_pulse
+  text: Our account manager flags some event-related interest without clarifying whether it will be a
+    small flurry or a more substantial interruption to normal ordering.
+  slots: {}
+  alert_spec:
+    family: temporary_pulse
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_demand_pulse
+    kind: ambiguous
+- id: tpl_dev_temporary_pulse_09
+  family: temporary_pulse
+  split: dev
+  kind: distractor
+  wording_family: wf_advisory_temporary_pulse
+  text: The marketing coordinator is changing the file names used for archived campaign artwork.
+  slots: {}
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_dev_temporary_pulse_10
+  family: temporary_pulse
+  split: dev
+  kind: distractor
+  wording_family: wf_advisory_temporary_pulse
+  text: The events desk has corrected a spelling error in an internal briefing title.
+  slots: {}
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_dev_lead_time_shift_01
+  family: lead_time_shift
+  split: dev
+  kind: accurate
+  wording_family: wf_advisory_lead_time_shift
+  text: The supplier advises that its revised handling routine will make deliveries take longer than usual
+    on an ongoing basis.
+  slots: {}
+  alert_spec:
+    family: lead_time_shift
+    target_stream: arrival
+    direction: arrival_delayed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_arrival_delay
+    kind: accurate
+- id: tpl_dev_lead_time_shift_02
+  family: lead_time_shift
+  split: dev
+  kind: accurate
+  wording_family: wf_advisory_lead_time_shift
+  text: Our logistics contact reports a slower regular route to the warehouse, with shipments still moving
+    but taking more time to arrive.
+  slots: {}
+  alert_spec:
+    family: lead_time_shift
+    target_stream: arrival
+    direction: arrival_delayed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_arrival_delay
+    kind: accurate
+- id: tpl_dev_lead_time_shift_03
+  family: lead_time_shift
+  split: dev
+  kind: accurate
+  wording_family: wf_advisory_lead_time_shift
+  text: The carrier says its new service arrangement adds waiting to the usual delivery journey and will
+    remain in use for now.
+  slots: {}
+  alert_spec:
+    family: lead_time_shift
+    target_stream: arrival
+    direction: arrival_delayed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_arrival_delay
+    kind: accurate
+- id: tpl_dev_lead_time_shift_04
+  family: lead_time_shift
+  split: dev
+  kind: accurate
+  wording_family: wf_advisory_lead_time_shift
+  text: The purchasing team reports that routine supplier turnaround has become longer, rather than a
+    particular consignment being briefly held.
+  slots: {}
+  alert_spec:
+    family: lead_time_shift
+    target_stream: arrival
+    direction: arrival_delayed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_arrival_delay
+    kind: accurate
+- id: tpl_dev_lead_time_shift_05
+  family: lead_time_shift
+  split: dev
+  kind: overstated
+  wording_family: wf_advisory_lead_time_shift
+  text: The supplier warns that deliveries will take far longer than anyone can reasonably plan for under
+    the new handling arrangement.
+  slots: {}
+  alert_spec:
+    family: lead_time_shift
+    target_stream: arrival
+    direction: arrival_delayed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_arrival_delay
+    kind: overstated
+- id: tpl_dev_lead_time_shift_06
+  family: lead_time_shift
+  split: dev
+  kind: overstated
+  wording_family: wf_advisory_lead_time_shift
+  text: The logistics manager describes the slower service as a severe and enduring delay that will leave
+    routine replenishment painfully late.
+  slots: {}
+  alert_spec:
+    family: lead_time_shift
+    target_stream: arrival
+    direction: arrival_delayed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_arrival_delay
+    kind: overstated
+- id: tpl_dev_lead_time_shift_07
+  family: lead_time_shift
+  split: dev
+  kind: ambiguous
+  wording_family: wf_advisory_lead_time_shift
+  text: The supplier has flagged a possible change to normal turnaround, but has not clarified the extent
+    or how long the arrangement will remain.
+  slots: {}
+  alert_spec:
+    family: lead_time_shift
+    target_stream: arrival
+    direction: arrival_delayed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_arrival_delay
+    kind: ambiguous
+- id: tpl_dev_lead_time_shift_08
+  family: lead_time_shift
+  split: dev
+  kind: ambiguous
+  wording_family: wf_advisory_lead_time_shift
+  text: Our transport contact says delivery expectations may need revisiting; the note leaves the size
+    and persistence of the timing issue unresolved.
+  slots: {}
+  alert_spec:
+    family: lead_time_shift
+    target_stream: arrival
+    direction: arrival_delayed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_arrival_delay
+    kind: ambiguous
+- id: tpl_dev_lead_time_shift_09
+  family: lead_time_shift
+  split: dev
+  kind: distractor
+  wording_family: wf_advisory_lead_time_shift
+  text: The carrier has updated its customer-service email address.
+  slots: {}
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_dev_lead_time_shift_10
+  family: lead_time_shift
+  split: dev
+  kind: distractor
+  wording_family: wf_advisory_lead_time_shift
+  text: The purchasing administrator has replaced the supplier logo on the internal directory page.
+  slots: {}
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_dev_shipment_loss_01
+  family: shipment_loss
+  split: dev
+  kind: accurate
+  wording_family: wf_advisory_shipment_loss
+  text: The carrier reports that affected consignments have gone missing and should not be expected to
+    arrive through the original delivery arrangements.
+  slots: {}
+  alert_spec:
+    family: shipment_loss
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_arrival_loss
+    kind: accurate
+- id: tpl_dev_shipment_loss_02
+  family: shipment_loss
+  split: dev
+  kind: accurate
+  wording_family: wf_advisory_shipment_loss
+  text: The supplier advises that goods on an affected dispatch were damaged beyond recovery and will
+    not reach the receiving warehouse.
+  slots: {}
+  alert_spec:
+    family: shipment_loss
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_arrival_loss
+    kind: accurate
+- id: tpl_dev_shipment_loss_03
+  family: shipment_loss
+  split: dev
+  kind: accurate
+  wording_family: wf_advisory_shipment_loss
+  text: Our freight contact confirms that affected cargo cannot be recovered; these consignments are not
+    merely waiting for onward movement.
+  slots: {}
+  alert_spec:
+    family: shipment_loss
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_arrival_loss
+    kind: accurate
+- id: tpl_dev_shipment_loss_04
+  family: shipment_loss
+  split: dev
+  kind: accurate
+  wording_family: wf_advisory_shipment_loss
+  text: The transport desk reports that goods from an affected dispatch were destroyed in handling, leaving
+    those deliveries unable to complete.
+  slots: {}
+  alert_spec:
+    family: shipment_loss
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_arrival_loss
+    kind: accurate
+- id: tpl_dev_shipment_loss_05
+  family: shipment_loss
+  split: dev
+  kind: overstated
+  wording_family: wf_advisory_shipment_loss
+  text: The carrier warns that the missing cargo represents a catastrophic shortfall and describes the
+    expected replenishment gap as enormous.
+  slots: {}
+  alert_spec:
+    family: shipment_loss
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_arrival_loss
+    kind: overstated
+- id: tpl_dev_shipment_loss_06
+  family: shipment_loss
+  split: dev
+  kind: overstated
+  wording_family: wf_advisory_shipment_loss
+  text: The purchasing manager says the missing consignments signal a continuing collapse in delivery
+    reliability, with future dispatches also unlikely to arrive.
+  slots: {}
+  alert_spec:
+    family: shipment_loss
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_arrival_loss
+    kind: overstated
+- id: tpl_dev_shipment_loss_07
+  family: shipment_loss
+  split: dev
+  kind: ambiguous
+  wording_family: wf_advisory_shipment_loss
+  text: The freight desk has raised a concern about whether affected goods will reach us, but has not
+    established their disposition or the extent of the problem.
+  slots: {}
+  alert_spec:
+    family: shipment_loss
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_arrival_loss
+    kind: ambiguous
+- id: tpl_dev_shipment_loss_08
+  family: shipment_loss
+  split: dev
+  kind: ambiguous
+  wording_family: wf_advisory_shipment_loss
+  text: Our supplier contact cannot yet account for some cargo; the message leaves open whether it can
+    still be recovered for delivery.
+  slots: {}
+  alert_spec:
+    family: shipment_loss
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_arrival_loss
+    kind: ambiguous
+- id: tpl_dev_shipment_loss_09
+  family: shipment_loss
+  split: dev
+  kind: distractor
+  wording_family: wf_advisory_shipment_loss
+  text: The claims administrator is reorganising old case folders.
+  slots: {}
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_dev_shipment_loss_10
+  family: shipment_loss
+  split: dev
+  kind: distractor
+  wording_family: wf_advisory_shipment_loss
+  text: The freight office has changed the formatting of its standard receipt form.
+  slots: {}
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_dev_transit_pause_01
+  family: transit_pause
+  split: dev
+  kind: accurate
+  wording_family: wf_advisory_transit_pause
+  text: The transfer hub reports that onward movement of goods is temporarily on hold while a clearance
+    issue is resolved.
+  slots: {}
+  alert_spec:
+    family: transit_pause
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '4_8'
+    prospective_signature: sig_arrival_stall
+    kind: accurate
+- id: tpl_dev_transit_pause_02
+  family: transit_pause
+  split: dev
+  kind: accurate
+  wording_family: wf_advisory_transit_pause
+  text: The freight coordinator says cargo remains at the interchange awaiting permission to resume its
+    journey.
+  slots: {}
+  alert_spec:
+    family: transit_pause
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '4_8'
+    prospective_signature: sig_arrival_stall
+    kind: accurate
+- id: tpl_dev_transit_pause_03
+  family: transit_pause
+  split: dev
+  kind: accurate
+  wording_family: wf_advisory_transit_pause
+  text: The carrier advises that affected goods are still in its custody but cannot move through the hub
+    until a temporary restriction is lifted.
+  slots: {}
+  alert_spec:
+    family: transit_pause
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '4_8'
+    prospective_signature: sig_arrival_stall
+    kind: accurate
+- id: tpl_dev_transit_pause_04
+  family: transit_pause
+  split: dev
+  kind: accurate
+  wording_family: wf_advisory_transit_pause
+  text: The transport desk reports a temporary stop to onward dispatch from the hub; the cargo is being
+    retained for release.
+  slots: {}
+  alert_spec:
+    family: transit_pause
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '4_8'
+    prospective_signature: sig_arrival_stall
+    kind: accurate
+- id: tpl_dev_transit_pause_05
+  family: transit_pause
+  split: dev
+  kind: overstated
+  wording_family: wf_advisory_transit_pause
+  text: The coordinator warns that the hold will leave replenishment stranded for a prolonged stretch,
+    with an exceptionally difficult recovery ahead.
+  slots: {}
+  alert_spec:
+    family: transit_pause
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '4_8'
+    prospective_signature: sig_arrival_stall
+    kind: overstated
+- id: tpl_dev_transit_pause_06
+  family: transit_pause
+  split: dev
+  kind: overstated
+  wording_family: wf_advisory_transit_pause
+  text: The freight manager describes the temporary restriction as a near-total breakdown that could keep
+    goods stuck indefinitely.
+  slots: {}
+  alert_spec:
+    family: transit_pause
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '4_8'
+    prospective_signature: sig_arrival_stall
+    kind: overstated
+- id: tpl_dev_transit_pause_07
+  family: transit_pause
+  split: dev
+  kind: ambiguous
+  wording_family: wf_advisory_transit_pause
+  text: The hub has raised a concern about onward movement, but the extent of the hold and the release
+    outlook remain unclear.
+  slots: {}
+  alert_spec:
+    family: transit_pause
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '4_8'
+    prospective_signature: sig_arrival_stall
+    kind: ambiguous
+- id: tpl_dev_transit_pause_08
+  family: transit_pause
+  split: dev
+  kind: ambiguous
+  wording_family: wf_advisory_transit_pause
+  text: Our carrier contact says goods may be waiting at the interchange; the update does not establish
+    the scope or likely length of the interruption.
+  slots: {}
+  alert_spec:
+    family: transit_pause
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '4_8'
+    prospective_signature: sig_arrival_stall
+    kind: ambiguous
+- id: tpl_dev_transit_pause_09
+  family: transit_pause
+  split: dev
+  kind: distractor
+  wording_family: wf_advisory_transit_pause
+  text: The hub administrator has circulated a revised staff contact list for routine enquiries.
+  slots: {}
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_dev_transit_pause_10
+  family: transit_pause
+  split: dev
+  kind: distractor
+  wording_family: wf_advisory_transit_pause
+  text: The logistics office is changing the colour scheme on its internal hub map.
+  slots: {}
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_dev_compound_01
+  family: compound
+  split: dev
+  kind: accurate
+  wording_family: wf_advisory_compound
+  text: The regional disruption is bringing extra customer orders while also holding up goods at the transfer
+    hub; both issues stem from the same event.
+  slots: {}
+  alert_spec:
+    family: compound
+    target_stream: both
+    direction: mixed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_compound
+    kind: accurate
+- id: tpl_dev_compound_02
+  family: compound
+  split: dev
+  kind: accurate
+  wording_family: wf_advisory_compound
+  text: The operations team reports that a local emergency is increasing customer purchasing and preventing
+    onward movement of incoming cargo.
+  slots: {}
+  alert_spec:
+    family: compound
+    target_stream: both
+    direction: mixed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_compound
+    kind: accurate
+- id: tpl_dev_compound_03
+  family: compound
+  split: dev
+  kind: accurate
+  wording_family: wf_advisory_compound
+  text: Our regional contact says the same disruption is prompting customers to stock up and stopping
+    replenishment from passing through the interchange.
+  slots: {}
+  alert_spec:
+    family: compound
+    target_stream: both
+    direction: mixed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_compound
+    kind: accurate
+- id: tpl_dev_compound_04
+  family: compound
+  split: dev
+  kind: accurate
+  wording_family: wf_advisory_compound
+  text: The branch manager reports stronger customer requests alongside a hold on inbound goods, both
+    linked to the disruption in the area.
+  slots: {}
+  alert_spec:
+    family: compound
+    target_stream: both
+    direction: mixed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_compound
+    kind: accurate
+- id: tpl_dev_compound_05
+  family: compound
+  split: dev
+  kind: overstated
+  wording_family: wf_advisory_compound
+  text: The regional team warns that the disruption will produce overwhelming customer orders and leave
+    incoming goods stranded for a prolonged stretch.
+  slots: {}
+  alert_spec:
+    family: compound
+    target_stream: both
+    direction: mixed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_compound
+    kind: overstated
+- id: tpl_dev_compound_06
+  family: compound
+  split: dev
+  kind: overstated
+  wording_family: wf_advisory_compound
+  text: The operations director describes an extreme buying rush and an almost complete replenishment
+    breakdown arising from the regional disruption.
+  slots: {}
+  alert_spec:
+    family: compound
+    target_stream: both
+    direction: mixed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_compound
+    kind: overstated
+- id: tpl_dev_compound_07
+  family: compound
+  split: dev
+  kind: ambiguous
+  wording_family: wf_advisory_compound
+  text: The regional desk flags possible repercussions for customer requests and inbound movement, but
+    cannot yet characterise either side of the issue.
+  slots: {}
+  alert_spec:
+    family: compound
+    target_stream: both
+    direction: mixed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_compound
+    kind: ambiguous
+- id: tpl_dev_compound_08
+  family: compound
+  split: dev
+  kind: ambiguous
+  wording_family: wf_advisory_compound
+  text: Our branch contact mentions an event affecting both purchasing activity and the route in; the
+    scale and persistence are still uncertain.
+  slots: {}
+  alert_spec:
+    family: compound
+    target_stream: both
+    direction: mixed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_compound
+    kind: ambiguous
+- id: tpl_dev_compound_09
+  family: compound
+  split: dev
+  kind: distractor
+  wording_family: wf_advisory_compound
+  text: The regional coordinator is combining two internal mailing lists for convenience.
+  slots: {}
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_dev_compound_10
+  family: compound
+  split: dev
+  kind: distractor
+  wording_family: wf_advisory_compound
+  text: The operations office is updating the headings in its branch directory.
+  slots: {}
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor

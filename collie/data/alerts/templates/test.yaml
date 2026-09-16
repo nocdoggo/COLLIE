@@ -1,0 +1,1175 @@
+# DEVELOPMENT DRAFT — authored stimuli, not final CP1 approval.
+# Each family has 4 accurate, 2 overstated, 2 ambiguous, 2 distractor entries.
+# Non-distractor labels follow the supplied foundation fake, not a verified registry.
+# PENDING_NO_CHANGE_SIGNATURE is deliberately unregistered; resolve with Module 02.
+# Do not treat a successful structural load as signature validation.
+# Compound persistence/duration follow the fake labels; check their semantics at integration.
+# Texts are synthetic messages, not reports of real events. They need human realism review.
+# Slots are empty deliberately: these are 60 distinct authored base messages per split.
+# Do not replace registry validation or real incident/benchmark leakage checks with these drafts.
+
+- id: tpl_test_demand_level_01
+  family: demand_level
+  split: test
+  kind: accurate
+  wording_family: wf_handover_demand_level
+  text: 'Handover note: the enlarged repeat-customer book is now part of the regular workload, and the
+    additional ordering is expected to persist.'
+  slots: {}
+  alert_spec:
+    family: demand_level
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_demand_level_up
+    kind: accurate
+- id: tpl_test_demand_level_02
+  family: demand_level
+  split: test
+  kind: accurate
+  wording_family: wf_handover_demand_level
+  text: 'Account review entry: customers have built larger ongoing requirements into their routine purchasing,
+    beyond the passing fluctuations we normally see.'
+  slots: {}
+  alert_spec:
+    family: demand_level
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_demand_level_up
+    kind: accurate
+- id: tpl_test_demand_level_03
+  family: demand_level
+  split: test
+  kind: accurate
+  wording_family: wf_handover_demand_level
+  text: 'Commercial watchlist: everyday take-up has settled at a stronger pace, with the retained business
+    supporting continuation rather than a brief peak.'
+  slots: {}
+  alert_spec:
+    family: demand_level
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_demand_level_up
+    kind: accurate
+- id: tpl_test_demand_level_04
+  family: demand_level
+  split: test
+  kind: accurate
+  wording_family: wf_handover_demand_level
+  text: 'Planning notebook: additional recurring business has become established across the range; the
+    earlier order expectations no longer describe the routine outlook.'
+  slots: {}
+  alert_spec:
+    family: demand_level
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_demand_level_up
+    kind: accurate
+- id: tpl_test_demand_level_05
+  family: demand_level
+  split: test
+  kind: overstated
+  wording_family: wf_handover_demand_level
+  text: 'Escalation note: the customer book is said to be expanding on an immense and permanent scale,
+    leaving normal supply capacity utterly outmatched.'
+  slots: {}
+  alert_spec:
+    family: demand_level
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_demand_level_up
+    kind: overstated
+- id: tpl_test_demand_level_06
+  family: demand_level
+  split: test
+  kind: overstated
+  wording_family: wf_handover_demand_level
+  text: 'Management handover: extraordinary order pressure is portrayed as the lasting norm, with virtually
+    unlimited additional customer appetite ahead.'
+  slots: {}
+  alert_spec:
+    family: demand_level
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_demand_level_up
+    kind: overstated
+- id: tpl_test_demand_level_07
+  family: demand_level
+  split: test
+  kind: ambiguous
+  wording_family: wf_handover_demand_level
+  text: 'Open account question: routine purchasing may be taking a different course, but neither its extent
+    nor its durability is settled.'
+  slots: {}
+  alert_spec:
+    family: demand_level
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_demand_level_up
+    kind: ambiguous
+- id: tpl_test_demand_level_08
+  family: demand_level
+  split: test
+  kind: ambiguous
+  wording_family: wf_handover_demand_level
+  text: 'Unresolved commercial entry: something in the repeat-order pattern appears different; the available
+    account notes do not pin down the change.'
+  slots: {}
+  alert_spec:
+    family: demand_level
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_demand_level_up
+    kind: ambiguous
+- id: tpl_test_demand_level_09
+  family: demand_level
+  split: test
+  kind: distractor
+  wording_family: wf_handover_demand_level
+  text: 'Administration log: a punctuation correction was made to the customer-directory heading.'
+  slots: {}
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_test_demand_level_10
+  family: demand_level
+  split: test
+  kind: distractor
+  wording_family: wf_handover_demand_level
+  text: 'Document handover: the sales team has adopted a different page footer for internal notes.'
+  slots: {}
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_test_temporary_pulse_01
+  family: temporary_pulse
+  split: test
+  kind: accurate
+  wording_family: wf_handover_temporary_pulse
+  text: 'Campaign handover: the extra customer requests belong to the limited offer; ordinary purchasing
+    is expected to resume when that activity has run its course.'
+  slots: {}
+  alert_spec:
+    family: temporary_pulse
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_demand_pulse
+    kind: accurate
+- id: tpl_test_temporary_pulse_02
+  family: temporary_pulse
+  split: test
+  kind: accurate
+  wording_family: wf_handover_temporary_pulse
+  text: 'Event ledger note: a brief cluster of additional orders is associated with the occasion, rather
+    than a continuing addition to routine business.'
+  slots: {}
+  alert_spec:
+    family: temporary_pulse
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_demand_pulse
+    kind: accurate
+- id: tpl_test_temporary_pulse_03
+  family: temporary_pulse
+  split: test
+  kind: accurate
+  wording_family: wf_handover_temporary_pulse
+  text: 'Launch review entry: the initial buying flurry is expected to fade after the launch activity,
+    leaving the underlying purchasing pace intact.'
+  slots: {}
+  alert_spec:
+    family: temporary_pulse
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_demand_pulse
+    kind: accurate
+- id: tpl_test_temporary_pulse_04
+  family: temporary_pulse
+  split: test
+  kind: accurate
+  wording_family: wf_handover_temporary_pulse
+  text: 'Account handover: customers describe their extra purchases as a short-lived stocking-up exercise
+    for the occasion, not an ongoing commitment.'
+  slots: {}
+  alert_spec:
+    family: temporary_pulse
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_demand_pulse
+    kind: accurate
+- id: tpl_test_temporary_pulse_05
+  family: temporary_pulse
+  split: test
+  kind: overstated
+  wording_family: wf_handover_temporary_pulse
+  text: 'Escalated campaign note: the approaching buying flurry is described as immense, with ordinary
+    fulfilment likely to be completely overwhelmed.'
+  slots: {}
+  alert_spec:
+    family: temporary_pulse
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_demand_pulse
+    kind: overstated
+- id: tpl_test_temporary_pulse_06
+  family: temporary_pulse
+  split: test
+  kind: overstated
+  wording_family: wf_handover_temporary_pulse
+  text: 'Event debrief outlook: the rush is being presented as the beginning of lasting heavy purchasing,
+    expected to continue well after the occasion.'
+  slots: {}
+  alert_spec:
+    family: temporary_pulse
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_demand_pulse
+    kind: overstated
+- id: tpl_test_temporary_pulse_07
+  family: temporary_pulse
+  split: test
+  kind: ambiguous
+  wording_family: wf_handover_temporary_pulse
+  text: 'Open campaign item: unusual customer activity has been mentioned, but the likely volume and the
+    end of any buying flurry remain unresolved.'
+  slots: {}
+  alert_spec:
+    family: temporary_pulse
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_demand_pulse
+    kind: ambiguous
+- id: tpl_test_temporary_pulse_08
+  family: temporary_pulse
+  split: test
+  kind: ambiguous
+  wording_family: wf_handover_temporary_pulse
+  text: 'Launch watchlist: there may be a burst of extra requests; the available notes do not establish
+    its significance or persistence.'
+  slots: {}
+  alert_spec:
+    family: temporary_pulse
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_demand_pulse
+    kind: ambiguous
+- id: tpl_test_temporary_pulse_09
+  family: temporary_pulse
+  split: test
+  kind: distractor
+  wording_family: wf_handover_temporary_pulse
+  text: 'Archive entry: the cover image on the internal campaign retrospective has been replaced.'
+  slots: {}
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_test_temporary_pulse_10
+  family: temporary_pulse
+  split: test
+  kind: distractor
+  wording_family: wf_handover_temporary_pulse
+  text: 'Event administration note: the attendance-sheet heading has been corrected for filing.'
+  slots: {}
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_test_lead_time_shift_01
+  family: lead_time_shift
+  split: test
+  kind: accurate
+  wording_family: wf_handover_lead_time_shift
+  text: 'Service handover: replenishment continues to travel, but the standing supplier process now calls
+    for a longer journey to receipt.'
+  slots: {}
+  alert_spec:
+    family: lead_time_shift
+    target_stream: arrival
+    direction: arrival_delayed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_arrival_delay
+    kind: accurate
+- id: tpl_test_lead_time_shift_02
+  family: lead_time_shift
+  split: test
+  kind: accurate
+  wording_family: wf_handover_lead_time_shift
+  text: 'Route review entry: the slower arrangement is becoming the regular service, so the added waiting
+    belongs in ordinary arrival expectations.'
+  slots: {}
+  alert_spec:
+    family: lead_time_shift
+    target_stream: arrival
+    direction: arrival_delayed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_arrival_delay
+    kind: accurate
+- id: tpl_test_lead_time_shift_03
+  family: lead_time_shift
+  split: test
+  kind: accurate
+  wording_family: wf_handover_lead_time_shift
+  text: 'Purchasing notebook: longer supplier turnaround is expected to persist under the revised routine,
+    beyond an isolated delivery problem.'
+  slots: {}
+  alert_spec:
+    family: lead_time_shift
+    target_stream: arrival
+    direction: arrival_delayed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_arrival_delay
+    kind: accurate
+- id: tpl_test_lead_time_shift_04
+  family: lead_time_shift
+  split: test
+  kind: accurate
+  wording_family: wf_handover_lead_time_shift
+  text: 'Transport handover: normal consignments are still progressing through the network, but the continuing
+    service revision makes arrival later than before.'
+  slots: {}
+  alert_spec:
+    family: lead_time_shift
+    target_stream: arrival
+    direction: arrival_delayed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_arrival_delay
+    kind: accurate
+- id: tpl_test_lead_time_shift_05
+  family: lead_time_shift
+  split: test
+  kind: overstated
+  wording_family: wf_handover_lead_time_shift
+  text: 'Escalated service entry: the continuing slowdown is described as extreme, with routine deliveries
+    expected to arrive disastrously late.'
+  slots: {}
+  alert_spec:
+    family: lead_time_shift
+    target_stream: arrival
+    direction: arrival_delayed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_arrival_delay
+    kind: overstated
+- id: tpl_test_lead_time_shift_06
+  family: lead_time_shift
+  split: test
+  kind: overstated
+  wording_family: wf_handover_lead_time_shift
+  text: 'Route risk note: the revised arrangement is portrayed as an immense and enduring drag on replenishment,
+    far beyond ordinary planning allowances.'
+  slots: {}
+  alert_spec:
+    family: lead_time_shift
+    target_stream: arrival
+    direction: arrival_delayed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_arrival_delay
+    kind: overstated
+- id: tpl_test_lead_time_shift_07
+  family: lead_time_shift
+  split: test
+  kind: ambiguous
+  wording_family: wf_handover_lead_time_shift
+  text: 'Open service item: the usual arrival expectations may be out of date, though the route notes
+    do not establish how much adjustment is needed.'
+  slots: {}
+  alert_spec:
+    family: lead_time_shift
+    target_stream: arrival
+    direction: arrival_delayed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_arrival_delay
+    kind: ambiguous
+- id: tpl_test_lead_time_shift_08
+  family: lead_time_shift
+  split: test
+  kind: ambiguous
+  wording_family: wf_handover_lead_time_shift
+  text: 'Purchasing query: a change to turnaround has been mentioned without a clear account of its reach
+    or how long it will remain relevant.'
+  slots: {}
+  alert_spec:
+    family: lead_time_shift
+    target_stream: arrival
+    direction: arrival_delayed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_arrival_delay
+    kind: ambiguous
+- id: tpl_test_lead_time_shift_09
+  family: lead_time_shift
+  split: test
+  kind: distractor
+  wording_family: wf_handover_lead_time_shift
+  text: 'Service administration log: the carrier directory now uses its updated trading name.'
+  slots: {}
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_test_lead_time_shift_10
+  family: lead_time_shift
+  split: test
+  kind: distractor
+  wording_family: wf_handover_lead_time_shift
+  text: 'Route-document note: a duplicate contact entry has been removed from the address list.'
+  slots: {}
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_test_shipment_loss_01
+  family: shipment_loss
+  split: test
+  kind: accurate
+  wording_family: wf_handover_shipment_loss
+  text: 'Receiving handover: the affected goods are confirmed unrecoverable and must no longer be counted
+    among arrivals still to come.'
+  slots: {}
+  alert_spec:
+    family: shipment_loss
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_arrival_loss
+    kind: accurate
+- id: tpl_test_shipment_loss_02
+  family: shipment_loss
+  split: test
+  kind: accurate
+  wording_family: wf_handover_shipment_loss
+  text: 'Cargo case note: damage has made the affected goods unusable, so their original delivery will
+    not be completed.'
+  slots: {}
+  alert_spec:
+    family: shipment_loss
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_arrival_loss
+    kind: accurate
+- id: tpl_test_shipment_loss_03
+  family: shipment_loss
+  split: test
+  kind: accurate
+  wording_family: wf_handover_shipment_loss
+  text: 'Transport case closure: the search for the missing goods has ended without recovery; waiting
+    longer will not bring those consignments in.'
+  slots: {}
+  alert_spec:
+    family: shipment_loss
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_arrival_loss
+    kind: accurate
+- id: tpl_test_shipment_loss_04
+  family: shipment_loss
+  split: test
+  kind: accurate
+  wording_family: wf_handover_shipment_loss
+  text: 'Warehouse handover: the affected dispatch cannot fulfil its expected receipt because the goods
+    were destroyed before delivery.'
+  slots: {}
+  alert_spec:
+    family: shipment_loss
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_arrival_loss
+    kind: accurate
+- id: tpl_test_shipment_loss_05
+  family: shipment_loss
+  split: test
+  kind: overstated
+  wording_family: wf_handover_shipment_loss
+  text: 'Escalated cargo entry: the missing goods are described as an immense shortfall that will devastate
+    the replenishment position.'
+  slots: {}
+  alert_spec:
+    family: shipment_loss
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_arrival_loss
+    kind: overstated
+- id: tpl_test_shipment_loss_06
+  family: shipment_loss
+  split: test
+  kind: overstated
+  wording_family: wf_handover_shipment_loss
+  text: 'Receiving risk outlook: the missing dispatch is being taken as a sign that incoming goods will
+    keep failing to arrive for an extended stretch.'
+  slots: {}
+  alert_spec:
+    family: shipment_loss
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_arrival_loss
+    kind: overstated
+- id: tpl_test_shipment_loss_07
+  family: shipment_loss
+  split: test
+  kind: ambiguous
+  wording_family: wf_handover_shipment_loss
+  text: 'Open cargo case: the location and recoverability of some expected goods remain unresolved, leaving
+    their eventual receipt uncertain.'
+  slots: {}
+  alert_spec:
+    family: shipment_loss
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_arrival_loss
+    kind: ambiguous
+- id: tpl_test_shipment_loss_08
+  family: shipment_loss
+  split: test
+  kind: ambiguous
+  wording_family: wf_handover_shipment_loss
+  text: 'Unsettled receiving item: there is concern that affected goods may not reach the warehouse, but
+    the transport notes do not establish the outcome.'
+  slots: {}
+  alert_spec:
+    family: shipment_loss
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_arrival_loss
+    kind: ambiguous
+- id: tpl_test_shipment_loss_09
+  family: shipment_loss
+  split: test
+  kind: distractor
+  wording_family: wf_handover_shipment_loss
+  text: 'Claims archive note: completed case files have been sorted into new folders.'
+  slots: {}
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_test_shipment_loss_10
+  family: shipment_loss
+  split: test
+  kind: distractor
+  wording_family: wf_handover_shipment_loss
+  text: 'Receiving administration entry: the blank receipt stationery now has a revised footer.'
+  slots: {}
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_test_transit_pause_01
+  family: transit_pause
+  split: test
+  kind: accurate
+  wording_family: wf_handover_transit_pause
+  text: 'Hub handover: cargo is being retained while a temporary clearance restriction prevents the next
+    leg of its journey.'
+  slots: {}
+  alert_spec:
+    family: transit_pause
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '4_8'
+    prospective_signature: sig_arrival_stall
+    kind: accurate
+- id: tpl_test_transit_pause_02
+  family: transit_pause
+  split: test
+  kind: accurate
+  wording_family: wf_handover_transit_pause
+  text: 'Movement log note: forwarding has temporarily stopped at the interchange; the affected goods
+    remain available for release when permission returns.'
+  slots: {}
+  alert_spec:
+    family: transit_pause
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '4_8'
+    prospective_signature: sig_arrival_stall
+    kind: accurate
+- id: tpl_test_transit_pause_03
+  family: transit_pause
+  split: test
+  kind: accurate
+  wording_family: wf_handover_transit_pause
+  text: 'Transport handover: the cargo has not been written off, but onward travel is waiting on the lifting
+    of a temporary hub restriction.'
+  slots: {}
+  alert_spec:
+    family: transit_pause
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '4_8'
+    prospective_signature: sig_arrival_stall
+    kind: accurate
+- id: tpl_test_transit_pause_04
+  family: transit_pause
+  split: test
+  kind: accurate
+  wording_family: wf_handover_transit_pause
+  text: 'Receiving notebook: a temporary standstill at the transfer point is preventing affected goods
+    from continuing towards the warehouse.'
+  slots: {}
+  alert_spec:
+    family: transit_pause
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '4_8'
+    prospective_signature: sig_arrival_stall
+    kind: accurate
+- id: tpl_test_transit_pause_05
+  family: transit_pause
+  split: test
+  kind: overstated
+  wording_family: wf_handover_transit_pause
+  text: 'Escalated hub note: the hold is portrayed as a severe and protracted standstill with release
+    unlikely for a very long time.'
+  slots: {}
+  alert_spec:
+    family: transit_pause
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '4_8'
+    prospective_signature: sig_arrival_stall
+    kind: overstated
+- id: tpl_test_transit_pause_06
+  family: transit_pause
+  split: test
+  kind: overstated
+  wording_family: wf_handover_transit_pause
+  text: 'Movement risk entry: the restriction is being described as an indefinite blockade that could
+    leave replenishment stranded without a workable recovery.'
+  slots: {}
+  alert_spec:
+    family: transit_pause
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '4_8'
+    prospective_signature: sig_arrival_stall
+    kind: overstated
+- id: tpl_test_transit_pause_07
+  family: transit_pause
+  split: test
+  kind: ambiguous
+  wording_family: wf_handover_transit_pause
+  text: 'Open hub item: onward movement may be constrained, but the handover does not establish how broadly
+    or for how long.'
+  slots: {}
+  alert_spec:
+    family: transit_pause
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '4_8'
+    prospective_signature: sig_arrival_stall
+    kind: ambiguous
+- id: tpl_test_transit_pause_08
+  family: transit_pause
+  split: test
+  kind: ambiguous
+  wording_family: wf_handover_transit_pause
+  text: 'Unresolved transport entry: waiting at the transfer point has been mentioned without enough detail
+    to characterise the interruption.'
+  slots: {}
+  alert_spec:
+    family: transit_pause
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '4_8'
+    prospective_signature: sig_arrival_stall
+    kind: ambiguous
+- id: tpl_test_transit_pause_09
+  family: transit_pause
+  split: test
+  kind: distractor
+  wording_family: wf_handover_transit_pause
+  text: 'Hub administration entry: the enquiry directory has a new page layout.'
+  slots: {}
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_test_transit_pause_10
+  family: transit_pause
+  split: test
+  kind: distractor
+  wording_family: wf_handover_transit_pause
+  text: 'Map filing note: the internal transit diagram has been moved to a different folder.'
+  slots: {}
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_test_compound_01
+  family: compound
+  split: test
+  kind: accurate
+  wording_family: wf_handover_compound
+  text: 'Regional handover: customers are placing extra requests as incoming goods wait at the hub, with
+    both developments traced to the same disruption.'
+  slots: {}
+  alert_spec:
+    family: compound
+    target_stream: both
+    direction: mixed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_compound
+    kind: accurate
+- id: tpl_test_compound_02
+  family: compound
+  split: test
+  kind: accurate
+  wording_family: wf_handover_compound
+  text: 'Incident notebook: the local emergency is prompting additional buying and simultaneously preventing
+    replenishment from moving onward.'
+  slots: {}
+  alert_spec:
+    family: compound
+    target_stream: both
+    direction: mixed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_compound
+    kind: accurate
+- id: tpl_test_compound_03
+  family: compound
+  split: test
+  kind: accurate
+  wording_family: wf_handover_compound
+  text: 'Branch review entry: heavier customer take-up and retained inbound cargo share a regional cause
+    rather than being separate operational developments.'
+  slots: {}
+  alert_spec:
+    family: compound
+    target_stream: both
+    direction: mixed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_compound
+    kind: accurate
+- id: tpl_test_compound_04
+  family: compound
+  split: test
+  kind: accurate
+  wording_family: wf_handover_compound
+  text: 'Operations handover: the event has both increased purchasing interest that is translating into
+    orders and interrupted the passage of incoming goods.'
+  slots: {}
+  alert_spec:
+    family: compound
+    target_stream: both
+    direction: mixed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_compound
+    kind: accurate
+- id: tpl_test_compound_05
+  family: compound
+  split: test
+  kind: overstated
+  wording_family: wf_handover_compound
+  text: 'Escalated regional entry: the shared disruption is described as creating boundless customer appetite
+    and a prolonged collapse of incoming supply.'
+  slots: {}
+  alert_spec:
+    family: compound
+    target_stream: both
+    direction: mixed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_compound
+    kind: overstated
+- id: tpl_test_compound_06
+  family: compound
+  split: test
+  kind: overstated
+  wording_family: wf_handover_compound
+  text: 'Branch risk outlook: extraordinary purchasing and a near-permanent standstill in replenishment
+    are being attributed to the same local event.'
+  slots: {}
+  alert_spec:
+    family: compound
+    target_stream: both
+    direction: mixed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_compound
+    kind: overstated
+- id: tpl_test_compound_07
+  family: compound
+  split: test
+  kind: ambiguous
+  wording_family: wf_handover_compound
+  text: 'Open regional item: there are linked concerns about customer activity and incoming movement,
+    but neither consequence is sufficiently characterised.'
+  slots: {}
+  alert_spec:
+    family: compound
+    target_stream: both
+    direction: mixed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_compound
+    kind: ambiguous
+- id: tpl_test_compound_08
+  family: compound
+  split: test
+  kind: ambiguous
+  wording_family: wf_handover_compound
+  text: 'Unsettled incident note: the event may matter for both purchases and receipt of goods; its operational
+    extent remains unclear.'
+  slots: {}
+  alert_spec:
+    family: compound
+    target_stream: both
+    direction: mixed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_compound
+    kind: ambiguous
+- id: tpl_test_compound_09
+  family: compound
+  split: test
+  kind: distractor
+  wording_family: wf_handover_compound
+  text: 'Regional administration log: the branch directory has been reformatted.'
+  slots: {}
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_test_compound_10
+  family: compound
+  split: test
+  kind: distractor
+  wording_family: wf_handover_compound
+  text: 'Operations filing entry: the joint commercial-logistics meeting notes have a revised title for
+    archiving.'
+  slots: {}
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
