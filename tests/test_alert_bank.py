@@ -27,7 +27,7 @@ LEAKY_YAML = '- id: leaky_001\n  family: transit_pause\n  split: dev\n  kind: ov
 
 
 def _prototype():
-    # 测试样例内嵌在本文件, 并写入临时目录验证加载器; 提交时无需额外 fixture 文件。
+    # The test sample is embedded in this file and written to a temporary directory to exercise the loader; no extra fixture files are needed.
     with TemporaryDirectory() as directory:
         path = Path(directory) / "prototype.yaml"
         path.write_text(PROTOTYPE_YAML)
@@ -126,7 +126,7 @@ def test_render_ignores_slot_mapping_order() -> None:
 
 
 def test_render_is_stable_across_processes() -> None:
-    # 更换 PYTHONHASHSEED 启动两个进程, 验证结果不依赖 Python 进程级随机哈希。
+    # Launch two processes with different PYTHONHASHSEED values to prove results do not depend on Python's per-process randomized hashing.
     script = """
 from collie.data.alerts.bank import render_alert
 from tests.test_alert_bank import _prototype
@@ -152,7 +152,7 @@ for seed in range(10):
 
 
 def test_leakage_scan_rejects_a_leaky_fixture(tmp_path) -> None:
-    # 先证明样例结构合法, 再验证它因可见文本泄漏而失败, 避免把解析失败误当成扫描有效。
+    # First prove the sample is structurally valid, then verify it fails on visible-text leakage, so a parse failure is not mistaken for an effective scan.
     path = tmp_path / "leaky_alert.yaml"
     path.write_text(LEAKY_YAML)
     # First prove this is structurally loadable, then reject its visible text.
@@ -302,7 +302,7 @@ def test_rejects_duplicate_yaml_key(tmp_path):
 
 
 def test_scans_every_slot_and_boundary():
-    # 泄漏片段分散在相邻槽位中, 只有检查所有拼接结果才能发现。
+    # The leak is split across adjacent slots, so only scanning every assembled rendering can find it.
     template = replace(
         _prototype(),
         text="Capacity is {amount}{unit}.",
@@ -345,7 +345,7 @@ def test_prototype_is_not_a_complete_bank():
 
 def test_composition_checker_uses_every_cell():
     # Synthetic objects exercise counts only: these are NOT authored production templates.
-    # 这里的合成模板只测试计数器; 正式 180 条模板另由下方 bank fixture 验收。
+    # These synthetic templates exercise only the counter; the real 180 templates are accepted separately by the bank fixture below.
     from collie.contracts import AlertKind, ShockFamily, Split
 
     base = _prototype()
@@ -377,7 +377,7 @@ def test_composition_checker_uses_every_cell():
 
 @pytest.fixture(scope="module")
 def bank():
-    # 直接加载准备提交的正式模板库, 避免只对 prototype 测试就宣称 CP1 已完成。
+    # Load the actual production bank intended for commit, so CP1 is not claimed complete from prototype tests alone.
     from collie.data.alerts.bank import load_alert_bank
 
     return load_alert_bank(ROOT / "collie/data/alerts/templates")
@@ -417,7 +417,7 @@ def test_no_test_wording_family_in_dev_or_cal(bank):
 
 
 def test_alert_spec_vocabulary_matches_shockspec(bank):
-    # 显式映射 family 到 shock_family, 再构造冻结 ShockSpec; 不把字段名称差异当作词表不一致。
+    # Map family to shock_family explicitly before building the frozen ShockSpec; a field-name difference is not a vocabulary mismatch.
     from dataclasses import asdict
 
     from collie.contracts import ShockSpec
@@ -470,7 +470,7 @@ def test_incident_metadata_is_scanned(tmp_path):
 
 
 def test_rollout_reuse_allowed_only_for_paired_unit(bank):
-    # 同 unit 复用是配对设计, 不同 unit 复用则违反刺激唯一性; 两条路径都必须验证。
+    # Reuse within one unit is the paired design; reuse across units violates stimulus uniqueness, and both paths must be tested.
     from collie.data.alerts.bank import validate_rollout_renderings
 
     rendered = render_alert(bank[0], 0)
@@ -480,7 +480,7 @@ def test_rollout_reuse_allowed_only_for_paired_unit(bank):
 
 
 def test_registry_injection_rejects_illegal_pairing():
-    # 用小型测试映射验证拒绝机制; 测试通过不代表真实模块 02 registry 已完成集成。
+    # Exercise the rejection mechanism with a small test mapping; a passing test does not mean the real Module 02 registry is integrated.
     from collie.data.alerts.bank import validate_registry
 
     template = _prototype()
@@ -505,3 +505,190 @@ def test_registry_injection_rejects_illegal_pairing():
             (replace(template, alert_spec=replace(template.alert_spec, onset_window=(8, 9))),),
             **kwargs,
         )
+
+
+def test_loader_rejects_non_mapping_entries(tmp_path):
+    path = tmp_path / "not_a_mapping.yaml"
+    path.write_text("- just a string\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="mapping with string keys"):
+        load_template_file(path)
+    raw = _raw_prototype()
+    raw["alert_spec"] = ["not", "a", "mapping"]
+    with pytest.raises(ValueError, match="mapping with string keys"):
+        _load_raw(tmp_path, raw)
+
+
+def test_loader_rejects_non_bank_split(tmp_path):
+    raw = _raw_prototype()
+    raw["split"] = "null_audit"
+    with pytest.raises(ValueError, match="split must be dev/cal/test"):
+        _load_raw(tmp_path, raw)
+
+
+def test_loader_rejects_no_change_outer_family(tmp_path):
+    raw = _raw_prototype()
+    raw["family"] = "no_change"
+    with pytest.raises(ValueError, match="six bank families"):
+        _load_raw(tmp_path, raw)
+
+
+def test_loader_rejects_malformed_slots(tmp_path):
+    raw = _raw_prototype()
+    raw["slots"] = ["port"]
+    with pytest.raises(ValueError, match="slots must be a mapping"):
+        _load_raw(tmp_path, raw)
+    raw = _raw_prototype()
+    raw["slots"]["not a name"] = ["x"]
+    with pytest.raises(ValueError, match="simple identifiers"):
+        _load_raw(tmp_path, raw)
+    raw = _raw_prototype()
+    raw["slots"]["port"] = []
+    with pytest.raises(ValueError, match="at least one value"):
+        _load_raw(tmp_path, raw)
+    raw = _raw_prototype()
+    raw["slots"]["port"] = ["Rotterdam", "Rotterdam"]
+    with pytest.raises(ValueError, match="duplicate candidate values"):
+        _load_raw(tmp_path, raw)
+
+
+def test_loader_rejects_unused_slots(tmp_path):
+    raw = _raw_prototype()
+    raw["slots"]["unused"] = ["x"]
+    with pytest.raises(ValueError, match="unused slots"):
+        _load_raw(tmp_path, raw)
+
+
+def test_loader_rejects_non_string_yaml_keys(tmp_path):
+    path = tmp_path / "int_keys.yaml"
+    path.write_text("- 42: x\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="keys must be strings"):
+        load_template_file(path)
+
+
+def test_loader_requires_a_yaml_list(tmp_path):
+    path = tmp_path / "mapping.yaml"
+    path.write_text("id: tpl_001\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="expected a YAML list"):
+        load_template_file(path)
+
+
+def test_loader_rejects_duplicate_ids_within_a_file(tmp_path):
+    path = tmp_path / "dupes.yaml"
+    path.write_text(yaml.safe_dump([_raw_prototype(), _raw_prototype()]), encoding="utf-8")
+    with pytest.raises(ValueError, match="duplicate template ids"):
+        load_template_file(path)
+
+
+def test_bank_loader_validates_directory_and_files(tmp_path):
+    from collie.data.alerts.bank import load_alert_bank
+
+    with pytest.raises(ValueError, match="does not exist"):
+        load_alert_bank(tmp_path / "missing")
+    empty = tmp_path / "empty"
+    empty.mkdir()
+    with pytest.raises(ValueError, match="no YAML files"):
+        load_alert_bank(empty)
+
+
+def test_bank_loader_rejects_duplicate_ids_across_files(tmp_path):
+    from collie.data.alerts.bank import load_alert_bank
+
+    (tmp_path / "a.yaml").write_text(yaml.safe_dump([_raw_prototype()]), encoding="utf-8")
+    (tmp_path / "b.yaml").write_text(yaml.safe_dump([_raw_prototype()]), encoding="utf-8")
+    with pytest.raises(ValueError, match="across alert-bank files"):
+        load_alert_bank(tmp_path)
+
+
+def test_draw_slots_requires_an_integer_seed():
+    from collie.data.alerts.bank import draw_slots
+
+    with pytest.raises(ValueError, match="seed must be an integer"):
+        draw_slots(_prototype(), "42")
+    with pytest.raises(ValueError, match="seed must be an integer"):
+        draw_slots(_prototype(), True)
+
+
+def test_draw_slots_rejects_empty_slot_values():
+    from collie.data.alerts.bank import draw_slots
+
+    template = replace(_prototype(), text="Port: {port}", slots={"port": ()})
+    with pytest.raises(ValueError, match="at least one value"):
+        draw_slots(template, 0)
+
+
+def test_forbidden_literals_must_not_be_blank():
+    with pytest.raises(ValueError, match="must not be empty"):
+        scan_text_for_leakage("some text", forbidden_literals=("",))
+    with pytest.raises(ValueError, match="must not be empty"):
+        scan_text_for_leakage("some text", forbidden_literals=("  ",))
+
+
+def test_all_rendered_texts_requires_a_positive_integer_limit():
+    with pytest.raises(ValueError, match="positive integer"):
+        validate_template_leakage(_prototype(), max_combinations=0)
+    with pytest.raises(ValueError, match="positive integer"):
+        validate_template_leakage(_prototype(), max_combinations=True)
+
+
+def _synthetic_bank():
+    # Synthetic objects exercise the composition counter only; they are NOT authored production templates.
+    from collie.contracts import AlertKind, ShockFamily, Split
+
+    base = _prototype()
+    templates = []
+    for family in set(ShockFamily) - {ShockFamily.NO_CHANGE}:
+        for split in (Split.DEV, Split.CAL, Split.TEST):
+            for kind, count in (
+                (AlertKind.ACCURATE, 4),
+                (AlertKind.OVERSTATED, 2),
+                (AlertKind.AMBIGUOUS, 2),
+                (AlertKind.DISTRACTOR, 2),
+            ):
+                for index in range(count):
+                    templates.append(
+                        replace(
+                            base,
+                            template_id=f"{family}-{split}-{kind}-{index}",
+                            family=family,
+                            split=split,
+                            kind=kind,
+                        )
+                    )
+    return tuple(templates)
+
+
+def test_composition_rejects_duplicate_ids():
+    templates = list(_synthetic_bank())
+    templates[1] = replace(templates[1], template_id=templates[0].template_id)
+    with pytest.raises(ValueError, match="duplicate template ids"):
+        validate_bank_composition(tuple(templates))
+
+
+def test_composition_rejects_out_of_bank_family_or_split():
+    from collie.contracts import ShockFamily, Split
+
+    bad_family = list(_synthetic_bank())
+    bad_family[0] = replace(bad_family[0], family=ShockFamily.NO_CHANGE)
+    with pytest.raises(ValueError, match="invalid bank family or split"):
+        validate_bank_composition(tuple(bad_family))
+    bad_split = list(_synthetic_bank())
+    bad_split[0] = replace(bad_split[0], split=Split.NULL_AUDIT)
+    with pytest.raises(ValueError, match="invalid bank family or split"):
+        validate_bank_composition(tuple(bad_split))
+
+
+def test_scalar_literals_descend_into_lists():
+    from collie.data.alerts.bank import scalar_literals
+
+    assert list(scalar_literals(["alpha", ["beta", 1.5]])) == ["alpha", "beta", "1.5"]
+
+
+def test_forbidden_from_metadata_rejects_empty_metadata(tmp_path):
+    from collie.data.alerts.bank import forbidden_from_metadata
+
+    benchmark = tmp_path / "benchmark.json"
+    benchmark.write_text('{"instances": []}', encoding="utf-8")
+    shocks = tmp_path / "shocks.json"
+    shocks.write_text('{"rollouts": []}', encoding="utf-8")
+    with pytest.raises(ValueError, match="empty leakage metadata"):
+        forbidden_from_metadata(benchmark, shocks)

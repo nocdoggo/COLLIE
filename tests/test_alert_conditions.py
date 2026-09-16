@@ -7,7 +7,12 @@ import pytest
 
 from collie.contracts import AlertKind, InformationCondition, ShockFamily, assert_no_hidden_state
 from collie.data.alerts.bank import load_alert_bank
-from collie.data.alerts.conditions import load_manifest, manifest_unit, render_conditions
+from collie.data.alerts.conditions import (
+    ExogenousDraws,
+    load_manifest,
+    manifest_unit,
+    render_conditions,
+)
 from collie.fakes import fixture_episode
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -15,7 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 @pytest.fixture
 def inputs():
-    # 从真实 manifest 取身份与时间信息, 用 fake 产生轨迹; 加入非空槽位, 避免槽位一致性断言空泛通过。
+    # Take identity and timing from the real manifest and generate the trajectory with fakes; add a nonempty slot so slot-consistency assertions cannot pass vacuously.
     manifest = load_manifest(ROOT / "manifests/shockspec_v1.json")
     row = next(r for r in manifest["rollouts"] if r["split"] == "dev" and r["family"] == 1)
     episode = fixture_episode(
@@ -30,7 +35,9 @@ def inputs():
     ]
     accurate = next(t for t in templates if t.kind is AlertKind.ACCURATE)
     accurate = replace(
-        accurate, text="{desk}: " + accurate.text, slots={"desk": ("Sales desk", "Account team")}
+        accurate,
+        text="{desk}: " + accurate.text,
+        slots={"desk": ("Sales desk", "Account team"), **accurate.slots},
     )
     return dict(
         manifest=manifest,
@@ -45,7 +52,7 @@ def inputs():
 
 
 def test_four_conditions_share_exogenous_draws(inputs):
-    # 同时检查共享对象、字节指纹和消息时间, 证明轨迹固定而信息条件确实发生变化。
+    # Check the shared object, byte fingerprint and message times together, proving the trajectory is fixed while the information condition really changes.
     result = render_conditions(**inputs)
     assert len(result) == 4
     assert len({r.exogenous.fingerprint_bytes() for r in result}) == 1
@@ -66,7 +73,7 @@ def test_independent_unit_id_on_every_rollout(inputs):
 
 
 def test_runner_boundary_has_no_hidden_truth(inputs):
-    # 检查输出给 runner 的消息映射, 确保隐藏标签不会进入策略可见对象。
+    # Inspect the message maps handed to the runner, ensuring hidden labels never enter policy-visible objects.
     for rollout in render_conditions(**inputs):
         alerts, ids = rollout.runner_alerts()
         assert_no_hidden_state(alerts)
@@ -76,7 +83,7 @@ def test_runner_boundary_has_no_hidden_truth(inputs):
 
 
 def test_conflicting_seed_in_manifest_raises(inputs):
-    # 故意让同一 unit 对应两个 seed, 确认系统拒绝伪配对。
+    # Deliberately give one unit two seeds to confirm the system rejects the false pairing.
     import copy
 
     manifest = copy.deepcopy(inputs["manifest"])
@@ -116,7 +123,7 @@ def test_out_of_horizon_not_silently_clipped(inputs):
 
 
 def test_signed_zero_changes_bitwise_fingerprint(inputs):
-    # 正负零数值相等但字节不同, 用它验证这里执行的是位级一致性检查。
+    # Positive and negative zero compare equal numerically but differ in bytes; use them to verify this is a bitwise consistency check.
     result = render_conditions(**inputs)[0].exogenous
     a = replace(result, demand=(0.0, *result.demand[1:]))
     b = replace(result, demand=(-0.0, *result.demand[1:]))
@@ -125,7 +132,7 @@ def test_signed_zero_changes_bitwise_fingerprint(inputs):
 
 
 def test_supply_losses_and_pauses_are_identical(inputs):
-    # 显式放入丢货和暂停事件, 避免只用正常供给路径就声称覆盖了这些状态。
+    # Insert loss and pause events explicitly, so coverage of these states is not claimed from the normal supply path alone.
     import math
 
     n = len(inputs["demand"])
@@ -140,7 +147,7 @@ def test_supply_losses_and_pauses_are_identical(inputs):
 
 
 def test_batch_rejects_text_reuse_across_independent_units(inputs):
-    # 构造不同身份但相同文本的两个 unit, 检查批量分配不会放过重复刺激。
+    # Build two units with different identities but the same text, checking that batch allocation does not let repeated stimuli through.
     import copy
 
     from collie.data.alerts.conditions import render_condition_batch
@@ -171,3 +178,107 @@ def test_demand_down_cannot_use_an_up_template(inputs):
             row["magnitude"] = 0.75
     with pytest.raises(ValueError, match="direction"):
         render_conditions(**(inputs | {"manifest": manifest}))
+
+
+def _valid_draw_kwargs(**overrides):
+    base = dict(
+        demand=(10.0, 12.0),
+        lead_times=(2.0, 2.0),
+        pause_active=(False, False),
+        onset=1,
+        slot_draws=(("tpl_001:port", "Rotterdam"),),
+    )
+    return base | overrides
+
+
+@pytest.mark.parametrize(
+    "field,value,message",
+    [
+        ("demand", [10.0, 12.0], "immutable tuples"),
+        ("lead_times", [2.0, 2.0], "immutable tuples"),
+        ("demand", (), "demand and lead times must align"),
+        ("lead_times", (2.0,), "demand and lead times must align"),
+        ("pause_active", [False, False], "pause path must align"),
+        ("pause_active", (False,), "pause path must align"),
+        ("slot_draws", [("tpl_001:port", "Rotterdam")], "immutable string pairs"),
+        ("slot_draws", (["tpl_001:port", "Rotterdam"],), "immutable string pairs"),
+        ("slot_draws", (("tpl_001:port",),), "immutable string pairs"),
+        ("slot_draws", (("tpl_001:port", 7),), "immutable string pairs"),
+        ("onset", 0, "onset outside trajectory"),
+        ("onset", 3, "onset outside trajectory"),
+        ("onset", True, "onset outside trajectory"),
+        ("demand", (float("nan"), 12.0), "finite and nonnegative"),
+        ("demand", (-1.0, 12.0), "finite and nonnegative"),
+        ("lead_times", (float("nan"), 2.0), "invalid lead time"),
+        ("lead_times", (-1.0, 2.0), "invalid lead time"),
+        ("pause_active", (0, False), "pause values must be booleans"),
+    ],
+)
+def test_exogenous_draws_reject_malformed_trajectories(field, value, message):
+    with pytest.raises(ValueError, match=message):
+        ExogenousDraws(**_valid_draw_kwargs(**{field: value}))
+
+
+def _four_row_manifest(template_id="tpl_001"):
+    rows = []
+    for condition in ("no_alert", "early_accurate", "late_accurate", "unreliable"):
+        rows.append(
+            {
+                "independent_unit_id": "u1",
+                "seed": 7,
+                "split": "dev",
+                "shock_family": "transit_pause",
+                "onset": 5,
+                "information_condition": condition,
+                "template_id": template_id,
+            }
+        )
+    return {"rollouts": rows}
+
+
+def test_manifest_unit_rejects_unknown_and_malformed_units():
+    with pytest.raises(ValueError, match="unknown independent unit"):
+        manifest_unit({"rollouts": []}, "ghost")
+    with pytest.raises(ValueError, match="exactly four"):
+        manifest_unit({"rollouts": _four_row_manifest()["rollouts"][:3]}, "u1")
+    with pytest.raises(ValueError, match="one manifest template slot"):
+        manifest_unit(_four_row_manifest(template_id=""), "u1")
+    divergent = _four_row_manifest()
+    divergent["rollouts"][1]["template_id"] = "tpl_other"
+    with pytest.raises(ValueError, match="one manifest template slot"):
+        manifest_unit(divergent, "u1")
+
+
+def test_trajectory_must_agree_with_manifest_onset_and_horizon(inputs):
+    with pytest.raises(ValueError, match="onset/horizon"):
+        render_conditions(**(inputs | {"onset": inputs["onset"] + 1}))
+    with pytest.raises(ValueError, match="onset/horizon"):
+        render_conditions(**(inputs | {"demand": inputs["demand"][:-1]}))
+
+
+def test_accurate_condition_requires_accurate_kind(inputs):
+    with pytest.raises(ValueError, match="requires an accurate template"):
+        render_conditions(
+            **(inputs | {"accurate": replace(inputs["accurate"], kind=AlertKind.OVERSTATED)})
+        )
+
+
+def test_unreliable_condition_rejects_accurate_kind(inputs):
+    with pytest.raises(ValueError, match="overstated/ambiguous/distractor"):
+        render_conditions(**(inputs | {"unreliable": inputs["accurate"]}))
+
+
+def test_unreliable_offset_must_be_an_integer(inputs):
+    with pytest.raises(ValueError, match="offset must be an integer"):
+        render_conditions(**inputs, unreliable_offset="1")
+    with pytest.raises(ValueError, match="offset must be an integer"):
+        render_conditions(**inputs, unreliable_offset=True)
+
+
+def test_batch_returns_rollouts_for_a_consistent_allocation(inputs):
+    from collie.data.alerts.conditions import render_condition_batch
+
+    result = render_condition_batch([inputs])
+    assert len(result) == 1
+    assert len(result[0]) == 4
+    assert result[0][0].condition is InformationCondition.NO_ALERT

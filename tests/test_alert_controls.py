@@ -33,7 +33,7 @@ CONFIG = default_audit_config()
 
 @pytest.fixture
 def variants():
-    # 五种文本共享一个调用机会, 作为时间戳、词序、长度和触发轨迹测试的基准。
+    # The five texts share one call opportunity, serving as the baseline for timestamp, word-order, length and trigger-trace tests.
     return render_content_controls(
         AlertMessage("original", 7, "Customer orders may rise next month."),
         trigger_trace=[{"period": 7, "reason": "alert"}],
@@ -53,7 +53,7 @@ def test_content_variants_share_timestamp(variants):
 
 
 def test_cross_timestamp_contrast_raises(variants):
-    # 主动混入另一个时间点的消息, 要求抛异常, 而不是仅打印警告后继续比较。
+    # Deliberately mix in a message from another time and require an exception, not just a printed warning before continuing the comparison.
     messages = {k: variants.message(k) for k in VARIANTS}
     messages["wrong"] = replace(messages["wrong"], period=8)
     with pytest.raises(ValueError, match="cross-timestamp"):
@@ -97,7 +97,7 @@ def test_controls_are_deterministic(variants):
 
 
 def test_separate_history_and_channel_ablations(variants):
-    # 分别检查历史消融与告警通道消融, 并确认原始提示对象未被修改。
+    # Check the history ablation and the alert-channel ablation separately, and confirm the original prompt object is unmodified.
     channels = PromptChannels(variants.message("true"), ("sales: 40", "inventory: 20"))
     assert numeric_history_removed(channels) == PromptChannels(channels.alert, ())
     assert no_alert(channels) == PromptChannels(None, channels.numeric_history)
@@ -111,7 +111,7 @@ def test_mutable_variant_input_rejected(variants):
 
 @pytest.fixture
 def audit_inputs():
-    # 评分完全是测试合成数据, 只用于验证统计与校验逻辑, 不能作为 P3/P4 的真实审核结果。
+    # The ratings are entirely synthetic test data for exercising the statistics and validation logic; they are not real P3/P4 audit results.
     bank = load_alert_bank(ROOT / "collie/data/alerts/templates")
     samples = review_samples(
         bank, review_sample(bank, CONFIG["render_sample_size"]), CONFIG["render_seed"]
@@ -137,7 +137,7 @@ def test_every_template_has_two_scores_per_criterion(audit_inputs):
 
 
 def test_leakage_failure_removes_template(audit_inputs):
-    # 只降低其中一位评分者的泄漏分数, 另一位同意也不能阻止模板被剔除。
+    # Lower only one rater's leakage score; the other's agreement must not stop the template from being removed.
     samples, ratings = audit_inputs
     ratings = list(ratings)
     index = next(i for i, r in enumerate(ratings) if r.criterion == "no_leakage")
@@ -162,7 +162,7 @@ def test_rendered_sample_leakage_removes_base_template(audit_inputs):
 
 
 def test_low_kappa_selects_120_and_requires_deviation(audit_inputs):
-    # 构造系统性分歧以触发缩减; 选出 120 条后仍须记录偏离并完成审核。
+    # Engineer systematic disagreement to trigger the reduction; after selecting 120, a deviation must still be recorded and the audit completed.
     samples, ratings = audit_inputs
     ratings = [replace(r, score=9 - r.score) if r.rater == "P4" else r for r in ratings]
     result = audit_ratings(samples, ratings, CONFIG)
@@ -202,7 +202,7 @@ def test_blank_sheet_never_counts_as_completed_audit(tmp_path):
 
 
 def test_stale_rating_sheet_rejected(tmp_path, audit_inputs):
-    # 评分表中的文本一旦与当前模板不一致, 旧评分必须失效, 不能沿用到修改后的刺激。
+    # Once a rating sheet's text disagrees with the current template, the old ratings must expire rather than carry over to the modified stimulus.
     import csv
 
     from collie.data.alerts.audit import read_ratings, write_rating_sheet
@@ -222,7 +222,7 @@ def test_stale_rating_sheet_rejected(tmp_path, audit_inputs):
 
 
 def test_undefined_kappa_never_passes(audit_inputs):
-    # 双方始终给相同常数分时, 机会一致率也为 1; 此时 κ 不可定义, 不能报告为完美一致。
+    # When both raters always give the same constant score, chance agreement is also 1, so κ is undefined and must not be reported as perfect agreement.
     samples, ratings = audit_inputs
     ratings = [replace(r, score=5) for r in ratings]
     result = audit_ratings(samples, ratings, CONFIG | {"status": "confirmed"})
@@ -237,7 +237,7 @@ def test_completed_non_degenerate_audit_can_pass(audit_inputs):
 
 
 def test_episode_runner_demo(capsys):
-    # 调用真正的 EpisodeRunner 演示, 检查四个条件和各内容对照的配对结果。
+    # Run the real EpisodeRunner demo and check the pairing across the four conditions and each content contrast.
     from tools.build_alert_bank import replay_one_seed
 
     report = replay_one_seed(show_diff=True)
@@ -256,7 +256,7 @@ def test_episode_runner_demo(capsys):
 
 
 def test_prepare_defaults_to_stdout_without_creating_files(tmp_path, monkeypatch, capsys):
-    # 默认输出只走终端, 防止运行工具时额外修改用户提交清单之外的文件。
+    # Default output goes to the terminal only, so running the tool never modifies files beyond the user's commit list.
     import csv
     import io
 
@@ -285,3 +285,221 @@ def test_default_configuration_is_a_fresh_pending_copy():
     second = default_audit_config()
     assert second["raters"] == ["P3", "P4"]
     assert second["status"] == "pending_team_confirmation"
+
+
+def test_variant_set_rejects_bad_timestamps(variants):
+    with pytest.raises(ValueError, match="invalid shared timestamp"):
+        replace(variants, timestamp=0)
+    with pytest.raises(ValueError, match="invalid shared timestamp"):
+        replace(variants, timestamp="7")
+
+
+def test_variant_set_rejects_malformed_trace_hash(variants):
+    with pytest.raises(ValueError, match="SHA256"):
+        replace(variants, trigger_trace_hash=64)
+    with pytest.raises(ValueError, match="SHA256"):
+        replace(variants, trigger_trace_hash="abcd")
+    with pytest.raises(ValueError, match="SHA256"):
+        replace(variants, trigger_trace_hash="z" * 64)
+
+
+def test_variant_set_requires_exactly_five_variants(variants):
+    with pytest.raises(ValueError, match="five content variants"):
+        replace(variants, texts=variants.texts[:4])
+    renamed = (("bogus", "Some text."), *variants.texts[1:])
+    with pytest.raises(ValueError, match="five content variants"):
+        replace(variants, texts=renamed)
+
+
+def test_from_messages_requires_all_five_variants(variants):
+    messages = {k: variants.message(k) for k in VARIANTS}
+    hashes = dict.fromkeys(VARIANTS, variants.trigger_trace_hash)
+    with pytest.raises(ValueError, match="five content variants"):
+        ContentVariantSet.from_messages({k: v for k, v in messages.items() if k != "wrong"}, hashes)
+    with pytest.raises(ValueError, match="five content variants"):
+        ContentVariantSet.from_messages(messages, {k: v for k, v in hashes.items() if k != "true"})
+
+
+def test_from_messages_round_trips_a_consistent_set(variants):
+    rebuilt = ContentVariantSet.from_messages(
+        {k: variants.message(k) for k in VARIANTS},
+        dict.fromkeys(VARIANTS, variants.trigger_trace_hash),
+    )
+    assert rebuilt == variants
+
+
+def test_wrong_text_must_come_from_a_different_family():
+    message = AlertMessage("original", 7, "Customer orders may rise next month.")
+    kwargs = dict(
+        trigger_trace=[{"period": 7, "reason": "alert"}],
+        true_family="demand_level",
+        seed=42,
+    )
+    with pytest.raises(ValueError, match="different family"):
+        render_content_controls(
+            message, wrong_text="Cargo waits.", wrong_family="demand_level", **kwargs
+        )
+    with pytest.raises(ValueError, match="different family"):
+        render_content_controls(message, wrong_text="   ", wrong_family="transit_pause", **kwargs)
+    with pytest.raises(ValueError, match="different family"):
+        render_content_controls(
+            message, wrong_text=message.text, wrong_family="transit_pause", **kwargs
+        )
+
+
+def test_length_tolerance_must_be_a_nonnegative_int(variants):
+    message = variants.message("true")
+    kwargs = dict(
+        trigger_trace=[{"period": 7, "reason": "alert"}],
+        wrong_text="Cargo is waiting at the port.",
+        true_family="demand_level",
+        wrong_family="transit_pause",
+        seed=42,
+    )
+    with pytest.raises(ValueError, match="invalid registered length tolerance"):
+        render_content_controls(message, length_tolerance=-1, **kwargs)
+    with pytest.raises(ValueError, match="invalid registered length tolerance"):
+        render_content_controls(message, length_tolerance=0.5, **kwargs)
+
+
+def test_identity_shuffle_falls_back_to_rotation():
+    # Seed 1 sorts the two words into their original order, so the rotation guard must fire to keep shuffled != true.
+    variants = render_content_controls(
+        AlertMessage("original", 7, "alpha beta"),
+        trigger_trace=[{"period": 7, "reason": "alert"}],
+        wrong_text="Cargo is waiting at the port.",
+        true_family="demand_level",
+        wrong_family="transit_pause",
+        seed=1,
+    )
+    assert dict(variants.texts)["shuffled"] == "beta alpha"
+
+
+def test_length_guard_catches_a_text_whose_length_lies():
+    # Masked and neutral are built to match an honest string's length exactly, so only a text
+    # whose reported length disagrees with its content can trip the tolerance guard.
+    class LyingText(str):
+        def __len__(self):
+            return 0
+
+    with pytest.raises(ValueError, match="length tolerance exceeded"):
+        render_content_controls(
+            AlertMessage("original", 7, LyingText("Customer orders may rise.")),
+            trigger_trace=[{"period": 7, "reason": "alert"}],
+            wrong_text="Cargo is waiting at the port.",
+            true_family="demand_level",
+            wrong_family="transit_pause",
+            seed=42,
+        )
+
+
+def test_prompt_channels_validate_immutable_inputs(variants):
+    with pytest.raises(ValueError, match="immutable tuple"):
+        PromptChannels(variants.message("true"), ["sales: 40"])
+    with pytest.raises(ValueError, match="immutable tuple"):
+        PromptChannels(variants.message("true"), (42,))
+    with pytest.raises(ValueError, match="observable AlertMessage"):
+        PromptChannels("not an alert", ("sales: 40",))
+
+
+def test_rating_validates_identity_and_criterion():
+    with pytest.raises(ValueError, match="sample id and a rater"):
+        Rating(" ", "P3", "no_leakage", 4)
+    with pytest.raises(ValueError, match="sample id and a rater"):
+        Rating("base:x", "", "no_leakage", 4)
+    with pytest.raises(ValueError, match="unknown criterion"):
+        Rating("base:x", "P3", "helpfulness", 4)
+
+
+def test_review_samples_validate_bank_and_selection(audit_inputs):
+    samples, _ = audit_inputs
+    templates = [value[0] for key, value in samples.items() if key.startswith("base:")]
+    first, second = templates[0], templates[1]
+    with pytest.raises(ValueError, match="duplicate template id in bank"):
+        review_samples([first, first], [], CONFIG["render_seed"])
+    with pytest.raises(ValueError, match="empty bank"):
+        review_samples([], [], CONFIG["render_seed"])
+    with pytest.raises(ValueError, match="not in bank"):
+        review_samples([first], [second], CONFIG["render_seed"])
+    with pytest.raises(ValueError, match="duplicate review sample"):
+        review_samples([first], [first, first], CONFIG["render_seed"])
+
+
+def test_kappa_rejects_unequal_or_empty_sequences():
+    with pytest.raises(ValueError, match="equal, non-empty"):
+        cohen_kappa([1, 2], [1])
+    with pytest.raises(ValueError, match="equal, non-empty"):
+        cohen_kappa([], [])
+
+
+def test_audit_ratings_validates_raters_and_known_samples(audit_inputs):
+    samples, ratings = audit_inputs
+    with pytest.raises(ValueError, match="two distinct raters"):
+        audit_ratings(samples, ratings, CONFIG | {"raters": ["P3"]})
+    with pytest.raises(ValueError, match="two distinct raters"):
+        audit_ratings(samples, ratings, CONFIG | {"raters": ["P3", "P3"]})
+    with pytest.raises(ValueError, match="unknown sample"):
+        audit_ratings(samples, [replace(ratings[0], sample_id="base:ghost")], CONFIG)
+    with pytest.raises(ValueError, match="unregistered rater"):
+        audit_ratings(samples, [replace(ratings[0], rater="P9")], CONFIG)
+
+
+def _fill_first_score(path, score):
+    import csv
+
+    from collie.data.alerts.audit import SHEET_COLUMNS
+
+    with path.open(newline="") as handle:
+        rows = list(csv.DictReader(handle))
+    rows[0]["score"] = score
+    with path.open("w", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(SHEET_COLUMNS))
+        writer.writeheader()
+        writer.writerows(rows)
+    return rows[0]
+
+
+def test_read_ratings_rejects_wrong_columns(tmp_path, audit_inputs):
+    from collie.data.alerts.audit import read_ratings
+
+    samples, _ = audit_inputs
+    path = tmp_path / "ratings.csv"
+    path.write_text("sample_id,score\nbase:x,4\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="columns"):
+        read_ratings(path, samples)
+
+
+def test_read_ratings_rejects_unknown_samples(tmp_path, audit_inputs):
+    from collie.data.alerts.audit import SHEET_COLUMNS, read_ratings
+
+    samples, _ = audit_inputs
+    path = tmp_path / "ratings.csv"
+    path.write_text(
+        ",".join(SHEET_COLUMNS)
+        + "\nbase:ghost,tpl,dev,transit_pause,accurate,P3,no_leakage,4,text\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="unknown sample"):
+        read_ratings(path, samples)
+
+
+def test_read_ratings_accepts_filled_scores(tmp_path, audit_inputs):
+    from collie.data.alerts.audit import read_ratings, write_rating_sheet
+
+    samples, _ = audit_inputs
+    path = tmp_path / "ratings.csv"
+    write_rating_sheet(path, samples, CONFIG["raters"])
+    row = _fill_first_score(path, "4")
+    ratings = read_ratings(path, samples)
+    assert ratings == (Rating(row["sample_id"], row["rater"], row["criterion"], 4),)
+
+
+def test_read_ratings_rejects_non_integer_scores(tmp_path, audit_inputs):
+    from collie.data.alerts.audit import read_ratings, write_rating_sheet
+
+    samples, _ = audit_inputs
+    path = tmp_path / "ratings.csv"
+    write_rating_sheet(path, samples, CONFIG["raters"])
+    _fill_first_score(path, "four")
+    with pytest.raises(ValueError, match="integer from 1 to 5"):
+        read_ratings(path, samples)

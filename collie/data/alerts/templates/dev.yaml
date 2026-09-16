@@ -5,7 +5,7 @@
 # Do not treat a successful structural load as signature validation.
 # Compound persistence/duration follow the fake labels; check their semantics at integration.
 # Texts are synthetic messages, not reports of real events. They need human realism review.
-# Slots are empty deliberately: these are 60 distinct authored base messages per split.
+# Slots carry per-episode controlled variation (supplier/location/timing/severity); draws are deterministic per (template_id, seed).
 # Do not replace registry validation or real incident/benchmark leakage checks with these drafts.
 
 - id: tpl_dev_demand_level_01
@@ -13,9 +13,29 @@
   split: dev
   kind: accurate
   wording_family: wf_advisory_demand_level
-  text: The sales desk reports a broader customer base for this range and expects the heavier ordering
-    to continue beyond the current busy spell.
-  slots: {}
+  text: The {supplier} reports a broader customer base for {location} and expects the {severity}
+    ordering to continue {timing}.
+  slots:
+    supplier:
+    - sales desk
+    - account manager
+    - commercial team
+    - regional sales office
+    location:
+    - this range
+    - this product range
+    - the seasonal line
+    - the core catalogue
+    timing:
+    - beyond the current busy spell
+    - through the coming quarter
+    - well into next season
+    - past the present trading spell
+    severity:
+    - heavier
+    - stronger
+    - brisker
+    - firmer
   alert_spec:
     family: demand_level
     target_stream: demand
@@ -33,9 +53,29 @@
   split: dev
   kind: accurate
   wording_family: wf_advisory_demand_level
-  text: Our account manager says customers are placing larger routine replenishment requests and are keeping
-    those requirements in their ongoing plans.
-  slots: {}
+  text: Our {supplier} says {location} are placing {severity} routine replenishment requests and are
+    keeping those requirements {timing}.
+  slots:
+    supplier:
+    - account manager
+    - regional representative
+    - commercial lead
+    - sales manager
+    location:
+    - customers
+    - customers in the northern region
+    - customers across the coastal market
+    - customers in the Baltic states
+    timing:
+    - in their ongoing plans
+    - in their forward planning
+    - in their standing schedules
+    - in their regular programmes
+    severity:
+    - larger
+    - bigger
+    - stronger
+    - broader
   alert_spec:
     family: demand_level
     target_stream: demand
@@ -53,9 +93,29 @@
   split: dev
   kind: accurate
   wording_family: wf_advisory_demand_level
-  text: The commercial team advises that recent additions to the customer roster are bringing sustained
-    extra purchasing rather than a brief promotional rush.
-  slots: {}
+  text: The {supplier} advises that recent additions to {location} are bringing {severity} extra
+    purchasing rather than {timing}.
+  slots:
+    supplier:
+    - commercial team
+    - sales desk
+    - account management office
+    - regional commercial desk
+    location:
+    - the customer roster
+    - the regional customer roster
+    - the northern customer roster
+    - the coastal customer roster
+    timing:
+    - a brief promotional rush
+    - a short-lived campaign spike
+    - a passing seasonal flurry
+    - a momentary event bump
+    severity:
+    - sustained
+    - steady
+    - continuing
+    - durable
   alert_spec:
     family: demand_level
     target_stream: demand
@@ -73,9 +133,29 @@
   split: dev
   kind: accurate
   wording_family: wf_advisory_demand_level
-  text: Distributors report that stronger everyday take-up is becoming established, with no return to
-    the earlier ordering pace currently expected.
-  slots: {}
+  text: Distributors report that {severity} {topic} is becoming established, with no return to
+    {location} {timing} expected.
+  slots:
+    location:
+    - the earlier ordering pace
+    - the earlier ordering pace in the northern region
+    - the earlier ordering pace across the coastal market
+    - the earlier ordering pace around Rotterdam
+    timing:
+    - currently
+    - at present
+    - right now
+    - as things stand
+    severity:
+    - stronger
+    - heavier
+    - brisker
+    - firmer
+    topic:
+    - everyday take-up
+    - everyday ordering
+    - routine take-up
+    - day-to-day ordering
   alert_spec:
     family: demand_level
     target_stream: demand
@@ -93,9 +173,29 @@
   split: dev
   kind: overstated
   wording_family: wf_advisory_demand_level
-  text: The sales director warns that customer orders are about to overwhelm our normal capacity and remain
-    exceptionally heavy for the foreseeable future.
-  slots: {}
+  text: The {supplier} warns that customer orders are about to overwhelm {location} and remain
+    {severity} {timing}.
+  slots:
+    supplier:
+    - sales director
+    - commercial director
+    - head of sales
+    - regional sales chief
+    location:
+    - our normal capacity
+    - our normal capacity in the northern region
+    - capacity at the Rotterdam DC
+    - our normal capacity across the coastal market
+    timing:
+    - for the foreseeable future
+    - for the coming quarters
+    - well beyond this season
+    - with no easing in sight
+    severity:
+    - exceptionally heavy
+    - punishingly heavy
+    - relentlessly heavy
+    - intensely heavy
   alert_spec:
     family: demand_level
     target_stream: demand
@@ -113,9 +213,29 @@
   split: dev
   kind: overstated
   wording_family: wf_advisory_demand_level
-  text: The account team describes the new buying pace as a dramatic and lasting surge across the customer
-    base, with little prospect of any easing.
-  slots: {}
+  text: The {supplier} describes the {timing} buying pace as a {severity} surge {location}, with
+    little prospect of any easing.
+  slots:
+    supplier:
+    - account team
+    - sales desk
+    - commercial office
+    - customer team
+    location:
+    - across the customer base
+    - across the northern customer base
+    - across the whole region
+    - across our coastal accounts
+    timing:
+    - new
+    - recent
+    - current
+    - emerging
+    severity:
+    - dramatic and lasting
+    - massive and enduring
+    - huge and unrelenting
+    - sweeping and permanent
   alert_spec:
     family: demand_level
     target_stream: demand
@@ -133,9 +253,29 @@
   split: dev
   kind: ambiguous
   wording_family: wf_advisory_demand_level
-  text: The sales desk has flagged a change in routine customer requests, although the scale and staying
-    power of the change are still unclear.
-  slots: {}
+  text: The {supplier} has flagged a change in {timing} {location}, although the scale and staying
+    power of the change are {severity}.
+  slots:
+    supplier:
+    - sales desk
+    - account manager
+    - commercial team
+    - regional office
+    location:
+    - customer requests
+    - customer requests in the northern region
+    - customer requests across the coastal market
+    - customer requests from Rotterdam-area accounts
+    timing:
+    - routine
+    - regular
+    - day-to-day
+    - standing
+    severity:
+    - still unclear
+    - yet to be established
+    - not yet known
+    - hard to gauge
   alert_spec:
     family: demand_level
     target_stream: demand
@@ -153,9 +293,29 @@
   split: dev
   kind: ambiguous
   wording_family: wf_advisory_demand_level
-  text: Our account manager thinks the usual purchasing rhythm may be different now; the update does not
-    establish how much or for how long.
-  slots: {}
+  text: Our {supplier} thinks {location} may be different {timing}; the update does not establish
+    {severity}.
+  slots:
+    supplier:
+    - account manager
+    - regional representative
+    - commercial contact
+    - sales lead
+    location:
+    - the usual purchasing rhythm
+    - the usual purchasing rhythm in the northern region
+    - the usual purchasing rhythm across the coastal market
+    - the usual purchasing rhythm among Rotterdam accounts
+    timing:
+    - now
+    - at present
+    - this season
+    - lately
+    severity:
+    - how much or for how long
+    - the size or the staying power
+    - how big or how persistent
+    - the scale or the duration
   alert_spec:
     family: demand_level
     target_stream: demand
@@ -173,8 +333,28 @@
   split: dev
   kind: distractor
   wording_family: wf_advisory_demand_level
-  text: The sales administrator has circulated a revised customer contact directory.
-  slots: {}
+  text: The {supplier} has {channel} a {timing} {topic}.
+  slots:
+    supplier:
+    - sales administrator
+    - commercial coordinator
+    - office manager
+    - sales support lead
+    timing:
+    - revised
+    - newly revised
+    - freshly updated
+    - recently refreshed
+    channel:
+    - circulated
+    - shared
+    - distributed
+    - sent round
+    topic:
+    - customer contact directory
+    - client contact list
+    - account directory
+    - customer roster
   alert_spec:
     family: no_change
     target_stream: none
@@ -190,8 +370,28 @@
   split: dev
   kind: distractor
   wording_family: wf_advisory_demand_level
-  text: The commercial team is refreshing the layout of its catalogue cover.
-  slots: {}
+  text: The {supplier} is {timing} the {topic} of {location}.
+  slots:
+    supplier:
+    - commercial team
+    - marketing office
+    - design team
+    - brand team
+    location:
+    - its catalogue cover
+    - its northern catalogue cover
+    - its Rotterdam catalogue cover
+    - its coastal catalogue cover
+    timing:
+    - refreshing
+    - currently refreshing
+    - gradually refreshing
+    - now refreshing
+    topic:
+    - layout
+    - design
+    - styling
+    - formatting
   alert_spec:
     family: no_change
     target_stream: none
@@ -207,9 +407,29 @@
   split: dev
   kind: accurate
   wording_family: wf_advisory_temporary_pulse
-  text: The promotions desk expects an extra burst of orders around the current campaign, followed by
-    a return to the usual purchasing pace.
-  slots: {}
+  text: The {supplier} expects {severity} of {location} {timing}, followed by a return to the usual
+    purchasing pace.
+  slots:
+    supplier:
+    - promotions desk
+    - marketing team
+    - campaign manager
+    - sales office
+    location:
+    - orders
+    - orders from the northern region
+    - orders from coastal accounts
+    - orders in the Rotterdam area
+    timing:
+    - around the current campaign
+    - during the present promotion
+    - over the launch period
+    - through the current sales drive
+    severity:
+    - an extra burst
+    - a noticeable bump
+    - a marked uptick
+    - a brisk flurry
   alert_spec:
     family: temporary_pulse
     target_stream: demand
@@ -227,9 +447,28 @@
   split: dev
   kind: accurate
   wording_family: wf_advisory_temporary_pulse
-  text: The sales team reports a brief rush of event-related customer requests and expects it to ease
-    once the event business is cleared.
-  slots: {}
+  text: The {supplier} reports {severity} of {location} and expects it to ease {timing}.
+  slots:
+    supplier:
+    - sales team
+    - promotions desk
+    - account management team
+    - commercial office
+    location:
+    - event-related customer requests
+    - event-related customer requests in the northern region
+    - event-related requests from coastal customers
+    - event-related customer requests around Rotterdam
+    timing:
+    - once the event business is cleared
+    - once the campaign wraps up
+    - after the promotion ends
+    - when the event season passes
+    severity:
+    - a brief rush
+    - a short burst
+    - a quick flurry
+    - a modest surge
   alert_spec:
     family: temporary_pulse
     target_stream: demand
@@ -247,9 +486,29 @@
   split: dev
   kind: accurate
   wording_family: wf_advisory_temporary_pulse
-  text: Our account manager advises that customers are stocking up for a limited occasion rather than
-    increasing their continuing requirements.
-  slots: {}
+  text: Our {supplier} advises that {location} are {severity} {timing} rather than increasing their
+    continuing requirements.
+  slots:
+    supplier:
+    - account manager
+    - sales desk
+    - regional representative
+    - commercial contact
+    location:
+    - customers
+    - customers in the northern region
+    - coastal customers
+    - customers around Rotterdam
+    timing:
+    - for a limited occasion
+    - for a short promotional window
+    - for a brief seasonal event
+    - for a one-off celebration
+    severity:
+    - stocking up
+    - buying ahead
+    - building extra stock
+    - ordering heavily
   alert_spec:
     family: temporary_pulse
     target_stream: demand
@@ -267,9 +526,29 @@
   split: dev
   kind: accurate
   wording_family: wf_advisory_temporary_pulse
-  text: The commercial desk expects a short-lived flurry of purchasing tied to a launch, with routine
-    ordering resuming afterwards.
-  slots: {}
+  text: The {supplier} expects {severity} of {location} tied to a launch, with routine ordering
+    resuming {timing}.
+  slots:
+    supplier:
+    - commercial desk
+    - sales team
+    - campaign manager
+    - promotions office
+    location:
+    - purchasing
+    - purchasing in the northern region
+    - purchasing across coastal accounts
+    - purchasing around Rotterdam
+    timing:
+    - afterwards
+    - once the launch dust settles
+    - after the launch window
+    - shortly afterwards
+    severity:
+    - a short-lived flurry
+    - a brief flurry
+    - a passing burst
+    - a quick uptick
   alert_spec:
     family: temporary_pulse
     target_stream: demand
@@ -287,9 +566,29 @@
   split: dev
   kind: overstated
   wording_family: wf_advisory_temporary_pulse
-  text: The promotions team warns that the campaign rush will be overwhelming, with exceptionally heavy
-    orders crowding out ordinary business.
-  slots: {}
+  text: The {supplier} warns that {timing} will be {severity}, with exceptionally heavy orders
+    crowding out {location}.
+  slots:
+    supplier:
+    - promotions team
+    - marketing director
+    - campaign manager
+    - sales office
+    location:
+    - ordinary business
+    - ordinary business in the northern region
+    - ordinary business across coastal accounts
+    - ordinary business around Rotterdam
+    timing:
+    - the campaign rush
+    - the current campaign rush
+    - this season's campaign rush
+    - the ongoing campaign rush
+    severity:
+    - overwhelming
+    - crushing
+    - unmanageable
+    - extreme
   alert_spec:
     family: temporary_pulse
     target_stream: demand
@@ -307,9 +606,29 @@
   split: dev
   kind: overstated
   wording_family: wf_advisory_temporary_pulse
-  text: The sales manager says the event rush is likely to keep orders elevated well beyond the occasion
-    and become the new routine.
-  slots: {}
+  text: The {supplier} says the event rush is likely to keep {location} {severity} {timing} and
+    become the new routine.
+  slots:
+    supplier:
+    - sales manager
+    - promotions lead
+    - campaign director
+    - sales office
+    location:
+    - orders
+    - orders in the northern region
+    - orders from coastal accounts
+    - orders around Rotterdam
+    timing:
+    - well beyond the occasion
+    - long after the event
+    - far past the campaign window
+    - indefinitely beyond the launch
+    severity:
+    - elevated
+    - inflated
+    - running hot
+    - sky-high
   alert_spec:
     family: temporary_pulse
     target_stream: demand
@@ -327,9 +646,29 @@
   split: dev
   kind: ambiguous
   wording_family: wf_advisory_temporary_pulse
-  text: The promotions desk has mentioned an unusual pocket of buying activity, but its size and likely
-    finishing point have not been established.
-  slots: {}
+  text: The {supplier} has mentioned {severity} of {location}, but its size and {timing} have not
+    been established.
+  slots:
+    supplier:
+    - promotions desk
+    - campaign manager
+    - marketing office
+    - sales desk
+    location:
+    - buying activity
+    - buying activity in the northern region
+    - buying activity among coastal accounts
+    - buying activity around Rotterdam
+    timing:
+    - likely finishing point
+    - probable winding-down point
+    - expected tail-off
+    - likely duration
+    severity:
+    - an unusual pocket
+    - a curious pocket
+    - a localised pocket
+    - an unexpected patch
   alert_spec:
     family: temporary_pulse
     target_stream: demand
@@ -347,9 +686,29 @@
   split: dev
   kind: ambiguous
   wording_family: wf_advisory_temporary_pulse
-  text: Our account manager flags some event-related interest without clarifying whether it will be a
-    small flurry or a more substantial interruption to normal ordering.
-  slots: {}
+  text: Our {supplier} flags some {timing} interest without clarifying whether it will be {severity}
+    to {location}.
+  slots:
+    supplier:
+    - account manager
+    - promotions contact
+    - regional representative
+    - commercial lead
+    location:
+    - normal ordering
+    - normal ordering in the northern region
+    - normal ordering across coastal accounts
+    - normal ordering around Rotterdam
+    timing:
+    - event-related
+    - campaign-related
+    - seasonal
+    - launch-related
+    severity:
+    - a small flurry or a more substantial interruption
+    - a brief bump or a longer disruption
+    - a minor blip or a sizeable interruption
+    - a passing ripple or a serious interruption
   alert_spec:
     family: temporary_pulse
     target_stream: demand
@@ -367,8 +726,28 @@
   split: dev
   kind: distractor
   wording_family: wf_advisory_temporary_pulse
-  text: The marketing coordinator is changing the file names used for archived campaign artwork.
-  slots: {}
+  text: The {supplier} is {channel} the {topic} used for {timing} campaign artwork.
+  slots:
+    supplier:
+    - marketing coordinator
+    - brand administrator
+    - design coordinator
+    - promotions assistant
+    timing:
+    - archived
+    - older archived
+    - previously archived
+    - last season's archived
+    channel:
+    - changing
+    - standardising
+    - tidying
+    - revising
+    topic:
+    - file names
+    - folder names
+    - file labels
+    - naming conventions
   alert_spec:
     family: no_change
     target_stream: none
@@ -384,8 +763,28 @@
   split: dev
   kind: distractor
   wording_family: wf_advisory_temporary_pulse
-  text: The events desk has corrected a spelling error in an internal briefing title.
-  slots: {}
+  text: The {supplier} has {channel} {severity} in {topic}.
+  slots:
+    supplier:
+    - events desk
+    - marketing office
+    - communications coordinator
+    - promotions team
+    severity:
+    - a spelling error
+    - a small spelling error
+    - a minor spelling error
+    - a tiny spelling error
+    channel:
+    - corrected
+    - fixed
+    - amended
+    - put right
+    topic:
+    - an internal briefing title
+    - an internal briefing heading
+    - an internal memo title
+    - an internal bulletin title
   alert_spec:
     family: no_change
     target_stream: none
@@ -401,9 +800,29 @@
   split: dev
   kind: accurate
   wording_family: wf_advisory_lead_time_shift
-  text: The supplier advises that its revised handling routine will make deliveries take longer than usual
-    on an ongoing basis.
-  slots: {}
+  text: The {supplier} advises that its revised handling routine will make {location} {severity}
+    {timing}.
+  slots:
+    supplier:
+    - supplier
+    - regional distributor
+    - freight forwarder
+    - logistics provider
+    location:
+    - deliveries
+    - deliveries to the Rotterdam DC
+    - deliveries to the northern depot
+    - deliveries into the coastal warehouse
+    timing:
+    - on an ongoing basis
+    - for the foreseeable future
+    - until further notice
+    - as a standing arrangement
+    severity:
+    - take longer than usual
+    - take noticeably longer than usual
+    - take markedly longer than usual
+    - run longer than usual
   alert_spec:
     family: lead_time_shift
     target_stream: arrival
@@ -421,9 +840,29 @@
   split: dev
   kind: accurate
   wording_family: wf_advisory_lead_time_shift
-  text: Our logistics contact reports a slower regular route to the warehouse, with shipments still moving
-    but taking more time to arrive.
-  slots: {}
+  text: Our {supplier} reports a {severity} regular route to {location}, with shipments {timing} but
+    taking more time to arrive.
+  slots:
+    supplier:
+    - logistics contact
+    - freight coordinator
+    - transport planner
+    - carrier representative
+    location:
+    - the warehouse
+    - the Rotterdam DC
+    - the northern depot
+    - the regional distribution centre
+    timing:
+    - still moving
+    - still moving for now
+    - continuing to move
+    - moving as before
+    severity:
+    - slower
+    - noticeably slower
+    - markedly slower
+    - somewhat slower
   alert_spec:
     family: lead_time_shift
     target_stream: arrival
@@ -441,9 +880,29 @@
   split: dev
   kind: accurate
   wording_family: wf_advisory_lead_time_shift
-  text: The carrier says its new service arrangement adds waiting to the usual delivery journey and will
-    remain in use for now.
-  slots: {}
+  text: The {supplier} says its new service arrangement {severity} to {location} and will remain in
+    use {timing}.
+  slots:
+    supplier:
+    - carrier
+    - regional distributor
+    - freight forwarder
+    - haulage firm
+    location:
+    - the usual delivery journey
+    - the usual Rotterdam delivery journey
+    - the usual northern delivery journey
+    - the usual coastal delivery journey
+    timing:
+    - for now
+    - for the time being
+    - until further notice
+    - for the present season
+    severity:
+    - adds waiting
+    - adds noticeable waiting
+    - adds some waiting
+    - adds marked extra waiting
   alert_spec:
     family: lead_time_shift
     target_stream: arrival
@@ -461,9 +920,29 @@
   split: dev
   kind: accurate
   wording_family: wf_advisory_lead_time_shift
-  text: The purchasing team reports that routine supplier turnaround has become longer, rather than a
-    particular consignment being briefly held.
-  slots: {}
+  text: The {supplier} reports that {location} has become {severity}, rather than a particular
+    consignment being {timing} held.
+  slots:
+    supplier:
+    - purchasing team
+    - procurement office
+    - buying desk
+    - supply manager
+    location:
+    - routine supplier turnaround
+    - routine turnaround from our northern suppliers
+    - routine supplier turnaround on the Rotterdam lane
+    - routine turnaround from coastal suppliers
+    timing:
+    - briefly
+    - momentarily
+    - temporarily
+    - only briefly
+    severity:
+    - longer
+    - noticeably longer
+    - markedly longer
+    - somewhat longer
   alert_spec:
     family: lead_time_shift
     target_stream: arrival
@@ -481,9 +960,29 @@
   split: dev
   kind: overstated
   wording_family: wf_advisory_lead_time_shift
-  text: The supplier warns that deliveries will take far longer than anyone can reasonably plan for under
-    the new handling arrangement.
-  slots: {}
+  text: The {supplier} warns that {location} will take {severity} than anyone can reasonably plan
+    for {timing}.
+  slots:
+    supplier:
+    - supplier
+    - regional distributor
+    - freight forwarder
+    - logistics provider
+    location:
+    - deliveries
+    - deliveries to the Rotterdam DC
+    - deliveries to the northern depot
+    - deliveries into the coastal warehouse
+    timing:
+    - under the new handling arrangement
+    - under the recently introduced handling arrangement
+    - under the current handling arrangement
+    - under the newly adopted handling arrangement
+    severity:
+    - far longer
+    - vastly longer
+    - dramatically longer
+    - immeasurably longer
   alert_spec:
     family: lead_time_shift
     target_stream: arrival
@@ -501,9 +1000,29 @@
   split: dev
   kind: overstated
   wording_family: wf_advisory_lead_time_shift
-  text: The logistics manager describes the slower service as a severe and enduring delay that will leave
-    routine replenishment painfully late.
-  slots: {}
+  text: The {supplier} describes {location} as a {severity} delay that will leave {timing}
+    replenishment painfully late.
+  slots:
+    supplier:
+    - logistics manager
+    - transport director
+    - freight coordinator
+    - distribution manager
+    location:
+    - the slower service
+    - the slower northern service
+    - the slower Rotterdam service
+    - the slower coastal service
+    timing:
+    - routine
+    - regular
+    - day-to-day
+    - standing
+    severity:
+    - severe and enduring
+    - brutal and lasting
+    - punishing and unrelenting
+    - crippling and long-lived
   alert_spec:
     family: lead_time_shift
     target_stream: arrival
@@ -521,9 +1040,29 @@
   split: dev
   kind: ambiguous
   wording_family: wf_advisory_lead_time_shift
-  text: The supplier has flagged a possible change to normal turnaround, but has not clarified the extent
-    or how long the arrangement will remain.
-  slots: {}
+  text: The {supplier} has flagged a possible change to {location}, but has not clarified {severity}
+    or how long the arrangement {timing}.
+  slots:
+    supplier:
+    - supplier
+    - regional distributor
+    - freight forwarder
+    - haulage partner
+    location:
+    - normal turnaround
+    - normal turnaround on the Rotterdam lane
+    - normal turnaround from northern suppliers
+    - normal turnaround on coastal routes
+    timing:
+    - will remain
+    - will stay in place
+    - will be kept
+    - will last
+    severity:
+    - the extent
+    - the scale
+    - the size
+    - how big the effect is
   alert_spec:
     family: lead_time_shift
     target_stream: arrival
@@ -541,9 +1080,29 @@
   split: dev
   kind: ambiguous
   wording_family: wf_advisory_lead_time_shift
-  text: Our transport contact says delivery expectations may need revisiting; the note leaves the size
-    and persistence of the timing issue unresolved.
-  slots: {}
+  text: Our {supplier} says {location} {timing}; the note leaves {severity} of the timing issue
+    unresolved.
+  slots:
+    supplier:
+    - transport contact
+    - carrier representative
+    - freight coordinator
+    - logistics planner
+    location:
+    - delivery expectations
+    - delivery expectations for the Rotterdam DC
+    - delivery expectations on northern routes
+    - delivery expectations for coastal depots
+    timing:
+    - may need revisiting
+    - may soon need revisiting
+    - may shortly need revisiting
+    - may eventually need revisiting
+    severity:
+    - the size and persistence
+    - the scale and staying power
+    - the extent and durability
+    - the magnitude and likely length
   alert_spec:
     family: lead_time_shift
     target_stream: arrival
@@ -561,8 +1120,25 @@
   split: dev
   kind: distractor
   wording_family: wf_advisory_lead_time_shift
-  text: The carrier has updated its customer-service email address.
-  slots: {}
+  text: The {supplier} has {channel} {topic}.
+  slots:
+    supplier:
+    - carrier
+    - regional distributor
+    - freight forwarder
+    - haulage firm
+    - logistics provider
+    channel:
+    - updated
+    - changed
+    - refreshed
+    - replaced
+    - recently updated
+    topic:
+    - its customer-service email address
+    - its customer-service phone number
+    - its support contact details
+    - its customer-service mailbox
   alert_spec:
     family: no_change
     target_stream: none
@@ -578,8 +1154,28 @@
   split: dev
   kind: distractor
   wording_family: wf_advisory_lead_time_shift
-  text: The purchasing administrator has replaced the supplier logo on the internal directory page.
-  slots: {}
+  text: The {supplier} has {channel} {topic} on {location}.
+  slots:
+    supplier:
+    - purchasing administrator
+    - procurement coordinator
+    - office manager
+    - buying desk assistant
+    location:
+    - the internal directory page
+    - the internal staff directory page
+    - the regional directory page
+    - the internal contact page
+    channel:
+    - replaced
+    - updated
+    - swapped out
+    - refreshed
+    topic:
+    - the supplier logo
+    - the vendor logo
+    - the supplier banner
+    - the partner logo
   alert_spec:
     family: no_change
     target_stream: none
@@ -595,9 +1191,29 @@
   split: dev
   kind: accurate
   wording_family: wf_advisory_shipment_loss
-  text: The carrier reports that affected consignments have gone missing and should not be expected to
-    arrive through the original delivery arrangements.
-  slots: {}
+  text: The {supplier} reports that {location} have {severity} and {timing} to arrive through the
+    original delivery arrangements.
+  slots:
+    supplier:
+    - carrier
+    - regional distributor
+    - freight forwarder
+    - haulage firm
+    location:
+    - affected consignments
+    - affected consignments bound for the Rotterdam DC
+    - affected consignments on the northern lane
+    - affected consignments headed to coastal depots
+    timing:
+    - should not be expected
+    - should no longer be expected
+    - should not any longer be expected
+    - should not now be expected
+    severity:
+    - gone missing
+    - been lost
+    - gone missing entirely
+    - been written off
   alert_spec:
     family: shipment_loss
     target_stream: arrival
@@ -615,9 +1231,29 @@
   split: dev
   kind: accurate
   wording_family: wf_advisory_shipment_loss
-  text: The supplier advises that goods on an affected dispatch were damaged beyond recovery and will
-    not reach the receiving warehouse.
-  slots: {}
+  text: The {supplier} advises that goods on an affected dispatch were {severity} and {timing}
+    {location}.
+  slots:
+    supplier:
+    - supplier
+    - regional distributor
+    - freight forwarder
+    - logistics provider
+    location:
+    - the receiving warehouse
+    - the Rotterdam DC
+    - the northern receiving depot
+    - the coastal warehouse
+    timing:
+    - will not reach
+    - will not now reach
+    - will no longer reach
+    - will not any longer reach
+    severity:
+    - damaged beyond recovery
+    - damaged beyond repair
+    - destroyed in transit
+    - spoiled beyond salvage
   alert_spec:
     family: shipment_loss
     target_stream: arrival
@@ -635,9 +1271,29 @@
   split: dev
   kind: accurate
   wording_family: wf_advisory_shipment_loss
-  text: Our freight contact confirms that affected cargo cannot be recovered; these consignments are not
-    merely waiting for onward movement.
-  slots: {}
+  text: Our {supplier} confirms that {location} {severity}; these consignments are not {timing} for
+    onward movement.
+  slots:
+    supplier:
+    - freight contact
+    - logistics coordinator
+    - carrier representative
+    - transport planner
+    location:
+    - affected cargo
+    - affected cargo on the northern lane
+    - affected cargo bound for Rotterdam
+    - affected cargo from coastal suppliers
+    timing:
+    - merely waiting
+    - simply waiting
+    - only waiting
+    - still waiting
+    severity:
+    - cannot be recovered
+    - is unrecoverable
+    - cannot be salvaged
+    - is beyond recovery
   alert_spec:
     family: shipment_loss
     target_stream: arrival
@@ -655,9 +1311,29 @@
   split: dev
   kind: accurate
   wording_family: wf_advisory_shipment_loss
-  text: The transport desk reports that goods from an affected dispatch were destroyed in handling, leaving
-    those deliveries unable to complete.
-  slots: {}
+  text: The {supplier} reports that goods from an affected dispatch were {severity}, leaving
+    {location} {timing}.
+  slots:
+    supplier:
+    - transport desk
+    - freight office
+    - logistics coordinator
+    - shipping desk
+    location:
+    - those deliveries
+    - those Rotterdam deliveries
+    - those northern deliveries
+    - those coastal deliveries
+    timing:
+    - unable to complete
+    - unable to complete as planned
+    - unable to complete on schedule
+    - unable to complete this cycle
+    severity:
+    - destroyed in handling
+    - damaged beyond recovery in handling
+    - ruined in handling
+    - crushed in handling
   alert_spec:
     family: shipment_loss
     target_stream: arrival
@@ -675,9 +1351,29 @@
   split: dev
   kind: overstated
   wording_family: wf_advisory_shipment_loss
-  text: The carrier warns that the missing cargo represents a catastrophic shortfall and describes the
-    expected replenishment gap as enormous.
-  slots: {}
+  text: The {supplier} warns that {location} represents a {severity} shortfall and describes
+    {timing} as enormous.
+  slots:
+    supplier:
+    - carrier
+    - regional distributor
+    - freight forwarder
+    - haulage firm
+    location:
+    - the missing cargo
+    - the missing northern cargo
+    - the missing Rotterdam cargo
+    - the missing coastal cargo
+    timing:
+    - the expected replenishment gap
+    - the coming replenishment gap
+    - the near-term replenishment gap
+    - the expected replenishment gap this quarter
+    severity:
+    - catastrophic
+    - devastating
+    - ruinous
+    - disastrous
   alert_spec:
     family: shipment_loss
     target_stream: arrival
@@ -695,9 +1391,29 @@
   split: dev
   kind: overstated
   wording_family: wf_advisory_shipment_loss
-  text: The purchasing manager says the missing consignments signal a continuing collapse in delivery
-    reliability, with future dispatches also unlikely to arrive.
-  slots: {}
+  text: The {supplier} says the missing consignments signal {severity} in {location}, with {timing}
+    dispatches also unlikely to arrive.
+  slots:
+    supplier:
+    - purchasing manager
+    - procurement director
+    - supply manager
+    - buying office
+    location:
+    - delivery reliability
+    - delivery reliability on the northern lane
+    - delivery reliability into Rotterdam
+    - delivery reliability on coastal routes
+    timing:
+    - future
+    - coming
+    - later
+    - subsequent
+    severity:
+    - a continuing collapse
+    - an ongoing collapse
+    - a deepening collapse
+    - a lasting breakdown
   alert_spec:
     family: shipment_loss
     target_stream: arrival
@@ -715,9 +1431,29 @@
   split: dev
   kind: ambiguous
   wording_family: wf_advisory_shipment_loss
-  text: The freight desk has raised a concern about whether affected goods will reach us, but has not
-    established their disposition or the extent of the problem.
-  slots: {}
+  text: The {supplier} has raised a concern about whether {location} {timing}, but has not
+    established their disposition or {severity}.
+  slots:
+    supplier:
+    - freight desk
+    - logistics office
+    - transport coordinator
+    - carrier liaison
+    location:
+    - affected goods
+    - affected goods on the northern lane
+    - affected goods bound for Rotterdam
+    - affected goods from coastal suppliers
+    timing:
+    - will reach us
+    - will still reach us
+    - will reach us eventually
+    - will reach us this cycle
+    severity:
+    - the extent of the problem
+    - the scale of the problem
+    - how large the problem is
+    - the size of the issue
   alert_spec:
     family: shipment_loss
     target_stream: arrival
@@ -735,9 +1471,29 @@
   split: dev
   kind: ambiguous
   wording_family: wf_advisory_shipment_loss
-  text: Our supplier contact cannot yet account for some cargo; the message leaves open whether it can
-    still be recovered for delivery.
-  slots: {}
+  text: Our {supplier} cannot {timing} account for {location}; the message leaves open whether it
+    can {severity} for delivery.
+  slots:
+    supplier:
+    - supplier contact
+    - freight contact
+    - logistics coordinator
+    - carrier liaison
+    location:
+    - some cargo
+    - some cargo on the northern lane
+    - some Rotterdam-bound cargo
+    - some coastal cargo
+    timing:
+    - yet
+    - so far
+    - at this stage
+    - as of now
+    severity:
+    - still be recovered
+    - be recovered
+    - be partly recovered
+    - be fully recovered
   alert_spec:
     family: shipment_loss
     target_stream: arrival
@@ -755,8 +1511,28 @@
   split: dev
   kind: distractor
   wording_family: wf_advisory_shipment_loss
-  text: The claims administrator is reorganising old case folders.
-  slots: {}
+  text: The {supplier} is {channel} {timing} case {topic}.
+  slots:
+    supplier:
+    - claims administrator
+    - records coordinator
+    - office administrator
+    - claims clerk
+    timing:
+    - old
+    - older
+    - legacy
+    - long-closed
+    channel:
+    - reorganising
+    - reordering
+    - tidying
+    - rearranging
+    topic:
+    - folders
+    - files
+    - binders
+    - records
   alert_spec:
     family: no_change
     target_stream: none
@@ -772,8 +1548,28 @@
   split: dev
   kind: distractor
   wording_family: wf_advisory_shipment_loss
-  text: The freight office has changed the formatting of its standard receipt form.
-  slots: {}
+  text: The {supplier} has {channel} the {topic} of its {timing} receipt form.
+  slots:
+    supplier:
+    - freight office
+    - transport desk
+    - logistics administrator
+    - shipping office
+    timing:
+    - standard
+    - long-standing
+    - routine
+    - familiar
+    channel:
+    - changed
+    - updated
+    - revised
+    - refreshed
+    topic:
+    - formatting
+    - layout
+    - styling
+    - headings
   alert_spec:
     family: no_change
     target_stream: none
@@ -789,9 +1585,29 @@
   split: dev
   kind: accurate
   wording_family: wf_advisory_transit_pause
-  text: The transfer hub reports that onward movement of goods is temporarily on hold while a clearance
-    issue is resolved.
-  slots: {}
+  text: The {supplier} reports that onward movement of {location} is {timing} on hold while
+    {severity} is resolved.
+  slots:
+    supplier:
+    - transfer hub
+    - interchange operator
+    - hub coordinator
+    - terminal operator
+    location:
+    - goods
+    - goods from the northern region
+    - goods bound for Rotterdam
+    - goods from coastal suppliers
+    timing:
+    - temporarily
+    - for the time being
+    - briefly
+    - for now
+    severity:
+    - a clearance issue
+    - a minor clearance issue
+    - a routine clearance issue
+    - a paperwork issue
   alert_spec:
     family: transit_pause
     target_stream: arrival
@@ -809,9 +1625,28 @@
   split: dev
   kind: accurate
   wording_family: wf_advisory_transit_pause
-  text: The freight coordinator says cargo remains at the interchange awaiting permission to resume its
-    journey.
-  slots: {}
+  text: The {supplier} says {severity} remains at {location} {timing}.
+  slots:
+    supplier:
+    - freight coordinator
+    - hub operator
+    - logistics contact
+    - terminal supervisor
+    location:
+    - the interchange
+    - the Rotterdam interchange
+    - the northern interchange
+    - the regional interchange
+    timing:
+    - awaiting permission to resume its journey
+    - awaiting clearance to resume its journey
+    - pending permission to continue
+    - awaiting the go-ahead to move on
+    severity:
+    - cargo
+    - a substantial amount of cargo
+    - part of the cargo
+    - a portion of the cargo
   alert_spec:
     family: transit_pause
     target_stream: arrival
@@ -829,9 +1664,29 @@
   split: dev
   kind: accurate
   wording_family: wf_advisory_transit_pause
-  text: The carrier advises that affected goods are still in its custody but cannot move through the hub
-    until a temporary restriction is lifted.
-  slots: {}
+  text: The {supplier} advises that affected goods are {timing} in its custody but cannot move
+    through {location} until {severity} is lifted.
+  slots:
+    supplier:
+    - carrier
+    - regional distributor
+    - freight forwarder
+    - haulage firm
+    location:
+    - the hub
+    - the Rotterdam hub
+    - the northern hub
+    - the regional transfer hub
+    timing:
+    - still
+    - for now
+    - at present
+    - as yet
+    severity:
+    - a temporary restriction
+    - a minor temporary restriction
+    - a short-lived restriction
+    - a limited restriction
   alert_spec:
     family: transit_pause
     target_stream: arrival
@@ -849,9 +1704,29 @@
   split: dev
   kind: accurate
   wording_family: wf_advisory_transit_pause
-  text: The transport desk reports a temporary stop to onward dispatch from the hub; the cargo is being
-    retained for release.
-  slots: {}
+  text: The {supplier} reports a {timing} stop to onward dispatch from {location}; {severity} is
+    being retained for release.
+  slots:
+    supplier:
+    - transport desk
+    - hub coordinator
+    - logistics office
+    - terminal office
+    location:
+    - the hub
+    - the Rotterdam hub
+    - the northern hub
+    - the regional interchange
+    timing:
+    - temporary
+    - short-lived
+    - brief
+    - interim
+    severity:
+    - the cargo
+    - the affected cargo
+    - most of the cargo
+    - the held cargo
   alert_spec:
     family: transit_pause
     target_stream: arrival
@@ -869,9 +1744,29 @@
   split: dev
   kind: overstated
   wording_family: wf_advisory_transit_pause
-  text: The coordinator warns that the hold will leave replenishment stranded for a prolonged stretch,
-    with an exceptionally difficult recovery ahead.
-  slots: {}
+  text: The {supplier} warns that the hold will leave {location} stranded {timing}, with {severity}
+    recovery ahead.
+  slots:
+    supplier:
+    - coordinator
+    - hub manager
+    - logistics contact
+    - terminal director
+    location:
+    - replenishment
+    - replenishment for the northern region
+    - replenishment into Rotterdam
+    - replenishment for coastal depots
+    timing:
+    - for a prolonged stretch
+    - for a long while
+    - well into the coming season
+    - for an extended spell
+    severity:
+    - an exceptionally difficult
+    - a brutally difficult
+    - a painfully slow
+    - an extremely tough
   alert_spec:
     family: transit_pause
     target_stream: arrival
@@ -889,9 +1784,29 @@
   split: dev
   kind: overstated
   wording_family: wf_advisory_transit_pause
-  text: The freight manager describes the temporary restriction as a near-total breakdown that could keep
-    goods stuck indefinitely.
-  slots: {}
+  text: The {supplier} describes the temporary restriction as a {severity} breakdown that could keep
+    {location} stuck {timing}.
+  slots:
+    supplier:
+    - freight manager
+    - hub director
+    - logistics coordinator
+    - terminal manager
+    location:
+    - goods
+    - goods bound for the northern region
+    - Rotterdam-bound goods
+    - goods from coastal suppliers
+    timing:
+    - indefinitely
+    - for a long stretch
+    - for the foreseeable future
+    - with no clear end
+    severity:
+    - near-total
+    - near-complete
+    - wholesale
+    - virtual
   alert_spec:
     family: transit_pause
     target_stream: arrival
@@ -909,9 +1824,29 @@
   split: dev
   kind: ambiguous
   wording_family: wf_advisory_transit_pause
-  text: The hub has raised a concern about onward movement, but the extent of the hold and the release
-    outlook remain unclear.
-  slots: {}
+  text: The {supplier} has raised a concern about {location}, but {severity} and {timing} remain
+    unclear.
+  slots:
+    supplier:
+    - hub
+    - interchange operator
+    - hub coordinator
+    - terminal office
+    location:
+    - onward movement
+    - onward movement toward the northern region
+    - onward movement toward Rotterdam
+    - onward movement toward coastal depots
+    timing:
+    - the release outlook
+    - the likely release timing
+    - the expected reopening
+    - the resumption outlook
+    severity:
+    - the extent of the hold
+    - the scale of the hold
+    - how wide the hold is
+    - the size of the hold
   alert_spec:
     family: transit_pause
     target_stream: arrival
@@ -929,9 +1864,29 @@
   split: dev
   kind: ambiguous
   wording_family: wf_advisory_transit_pause
-  text: Our carrier contact says goods may be waiting at the interchange; the update does not establish
-    the scope or likely length of the interruption.
-  slots: {}
+  text: Our {supplier} says goods {timing} at {location}; the update does not establish {severity}
+    of the interruption.
+  slots:
+    supplier:
+    - carrier contact
+    - freight contact
+    - logistics coordinator
+    - hub liaison
+    location:
+    - the interchange
+    - the Rotterdam interchange
+    - the northern interchange
+    - the regional interchange
+    timing:
+    - may be waiting
+    - may currently be waiting
+    - may still be waiting
+    - may be waiting for now
+    severity:
+    - the scope or likely length
+    - the scale or probable duration
+    - the extent or likely duration
+    - the size or expected length
   alert_spec:
     family: transit_pause
     target_stream: arrival
@@ -949,8 +1904,28 @@
   split: dev
   kind: distractor
   wording_family: wf_advisory_transit_pause
-  text: The hub administrator has circulated a revised staff contact list for routine enquiries.
-  slots: {}
+  text: The {supplier} has {channel} {topic} for {timing} enquiries.
+  slots:
+    supplier:
+    - hub administrator
+    - terminal office
+    - site coordinator
+    - operations secretary
+    timing:
+    - routine
+    - everyday
+    - day-to-day
+    - general
+    channel:
+    - circulated
+    - shared
+    - distributed
+    - sent round
+    topic:
+    - a revised staff contact list
+    - an updated staff contact list
+    - a refreshed team directory
+    - a reorganised staff phone list
   alert_spec:
     family: no_change
     target_stream: none
@@ -966,8 +1941,28 @@
   split: dev
   kind: distractor
   wording_family: wf_advisory_transit_pause
-  text: The logistics office is changing the colour scheme on its internal hub map.
-  slots: {}
+  text: The {supplier} is {channel} the {topic} on {location}.
+  slots:
+    supplier:
+    - logistics office
+    - transport planning team
+    - operations team
+    - planning office
+    location:
+    - its internal hub map
+    - its internal northern hub map
+    - its Rotterdam hub map
+    - its internal regional hub map
+    channel:
+    - changing
+    - updating
+    - refreshing
+    - revising
+    topic:
+    - colour scheme
+    - colour palette
+    - shading scheme
+    - icon set
   alert_spec:
     family: no_change
     target_stream: none
@@ -983,9 +1978,29 @@
   split: dev
   kind: accurate
   wording_family: wf_advisory_compound
-  text: The regional disruption is bringing extra customer orders while also holding up goods at the transfer
-    hub; both issues stem from the same event.
-  slots: {}
+  text: The {location} disruption {timing} bringing {severity} customer orders while also {channel}
+    goods at the transfer hub; both issues stem from the same event.
+  slots:
+    location:
+    - regional
+    - northern
+    - Rotterdam-area
+    - coastal
+    timing:
+    - is
+    - is now
+    - is currently
+    - is still
+    severity:
+    - extra
+    - added
+    - additional
+    - heavier
+    channel:
+    - holding up
+    - delaying
+    - stacking up
+    - backing up
   alert_spec:
     family: compound
     target_stream: both
@@ -1003,9 +2018,29 @@
   split: dev
   kind: accurate
   wording_family: wf_advisory_compound
-  text: The operations team reports that a local emergency is increasing customer purchasing and preventing
-    onward movement of incoming cargo.
-  slots: {}
+  text: The {supplier} reports that a {location} emergency is {severity} customer purchasing and
+    preventing onward movement of {timing} cargo.
+  slots:
+    supplier:
+    - operations team
+    - regional office
+    - branch management
+    - duty manager
+    location:
+    - local
+    - regional
+    - northern
+    - Rotterdam-area
+    timing:
+    - incoming
+    - awaited
+    - scheduled
+    - expected
+    severity:
+    - increasing
+    - noticeably increasing
+    - steadily increasing
+    - markedly increasing
   alert_spec:
     family: compound
     target_stream: both
@@ -1023,9 +2058,29 @@
   split: dev
   kind: accurate
   wording_family: wf_advisory_compound
-  text: Our regional contact says the same disruption is prompting customers to stock up and stopping
-    replenishment from passing through the interchange.
-  slots: {}
+  text: Our {supplier} says the {timing} disruption is prompting customers to {severity} and
+    stopping replenishment from passing through {location}.
+  slots:
+    supplier:
+    - regional contact
+    - branch manager
+    - local office
+    - site supervisor
+    location:
+    - the interchange
+    - the Rotterdam interchange
+    - the northern interchange
+    - the regional interchange
+    timing:
+    - same
+    - ongoing
+    - current
+    - continuing
+    severity:
+    - stock up
+    - buy ahead
+    - order heavily
+    - build up stock
   alert_spec:
     family: compound
     target_stream: both
@@ -1043,9 +2098,29 @@
   split: dev
   kind: accurate
   wording_family: wf_advisory_compound
-  text: The branch manager reports stronger customer requests alongside a hold on inbound goods, both
-    linked to the disruption in the area.
-  slots: {}
+  text: The {supplier} reports {severity} customer requests alongside a hold on {timing} goods, both
+    linked to the disruption in {location}.
+  slots:
+    supplier:
+    - branch manager
+    - site manager
+    - regional supervisor
+    - depot manager
+    location:
+    - the area
+    - the northern region
+    - the Rotterdam area
+    - the coastal district
+    timing:
+    - inbound
+    - expected inbound
+    - scheduled inbound
+    - awaited
+    severity:
+    - stronger
+    - heavier
+    - brisker
+    - firmer
   alert_spec:
     family: compound
     target_stream: both
@@ -1063,9 +2138,29 @@
   split: dev
   kind: overstated
   wording_family: wf_advisory_compound
-  text: The regional team warns that the disruption will produce overwhelming customer orders and leave
-    incoming goods stranded for a prolonged stretch.
-  slots: {}
+  text: The {supplier} warns that {location} will produce {severity} customer orders and leave
+    incoming goods stranded {timing}.
+  slots:
+    supplier:
+    - regional team
+    - operations director
+    - branch office
+    - site committee
+    location:
+    - the disruption
+    - the northern disruption
+    - the Rotterdam-area disruption
+    - the coastal disruption
+    timing:
+    - for a prolonged stretch
+    - for a long while
+    - well into the coming season
+    - for an extended spell
+    severity:
+    - overwhelming
+    - crushing
+    - unprecedented
+    - unmanageable
   alert_spec:
     family: compound
     target_stream: both
@@ -1083,9 +2178,29 @@
   split: dev
   kind: overstated
   wording_family: wf_advisory_compound
-  text: The operations director describes an extreme buying rush and an almost complete replenishment
-    breakdown arising from the regional disruption.
-  slots: {}
+  text: The {supplier} describes an {severity} {timing} and an almost complete replenishment
+    breakdown arising from the {location} disruption.
+  slots:
+    supplier:
+    - operations director
+    - regional director
+    - general manager
+    - site director
+    location:
+    - regional
+    - northern
+    - Rotterdam-area
+    - coastal
+    timing:
+    - buying rush
+    - current buying rush
+    - ongoing buying rush
+    - present buying rush
+    severity:
+    - extreme
+    - unprecedented
+    - intense
+    - exceptional
   alert_spec:
     family: compound
     target_stream: both
@@ -1103,9 +2218,29 @@
   split: dev
   kind: ambiguous
   wording_family: wf_advisory_compound
-  text: The regional desk flags possible repercussions for customer requests and inbound movement, but
-    cannot yet characterise either side of the issue.
-  slots: {}
+  text: The {supplier} flags {severity} for customer requests and {location}, but cannot {timing}
+    characterise either side of the issue.
+  slots:
+    supplier:
+    - regional desk
+    - branch office
+    - operations team
+    - site manager
+    location:
+    - inbound movement
+    - inbound movement toward Rotterdam
+    - inbound movement toward the northern region
+    - inbound movement toward coastal depots
+    timing:
+    - yet
+    - so far
+    - at this stage
+    - as yet
+    severity:
+    - possible repercussions
+    - potential repercussions
+    - plausible repercussions
+    - emerging repercussions
   alert_spec:
     family: compound
     target_stream: both
@@ -1123,9 +2258,29 @@
   split: dev
   kind: ambiguous
   wording_family: wf_advisory_compound
-  text: Our branch contact mentions an event affecting both purchasing activity and the route in; the
-    scale and persistence are still uncertain.
-  slots: {}
+  text: Our {supplier} mentions {timing} both purchasing activity and {location}; the scale and
+    persistence are {severity}.
+  slots:
+    supplier:
+    - branch contact
+    - regional desk
+    - site supervisor
+    - local office
+    location:
+    - the route in
+    - the northern route in
+    - the Rotterdam route in
+    - the coastal route in
+    timing:
+    - an event affecting
+    - an event currently affecting
+    - an event now affecting
+    - an event still affecting
+    severity:
+    - still uncertain
+    - yet to be established
+    - not yet known
+    - hard to gauge
   alert_spec:
     family: compound
     target_stream: both
@@ -1143,8 +2298,28 @@
   split: dev
   kind: distractor
   wording_family: wf_advisory_compound
-  text: The regional coordinator is combining two internal mailing lists for convenience.
-  slots: {}
+  text: The {supplier} is {channel} two internal {topic} {timing}.
+  slots:
+    supplier:
+    - regional coordinator
+    - office manager
+    - communications lead
+    - branch administrator
+    timing:
+    - for convenience
+    - for everyday convenience
+    - for routine use
+    - for day-to-day use
+    channel:
+    - combining
+    - merging
+    - joining
+    - consolidating
+    topic:
+    - mailing lists
+    - contact lists
+    - distribution lists
+    - address lists
   alert_spec:
     family: no_change
     target_stream: none
@@ -1160,8 +2335,28 @@
   split: dev
   kind: distractor
   wording_family: wf_advisory_compound
-  text: The operations office is updating the headings in its branch directory.
-  slots: {}
+  text: The {supplier} is {channel} the {topic} in {location}.
+  slots:
+    supplier:
+    - operations office
+    - branch administration team
+    - regional coordinator
+    - head-office team
+    location:
+    - its branch directory
+    - its northern branch directory
+    - its regional branch directory
+    - its Rotterdam branch directory
+    channel:
+    - updating
+    - revising
+    - refreshing
+    - tidying up
+    topic:
+    - headings
+    - section titles
+    - labels
+    - entry headings
   alert_spec:
     family: no_change
     target_stream: none
