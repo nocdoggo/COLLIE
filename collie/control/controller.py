@@ -26,6 +26,16 @@ passes the loaded instance's ``spec.order_cap``) and never a literal in this mod
 too is what makes ``0 <= q_t <= C_t`` a property of this class in isolation, not just of the
 runner wrapped around it.
 
+**Integral orders and the published smoother.** Orders are integer-valued
+(``ceil`` of the real-valued shortfall), matching arm 1 and the benchmark's integral order
+sequences. The controller also applies the published baseline's policy-internal order smoother —
+``mean + z_0.95 * std`` over the same forecast samples, algebraically independent of lead time —
+as a second cap, separate from ``C_t`` (``docs/env_contract.md`` §2.3 keeps the two apart, and
+``docs/implementation/04-or-compiler.md`` §"controller" warns never to confuse them). Both are
+what make the baseline config reproduce arm 1 bit for bit
+(``test_baseline_config_reproduces_arm1``), so that "the baseline OR policy is running" is
+literally true for every arm, not approximately.
+
 **Age-binned telemetry** (``ledger`` below) is an *ablation flag*, never a per-arm feature: any
 ``OrCompilerController``, regardless of ``arm_id``, records identically into whatever
 :class:`~collie.control.ledger.FIFOLedger` its caller attaches. Handing a richer, ledger-derived
@@ -48,6 +58,11 @@ from collie.control.forecast import DemandForecaster
 from collie.control.ledger import FIFOLedger
 
 __all__ = ["OrCompilerController", "base_stock_target", "critical_fractile"]
+
+PUBLISHED_SMOOTHER_QUANTILE = 0.95
+"""Arm 1's ``BaseStockParams.cap_quantile`` — the published baseline's policy-internal order
+smoother, algebraically independent of lead time (``collie/arms/base_stock.py``). Reproduced by
+name here, never as a cap literal, so the AST cap check still guards ``C_t`` alone."""
 
 
 def critical_fractile(profit_per_unit: float, holding_cost_per_unit: float) -> float:
@@ -99,15 +114,25 @@ class OrCompilerController:
 
     def order(self, obs: PeriodObservation) -> Decision:
         # Record first, decide second: the estimator at period t must have already seen t-1's
-        # demand (docs/env_contract.md §8.5), matching arm 1's convention exactly.
-        self._forecaster.record(obs.prev_demand)
+        # demand (docs/env_contract.md §8.5), matching arm 1's convention exactly. Period 1's
+        # prev_demand is the reference's pre-loop initialisation, not an observation — arm 1
+        # skips it (collie/arms/base_stock.py::_record_demand) and so does this controller,
+        # or the placeholder zero pollutes every early estimate and breaks baseline parity.
+        if obs.period > 1:
+            self._forecaster.record(obs.prev_demand)
         if self.ledger is not None and obs.period > 1:
             self.ledger.record_receipt(obs.period, obs.prev_arrivals)
         stats = self._forecaster.stats()
         fractile = critical_fractile(obs.profit_per_unit, obs.holding_cost_per_unit)
         target = base_stock_target(self.config, mean=stats.mean, std=stats.std, fractile=fractile)
         position = obs.on_hand + self.config.gamma * obs.in_transit_total
-        quantity = min(max(0.0, target - position), self.order_cap)
+        # Arm 1's rounding and the published smoother, in arm 1's order: ceil the shortfall,
+        # floor at zero, then take the smaller of the smoother cap and the contract cap.
+        uncapped = max(math.ceil(target - position), 0)
+        smoother_cap = math.ceil(
+            stats.mean + float(norm.ppf(PUBLISHED_SMOOTHER_QUANTILE)) * stats.std
+        )
+        quantity = float(min(uncapped, smoother_cap, self.order_cap))
         if self.ledger is not None:
             self.ledger.record_order(obs.period, quantity)
         return Decision(

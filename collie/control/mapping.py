@@ -295,13 +295,17 @@ def mapping_table() -> tuple[tuple[ShockSpec, ControlConfig], ...]:
 class GridCompiler:
     """The ``collie.arms.protocols.SpecCompiler`` seam, satisfied structurally by the grid.
 
-    The grid is absolute: a spec compiles to the same config regardless of what is currently
-    running, so ``current`` is accepted for protocol shape and deliberately unread. Arms never
-    import this module — the harness wires one instance in (``tests/conftest.py``).
+    The grid is absolute: a non-abstaining spec compiles to the same config regardless of what
+    is currently running. An abstention instead returns ``current`` unchanged — "no_change maps
+    to the baseline" means *carry on as before* (``docs/implementation/04-or-compiler.md``), and
+    what was running is the caller's per-instance baseline descriptor, whose ``l_eff`` matches
+    the instance's promised lead time rather than the grid reference point. Arms never import
+    this module — the harness wires one instance in (``tests/conftest.py``).
     """
 
     def compile(self, spec: ShockSpec, *, current: ControlConfig) -> ControlConfig:
-        del current
+        if spec.is_abstention:
+            return current
         return compile_spec(spec)
 
 

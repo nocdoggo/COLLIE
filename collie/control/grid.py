@@ -17,6 +17,7 @@ which is what keeps this module honest about not encoding per-family knowledge t
 from __future__ import annotations
 
 import itertools
+from dataclasses import replace
 from typing import Any
 
 from collie.contracts import ControlConfig
@@ -31,6 +32,7 @@ __all__ = [
     "L_EFF_VALUES",
     "M_VALUES",
     "all_configs",
+    "baseline_config_for",
     "predictive_model_for",
     "predictive_model_keys",
 ]
@@ -112,6 +114,19 @@ BASELINE_CONFIG = ControlConfig(
     gamma=BASELINE_GAMMA,
     predictive_model=BASELINE_PREDICTIVE_MODEL,
 )
+
+
+def baseline_config_for(promised_lead_time: int) -> ControlConfig:
+    """The per-instance baseline descriptor: the registered baseline point with ``l_eff`` set to
+    the instance's promised lead time, so a controller holding it reproduces arm 1 bit for bit
+    (``tests/test_controller.py::test_baseline_config_reproduces_arm1``). ``BASELINE_CONFIG``
+    remains the grid's registered reference point and ``compile_spec``'s abstention target; this
+    descriptor is what arms and demos actually run while no proposal is active."""
+    if isinstance(promised_lead_time, bool) or not isinstance(promised_lead_time, int):
+        raise ValueError(f"promised_lead_time must be an integer, got {promised_lead_time!r}")
+    if promised_lead_time < 0:
+        raise ValueError(f"promised_lead_time must be non-negative, got {promised_lead_time}")
+    return replace(BASELINE_CONFIG, l_eff=promised_lead_time)
 
 
 def _print_table() -> None:  # pragma: no cover - CLI only

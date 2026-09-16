@@ -134,3 +134,47 @@ def test_mapping_module_never_names_hidden_state() -> None:
     tree = ast.parse((REPO_ROOT / "collie/control/mapping.py").read_text(encoding="utf-8"))
     names = {node.id for node in ast.walk(tree) if isinstance(node, ast.Name)}
     assert not (names & hidden)
+
+
+# ---------------------------------------------------------------------------
+# GridCompiler: the SpecCompiler seam the arms actually receive
+# ---------------------------------------------------------------------------
+
+
+def test_grid_compiler_satisfies_the_spec_compiler_protocol() -> None:
+    """Module 06's injection seam, checked structurally: the arms must never need to know which
+    concrete compiler they were handed."""
+    from collie.arms.protocols import SpecCompiler
+    from collie.control.mapping import GridCompiler
+
+    assert isinstance(GridCompiler(), SpecCompiler)
+
+
+def test_grid_compiler_abstention_returns_current_unchanged() -> None:
+    """ "Carry on as before" means exactly that: an abstention must not move whatever config is
+    running, including a per-instance baseline descriptor whose ``l_eff`` is the instance's
+    promised lead time rather than the grid reference point."""
+    from collie.contracts import ControlConfig
+    from collie.control.grid import BASELINE_CONFIG
+    from collie.control.mapping import GridCompiler
+
+    (no_change_spec,) = [s for s in iter_legal_specs() if s.is_abstention]
+    current = ControlConfig(m=1.25, l_eff=4, gamma=0.5, predictive_model="probe")
+    assert GridCompiler().compile(no_change_spec, current=current) is current
+    # At the registered baseline point the seam agrees with compile_spec's registered answer.
+    assert GridCompiler().compile(no_change_spec, current=BASELINE_CONFIG) == compile_spec(
+        no_change_spec
+    )
+
+
+def test_grid_compiler_matches_compile_spec_on_every_real_spec() -> None:
+    """Non-abstaining specs are absolute: the seam must not consult ``current`` for them."""
+    from collie.control.grid import BASELINE_CONFIG
+    from collie.control.mapping import GridCompiler
+
+    probe = next(s for s in iter_legal_specs() if not s.is_abstention)
+    off_grid = BASELINE_CONFIG.__class__(m=0.6, l_eff=3, gamma=0.0, predictive_model="probe")
+    assert GridCompiler().compile(probe, current=off_grid) == compile_spec(probe)
+    for spec in iter_legal_specs():
+        if not spec.is_abstention:
+            assert GridCompiler().compile(spec, current=BASELINE_CONFIG) == compile_spec(spec)

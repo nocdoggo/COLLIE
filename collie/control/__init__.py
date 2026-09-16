@@ -14,6 +14,7 @@ from collie.control.grid import (
     L_EFF_VALUES,
     M_VALUES,
     all_configs,
+    baseline_config_for,
     predictive_model_for,
     predictive_model_keys,
 )
@@ -51,6 +52,7 @@ __all__ = [
     "all_configs",
     "assert_no_ledger_state",
     "base_stock_target",
+    "baseline_config_for",
     "compile_spec",
     "critical_fractile",
     "find_ledger_state",

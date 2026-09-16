@@ -12,13 +12,23 @@ import ast
 import math
 from pathlib import Path
 
+import numpy as np
 import pytest
-from hypothesis import given
+from hypothesis import given, settings
 from hypothesis import strategies as st
 
+from collie.arms.base_stock import CappedBaseStockController
 from collie.contracts import ControlConfig, PeriodObservation
 from collie.control.controller import OrCompilerController, base_stock_target, critical_fractile
-from collie.control.grid import BASELINE_CONFIG, GAMMA_VALUES, L_EFF_VALUES, M_VALUES
+from collie.control.grid import (
+    BASELINE_CONFIG,
+    GAMMA_VALUES,
+    L_EFF_VALUES,
+    M_VALUES,
+    baseline_config_for,
+)
+from collie.sim.runner import EpisodeRunner
+from tests.test_episode_runner import make_instance
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 CONTROLLER_SRC = REPO_ROOT / "collie/control/controller.py"
@@ -168,11 +178,14 @@ def test_cap_comes_from_the_contract() -> None:
 
 
 def test_no_numeric_cap_literal_anywhere_in_the_module() -> None:
+    from collie.control.controller import PUBLISHED_SMOOTHER_QUANTILE
+
     tree = ast.parse(CONTROLLER_SRC.read_text(encoding="utf-8"))
     for node in ast.walk(tree):
         if isinstance(node, ast.Constant) and isinstance(node.value, int | float):
-            # 0/0.0/1.0 appear in max(0, ...) and the (1+l_eff) term; neither is a cap value.
-            assert node.value in (0, 0.0, 1.0), (
+            # 0/0.0/1.0 appear in max(0, ...) and the (1+l_eff) term; the smoother quantile is
+            # the published policy's own parameter, whitelisted by reference — not a cap value.
+            assert node.value in (0, 0.0, 1.0, PUBLISHED_SMOOTHER_QUANTILE), (
                 f"suspicious numeric literal in controller.py: {node.value}"
             )
 
@@ -270,3 +283,70 @@ def test_shared_control_path_byte_identical() -> None:
 def test_negative_order_cap_is_rejected() -> None:
     with pytest.raises(ValueError, match="order_cap"):
         OrCompilerController(order_cap=-1.0, config=BASELINE_CONFIG)
+
+
+# ---------------------------------------------------------------------------
+# arm-1 parity at the baseline descriptor
+# ---------------------------------------------------------------------------
+
+
+@given(
+    seed=st.integers(min_value=0, max_value=2**31 - 1),
+    promised=st.sampled_from([0, 2, 4]),
+)
+@settings(max_examples=30, deadline=None)
+def test_baseline_config_reproduces_arm1(seed: int, promised: int) -> None:
+    """The ladder's baseline path IS arm 1: the shared controller holding
+    ``baseline_config_for(promised)`` must reproduce ``CappedBaseStockController``'s order
+    sequence bit for bit on any demand stream, or every arm-versus-baseline contrast confounds
+    the hypothesis with the controller. Integral orders, the published smoother, and the
+    per-instance promised lead time are exactly what the descriptor pins."""
+    rng = np.random.Generator(np.random.PCG64(seed))
+    horizon = 24
+    demand = tuple(
+        float(v) for v in np.floor(np.maximum(rng.normal(100.0, 25.0, horizon), 0.0) + 0.5)
+    )
+    instance = make_instance(
+        demand=demand, lead_times=(float(promised),) * horizon, promised_lead_time=promised
+    )
+    arm1 = [
+        d.order_quantity for d in EpisodeRunner(instance).run(CappedBaseStockController()).decisions
+    ]
+    shared = OrCompilerController(
+        order_cap=instance.spec.order_cap, config=baseline_config_for(promised)
+    )
+    assert [d.order_quantity for d in EpisodeRunner(instance).run(shared).decisions] == arm1
+
+
+def test_baseline_config_reproduces_arm1_under_a_finite_cap_and_mixed_lead_times() -> None:
+    """The contract cap binds identically through both paths and parity survives stochastic
+    lead times. Where the cap bites, raw ``Decision``s legitimately differ — this controller
+    clamps in isolation, arm 1 delegates the clamp to the runner — so the comparison is the
+    *dispatched* orders (``order_rows``, the exact ``results.csv`` shape), which must be
+    identical."""
+    rng = np.random.Generator(np.random.PCG64(7))
+    horizon = 24
+    demand = tuple(
+        float(v) for v in np.floor(np.maximum(rng.normal(100.0, 25.0, horizon), 0.0) + 0.5)
+    )
+    lead_times = tuple(float(rng.choice([1.0, 2.0, 3.0])) for _ in range(horizon))
+    instance = make_instance(
+        demand=demand, lead_times=lead_times, promised_lead_time=2, order_cap=120.0
+    )
+    arm1_rows = EpisodeRunner(instance).run(CappedBaseStockController()).order_rows()
+    shared = OrCompilerController(order_cap=instance.spec.order_cap, config=baseline_config_for(2))
+    shared_outcome = EpisodeRunner(instance).run(shared)
+    assert shared_outcome.order_rows() == arm1_rows
+    assert 120.0 in dict(arm1_rows).values()  # the cap really did bind — the test is not vacuous
+    assert max(q for _, q in shared_outcome.order_rows()) <= 120.0
+
+
+def test_baseline_config_for_validates_promised_lead_time() -> None:
+    for bad in (True, 2.0, -1):
+        with pytest.raises(ValueError, match="promised_lead_time"):
+            baseline_config_for(bad)
+    config = baseline_config_for(4)
+    assert config.m == BASELINE_CONFIG.m
+    assert config.l_eff == 4
+    assert config.gamma == BASELINE_CONFIG.gamma
+    assert config.predictive_model == BASELINE_CONFIG.predictive_model
