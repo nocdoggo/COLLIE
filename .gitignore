@@ -230,3 +230,7 @@ __marimo__/
 #   never commit anything under this directory.
 /cloud_endpoint/*
 !/cloud_endpoint/models.json
+
+#   Raw key material anywhere in the tree, not only under cloud_endpoint/ — a stray
+#   provider key must never be committable regardless of where it is dropped.
+*.key
