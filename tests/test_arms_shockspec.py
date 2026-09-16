@@ -8,6 +8,7 @@ collapse to one physical call with one charged copy per arm) and the divergence 
 from __future__ import annotations
 
 import hashlib
+import math
 import tempfile
 from pathlib import Path
 
@@ -15,11 +16,6 @@ import pytest
 from hypothesis import given, settings
 
 from collie.arms.protocols import ProposalPayload
-from collie.arms.reference_control import (
-    ReferenceCompiler,
-    ReferenceController,
-    baseline_config,
-)
 from collie.arms.shockspec import (
     ARM8_ARM_ID,
     ARM9_ARM_ID,
@@ -44,6 +40,9 @@ from collie.contracts import (
     TargetStream,
     find_hidden_state,
 )
+from collie.control.controller import OrCompilerController
+from collie.control.grid import baseline_config_for
+from collie.control.mapping import GridCompiler
 from collie.fakes.fake_verifier import FakeVerifier
 from collie.llm import CallLedger, DiskCache, MeteredClient
 from collie.llm.demo import scripted_endpoint
@@ -88,8 +87,10 @@ class _Parser:
         return None if text == "BAD" else self.payload
 
 
-def _factory(config: ControlConfig, demands: tuple[float, ...]) -> ReferenceController:
-    return ReferenceController(config=config, train_demand=demands)
+def _factory(config: ControlConfig, demands: tuple[float, ...]) -> OrCompilerController:
+    # No specific instance in scope here; every instance in this file carries the
+    # ``make_instance`` default cap, so ``math.inf`` matches the contract exactly.
+    return OrCompilerController(order_cap=math.inf, config=config, train_demand=demands)
 
 
 def _harness(root: Path, default: str = "OK"):
@@ -110,12 +111,14 @@ def _arm(metered, instance, activation, *, arm_id, trigger=None, parser=None) ->
         channel=metered.channel(arm_id=arm_id, episode_id=instance.spec.episode_id),
         prompter=_Prompter(),
         parser=parser or _Parser(),
-        compiler=ReferenceCompiler(),
+        compiler=GridCompiler(),
         activation=activation,
-        baseline=ReferenceController(config=baseline_config(promised)),
+        baseline=OrCompilerController(
+            order_cap=instance.spec.order_cap, config=baseline_config_for(promised)
+        ),
         controller_factory=_factory,
         trigger=trigger or _ScriptedTrigger({5}),
-        baseline_config=baseline_config(promised),
+        baseline_config=baseline_config_for(promised),
         arm_id=arm_id,
     )
 
@@ -222,7 +225,7 @@ def test_proposed_spec_influences_nothing(tmp_path) -> None:
         arm_id=ARM10_ARM_ID,
     )
     outcome = EpisodeRunner(instance).run(arm)
-    check = ReferenceController(config=baseline_config(0))
+    check = OrCompilerController(order_cap=math.inf, config=baseline_config_for(0))
     check.reset()
     expected = [check.order(obs).order_quantity for obs in outcome.observations]
     assert [d.order_quantity for d in outcome.decisions] == expected
@@ -243,7 +246,7 @@ def test_parse_failure_is_counted_and_the_baseline_runs_on(tmp_path) -> None:
     outcome = EpisodeRunner(instance).run(arm)
     assert all(d.lifecycle_state is None for d in outcome.decisions)
     assert [c.outcome for c in ledger.charged_entries()] == [ParseOutcome.FALLBACK]
-    check = ReferenceController(config=baseline_config(0))
+    check = OrCompilerController(order_cap=math.inf, config=baseline_config_for(0))
     check.reset()
     expected = [check.order(obs).order_quantity for obs in outcome.observations]
     assert [d.order_quantity for d in outcome.decisions] == expected
@@ -280,7 +283,7 @@ def test_refutation_reverts_orders_to_baseline(tmp_path) -> None:
     _, _, metered = _harness(tmp_path)
     arm = _arm(metered, instance, HeuristicRollbackActivation(), arm_id=ARM9_ARM_ID)
     outcome = EpisodeRunner(instance).run(arm)
-    check = ReferenceController(config=baseline_config(0))
+    check = OrCompilerController(order_cap=math.inf, config=baseline_config_for(0))
     check.reset()
     expected = [check.order(obs).order_quantity for obs in outcome.observations]
     refuted_at = [

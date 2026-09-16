@@ -1,25 +1,24 @@
 """Injection wiring for the arm-ladder tests (module brief §3).
 
 Every arm depends on protocols and receives its collaborators here: the metered channel stack
-(transport, cache, ledger) from ``collie.llm``, the temporary compiler/controller stand-in from
-``collie/arms/reference_control.py`` (deleted when module 04 lands — arms never import it), and
-arm 4's fallback (arm 1's controller). No fixture touches a live endpoint; live calls are the
-``needs_llm`` tests in ``tests/test_llm_client.py``.
+(transport, cache, ledger) from ``collie.llm``, module 04's real implementation
+(``collie.control.mapping.GridCompiler`` and ``collie.control.controller.OrCompilerController``,
+wired here — arms never import them), and arm 4's fallback (arm 1's controller). No fixture
+touches a live endpoint; live calls are the ``needs_llm`` tests in ``tests/test_llm_client.py``.
 """
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
 
 import pytest
 
 from collie.arms.base_stock import CappedBaseStockController
-from collie.arms.reference_control import (
-    ReferenceCompiler,
-    ReferenceController,
-    baseline_config,
-)
 from collie.contracts import ControlConfig
+from collie.control.controller import OrCompilerController
+from collie.control.grid import baseline_config_for
+from collie.control.mapping import GridCompiler
 from collie.llm import CallLedger, DiskCache, MeteredClient
 from collie.llm.demo import ScriptedTransport, scripted_endpoint
 
@@ -53,15 +52,15 @@ def harness(tmp_path) -> Harness:
 
 
 @pytest.fixture
-def compiler() -> ReferenceCompiler:
-    """The injected SpecCompiler stand-in (module 04's real one drops in unchanged)."""
-    return ReferenceCompiler()
+def compiler() -> GridCompiler:
+    """The injected SpecCompiler: module 04's real grid mapping."""
+    return GridCompiler()
 
 
 @pytest.fixture
-def reference_controller() -> ReferenceController:
-    """The injected Controller stand-in at the baseline (arm-1-equivalent) config."""
-    return ReferenceController(config=baseline_config(promised_lead_time=2))
+def reference_controller() -> OrCompilerController:
+    """The injected shared controller at the baseline (arm-1-equivalent) descriptor."""
+    return OrCompilerController(order_cap=math.inf, config=baseline_config_for(2))
 
 
 def make_fallback(**kwargs) -> CappedBaseStockController:

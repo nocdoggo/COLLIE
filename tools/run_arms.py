@@ -55,11 +55,6 @@ from collie.arms.llm_to_or import (
 )
 from collie.arms.oracle import ORACLE_ARM_ID, OracleShockSpecArm, incident_to_payload
 from collie.arms.protocols import ProposalPayload
-from collie.arms.reference_control import (
-    ReferenceCompiler,
-    ReferenceController,
-    baseline_config,
-)
 from collie.arms.shockspec import (
     ARM8_ARM_ID,
     ARM9_ARM_ID,
@@ -83,6 +78,9 @@ from collie.contracts import (
     Split,
     TargetStream,
 )
+from collie.control.controller import OrCompilerController
+from collie.control.grid import baseline_config_for
+from collie.control.mapping import GridCompiler
 from collie.data.families import generate_episode
 from collie.data.splits import FAMILIES, build_units
 from collie.data.writer import write_pair
@@ -332,7 +330,7 @@ def run_ladder(
         train = _train_samples(root, spec.episode_id)
         prompt_spec = prompt_spec_from_episode(spec, train_samples=train)
         alerts = _demo_alert(instance)
-        compiler = ReferenceCompiler()
+        compiler = GridCompiler()
 
         horizon = spec.horizon
         episode_id = spec.episode_id
@@ -342,12 +340,15 @@ def run_ladder(
             config: ControlConfig,
             demands: tuple[float, ...],
             *,
+            _cap: float = spec.order_cap,
             _train: tuple[float, ...] = train_demands,
-        ) -> ReferenceController:
+        ) -> OrCompilerController:
             # The compiled controller's samples: the episode's train history plus what the arm
             # observed before the switch (the arm excludes the switch period's prev_demand,
             # which the new controller records itself).
-            return ReferenceController(config=config, train_demand=(*_train, *demands))
+            return OrCompilerController(
+                order_cap=_cap, config=config, train_demand=(*_train, *demands)
+            )
 
         def fresh_trigger(*, _horizon: int = horizon, _seed: int = seed) -> object:
             return build_wrapped("alert_or_detector", _horizon, 0, _seed)
@@ -410,12 +411,14 @@ def run_ladder(
                         parser=_DemoParser(),
                         compiler=compiler,
                         activation=activation,
-                        baseline=ReferenceController(
-                            config=baseline_config(promised), train_demand=train_demands
+                        baseline=OrCompilerController(
+                            order_cap=spec.order_cap,
+                            config=baseline_config_for(promised),
+                            train_demand=train_demands,
                         ),
                         controller_factory=factory,
                         trigger=fresh_trigger(),
-                        baseline_config=baseline_config(promised),
+                        baseline_config=baseline_config_for(promised),
                         arm_id=arm_id,
                     ),
                     True,
@@ -427,11 +430,13 @@ def run_ladder(
                 DetectorToCompilerArm(
                     compiler=compiler,
                     trigger=fresh_trigger(),
-                    baseline=ReferenceController(
-                        config=baseline_config(promised), train_demand=train_demands
+                    baseline=OrCompilerController(
+                        order_cap=spec.order_cap,
+                        config=baseline_config_for(promised),
+                        train_demand=train_demands,
                     ),
                     controller_factory=factory,
-                    baseline_config=baseline_config(promised),
+                    baseline_config=baseline_config_for(promised),
                 ),
                 True,
             )
@@ -441,11 +446,13 @@ def run_ladder(
                 KEYWORD_CONTROL_ARM_ID,
                 KeywordParserArm(
                     compiler=compiler,
-                    baseline=ReferenceController(
-                        config=baseline_config(promised), train_demand=train_demands
+                    baseline=OrCompilerController(
+                        order_cap=spec.order_cap,
+                        config=baseline_config_for(promised),
+                        train_demand=train_demands,
                     ),
                     controller_factory=factory,
-                    baseline_config=baseline_config(promised),
+                    baseline_config=baseline_config_for(promised),
                 ),
                 True,
             )
@@ -462,11 +469,13 @@ def run_ladder(
                         alert_spec=_hidden_alert_spec(instance.incident),
                         alert_period=instance.incident.onset_period - 1,
                         compiler=compiler,
-                        baseline=ReferenceController(
-                            config=baseline_config(promised), train_demand=train_demands
+                        baseline=OrCompilerController(
+                            order_cap=spec.order_cap,
+                            config=baseline_config_for(promised),
+                            train_demand=train_demands,
                         ),
                         controller_factory=factory,
-                        baseline_config=baseline_config(promised),
+                        baseline_config=baseline_config_for(promised),
                     ),
                     False,  # carries hidden truth by design (allowlisted upper bound)
                 )
@@ -477,11 +486,13 @@ def run_ladder(
                     OracleShockSpecArm(
                         incident=instance.incident,
                         compiler=compiler,
-                        baseline=ReferenceController(
-                            config=baseline_config(promised), train_demand=train_demands
+                        baseline=OrCompilerController(
+                            order_cap=spec.order_cap,
+                            config=baseline_config_for(promised),
+                            train_demand=train_demands,
                         ),
                         controller_factory=factory,
-                        baseline_config=baseline_config(promised),
+                        baseline_config=baseline_config_for(promised),
                     ),
                     False,  # the oracle reads hidden truth by definition
                 )
