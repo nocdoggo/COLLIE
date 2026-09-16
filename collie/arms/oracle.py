@@ -1,131 +1,158 @@
-"""The oracle arm's config selection.
+"""The oracle ShockSpec headroom bound (arm_id ``oracle_shockspec_headroom``).
 
-This is a factory, not a controller subclass. Once :func:`oracle_config_for` has read the hidden
-incident and produced a :class:`~collie.contracts.ControlConfig`, everything downstream is the
-identical :class:`~collie.control.controller.OrCompilerController` every other arm wraps — the
-shared control path (``tests/test_controller.py::test_shared_control_path_byte_identical``) is
-what makes an oracle-vs-ShockSpec profit comparison a comparison of *hypotheses*, not of
-controllers.
+This arm is the headroom ceiling of the arm ladder: at the incident's true onset period it
+maps the *hidden truth* onto a proposal payload, compiles it through the same injected
+:class:`~collie.arms.protocols.SpecCompiler` and controller factory as every other
+compile-once arm (``collie/arms/controls.py``'s :class:`~collie.arms.controls.CompilerSwitchArm`),
+and orders from the compiled controller from that period on. The band between arm 1's score and
+this arm's score is the entire value any alert channel, detector, parser, or verifier could
+ever add on a shocked episode — the quantity the ladder's contrasts are read against.
 
-The oracle is one of the two permitted readers of :class:`~collie.contracts.HiddenIncident`
-outside the evaluator (``collie/contracts.py``'s own docstring), and it is never tuned on test
-(``docs/implementation/README.md``, standing rule 1). This module exists at Checkpoint 2 only to
-demonstrate the compiler's headroom before module 06 builds the full arm ladder; the proposal
-budget and triggering a real oracle arm needs are out of scope here.
+**This arm reads hidden truth, and that is its whole definition.** The
+:class:`~collie.contracts.HiddenIncident` enters through the constructor, injected by the
+harness — the only place hidden state may enter — never through the observation stream. The
+runner must therefore execute it with ``check_controller_isolation=False`` (the runner's own
+docstring names this arm as the exception), and two disciplines bind its use:
 
-**Activation window.** A real ShockSpec arm earns activation from module 05's verifier, which has
-not landed yet. The oracle does not need to earn it — it is privileged to read
-``incident.onset_period`` and ``incident.duration`` directly, so it activates its compiled config
-for exactly that window and runs the baseline config outside it. This is not a stand-in for the
-verifier's lifecycle: it is knowledge only the oracle is allowed to have. Applying the compiled
-config for an entire episode regardless of whether the hazard is still live was tried first and
-produces a large *negative* headroom on families with a short-lived hazard (``shipment_loss``,
-``transit_pause``) — a low ``gamma`` held on well past the hazard window makes the controller
-distrust perfectly real, arriving inventory for the rest of the episode, which manufactures a
-holding-cost blowup that has nothing to do with the hypothesis being wrong. That failure mode is
-a property of running a static config with no lifecycle, not of the compiler, which is exactly
-why the real arms need module 05's activation gate rather than a config applied forever.
+* it may never be tuned on test data — the mapping below is fixed by the registered family
+  semantics, and the one provisional choice (the magnitude binning) is marked as such; and
+* it is an analysis instrument, not a candidate policy — nothing deployable may inherit from
+  it.
+
+No LLM is called; like the controls, call-ledger conservation is vacuous here.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
 
+from collie.arms.controls import CompilerSwitchArm
+from collie.arms.protocols import ProposalPayload
 from collie.contracts import (
-    ControlConfig,
-    Decision,
+    Direction,
+    DurationBin,
     HiddenIncident,
+    MagnitudeBin,
     PeriodObservation,
+    Persistence,
     ShockFamily,
-    ShockSpec,
+    TargetStream,
 )
-from collie.control.controller import OrCompilerController
-from collie.control.grid import BASELINE_CONFIG
-from collie.control.mapping import compile_spec
 
-__all__ = ["ORACLE_ARM_ID", "OracleController", "oracle_config_for", "oracle_controller_for"]
+__all__ = [
+    "ORACLE_ARM_ID",
+    "OracleShockSpecArm",
+    "incident_to_payload",
+]
 
-ORACLE_ARM_ID = "oracle_shockspec"
+ORACLE_ARM_ID = "oracle_shockspec_headroom"
 
 
-def oracle_config_for(incident: HiddenIncident) -> ControlConfig:
-    """Translate ground truth into the exact typed hypothesis a perfectly informed model would
-    commit to, then compile it through the identical path every ShockSpec arm uses.
+def _duration_bin(duration: int) -> DurationBin:
+    """Bin an incident duration: 1-3 short, 4-8 medium, longer otherwise.
 
-    A null incident (or one somehow missing its alert spec) gets the baseline, exactly like a
-    ``no_change`` proposal would.
+    The cut points are the ``DurationBin`` vocabulary's own values (``"1_3"`` / ``"4_8"``),
+    applied to truth. Callers guarantee ``duration >= 1``.
     """
-    if incident.family is ShockFamily.NO_CHANGE or incident.alert_spec is None:
-        return BASELINE_CONFIG
-    alert = incident.alert_spec
-    spec = ShockSpec(
-        target_stream=alert.target_stream,
-        shock_family=alert.family,
-        direction=alert.direction,
-        onset_window=alert.onset_window,
-        magnitude_bin=alert.magnitude_bin,
-        persistence=alert.persistence,
-        duration_bin=alert.duration_bin,
-        evidence_refs=(),
-        prospective_signature=alert.prospective_signature,
-        tau_j=incident.onset_period,
-        proposal_index=1,
-        model_id="oracle",
-        decoding_hash="oracle",
-        prompt_hash="oracle",
+    if duration <= 3:
+        return DurationBin.SHORT
+    if duration <= 8:
+        return DurationBin.MEDIUM
+    return DurationBin.LONGER
+
+
+def _magnitude_bin(magnitude: float) -> MagnitudeBin:
+    """Bin a demand multiplier by ``|magnitude - 1|``: under 0.3 low, under 0.6 medium, else high.
+
+    **Provisional binning — module 02 owns the real one.** The registered dev magnitudes
+    (1.25/1.5 up, 0.6/0.75 down; ``collie/data/families/demand.py``) sit at 0.25-0.5 from 1,
+    so the cut points separate the registered set without having been fit to anything.
+    Supply-family incidents carry ``magnitude == 1.0`` by the fixture convention
+    (``collie/data/families/supply.py``) and therefore bin LOW; the bin is only meaningful for
+    demand families, and the compiler does not read it either way.
+    """
+    delta = abs(magnitude - 1.0)
+    if delta < 0.3:
+        return MagnitudeBin.LOW
+    if delta < 0.6:
+        return MagnitudeBin.MEDIUM
+    return MagnitudeBin.HIGH
+
+
+def incident_to_payload(incident: HiddenIncident) -> ProposalPayload:
+    """Map ground truth onto the payload a perfect shock-typer would emit at onset.
+
+    Family determines ``(target_stream, direction)``: the demand families carry their
+    multiplier's sign; a lead-time shift is a delay; a shipment loss or transit pause is an
+    interruption. Persistence is TRANSIENT for a temporary pulse and PERSISTENT otherwise (the
+    demand-level and supply families all run to the horizon or are permanent effects). The
+    onset window is ``(0, 0)`` — the oracle knows the onset is *now*, which is exactly the
+    headroom being measured. The compound family is refused: one incident driving both streams
+    needs module 05's joint construction, not a marginal guess, and ``no_change`` is not an
+    incident.
+    """
+    family = incident.family
+    if family in (ShockFamily.DEMAND_LEVEL, ShockFamily.TEMPORARY_PULSE):
+        stream = TargetStream.DEMAND
+        if incident.magnitude > 1.0:
+            direction = Direction.DEMAND_UP
+        elif incident.magnitude < 1.0:
+            direction = Direction.DEMAND_DOWN
+        else:
+            raise ValueError(
+                f"a {family} incident with magnitude 1.0 is a non-shock and has no direction"
+            )
+    elif family is ShockFamily.LEAD_TIME_SHIFT:
+        stream, direction = TargetStream.ARRIVAL, Direction.ARRIVAL_DELAYED
+    elif family in (ShockFamily.SHIPMENT_LOSS, ShockFamily.TRANSIT_PAUSE):
+        stream, direction = TargetStream.ARRIVAL, Direction.ARRIVAL_INTERRUPTED
+    else:
+        raise ValueError(
+            f"the oracle does not map family {family!r}: compound incidents need module 05's "
+            "joint construction and no_change is not an incident"
+        )
+    persistence = (
+        Persistence.TRANSIENT if family is ShockFamily.TEMPORARY_PULSE else Persistence.PERSISTENT
     )
-    return compile_spec(spec)
+    return ProposalPayload(
+        target_stream=stream,
+        shock_family=family,
+        direction=direction,
+        onset_window=(0, 0),
+        magnitude_bin=_magnitude_bin(incident.magnitude),
+        persistence=persistence,
+        duration_bin=_duration_bin(incident.duration),
+        evidence_refs=(),
+        prospective_signature=f"sig_oracle_{family.value}",  # clearly labelled, never registry
+    )
 
 
-@dataclass(slots=True)
-class OracleController:
-    """Wraps the shared :class:`OrCompilerController`, swapping its ``.config`` between the
-    ground-truth config and the baseline as the episode crosses the hazard window.
+@dataclass(slots=True, kw_only=True)
+class OracleShockSpecArm(CompilerSwitchArm):
+    """The oracle headroom bound — **this arm reads hidden truth** (see the module docstring).
 
-    Composition, not subclassing: the order rule itself (``inner``) never learns *why* its
-    config changed, only what it is right now, exactly as ``OrCompilerController``'s own
-    docstring anticipates for a lifecycle-gated arm.
+    Constructed with the episode's :class:`~collie.contracts.HiddenIncident`; at
+    ``obs.period == incident.onset_period`` the truth is mapped onto a payload
+    (:func:`incident_to_payload`) and compiled, and the compiled controller orders from that
+    period on. Construction validates the incident eagerly — an unmappable family, a unit
+    magnitude on a demand family, or a non-positive onset or duration fails before any episode
+    runs rather than mid-episode.
     """
 
-    inner: OrCompilerController
-    active_config: ControlConfig
-    onset_period: int
-    active_through: int
-    """Last period (inclusive) the hazard is live. ``onset_period - 1`` if it never activates."""
+    incident: HiddenIncident
     arm_id: str = ORACLE_ARM_ID
 
-    def reset(self) -> None:
-        self.inner.reset()
+    def __post_init__(self) -> None:
+        # Explicit base call: under @dataclass(slots=True) the zero-argument super() binds to
+        # the pre-slots class object and raises TypeError.
+        CompilerSwitchArm.__post_init__(self)
+        if self.incident.onset_period < 1:
+            raise ValueError(f"onset_period must be >= 1, got {self.incident.onset_period}")
+        if self.incident.duration < 1:
+            raise ValueError(f"duration must be >= 1, got {self.incident.duration}")
+        incident_to_payload(self.incident)  # fail fast on unmappable truth
 
-    def order(self, obs: PeriodObservation) -> Decision:
-        active = self.onset_period <= obs.period <= self.active_through
-        self.inner.config = self.active_config if active else BASELINE_CONFIG
-        decision = self.inner.order(obs)
-        return Decision(
-            period=decision.period,
-            order_quantity=decision.order_quantity,
-            arm_id=self.arm_id,
-            control_config=decision.control_config,
-            lifecycle_state=None,
-            triggered=active,
-        )
-
-
-def oracle_controller_for(
-    incident: HiddenIncident, *, order_cap: float, train_demand: tuple[float, ...] = ()
-) -> OracleController:
-    """The oracle arm: the shared controller, pre-loaded with the ground-truth config and gated
-    to the ground-truth activation window (see the module docstring for why the gate matters)."""
-    inner = OrCompilerController(
-        order_cap=order_cap, config=BASELINE_CONFIG, train_demand=train_demand
-    )
-    if incident.family is ShockFamily.NO_CHANGE:
-        return OracleController(
-            inner=inner, active_config=BASELINE_CONFIG, onset_period=1, active_through=0
-        )
-    return OracleController(
-        inner=inner,
-        active_config=oracle_config_for(incident),
-        onset_period=incident.onset_period,
-        active_through=incident.onset_period + max(incident.duration, 1) - 1,
-    )
+    def _switch_payload(self, obs: PeriodObservation) -> ProposalPayload | None:
+        if obs.period < self.incident.onset_period:
+            return None
+        return incident_to_payload(self.incident)

@@ -183,25 +183,45 @@ def _regret_sweep(family_name: str, *, seeds: int = 6) -> None:  # pragma: no co
 def _oracle_headroom(*, seeds_per_family: int = 3) -> None:  # pragma: no cover - CLI only
     """The oracle-ShockSpec arm against stationary OR on the fixture's dev episodes.
 
-    6 families * 3 seeds = 18 episodes, matching the Checkpoint 2 pass criterion. This is the
-    headroom number: if the oracle barely beats stationary OR here, the shocks module 01
-    generates are too mild for anything downstream to detect."""
-    from collie.arms.oracle import oracle_controller_for
+    5 families * 3 seeds = 15 episodes. Compound is excluded and said so below: the oracle
+    arm (``collie/arms/oracle.py``) refuses compound incidents by design — a joint
+    demand+supply construction is module 05's — so compound contributes no headroom cell.
+    This is the headroom number: if the oracle barely beats stationary OR here, the shocks
+    module 01 generates are too mild for anything downstream to detect."""
+    from collie.arms.oracle import OracleShockSpecArm
     from collie.contracts import ShockFamily
     from collie.control.controller import OrCompilerController
+    from collie.control.mapping import GridCompiler
     from collie.fakes import fixture_episode
     from collie.sim.runner import EpisodeRunner
 
-    families = [f for f in ShockFamily if f is not ShockFamily.NO_CHANGE]
+    families = [f for f in ShockFamily if f not in (ShockFamily.NO_CHANGE, ShockFamily.COMPOUND)]
     oracle_total = 0.0
     stationary_total = 0.0
     n = 0
     for family in families:
         for seed in range(seeds_per_family):
             inst = _loaded_instance_from_fixture(fixture_episode(family, seed=seed))
-            oracle = oracle_controller_for(inst.incident, order_cap=inst.spec.order_cap)
-            stationary = OrCompilerController(order_cap=inst.spec.order_cap, config=BASELINE_CONFIG)
-            oracle_reward = EpisodeRunner(instance=inst).run(oracle).result.total_reward
+            cap = inst.spec.order_cap
+
+            def factory(config, history, *, _cap=cap):
+                return OrCompilerController(order_cap=_cap, config=config, train_demand=history)
+
+            oracle = OracleShockSpecArm(
+                incident=inst.incident,
+                compiler=GridCompiler(),
+                baseline=OrCompilerController(order_cap=cap, config=BASELINE_CONFIG),
+                controller_factory=factory,
+                baseline_config=BASELINE_CONFIG,
+            )
+            stationary = OrCompilerController(order_cap=cap, config=BASELINE_CONFIG)
+            # The oracle reads hidden truth by definition; the runner exempts it from the
+            # controller-isolation walk (run_arms.py does the same for the ladder).
+            oracle_reward = (
+                EpisodeRunner(instance=inst, check_controller_isolation=False)
+                .run(oracle)
+                .result.total_reward
+            )
             stationary_reward = EpisodeRunner(instance=inst).run(stationary).result.total_reward
             oracle_total += oracle_reward
             stationary_total += stationary_reward
@@ -209,7 +229,8 @@ def _oracle_headroom(*, seeds_per_family: int = 3) -> None:  # pragma: no cover 
 
     print(
         f"oracle-ShockSpec headroom over stationary OR, {n} dev episodes ({len(families)} "
-        f"families x {seeds_per_family} seeds)"
+        f"families x {seeds_per_family} seeds; compound excluded, needs module 05's joint "
+        "construction)"
     )
     print(f"  oracle mean reward:      {oracle_total / n:.2f}")
     print(f"  stationary mean reward:  {stationary_total / n:.2f}")

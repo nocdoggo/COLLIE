@@ -26,7 +26,13 @@ from collie.control.ledger import (
     find_ledger_state,
     scan_for_ledger_references,
 )
-from collie.control.mapping import CANONICAL_SHAPES, compile_spec, iter_legal_specs, mapping_table
+from collie.control.mapping import (
+    CANONICAL_SHAPES,
+    GridCompiler,
+    compile_spec,
+    iter_legal_specs,
+    mapping_table,
+)
 
 __all__ = [
     "BASELINE_CONFIG",
@@ -38,6 +44,7 @@ __all__ = [
     "DemandForecaster",
     "FIFOLedger",
     "ForecastStats",
+    "GridCompiler",
     "LedgerInconsistency",
     "LedgerLeak",
     "OrCompilerController",

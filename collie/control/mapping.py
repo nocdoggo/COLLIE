@@ -39,6 +39,7 @@ from __future__ import annotations
 
 import itertools
 from collections.abc import Iterator
+from dataclasses import dataclass
 
 from collie.contracts import (
     ControlConfig,
@@ -288,6 +289,20 @@ def mapping_table() -> tuple[tuple[ShockSpec, ControlConfig], ...]:
     """Every legal spec shape against the config it compiles to. What ``--print-table`` prints
     and what Checkpoint 1's audit reads."""
     return tuple((spec, compile_spec(spec)) for spec in iter_legal_specs())
+
+
+@dataclass(frozen=True, slots=True)
+class GridCompiler:
+    """The ``collie.arms.protocols.SpecCompiler`` seam, satisfied structurally by the grid.
+
+    The grid is absolute: a spec compiles to the same config regardless of what is currently
+    running, so ``current`` is accepted for protocol shape and deliberately unread. Arms never
+    import this module — the harness wires one instance in (``tests/conftest.py``).
+    """
+
+    def compile(self, spec: ShockSpec, *, current: ControlConfig) -> ControlConfig:
+        del current
+        return compile_spec(spec)
 
 
 def _print_table() -> None:  # pragma: no cover - CLI only
