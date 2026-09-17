@@ -1,0 +1,112 @@
+%% fig1_pipeline.tex -- Figure 1. The whole idea in one picture.
+%%
+%% FINAL FIGURE DESCRIPTION (for the illustrator, and for the record):
+%% A left-to-right pipeline across the full text width, with a side panel.
+%%   Left, stacked: the two trigger inputs, an operational alert and the demand
+%%   telemetry stream. They meet in the trigger box, which is annotated with the
+%%   refractory window of 5 periods and the cap of at most 2 proposals.
+%%   The trigger opens a proposal opportunity at the stopping time tau_j.
+%%   The language model is consulted exactly there and returns one typed
+%%   ShockSpec, drawn with a lock icon to mark that it is frozen and immutable.
+%%   The compiler maps the spec to one of 72 registered ControlConfig points.
+%%   Between the compiler and the controller sits the e-process gate, drawn as a
+%%   valve rather than an arrow, because that is the point of the figure: the
+%%   compiled configuration is computed but does not flow until the evidence
+%%   path E_{j,t}, accumulated only from observations after tau_j, crosses
+%%   1/alpha_j. A dashed bypass path carries the baseline configuration straight
+%%   to the controller and is the live path while the gate is closed.
+%%   The controller emits q_t. A feedback arrow returns the realized observation
+%%   Y_{t+1} to both the telemetry stream and the evidence path, which is what
+%%   makes the closed-loop argument of Lemma 1 necessary rather than decorative.
+%%   Right panel: the eleven-rung ladder as a vertical list, with arms 8, 9 and
+%%   10 braced together and labeled "one physical call set, three activation
+%%   policies", and arm 10 marked as the contribution.
+%%
+%% This file is the real figure, drawn in TikZ with base libraries only. It is
+%% included by \input, not \includegraphics, so no external build step exists.
+
+\begin{figure*}[!t]
+\centering
+\footnotesize
+\begin{tikzpicture}[
+  node distance=3.6mm,
+  box/.style={draw, rounded corners=1pt, align=center, inner sep=2.2pt,
+              minimum height=7.5mm, font=\footnotesize},
+  src/.style={box, fill=black!4, minimum width=15mm},
+  proc/.style={box, fill=black!6, minimum width=17mm},
+  spec/.style={box, fill=black!10, minimum width=19mm, very thick},
+  gate/.style={box, fill=black!14, minimum width=21mm, very thick},
+  outbox/.style={box, fill=black!4, minimum width=11mm},
+  rung/.style={align=left, font=\scriptsize, inner sep=1pt},
+  flow/.style={-{Latex[length=1.6mm]}, thick},
+  bypass/.style={-{Latex[length=1.6mm]}, thick, dashed},
+  fb/.style={-{Latex[length=1.6mm]}, semithick, densely dotted},
+  lbl/.style={font=\scriptsize, align=center, inner sep=1pt},
+]
+
+%% ---- inputs ---------------------------------------------------------------
+\node[src] (alert) {operational\\alert};
+\node[src, below=5mm of alert] (tele) {demand\\telemetry};
+
+%% ---- trigger --------------------------------------------------------------
+\node[proc, right=6mm of $(alert)!0.5!(tele)$] (trig) {trigger\\$\tau_j$};
+\node[lbl, below=1.2mm of trig] {refractory 5\\$\le 2$ proposals};
+
+%% ---- model ---------------------------------------------------------------
+\node[proc, right=7mm of trig] (llm) {language\\model};
+
+%% ---- the frozen spec ----------------------------------------------------
+\node[spec, right=7mm of llm] (spec) {\shockspec{}\\\emph{frozen at} $\tau_j$};
+
+%% ---- compiler ------------------------------------------------------------
+\node[proc, right=7mm of spec] (comp) {compiler\\72 points};
+
+%% ---- the gate ------------------------------------------------------------
+\node[gate, right=7mm of comp] (gate)
+  {\eprocess{} gate\\$E_{j,t} \ge 1/\alpha_j$};
+\node[lbl, below=1.2mm of gate] {evidence from\\$\tau_j{+}1$ onward only};
+
+%% ---- controller and order ------------------------------------------------
+\node[proc, right=7mm of gate] (ctrl) {capped\\base-stock};
+\node[outbox, right=6mm of ctrl] (order) {order $q_t$};
+
+%% ---- flow ----------------------------------------------------------------
+\draw[flow] (alert.east) -- (trig.west);
+\draw[flow] (tele.east)  -- (trig.west);
+\draw[flow] (trig)  -- (llm);
+\draw[flow] (llm)   -- (spec);
+\draw[flow] (spec)  -- (comp);
+\draw[flow] (comp)  -- (gate);
+\draw[flow] (gate)  -- (ctrl);
+\draw[flow] (ctrl)  -- (order);
+
+%% ---- the baseline bypass, live while the gate is closed ------------------
+\coordinate (bypassL) at ($(comp.north) + (0,5.5mm)$);
+\coordinate (bypassR) at ($(ctrl.north) + (0,5.5mm)$);
+\draw[bypass] (comp.north) |- (bypassL) -- (bypassR) -| (ctrl.north);
+\node[lbl, above=0.4mm] at ($(bypassL)!0.5!(bypassR)$)
+  {baseline configuration, live until activation};
+
+%% ---- closed loop ---------------------------------------------------------
+\coordinate (fbY) at ($(tele.south) + (0,-8mm)$);
+\draw[fb] (order.south) |- (fbY) -| (tele.south);
+\node[lbl, above=0.4mm] at ($(fbY) + (26mm,0)$) {$Y_{t+1}$, and it also feeds the evidence path};
+
+%% The ladder side panel was removed once Table~\ref{tab:ladder} carried the same
+%% eleven rungs; keeping both duplicated the list and made this figure a third of
+%% a page taller. The brace annotation that mattered is kept inline below.
+\node[lbl, below=1.2mm of order] {arms 8, 9, 10 share\\one physical call set};
+
+\end{tikzpicture}
+\caption{The handshake. A shared trigger decides \emph{when} the model is
+consulted, a closed schema decides \emph{what} it may say, and an
+anytime-valid \eprocess{} decides \emph{whether} the answer touches an order.
+The gate is drawn as a valve rather than an arrow because that is the point: the
+compiled configuration is computed immediately and flows only after evidence
+gathered strictly after $\tau_j$ drives $E_{j,t}$ above $1/\alpha_j$. The dashed
+path is the baseline configuration, which is live until then. The dotted return
+is what makes fact (F1) of Section~\ref{sec:verify} load-bearing rather than
+decorative, since the controller's own orders shape the observations the test
+consumes.}
+\label{fig:pipeline}
+\end{figure*}

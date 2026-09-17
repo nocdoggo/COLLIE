@@ -1,0 +1,76 @@
+\section{Compilation: From a Claim to an Order}
+\label{sec:compile}
+
+How does a sentence about the world become an order quantity? Through a total,
+pure, deterministic function with no episode state, history or clock.
+
+A \controlconfig{} is a four-tuple $(m, L_{\mathrm{eff}}, \gamma, k)$ with
+$m \in \{0.6, 0.75, 1.0, 1.25, 1.5, 2.0\}$, $L_{\mathrm{eff}} \in \{1,2,3,4\}$
+and $\gamma \in \{0, 0.5, 1\}$, which is $6 \times 4 \times 3 = 72$
+configurations. The fourth entry is a pure function of the other three, obtained
+by comparing the point against the grid reference on two flags, whether the
+compiled belief moves demand and whether and how it moves the supply side. That
+key has two consumers: control acts on it, and Section~\ref{sec:verify}'s
+registry resolves the same key into the construction that will test it, so a
+hypothesis cannot be acted on under one reading and tested under another. Note
+that $L_{\mathrm{eff}}$ is a compiled \emph{belief} and never the observation's
+promised lead time, because the compiler is a pure function of the \shockspec{}
+alone. Precedence is fixed as family, then direction, then magnitude bin, then
+target stream.
+
+\begin{table}[!tb]
+\caption{The registered compiler table, by severity rank, as absolute points
+around the grid reference $(1, 1, 1)$.}
+\label{tab:mapping}
+\centering
+\footnotesize
+\begin{tabular}{@{}llll@{}}
+\toprule
+Shape & $m$ & $L_{\mathrm{eff}}$ & $\gamma$ \\
+\midrule
+\texttt{demand\_level} up      & 1.25 / 1.5 / 2.0 & 1 & 1.0 \\
+\texttt{demand\_level} down    & 0.75 / 0.6 / 0.6 & 1 & 1.0 \\
+\texttt{temporary\_pulse} up   & 1.25 / 1.5 / 2.0 & 1 & 1.0 \\
+\texttt{temporary\_pulse} down & 0.75 / 0.6 / 0.6 & 1 & 1.0 \\
+\texttt{lead\_time\_shift}     & 1.0 & 2 / 3 / 4 & 1.0 \\
+\texttt{shipment\_loss}        & 1.0 & 1 & 0.5 / 0.0 / 0.0 \\
+\texttt{transit\_pause}        & 1.0 & 2 / 2 / 3 & 1.0 / 1.0 / 0.5 \\
+\texttt{compound}              & 1.25 / 1.25 / 1.5 & 2 / 2 / 3 & 1.0 \\
+\texttt{no\_change}            & 1.0 & reference & 1.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A lead-time shift moves $L_{\mathrm{eff}}$ alone, because arrivals are still
+coming, while a shipment loss moves $\gamma$ alone, because arrivals keep their
+timing but fewer can be trusted to be real. A pause is deliberately asymmetric,
+since under the authoritative harness nothing inflates the pipeline count for
+$\gamma$ to correct. Composition is reference-relative, because an absolute grid
+point applied wholesale would move axes the hypothesis does not concern, and a
+demand-up hypothesis compiled to $L_{\mathrm{eff}} = 1$ against a promised lead
+time of 2 cancels its own demand signal exactly. An axis left at the reference is
+inherited, and a moved axis applies absolutely for $m$, as an offset for
+$L_{\mathrm{eff}}$ and as a ratio for $\gamma$.
+
+One controller serves every arm that routes through the compiler, differing only
+in which configuration is active in a period. With $\bar{d}_t$ and $s_{d,t}$ the
+running mean and sample standard deviation of the training samples followed by
+every demand observed so far, and $z^\star = \Phi^{-1}(p/(p+h))$,
+\begin{align}
+IP_t &= I_t + \gamma P_t, \\
+S_t  &= m\,(1 + L_{\mathrm{eff}})\,\bar{d}_t
+        + z^\star \sqrt{1 + L_{\mathrm{eff}}}\; s_{d,t}, \\
+q_t  &= \min\bigl(\max(0, \lceil S_t - IP_t \rceil),\; C_t,\; \hat{C}_t\bigr).
+\end{align}
+The critical fractile is read from the per-period cost columns rather than
+assumed constant, putting $z^\star$ at the $0.95$, $0.80$ and $0.50$ quantiles
+across the three registered cost ratios, and $\hat{C}_t$ is the published
+baseline's own internal smoother, kept separate from our cap $C_t$ because they
+are different objects that share a word. The property that makes the ladder
+legitimate is that at the per-instance baseline configuration this controller
+reproduces arm~1 bit for bit, so ``the published operations research policy is
+running'' is literally true for every arm while no hypothesis is active. For the
+running example the compiled point is $\gamma = 0.5$ at low severity and
+$\gamma = 0$ above it, so the inventory position shrinks by the discounted
+pipeline and the controller replaces the shipments it no longer believes in. That
+is the whole intervention.

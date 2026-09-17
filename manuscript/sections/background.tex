@@ -1,0 +1,64 @@
+\section{The Audited Benchmark}
+\label{sec:background}
+
+What does InventoryBench specify, and what did we have to establish ourselves? We
+answer from its code and its data, because three answers differ from its
+documentation and one of them moves a published number.
+
+\textbf{Inventory and lead times.} There are 1{,}320 instances, 720 synthetic and
+600 derived from real weekly apparel sales, split evenly across three lead-time
+directories. Synthetic episodes run 50 decisions and real ones 47, not the 48
+often reported, which counts the trajectory file's header line. Two lead-time
+quantities are easy to conflate: the \emph{promised} lead time, passed to the
+policy at initialization with values $\{0, 4, 2\}$, and the \emph{actual}
+per-period lead time, never shown to the policy, with values $\{0\}$, $\{4\}$ or
+$\{1,2,3,\infty\}$, where $\infty$ encodes a lost shipment. Exactly 440 instances,
+the whole stochastic third, contain at least one lost period.
+
+\textbf{Event order and observability.} Each period decides, then receives, then
+sells, then charges. Two consequences are load-bearing: an order with actual lead
+time zero arrives in the same period, because scheduling precedes the arrival
+pop, and the in-transit total shown at $t$ still contains units that land at $t$.
+Holding falls on ending inventory and nothing is backordered, which makes
+lost-sales units a coherent safety endpoint. The policy sees uncensored previous
+demand rather than sales, and in-transit inventory is a scalar with no shipment
+ages, so many shipment-level histories are consistent with the same receipts.
+That last fact drives a decision in Section~\ref{sec:verify}: the controller may
+keep an imputed first-in-first-out ledger, and the verifier may never use it as
+evidence.
+
+\textbf{Integer economics, and two absences.} Every demand, profit and holding
+cell is an integer, so every sum is exact and our equivalence suite can demand a
+maximum absolute difference of exactly $0.0$ rather than a tolerance: a nonzero
+difference could only be a semantic disagreement. Holding cost is $1.0$ everywhere
+and profit is $19$, $4$ or $1$, so \textbf{the labels \texttt{high},
+\texttt{med} and \texttt{low} name the margin, not the holding burden}. Two
+absences are ours to fill. There is no upstream order cap, so \collie{} registers
+its own $C_t$ and labels it as ours wherever it affects a number, distinct from
+the published baseline's internal smoother. And a transit pause is not
+expressible in the instance format, because both simulators fix a shipment's
+arrival period at order time, so it needs a project-owned sidecar.
+
+\subsection{The harness divergence}
+\label{sec:divergence}
+
+The benchmark ships two simulators and they disagree about one thing. In the
+legacy game simulator a lost order stays in in-transit inventory forever, since
+its arrival period is set to infinity and never popped, while in the submission
+path it is never added to in-transit at all. The disagreement never changes the
+physics, since replaying a run's orders under the other simulator reproduces the
+arrivals, the reward and the lost-unit total exactly. It changes what a policy
+\emph{reads}, because a base-stock policy under legacy semantics credits units
+that will never arrive, orders less, and loses fewer units.
+
+We declare the submission path authoritative, because it is the contract we are
+scored against. Under legacy semantics our reimplementation reproduces the
+published $0.4447$ to one unit in the last place and matches all 1{,}320 published
+order sequences bit for bit, a far stronger check than a matching aggregate that
+many policies could reach. Under the authoritative path the same policy scores
+$0.5208$, exactly the 880 deterministic-lead-time instances still match, and all
+440 stochastic ones differ. Since 440 is precisely the number of instances the
+audit found to contain a lost shipment, the divergence is accounted for with no
+residue. The published figure was therefore generated under legacy lost-order
+semantics and is not reachable from the submission path, so every table comparing
+against it must name the harness.

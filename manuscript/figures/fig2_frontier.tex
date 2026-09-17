@@ -1,0 +1,91 @@
+%% fig2_frontier.tex -- Figure 2. The reward against compute frontier.
+%%
+%% FINAL FIGURE DESCRIPTION (for the record, and for whoever fills the data):
+%% A single-column pgfplots panel. Horizontal axis: realized charged calls per
+%% episode, log scale, because the arms span roughly 0 to 50 calls per episode.
+%% Vertical axis: stratum-weighted cumulative profit per episode, the primary
+%% endpoint, not the clipped normalized reward. Every arm is one marked point
+%% with a vertical error bar from the seed-level cluster bootstrap. The two
+%% horizontal reference rules are the arm 1 floor and the oracle ceiling, and the
+%% gap between them is the only space any arm can win in, so the figure is also
+%% the headroom figure. A shaded staircase traces the Pareto front over the
+%% points that are not dominated on both axes. Arms 8, 9 and 10 sit at the same
+%% horizontal position by construction, because they share one physical call set,
+%% so the vertical spread between those three markers is exactly the effect of
+%% the activation stage and should be annotated as such.
+%%
+%% The companion token and dollar panels use the same shape with the horizontal
+%% axis swapped, and they additionally carry matched-budget points rather than
+%% realized ones, so they are generated from the same data block.
+%%
+%% DATA BLOCK: every coordinate below is a placeholder. Replace the whole
+%% filecontents block with the emitted frontier table and nothing else changes.
+%% Column order: arm_id  calls  profit  ci_low  ci_high
+
+\begin{filecontents*}{frontier_pending.dat}
+% arm_id                       calls  profit  ci_low  ci_high
+% PENDING: every row below is a placeholder coordinate, not a measurement.
+% The axis ranges, the reference rules and the front are therefore also pending.
+arm1_capped_base_stock             0     nan     nan     nan
+arm2_telemetry_hmm_or              0     nan     nan     nan
+arm3_llm_direct                   50     nan     nan     nan
+arm4_triggered_llm_direct          2     nan     nan     nan
+arm5_llm_to_or_every_period       50     nan     nan     nan
+arm6_llm_to_or_sparse              2     nan     nan     nan
+arm7_llm_to_or_persistent          2     nan     nan     nan
+arm8_spec_immediate                2     nan     nan     nan
+arm9_spec_heuristic_rollback       2     nan     nan     nan
+arm10_spec_eprocess                2     nan     nan     nan
+arm11_or_to_llm                   50     nan     nan     nan
+ctrl_cusum_to_compiler             0     nan     nan     nan
+ctrl_keyword_parser                0     nan     nan     nan
+ctrl_alertspec_upper_bound         2     nan     nan     nan
+oracle_shockspec_headroom          0     nan     nan     nan
+\end{filecontents*}
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=\columnwidth,
+  height=0.62\columnwidth,
+  scale only axis,
+  xlabel={realized charged calls per episode},
+  ylabel={profit per episode},
+  xmin=-2, xmax=55,
+  ymin=0, ymax=1,
+  ytick=\empty,
+  xtick={0,2,10,25,50},
+  tick label style={font=\scriptsize},
+  label style={font=\scriptsize},
+  grid=major,
+  grid style={black!12},
+  axis line style={black!55},
+]
+%% pgfplots needs at least one plot in an axis; this one draws nothing and only
+%% exists so the empty frame typesets. Delete it when the real series lands.
+\addplot[draw=none, forget plot] coordinates {(0,0)};
+%% The frame is real; the series is deliberately empty until the sweep lands.
+%% Once frontier_pending.dat carries numbers, replace this node with:
+%%   \addplot+[only marks, error bars/.cd, y dir=both, y explicit]
+%%     table[x=calls, y=profit, y error plus expr=\thisrow{ci_high}-\thisrow{profit},
+%%           y error minus expr=\thisrow{profit}-\thisrow{ci_low}]
+%%     {frontier_pending.dat};
+%% plus \addplot[no marks, dashed] for the arm 1 floor and the oracle ceiling.
+\end{axis}
+\end{tikzpicture}
+
+\smallskip
+\parbox{\columnwidth}{\centering\footnotesize
+\pending{reward against compute frontier: one marked point per arm on realized
+charged calls, the arm~1 floor and the oracle ceiling as horizontal reference
+rules, and the non-dominated front}}
+
+\caption{The frontier slot. Arms 8, 9 and 10 will sit at the same horizontal
+position by construction, because they share one physical proposal call set, so
+the vertical spread among those three markers is exactly the effect of the
+activation stage. The distance between the arm~1 floor and the oracle ceiling is
+the only space any arm can win in, which makes this figure the headroom figure as
+well.}
+\label{fig:frontier}
+\end{figure}

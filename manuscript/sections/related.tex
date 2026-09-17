@@ -1,0 +1,42 @@
+\section{Related Work}
+\label{sec:related}
+
+Which ingredient is new? None. The handshake is.
+
+\textbf{Language models for operations.} InventoryBench established the
+complementarity this paper starts from, and its four strategies are our arms 1,
+3, 5 and 11~\cite{inventorybench}. A design-time session can synthesize reusable
+operations research algorithms outright~\cite{llm-or-algorithms}, and InvEvolve
+evolves white-box inventory policies online~\cite{invevolve}. Our model does the
+opposite of both: it estimates the environment rather than the policy, writes no
+code, and every action stays fixed-form operations research. InvEvolve has no
+public code artifact as of our search, so any comparison against it must be
+labeled a faithful reimplementation, and we have not implemented one. Field
+evidence supports the interface shape: judgmental adjustment of a forecast input
+raised profitability by 4.92 percent on average in a retail
+experiment~\cite{kesavan-field}, and average United States import shipping delay
+rose by 21 days between 2018 and 2024~\cite{carreras-valle-delays}.
+
+\textbf{When to call, and what to commit to.} Event-triggered invocation with
+threshold, CUSUM, sequential probability ratio, Bayesian and learned rules is
+already established~\cite{event-triggered-llm}, so we treat invocation as fixed
+infrastructure and claim nothing about it. Structuring a plan as falsifiable commitments with confirming
+and falsifying evidence, and running a hypothesis lifecycle with provenance and
+belief updates, also exist already~\cite{fcpagent, hep}. What differs here is
+that the commitment parameterizes an \emph{exogenous stochastic model} whose
+influence is authorized by a preregistered sequential statistic and compiled into
+inventory-control inputs, so the object is tested rather than merely recorded.
+
+\textbf{Statistics and inventory theory.} We use e-values and anytime-valid
+inference as given~\cite{vovk-wang-evalues, ramdas-savi}, with the classical
+sequential and changepoint machinery behind them~\cite{ville, page-cusum}. The
+nearest construction is the e-detector, which sums
+processes started at every time and controls the average run
+length~\cite{e-detectors}, while we start one only at model-selected stopping
+times and control per-episode false activation by budget splitting. A theorem-backed
+\emph{retirement} rule would need the forward and backward confidence-sequence
+intersection test~\cite{shekhar-backward-cs}, which we do not adopt, which is why
+our retirement rules are labeled empirical. The controller is the textbook
+one~\cite{clark-scarf}, and our transit-pause semantics follow an established
+simulation convention in which material already moving stops
+progressing~\cite{stockpyl}.

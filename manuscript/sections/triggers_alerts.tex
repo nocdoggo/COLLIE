@@ -1,0 +1,58 @@
+\section{Triggers and the Alert Bank}
+\label{sec:triggers}
+
+Who decides when the model is consulted, and where does the text come from? Both
+are infrastructure rather than contribution, and we say so, because
+event-triggered invocation is already well covered~\cite{event-triggered-llm}.
+What matters is that the infrastructure be shared exactly enough that no
+comparison can be confounded by it.
+
+A proposal opportunity opens when an operational alert arrives or when a
+calibrated telemetry detector crosses its threshold. Six rules exist: alert only,
+CUSUM~\cite{page-cusum}, Page-Hinkley, their disjunction with the alert channel,
+which is the primary rule, and two budget-matched schedules. Detectors are
+stateless about suppression: one emits a raw candidate and two wrappers decide,
+composed as \texttt{MaxProposals(Refractory(}\textit{d}\texttt{, 5), 2)}, so the
+window and the cap are uniform across rules, including rules written after the
+design was frozen. Thresholds come from Monte Carlo on development and
+calibration nulls only, at the nearest-rank 95th percentile of the per-episode
+maximum statistic over 60 stationary twin paths, so three of 60 null episodes
+fire by construction. The window of 5 periods covers the longest registered pulse
+and pause, and the cap of 2 is the value $\alpha_j = \alpha\,2^{-j}$ was designed
+around. Two properties matter for the claims. The demand-side detectors read only the
+previous demand and the alert channel, both exogenous to the policy, so a trigger
+trace is a pure function of the episode's demand and alert streams and two arms
+sharing a rule must produce bitwise-identical traces, which the suite asserts.
+Without that, a comparison between two arms would conflate a different invocation
+pattern with a different policy. And a denylist, enforced at runtime on
+every feature mapping and statically by a syntax-tree scan, forbids future demand
+and arrivals, pattern names, instance identifiers, split and test labels and every
+field of the hidden incident record. It is deliberately over-broad on substrings,
+because a trigger that peeks is worse than a bad trigger: it looks like a good
+one.
+
+\textbf{What the detector cannot see.} Measured over 120 seeds per family at the
+frozen calibration under the no-alert condition, the firing rate is $0.99$ for a
+demand increase, $1.00$ for a demand decrease, $0.69$ for the temporary pulse,
+$0.03$ for the lead-time shift, $0.03$ for the lost-shipment burst and $0.77$ for
+the compound event. The two supply-only families sit at the null rate \emph{by
+construction}, since a demand-side detector cannot see a lead-time shift or a
+lost shipment. This is not a tuning failure to be fixed: it is what makes the
+alert channel the only early signal for our running example.
+
+\textbf{The alert bank.} The text channel is 180 short synthetic operational
+templates, 60 per split and 10 per family within each split, of which four per
+family-split cell are accurate, two overstated, two ambiguous and two operational
+distractors, with wording families held out across splits and controlled slots
+instantiated per episode. Template identity stays on the analysis side, because
+language-level uncertainty must treat the template as a sampling unit and not the
+rendered string, and synthetic messages are preferred because timing and
+information content are controllable: a message must not carry information that
+could not have existed when it is delivered. Two independent raters score every
+template on five criteria, and leakage is not negotiable by consensus, since one
+below-threshold score from either rater removes it. \pending{inter-rater
+agreement and templates pruned for leakage} Each message also carries a hidden
+\alertspec{}, and feeding that straight to the compiler is the perfect-parsing
+upper bound. Every trajectory is crossed with the identical exogenous realization
+under four information conditions, and the four cells of one seed are
+\emph{paired replays of one independent unit}.

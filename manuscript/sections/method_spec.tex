@@ -1,0 +1,45 @@
+\section{\shockspec{}: The Typed Commitment}
+\label{sec:spec}
+
+What is the model allowed to say? Exactly one object, drawn from a vocabulary the
+system froze before any test episode ran. Closing that vocabulary is what makes
+the later test admissible rather than decorative.
+
+At the proposal period $\tau_j$ the model receives only information in
+$\Filt_{\tau_j}$: the permitted product text, any alert visible then, the demand
+and arrival history, the inventory position, an aged pipeline summary and the
+costs. It must return valid JSON under a closed schema that
+forbids unknown keys and yields an immutable object. The model selects nine
+fields. \texttt{shock\_family} is one of \texttt{no\_change},
+\texttt{demand\_level}, \texttt{temporary\_pulse}, \texttt{lead\_time\_shift},
+\texttt{shipment\_loss}, \texttt{transit\_pause} or \texttt{compound}.
+\texttt{target\_stream} ranges over demand, arrival, both and none, and
+\texttt{direction} over the six registered directions. \texttt{onset\_window} is
+a registered offset pair or null, while \texttt{magnitude\_bin},
+\texttt{persistence} and \texttt{duration\_bin} take their registered bins.
+\texttt{evidence\_refs} points at visible message spans or observation
+identifiers, and \texttt{prospective\_signature} is schema-defined. Five fields
+are stamped by the system and never by the model:
+$\tau_j$, the one-based proposal index, the model identifier, the decoding hash
+and the prompt hash. \texttt{no\_change} is a first-class output rather than a
+failure code, and an accepted abstention is scored separately from a formatting
+failure because capability and reliability should not share a cell.
+\texttt{transit\_pause} is a first-class family even though no generator family
+emits it alone, since it is the supply leg of family 6.
+
+The model selects a key. It cannot write a falsifier, a likelihood, a threshold,
+an order equation, or code: the system maps the pair (\texttt{shock\_family},
+\texttt{prospective\_signature}) to a verifier construction and the whole object
+to controller parameters. An invalid object gets one format-repair attempt, a
+second failure falls back to the unchanged baseline, and every attempt is counted
+as accepted, accepted after repair, or fallback. The restriction is load-bearing:
+if the model could invent its own vague test after seeing the trigger window,
+falsifiability would be cosmetic. Two structural facts remove the
+circularity. \textbf{(A3) Closed selection space:} the hypothesis is drawn from a
+registered vocabulary whose map to a construction is frozen. \textbf{(A4) Frozen
+at a stopping time:} $\tau_j$ is a stopping time, $h_j$ is
+$\Filt_{\tau_j}$-measurable, and its evidence product starts at $\tau_j + 1$. For
+the carrier suspension the model is expected to return \texttt{shipment\_loss} on
+the \texttt{arrival} stream, direction \texttt{arrival\_interrupted}, duration bin
+\texttt{1\_3}, with \texttt{evidence\_refs} naming the alert and the arrival
+residual. Nothing in that object is an order. It says what changed.

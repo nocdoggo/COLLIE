@@ -1,0 +1,62 @@
+\section{Experimental Design}
+\label{sec:experiments}
+
+What would count as evidence, and what was decided before any test trajectory
+ran? This section is design only. The experiments are running, so every cell is
+marked \pending{} and every table is a pre-built slot.
+
+\textbf{Splits, and the independent unit.} Seeds come from disjoint reserved
+pools of 36 development units, 24 calibration units and 150 test units, six
+families by six, four and twenty-five seeds. Each test unit is crossed with the
+four information conditions, giving 600 paired replays plus 20 silent-null and 20
+false-alert-null controls, so 640 held-out rollouts per sparse arm, with every
+threshold and mapping frozen on development and calibration data. \textbf{The independent unit is the seed, not the rollout.} The four
+information cells of one seed are paired replays of one exogenous trajectory, so
+treating them as four samples would inflate the effective sample size fourfold
+and narrow every interval by roughly half, invisibly. The evaluation engine is
+therefore registered to refuse any confirmatory statistic computed from a frame
+with more than one row per pair of independent unit and arm, and to raise rather
+than warn. Family tail estimates stay exploratory even at twenty-five seeds, and
+every language-level claim bootstraps jointly over seed and template identity.
+
+\textbf{Endpoints.} The primary reward endpoint is cumulative undiscounted profit
+per episode and the primary safety endpoint is total lost-sales units per episode,
+both macro-averaged with equal weight across the six family strata and one null
+stratum and across the four conditions within a family. Fixing endpoint and
+weighting in advance prevents a later choice among raw profit, a ratio and a
+favorable mixture.
+
+\textbf{The three contrasts.} Three contrasts and two endpoints give six tests,
+Holm-corrected as one family, and Table~\ref{tab:ladder} holds their slots. C1 is arm 10 against arm 8: does verification earn
+its place, or is immediate activation enough? C2 is arm 10 against arm 6: does
+the typed hypothesis beat ephemeral numerical parameters at matched calls? C3 is
+arm 10 against arm 11: does it beat the strongest published method? C1 and C2 are
+mechanism contrasts and hold the trigger time, the information, the controller,
+the model, the decoding configuration and the realized call budget fixed, so the
+treatment is a single factor. C3 is not, and we do not present it as one, because
+arm 11 differs in timing, content and trust at once. Arm 2 is the registered
+secondary comparator for whether language is needed at all. Primary inference is
+two-sided paired randomization on per-seed differences after condition cells are
+aggregated within their seed, with seed-level cluster-bootstrap intervals and
+Wilcoxon tests as a secondary check, and every analysis not listed here is
+exploratory.
+
+\textbf{Three further reporting rules.} False activation and wrong-family
+activation occupy separate columns and are never merged, because the first is
+covered by Theorem~\ref{thm:activation} and the second has no theorem-backed
+bound. Forty main-table null rollouts cannot estimate a five percent error rate,
+so a separate bank of 1{,}300 episodes runs the complete pipeline: 1{,}000
+well-specified registered-model nulls across five strata, and 300 that violate
+those assumptions, reported separately and \emph{never} pooled with them. And
+because an earlier call opportunity must not be mistaken for evidence that a
+message meant something, every semantic-content comparison fixes the alert
+timestamp, the trigger trace hash and the call opportunity across five variants,
+while the early-warning comparison is a \emph{different estimand}. Efficiency
+reporting covers calls, repairs, rejections, tokens, latency quantiles, dated
+dollar cost and actions per accepted call, with profit-against-cost frontiers on
+\emph{realized} budgets. One always-online sweep is
+$720 \times 50 + 600 \times 47 = 64{,}200$ calls, roughly \$108 to \$217 at the
+dated primary price.
+\pending{activation ablation, null-audit calibration and fragility, content
+against timing, efficiency and frontiers, operational and hypothesis metrics,
+traced cases}

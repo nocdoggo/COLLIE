@@ -1,0 +1,133 @@
+%% main.tex -- COLLIE, IEEE UV 2026 submission draft.
+%%
+%% Venue: 8th IEEE International Conference on Universal Village (IEEE UV 2026).
+%% Format: IEEEtran conference class, two column, US Letter.
+%% Page budget and every other venue fact, with the URL it was verified at and
+%% the access date, are recorded in manuscript/README.md. Where a fact could not
+%% be verified, README.md names the assumption used instead.
+%%
+%% THIS IS AN INITIAL DRAFT. Experiments are still running. Every result cell,
+%% every arm score, and every contrast is marked with \pending{...} and is listed
+%% in the placeholder inventory in manuscript/README.md. Every substantive claim
+%% is traced to its evidence in manuscript/CLAIMS.md.
+
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+%%% --- required by IEEEtran ----------------------------------------------------
+\usepackage{cite}
+
+%%% --- encoding ----------------------------------------------------------------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+%%% --- math --------------------------------------------------------------------
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{bm}
+%% IEEEtran already defines \proof / \endproof, so amsthm must be told to take
+%% them over rather than error on a redefinition.
+\let\proof\relax
+\let\endproof\relax
+\usepackage{amsthm}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+
+%%% --- graphics and color ------------------------------------------------------
+\usepackage{graphicx}
+\graphicspath{{figures/}}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,calc,backgrounds,decorations.pathreplacing}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+%%% --- tables ------------------------------------------------------------------
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+
+%%% --- captions ----------------------------------------------------------------
+\usepackage{caption}
+\captionsetup[table]{font={footnotesize,sc},labelsep=period}
+\captionsetup[figure]{font={footnotesize},name={Fig.},labelsep=period}
+
+%%% --- microtype and refs -----------------------------------------------------
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+
+%%% --- the placeholder convention ---------------------------------------------
+%% Every number, figure datapoint, and result sentence that the experiments have
+%% not yet produced is wrapped in \pending. The convention is mandatory: a
+%% half-filled draft must be impossible to mistake for a finished one. Grep
+%% "pending" over manuscript/ and the count must match the inventory table in
+%% manuscript/README.md exactly.
+%%
+%% \pending is a TEXT command. It must never appear inside a math environment.
+\newcommand{\pending}[1]{\textcolor{red}{\textbf{[PENDING: #1]}}}
+%% Table cells that will receive a single scalar. Same convention, shorter.
+\newcommand{\pcell}{\textcolor{red}{\textbf{PENDING}}}
+
+%%% --- notation shorthands ----------------------------------------------------
+\newcommand{\Filt}{\mathcal{F}}
+\newcommand{\Ind}{\mathbb{1}}
+\newcommand{\Real}{\mathbb{R}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\Expect}{\mathbb{E}}
+\newcommand{\shockspec}{\textsc{ShockSpec}}
+\newcommand{\controlconfig}{\textsc{ControlConfig}}
+\newcommand{\alertspec}{\textsc{AlertSpec}}
+\newcommand{\eprocess}{e\nobreakdash-process}
+\newcommand{\evalue}{e\nobreakdash-value}
+\newcommand{\collie}{\textsc{Collie}}
+\newcommand{\evalpath}{\texttt{eval/}}
+\newcommand{\envpath}{\texttt{env.py}}
+
+\begin{document}
+
+%% No manual line breaks: IEEEtran centres and wraps a title better than a
+%% hand-chosen break, which rewrapped badly at this length.
+\title{Ask What Changed, Not What to Order: Typed Shock Hypotheses,
+Compiled into an Inventory Controller, Activated by an Anytime-Valid
+\eprocess{}}
+
+%% AUTHOR LINE, non-anonymous. Review is NOT blind: the IEEE UV 2026 call for
+%% papers (verified 2026-09-17, URL and quote in manuscript/README.md) contains
+%% no mention of blind or anonymous review, the venue's own annotated sample
+%% ships a full \author block with affiliations and emails, and the submission
+%% instructions distribute no anonymous style file. The names themselves are
+%% \pending{} because the author list is the submitting authors' to set.
+%%
+%% The call also asks submissions to carry no running headers or footers, no page
+%% numbering, and no blue underlining on URLs and email addresses. IEEEtran's
+%% conference mode already omits headers and page numbers, this file adds no
+%% fancyhdr block, and hyperref is loaded with [hidelinks] for the third.
+\author{\IEEEauthorblockN{\pending{author list}}
+\IEEEauthorblockA{\pending{affiliation}\\
+\pending{email}}}
+
+\maketitle
+
+\input{sections/abstract}
+
+\begin{IEEEkeywords}
+large language models, inventory control, operations research, anytime-valid
+inference, \eprocess{}, sequential change detection, agent evaluation
+\end{IEEEkeywords}
+
+\input{sections/intro}
+\input{sections/background}
+\input{sections/setup}
+\input{sections/method_spec}
+\input{sections/method_compile}
+\input{sections/method_verify}
+\input{sections/triggers_alerts}
+\input{sections/ladder_accounting}
+\input{sections/experiments}
+\input{sections/related}
+\input{sections/limitations}
+\input{sections/conclusion}
+
+\bibliographystyle{IEEEtran}
+\bibliography{refs}
+
+\end{document}

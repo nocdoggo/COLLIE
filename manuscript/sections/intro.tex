@@ -1,0 +1,82 @@
+\section{Introduction}
+
+Retailers are already asking language models what to order. On InventoryBench, a
+benchmark of 1{,}320 multi-period lost-sales replenishment instances, the
+strongest published language-model strategy reaches a normalized reward of
+$0.5380$ against $0.4447$ for the operations research policy it is asked to
+improve~\cite{inventorybench}. That gap is why the approach is taken seriously.
+It is also uninterpretable: the published strategy calls the model once per
+period, lets it name an order quantity outright, and applies that quantity with
+no test of whether the model was right, so three decisions are welded into one
+design and the reported gain cannot be assigned to any of them.
+
+Reproducing the baseline made this worse. Our arm~1 reimplements the published
+capped base-stock policy and matches all 1{,}320 published order sequences bit
+for bit, so it is the same policy rather than an approximation of one. Under the
+benchmark's authoritative submission path that policy scores $0.5208$, not
+$0.4447$, because the published figure came from the benchmark's legacy
+simulator, which keeps a lost shipment visible in in-transit inventory forever
+and so makes the baseline under-order after every loss. The motivating evidence
+is therefore both bundled and partly artifactual, and the useful question is not
+whether a language model helps on average but which of the three decisions does
+the work.
+
+\subsection*{The thesis}
+
+A language model should not be asked what to order. It should be asked what
+changed, once, in a vocabulary the system fixed in advance, and it should be
+believed only after the data says so.
+
+\collie{} implements that in three stages. A shared trigger decides \emph{when}:
+an alert or a calibrated detector opens a proposal opportunity, a refractory
+window suppresses repeats, and at most two proposals are permitted per episode. A
+closed schema decides \emph{what}: at the proposal period $\tau_j$ the model
+returns a \shockspec{}, a typed claim about the exogenous process drawn from a
+registered vocabulary of families, directions, onset windows, magnitude bins and
+durations, and it cannot write an order, a threshold, a likelihood, a falsifier,
+or code. An anytime-valid \eprocess{} decides \emph{whether}: the hypothesis is
+frozen at $\tau_j$ and influences no order until evidence arriving strictly after
+$\tau_j$ drives the process above $1/\alpha_j$, and until then a deterministic
+compiler is the only thing that ever touches the baseline controller's
+parameters. Our notes name the design axis in one line: compile shocks, or always
+inventory. Either the model's reading of an exception is compiled once into the
+controller and then defended by prospective evidence, or the model is asked what
+to order, every period, forever.
+
+\input{figures/fig1_pipeline}
+
+One episode threads through the paper. A planner is told that a carrier has
+suspended outbound scans on a lane and that containers booked over the last week
+may not arrive at all. This is family~5 of our generator, a lost-shipment burst in
+which orders dispatched in one to three consecutive periods are never delivered,
+and it is a hard case on purpose: the demand stream is untouched, so the
+calibrated detector fires at its null rate and the shortfall shows up in
+telemetry only as an arrival that does not happen. Text is the only early signal,
+and a wrong reading of it is expensive in both directions.
+
+\subsection*{Contributions}
+
+\begin{itemize}\itemsep0pt
+\item \textbf{An audited testbed, and a divergence finding.} Our runner matches
+      the official pipeline with a maximum absolute difference of exactly $0.0$
+      over 648 comparisons, and arm~1 reproduces every published baseline order
+      sequence bit for bit, which is how we established that the published score
+      belongs to the legacy simulator (Section~\ref{sec:background}).
+\item \textbf{\shockspec{} and its compiler.} A closed, frozen, typed vocabulary
+      for what changed, plus a total deterministic map from a hypothesis to one
+      point of a 72 configuration grid over a capped base-stock controller
+      (Sections~\ref{sec:spec}, \ref{sec:compile}).
+\item \textbf{Per-episode anytime-valid activation.} A discrete-mixture
+      likelihood-ratio \eprocess{} started strictly after the proposal, with
+      budget $\alpha_j = \alpha\,2^{-j}$ over at most two proposals, a
+      family-by-family validity statement, and one explicitly prohibited shortcut
+      (Section~\ref{sec:verify}).
+\item \textbf{An eleven-rung ladder with honest cost accounting,} in which arms
+      8, 9 and 10 share one physical set of proposal calls, so a difference
+      between them cannot be a difference in calls (Section~\ref{sec:ladder}).
+\end{itemize}
+
+This draft is written against a running experiment, so every result cell is
+marked \pending{} and inventoried, and Section~\ref{sec:notclaim} states the
+single guarantee the system certifies and enumerates the readings of it that are
+wrong.

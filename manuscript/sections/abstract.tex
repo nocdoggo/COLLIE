@@ -1,0 +1,24 @@
+\begin{abstract}
+A language model can be attached to a deployed replenishment controller in three
+separable ways: by changing \emph{when} it is consulted, \emph{what} it may say,
+and \emph{when} its answer is trusted. Published agentic inventory systems change
+all three at once, so no reported gain can be attributed to any of them. We
+separate the three. \collie{} consults a frozen language model only at rare
+trigger moments, and the model may return only a typed hypothesis about the
+exogenous process, a \shockspec{}, drawn from a closed vocabulary of six shock
+families and frozen at the proposal period. A deterministic compiler maps that
+hypothesis onto one point of a 72 configuration grid for a capped base-stock
+controller, which computes every order, and the hypothesis influences orders only
+after an anytime-valid \eprocess{} started strictly after the proposal crosses
+the Ville threshold $1/\alpha_j$ under the geometric budget
+$\alpha_j = \alpha\,2^{-j}$ over at most two proposals per episode. The resulting
+guarantee is a model-conditional, anytime-valid, per-episode false-activation
+bound, and we state explicitly what it does not cover. The testbed is an audited
+reimplementation of InventoryBench whose accounting matches the official pipeline
+exactly and whose operations research baseline reproduces all 1{,}320 published
+order sequences bit for bit. That reproduction surfaced a harness divergence: the
+published baseline score of $0.4447$ belongs to the legacy simulator, while the
+same policy scores $0.5208$ under the authoritative submission path. We evaluate
+an eleven-rung arm ladder with physical and charged call accounting kept
+separate. \pending{headline result}
+\end{abstract}

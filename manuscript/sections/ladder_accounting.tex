@@ -1,0 +1,79 @@
+\section{The Arm Ladder and Honest Accounting}
+\label{sec:ladder}
+
+What cheaper thing would have worked just as well? Every rung in
+Table~\ref{tab:ladder} is one answer, stated as a reviewer would state it, and
+the rung above it is what remains once the answer is removed. The same table
+carries the headline result slots, so the objection and the number that answers
+it sit on one line.
+
+\begin{table*}[!t]
+\caption{The ladder and the headline result slot in one place. Each rung names
+the objection it answers, and its three cells are the pre-built slots the sweep
+will fill: stratum-weighted estimates on the submission harness with seed-level
+cluster-bootstrap intervals over the independent unit. The last three rows are
+the six confirmatory tests, Holm-corrected as one family.}
+\label{tab:ladder}
+\centering
+\scriptsize
+\begin{tabular}{@{}r@{~}p{0.175\textwidth}p{0.235\textwidth}ccc@{}}
+\toprule
+\# & Arm & Objection it answers & Profit & Lost sales & Norm.\ reward \\
+\midrule
+1  & capped base-stock & the published baseline & \pcell & \pcell & \pcell \\
+2  & telemetry-only adaptive & a changepoint detector would do this & \pcell & \pcell & \pcell \\
+3  & every-period direct action & just let the model order & \pcell & \pcell & \pcell \\
+4  & triggered direct action & the gain is from calling less often & \pcell & \pcell & \pcell \\
+5  & every-period parameters & the gain is from the OR layer & \pcell & \pcell & \pcell \\
+6  & sparse ephemeral parameters & the gain is from sparsity & \pcell & \pcell & \pcell \\
+7  & persistent parameters, fixed expiry & the gain is from persistence & \pcell & \pcell & \pcell \\
+8  & \shockspec{}, immediate & the gain is from typing the hypothesis & \pcell & \pcell & \pcell \\
+9  & \shockspec{}, heuristic rollback & a heuristic guard would do & \pcell & \pcell & \pcell \\
+10 & \shockspec{}, \eprocess{} & \textbf{the contribution} & \pcell & \pcell & \pcell \\
+11 & every-period recommendation, then model & the strongest published method & \pcell & \pcell & \pcell \\
+\midrule
+   & CUSUM to compiler & does telemetry alone suffice & \pcell & \pcell & \pcell \\
+   & keyword parser & does reading the message need a model & \pcell & \pcell & \pcell \\
+   & \alertspec{} upper bound & ceiling for perfect parsing & \pcell & \pcell & \pcell \\
+   & oracle headroom & ceiling the compiler can reach at all & \pcell & \pcell & \pcell \\
+\midrule
+   & C1, arm 10 vs arm 8 & does verification earn its place & \pcell & \pcell & \\
+   & C2, arm 10 vs arm 6 & does typing beat ephemeral parameters & \pcell & \pcell & \\
+   & C3, arm 10 vs arm 11 & does it beat the best published method & \pcell & \pcell & \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+Arms 3, 5 and 11 reproduce the benchmark's own three language-model strategies on
+a prompt builder asserted byte-identical to the published agent's prompt at the
+same state, which is what makes arm 3 a fair representation of the existing
+approach rather than a strawman. Arm 7's expiry equals the frozen refractory
+window, so it measures persistence rather than a longer invocation budget, and
+arms 4 and 6 are matched to arms 3 and 5 on \emph{realized} calls.
+Arm 9's guard is real: an observation contradicts the spec when it lands more than
+one baseline standard deviation on the wrong side of the pre-proposal baseline
+mean for the spec's direction, and two consecutive contradictions refute it. Four
+further arms route through the identical compiler and controller, so a difference
+between any two is a difference in what reached it: a detector, a keyword parser,
+the hidden \alertspec{} as the perfect-parsing ceiling, and an oracle
+\shockspec{} as the headroom bound. Only the last two may read hidden truth.
+
+Arms 8, 9 and 10 build the same proposal prompt at the same decision point and
+differ only in the injected activation policy, and the cache collapses those to
+one physical request with one charged copy per arm. Two tests carry the design:
+one asserts that the physical call set is shared, the other asserts
+\emph{divergence}, that identical proposals produce different activation traces.
+If they did not, the activation stage would be doing nothing.
+
+\textbf{Physical against charged.} Every cost claim depends on this. A
+\emph{physical} entry is what the provider saw, one per real request, and a
+\emph{charged} entry is what an arm would have paid, one per arm per call it would
+have made, including calls served from cache. Arms 8, 9 and 10 sharing one
+proposal call therefore produce one physical and three charged entries, and
+$\text{physical} \le \sum_{\text{arms}} \text{charged}$ becomes a property of the
+books, asserted over random arm sets. Every attempted call is classified exactly
+once when the arm settles it, an unsettled charged entry fails a conservation
+check, and dated cost is computed at log time from the registered price table. The configuration is cloud-only, with a hosted Gemini
+Flash endpoint as the primary at \$0.75 per million input and \$3.75 per million
+output tokens including thinking tokens, retrieved 2026-09-06, and a different
+provider for confirmation.

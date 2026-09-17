@@ -1,0 +1,15 @@
+# LaTeX build intermediates. main.pdf is tracked on purpose: it is the
+# reviewable deliverable, and a reader without TeX Live 2026 should not have to
+# build it to read the draft. Regenerate everything here with `make`.
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.out
+*.synctex.gz
+*.toc
+__pycache__/
+
+# Written by the filecontents block in figures/fig2_frontier.tex.
+frontier_pending.dat

@@ -1,0 +1,157 @@
+\section{Verified Activation}
+\label{sec:verify}
+
+When may a frozen hypothesis touch an order? Only when observations that arrived
+after it was written down have paid for the privilege.
+
+\subsection{Construction and theorem}
+
+The model chooses $h_j$ \emph{because} something looked unusual, and reusing the
+periods that motivated the choice as confirming evidence would make the apparent
+evidence an artifact of selection, and (A3) and (A4) remove that. For a
+proposal $j$ with registered null $p_0$ and alternative region $\Theta_j$,
+\begin{equation}
+E_{j,t} \;=\; \int_{\Theta_j}
+\prod_{r=\tau_j+1}^{t}
+\frac{p_{h_j,\theta}\bigl(Y_r \mid \Filt_{r-1}, A_{r-1}\bigr)}
+     {p_0\bigl(Y_r \mid \Filt_{r-1}, A_{r-1}\bigr)}
+\; dW_j(\theta),
+\label{eq:eprocess}
+\end{equation}
+with $E_{j,\tau_j} = 1$ by the empty-product convention. Two facts
+make~\eqref{eq:eprocess} an \eprocess{} started at $\tau_j$~\cite{ramdas-savi,
+e-detectors}. \textbf{(F1) Unit conditional mean:} for fixed $\theta$ the ratio has conditional
+expectation one under the null, because the expectation integrates it against
+$p_0$ and leaves $\int p_{h,\theta}\, d\mu = 1$, which needs only a common
+dominating measure and $p_0 > 0$ wherever $p_{h,\theta} > 0$, and we check that
+shared support rather than assume it. \textbf{(F2) Mixing preserves the property:} the
+fixed-$\theta$ product is a nonnegative martingale with unit initial value, a
+test martingale, and a mixture over $\theta$ with prior $W_j$ is again one by
+Fubini, which handles a composite alternative without estimating $\theta$ from
+the data being tested.
+
+(F1) is where the closed loop is handled, because it holds \emph{whatever policy
+generated} $A_{r-1}$, including one that reacts to $E_{j,t}$ itself, so an
+adaptive, self-referential controller does not invalidate the test. That is why
+the design insists actions be predictable. One implementation detail is easy to
+get wrong: with $W_j$ discrete on a registered grid, the mixture sits
+\emph{outside} the product, so each component carries its own cumulative ratio
+and the prior averages component wealth. Multiplying period-wise mixture averages
+would define a different process.
+
+Ville's inequality bounds a nonnegative supermartingale $M$ with $M_0 = 1$ by
+$\Prob(\sup_t M_t \ge 1/\alpha) \le \alpha$~\cite{ville}. Index proposals within
+episode $e$ by $j = 1, 2, \dots$, allocate $\alpha_j = \alpha\, 2^{-j}$, and
+activate proposal $j$ at the first $t$ with $E_{j,t} \ge 1/\alpha_j$.
+
+\begin{theorem}
+\label{thm:activation}
+Under the registered global no-change null, with (A1) through (A4) and (F1),
+(F2),
+$\Prob_0(\text{any false activation in episode } e)
+\le \sum_j \alpha_j \le \alpha \sum_{j \ge 1} 2^{-j} = \alpha$.
+\end{theorem}
+
+Each $E_{j,\cdot}$ is a unit-initial nonnegative martingale, so Ville bounds its
+own crossing probability by $\alpha_j$, and a union bound with
+$\sum_{j\ge1} 2^{-j} = 1$ gives the result. The allocation is why the proposal
+index is one-based: an index of zero would spend the whole budget on the first
+proposal.
+
+\subsection{Arrivals, and the one prohibited shortcut}
+
+Only the aggregate receipt is observed, and many shipment-level histories are
+consistent with the same receipt sequence, so \emph{assuming} first-in-first-out
+order would inject an assumption as if it were data. The controller's imputed
+ledger is a control convenience only and the verifier marginalizes instead, which
+is enforced rather than documented: the ledger's symbols are unreachable from the
+verifier by a static check and a runtime input-graph assertion. Our own dispatch
+quantities are known exactly, so the only latent quantity is each outstanding
+order's transit realization, and the state is the vector of remaining transit
+times of outstanding cohorts, truncated at $L_{\max}$ with a lost outcome
+absorbing, giving at most $1296$ states for $L_{\max} = 4$. A forward recursion
+over that state returns the \emph{exact} conditional density of the receipt, so
+(F1) applies verbatim, with exactness checked per family against brute force.
+
+Compound shocks need one more rule, because the generator's
+conditional-independence flag is false there. Where the contract makes
+independence explicit a registered \emph{joint} conditional likelihood may be
+used. Otherwise we run two separate \eprocess{}es with an explicit prior split of
+the budget, and Theorem~\ref{thm:activation} applies with the finer partition,
+because the union bound is indifferent to how the budget is subdivided in
+advance. Multiplying marginal likelihood ratios when independence is not part of
+the contract is \textbf{prohibited}: under dependence the product is not the
+ratio of joint densities, its conditional mean need not be one, (F1) fails, and
+the bound is void with no visible symptom. The joint code path is therefore
+asserted unreachable whenever the flag is false, since an assertion is the only
+defense that survives a refactor.
+
+\subsection{Validity, lifecycle, and what we do not claim}
+\label{sec:notclaim}
+
+A registered validity status accompanies every family and the code is asserted to
+agree with it, so a disagreement is a test failure. The two demand families use
+the mixture ratio and are anytime-valid, with the pulse underpowered by
+construction. The three arrival families and the compound family use the forward
+recursion, with a budget split for the compound case, and are anytime-valid
+\emph{on our own episodes only}, since the official lead-time law's probabilities
+are unpublished and a null with unknown parameters is not a registered null. The
+censored observation model and the plug-in variant are empirical only, the first
+pending derivation and the second permanently, because re-estimating $p_0$ from
+the stream being tested makes the null data-dependent and (F1) fails. The plug-in
+variant is implemented anyway, labeled as carrying no finite-sample guarantee.
+
+%% PAGE BUDGET: the per-family validity table below is preserved verbatim but
+%% commented out, because the venue's 8-page limit does not fit it alongside the
+%% compiler table, the ladder and the result slots. Its content is stated in the
+%% prose immediately above. Uncomment it for any longer version of this paper.
+%% manuscript/README.md records this as a deliberate layout decision.
+%% \begin{table}[!tb]
+%% \caption{Registered construction and validity per family. Arrival-side status is
+%% restricted because the official stochastic lead-time law's probabilities are
+%% unpublished, so on official instances there is no registered null.}
+%% \label{tab:validity}
+%% \centering
+%% \footnotesize
+%% \begin{tabular}{@{}p{0.22\columnwidth}p{0.24\columnwidth}p{0.38\columnwidth}@{}}
+%% \toprule
+%% Family & Construction & Status \\
+%% \midrule
+%% \texttt{demand\_level}, \texttt{temporary\_pulse} & mixture ratio, one-sided or
+%%   bounded-duration shift & anytime-valid; the pulse is underpowered by
+%%   construction \\
+%% \texttt{lead\_time\_shift}, \texttt{shipment\_loss},
+%%   \texttt{transit\_pause}, \texttt{compound} & forward recursion, plus a budget
+%%   split for \texttt{compound} & anytime-valid on our own episodes only; the joint
+%%   path is forbidden \\
+%% censored sales, plug-in null & law for sales given availability; null
+%%   re-estimated online & empirical only, the first pending derivation and the
+%%   second permanently \\
+%% \bottomrule
+%% \end{tabular}
+%% \end{table}
+
+A hypothesis is \texttt{proposed} on arrival and influences nothing, becomes
+\texttt{active} only on an activation point from the \eprocess{}, and is
+\texttt{refuted}, \texttt{expired} or \texttt{superseded} by registered
+operational rules. Only the transition into \texttt{active} is covered by the
+theorem, so exactly one guarantee is certified: arm~10's activation rule is
+model-conditional, anytime-valid and per-episode. \emph{Model-conditional} means
+it presumes the registered $p_0$ is the true conditional law of the exposed
+observable, so it is a statement within a model and not a distribution-free one.
+\emph{Anytime-valid} means it holds at all stopping times simultaneously, so
+continuous monitoring and optional stopping are permitted. \emph{Per-episode}
+means the union bound runs over proposals within one episode.
+
+Nothing else is guaranteed. It is not dataset-wide family-wise control. It is not
+a safety guarantee, because activation being rare under the null says nothing
+about loss magnitude when activation does occur. It is not a profit guarantee,
+because an activated correct hypothesis can still lose money through a bad
+control mapping. It is not a bound on wrong-family activation: activating
+\texttt{transit\_pause} when a \texttt{shipment\_loss} is genuinely present is
+not a null event, so we report that as an empirical metric. It says nothing about
+refutation or expiry, and it does not extend to arrival-side families on official
+instances, to the censored observation model, or to the plug-in variant. We claim priority on no
+ingredient either: not the first event-triggered language model, not the first
+falsifiable commitment, not the first language-model-to-operations-research
+interface, and not a certified inventory agent.
