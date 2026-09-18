@@ -72,7 +72,29 @@ With those, the R4 repair loop lives in the arm (parse → one repair prompt via
 `parse_shockspec` as the convenience path, both tested. Add runtime conformance tests in the
 style of `tests/test_control_mapping.py::test_grid_compiler_satisfies_the_spec_compiler_protocol`.
 
-## 5. Hygiene
+## 5. Rename `tests/test_spec_verifier_contract.py` (new since the first review)
+
+Module 05's branch carries a file with the same name, and *its* name is prescribed by module
+05's brief (it appears verbatim in the Checkpoint 2 audit command), so yours is the one that
+moves. Suggested: `tests/test_spec_lifecycle_contract.py` — yours is the parser-side contract
+against the verifier/lifecycle seam. Keep every guard and assertion; only the filename
+changes. Do this in the same commit as your merge of `main` so the collision never exists on
+any merged tree.
+
+## 6. The pairing registry now has a dated decision behind it (2026-09-18)
+
+The module 04/05 key fork was settled (prereg/deviations.md, 2026-09-18): the compiler's
+`predictive_model` is descriptive metadata, the verifier keys constructions off the spec's
+(family, signature), and the joint invariant is a compatibility test. Consequences for you:
+
+- Your `legal_pairs()` registry is the **only** remaining vote on the legal shape space —
+  module 04 guessed 8 canonical shapes, module 05 registered 7, and they disagree on whether
+  `TEMPORARY_PULSE` with `DEMAND_DOWN` is expressible. Settle it in your registry with a
+  rationale line in your research notes; both sides will conform to your answer.
+- Once your registry lands, the compatibility test (module 05's side) and the tier-2 closure
+  removal (module 04's side) both re-derive from it.
+
+## 7. Hygiene
 
 - Translate the one remaining Chinese comment in `tests/test_prompt_legality.py`.
 - Tick the 12.x checkboxes in `.kiro/specs/collie-shockspec-interface/tasks.md` as you finish
