@@ -107,7 +107,15 @@ class ImmediateActivation:
         self._spec = spec
         self._state = LifecycleState.ACTIVE
 
-    def observe(self, period: int, value: float) -> LifecycleState:
+    def observe(
+        self,
+        period: int,
+        demand: float,
+        *,
+        dispatch: float | None = None,
+        receipt: float | None = None,
+    ) -> LifecycleState:
+        del demand, dispatch, receipt  # immediate activation never looks at evidence
         return self._state
 
     @property
@@ -152,11 +160,19 @@ class HeuristicRollbackActivation:
         self._state = LifecycleState.ACTIVE
         self._streak = 0
 
-    def observe(self, period: int, value: float) -> LifecycleState:
+    def observe(
+        self,
+        period: int,
+        demand: float,
+        *,
+        dispatch: float | None = None,
+        receipt: float | None = None,
+    ) -> LifecycleState:
+        del dispatch  # the rollback guard tests residuals, not the order book
         if self._state is not LifecycleState.ACTIVE:
             return self._state
         assert self._spec is not None and self._baseline is not None
-        if self._contradicts(value):
+        if self._contradicts(demand, receipt):
             self._streak += 1
         else:
             self._streak = 0
@@ -164,17 +180,19 @@ class HeuristicRollbackActivation:
             self._state = LifecycleState.REFUTED
         return self._state
 
-    def _contradicts(self, value: float) -> bool:
-        """Whether ``value`` speaks against the spec's claimed direction."""
+    def _contradicts(self, demand: float, receipt: float | None) -> bool:
+        """Whether the spec-relevant channel speaks against the claimed direction."""
         assert self._spec is not None and self._baseline is not None  # observe() gates this
         mean, std = self._baseline
         direction = self._spec.direction
         if direction is Direction.DEMAND_UP:
-            return value < mean - CONTRADICTION_Z * std
+            return demand < mean - CONTRADICTION_Z * std
         if direction is Direction.DEMAND_DOWN:
-            return value > mean + CONTRADICTION_Z * std
+            return demand > mean + CONTRADICTION_Z * std
         if direction in (Direction.ARRIVAL_DELAYED, Direction.ARRIVAL_INTERRUPTED):
-            return value > mean + CONTRADICTION_Z * std
+            if receipt is None:
+                raise ValueError("an arrival-direction rollback needs the receipt channel")
+            return receipt > mean + CONTRADICTION_Z * std
         return False  # none/mixed directions: the guard stays silent
 
     @property
@@ -190,9 +208,9 @@ class HeuristicRollbackActivation:
 class EProcessActivation:
     """Arm 10's policy: defer to the injected verifier (FakeVerifier today, module 05 later).
 
-    The verifier's interface — ``register(spec)``, ``observe(period, value) -> LifecycleState``,
-    ``is_active``, ``reset()`` — is deliberately the future-only one: the e-process may only
-    see ``Y_r`` for ``r > tau_j``.
+    The verifier's interface — ``register(spec)``, ``observe(period, demand, *, dispatch,
+    receipt) -> LifecycleState``, ``is_active``, ``reset()`` — is deliberately the future-only
+    one: the e-process may only see ``Y_r`` for ``r > tau_j``.
     """
 
     verifier: object  # FakeVerifier-shaped; typed as object so module 05 drops in unchanged
@@ -204,8 +222,15 @@ class EProcessActivation:
         del baseline  # the e-process carries its own evidence; baseline stats are not its input
         self.verifier.register(spec)
 
-    def observe(self, period: int, value: float) -> LifecycleState:
-        return self.verifier.observe(period, value)
+    def observe(
+        self,
+        period: int,
+        demand: float,
+        *,
+        dispatch: float | None = None,
+        receipt: float | None = None,
+    ) -> LifecycleState:
+        return self.verifier.observe(period, demand, dispatch=dispatch, receipt=receipt)
 
     @property
     def is_active(self) -> bool:
@@ -308,26 +333,24 @@ class ShockSpecArm:
     # -- internals -----------------------------------------------------------
 
     def _lifecycle_step(self, obs: PeriodObservation) -> LifecycleState | None:
-        """Feed the evidence stream, strictly post-tau. Returns the current lifecycle state."""
+        """Feed the evidence stream, strictly post-tau. Returns the current lifecycle state.
+
+        All three channels of the evidence period go through; which of them a policy tests is
+        the policy's business, decided by the registered spec's construction — the arm does
+        not pre-select a stream.
+        """
         if not self._specs:
             return None
         latest = self._specs[-1]
         evidence_period = obs.period - 1
         if evidence_period <= latest.tau_j:
             return self.activation.state
-        value = self._evidence_value(latest, evidence_period)
-        return self.activation.observe(evidence_period, value)
-
-    def _evidence_value(self, spec: ShockSpec, evidence_period: int) -> float:
-        """The scalar the policy tests: demand or arrivals by the spec's target stream.
-
-        ``BOTH`` feeds the demand side; the joint-stream evidence construction is module 05's
-        (the compound family's ``conditional_independence`` flag governs that branch, not this
-        arm). ``history.demands[r - 1]`` holds period ``r``'s demand (likewise arrivals).
-        """
-        if spec.target_stream is TargetStream.ARRIVAL:
-            return self._history.arrivals[evidence_period - 1]
-        return self._history.demands[evidence_period - 1]
+        return self.activation.observe(
+            evidence_period,
+            self._history.demands[evidence_period - 1],
+            dispatch=self._history.dispatch_at(evidence_period),
+            receipt=self._history.arrivals[evidence_period - 1],
+        )
 
     def _maybe_propose(self, obs: PeriodObservation) -> bool:
         """One proposal call if the trigger fires. Returns whether a call was made."""

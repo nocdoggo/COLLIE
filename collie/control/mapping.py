@@ -317,10 +317,11 @@ class GridCompiler:
       means longer than what is running, not the reference-anchored point the instance
       already sits at.
 
-    ``predictive_model`` stays the registered key of the absolute grid point: it names the
-    *hypothesis* the verifier will test, which is instance-independent, so it is deliberately
-    not recomputed from the composed axes. Arms never import this module — the harness wires
-    one instance in (``tests/conftest.py``).
+    ``predictive_model`` stays the label of the absolute grid point the mapping selected: it
+    records the tier-1 belief *before* composition, which is instance-independent, so it is
+    deliberately not recomputed from the composed axes. The verifier derives the hypothesis it
+    tests from the spec itself, never from this label (prereg/deviations.md, 2026-09-18).
+    Arms never import this module — the harness wires one instance in (``tests/conftest.py``).
     """
 
     def compile(self, spec: ShockSpec, *, current: ControlConfig) -> ControlConfig:

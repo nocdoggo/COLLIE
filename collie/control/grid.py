@@ -11,7 +11,10 @@ verified in complete isolation: enumerate the 72 points, and check they are dist
 produces has exactly 72 elements rather than ``72 * len(keys)``. The categories fall out of
 comparing ``(m, l_eff, gamma)`` against the baseline point rather than being hand-assigned,
 which is what keeps this module honest about not encoding per-family knowledge that belongs in
-``mapping.py``.
+``mapping.py``. The key is *descriptive metadata* about the controller's compiled belief:
+module 05's verifier derives its construction from the ``ShockSpec`` itself, and the joint
+invariant is a compatibility relation between the two (prereg/deviations.md, 2026-09-18),
+not a key lookup.
 """
 
 from __future__ import annotations
@@ -60,12 +63,14 @@ BASELINE_PREDICTIVE_MODEL = "stationary"
 
 
 def predictive_model_for(m: float, l_eff: int, gamma: float) -> str:
-    """The verifier-construction key for one grid point, derived from the point alone.
+    """The belief-category label for one grid point, derived from the point alone.
 
     Two flags, each computed against the baseline: whether the compiled belief moves demand, and
-    whether it moves the supply side (and how). Their cross product is the full registered key
-    space. Module 05's construction registry resolves every key this produces
-    (``test_predictive_model_key_resolves_in_verifier_registry``, joint with P4).
+    whether it moves the supply side (and how). Their cross product is the full label space.
+    The label describes the *controller's* posture; module 05's verifier selects its
+    construction from the ``ShockSpec`` (family, signature), and the joint test asserts the
+    two are compatible for every legal spec — it does not look constructions up by this key
+    (prereg/deviations.md, 2026-09-18).
     """
     if m == BASELINE_M:
         demand = "neutral"
@@ -103,8 +108,9 @@ def all_configs() -> tuple[ControlConfig, ...]:
 
 
 def predictive_model_keys() -> frozenset[str]:
-    """Every key reachable from the grid. Module 05 must resolve all of them, and no more may
-    exist than the grid can produce (the second half of the joint invariant in 05's doc)."""
+    """Every label reachable from the grid. Module 05's joint consistency test checks that
+    each of these is compatible with at least one verifier construction (and that no
+    construction is unreachable from the compiler's label space)."""
     return frozenset(c.predictive_model for c in all_configs())
 
 

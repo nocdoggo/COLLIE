@@ -73,7 +73,8 @@ def test_activation_policies_match_the_protocol_signature() -> None:
     )
     from collie.fakes import FakeVerifier
 
-    declared = inspect.signature(ActivationPolicy.register).parameters
+    declared_register = inspect.signature(ActivationPolicy.register).parameters
+    declared_observe = inspect.signature(ActivationPolicy.observe).parameters
     mismatches: list[str] = []
     for impl in (
         ImmediateActivation,
@@ -81,12 +82,14 @@ def test_activation_policies_match_the_protocol_signature() -> None:
         EProcessActivation,
         FakeVerifier,
     ):
-        actual = inspect.signature(impl.register).parameters
-        if set(declared) != set(actual):
-            mismatches.append(
-                f"{impl.__name__}.register{inspect.signature(impl.register)} "
-                f"!= Protocol register{inspect.signature(ActivationPolicy.register)}"
-            )
+        for method, declared in (("register", declared_register), ("observe", declared_observe)):
+            actual = inspect.signature(getattr(impl, method)).parameters
+            if set(declared) != set(actual):
+                protocol_sig = inspect.signature(getattr(ActivationPolicy, method))
+                mismatches.append(
+                    f"{impl.__name__}.{method}{inspect.signature(getattr(impl, method))} "
+                    f"!= Protocol {method}{protocol_sig}"
+                )
     assert not mismatches, "activation policies diverge from their Protocol:\n  " + "\n  ".join(
         mismatches
     )
