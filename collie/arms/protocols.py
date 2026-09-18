@@ -118,8 +118,24 @@ class ActivationPolicy(Protocol):
         """
         ...
 
-    def observe(self, period: int, value: float) -> LifecycleState:
-        """Feed one post-proposal observation; return the resulting lifecycle state."""
+    def observe(
+        self,
+        period: int,
+        demand: float,
+        *,
+        dispatch: float | None = None,
+        receipt: float | None = None,
+    ) -> LifecycleState:
+        """Feed one post-proposal period of evidence; return the lifecycle state.
+
+        Three channels, all observable, all indexed by ``period``: ``demand`` is the period's
+        (uncensored) demand; ``dispatch`` is the arm's own order sent at ``period`` — known
+        before that period's receipt is observed, per the runner's event order; ``receipt``
+        is the arrivals during ``period``. A demand-side policy reads ``demand``; an
+        arrival-side construction needs ``(dispatch, receipt)``; a compound needs all three.
+        ``None`` means the channel was not supplied, and a policy that needs it must raise
+        rather than silently degrade.
+        """
         ...
 
     @property

@@ -189,8 +189,9 @@ from collie.fakes import (
   class holds ready payloads including malformed, fenced, prose-wrapped, extra-field, and
   smuggled-`threshold` outputs. Module 02 should fail against every one of them before it sees a real
   model.
-- **`FakeVerifier`** exposes `register(spec)`, `observe(period, value) -> LifecycleState`,
-  `is_active`, `activation_delay`. Enough to build arms 8-10 before module 05 lands.
+- **`FakeVerifier`** exposes `register(spec)`,
+  `observe(period, demand, *, dispatch, receipt) -> LifecycleState`, `is_active`,
+  `activation_delay`. Enough to build arms 8-10 before module 05 lands.
 - **`fixture_episode(family)`** returns a `FixtureEpisode` with a 20-period horizon, onset at 10,
   base demand 100, sigma 10. Hidden truth is returned **alongside** the observable episode, never
   inside it, so a test that leaks hidden state into a controller fails the isolation walk instead of

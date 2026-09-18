@@ -379,22 +379,46 @@ def test_rollback_guard_direction_branches() -> None:
     """Every direction branch of the guard: demand_down, arrival interruption, and silence."""
     down = HeuristicRollbackActivation()
     down.register(_spec(direction=Direction.DEMAND_DOWN), baseline=(10.0, 1.0))
-    assert not down._contradicts(5.0)  # a drop AGREES with demand_down
-    assert down._contradicts(15.0)  # a surge contradicts it
+    assert not down._contradicts(5.0, None)  # a drop AGREES with demand_down
+    assert down._contradicts(15.0, None)  # a surge contradicts it
 
     arrival = HeuristicRollbackActivation()
     arrival.register(_spec(direction=Direction.ARRIVAL_INTERRUPTED), baseline=(3.0, 1.0))
-    assert not arrival._contradicts(0.0)  # no arrivals AGREES with an interruption
-    assert arrival._contradicts(9.0)  # a fat arrival contradicts it
+    assert not arrival._contradicts(0.0, 0.0)  # no arrivals AGREES with an interruption
+    assert arrival._contradicts(0.0, 9.0)  # a fat arrival contradicts it
 
     silent = HeuristicRollbackActivation()
     silent.register(_spec(direction=Direction.NONE), baseline=(10.0, 1.0))
-    assert not silent._contradicts(0.0)
-    assert not silent._contradicts(999.0)
+    assert not silent._contradicts(0.0, None)
+    assert not silent._contradicts(999.0, None)
+
+
+def test_rollback_guard_reads_the_receipt_channel_not_the_demand_channel() -> None:
+    """An arrival-direction spec is refuted by a receipt spike with calm demand, and is
+    deaf to a demand spike with calm receipts — the channels must not be crossed."""
+    arrival = HeuristicRollbackActivation()
+    arrival.register(_spec(direction=Direction.ARRIVAL_INTERRUPTED), baseline=(3.0, 1.0))
+    for i in range(CONTRADICTION_PERIODS):
+        arrival.observe(6 + i, 999.0, receipt=9.0)  # demand screams, receipts confirm anyway
+    assert arrival.state is LifecycleState.REFUTED
+
+    undisturbed = HeuristicRollbackActivation()
+    undisturbed.register(_spec(direction=Direction.ARRIVAL_INTERRUPTED), baseline=(3.0, 1.0))
+    for i in range(CONTRADICTION_PERIODS):
+        undisturbed.observe(6 + i, 999.0, receipt=0.0)  # demand spike, receipts quiet
+    assert undisturbed.state is LifecycleState.ACTIVE
+
+
+def test_rollback_guard_raises_when_the_receipt_channel_is_missing() -> None:
+    """A missing channel is a loud error, never a silently skipped check."""
+    arrival = HeuristicRollbackActivation()
+    arrival.register(_spec(direction=Direction.ARRIVAL_INTERRUPTED), baseline=(3.0, 1.0))
+    with pytest.raises(ValueError, match="receipt channel"):
+        arrival.observe(6, 5.0)
 
 
 def test_arrival_stream_spec_feeds_the_arrival_evidence(tmp_path) -> None:
-    """An arrival-targeted spec reads the arrival stream for both evidence and baseline."""
+    """An arrival-targeted spec draws its baseline statistics from the arrival stream."""
     payload = ProposalPayload(
         target_stream=TargetStream.ARRIVAL,
         shock_family=ShockFamily.TRANSIT_PAUSE,
@@ -421,6 +445,58 @@ def test_arrival_stream_spec_feeds_the_arrival_evidence(tmp_path) -> None:
     assert LifecycleState.ACTIVE in states  # and the evidence stream activated it later
 
 
+class _RecordingPolicy:
+    """Captures every evidence triple the arm feeds, never activates."""
+
+    def __init__(self) -> None:
+        self.calls: list[tuple[int, float, float, float]] = []
+
+    def reset(self) -> None:
+        self.calls.clear()
+
+    def register(self, spec: ShockSpec, *, baseline: tuple[float, float] | None = None) -> None:
+        del baseline
+
+    def observe(
+        self,
+        period: int,
+        demand: float,
+        *,
+        dispatch: float | None = None,
+        receipt: float | None = None,
+    ) -> LifecycleState:
+        assert dispatch is not None and receipt is not None
+        self.calls.append((period, demand, dispatch, receipt))
+        return LifecycleState.PROPOSED
+
+    @property
+    def is_active(self) -> bool:
+        return False
+
+    @property
+    def state(self) -> LifecycleState:
+        return LifecycleState.PROPOSED
+
+
+def test_the_arm_feeds_all_three_evidence_channels_aligned_to_the_period(tmp_path) -> None:
+    """The widened seam, end to end: demand, own dispatch, and receipt of the SAME period,
+    with the receipt equal to the arm's dispatch two periods earlier under L=2."""
+    policy = _RecordingPolicy()
+    instance = make_instance(demand=(5.0,) * 8, lead_times=(2.0,) * 8)
+    _, _, metered = _harness(tmp_path)
+    arm = _arm(metered, instance, policy, arm_id=ARM10_ARM_ID)
+    outcome = EpisodeRunner(instance).run(arm)
+    orders = {d.period: d.order_quantity for d in outcome.decisions}
+
+    assert policy.calls, "the proposal at period 5 must be followed by evidence"
+    first_period = policy.calls[0][0]
+    assert first_period == 6  # strictly after tau_j=5, never at or before it
+    for period, demand, dispatch, receipt in policy.calls:
+        assert demand == 5.0
+        assert dispatch == orders[period]  # the arm's own decision record
+        assert receipt == orders[period - 2]  # L=2: this period's arrivals were ordered then
+
+
 def test_proposal_at_period_1_has_empty_baseline_stats(tmp_path) -> None:
     """A proposal on the first period: no history yet, baseline stats are (0, 0)."""
     instance = make_instance(demand=(5.0,) * 4, lead_times=(0.0,) * 4)
@@ -435,3 +511,19 @@ def test_proposal_at_period_1_has_empty_baseline_stats(tmp_path) -> None:
     EpisodeRunner(instance).run(arm)
     assert arm.activation._baseline == (0.0, 0.0)
     assert arm._specs[0].tau_j == 1
+
+
+def test_dispatch_book_remembers_every_period_and_is_loud_about_gaps() -> None:
+    """The FIFO queue is consumed by arrivals; the dispatch book is the durable record."""
+    from collie.arms.history import BenchmarkHistory
+
+    history = BenchmarkHistory(arm_id="t")
+    history.note_dispatch(1, 7.0)
+    history.note_dispatch(2, 3.0)
+    assert history.dispatch_at(1) == 7.0
+    assert history.dispatch_at(2) == 3.0
+    with pytest.raises(KeyError, match="no dispatch at period 3"):
+        history.dispatch_at(3)
+    history.reset()
+    with pytest.raises(KeyError, match="no dispatch at period 1"):
+        history.dispatch_at(1)
