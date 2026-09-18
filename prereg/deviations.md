@@ -41,6 +41,42 @@ Two guards read this file:
 
 Not yet frozen. Task 19 establishes `prereg/freeze_manifest.json` at the end of week 3.
 
+### 2026-09-16 — module 04's controller gains arm-1 parity; the compiler seam composes relative to the running baseline
+
+- **Artefact:** the written controller formula and mapping semantics of
+  `docs/implementation/04-or-compiler.md` (`q = min(max(0, S−IP), C_t)`, grid applied
+  absolutely). No frozen file changes hash; module 04's files are not yet registered.
+- **New sha256:** n/a — no frozen artefact is edited.
+- **What changed:** (1) `OrCompilerController` now ceilings the order shortfall to integral
+  units and applies the published baseline's policy-internal smoother (`mean + z·std`,
+  quantile whitelisted by reference in the AST cap guard) as a second cap alongside `C_t`;
+  (2) the controller skips the period-1 `prev_demand` sentinel, matching arm 1's
+  pre-loop-initialisation convention; (3) `GridCompiler` composes compiled configs relative
+  to the running config — reference-held axes are inherited, moved axes apply as absolute
+  `m`, `l_eff` reference offset, and `gamma` reference ratio — and returns `current` on
+  abstention; (4) module 06's merged oracle arm gates its dispatch to the ground-truth
+  hazard window (`onset + duration − 1`) through a new `_dispatch_active` hook that defaults
+  to the controls' deliberate switch-and-hold.
+- **Why:** with the brief's literal formula, no arm routed through the shared controller ran
+  the published baseline policy — orders were non-integral, the smoother absent, the baseline
+  lead time fixed at a grid reference (`l_eff=1`) no benchmark instance uses — so every
+  arm-versus-baseline contrast confounded hypothesis with controller. Worse, the absolute
+  grid cancelled hypotheses outright: on a promised-2 instance a demand-up spec compiled to
+  `m·(1+l_eff)` exactly equal to the baseline's, and the oracle's headroom measured ~0
+  (demand-up configs made it order *less* during a demand-up shock). And module 04's own
+  checkpoint demo had shown an un-windowed hazard config manufactures a holding blowup
+  (measured again post-merge: −542/episode on temporary_pulse).
+- **Blast radius:** module 04's checkpoint-demo numbers (headroom +793 against the grid
+  reference baseline) are superseded — under the arm-1-equivalent baseline with the composed
+  seam the fixture headroom is demand_level +388, temporary_pulse +118, lead_time_shift +391,
+  shipment_loss +32, transit_pause −176 per episode; the negative transit_pause cell is a
+  tier-1 calibration question referred to the module owner (their summary already directs
+  re-validation against the real shock distribution) and was not tuned. The stand-in-era dev
+  table in `docs/module06_research_notes.md` was exploratory and is likewise superseded.
+  `compile_spec`'s static table, the 72-point grid, and `collie/contracts.py` are unchanged;
+  903 tests green including a hypothesis differential pinning baseline-config parity with
+  arm 1 bit for bit.
+
 ### 2026-09-07 — LLM serving moved to cloud providers; confirmation provider split from primary
 
 - **Artefact:** the serving assumptions of `docs/implementation/06-arms-and-harness.md` §0.6

@@ -237,9 +237,10 @@ accurate for the primary path; the new providers' live findings:
 initially the same provider and is now xAI Grok (see the update above). One client shape serves
 all providers. The brief's "local primary" language is superseded; this is declared as a
 checkpoint deviation and logged in `prereg/deviations.md`. Credentials live in `cloud_endpoint/`:
-key files `gemini.key` / `grok.key` / `zai.key` (operator-supplied, file mode 600, gitignored)
-and `models.json` (the model registry, committed — the Checkpoint-1 audit note that a gitignored
-registry is not reproducible from a clean clone). The client raises on a missing key and never
+key files `gemini.key` / `grok.key` / `zai.key` (operator-supplied, file mode 600, gitignored;
+the directory itself is fully untracked since 2026-09-16 per operator instruction). The model
+registry was moved out of the credential directory to `docs/module06_model_registry.json` on the
+same date so the evidence survives clean clones. The client raises on a missing key and never
 substitutes another provider or model. Gemini registry detail, live-verified against
 `v1beta/models` on 2026-09-06: `gemini-3.8-flash` exists with 1,048,576 input / 65,536 output
 token limits, and is the registered default per operator instruction; 18 chat-capable models

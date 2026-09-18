@@ -1,7 +1,7 @@
 """Cross-arm isolation and seam discipline.
 
-Grows over Waves 3-6: the reference-control import ban (below), then the full-ladder
-``check_controller_isolation`` sweep once arms 5-10 exist.
+Grows over Waves 3-6: the reference-control stand-in's import ban and deletion pin (below),
+then the full-ladder ``check_controller_isolation`` sweep once arms 5-10 exist.
 """
 
 from __future__ import annotations
@@ -15,22 +15,25 @@ STAND_IN = "collie.arms.reference_control"
 
 
 def test_no_arm_imports_the_reference_control_stand_in() -> None:
-    """Module brief §3: the module-04 stand-in reaches arms only by injection.
+    """Module brief §3: the compiler and controller reach arms only by injection.
+
+    The temporary module-04 stand-in this guard was named for is deleted — module 04's real
+    implementation (``collie.control.mapping.GridCompiler`` /
+    ``collie.control.controller.OrCompilerController``) is wired in ``tests/conftest.py`` and
+    ``tools/run_arms.py`` instead. The guard stays, now pinning both halves of the swap: the
+    stand-in file must not reappear, and no file under ``collie/arms/`` may import the module
+    path, or a future regression would not be a clean compiler swap.
 
     Enforced by AST, in the style of
-    ``tests/test_project_skeleton.py::test_only_the_adapter_imports_the_benchmark``. The wiring
-    (``tests/conftest.py``, ``tools/run_arms.py``) imports the stand-in; no file under
-    ``collie/arms/`` may, or module 04's drop-in replacement would not be a clean swap. When the
-    stand-in is deleted on module 04's merge, this test goes with it.
+    ``tests/test_project_skeleton.py::test_only_the_adapter_imports_the_benchmark``.
     """
     stand_in_path = ARMS / "reference_control.py"
-    assert stand_in_path.is_file(), (
-        "the stand-in is gone — delete this test with it (module 04 has landed)"
+    assert not stand_in_path.exists(), (
+        "collie/arms/reference_control.py was deleted when module 04 landed; do not reintroduce "
+        "it — wire the real implementation by injection instead"
     )
     offenders: list[str] = []
     for py in sorted(ARMS.rglob("*.py")):
-        if py.name == "reference_control.py":
-            continue
         tree = ast.parse(py.read_text(encoding="utf-8"))
         for node in ast.walk(tree):
             if isinstance(node, ast.Import):

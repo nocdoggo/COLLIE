@@ -4,7 +4,10 @@ This arm is the headroom ceiling of the arm ladder: at the incident's true onset
 maps the *hidden truth* onto a proposal payload, compiles it through the same injected
 :class:`~collie.arms.protocols.SpecCompiler` and controller factory as every other
 compile-once arm (``collie/arms/controls.py``'s :class:`~collie.arms.controls.CompilerSwitchArm`),
-and orders from the compiled controller from that period on. The band between arm 1's score and
+and orders from the compiled controller for exactly the ground-truth hazard window — onset
+through ``onset_period + duration - 1`` — with the baseline dispatching outside it (the window
+is load-bearing: a hazard config held past a short-lived shock manufactures a holding-cost
+blowup, module 04's checkpoint finding). The band between arm 1's score and
 this arm's score is the entire value any alert channel, detector, parser, or verifier could
 ever add on a shocked episode — the quantity the ladder's contrasts are read against.
 
@@ -133,10 +136,16 @@ class OracleShockSpecArm(CompilerSwitchArm):
 
     Constructed with the episode's :class:`~collie.contracts.HiddenIncident`; at
     ``obs.period == incident.onset_period`` the truth is mapped onto a payload
-    (:func:`incident_to_payload`) and compiled, and the compiled controller orders from that
-    period on. Construction validates the incident eagerly — an unmappable family, a unit
-    magnitude on a demand family, or a non-positive onset or duration fails before any episode
-    runs rather than mid-episode.
+    (:func:`incident_to_payload`) and compiled, and the compiled controller orders for exactly
+    the ground-truth hazard window — onset through ``onset_period + duration - 1`` — with the
+    baseline dispatching outside it. The window is not optional: holding a hazard config past
+    a short-lived shock manufactures a holding-cost blowup that measures a missing lifecycle,
+    not the hypothesis (module 04's checkpoint demo caught a negative aggregate gap from this,
+    and the merged ladder shows temporary_pulse at -542 per episode un-windowed). Real
+    ShockSpec arms earn the same deactivation from module 05's verifier lifecycle; the oracle
+    is simply privileged to read it. Construction validates the incident eagerly — an
+    unmappable family, a unit magnitude on a demand family, or a non-positive onset or
+    duration fails before any episode runs rather than mid-episode.
     """
 
     incident: HiddenIncident
@@ -151,6 +160,14 @@ class OracleShockSpecArm(CompilerSwitchArm):
         if self.incident.duration < 1:
             raise ValueError(f"duration must be >= 1, got {self.incident.duration}")
         incident_to_payload(self.incident)  # fail fast on unmappable truth
+
+    @property
+    def _active_through(self) -> int:
+        """Last period (inclusive) the ground-truth hazard is live."""
+        return self.incident.onset_period + self.incident.duration - 1
+
+    def _dispatch_active(self, obs: PeriodObservation) -> bool:
+        return obs.period <= self._active_through
 
     def _switch_payload(self, obs: PeriodObservation) -> ProposalPayload | None:
         if obs.period < self.incident.onset_period:

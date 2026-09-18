@@ -45,11 +45,6 @@ from collie.arms.controls import (
 )
 from collie.arms.oracle import ORACLE_ARM_ID, OracleShockSpecArm, incident_to_payload
 from collie.arms.protocols import ProposalPayload
-from collie.arms.reference_control import (
-    ReferenceCompiler,
-    ReferenceController,
-    baseline_config,
-)
 from collie.arms.shockspec import ARM8_ARM_ID, ImmediateActivation, ShockSpecArm
 from collie.contracts import (
     AlertKind,
@@ -70,6 +65,9 @@ from collie.contracts import (
     TargetStream,
     find_hidden_state,
 )
+from collie.control.controller import OrCompilerController
+from collie.control.grid import baseline_config_for
+from collie.control.mapping import GridCompiler
 from collie.data.families import generate_episode
 from collie.data.families.demand import DEMAND_FAMILIES
 from collie.data.splits import build_units
@@ -87,31 +85,33 @@ from tests.test_episode_runner import make_instance
 # ---------------------------------------------------------------------------
 
 
-def _factory(config: ControlConfig, demands: tuple[float, ...]) -> ReferenceController:
-    return ReferenceController(config=config, train_demand=demands)
+def _factory(config: ControlConfig, demands: tuple[float, ...]) -> OrCompilerController:
+    # No specific instance in scope here; every instance in this file carries the
+    # ``make_instance`` default cap, so ``math.inf`` matches the contract exactly.
+    return OrCompilerController(order_cap=math.inf, config=config, train_demand=demands)
 
 
 def _base_kwargs(promised_lead_time: int = 2) -> dict:
-    """The shared injections: the reference stand-in baseline at the arm-1 config."""
+    """The shared injections: the shared OR controller at the per-instance arm-1 descriptor."""
     return {
         "controller_factory": _factory,
-        "baseline": ReferenceController(config=baseline_config(promised_lead_time)),
-        "baseline_config": baseline_config(promised_lead_time),
+        "baseline": OrCompilerController(
+            order_cap=math.inf, config=baseline_config_for(promised_lead_time)
+        ),
+        "baseline_config": baseline_config_for(promised_lead_time),
     }
 
 
 def _detector(trigger, *, compiler=None, promised_lead_time: int = 2) -> DetectorToCompilerArm:
     return DetectorToCompilerArm(
-        compiler=compiler or ReferenceCompiler(),
+        compiler=compiler or GridCompiler(),
         trigger=trigger,
         **_base_kwargs(promised_lead_time),
     )
 
 
 def _keyword(*, compiler=None, promised_lead_time: int = 2) -> KeywordParserArm:
-    return KeywordParserArm(
-        compiler=compiler or ReferenceCompiler(), **_base_kwargs(promised_lead_time)
-    )
+    return KeywordParserArm(compiler=compiler or GridCompiler(), **_base_kwargs(promised_lead_time))
 
 
 def _alert_spec() -> HiddenAlertSpec:
@@ -131,7 +131,7 @@ def _alert_spec() -> HiddenAlertSpec:
 
 def _ub(spec: HiddenAlertSpec, period: int, *, compiler=None) -> AlertSpecUpperBoundArm:
     return AlertSpecUpperBoundArm(
-        compiler=compiler or ReferenceCompiler(),
+        compiler=compiler or GridCompiler(),
         alert_spec=spec,
         alert_period=period,
         **_base_kwargs(2),
@@ -152,7 +152,7 @@ def _oracle(
     incident: HiddenIncident, *, compiler=None, promised_lead_time: int = 2
 ) -> OracleShockSpecArm:
     return OracleShockSpecArm(
-        compiler=compiler or ReferenceCompiler(),
+        compiler=compiler or GridCompiler(),
         incident=incident,
         **_base_kwargs(promised_lead_time),
     )
@@ -168,7 +168,7 @@ def _wrapped_cusum() -> MaxProposalsWrapper:
 
 def _baseline_reference(outcome, promised_lead_time: int = 2) -> list[float]:
     """What a baseline-only controller would have ordered over the same observations."""
-    check = ReferenceController(config=baseline_config(promised_lead_time))
+    check = OrCompilerController(order_cap=math.inf, config=baseline_config_for(promised_lead_time))
     check.reset()
     return [check.order(obs).order_quantity for obs in outcome.observations]
 
@@ -428,7 +428,7 @@ def test_bare_switch_arm_never_switches_and_orders_baseline() -> None:
     instance = make_instance(
         demand=(100.0, 110.0, 90.0, 120.0, 80.0, 95.0), lead_times=(2.0,) * 6, promised_lead_time=2
     )
-    arm = CompilerSwitchArm(compiler=ReferenceCompiler(), arm_id="never", **_base_kwargs(2))
+    arm = CompilerSwitchArm(compiler=GridCompiler(), arm_id="never", **_base_kwargs(2))
     outcome = EpisodeRunner(instance).run(arm)
     assert [d.order_quantity for d in outcome.decisions] == _baseline_reference(outcome)
     assert arm._switch_period is None and arm._compiled is None and arm._baseline_handoff is None
@@ -446,7 +446,7 @@ def test_no_arm_in_this_wave_can_call_an_llm_by_construction() -> None:
         _keyword(),
         _ub(_alert_spec(), 2),
         _oracle(_incident()),
-        CompilerSwitchArm(compiler=ReferenceCompiler(), arm_id="never", **_base_kwargs(2)),
+        CompilerSwitchArm(compiler=GridCompiler(), arm_id="never", **_base_kwargs(2)),
     ]
     for arm in arms:
         assert isinstance(arm, Controller)
@@ -473,7 +473,10 @@ def test_detector_control_switches_on_a_real_cusum_firing() -> None:
 
     assert trigger.trace.periods == (14,)  # switched exactly once
     assert arm._switch_period == 14
-    expected_config = ControlConfig(m=1.5, l_eff=2, gamma=0.3, predictive_model="ewma")
+    # The fixed demand-up/medium payload compiles to the grid's demand-up m (1.5, absolute);
+    # the supply axes are the hypothesis-untouched ones, so the seam inherits them from the
+    # running baseline descriptor (l_eff=2, gamma=1.0 — the instance's promised lead time).
+    expected_config = ControlConfig(m=1.5, l_eff=2, gamma=1.0, predictive_model="demand_up")
     for d in outcome.decisions:
         assert not d.llm_called
         if d.period < 14:
@@ -509,7 +512,7 @@ def test_detector_control_stays_on_baseline_when_the_detector_never_fires() -> N
 
 def test_detector_feeds_the_identical_compiler_as_the_llm_arms(harness) -> None:
     """R5.2: one compiler instance wired into both an LLM arm and the detector control."""
-    shared = ReferenceCompiler()
+    shared = GridCompiler()
     instance = make_instance(demand=(100.0,) * 6, lead_times=(2.0,) * 6, promised_lead_time=2)
     llm_arm = ShockSpecArm(
         channel=harness.channel(arm_id=ARM8_ARM_ID, episode_id=instance.spec.episode_id),
@@ -517,10 +520,10 @@ def test_detector_feeds_the_identical_compiler_as_the_llm_arms(harness) -> None:
         parser=_Parser(),
         compiler=shared,
         activation=ImmediateActivation(),
-        baseline=ReferenceController(config=baseline_config(2)),
+        baseline=OrCompilerController(order_cap=math.inf, config=baseline_config_for(2)),
         controller_factory=_factory,
         trigger=_ScriptedTrigger({3}),
-        baseline_config=baseline_config(2),
+        baseline_config=baseline_config_for(2),
     )
     control = _detector(_ScriptedTrigger({3}), compiler=shared)
     assert control.compiler is llm_arm.compiler
@@ -603,9 +606,10 @@ def test_keyword_first_decisive_alert_wins() -> None:
     arm = _keyword()
     outcome = EpisodeRunner(instance, alerts=alerts).run(arm)
     assert arm._switch_period == 4
-    # An arrival payload would have compiled to l_eff = 3; the demand-up one keeps l_eff = 2.
+    # An arrival payload would have compiled to the shipment-loss point (m=1.0, gamma=0.0);
+    # the demand-up one carries m=1.5 with full pipeline trust.
     assert all(
-        d.control_config is not None and d.control_config.l_eff == 2 and d.control_config.m == 1.5
+        d.control_config is not None and d.control_config.m == 1.5 and d.control_config.gamma == 1.0
         for d in outcome.decisions[3:]
     )
     assert arm._spec is not None and arm._spec.evidence_refs == ("a4",)
@@ -661,7 +665,7 @@ def test_alertspec_ub_switches_at_the_alert_period() -> None:
     assert outcome.decisions[5].triggered
     assert all(d.control_config is None for d in outcome.decisions[:5])
     assert all(
-        d.control_config == ControlConfig(m=1.5, l_eff=2, gamma=0.3, predictive_model="ewma")
+        d.control_config == ControlConfig(m=1.5, l_eff=2, gamma=1.0, predictive_model="demand_up")
         and d.active_spec_id == "spec-1@tau6"
         for d in outcome.decisions[5:]
     )
@@ -897,8 +901,9 @@ def test_oracle_switches_at_the_true_onset() -> None:
 
 
 def test_oracle_beats_arm1_on_the_shocked_episode() -> None:
-    """The headroom test: switching at exactly the right period is worth +0.0279 normalized
-    reward here (arm 1 scores 0.7838, the oracle 0.8117 — pinned values, this scenario)."""
+    """The headroom test: switching at exactly the right period is worth +0.0273 normalized
+    reward here (arm 1 scores 0.7838, the oracle 0.8111 — pinned values, this scenario,
+    measured through module 04's real compiler and shared controller)."""
     instance, incident = _step_instance()
     arm1 = EpisodeRunner(instance).run(CappedBaseStockController()).result.normalized_reward
     oracle = EpisodeRunner(instance).run(_oracle(incident)).result.normalized_reward
@@ -908,7 +913,7 @@ def test_oracle_beats_arm1_on_the_shocked_episode() -> None:
 
 def test_oracle_margin_is_sensitive_to_the_onset() -> None:
     """Negative control (b): the same oracle told the onset is one period later keeps a
-    strictly smaller margin over arm 1 (+0.0184 vs +0.0279 here) — the headroom test would
+    strictly smaller margin over arm 1 (+0.0167 vs +0.0273 here) — the headroom test would
     notice a mistimed switch."""
     instance, incident = _step_instance()
     arm1 = EpisodeRunner(instance).run(CappedBaseStockController()).result.normalized_reward
@@ -917,6 +922,24 @@ def test_oracle_margin_is_sensitive_to_the_onset() -> None:
     margin_late = EpisodeRunner(instance).run(_oracle(late)).result.normalized_reward - arm1
     assert margin_true > 0.0
     assert 0.0 < margin_late < margin_true
+
+
+def test_oracle_stands_down_when_the_hazard_window_closes() -> None:
+    """Module 04's checkpoint finding, pinned: a hazard config held past a short-lived shock
+    manufactures losses, so the oracle — privileged to know the true duration — reverts to the
+    baseline dispatch after ``onset + duration - 1``. With duration 2 the compiled config
+    governs periods 12-13 only; from period 14 on every decision carries no config and orders
+    exactly what a baseline-only controller orders (its estimator never skipped a period)."""
+    instance, incident = _step_instance()
+    outcome = EpisodeRunner(instance).run(_oracle(replace(incident, duration=2)))
+    assert all(d.control_config is None for d in outcome.decisions[:11])
+    assert [d.active_spec_id for d in outcome.decisions[11:13]] == ["spec-1@tau12"] * 2
+    assert all(
+        d.control_config is None and d.active_spec_id is None and not d.triggered
+        for d in outcome.decisions[13:]
+    )
+    reference = _baseline_reference(outcome)
+    assert [d.order_quantity for d in outcome.decisions[13:]] == reference[13:]
 
 
 def test_oracle_arrival_stream_switch_hands_over_arrival_stats() -> None:
@@ -936,9 +959,12 @@ def test_oracle_arrival_stream_switch_hands_over_arrival_stats() -> None:
     mean = sum(arrivals) / len(arrivals)
     std = math.sqrt(sum((a - mean) ** 2 for a in arrivals) / (len(arrivals) - 1))
     assert arm._baseline_handoff == (mean, std)
-    # The arrival interruption compiled to the lengthened pipeline.
-    assert outcome.decisions[3].control_config is not None
-    assert outcome.decisions[3].control_config.l_eff == 3
+    # The arrival interruption compiled to the shipment-loss grid gamma (0.5, scaling the
+    # running trust); demand level and the pipeline length are hypothesis-untouched, so the
+    # seam inherits them from the baseline descriptor (m=1.0, l_eff=2).
+    assert outcome.decisions[3].control_config == ControlConfig(
+        m=1.0, l_eff=2, gamma=0.5, predictive_model="shipment_loss"
+    )
 
 
 def test_oracle_carries_the_incident_and_the_runner_knows() -> None:
@@ -965,7 +991,7 @@ def test_every_control_and_the_oracle_route_identically() -> None:
     demand = (100.0,) * 5 + (150.0,) * 7
     instance = make_instance(demand=demand, lead_times=(2.0,) * 12, promised_lead_time=2)
     alerts = {period: AlertMessage(alert_id="a6", period=period, text="demand surge expected")}
-    shared_compiler = ReferenceCompiler()
+    shared_compiler = GridCompiler()
 
     arms = {
         "detector": _detector(_ScriptedTrigger({period}), compiler=shared_compiler),
@@ -1006,7 +1032,7 @@ class _PeekingKeywordArm(KeywordParserArm):
 
 def test_a_peeking_keyword_arm_fails_the_isolation_scan() -> None:
     """If this test ever passed trivially, the isolation walk would be broken, not the arm."""
-    arm = _PeekingKeywordArm(compiler=ReferenceCompiler(), truth=_incident(), **_base_kwargs(2))
+    arm = _PeekingKeywordArm(compiler=GridCompiler(), truth=_incident(), **_base_kwargs(2))
     assert find_hidden_state(arm) == ["obj.truth"]
     instance = make_instance(demand=(100.0,) * 4, lead_times=(2.0,) * 4)
     with pytest.raises(HiddenStateLeak):

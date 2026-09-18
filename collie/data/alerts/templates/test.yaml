@@ -1,0 +1,2371 @@
+# DEVELOPMENT DRAFT — authored stimuli, not final CP1 approval.
+# Each family has 4 accurate, 2 overstated, 2 ambiguous, 2 distractor entries.
+# Non-distractor labels follow the supplied foundation fake, not a verified registry.
+# PENDING_NO_CHANGE_SIGNATURE is deliberately unregistered; resolve with Module 02.
+# Do not treat a successful structural load as signature validation.
+# Compound persistence/duration follow the fake labels; check their semantics at integration.
+# Texts are synthetic messages, not reports of real events. They need human realism review.
+# Slots carry per-episode controlled variation (supplier/location/timing/severity); draws are deterministic per (template_id, seed).
+# Do not replace registry validation or real incident/benchmark leakage checks with these drafts.
+
+- id: tpl_test_demand_level_01
+  family: demand_level
+  split: test
+  kind: accurate
+  wording_family: wf_handover_demand_level
+  text: 'Handover note: the {severity} repeat-customer book is {timing} part of {location}, and
+    {supplier} is expected to persist.'
+  slots:
+    supplier:
+    - 'the additional ordering'
+    - 'the additional ordering reported by our regional distributor'
+    - 'the additional ordering flagged by Meridian Freight'
+    - 'the additional ordering confirmed by our supply partner'
+    location:
+    - 'the regular workload'
+    - 'the regular workload across the northern region'
+    - 'the regular workload at the Rotterdam DC'
+    - 'the regular workload across this product range'
+    timing:
+    - 'now'
+    - 'at this stage'
+    - 'by this point'
+    - 'currently'
+    severity:
+    - 'enlarged'
+    - 'markedly enlarged'
+    - 'noticeably enlarged'
+    - 'appreciably enlarged'
+  alert_spec:
+    family: demand_level
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_demand_level_up
+    kind: accurate
+- id: tpl_test_demand_level_02
+  family: demand_level
+  split: test
+  kind: accurate
+  wording_family: wf_handover_demand_level
+  text: 'Account review entry: {supplier} have built {severity} ongoing requirements into
+    {location}, beyond the passing fluctuations we {timing} see.'
+  slots:
+    supplier:
+    - 'customers'
+    - 'customers of our regional distributor'
+    - 'customers served by Meridian Freight'
+    - 'customers buying through our supply partner'
+    location:
+    - 'their routine purchasing'
+    - 'their routine purchasing across the northern region'
+    - 'their routine purchasing in the Rotterdam catchment'
+    - 'their routine purchasing across this product range'
+    timing:
+    - 'normally'
+    - 'in a typical spell'
+    - 'in quieter stretches'
+    - 'ordinarily'
+    severity:
+    - 'larger'
+    - 'markedly larger'
+    - 'noticeably larger'
+    - 'appreciably larger'
+  alert_spec:
+    family: demand_level
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_demand_level_up
+    kind: accurate
+- id: tpl_test_demand_level_03
+  family: demand_level
+  split: test
+  kind: accurate
+  wording_family: wf_handover_demand_level
+  text: 'Commercial watchlist: {location} has settled at a {severity} pace, with {supplier}
+    supporting continuation rather than a {timing} peak.'
+  slots:
+    supplier:
+    - 'the retained business'
+    - 'the retained business reported by our regional distributor'
+    - 'the retained business tracked by Meridian Freight'
+    - 'the retained business confirmed by our supply partner'
+    location:
+    - 'everyday take-up'
+    - 'everyday take-up in the northern region'
+    - 'everyday take-up across this product range'
+    - 'everyday take-up at the Rotterdam DC'
+    timing:
+    - 'brief'
+    - 'passing'
+    - 'momentary'
+    - 'fleeting'
+    severity:
+    - 'stronger'
+    - 'noticeably stronger'
+    - 'markedly stronger'
+    - 'distinctly stronger'
+  alert_spec:
+    family: demand_level
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_demand_level_up
+    kind: accurate
+- id: tpl_test_demand_level_04
+  family: demand_level
+  split: test
+  kind: accurate
+  wording_family: wf_handover_demand_level
+  text: 'Planning notebook: {supplier} has become {severity} across {location}; the {timing} order
+    expectations no longer describe the routine outlook.'
+  slots:
+    supplier:
+    - 'additional recurring business'
+    - 'additional recurring business reported by our regional distributor'
+    - 'additional recurring business logged by Meridian Freight'
+    - 'additional recurring business confirmed by our supply partner'
+    location:
+    - 'the range'
+    - 'the northern region'
+    - 'this product range'
+    - 'the Rotterdam catchment'
+    timing:
+    - 'earlier'
+    - 'previous'
+    - 'former'
+    - 'older'
+    severity:
+    - 'established'
+    - 'firmly established'
+    - 'well established'
+    - 'clearly established'
+  alert_spec:
+    family: demand_level
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_demand_level_up
+    kind: accurate
+- id: tpl_test_demand_level_05
+  family: demand_level
+  split: test
+  kind: overstated
+  wording_family: wf_handover_demand_level
+  text: 'Escalation note: {supplier} is said to be expanding on an {severity} and {timing} scale,
+    leaving {location} utterly outmatched.'
+  slots:
+    supplier:
+    - 'the customer book'
+    - 'the customer book as described by our regional distributor'
+    - 'the customer book as portrayed by Meridian Freight'
+    - 'the customer book as described by our supply partner'
+    location:
+    - 'normal supply capacity'
+    - 'normal supply capacity in the northern region'
+    - 'normal supply capacity at the Rotterdam DC'
+    - 'normal supply capacity across this product range'
+    timing:
+    - 'permanent'
+    - 'everlasting'
+    - 'unending'
+    - 'lifelong'
+    severity:
+    - 'immense'
+    - 'overwhelming'
+    - 'unimaginable'
+    - 'unbounded'
+  alert_spec:
+    family: demand_level
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_demand_level_up
+    kind: overstated
+- id: tpl_test_demand_level_06
+  family: demand_level
+  split: test
+  kind: overstated
+  wording_family: wf_handover_demand_level
+  text: 'Management handover: {supplier} is portrayed as the {timing} norm, with {severity}
+    additional {location} ahead.'
+  slots:
+    supplier:
+    - 'extraordinary order pressure'
+    - 'extraordinary order pressure described by our regional distributor'
+    - 'extraordinary order pressure portrayed by Meridian Freight'
+    - 'extraordinary order pressure reported by our supply partner'
+    location:
+    - 'customer appetite'
+    - 'customer appetite in the northern region'
+    - 'customer appetite at the Rotterdam DC'
+    - 'customer appetite across this product range'
+    timing:
+    - 'lasting'
+    - 'enduring'
+    - 'permanent'
+    - 'unending'
+    severity:
+    - 'virtually unlimited'
+    - 'practically boundless'
+    - 'almost limitless'
+    - 'near-inexhaustible'
+  alert_spec:
+    family: demand_level
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_demand_level_up
+    kind: overstated
+- id: tpl_test_demand_level_07
+  family: demand_level
+  split: test
+  kind: ambiguous
+  wording_family: wf_handover_demand_level
+  text: 'Open account question: {supplier} may be taking {timing}, but neither its {severity} nor
+    {location} is settled.'
+  slots:
+    supplier:
+    - 'routine purchasing'
+    - 'routine purchasing reported by our regional distributor'
+    - 'routine purchasing noted by Meridian Freight'
+    - 'routine purchasing described by our supply partner'
+    location:
+    - 'its durability'
+    - 'its durability in the northern region'
+    - 'its durability at the Rotterdam DC'
+    - 'its durability across this product range'
+    timing:
+    - 'a different course'
+    - 'a different course in recent weeks'
+    - 'a different course over the past few days'
+    - 'a different course lately'
+    severity:
+    - 'extent'
+    - 'scale'
+    - 'magnitude'
+    - 'size'
+  alert_spec:
+    family: demand_level
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_demand_level_up
+    kind: ambiguous
+- id: tpl_test_demand_level_08
+  family: demand_level
+  split: test
+  kind: ambiguous
+  wording_family: wf_handover_demand_level
+  text: 'Unresolved commercial entry: something in {location} appears {severity}; {supplier} do not
+    pin down {timing}.'
+  slots:
+    supplier:
+    - 'the available account notes'
+    - 'the account notes from our regional distributor'
+    - 'the account notes supplied by Meridian Freight'
+    - 'the account notes shared by our supply partner'
+    location:
+    - 'the repeat-order pattern'
+    - 'the repeat-order pattern in the northern region'
+    - 'the repeat-order pattern at the Rotterdam DC'
+    - 'the repeat-order pattern across this product range'
+    timing:
+    - 'the change'
+    - 'the recent change'
+    - 'the newly observed change'
+    - 'the change seen lately'
+    severity:
+    - 'different'
+    - 'somewhat different'
+    - 'rather different'
+    - 'a little different'
+  alert_spec:
+    family: demand_level
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_demand_level_up
+    kind: ambiguous
+- id: tpl_test_demand_level_09
+  family: demand_level
+  split: test
+  kind: distractor
+  wording_family: wf_handover_demand_level
+  text: 'Administration log: {severity} {timing} to the {topic} {location}.'
+  slots:
+    severity:
+    - 'a punctuation correction'
+    - 'a minor punctuation correction'
+    - 'a small punctuation correction'
+    - 'a tiny punctuation correction'
+    topic:
+    - 'customer-directory'
+    - 'supplier-list'
+    - 'contact-directory'
+    - 'account-directory'
+    location:
+    - 'heading'
+    - 'heading used in the northern region'
+    - 'heading at the Rotterdam DC'
+    - 'heading covering this product range'
+    timing:
+    - 'was made'
+    - 'was made earlier this week'
+    - 'was made in recent days'
+    - 'was made during a quiet spell'
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_test_demand_level_10
+  family: demand_level
+  split: test
+  kind: distractor
+  wording_family: wf_handover_demand_level
+  text: 'Document handover: {supplier} {timing} {topic} for {location}.'
+  slots:
+    supplier:
+    - 'the sales team'
+    - 'the regional sales desk'
+    - 'the account team'
+    - 'the commercial team'
+    location:
+    - 'internal notes'
+    - 'internal notes in the northern region'
+    - 'internal notes at the Rotterdam DC'
+    - 'internal notes across this product range'
+    timing:
+    - 'has adopted'
+    - 'has recently adopted'
+    - 'has just adopted'
+    - 'has now adopted'
+    topic:
+    - 'a different page footer'
+    - 'a new page footer'
+    - 'a revised page footer'
+    - 'an updated page footer'
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_test_temporary_pulse_01
+  family: temporary_pulse
+  split: test
+  kind: accurate
+  wording_family: wf_handover_temporary_pulse
+  text: 'Campaign handover: the {severity} customer requests belong to {supplier}; {location} is
+    expected to resume {timing}.'
+  slots:
+    supplier:
+    - 'the limited offer'
+    - 'the limited offer from our regional distributor'
+    - 'the limited offer arranged with Meridian Freight'
+    - 'the limited offer agreed with our supply partner'
+    location:
+    - 'ordinary purchasing'
+    - 'ordinary purchasing in the northern region'
+    - 'ordinary purchasing at the Rotterdam DC'
+    - 'ordinary purchasing across this product range'
+    timing:
+    - 'when that activity has run its course'
+    - 'once that activity winds down'
+    - 'after that activity ends'
+    - 'when that activity finishes'
+    severity:
+    - 'extra'
+    - 'additional'
+    - 'added'
+    - 'supplementary'
+  alert_spec:
+    family: temporary_pulse
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_demand_pulse
+    kind: accurate
+- id: tpl_test_temporary_pulse_02
+  family: temporary_pulse
+  split: test
+  kind: accurate
+  wording_family: wf_handover_temporary_pulse
+  text: 'Event ledger note: a {timing} {severity} of additional orders is associated with
+    {supplier}, rather than a continuing addition to {location}.'
+  slots:
+    supplier:
+    - 'the occasion'
+    - 'the occasion hosted with our regional distributor'
+    - 'the occasion arranged with Meridian Freight'
+    - 'the occasion run with our supply partner'
+    location:
+    - 'routine business'
+    - 'routine business in the northern region'
+    - 'routine business at the Rotterdam DC'
+    - 'routine business across this product range'
+    timing:
+    - 'brief'
+    - 'short-lived'
+    - 'passing'
+    - 'fleeting'
+    severity:
+    - 'cluster'
+    - 'noticeable cluster'
+    - 'marked cluster'
+    - 'modest cluster'
+  alert_spec:
+    family: temporary_pulse
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_demand_pulse
+    kind: accurate
+- id: tpl_test_temporary_pulse_03
+  family: temporary_pulse
+  split: test
+  kind: accurate
+  wording_family: wf_handover_temporary_pulse
+  text: 'Launch review entry: the {timing} {severity} is expected to fade after {supplier}, leaving
+    {location} intact.'
+  slots:
+    supplier:
+    - 'the launch activity'
+    - 'the launch activity with our regional distributor'
+    - 'the launch activity run with Meridian Freight'
+    - 'the launch activity led by our supply partner'
+    location:
+    - 'the underlying purchasing pace'
+    - 'the underlying purchasing pace in the northern region'
+    - 'the underlying purchasing pace at the Rotterdam DC'
+    - 'the underlying purchasing pace across this product range'
+    timing:
+    - 'initial'
+    - 'early'
+    - 'opening'
+    - 'preliminary'
+    severity:
+    - 'buying flurry'
+    - 'marked buying flurry'
+    - 'noticeable buying flurry'
+    - 'modest buying flurry'
+  alert_spec:
+    family: temporary_pulse
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_demand_pulse
+    kind: accurate
+- id: tpl_test_temporary_pulse_04
+  family: temporary_pulse
+  split: test
+  kind: accurate
+  wording_family: wf_handover_temporary_pulse
+  text: 'Account handover: {supplier} describe {location} as a {timing} {severity} for the occasion,
+    not an ongoing commitment.'
+  slots:
+    supplier:
+    - 'customers'
+    - 'customers of our regional distributor'
+    - 'customers served by Meridian Freight'
+    - 'customers buying through our supply partner'
+    location:
+    - 'their extra purchases'
+    - 'their extra purchases in the northern region'
+    - 'their extra purchases in the Rotterdam catchment'
+    - 'their extra purchases across this product range'
+    timing:
+    - 'short-lived'
+    - 'brief'
+    - 'passing'
+    - 'fleeting'
+    severity:
+    - 'stocking-up exercise'
+    - 'modest stocking-up exercise'
+    - 'marked stocking-up exercise'
+    - 'noticeable stocking-up exercise'
+  alert_spec:
+    family: temporary_pulse
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_demand_pulse
+    kind: accurate
+- id: tpl_test_temporary_pulse_05
+  family: temporary_pulse
+  split: test
+  kind: overstated
+  wording_family: wf_handover_temporary_pulse
+  text: 'Escalated campaign note: the {timing} {supplier} is described as {severity}, with
+    {location} likely to be completely overwhelmed.'
+  slots:
+    supplier:
+    - 'buying flurry'
+    - 'buying flurry reported by our regional distributor'
+    - 'buying flurry tracked by Meridian Freight'
+    - 'buying flurry flagged by our supply partner'
+    location:
+    - 'ordinary fulfilment'
+    - 'ordinary fulfilment in the northern region'
+    - 'ordinary fulfilment at the Rotterdam DC'
+    - 'ordinary fulfilment across this product range'
+    timing:
+    - 'approaching'
+    - 'fast-approaching'
+    - 'imminent'
+    - 'looming'
+    severity:
+    - 'immense'
+    - 'overwhelming'
+    - 'colossal'
+    - 'staggering'
+  alert_spec:
+    family: temporary_pulse
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_demand_pulse
+    kind: overstated
+- id: tpl_test_temporary_pulse_06
+  family: temporary_pulse
+  split: test
+  kind: overstated
+  wording_family: wf_handover_temporary_pulse
+  text: 'Event debrief outlook: {supplier} is being presented as the beginning of {timing}
+    {severity} {location}, expected to continue well after the occasion.'
+  slots:
+    supplier:
+    - 'the rush'
+    - 'the rush described by our regional distributor'
+    - 'the rush reported by Meridian Freight'
+    - 'the rush portrayed by our supply partner'
+    location:
+    - 'purchasing'
+    - 'purchasing in the northern region'
+    - 'purchasing at the Rotterdam DC'
+    - 'purchasing across this product range'
+    timing:
+    - 'lasting'
+    - 'enduring'
+    - 'unending'
+    - 'permanent'
+    severity:
+    - 'heavy'
+    - 'intense'
+    - 'relentless'
+    - 'fierce'
+  alert_spec:
+    family: temporary_pulse
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_demand_pulse
+    kind: overstated
+- id: tpl_test_temporary_pulse_07
+  family: temporary_pulse
+  split: test
+  kind: ambiguous
+  wording_family: wf_handover_temporary_pulse
+  text: 'Open campaign item: {severity} {supplier} has been mentioned, but {location} and {timing}
+    of any buying flurry remain unresolved.'
+  slots:
+    supplier:
+    - 'customer activity'
+    - 'customer activity mentioned by our regional distributor'
+    - 'customer activity noted by Meridian Freight'
+    - 'customer activity flagged by our supply partner'
+    location:
+    - 'the likely volume'
+    - 'the likely volume in the northern region'
+    - 'the likely volume at the Rotterdam DC'
+    - 'the likely volume across this product range'
+    timing:
+    - 'the end'
+    - 'the likely end'
+    - 'the eventual end'
+    - 'the possible end'
+    severity:
+    - 'unusual'
+    - 'slightly unusual'
+    - 'somewhat unusual'
+    - 'rather unusual'
+  alert_spec:
+    family: temporary_pulse
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_demand_pulse
+    kind: ambiguous
+- id: tpl_test_temporary_pulse_08
+  family: temporary_pulse
+  split: test
+  kind: ambiguous
+  wording_family: wf_handover_temporary_pulse
+  text: 'Launch watchlist: {timing} {location}; {supplier} do not establish {severity} or
+    persistence.'
+  slots:
+    supplier:
+    - 'the available notes'
+    - 'the notes from our regional distributor'
+    - 'the notes shared by Meridian Freight'
+    - 'the notes provided by our supply partner'
+    location:
+    - 'a burst of extra requests'
+    - 'a burst of extra requests in the northern region'
+    - 'a burst of extra requests at the Rotterdam DC'
+    - 'a burst of extra requests across this product range'
+    timing:
+    - 'there may be'
+    - 'there could shortly be'
+    - 'there may soon be'
+    - 'there might be'
+    severity:
+    - 'its significance'
+    - 'its scale'
+    - 'its magnitude'
+    - 'its importance'
+  alert_spec:
+    family: temporary_pulse
+    target_stream: demand
+    direction: demand_up
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_demand_pulse
+    kind: ambiguous
+- id: tpl_test_temporary_pulse_09
+  family: temporary_pulse
+  split: test
+  kind: distractor
+  wording_family: wf_handover_temporary_pulse
+  text: 'Archive entry: the {topic} {format} on {location} {timing}.'
+  slots:
+    topic:
+    - 'cover'
+    - 'header'
+    - 'title'
+    - 'front'
+    format:
+    - 'image'
+    - 'graphic'
+    - 'banner'
+    - 'visual'
+    location:
+    - 'the internal campaign retrospective'
+    - 'the internal campaign retrospective for the northern region'
+    - 'the internal campaign retrospective for the Rotterdam DC'
+    - 'the internal campaign retrospective for this product range'
+    timing:
+    - 'has been replaced'
+    - 'was replaced earlier this week'
+    - 'was replaced in recent days'
+    - 'has just been replaced'
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_test_temporary_pulse_10
+  family: temporary_pulse
+  split: test
+  kind: distractor
+  wording_family: wf_handover_temporary_pulse
+  text: 'Event administration note: the {topic} {format} {timing} {location}.'
+  slots:
+    topic:
+    - 'attendance-sheet'
+    - 'sign-in-sheet'
+    - 'registration-sheet'
+    - 'check-in-sheet'
+    format:
+    - 'heading'
+    - 'header'
+    - 'title block'
+    - 'banner'
+    location:
+    - 'for filing'
+    - 'for filing in the northern region office'
+    - 'for filing at the Rotterdam DC'
+    - 'for filing with the regional archive'
+    timing:
+    - 'has been corrected'
+    - 'was corrected earlier this week'
+    - 'was corrected in recent days'
+    - 'has just been corrected'
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_test_lead_time_shift_01
+  family: lead_time_shift
+  split: test
+  kind: accurate
+  wording_family: wf_handover_lead_time_shift
+  text: 'Service handover: {location} continues to travel, but the standing {supplier} {timing}
+    calls for a {severity} journey to receipt.'
+  slots:
+    supplier:
+    - 'supplier process'
+    - 'distributor process'
+    - 'freight-partner process'
+    - 'fulfilment-partner process'
+    location:
+    - 'replenishment'
+    - 'replenishment into the northern region'
+    - 'replenishment into the Rotterdam DC'
+    - 'replenishment across this product range'
+    timing:
+    - 'now'
+    - 'currently'
+    - 'at present'
+    - 'these days'
+    severity:
+    - 'longer'
+    - 'noticeably longer'
+    - 'markedly longer'
+    - 'considerably longer'
+  alert_spec:
+    family: lead_time_shift
+    target_stream: arrival
+    direction: arrival_delayed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_arrival_delay
+    kind: accurate
+- id: tpl_test_lead_time_shift_02
+  family: lead_time_shift
+  split: test
+  kind: accurate
+  wording_family: wf_handover_lead_time_shift
+  text: 'Route review entry: {supplier} {timing} {location}, so {severity} belongs in ordinary
+    arrival expectations.'
+  slots:
+    supplier:
+    - 'the slower arrangement'
+    - 'the slower arrangement with our regional distributor'
+    - 'the slower arrangement with Meridian Freight'
+    - 'the slower arrangement with our freight partner'
+    location:
+    - 'the regular service'
+    - 'the regular service in the northern region'
+    - 'the regular service into the Rotterdam DC'
+    - 'the regular service on the southern corridor'
+    timing:
+    - 'is becoming'
+    - 'is gradually becoming'
+    - 'has lately become'
+    - 'has recently become'
+    severity:
+    - 'the added waiting'
+    - 'the noticeable added waiting'
+    - 'the marked added waiting'
+    - 'the modest added waiting'
+  alert_spec:
+    family: lead_time_shift
+    target_stream: arrival
+    direction: arrival_delayed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_arrival_delay
+    kind: accurate
+- id: tpl_test_lead_time_shift_03
+  family: lead_time_shift
+  split: test
+  kind: accurate
+  wording_family: wf_handover_lead_time_shift
+  text: 'Purchasing notebook: {severity} {supplier} {timing} under {location}, beyond an isolated
+    delivery problem.'
+  slots:
+    supplier:
+    - 'supplier turnaround'
+    - 'distributor turnaround'
+    - 'freight-partner turnaround'
+    - 'haulier turnaround'
+    location:
+    - 'the revised routine'
+    - 'the revised routine in the northern region'
+    - 'the revised routine at the Rotterdam DC'
+    - 'the revised routine across this product range'
+    timing:
+    - 'is expected to persist'
+    - 'is expected to persist for the foreseeable future'
+    - 'looks set to persist'
+    - 'is likely to persist for a while yet'
+    severity:
+    - 'longer'
+    - 'noticeably longer'
+    - 'markedly longer'
+    - 'appreciably longer'
+  alert_spec:
+    family: lead_time_shift
+    target_stream: arrival
+    direction: arrival_delayed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_arrival_delay
+    kind: accurate
+- id: tpl_test_lead_time_shift_04
+  family: lead_time_shift
+  split: test
+  kind: accurate
+  wording_family: wf_handover_lead_time_shift
+  text: 'Transport handover: normal consignments are {timing} progressing through {location}, but
+    {supplier} makes arrival {severity} than before.'
+  slots:
+    supplier:
+    - 'the continuing service revision'
+    - 'the continuing service revision by our regional distributor'
+    - 'the continuing service revision by Meridian Freight'
+    - 'the continuing service revision by our freight partner'
+    location:
+    - 'the network'
+    - 'the northern region network'
+    - 'the Rotterdam DC network'
+    - 'the southern corridor network'
+    timing:
+    - 'still'
+    - 'for now'
+    - 'at present'
+    - 'currently'
+    severity:
+    - 'later'
+    - 'noticeably later'
+    - 'markedly later'
+    - 'appreciably later'
+  alert_spec:
+    family: lead_time_shift
+    target_stream: arrival
+    direction: arrival_delayed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_arrival_delay
+    kind: accurate
+- id: tpl_test_lead_time_shift_05
+  family: lead_time_shift
+  split: test
+  kind: overstated
+  wording_family: wf_handover_lead_time_shift
+  text: 'Escalated service entry: the {timing} {supplier} is described as extreme, with {location}
+    expected to arrive {severity} late.'
+  slots:
+    supplier:
+    - 'slowdown'
+    - 'slowdown reported by our regional distributor'
+    - 'slowdown reported by Meridian Freight'
+    - 'slowdown described by our freight partner'
+    location:
+    - 'routine deliveries'
+    - 'routine deliveries in the northern region'
+    - 'routine deliveries into the Rotterdam DC'
+    - 'routine deliveries across this product range'
+    timing:
+    - 'continuing'
+    - 'unrelenting'
+    - 'never-ending'
+    - 'prolonged'
+    severity:
+    - 'disastrously'
+    - 'catastrophically'
+    - 'hopelessly'
+    - 'ruinously'
+  alert_spec:
+    family: lead_time_shift
+    target_stream: arrival
+    direction: arrival_delayed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_arrival_delay
+    kind: overstated
+- id: tpl_test_lead_time_shift_06
+  family: lead_time_shift
+  split: test
+  kind: overstated
+  wording_family: wf_handover_lead_time_shift
+  text: 'Route risk note: {supplier} is portrayed as an {severity} and {timing} drag on {location},
+    far beyond ordinary planning allowances.'
+  slots:
+    supplier:
+    - 'the revised arrangement'
+    - 'the revised arrangement with our regional distributor'
+    - 'the revised arrangement with Meridian Freight'
+    - 'the revised arrangement imposed by our freight partner'
+    location:
+    - 'replenishment'
+    - 'replenishment in the northern region'
+    - 'replenishment into the Rotterdam DC'
+    - 'replenishment across this product range'
+    timing:
+    - 'enduring'
+    - 'unending'
+    - 'permanent'
+    - 'indefinite'
+    severity:
+    - 'immense'
+    - 'enormous'
+    - 'overwhelming'
+    - 'unrelenting'
+  alert_spec:
+    family: lead_time_shift
+    target_stream: arrival
+    direction: arrival_delayed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_arrival_delay
+    kind: overstated
+- id: tpl_test_lead_time_shift_07
+  family: lead_time_shift
+  split: test
+  kind: ambiguous
+  wording_family: wf_handover_lead_time_shift
+  text: 'Open service item: {location} {timing} out of date, though {supplier} do not establish
+    {severity} adjustment is needed.'
+  slots:
+    supplier:
+    - 'the route notes'
+    - 'the route notes from our regional distributor'
+    - 'the route notes from Meridian Freight'
+    - 'the route notes from our freight partner'
+    location:
+    - 'the usual arrival expectations'
+    - 'the usual arrival expectations in the northern region'
+    - 'the usual arrival expectations at the Rotterdam DC'
+    - 'the usual arrival expectations across this product range'
+    timing:
+    - 'may be'
+    - 'may lately be'
+    - 'may now be'
+    - 'may recently be'
+    severity:
+    - 'how much'
+    - 'how large an'
+    - 'what scale of'
+    - 'what degree of'
+  alert_spec:
+    family: lead_time_shift
+    target_stream: arrival
+    direction: arrival_delayed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_arrival_delay
+    kind: ambiguous
+- id: tpl_test_lead_time_shift_08
+  family: lead_time_shift
+  split: test
+  kind: ambiguous
+  wording_family: wf_handover_lead_time_shift
+  text: 'Purchasing query: a change to {location} {supplier} without a clear account of {severity}
+    or {timing}.'
+  slots:
+    supplier:
+    - 'has been mentioned'
+    - 'has been mentioned by our regional distributor'
+    - 'has been flagged by Meridian Freight'
+    - 'has been raised by our freight partner'
+    location:
+    - 'turnaround'
+    - 'turnaround in the northern region'
+    - 'turnaround at the Rotterdam DC'
+    - 'turnaround across this product range'
+    timing:
+    - 'how long it will remain relevant'
+    - 'when it will stop being relevant'
+    - 'how long it will stay in force'
+    - 'when it will lapse'
+    severity:
+    - 'its reach'
+    - 'its scale'
+    - 'its magnitude'
+    - 'its extent'
+  alert_spec:
+    family: lead_time_shift
+    target_stream: arrival
+    direction: arrival_delayed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_arrival_delay
+    kind: ambiguous
+- id: tpl_test_lead_time_shift_09
+  family: lead_time_shift
+  split: test
+  kind: distractor
+  wording_family: wf_handover_lead_time_shift
+  text: 'Service administration log: the {supplier} {location} {timing} uses its updated {topic}.'
+  slots:
+    supplier:
+    - 'carrier'
+    - 'regional carrier'
+    - 'contracted carrier'
+    - 'freight carrier'
+    location:
+    - 'directory'
+    - 'directory used in the northern region'
+    - 'directory kept at the Rotterdam DC'
+    - 'directory covering this product range'
+    timing:
+    - 'now'
+    - 'currently'
+    - 'as of this cycle'
+    - 'at present'
+    topic:
+    - 'trading name'
+    - 'brand name'
+    - 'registered name'
+    - 'display name'
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_test_lead_time_shift_10
+  family: lead_time_shift
+  split: test
+  kind: distractor
+  wording_family: wf_handover_lead_time_shift
+  text: 'Route-document note: a {topic} {format} {timing} from {location}.'
+  slots:
+    topic:
+    - 'duplicate'
+    - 'redundant'
+    - 'stale'
+    - 'superseded'
+    format:
+    - 'contact entry'
+    - 'contact record'
+    - 'address entry'
+    - 'supplier entry'
+    location:
+    - 'the address list'
+    - 'the address list used in the northern region'
+    - 'the address list at the Rotterdam DC'
+    - 'the address list covering this product range'
+    timing:
+    - 'has been removed'
+    - 'was removed earlier this week'
+    - 'was removed in recent days'
+    - 'has just been removed'
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_test_shipment_loss_01
+  family: shipment_loss
+  split: test
+  kind: accurate
+  wording_family: wf_handover_shipment_loss
+  text: 'Receiving handover: {supplier} are {timing} {severity} and must no longer be counted
+    {location}.'
+  slots:
+    supplier:
+    - 'the affected goods'
+    - 'the affected goods from our regional distributor'
+    - 'the affected goods shipped by Meridian Freight'
+    - 'the affected goods sent by our freight partner'
+    location:
+    - 'among arrivals still to come'
+    - 'among arrivals still to come at the Rotterdam DC'
+    - 'among arrivals still to come in the northern region'
+    - 'among arrivals still to come for this product range'
+    timing:
+    - 'confirmed'
+    - 'now confirmed'
+    - 'confirmed at this stage'
+    - 'formally confirmed'
+    severity:
+    - 'unrecoverable'
+    - 'clearly unrecoverable'
+    - 'fully unrecoverable'
+    - 'firmly unrecoverable'
+  alert_spec:
+    family: shipment_loss
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_arrival_loss
+    kind: accurate
+- id: tpl_test_shipment_loss_02
+  family: shipment_loss
+  split: test
+  kind: accurate
+  wording_family: wf_handover_shipment_loss
+  text: 'Cargo case note: {supplier} has made {location} {severity}, so their original delivery
+    {timing}.'
+  slots:
+    supplier:
+    - 'damage'
+    - 'damage reported by our regional distributor'
+    - 'damage confirmed by Meridian Freight'
+    - 'damage noted by our freight partner'
+    severity:
+    - 'unusable'
+    - 'badly unusable'
+    - 'clearly unusable'
+    - 'entirely unusable'
+    location:
+    - 'the affected goods'
+    - 'the affected goods bound for the Rotterdam DC'
+    - 'the affected goods bound for the northern region'
+    - 'the affected goods covering this product range'
+    timing:
+    - 'will not be completed'
+    - 'will not now be completed'
+    - 'will not be completed at this stage'
+    - 'will no longer be completed'
+  alert_spec:
+    family: shipment_loss
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_arrival_loss
+    kind: accurate
+- id: tpl_test_shipment_loss_03
+  family: shipment_loss
+  split: test
+  kind: accurate
+  wording_family: wf_handover_shipment_loss
+  text: 'Transport case closure: {supplier} for {location} has ended {severity}; waiting {timing}
+    will not bring those consignments in.'
+  slots:
+    supplier:
+    - 'the search'
+    - 'the search by our regional distributor'
+    - 'the search led by Meridian Freight'
+    - 'the search coordinated by our freight partner'
+    location:
+    - 'the missing goods'
+    - 'the missing goods bound for the Rotterdam DC'
+    - 'the missing goods bound for the northern region'
+    - 'the missing goods covering this product range'
+    timing:
+    - 'longer'
+    - 'any longer'
+    - 'beyond this stage'
+    - 'further'
+    severity:
+    - 'without recovery'
+    - 'with a clear shortfall'
+    - 'with a marked shortfall'
+    - 'with a noticeable shortfall'
+  alert_spec:
+    family: shipment_loss
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_arrival_loss
+    kind: accurate
+- id: tpl_test_shipment_loss_04
+  family: shipment_loss
+  split: test
+  kind: accurate
+  wording_family: wf_handover_shipment_loss
+  text: 'Warehouse handover: {supplier} cannot fulfil {location} because the goods were {severity}
+    {timing}.'
+  slots:
+    supplier:
+    - 'the affected dispatch'
+    - 'the affected dispatch from our regional distributor'
+    - 'the affected dispatch arranged by Meridian Freight'
+    - 'the affected dispatch sent by our freight partner'
+    location:
+    - 'its expected receipt'
+    - 'its expected receipt at the Rotterdam DC'
+    - 'its expected receipt in the northern region'
+    - 'its expected receipt for this product range'
+    timing:
+    - 'before delivery'
+    - 'ahead of delivery'
+    - 'prior to delivery'
+    - 'before reaching the dock'
+    severity:
+    - 'destroyed'
+    - 'completely destroyed'
+    - 'fully destroyed'
+    - 'effectively destroyed'
+  alert_spec:
+    family: shipment_loss
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_arrival_loss
+    kind: accurate
+- id: tpl_test_shipment_loss_05
+  family: shipment_loss
+  split: test
+  kind: overstated
+  wording_family: wf_handover_shipment_loss
+  text: 'Escalated cargo entry: {supplier} are described as an {severity} shortfall that {timing}
+    {location}.'
+  slots:
+    supplier:
+    - 'the missing goods'
+    - 'the missing goods from our regional distributor'
+    - 'the missing goods shipped by Meridian Freight'
+    - 'the missing goods sent by our freight partner'
+    location:
+    - 'the replenishment position'
+    - 'the replenishment position at the Rotterdam DC'
+    - 'the replenishment position in the northern region'
+    - 'the replenishment position across this product range'
+    severity:
+    - 'immense'
+    - 'overwhelming'
+    - 'enormous'
+    - 'unprecedented'
+    timing:
+    - 'will devastate'
+    - 'will soon devastate'
+    - 'will inevitably devastate'
+    - 'will before long devastate'
+  alert_spec:
+    family: shipment_loss
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_arrival_loss
+    kind: overstated
+- id: tpl_test_shipment_loss_06
+  family: shipment_loss
+  split: test
+  kind: overstated
+  wording_family: wf_handover_shipment_loss
+  text: 'Receiving risk outlook: {supplier} is being taken as a sign that {location} will {severity}
+    to arrive {timing}.'
+  slots:
+    supplier:
+    - 'the missing dispatch'
+    - 'the missing dispatch from our regional distributor'
+    - 'the missing dispatch arranged by Meridian Freight'
+    - 'the missing dispatch sent by our freight partner'
+    location:
+    - 'incoming goods'
+    - 'incoming goods at the Rotterdam DC'
+    - 'incoming goods in the northern region'
+    - 'incoming goods for this product range'
+    timing:
+    - 'for an extended stretch'
+    - 'for the foreseeable future'
+    - 'for a long while'
+    - 'over a prolonged spell'
+    severity:
+    - 'keep failing'
+    - 'repeatedly fail'
+    - 'persistently fail'
+    - 'continually fail'
+  alert_spec:
+    family: shipment_loss
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_arrival_loss
+    kind: overstated
+- id: tpl_test_shipment_loss_07
+  family: shipment_loss
+  split: test
+  kind: ambiguous
+  wording_family: wf_handover_shipment_loss
+  text: 'Open cargo case: {severity} of {supplier} {timing}, leaving {location} uncertain.'
+  slots:
+    supplier:
+    - 'some expected goods'
+    - 'some expected goods from our regional distributor'
+    - 'some expected goods shipped by Meridian Freight'
+    - 'some expected goods sent by our freight partner'
+    severity:
+    - 'the location and recoverability'
+    - 'the whereabouts and recoverability'
+    - 'the status and recoverability'
+    - 'the condition and recoverability'
+    timing:
+    - 'remain unresolved'
+    - 'remain unresolved for now'
+    - 'remain unresolved at this stage'
+    - 'remain unresolved as of this cycle'
+    location:
+    - 'their eventual receipt'
+    - 'their eventual receipt at the Rotterdam DC'
+    - 'their eventual receipt in the northern region'
+    - 'their eventual receipt for this product range'
+  alert_spec:
+    family: shipment_loss
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_arrival_loss
+    kind: ambiguous
+- id: tpl_test_shipment_loss_08
+  family: shipment_loss
+  split: test
+  kind: ambiguous
+  wording_family: wf_handover_shipment_loss
+  text: 'Unsettled receiving item: there is {severity} that affected goods {timing} {location}, but
+    {supplier} do not establish the outcome.'
+  slots:
+    supplier:
+    - 'the transport notes'
+    - 'the transport notes from our regional distributor'
+    - 'the transport notes shared by Meridian Freight'
+    - 'the transport notes provided by our freight partner'
+    location:
+    - 'the warehouse'
+    - 'the Rotterdam DC'
+    - 'the northern region warehouse'
+    - 'the regional depot'
+    timing:
+    - 'may not reach'
+    - 'may not presently reach'
+    - 'may not yet reach'
+    - 'might not reach'
+    severity:
+    - 'concern'
+    - 'growing concern'
+    - 'marked concern'
+    - 'noticeable concern'
+  alert_spec:
+    family: shipment_loss
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '1_3'
+    prospective_signature: sig_arrival_loss
+    kind: ambiguous
+- id: tpl_test_shipment_loss_09
+  family: shipment_loss
+  split: test
+  kind: distractor
+  wording_family: wf_handover_shipment_loss
+  text: 'Claims archive note: {topic} {timing} {format} into {location}.'
+  slots:
+    topic:
+    - 'completed case files'
+    - 'closed case files'
+    - 'finished claim files'
+    - 'settled case files'
+    timing:
+    - 'have been'
+    - 'have just been'
+    - 'were recently'
+    - 'were earlier this week'
+    format:
+    - 'sorted'
+    - 'filed'
+    - 'arranged'
+    - 'catalogued'
+    location:
+    - 'new folders'
+    - 'new folders in the northern region archive'
+    - 'new folders at the Rotterdam DC'
+    - 'new folders in the regional archive'
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_test_shipment_loss_10
+  family: shipment_loss
+  split: test
+  kind: distractor
+  wording_family: wf_handover_shipment_loss
+  text: 'Receiving administration entry: the {format} {topic} {timing} has {location}.'
+  slots:
+    topic:
+    - 'receipt stationery'
+    - 'receipt paper'
+    - 'receipt letterhead'
+    - 'receipt paperwork'
+    format:
+    - 'blank'
+    - 'empty'
+    - 'unused'
+    - 'unprinted'
+    timing:
+    - 'now'
+    - 'currently'
+    - 'as of this cycle'
+    - 'at present'
+    location:
+    - 'a revised footer'
+    - 'a revised footer for the northern region'
+    - 'a revised footer at the Rotterdam DC'
+    - 'a revised footer for this product range'
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_test_transit_pause_01
+  family: transit_pause
+  split: test
+  kind: accurate
+  wording_family: wf_handover_transit_pause
+  text: 'Hub handover: {supplier} is being {severity} while {timing} prevents {location}.'
+  slots:
+    supplier:
+    - 'cargo'
+    - 'cargo from our regional distributor'
+    - 'cargo shipped by Meridian Freight'
+    - 'cargo consigned by our freight partner'
+    timing:
+    - 'a temporary clearance restriction'
+    - 'a short-lived clearance restriction'
+    - 'a passing clearance restriction'
+    - 'a brief clearance restriction'
+    location:
+    - 'the next leg of its journey'
+    - 'the next leg of its journey towards the Rotterdam DC'
+    - 'the next leg of its journey towards the northern region'
+    - 'the next leg of its journey serving this product range'
+    severity:
+    - 'retained'
+    - 'firmly retained'
+    - 'temporarily retained'
+    - 'securely retained'
+  alert_spec:
+    family: transit_pause
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '4_8'
+    prospective_signature: sig_arrival_stall
+    kind: accurate
+- id: tpl_test_transit_pause_02
+  family: transit_pause
+  split: test
+  kind: accurate
+  wording_family: wf_handover_transit_pause
+  text: 'Movement log note: {supplier} has {timing} stopped {location}; the affected goods
+    {severity} for release when permission returns.'
+  slots:
+    supplier:
+    - 'forwarding'
+    - 'forwarding by our regional distributor'
+    - 'forwarding by Meridian Freight'
+    - 'forwarding by our freight partner'
+    location:
+    - 'at the interchange'
+    - 'at the interchange serving the Rotterdam DC'
+    - 'at the interchange serving the northern region'
+    - 'at the interchange serving this product range'
+    timing:
+    - 'temporarily'
+    - 'for a short spell'
+    - 'for the present moment'
+    - 'for a limited spell'
+    severity:
+    - 'remain available'
+    - 'remain fully available'
+    - 'remain safely available'
+    - 'stay available'
+  alert_spec:
+    family: transit_pause
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '4_8'
+    prospective_signature: sig_arrival_stall
+    kind: accurate
+- id: tpl_test_transit_pause_03
+  family: transit_pause
+  split: test
+  kind: accurate
+  wording_family: wf_handover_transit_pause
+  text: 'Transport handover: {supplier} has not been written off, but {location} is waiting on
+    {timing} of a {severity} hub restriction.'
+  slots:
+    supplier:
+    - 'the cargo'
+    - 'the cargo from our regional distributor'
+    - 'the cargo shipped by Meridian Freight'
+    - 'the cargo consigned by our freight partner'
+    location:
+    - 'onward travel'
+    - 'onward travel towards the Rotterdam DC'
+    - 'onward travel towards the northern region'
+    - 'onward travel serving this product range'
+    timing:
+    - 'the lifting'
+    - 'the expected lifting'
+    - 'the eventual lifting'
+    - 'the anticipated lifting'
+    severity:
+    - 'temporary'
+    - 'short-lived'
+    - 'passing'
+    - 'limited-duration'
+  alert_spec:
+    family: transit_pause
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '4_8'
+    prospective_signature: sig_arrival_stall
+    kind: accurate
+- id: tpl_test_transit_pause_04
+  family: transit_pause
+  split: test
+  kind: accurate
+  wording_family: wf_handover_transit_pause
+  text: 'Receiving notebook: {timing} at {location} is {severity} {supplier} from continuing towards
+    the warehouse.'
+  slots:
+    supplier:
+    - 'affected goods'
+    - 'affected goods from our regional distributor'
+    - 'affected goods shipped by Meridian Freight'
+    - 'affected goods consigned by our freight partner'
+    location:
+    - 'the transfer point'
+    - 'the transfer point serving the Rotterdam DC'
+    - 'the transfer point serving the northern region'
+    - 'the transfer point serving this product range'
+    timing:
+    - 'a temporary standstill'
+    - 'a short-lived standstill'
+    - 'a passing standstill'
+    - 'a brief standstill'
+    severity:
+    - 'preventing'
+    - 'currently preventing'
+    - 'effectively preventing'
+    - 'for now preventing'
+  alert_spec:
+    family: transit_pause
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '4_8'
+    prospective_signature: sig_arrival_stall
+    kind: accurate
+- id: tpl_test_transit_pause_05
+  family: transit_pause
+  split: test
+  kind: overstated
+  wording_family: wf_handover_transit_pause
+  text: 'Escalated hub note: {supplier} is portrayed as a {severity} standstill with {location}
+    unlikely {timing}.'
+  slots:
+    supplier:
+    - 'the hold'
+    - 'the hold reported by our regional distributor'
+    - 'the hold described by Meridian Freight'
+    - 'the hold flagged by our freight partner'
+    location:
+    - 'release'
+    - 'release towards the Rotterdam DC'
+    - 'release towards the northern region'
+    - 'release serving this product range'
+    timing:
+    - 'for a very long time'
+    - 'for an age'
+    - 'until far beyond the current spell'
+    - 'for a profoundly long stretch'
+    severity:
+    - 'severe and protracted'
+    - 'brutal and protracted'
+    - 'harsh and protracted'
+    - 'crushing and protracted'
+  alert_spec:
+    family: transit_pause
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '4_8'
+    prospective_signature: sig_arrival_stall
+    kind: overstated
+- id: tpl_test_transit_pause_06
+  family: transit_pause
+  split: test
+  kind: overstated
+  wording_family: wf_handover_transit_pause
+  text: 'Movement risk entry: {supplier} is being described as an {timing} blockade that could leave
+    {location} stranded {severity}.'
+  slots:
+    supplier:
+    - 'the restriction'
+    - 'the restriction reported by our regional distributor'
+    - 'the restriction described by Meridian Freight'
+    - 'the restriction flagged by our freight partner'
+    location:
+    - 'replenishment'
+    - 'replenishment into the Rotterdam DC'
+    - 'replenishment into the northern region'
+    - 'replenishment for this product range'
+    timing:
+    - 'indefinite'
+    - 'unending'
+    - 'open-ended'
+    - 'endless'
+    severity:
+    - 'without a workable recovery'
+    - 'with no workable recovery in sight'
+    - 'without any realistic recovery'
+    - 'with recovery utterly out of reach'
+  alert_spec:
+    family: transit_pause
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '4_8'
+    prospective_signature: sig_arrival_stall
+    kind: overstated
+- id: tpl_test_transit_pause_07
+  family: transit_pause
+  split: test
+  kind: ambiguous
+  wording_family: wf_handover_transit_pause
+  text: 'Open hub item: {supplier} may be {severity}, but {location} does not establish {timing}.'
+  slots:
+    supplier:
+    - 'onward movement'
+    - 'onward movement of goods from our regional distributor'
+    - 'onward movement of goods shipped by Meridian Freight'
+    - 'onward movement of goods consigned by our freight partner'
+    location:
+    - 'the handover'
+    - 'the handover at the Rotterdam DC'
+    - 'the handover in the northern region'
+    - 'the handover covering this product range'
+    timing:
+    - 'how broadly or for how long'
+    - 'how broadly or for what span'
+    - 'how widely or for how long'
+    - 'how far or for how long'
+    severity:
+    - 'constrained'
+    - 'noticeably constrained'
+    - 'markedly constrained'
+    - 'somewhat constrained'
+  alert_spec:
+    family: transit_pause
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '4_8'
+    prospective_signature: sig_arrival_stall
+    kind: ambiguous
+- id: tpl_test_transit_pause_08
+  family: transit_pause
+  split: test
+  kind: ambiguous
+  wording_family: wf_handover_transit_pause
+  text: 'Unresolved transport entry: {supplier} {location} {timing} without {severity} to
+    characterise the interruption.'
+  slots:
+    supplier:
+    - 'waiting'
+    - 'waiting of cargo from our regional distributor'
+    - 'waiting of cargo shipped by Meridian Freight'
+    - 'waiting of cargo consigned by our freight partner'
+    location:
+    - 'at the transfer point'
+    - 'at the transfer point serving the Rotterdam DC'
+    - 'at the transfer point serving the northern region'
+    - 'at the transfer point serving this product range'
+    timing:
+    - 'has been mentioned'
+    - 'was mentioned recently'
+    - 'has been mentioned in recent days'
+    - 'was mentioned earlier this cycle'
+    severity:
+    - 'enough detail'
+    - 'adequate detail'
+    - 'sufficient detail'
+    - 'clear detail'
+  alert_spec:
+    family: transit_pause
+    target_stream: arrival
+    direction: arrival_interrupted
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: transient
+    duration_bin: '4_8'
+    prospective_signature: sig_arrival_stall
+    kind: ambiguous
+- id: tpl_test_transit_pause_09
+  family: transit_pause
+  split: test
+  kind: distractor
+  wording_family: wf_handover_transit_pause
+  text: 'Hub administration entry: the {topic} {location} {timing} a new {format}.'
+  slots:
+    topic:
+    - 'enquiry'
+    - 'contact'
+    - 'service'
+    - 'partner'
+    location:
+    - 'directory'
+    - 'directory used in the northern region'
+    - 'directory kept at the Rotterdam DC'
+    - 'directory covering this product range'
+    timing:
+    - 'has'
+    - 'now has'
+    - 'just received'
+    - 'recently received'
+    format:
+    - 'page layout'
+    - 'page design'
+    - 'page template'
+    - 'page format'
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_test_transit_pause_10
+  family: transit_pause
+  split: test
+  kind: distractor
+  wording_family: wf_handover_transit_pause
+  text: 'Map filing note: the {audience} {topic} {timing} to {location}.'
+  slots:
+    audience:
+    - 'internal'
+    - 'team-only'
+    - 'shared'
+    - 'restricted'
+    topic:
+    - 'transit diagram'
+    - 'route diagram'
+    - 'network map'
+    - 'flow chart'
+    timing:
+    - 'has been moved'
+    - 'was moved earlier this week'
+    - 'was moved in recent days'
+    - 'has just been moved'
+    location:
+    - 'a different folder'
+    - 'a different folder for the northern region'
+    - 'a different folder at the Rotterdam DC'
+    - 'a different folder for this product range'
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_test_compound_01
+  family: compound
+  split: test
+  kind: accurate
+  wording_family: wf_handover_compound
+  text: 'Regional handover: {supplier} are placing {severity} requests as incoming goods wait
+    {location}, with both developments {timing} to the same disruption.'
+  slots:
+    supplier:
+    - 'customers'
+    - 'customers of our regional distributor'
+    - 'customers served by Meridian Freight'
+    - 'customers buying through our supply partner'
+    location:
+    - 'at the hub'
+    - 'at the hub serving the Rotterdam DC'
+    - 'at the hub serving the northern region'
+    - 'at the hub serving this product range'
+    timing:
+    - 'traced'
+    - 'traced this cycle'
+    - 'currently traced'
+    - 'now traced'
+    severity:
+    - 'extra'
+    - 'noticeable extra'
+    - 'marked extra'
+    - 'appreciable extra'
+  alert_spec:
+    family: compound
+    target_stream: both
+    direction: mixed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_compound
+    kind: accurate
+- id: tpl_test_compound_02
+  family: compound
+  split: test
+  kind: accurate
+  wording_family: wf_handover_compound
+  text: 'Incident notebook: {supplier} {timing} {severity} buying and simultaneously preventing
+    {location} from moving onward.'
+  slots:
+    supplier:
+    - 'the local emergency'
+    - 'the local emergency reported by our regional distributor'
+    - 'the local emergency described by Meridian Freight'
+    - 'the local emergency flagged by our freight partner'
+    location:
+    - 'replenishment'
+    - 'replenishment into the Rotterdam DC'
+    - 'replenishment into the northern region'
+    - 'replenishment for this product range'
+    timing:
+    - 'is prompting'
+    - 'is currently prompting'
+    - 'is presently prompting'
+    - 'is now prompting'
+    severity:
+    - 'additional'
+    - 'noticeable additional'
+    - 'marked additional'
+    - 'appreciable additional'
+  alert_spec:
+    family: compound
+    target_stream: both
+    direction: mixed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_compound
+    kind: accurate
+- id: tpl_test_compound_03
+  family: compound
+  split: test
+  kind: accurate
+  wording_family: wf_handover_compound
+  text: 'Branch review entry: {severity} {supplier} and {location} {timing} a regional cause rather
+    than being separate operational developments.'
+  slots:
+    supplier:
+    - 'customer take-up'
+    - 'customer take-up reported by our regional distributor'
+    - 'customer take-up noted by Meridian Freight'
+    - 'customer take-up tracked by our supply partner'
+    location:
+    - 'retained inbound cargo'
+    - 'retained inbound cargo at the Rotterdam DC'
+    - 'retained inbound cargo in the northern region'
+    - 'retained inbound cargo for this product range'
+    timing:
+    - 'share'
+    - 'currently share'
+    - 'presently share'
+    - 'now share'
+    severity:
+    - 'heavier'
+    - 'markedly heavier'
+    - 'noticeably heavier'
+    - 'distinctly heavier'
+  alert_spec:
+    family: compound
+    target_stream: both
+    direction: mixed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_compound
+    kind: accurate
+- id: tpl_test_compound_04
+  family: compound
+  split: test
+  kind: accurate
+  wording_family: wf_handover_compound
+  text: 'Operations handover: {supplier} {timing} {severity} that is translating into orders and
+    interrupted {location}.'
+  slots:
+    supplier:
+    - 'the event'
+    - 'the event reported by our regional distributor'
+    - 'the event described by Meridian Freight'
+    - 'the event flagged by our freight partner'
+    location:
+    - 'the passage of incoming goods'
+    - 'the passage of incoming goods towards the Rotterdam DC'
+    - 'the passage of incoming goods towards the northern region'
+    - 'the passage of incoming goods for this product range'
+    timing:
+    - 'has both increased'
+    - 'has both lately increased'
+    - 'has both recently increased'
+    - 'has both now increased'
+    severity:
+    - 'purchasing interest'
+    - 'marked purchasing interest'
+    - 'noticeable purchasing interest'
+    - 'appreciable purchasing interest'
+  alert_spec:
+    family: compound
+    target_stream: both
+    direction: mixed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_compound
+    kind: accurate
+- id: tpl_test_compound_05
+  family: compound
+  split: test
+  kind: overstated
+  wording_family: wf_handover_compound
+  text: 'Escalated regional entry: {supplier} is described as creating {severity} customer appetite
+    and a {timing} collapse of {location}.'
+  slots:
+    supplier:
+    - 'the shared disruption'
+    - 'the shared disruption reported by our regional distributor'
+    - 'the shared disruption described by Meridian Freight'
+    - 'the shared disruption flagged by our freight partner'
+    location:
+    - 'incoming supply'
+    - 'incoming supply into the Rotterdam DC'
+    - 'incoming supply into the northern region'
+    - 'incoming supply for this product range'
+    timing:
+    - 'prolonged'
+    - 'drawn-out'
+    - 'never-ending'
+    - 'long-running'
+    severity:
+    - 'boundless'
+    - 'limitless'
+    - 'insatiable'
+    - 'bottomless'
+  alert_spec:
+    family: compound
+    target_stream: both
+    direction: mixed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_compound
+    kind: overstated
+- id: tpl_test_compound_06
+  family: compound
+  split: test
+  kind: overstated
+  wording_family: wf_handover_compound
+  text: 'Branch risk outlook: {severity} {supplier} and a {timing} standstill in {location} are
+    being attributed to the same local event.'
+  slots:
+    supplier:
+    - 'purchasing'
+    - 'purchasing reported by our regional distributor'
+    - 'purchasing described by Meridian Freight'
+    - 'purchasing flagged by our supply partner'
+    location:
+    - 'replenishment'
+    - 'replenishment into the Rotterdam DC'
+    - 'replenishment into the northern region'
+    - 'replenishment for this product range'
+    timing:
+    - 'near-permanent'
+    - 'virtually permanent'
+    - 'never-ending'
+    - 'seemingly permanent'
+    severity:
+    - 'extraordinary'
+    - 'immense'
+    - 'overwhelming'
+    - 'boundless'
+  alert_spec:
+    family: compound
+    target_stream: both
+    direction: mixed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_compound
+    kind: overstated
+- id: tpl_test_compound_07
+  family: compound
+  split: test
+  kind: ambiguous
+  wording_family: wf_handover_compound
+  text: 'Open regional item: {supplier} {timing} concerns about {location}, but neither consequence
+    is {severity} characterised.'
+  slots:
+    supplier:
+    - 'there are'
+    - 'our regional distributor reports'
+    - 'Meridian Freight reports'
+    - 'our freight partner reports'
+    location:
+    - 'customer activity and incoming movement'
+    - 'customer activity and incoming movement around the Rotterdam DC'
+    - 'customer activity and incoming movement in the northern region'
+    - 'customer activity and incoming movement affecting this product range'
+    timing:
+    - 'linked'
+    - 'currently linked'
+    - 'presently linked'
+    - 'now linked'
+    severity:
+    - 'sufficiently'
+    - 'adequately'
+    - 'properly'
+    - 'fully'
+  alert_spec:
+    family: compound
+    target_stream: both
+    direction: mixed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_compound
+    kind: ambiguous
+- id: tpl_test_compound_08
+  family: compound
+  split: test
+  kind: ambiguous
+  wording_family: wf_handover_compound
+  text: 'Unsettled incident note: {supplier} may matter for both purchases and {location}; its
+    operational extent {timing} {severity}.'
+  slots:
+    supplier:
+    - 'the event'
+    - 'the event noted by our regional distributor'
+    - 'the event described by Meridian Freight'
+    - 'the event flagged by our freight partner'
+    location:
+    - 'receipt of goods'
+    - 'receipt of goods at the Rotterdam DC'
+    - 'receipt of goods in the northern region'
+    - 'receipt of goods for this product range'
+    timing:
+    - 'remains'
+    - 'currently remains'
+    - 'presently remains'
+    - 'for now remains'
+    severity:
+    - 'unclear'
+    - 'decidedly unclear'
+    - 'rather unclear'
+    - 'still unclear'
+  alert_spec:
+    family: compound
+    target_stream: both
+    direction: mixed
+    onset_window:
+    - -1
+    - 1
+    magnitude_bin: medium
+    persistence: persistent
+    duration_bin: longer
+    prospective_signature: sig_compound
+    kind: ambiguous
+- id: tpl_test_compound_09
+  family: compound
+  split: test
+  kind: distractor
+  wording_family: wf_handover_compound
+  text: 'Regional administration log: the {topic} {location} {timing} {format}.'
+  slots:
+    topic:
+    - 'branch'
+    - 'site'
+    - 'office'
+    - 'region'
+    location:
+    - 'directory'
+    - 'directory used in the northern region'
+    - 'directory kept at the Rotterdam DC'
+    - 'directory covering this product range'
+    timing:
+    - 'has been'
+    - 'has just been'
+    - 'has recently been'
+    - 'was recently'
+    format:
+    - 'reformatted'
+    - 'restructured'
+    - 'reorganised'
+    - 'restyled'
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
+- id: tpl_test_compound_10
+  family: compound
+  split: test
+  kind: distractor
+  wording_family: wf_handover_compound
+  text: 'Operations filing entry: the {topic} {format} {location} {timing} for archiving.'
+  slots:
+    topic:
+    - 'joint'
+    - 'shared'
+    - 'combined'
+    - 'cross-team'
+    format:
+    - 'commercial-logistics'
+    - 'sales-operations'
+    - 'commercial-transport'
+    - 'sales-logistics'
+    location:
+    - 'meeting notes'
+    - 'meeting notes for the northern region'
+    - 'meeting notes for the Rotterdam DC'
+    - 'meeting notes covering this product range'
+    timing:
+    - 'have a revised title'
+    - 'have had a revised title since earlier this week'
+    - 'received a revised title in recent days'
+    - 'have just had a revised title'
+  alert_spec:
+    family: no_change
+    target_stream: none
+    direction: none
+    onset_window: null
+    magnitude_bin: null
+    persistence: none
+    duration_bin: none
+    prospective_signature: PENDING_NO_CHANGE_SIGNATURE
+    kind: distractor
