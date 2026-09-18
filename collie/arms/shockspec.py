@@ -44,6 +44,7 @@ from dataclasses import asdict, dataclass, field
 from collie.arms.history import BenchmarkHistory
 from collie.arms.protocols import (
     ActivationPolicy,
+    RepairingSpecPrompter,
     SpecCompiler,
     SpecParser,
     SpecPrompter,
@@ -280,6 +281,8 @@ class ShockSpecArm:
 
     def reset(self) -> None:
         self._history.reset()
+        if isinstance(self.prompter, RepairingSpecPrompter):
+            self.prompter.reset()
         self._specs = []
         self._experimental = None
         self._compiled = None
@@ -289,6 +292,8 @@ class ShockSpecArm:
     def order(self, obs: PeriodObservation) -> Decision:
         self.channel.set_period(obs.period)
         self._history.observe(obs)
+        if isinstance(self.prompter, RepairingSpecPrompter):
+            self.prompter.observe(obs)
         self._history.record_demand(obs)
 
         lifecycle = self._lifecycle_step(obs)
@@ -357,14 +362,27 @@ class ShockSpecArm:
         if not self.trigger.should_propose(obs):
             return False
         prompt = self.prompter.prompt(obs)
-        raw_text = self.channel.complete(prompt)
+        raw_text = self.channel.complete_attempt(prompt, decoding_hash="det-v1", attempt_index=1)
         call_id = self.channel.last_call_id
         assert call_id is not None  # the channel stamps every call
         payload = self.parser.parse(raw_text)
+        outcome = ParseOutcome.ACCEPTED
         if payload is None:
             self.channel.settle(call_id, ParseOutcome.FALLBACK)
-            return True
-        self.channel.settle(call_id, ParseOutcome.ACCEPTED)
+            if not isinstance(self.prompter, RepairingSpecPrompter):
+                return True
+            prompt = self.prompter.repair_prompt()
+            raw_text = self.channel.complete_attempt(
+                prompt, decoding_hash="det-v1", attempt_index=2
+            )
+            call_id = self.channel.last_call_id
+            assert call_id is not None
+            payload = self.parser.parse(raw_text)
+            if payload is None:
+                self.channel.settle(call_id, ParseOutcome.FALLBACK)
+                return True
+            outcome = ParseOutcome.ACCEPTED_AFTER_REPAIR
+        self.channel.settle(call_id, outcome)
         spec = ShockSpec(
             **asdict(payload),
             tau_j=obs.period,
@@ -373,6 +391,8 @@ class ShockSpecArm:
             decoding_hash="det-v1",
             prompt_hash=hashlib.sha256(prompt.encode()).hexdigest(),
         )
+        if spec.is_abstention:
+            return True
         self.activation.register(spec, baseline=self._baseline_stats(spec))
         self._specs.append(spec)
         return True

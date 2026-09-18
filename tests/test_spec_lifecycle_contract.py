@@ -1,4 +1,4 @@
-"""Joint Module 2/5 contract gate.
+"""Joint Module 2/5 lifecycle contract gate.
 
 This file deliberately stays skipped until Module 5 publishes its real
 construction registry. A fake registry would make the central claim circular.

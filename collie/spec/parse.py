@@ -216,7 +216,7 @@ def parse_shockspec(
         except (ValueError, TypeError, RuntimeError, OSError) as error:
             latency_ms = (time.perf_counter() - started) * 1000
             errors.append(f"attempt {attempt_index}: {type(error).__name__}: {error}")
-            final_outcome = ParseOutcome.FALLBACK if attempt_index == 2 else None
+            final_outcome = ParseOutcome.FALLBACK
             calls.append(
                 _call_log(
                     call_id=(
@@ -266,8 +266,6 @@ def parse_shockspec(
             errors=tuple(errors),
         )
 
-    raise AssertionError("the two-attempt parse loop must always return")
-
 
 def _demo_prompt() -> PromptBundle:
     observation = PeriodObservation(
@@ -306,6 +304,10 @@ def _demo_corpus() -> Mapping[str, tuple[str, ...]]:
         "nested_code_block": (f"```text\n```json\n{canned.VALID}\n```\n```",),
         "truncated": (canned.TRUNCATED, canned.VALID),
         "empty": (canned.EMPTY, canned.VALID),
+        "duplicate_field": (
+            ' {"shock_family":"no_change","shock_family":"compound"}',
+            canned.VALID,
+        ),
         "extra_field": (canned.EXTRA_FIELD, canned.VALID),
         "smuggled_threshold": (canned.SMUGGLED_THRESHOLD, canned.VALID),
         "smuggled_falsifier": (canned.SMUGGLED_FALSIFIER, canned.VALID),
@@ -342,7 +344,7 @@ def _run_demo() -> int:
     from collie.fakes.fake_llm import FakeLLM
 
     prompt = _demo_prompt()
-    print("case\toutcome\tattempted\trepaired\trejected")
+    print("case\toutcome\tattempted\taccepted\trepaired\trejected")
     for name, responses in _demo_corpus().items():
         client = FakeLLM(responses=list(responses))
         result = parse_shockspec(
@@ -352,10 +354,12 @@ def _run_demo() -> int:
             arm_id="demo",
             proposal_index=1,
         )
-        rejected = sum(call.outcome in (None, ParseOutcome.FALLBACK) for call in result.calls)
+        rejected = sum(call.outcome is ParseOutcome.FALLBACK for call in result.calls)
+        accepted = sum(call.outcome is ParseOutcome.ACCEPTED for call in result.calls)
+        repaired = sum(call.outcome is ParseOutcome.ACCEPTED_AFTER_REPAIR for call in result.calls)
         print(
             f"{name}\t{result.outcome.value}\t{len(result.calls)}\t"
-            f"{int(len(result.calls) == 2)}\t{rejected}"
+            f"{accepted}\t{repaired}\t{rejected}"
         )
     return 0
 

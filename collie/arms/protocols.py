@@ -33,6 +33,7 @@ from collie.contracts import (
 __all__ = [
     "ActivationPolicy",
     "ProposalPayload",
+    "RepairingSpecPrompter",
     "SpecCompiler",
     "SpecParser",
     "SpecPrompter",
@@ -147,3 +148,14 @@ class ActivationPolicy(Protocol):
     def state(self) -> LifecycleState:
         """The current lifecycle state of the registered hypothesis."""
         ...
+
+
+@runtime_checkable
+class RepairingSpecPrompter(SpecPrompter, Protocol):
+    """Optional history/reset/repair seam; legacy one-shot prompters remain valid."""
+
+    def observe(self, obs: PeriodObservation) -> None: ...
+
+    def reset(self) -> None: ...
+
+    def repair_prompt(self) -> str: ...

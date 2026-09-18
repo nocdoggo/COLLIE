@@ -128,9 +128,6 @@ def build_prompt(
                 f"[{alert_id}] operational_message={json.dumps(alert.text, ensure_ascii=True)}"
             )
 
-    if len(evidence_ids) != len(set(evidence_ids)):
-        raise ValueError("evidence identifiers must be unique")
-
     schema_example = {
         "target_stream": "none | demand | arrival | both",
         "shock_family": (

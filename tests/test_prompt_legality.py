@@ -301,3 +301,21 @@ def test_history_permutation_future_filtering_and_alert_id_collisions() -> None:
         build_prompt([replace(first, alert=second.alert), second], tau_j=17)
     with pytest.raises(ValueError, match="at least one"):
         build_prompt([future], tau_j=17)
+
+
+def test_every_history_line_has_an_identifier():
+    bundle = _bundle()
+    history = bundle.text.split("VISIBLE HISTORY\n", 1)[1].split("\n\n", 1)[0]
+    identifiers = []
+    for line in history.splitlines():
+        match = re.match(r"^\[(obs_t\d+|alert_\d+)\] ", line)
+        assert match is not None, line
+        identifiers.append(match.group(1))
+    assert tuple(identifiers) == bundle.evidence_ids
+    assert len(identifiers) == len(set(identifiers))
+    assert identifiers == ["obs_t15", "obs_t16", "obs_t17", "alert_17"]
+
+
+def test_null_numeric_observation_is_rendered():
+    obs = replace(_observation(1, demand=1), prev_order=None)
+    assert "previous_order=null" in build_prompt([obs], tau_j=1).text

@@ -179,7 +179,10 @@ def test_ledger_counts_attempted_repaired_and_rejected() -> None:
     repair = build_repair_prompt(prompt)
     result = _parse(FakeLLM.repair_then_succeed())
     assert [call.attempt_index for call in result.calls] == [1, 2]
-    assert [call.outcome for call in result.calls] == [None, ParseOutcome.ACCEPTED_AFTER_REPAIR]
+    assert [call.outcome for call in result.calls] == [
+        ParseOutcome.FALLBACK,
+        ParseOutcome.ACCEPTED_AFTER_REPAIR,
+    ]
     assert [call.prompt_hash for call in result.calls] == [prompt.prompt_hash, repair.prompt_hash]
     assert len({call.call_id for call in result.calls}) == 2
     assert all(call.episode_id == "episode-safe-id" for call in result.calls)
@@ -277,7 +280,7 @@ def test_two_hostile_outputs_always_end_in_counted_fallback(raw) -> None:
     result = run(client)
     assert result.outcome is ParseOutcome.FALLBACK and result.spec is None
     assert len(result.calls) == len(result.errors) == client.n_calls == 2
-    assert [c.outcome for c in result.calls] == [None, ParseOutcome.FALLBACK]
+    assert [c.outcome for c in result.calls] == [ParseOutcome.FALLBACK, ParseOutcome.FALLBACK]
 
 
 class ProviderFailure(Exception):
@@ -305,7 +308,7 @@ def test_every_provider_exception_is_logged_with_at_most_one_repair(error_type, 
     client = Client()
     result = run(client)
     assert len(result.calls) == len(client.prompts) == 2
-    assert result.calls[0].outcome is None
+    assert result.calls[0].outcome is ParseOutcome.FALLBACK
     assert len(result.errors) == (1 if recover else 2)
     assert result.outcome is (
         ParseOutcome.ACCEPTED_AFTER_REPAIR if recover else ParseOutcome.FALLBACK
@@ -370,3 +373,56 @@ def test_arbitrary_model_text_never_escapes_the_accounted_boundary(raw) -> None:
 def test_extractor_rejects_non_json_numeric_extensions(constant) -> None:
     with pytest.raises(ValueError):
         extract_json_payload('{"value":' + constant + "}")
+
+
+@pytest.mark.parametrize(
+    "responses,expected",
+    [
+        ([canned.VALID], (1, 0, 0)),
+        ([canned.EMPTY, canned.VALID], (0, 1, 1)),
+        ([canned.EMPTY, canned.EMPTY], (0, 0, 2)),
+    ],
+)
+def test_ledger_counts_attempted_repaired_rejected(responses, expected):
+    client = FakeLLM(responses=responses)
+    result = _parse(client)
+    counts = tuple(
+        sum(call.outcome is outcome for call in result.calls)
+        for outcome in (
+            ParseOutcome.ACCEPTED,
+            ParseOutcome.ACCEPTED_AFTER_REPAIR,
+            ParseOutcome.FALLBACK,
+        )
+    )
+    assert counts == expected
+    assert client.n_calls == len(result.calls) == sum(counts)
+    assert len({call.call_id for call in result.calls}) == client.n_calls
+    assert [call.attempt_index for call in result.calls] == list(range(1, client.n_calls + 1))
+
+
+def test_demo_cli(capsys):
+    from collie.spec.parse import main
+
+    assert main(["--demo-corpus"]) == 0
+    rows = capsys.readouterr().out.strip().splitlines()
+    assert len(rows[1:]) >= 20
+    for row in rows[1:]:
+        _, outcome, attempted, accepted, repaired, rejected = row.split("\t")
+        assert outcome in {item.value for item in ParseOutcome}
+        assert int(attempted) == int(accepted) + int(repaired) + int(rejected)
+    assert main([]) == 0
+    assert "--demo-corpus" in capsys.readouterr().out
+
+
+def test_parse_module_entrypoint(capsys):
+    import runpy
+    import sys
+    import warnings
+    from unittest.mock import patch
+
+    with patch.object(sys, "argv", ["parse", "--demo-corpus"]), warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)
+        with pytest.raises(SystemExit) as error:
+            runpy.run_module("collie.spec.parse", run_name="__main__")
+    assert error.value.code == 0
+    assert "fallback_after_two_failures" in capsys.readouterr().out
