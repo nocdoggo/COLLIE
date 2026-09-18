@@ -81,11 +81,12 @@ def test_canonical_shapes_use_the_full_severity_range() -> None:
 
 def test_predictive_model_key_resolves_in_verifier_registry() -> None:
     """Joint with P4 (module 05's construction registry). Module 05 has not landed on ``main``
-    yet, so this checks 04's own internal consistency today: every key the mapping can emit is
-    drawn from the grid's own registered key set, never an ad hoc string invented in ``mapping.py``.
-    Extend this to import ``collie.verify.registry.CONSTRUCTIONS`` once 05 lands, per
-    ``docs/implementation/05-verifier.md``'s "Keyed by the predictive_model value module 04
-    emits."""
+    yet, so this checks 04's own internal consistency today: every label the mapping can emit is
+    drawn from the grid's own registered label set, never an ad hoc string invented in
+    ``mapping.py``. Per the 2026-09-18 deviation entry, the verifier resolves constructions from
+    the spec rather than from this label; the joint *compatibility* test between these labels
+    and ``collie.verify.registry.CONSTRUCTIONS`` lands with module 05's merge.
+    """
     from collie.control.grid import predictive_model_keys
 
     registered = predictive_model_keys()

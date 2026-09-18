@@ -41,6 +41,7 @@ class BenchmarkHistory:
     _queue: list[list[float | int]] = field(default_factory=list, repr=False)
     _demands: list[float] = field(default_factory=list, repr=False)
     _arrivals: list[float] = field(default_factory=list, repr=False)
+    _dispatches: dict[int, float] = field(default_factory=dict, repr=False)
     _observed_lead_times: list[int] = field(default_factory=list, repr=False)
     _last_order: float = field(default=0.0, repr=False)
     _prev_on_hand: float = field(default=0.0, repr=False)
@@ -52,6 +53,7 @@ class BenchmarkHistory:
         self._queue = []
         self._demands = []
         self._arrivals = []
+        self._dispatches = {}
         self._observed_lead_times = []
         self._last_order = 0.0
         self._prev_on_hand = 0.0
@@ -139,7 +141,21 @@ class BenchmarkHistory:
     def note_dispatch(self, period: int, quantity: float) -> None:
         """Record the quantity actually sent this period (post arm-level validation)."""
         self._queue.append([period, quantity])
+        self._dispatches[period] = quantity
         self._last_order = quantity
+
+    def dispatch_at(self, period: int) -> float:
+        """The quantity the arm itself sent at ``period``, from its own decision record.
+
+        The FIFO ``_queue`` is an attribution structure and is consumed as arrivals land; it
+        cannot answer "what did the arm order at period r" once a cohort pops. Activation
+        policies need exactly that question answered (an arrival-side construction conditions
+        on the dispatch), so the dispatch book is kept separately and never popped.
+        """
+        try:
+            return self._dispatches[period]
+        except KeyError:
+            raise KeyError(f"{self.arm_id!r} recorded no dispatch at period {period}") from None
 
     def update_insights(self, period: int, payload: Mapping[str, Any]) -> None:
         """The carry-over rule (``run_llm.py:882-890``), applied to an already-parsed payload.

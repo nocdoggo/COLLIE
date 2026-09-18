@@ -58,11 +58,21 @@ class FakeVerifier:
         self.observations_since_activation = 0
         self.history.append((spec.tau_j, LifecycleState.PROPOSED))
 
-    def observe(self, period: int, value: float) -> LifecycleState:
-        """Feed one post-proposal observation and return the resulting lifecycle state.
+    def observe(
+        self,
+        period: int,
+        demand: float,
+        *,
+        dispatch: float | None = None,
+        receipt: float | None = None,
+    ) -> LifecycleState:
+        """Feed one post-proposal period of evidence and return the lifecycle state.
 
-        Raises if handed an observation at or before ``tau_j``: the future-only boundary is the
-        property under test, so violating it must be loud even in a fake.
+        Raises if handed evidence at or before ``tau_j``: the future-only boundary is the
+        property under test, so violating it must be loud even in a fake. All three channels
+        are accepted and ignored — activation here is schedule-driven, not evidence-driven,
+        and the widened signature exists so the real verifier's seam is exercised, not a
+        narrower one.
         """
         if self.spec is None or self.tau_j is None:
             return self.state
