@@ -120,12 +120,34 @@ production-registry branch rather than the mirror-table fallback.
 - Slow calibration adds ~3 min to the default suite (~7.5 min under coverage). Fine for now;
   if CI time becomes painful, the deselect strategy is a maintainer decision, not P4's.
 
-## What P4 should do tomorrow, in order
+## What P4 should do, in order
 
-1. Read F1 and come to the key-space conversation with a preference; the recommendation is C.
-2. F2(ii): the adapter, once the protocol widening (module 06 side) lands or is agreed in
-   principle — the adapter can be written against the widened shape immediately.
-3. F3: demo subprocess tests plus error-path tests to 100%.
-4. Re-run the merge per `module05-merge-audit` (or cherry its `conftest.py` resolution), then
-   the full verification block: `make lint`, `uv run pytest -q`, `make check-freeze`,
+1. F2(ii): the adapter, against the widened protocol (already on main — see below).
+2. F3: demo subprocess tests plus error-path tests to 100%.
+3. The full verification block: `make lint`, `uv run pytest -q`, `make check-freeze`,
    `make equivalence`, `--cov=collie.verify` at 100%.
+
+## Resolution status — 2026-09-18 (updated post-audit)
+
+- **F1: decided, option C, implemented.** Dated entries in `prereg/deviations.md`. The
+  compiler label is descriptive metadata; the verifier keys off the spec. The joint
+  consistency test is `tests/test_key_compatibility.py` on this branch — it already earned
+  its keep on first run by surfacing that module 04's low/medium transit-pause row compiles
+  to the `lead_time_delay` label; the table records that pairing explicitly with a pointer to
+  the open tier-1 calibration question. Main-side docstrings updated (`grid.py`,
+  `mapping.py`, `test_control_mapping.py`, `00-foundation.md`).
+- **F2(i): done.** `ActivationPolicy.observe` is now
+  `observe(period, demand, *, dispatch=None, receipt=None)` on main; the arm feeds all three
+  channels from its history (new never-popped dispatch book), the rollback guard reads the
+  receipt channel for arrival directions and raises on a missing channel, and the conformance
+  test covers `observe` as well as `register`. **What remains for P4 is F2(ii): the adapter**
+  — a thin `collie/verify/` class implementing the protocol over `LifecycleManager` and the
+  stream verifiers, with `baseline=(mean, sd)` mapping onto `BaselineSpec`, evidence strictly
+  after `tau_j`, validity labels into the `RunRecord`, and conformance tests in the style of
+  `tests/test_arms_isolation.py`.
+- **F3: unchanged, still P4's.** 81% → 100%, demo subprocess tests plus error paths.
+- **F4: done.** Rename instruction added to `docs/module02_review_instructions.md` on
+  Crescent's branch (module 02 renames; module 05's filename is brief-prescribed).
+- **F5: done.** The merge on this branch carries the docstring line for `--replications`.
+- **New main is merged into this branch** (single `conftest.py` conflict, resolved as
+  documented above). The branch is at: full suite, lint, freeze, equivalence — all green.
