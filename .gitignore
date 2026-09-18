@@ -225,3 +225,12 @@ __marimo__/
 #   Generated submission directories: 2,640 order CSVs per full run, regenerable with
 #   `make arm1`. The scored summary that we actually cite lives in reports/ and is committed.
 /results/
+
+#   Cloud endpoint credentials (Module 06). Contains the API keys; never commit anything
+#   under this directory. The non-secret model registry lives at
+#   docs/module06_model_registry.json instead.
+/cloud_endpoint/
+
+#   Raw key material anywhere in the tree, not only under cloud_endpoint/ — a stray
+#   provider key must never be committable regardless of where it is dropped.
+*.key

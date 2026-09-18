@@ -1,0 +1,79 @@
+{
+  "notes": "Committed model registry; moved from cloud_endpoint/ on 2026-09-16 when that directory became fully untracked (operator instruction). The keys remain gitignored under cloud_endpoint/. Every entry live-verified against the provider's /models listing on its retrieval date. Default models set per operator instruction: gemini-3.8-flash for testing first; grok-4.20-0309-non-reasoning is the hosted-confirmation default (Checkpoint-1 audit ruling: the confirmation provider must differ from the primary); glm-5.3-flash is what the Z.ai coding plan actually serves.",
+  "providers": {
+    "google-gemini": {
+      "base_url_native": "https://generativelanguage.googleapis.com/v1beta",
+      "base_url_openai_compat": "https://generativelanguage.googleapis.com/v1beta/openai/",
+      "key_file": "gemini.key",
+      "default_model": "gemini-3.8-flash",
+      "retrieved": "2026-09-06",
+      "supports_seed": false,
+      "seed_evidence": "400 INVALID_ARGUMENT on the OpenAI-compat endpoint, 2026-09-06",
+      "models": {
+        "gemini-2.5-flash": {"display_name": "Gemini 2.5 Flash", "input_token_limit": 1048576, "output_token_limit": 65536},
+        "gemini-2.5-flash-lite": {"display_name": "Gemini 2.5 Flash-Lite", "input_token_limit": 1048576, "output_token_limit": 65536},
+        "gemini-2.5-pro": {"display_name": "Gemini 2.5 Pro", "input_token_limit": 1048576, "output_token_limit": 65536},
+        "gemini-3-flash-preview": {"display_name": "Gemini 3 Flash Preview", "input_token_limit": 1048576, "output_token_limit": 65536},
+        "gemini-3.1-flash-lite": {"display_name": "Gemini 3.1 Flash Lite", "input_token_limit": 1048576, "output_token_limit": 65536},
+        "gemini-3.1-flash-lite-preview": {"display_name": "Gemini 3.1 Flash Lite Preview", "input_token_limit": 1048576, "output_token_limit": 65536},
+        "gemini-3.1-pro-preview": {"display_name": "Gemini 3.1 Pro Preview", "input_token_limit": 1048576, "output_token_limit": 65536},
+        "gemini-3.1-pro-preview-customtools": {"display_name": "Gemini 3.1 Pro Preview Custom Tools", "input_token_limit": 1048576, "output_token_limit": 65536},
+        "gemini-3.5-flash": {"display_name": "Gemini 3.5 Flash", "input_token_limit": 1048576, "output_token_limit": 65536},
+        "gemini-3.5-flash-lite": {"display_name": "Gemini 3.5 Flash-Lite", "input_token_limit": 1048576, "output_token_limit": 65536},
+        "gemini-3.6-flash": {"display_name": "Gemini 3.6 Flash", "input_token_limit": 1048576, "output_token_limit": 65536},
+        "gemini-3.7-flash": {"display_name": "Gemini 3.7 Flash", "input_token_limit": 1048576, "output_token_limit": 65536},
+        "gemini-3.8-flash": {"display_name": "Gemini 3.8 Flash", "input_token_limit": 1048576, "output_token_limit": 65536},
+        "gemini-flash-latest": {"display_name": "Gemini Flash Latest", "input_token_limit": 1048576, "output_token_limit": 65536},
+        "gemini-flash-lite-latest": {"display_name": "Gemini Flash-Lite Latest", "input_token_limit": 1048576, "output_token_limit": 65536},
+        "gemini-omni-1.1-flash": {"display_name": "Gemini Omni 1.1 Flash", "input_token_limit": 131072, "output_token_limit": 65536},
+        "gemini-omni-flash-preview": {"display_name": "Gemini Omni Flash Preview", "input_token_limit": 131072, "output_token_limit": 65536},
+        "gemini-pro-latest": {"display_name": "Gemini Pro Latest", "input_token_limit": 1048576, "output_token_limit": 65536}
+      }
+    },
+    "xai": {
+      "base_url_openai_compat": "https://api.x.ai/v1",
+      "key_file": "grok.key",
+      "default_model": "grok-4.20-0309-non-reasoning",
+      "retrieved": "2026-09-07",
+      "supports_seed": true,
+      "seed_evidence": "seed accepted and an identical seeded repeat returned byte-identical content, 2026-09-07",
+      "notes": "Upstream's published Grok (x-ai/grok-4.1-fast via OpenRouter) is retired on the direct API; the default is the pinned dated snapshot of the current non-reasoning fast line. usage.total_tokens = prompt + completion + reasoning, so billable output is total - prompt; cross-checked to the micro-dollar against the server-side cost_in_usd_ticks field.",
+      "models": {
+        "grok-4.20-0309-non-reasoning": {"kind": "chat", "input_token_limit": 1000000, "role": "default"},
+        "grok-4.20-0309-reasoning": {"kind": "chat", "role": "reasoning sibling of the default"},
+        "grok-4.20-multi-agent-0309": {"kind": "chat", "role": "multi-agent variant"},
+        "grok-4.3": {"kind": "chat", "role": "stable alias"},
+        "grok-4.5": {"kind": "chat", "role": "stable alias"},
+        "grok-4.6": {"kind": "chat", "input_token_limit": 500000, "role": "flagship alias; reasoning tokens observed in usage"},
+        "grok-build-0.1": {"kind": "chat", "role": "build variant"},
+        "grok-imagine-image": {"kind": "media"},
+        "grok-imagine-image-2.0": {"kind": "media"},
+        "grok-imagine-image-quality": {"kind": "media"},
+        "grok-imagine-video": {"kind": "media"},
+        "grok-imagine-video-1.5": {"kind": "media"}
+      }
+    },
+    "zai": {
+      "base_url_openai_compat": "https://api.z.ai/api/coding/paas/v4",
+      "base_url_anthropic": "https://api.z.ai/api/anthropic (unused: our transport speaks OpenAI chat completions)",
+      "key_file": "zai.key",
+      "default_model": "glm-5.3-flash",
+      "retrieved": "2026-09-07",
+      "supports_seed": false,
+      "seed_evidence": "seed accepted without error but an identical seeded repeat returned different content (472819 vs 427619), 2026-09-07",
+      "notes": "Coding-plan subscription endpoint. The plan currently SERVES glm-5.3-flash regardless of the requested model id (requesting glm-4.5 or glm-4.6 echoes glm-5.3-flash, verified 2026-09-07); treat every id below as an alias until the plan exposes per-model routing, and record the echoed model in any benchmark ledger. Requests must send thinking={type: disabled} or reasoning tokens consume the completion budget and content returns empty. usage.completion_tokens already includes reasoning tokens (total = prompt + completion), so billable output is completion_tokens. Prices: paas list used as the dated shadow price over the flat subscription.",
+      "models": {
+        "glm-4.5": {"kind": "chat"},
+        "glm-4.5-air": {"kind": "chat"},
+        "glm-4.6": {"kind": "chat"},
+        "glm-4.7": {"kind": "chat"},
+        "glm-5": {"kind": "chat"},
+        "glm-5-turbo": {"kind": "chat"},
+        "glm-5.1": {"kind": "chat"},
+        "glm-5.2": {"kind": "chat"},
+        "glm-5.3": {"kind": "chat"},
+        "glm-5.3-flash": {"kind": "chat", "role": "default; the served model for every request on this plan as of 2026-09-07"}
+      }
+    }
+  }
+}
