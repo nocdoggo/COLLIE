@@ -151,3 +151,19 @@ production-registry branch rather than the mirror-table fallback.
 - **F5: done.** The merge on this branch carries the docstring line for `--replications`.
 - **New main is merged into this branch** (single `conftest.py` conflict, resolved as
   documented above). The branch is at: full suite, lint, freeze, equivalence — all green.
+
+## Final resolution — 2026-09-19
+
+- **F2(ii): done.** `collie.verify.VerifierActivationPolicy` implements the widened activation
+  protocol over the registered stream verifiers and `LifecycleManager`. The arm's `(mean, sd)`
+  tuple is frozen into a `BaselineSpec`; demand, dispatch, and receipt remain period-aligned; the
+  proposal-period observation conditions the arrival recursion without entering the strictly
+  post-`tau_j` e-process product. Lifecycle output records carry the consumed evidence-validity
+  label. Arm 10's pilot wiring now uses this adapter rather than `FakeVerifier`, and signature,
+  channel, boundary, reset, and end-to-end conformance tests cover the production call path.
+- **F3: done.** Subprocess audit tests execute the demand and arrival demos (the arrival demo also
+  runs the compound lifecycle path). In-process mirrors keep those child-process paths under the
+  coverage tracer, and deterministic guard tests cover the remaining error branches. The focused
+  command reports `1326/1326` statements and `100.00%` coverage for `collie.verify`.
+- **Final gates:** `1184 passed, 3 skipped` in the full suite (only provider-key tests skipped),
+  equivalence `219 passed`, lint clean, and the frozen core-contract hash intact.

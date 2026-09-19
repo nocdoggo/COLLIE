@@ -59,7 +59,6 @@ from collie.arms.shockspec import (
     ARM8_ARM_ID,
     ARM9_ARM_ID,
     ARM10_ARM_ID,
-    EProcessActivation,
     HeuristicRollbackActivation,
     ImmediateActivation,
     ShockSpecArm,
@@ -84,13 +83,13 @@ from collie.control.mapping import GridCompiler
 from collie.data.families import generate_episode
 from collie.data.splits import FAMILIES, build_units
 from collie.data.writer import write_pair
-from collie.fakes.fake_verifier import FakeVerifier
 from collie.llm import CallLedger, DiskCache, MeteredClient
 from collie.llm.client import RawResponse
 from collie.llm.demo import scripted_endpoint
 from collie.sim.loader import LoadedInstance, load_instance
 from collie.sim.runner import EpisodeRunner
 from collie.trigger.demo import DEMO_HORIZON, build_wrapped
+from collie.verify import VerifierActivationPolicy
 
 DEMO_HORIZON_LOCAL = DEMO_HORIZON  # the official synthetic horizon (env contract §1)
 
@@ -400,7 +399,7 @@ def run_ladder(
         for arm_id, activation in (
             (ARM8_ARM_ID, ImmediateActivation()),
             (ARM9_ARM_ID, HeuristicRollbackActivation()),
-            (ARM10_ARM_ID, EProcessActivation(FakeVerifier(activate_after=2))),
+            (ARM10_ARM_ID, VerifierActivationPolicy(episode_horizon=horizon)),
         ):
             arms.append(
                 (
