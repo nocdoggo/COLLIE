@@ -5,6 +5,9 @@ Every arm depends on protocols and receives its collaborators here: the metered 
 (``collie.control.mapping.GridCompiler`` and ``collie.control.controller.OrCompilerController``,
 wired here — arms never import them), and arm 4's fallback (arm 1's controller). No fixture
 touches a live endpoint; live calls are the ``needs_llm`` tests in ``tests/test_llm_client.py``.
+
+Module 05 adds ``--replications`` below: the Monte Carlo replication count for its
+calibration tests (CP2 default 2,000 per registered null).
 """
 
 from __future__ import annotations
@@ -72,3 +75,13 @@ def make_control_config(**overrides) -> ControlConfig:
     base = dict(m=1.0, l_eff=2, gamma=1.0, predictive_model="running")
     base.update(overrides)
     return ControlConfig(**base)
+
+
+def pytest_addoption(parser: pytest.Parser) -> None:
+    parser.addoption(
+        "--replications",
+        action="store",
+        default=2000,
+        type=int,
+        help="Monte Carlo replication count (CP2 default: 2,000 per registered null)",
+    )

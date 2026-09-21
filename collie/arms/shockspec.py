@@ -219,8 +219,7 @@ class EProcessActivation:
         self.verifier.reset()
 
     def register(self, spec: ShockSpec, *, baseline: tuple[float, float] | None = None) -> None:
-        del baseline  # the e-process carries its own evidence; baseline stats are not its input
-        self.verifier.register(spec)
+        self.verifier.register(spec, baseline=baseline)
 
     def observe(
         self,
@@ -343,7 +342,17 @@ class ShockSpecArm:
             return None
         latest = self._specs[-1]
         evidence_period = obs.period - 1
-        if evidence_period <= latest.tau_j:
+        if evidence_period < latest.tau_j:
+            return self.activation.state
+        if evidence_period == latest.tau_j:
+            condition = getattr(self.activation, "condition", None)
+            if condition is not None:
+                return condition(
+                    evidence_period,
+                    self._history.demands[evidence_period - 1],
+                    dispatch=self._history.dispatch_at(evidence_period),
+                    receipt=self._history.arrivals[evidence_period - 1],
+                )
             return self.activation.state
         return self.activation.observe(
             evidence_period,
@@ -373,6 +382,16 @@ class ShockSpecArm:
             decoding_hash="det-v1",
             prompt_hash=hashlib.sha256(prompt.encode()).hexdigest(),
         )
+        prime = getattr(self.activation, "prime", None)
+        if prime is not None:
+            prefix = range(1, spec.tau_j)
+            prime(
+                tuple(self._history.demands),
+                tuple(
+                    (self._history.dispatch_at(period), self._history.arrivals[period - 1])
+                    for period in prefix
+                ),
+            )
         self.activation.register(spec, baseline=self._baseline_stats(spec))
         self._specs.append(spec)
         return True
