@@ -239,8 +239,12 @@ The required joint invariant is bidirectional:
 1. every legal Module 02 spec resolves to exactly one verifier construction; and
 2. every registered construction is reachable from a legal spec.
 
-The real `collie.verify.registry` is not yet present on `main`. The joint test remains intentionally
-skip-guarded and must be completed when that dependency lands. No fake registry is introduced.
+No fake registry was introduced. **Update 2026-09-21:** module 05 merged to `main` and the
+skip guards in `tests/test_spec_lifecycle_contract.py` fired as designed; the guards were
+replaced with the real bidirectional enumeration over both production registries, an
+onset-window agreement assertion (both sides registered the identical four windows), and
+abstention-first checks against compiler and verifier. All joint tests pass, including module
+05's own P3 contract test, which now runs against this registry.
 
 ## 9. Verification status
 
@@ -260,9 +264,15 @@ The final local audit after merging the latest `main` produced:
 The two Module 05 skips reflect the missing real registry. The other three skips require local
 provider credentials and are unrelated to Module 02.
 
+**Update 2026-09-21 (post-integration):** with module 05 merged, the integrated tree reports
+1,587 passed and the two Module 05 skips are live tests that pass. `collie/spec` coverage
+remains 342/342 at 100%.
+
 ## 10. Deferred work
 
-- Complete the bidirectional verifier compatibility test when Module 05 lands.
+- ~~Complete the bidirectional verifier compatibility test when Module 05 lands.~~ Done
+  2026-09-21: module 05 merged, guards fired, real joint tests in
+  `tests/test_spec_lifecycle_contract.py` and `tests/test_key_compatibility.py` pass.
 - Coordinate removal of Module 04's provisional tier-2 closure.
 - Run three-seed robustness when supported real transport is available.
 - Evaluate held-out wording generalization with Module 03 test-split runs.
