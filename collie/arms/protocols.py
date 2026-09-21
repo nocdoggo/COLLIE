@@ -33,6 +33,7 @@ from collie.contracts import (
 __all__ = [
     "ActivationPolicy",
     "ProposalPayload",
+    "RepairingSpecPrompter",
     "SpecCompiler",
     "SpecParser",
     "SpecPrompter",
@@ -101,6 +102,14 @@ class ActivationPolicy(Protocol):
     Mirrors ``collie/fakes/fake_verifier.py``'s constraint: evidence enters only as the
     observable stream, strictly after ``tau_j``. The three arms 8/9/10 differ *only* in the
     injected implementation of this protocol (brief §6.4).
+
+    A policy may additionally define the optional hooks ``prime(demand_history,
+    arrival_history)`` and ``condition(period, demand, *, dispatch, receipt)``, discovered by
+    the arm through duck typing: they transfer already-observed pre-proposal history for
+    conditioning without admitting it to the e-process product. Module 05's
+    ``VerifierActivationPolicy`` implements them; policies that need no conditioning simply
+    omit them, and an implementation that needs them but forgets one fails loudly at
+    ``register`` or ``observe``.
     """
 
     def reset(self) -> None:
@@ -147,3 +156,14 @@ class ActivationPolicy(Protocol):
     def state(self) -> LifecycleState:
         """The current lifecycle state of the registered hypothesis."""
         ...
+
+
+@runtime_checkable
+class RepairingSpecPrompter(SpecPrompter, Protocol):
+    """Optional history/reset/repair seam; legacy one-shot prompters remain valid."""
+
+    def observe(self, obs: PeriodObservation) -> None: ...
+
+    def reset(self) -> None: ...
+
+    def repair_prompt(self) -> str: ...

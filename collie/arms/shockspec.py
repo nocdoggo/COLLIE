@@ -44,6 +44,7 @@ from dataclasses import asdict, dataclass, field
 from collie.arms.history import BenchmarkHistory
 from collie.arms.protocols import (
     ActivationPolicy,
+    RepairingSpecPrompter,
     SpecCompiler,
     SpecParser,
     SpecPrompter,
@@ -206,11 +207,13 @@ class HeuristicRollbackActivation:
 
 @dataclass(slots=True)
 class EProcessActivation:
-    """Arm 10's policy: defer to the injected verifier (FakeVerifier today, module 05 later).
+    """Arm 10's policy: defer to the injected verifier (FakeVerifier in tests; module 05's
+    ``VerifierActivationPolicy`` in production wiring, which additionally implements the
+    optional ``prime``/``condition`` conditioning hooks the arm discovers by duck typing).
 
-    The verifier's interface — ``register(spec)``, ``observe(period, demand, *, dispatch,
-    receipt) -> LifecycleState``, ``is_active``, ``reset()`` — is deliberately the future-only
-    one: the e-process may only see ``Y_r`` for ``r > tau_j``.
+    The verifier's interface — ``register(spec, *, baseline)``, ``observe(period, demand, *,
+    dispatch, receipt) -> LifecycleState``, ``is_active``, ``reset()`` — is deliberately the
+    future-only one: the e-process may only see ``Y_r`` for ``r > tau_j``.
     """
 
     verifier: object  # FakeVerifier-shaped; typed as object so module 05 drops in unchanged
@@ -279,6 +282,8 @@ class ShockSpecArm:
 
     def reset(self) -> None:
         self._history.reset()
+        if isinstance(self.prompter, RepairingSpecPrompter):
+            self.prompter.reset()
         self._specs = []
         self._experimental = None
         self._compiled = None
@@ -288,6 +293,8 @@ class ShockSpecArm:
     def order(self, obs: PeriodObservation) -> Decision:
         self.channel.set_period(obs.period)
         self._history.observe(obs)
+        if isinstance(self.prompter, RepairingSpecPrompter):
+            self.prompter.observe(obs)
         self._history.record_demand(obs)
 
         lifecycle = self._lifecycle_step(obs)
@@ -342,17 +349,19 @@ class ShockSpecArm:
             return None
         latest = self._specs[-1]
         evidence_period = obs.period - 1
-        if evidence_period < latest.tau_j:
-            return self.activation.state
-        if evidence_period == latest.tau_j:
-            condition = getattr(self.activation, "condition", None)
-            if condition is not None:
-                return condition(
-                    evidence_period,
-                    self._history.demands[evidence_period - 1],
-                    dispatch=self._history.dispatch_at(evidence_period),
-                    receipt=self._history.arrivals[evidence_period - 1],
-                )
+        if evidence_period <= latest.tau_j:
+            # In the runner's flow a spec enters ``_specs`` at its own proposal period, so the
+            # strict-less-than case is unreachable today; the guard stays because feeding
+            # pre-proposal evidence is the one mistake this module must never make.
+            if evidence_period == latest.tau_j:
+                condition = getattr(self.activation, "condition", None)
+                if condition is not None:
+                    return condition(
+                        evidence_period,
+                        self._history.demands[evidence_period - 1],
+                        dispatch=self._history.dispatch_at(evidence_period),
+                        receipt=self._history.arrivals[evidence_period - 1],
+                    )
             return self.activation.state
         return self.activation.observe(
             evidence_period,
@@ -366,14 +375,27 @@ class ShockSpecArm:
         if not self.trigger.should_propose(obs):
             return False
         prompt = self.prompter.prompt(obs)
-        raw_text = self.channel.complete(prompt)
+        raw_text = self.channel.complete_attempt(prompt, decoding_hash="det-v1", attempt_index=1)
         call_id = self.channel.last_call_id
         assert call_id is not None  # the channel stamps every call
         payload = self.parser.parse(raw_text)
+        outcome = ParseOutcome.ACCEPTED
         if payload is None:
             self.channel.settle(call_id, ParseOutcome.FALLBACK)
-            return True
-        self.channel.settle(call_id, ParseOutcome.ACCEPTED)
+            if not isinstance(self.prompter, RepairingSpecPrompter):
+                return True
+            prompt = self.prompter.repair_prompt()
+            raw_text = self.channel.complete_attempt(
+                prompt, decoding_hash="det-v1", attempt_index=2
+            )
+            call_id = self.channel.last_call_id
+            assert call_id is not None
+            payload = self.parser.parse(raw_text)
+            if payload is None:
+                self.channel.settle(call_id, ParseOutcome.FALLBACK)
+                return True
+            outcome = ParseOutcome.ACCEPTED_AFTER_REPAIR
+        self.channel.settle(call_id, outcome)
         spec = ShockSpec(
             **asdict(payload),
             tau_j=obs.period,
@@ -382,6 +404,8 @@ class ShockSpecArm:
             decoding_hash="det-v1",
             prompt_hash=hashlib.sha256(prompt.encode()).hexdigest(),
         )
+        if spec.is_abstention:
+            return True
         prime = getattr(self.activation, "prime", None)
         if prime is not None:
             prefix = range(1, spec.tau_j)
