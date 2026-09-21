@@ -207,11 +207,13 @@ class HeuristicRollbackActivation:
 
 @dataclass(slots=True)
 class EProcessActivation:
-    """Arm 10's policy: defer to the injected verifier (FakeVerifier today, module 05 later).
+    """Arm 10's policy: defer to the injected verifier (FakeVerifier in tests; module 05's
+    ``VerifierActivationPolicy`` in production wiring, which additionally implements the
+    optional ``prime``/``condition`` conditioning hooks the arm discovers by duck typing).
 
-    The verifier's interface — ``register(spec)``, ``observe(period, demand, *, dispatch,
-    receipt) -> LifecycleState``, ``is_active``, ``reset()`` — is deliberately the future-only
-    one: the e-process may only see ``Y_r`` for ``r > tau_j``.
+    The verifier's interface — ``register(spec, *, baseline)``, ``observe(period, demand, *,
+    dispatch, receipt) -> LifecycleState``, ``is_active``, ``reset()`` — is deliberately the
+    future-only one: the e-process may only see ``Y_r`` for ``r > tau_j``.
     """
 
     verifier: object  # FakeVerifier-shaped; typed as object so module 05 drops in unchanged
@@ -220,8 +222,7 @@ class EProcessActivation:
         self.verifier.reset()
 
     def register(self, spec: ShockSpec, *, baseline: tuple[float, float] | None = None) -> None:
-        del baseline  # the e-process carries its own evidence; baseline stats are not its input
-        self.verifier.register(spec)
+        self.verifier.register(spec, baseline=baseline)
 
     def observe(
         self,
@@ -348,7 +349,17 @@ class ShockSpecArm:
             return None
         latest = self._specs[-1]
         evidence_period = obs.period - 1
-        if evidence_period <= latest.tau_j:
+        if evidence_period < latest.tau_j:
+            return self.activation.state
+        if evidence_period == latest.tau_j:
+            condition = getattr(self.activation, "condition", None)
+            if condition is not None:
+                return condition(
+                    evidence_period,
+                    self._history.demands[evidence_period - 1],
+                    dispatch=self._history.dispatch_at(evidence_period),
+                    receipt=self._history.arrivals[evidence_period - 1],
+                )
             return self.activation.state
         return self.activation.observe(
             evidence_period,
@@ -393,6 +404,16 @@ class ShockSpecArm:
         )
         if spec.is_abstention:
             return True
+        prime = getattr(self.activation, "prime", None)
+        if prime is not None:
+            prefix = range(1, spec.tau_j)
+            prime(
+                tuple(self._history.demands),
+                tuple(
+                    (self._history.dispatch_at(period), self._history.arrivals[period - 1])
+                    for period in prefix
+                ),
+            )
         self.activation.register(spec, baseline=self._baseline_stats(spec))
         self._specs.append(spec)
         return True

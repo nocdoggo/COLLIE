@@ -72,6 +72,7 @@ def test_activation_policies_match_the_protocol_signature() -> None:
         ImmediateActivation,
     )
     from collie.fakes import FakeVerifier
+    from collie.verify import VerifierActivationPolicy
 
     declared_register = inspect.signature(ActivationPolicy.register).parameters
     declared_observe = inspect.signature(ActivationPolicy.observe).parameters
@@ -81,6 +82,7 @@ def test_activation_policies_match_the_protocol_signature() -> None:
         HeuristicRollbackActivation,
         EProcessActivation,
         FakeVerifier,
+        VerifierActivationPolicy,
     ):
         for method, declared in (("register", declared_register), ("observe", declared_observe)):
             actual = inspect.signature(getattr(impl, method)).parameters
