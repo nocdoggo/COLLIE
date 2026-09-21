@@ -349,17 +349,19 @@ class ShockSpecArm:
             return None
         latest = self._specs[-1]
         evidence_period = obs.period - 1
-        if evidence_period < latest.tau_j:
-            return self.activation.state
-        if evidence_period == latest.tau_j:
-            condition = getattr(self.activation, "condition", None)
-            if condition is not None:
-                return condition(
-                    evidence_period,
-                    self._history.demands[evidence_period - 1],
-                    dispatch=self._history.dispatch_at(evidence_period),
-                    receipt=self._history.arrivals[evidence_period - 1],
-                )
+        if evidence_period <= latest.tau_j:
+            # In the runner's flow a spec enters ``_specs`` at its own proposal period, so the
+            # strict-less-than case is unreachable today; the guard stays because feeding
+            # pre-proposal evidence is the one mistake this module must never make.
+            if evidence_period == latest.tau_j:
+                condition = getattr(self.activation, "condition", None)
+                if condition is not None:
+                    return condition(
+                        evidence_period,
+                        self._history.demands[evidence_period - 1],
+                        dispatch=self._history.dispatch_at(evidence_period),
+                        receipt=self._history.arrivals[evidence_period - 1],
+                    )
             return self.activation.state
         return self.activation.observe(
             evidence_period,
