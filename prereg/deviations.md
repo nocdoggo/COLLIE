@@ -97,6 +97,41 @@ Two guards read this file:
 
 ## Gate 2 — registered method files
 
+### 2026-09-21 — three claim-hygiene findings on the merged verifier, fenced as exploratory
+
+- **Artefact:** `collie/verify/adapter.py` and `collie/verify/arrival.py` as merged in PR #6.
+  No frozen file changes hash; module 05's files are not yet registered.
+- **New sha256:** n/a — no frozen artefact is edited.
+- **What changed:** nothing yet — this entry records three findings from the automated PR
+  review, triaged by the integration auditor, so the claims boundary is on the record before
+  any confirmatory run.
+  1. **The demand null's parameters are prefix-estimated.** The adapter freezes the arm's
+     pre-proposal `(mean, sd)` into the `STATIONARY_IID` null. The checkpoint calibration
+     measured the exact-null case (registered parameters as truth and as null); the runtime
+     path estimates them from the prefix. The estimate is `F_{tau_j}`-measurable, so the
+     conditioning argument survives, but the finite-sample label strictly covers the
+     exact-null case only. Before any confirmatory use: extend calibration to the
+     prefix-estimated-null path, or register the estimator as part of the frozen method.
+  2. **Alternative arrival filters start from the null posterior.** For onset windows with
+     negative offsets, a component whose regime begins before `tau_j` never filters the
+     prefix under its own changed law (`arrival.py:476` copies the null posterior). The
+     e-property is preserved — each component still emits a proper, predictable conditional
+     density with common support — so validity holds; what degrades is **power** for
+     already-in-progress shocks, the case those windows exist for. Fix candidate: filter the
+     prefix under each alternative; measure the power difference before the pilot.
+  3. **`arrival_source` defaults to `collie_shockspec` without a provenance binding.** The
+     2026-09-08 arrival-law deviation promised that only episodes bound to the registered law
+     receive the theorem-backed arrival label; the binding mechanism is still open, so the
+     adapter currently attaches the label by default.
+- **Why:** none of the three makes merged code mechanically wrong, and all output is stamped
+  `analysis_class = exploratory` (with a hard guard refusing `empirical_only` rows a
+  confirmatory label), so nothing downstream can consume these labels confirmatorily today.
+  But the derivation note's rule is that a disagreement is a finding with a dated entry, not
+  a quiet fix — and findings 1 and 3 sit exactly on the claim the paper protects.
+- **Blast radius:** none to any published or checkpoint number. Before Gate 2 freezes module
+  05 and before any confirmatory contrast consumes arm 10, all three need either a fix or an
+  explicit registered scope decision, owned by P4.
+
 ### 2026-09-18 — `predictive_model` is descriptive metadata; the verifier keys off the spec
 
 - **Artefact:** the documented intent of `collie/control/grid.py` and
