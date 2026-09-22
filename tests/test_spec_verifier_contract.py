@@ -1,4 +1,4 @@
-"""Module 02/05 contract test, runnable against the frozen schema before convergence."""
+"""Module 02/05 contract test, in both directions against the merged registries."""
 
 from __future__ import annotations
 
@@ -18,9 +18,10 @@ from collie.contracts import (
 from collie.fakes import canned
 from collie.verify.registry import CONSTRUCTIONS, resolve_spec, resolve_spec_shape
 
-# Frozen Module 02 side of the interface.  This is intentionally independent of Module 05's
-# CONSTRUCTIONS table so the pre-convergence test can fail when either side drifts.  Once P3 lands,
-# the second test below additionally imports and compares its production registry.
+# Module 02 side of the interface, transcribed independently of Module 05's CONSTRUCTIONS table
+# so this file fails when either side drifts.  Module 02 has landed, and the second test below
+# compares this transcription against its production registry, which makes the two mutual
+# cross-checks: a silent edit to either table, or to this transcription, breaks a test.
 MODULE02_ACTIONABLE_SHAPES = {
     (ShockFamily.DEMAND_LEVEL, "sig_demand_level_up", TargetStream.DEMAND, Direction.DEMAND_UP),
     (
@@ -93,27 +94,28 @@ def test_spec_maps_to_exactly_one_construction() -> None:
     assert len(resolved) == len(MODULE02_ACTIONABLE_SHAPES) == 7
 
 
-def test_module02_and_verifier_registries_match_when_p3_is_present() -> None:
-    try:
-        from collie.spec.registry import FAMILY_SIGNATURE
-    except ModuleNotFoundError as exc:
-        if exc.name != "collie.spec.registry":
-            raise
-        # README's late-convergence rule: assert against the independent frozen stand-in rather than
-        # silently passing an assertion-free branch.  P3's production table replaces this source
-        # automatically when it lands.
-        module02_pairs = {
-            (family, signature) for family, signature, _, _ in MODULE02_ACTIONABLE_SHAPES
-        }
-    else:
-        module02_pairs = {
-            (family, signature)
-            for family, signatures in FAMILY_SIGNATURE.items()
-            if family is not ShockFamily.NO_CHANGE
-            for signature in signatures
-        }
+def test_module02_and_verifier_registries_match() -> None:
+    """Module 02's production pairing registry against module 05's construction registry.
+
+    Both sides have landed, so this reads the real ``FAMILY_SIGNATURE`` unconditionally; the
+    late-convergence fallback that used to stand in for an absent ``collie.spec.registry`` is
+    gone rather than left as a branch nothing can reach.
+    """
+    from collie.spec.registry import FAMILY_SIGNATURE
+
+    module02_pairs = {
+        (family, signature)
+        for family, signatures in FAMILY_SIGNATURE.items()
+        if family is not ShockFamily.NO_CHANGE
+        for signature in signatures
+    }
     verifier_pairs = {(item.family, item.signature) for item in CONSTRUCTIONS.values()}
     assert module02_pairs == verifier_pairs
+    # And the independent transcription at the top of this file still agrees with both, so a
+    # matched edit to the two registries cannot pass unnoticed.
+    assert module02_pairs == {
+        (family, signature) for family, signature, _, _ in MODULE02_ACTIONABLE_SHAPES
+    }
 
 
 def test_foundation_module02_fake_reaches_the_registered_verifier() -> None:

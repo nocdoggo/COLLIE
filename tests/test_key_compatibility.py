@@ -11,8 +11,11 @@ verifier derives its construction from the ``ShockSpec`` itself. The joint invar
 4. for every spec the verifier accepts, the compiled label is compatible with the resolved
    construction — including the pulse cell, where one compiler label legitimately covers two
    different constructions (level shift and bounded-duration pulse);
-5. a shape outside the registered space (pulse-down, pending module 02's pairing registry)
-   is rejected loudly today, so it cannot silently become expressible later.
+5. a shape outside the registered space (pulse-down) is rejected loudly, so it cannot silently
+   become expressible later. Module 02's pairing registry has landed and settled the question
+   the other way from module 04's tier-1 table: ``collie.spec.registry`` registers
+   ``sig_demand_pulse`` as ``demand_up`` only, so pulse-down is not expressible on the spec
+   side and this assertion is now the standing guard rather than a placeholder.
 """
 
 from __future__ import annotations
@@ -118,12 +121,12 @@ def test_compiled_label_is_compatible_with_the_resolved_construction(
     )
 
 
-def test_pulse_down_is_rejected_loudly_pending_module_02s_pairing_registry() -> None:
-    """Direction 5: module 04 compiles a downward pulse, module 05 registers pulse only as
-    DEMAND_UP, and the derivation note lists pulse once. Until module 02's legal-pairing
-    registry settles the shape, a pulse-down spec must fail here — loudly, so the day the
-    registry lands this test forces the table conversation instead of letting the shape leak
-    through as a level shift."""
+def test_pulse_down_is_rejected_loudly() -> None:
+    """Direction 5: module 04's tier-1 table compiles a downward pulse, module 05 registers pulse
+    only as DEMAND_UP, and the derivation note lists pulse once. Module 02's registry has landed
+    and agrees with module 05 (``sig_demand_pulse`` is ``demand_up``), so a pulse-down spec must
+    keep failing here — loudly, so the shape cannot leak through as a level shift and so any
+    later widening of the pairing registry has to come through this test."""
     spec = _spec_for("demand_pulse")
     pulse_down = ShockSpec(**{**spec.model_dump(), "direction": Direction.DEMAND_DOWN})
     with pytest.raises(ValueError, match="direction does not match"):

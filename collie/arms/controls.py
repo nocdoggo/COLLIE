@@ -514,7 +514,7 @@ class DetectorToCompilerArm(CompilerSwitchArm):
 
 
 # ---------------------------------------------------------------------------
-# control 2 — the keyword parser (provisional until module 03)
+# control 2 — the keyword parser
 # ---------------------------------------------------------------------------
 
 ARRIVAL_ALERT_KEYWORDS = (
@@ -568,7 +568,10 @@ KEYWORD_RULES: tuple[tuple[tuple[str, ...], ProposalPayload], ...] = (
     (DEMAND_UP_ALERT_KEYWORDS, DEMAND_UP_PAYLOAD),
     (DEMAND_DOWN_ALERT_KEYWORDS, _DEMAND_DOWN_PAYLOAD),
 )
-"""The keyword table, **provisional until module 03** owns alert parsing. Matching is plain
+"""The keyword table. Module 03's alert bank has landed (``collie/data/alerts/``) and owns alert
+*generation* — templates, conditions, and content controls — but no text parser, so this table
+is module 06's own and is reviewed at Gate 2 alongside arm 9's guard constants. It exists to
+answer "a keyword rule would do", so it is a real rule rather than a strawman. Matching is plain
 substring on the lowercased text (which is why the multi-word cues work — and why ``"port"``
 fires inside ``"report"``; the test suite pins that consequence so the choice is explicit).
 First class in this tuple wins when the text hits several — registration order, no scoring."""

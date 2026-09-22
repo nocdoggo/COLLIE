@@ -41,11 +41,13 @@ def dev_episode_streams(
 ) -> list[tuple[str, int, int, list[PeriodObservation]]]:
     """Materialise dev episodes and build each one's (demand, alert) observation stream.
 
-    The alert channel does not exist yet (module 03 lands later), so the demo injects one
-    synthetic accurate alert at ``onset - 1`` — the fixture convention
-    (``collie/fakes/fake_generator.py``) — clearly labelled in the table caption. Triggers read
-    ``prev_demand`` and alerts only, so the stream is a pure function of the episode and no
-    policy needs to run.
+    The demo injects one synthetic accurate alert at ``onset - 1`` — the fixture convention
+    (``collie/fakes/fake_generator.py``) — clearly labelled in the table caption. Module 03's
+    alert bank has landed (``collie/data/alerts/``), and this stays synthetic on purpose:
+    rendering from the bank would make trigger firing times depend on template sampling and on
+    the bank's noise and decoy conditions, when the point of this table is the *rules'*
+    firing behaviour against a known onset. Triggers read ``prev_demand`` and alerts only, so
+    the stream is a pure function of the episode and no policy needs to run.
     """
     units = build_units(Split.DEV)
     by_family = {f: [u for u in units if u.family == f] for f in FAMILIES}
@@ -131,8 +133,8 @@ def trigger_table(episodes: int) -> str:
     """The Checkpoint 1 table: every rule's firing periods against the true onset."""
     lines = [
         f"Trigger-time table: {episodes} dev episodes, horizon {DEMO_HORIZON}, onsets U{{14..22}}.",
-        "Alert channel: one synthetic accurate alert at onset-1 per episode, a demo stand-in",
-        "until module 03 lands. periodic/random are budget-matched to alert_or_detector's",
+        "Alert channel: one synthetic accurate alert at onset-1 per episode, deliberately not",
+        "module 03's bank. periodic/random are budget-matched to alert_or_detector's",
         f"realised count on the same episode. Wrappers: refractory {FROZEN.refractory_window},",
         f"cap {FROZEN.max_proposals}. rel_onset = firing period minus true onset.",
         "",

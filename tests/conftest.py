@@ -6,6 +6,13 @@ Every arm depends on protocols and receives its collaborators here: the metered 
 wired here — arms never import them), and arm 4's fallback (arm 1's controller). No fixture
 touches a live endpoint; live calls are the ``needs_llm`` tests in ``tests/test_llm_client.py``.
 
+The other two seams are wired per test rather than by fixture, because both are stateful per
+arm: module 02's ``ShockSpecPrompter`` / ``ShockSpecParser`` pair (``tests/test_spec_adapters.py``,
+and ``tools/run_arms.py`` for the demo ladder) and module 05's ``VerifierActivationPolicy``
+(``tests/test_verifier_adapter.py``). ``collie/fakes/`` is still used deliberately, as the
+stand-in that proves no arm depends on a concrete collaborator, not as a substitute for an
+unlanded module.
+
 Module 05 adds ``--replications`` below: the Monte Carlo replication count for its
 calibration tests (CP2 default 2,000 per registered null).
 """

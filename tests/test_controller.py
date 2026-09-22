@@ -246,15 +246,16 @@ def test_reset_clears_accumulated_history() -> None:
 
 def test_shared_control_path_byte_identical() -> None:
     """Every OR-compiler arm — the detector control, the parsing upper bound, and the oracle —
-    is, as of this checkpoint, an instance of this exact class wrapping a chosen
-    ``ControlConfig``. Two such instances, given the same config and the same observation
-    sequence, must produce byte-identical decisions: any divergence would mean two arms could
-    differ for a reason other than which hypothesis was active, which is the one thing the
-    paper's arm ladder cannot tolerate.
+    is an instance of this exact class wrapping a chosen ``ControlConfig``. Two such instances,
+    given the same config and the same observation sequence, must produce byte-identical
+    decisions: any divergence would mean two arms could differ for a reason other than which
+    hypothesis was active, which is the one thing the paper's arm ladder cannot tolerate.
 
-    Once module 06 exists, extend this to construct the detector/parsing-upper-bound/oracle
-    controllers through their real code paths and assert equality against a bare
-    ``OrCompilerController`` directly, rather than two bare instances of it as done here.
+    This is the module-04-local half, and on its own it is close to tautological. Module 06 has
+    landed and supplies the load-bearing half:
+    ``tests/test_controls.py::test_every_control_and_the_oracle_route_identically`` builds the
+    four real arms through their real code paths over a real episode, asserts one distinct order
+    stream, and pins non-vacuousness against a never-switching baseline.
     """
     config = ControlConfig(m=1.5, l_eff=3, gamma=0.5, predictive_model="probe")
     observations = [

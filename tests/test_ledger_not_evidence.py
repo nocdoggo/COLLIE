@@ -1,11 +1,11 @@
 """Module 04, Checkpoint 2 — the ledger must never reach the verifier.
 
 Two independent checks, both required by ``docs/implementation/04-or-compiler.md``: a static AST
-scan over ``collie/verify/`` (today an empty stub, since module 05 has not landed on ``main``
-yet — see the dependency graph in ``docs/implementation/README.md``) and a runtime object-graph
-walk over whatever is about to be handed to a verifier. Both are proven here against a
-deliberately leaky fixture, not just against the real (currently empty) ``collie/verify/``, so
-the checks are demonstrated to actually fire rather than passing vacuously.
+scan over ``collie/verify/`` and a runtime object-graph walk over whatever is about to be handed
+to a verifier. Module 05 has landed, so the static scan now runs over the real e-process,
+arrival, lifecycle, and adapter sources rather than an empty package. Both checks are also
+proven against a deliberately leaky fixture, so they are demonstrated to actually fire rather
+than passing vacuously over clean code.
 """
 
 from __future__ import annotations
@@ -43,10 +43,10 @@ class LeakyConstruction:
 # ---------------------------------------------------------------------------
 
 
-def test_real_verify_package_has_no_ledger_references_today() -> None:
-    """The actual (currently empty) ``collie/verify/`` passes cleanly. This is the check the
-    real Checkpoint 2 audit runs; it is expected to keep passing as module 05 lands, precisely
-    because that module must never import the ledger."""
+def test_real_verify_package_has_no_ledger_references() -> None:
+    """The merged ``collie/verify/`` passes cleanly. This is the check the Checkpoint 2 audit
+    runs; it keeps passing now that module 05 has landed precisely because that module must
+    never import the ledger. The ``paths`` assertion keeps it from passing vacuously."""
     paths = list(VERIFY_DIR.rglob("*.py"))
     assert paths, "collie/verify/ has no python files to scan; the scan would prove nothing"
     assert scan_for_ledger_references(paths) == []
@@ -79,8 +79,8 @@ def test_static_scan_catches_attribute_access_too(tmp_path: Path) -> None:
 
 @dataclass(frozen=True, slots=True)
 class _LeakyVerifierInputs:
-    """Stands in for whatever module 05 will eventually pass its construction: a plausible
-    verifier-input bundle that got the ledger smuggled into it through a nested field."""
+    """Stands in for the bundle module 05 passes its construction: a plausible verifier-input
+    shape that got the ledger smuggled into it through a nested field."""
 
     period: int
     observed_value: float

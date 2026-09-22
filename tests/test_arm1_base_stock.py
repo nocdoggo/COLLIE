@@ -24,7 +24,14 @@ from collie.arms.base_stock import (
 )
 from collie.contracts import ObservationMode, PeriodObservation, find_hidden_state
 from collie.data.instances import InstanceKey, enumerate_instances, stratified_sample
-from collie.eval.submission import aggregate, run_submission, score_instance, write_results_csv
+from collie.eval.submission import (
+    BatchScore,
+    SubmissionScores,
+    aggregate,
+    run_submission,
+    score_instance,
+    write_results_csv,
+)
 from collie.sim.loader import LoadedInstance, load_instance
 from collie.sim.runner import EpisodeRunner
 from tests.test_episode_runner import make_instance
@@ -298,6 +305,27 @@ def test_write_results_csv_has_the_official_header(tmp_path: Path) -> None:
 def test_aggregate_refuses_an_empty_submission() -> None:
     with pytest.raises(ValueError, match="empty submission"):
         aggregate([])
+
+
+def test_batch_lookup_names_the_batches_it_has() -> None:
+    """A mistyped batch name must list the real ones, not return a silent ``None``.
+
+    Every published comparison selects a batch by name, so this lookup is on the path to a
+    number in the paper: failing loudly with the available names is what stops a typo from
+    quietly becoming a missing row.
+    """
+    scores = SubmissionScores(
+        overall_score=0.5,
+        total_instances=1,
+        batches=(
+            BatchScore(
+                name="synthetic_trajectory", num_instances=1, score=0.5, service_level_mean=0.9
+            ),
+        ),
+    )
+    assert scores.batch("synthetic_trajectory").score == 0.5
+    with pytest.raises(KeyError, match="no batch 'real_trajectory'"):
+        scores.batch("real_trajectory")
 
 
 @pytest.mark.needs_benchmark

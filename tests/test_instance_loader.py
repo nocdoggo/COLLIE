@@ -23,6 +23,7 @@ from collie.contracts import (
 from collie.data.instances import (
     InstanceKey,
     _lead_time_label,
+    _read_header_economics,
     cost_ratio_label,
     enumerate_instances,
     stratified_sample,
@@ -385,6 +386,38 @@ def test_lead_time_label_must_be_present() -> None:
     assert _lead_time_label("real_trajectory/lead_time_stochastic/x") == "lead_time_stochastic"
     with pytest.raises(ValueError, match="no lead-time label"):
         _lead_time_label("real_trajectory/unlabelled/x")
+
+
+# ---------------------------------------------------------------------------
+# header parsing: the two ways an instance CSV can be malformed
+# ---------------------------------------------------------------------------
+
+
+def test_header_economics_refuses_a_file_with_no_data_rows(tmp_path: Path) -> None:
+    """A header-only ``test.csv`` must name itself, not surface as a bare IndexError.
+
+    The census reads the first data row of 1,320 files; a truncated one is the realistic
+    failure, and enumeration has to say which file rather than dying on ``rows[0]``.
+    """
+    csv_path = tmp_path / "test.csv"
+    csv_path.write_text(
+        f"exact_dates_{ITEM},demand_{ITEM},lead_time_{ITEM},profit_{ITEM},holding_cost_{ITEM}\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="has a header but no data rows"):
+        _read_header_economics(csv_path)
+
+
+def test_header_economics_refuses_a_file_with_no_demand_column(tmp_path: Path) -> None:
+    """The item id is derived from the ``demand_*`` column, so its absence is unrecoverable."""
+    csv_path = tmp_path / "test.csv"
+    csv_path.write_text(
+        f"exact_dates_{ITEM},sales_{ITEM},profit_{ITEM},holding_cost_{ITEM}\n"
+        "2024-01-01,10.0,4.0,1.0\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match=r"no demand_\* column"):
+        _read_header_economics(csv_path)
 
 
 @pytest.mark.needs_benchmark

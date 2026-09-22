@@ -15,7 +15,9 @@ Lifecycle rules (frozen contracts + derivation note §5):
   at most two proposals — the shared trigger's ``MaxProposalsWrapper`` enforces the cap).
 * Evidence enters the policy strictly after ``tau_j``: at decision period ``t`` the arm feeds
   ``Y_{t-1}`` and only when ``t - 1 > tau_j``, so the future-only boundary holds by
-  construction (the fake verifier raises on violation; the real one will inherit the seam).
+  construction, and both policies on the seam raise on violation rather than degrade — the
+  fake verifier and module 05's ``VerifierActivationPolicy.observe``
+  ("verifier evidence must be strictly after tau_j", ``collie/verify/adapter.py``).
 
 The activation policies:
 
@@ -26,8 +28,11 @@ The activation policies:
   order path reverts to baseline). The guard's constants are module 06's heuristic, registered
   here and reviewed at Gate 2 — arm 9 exists to answer "a heuristic guard would do", so it must
   be a real guard, not a strawman.
-* ``EProcessActivation`` (arm 10): defers entirely to the injected verifier
-  (``collie/fakes/fake_verifier.py`` today, module 05's e-processes unchanged later).
+* ``EProcessActivation`` (arm 10): defers entirely to the injected verifier. Module 05 landed
+  and its ``collie.verify.VerifierActivationPolicy`` satisfies ``ActivationPolicy`` directly,
+  so ``tools/run_arms.py`` injects it as the policy; this wrapper stays for verifier objects
+  that expose the e-process surface without being a policy themselves
+  (``collie/fakes/fake_verifier.py``, used by the isolation tests).
 
 What the model is asked and how its answer validates belongs to module 02 (``SpecPrompter`` /
 ``SpecParser`` seams); the ShockSpec-to-ControlConfig mapping belongs to module 04

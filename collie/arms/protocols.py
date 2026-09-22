@@ -1,12 +1,19 @@
 """Injection seams between the arms (module 06) and modules 02, 04, and 05.
 
 The arm ladder is built against these protocols and receives every collaborator by injection
-(module brief §3): no arm imports a concrete compiler, controller, parser, or verifier. Module
-04 has landed: its ``collie.control.mapping.GridCompiler`` and
-``collie.control.controller.OrCompilerController`` satisfy ``SpecCompiler`` and the shared
-``Controller`` seam unchanged, and are wired in ``tests/conftest.py`` and
-``tools/run_arms.py``. Modules 02 and 05 are still stood in for — by test-local
-prompters/parsers and the fakes in ``collie/fakes/`` — until their real implementations land.
+(module brief §3): no arm imports a concrete compiler, controller, parser, or verifier. All
+three owning modules have landed, and every seam below is satisfied by its real implementation
+without either side changing shape:
+
+* module 02 — ``collie.spec.adapters.ShockSpecPrompter`` satisfies ``SpecPrompter`` and
+  ``RepairingSpecPrompter``, ``collie.spec.adapters.ShockSpecParser`` satisfies ``SpecParser``;
+* module 04 — ``collie.control.mapping.GridCompiler`` satisfies ``SpecCompiler`` and
+  ``collie.control.controller.OrCompilerController`` the shared ``Controller`` seam;
+* module 05 — ``collie.verify.VerifierActivationPolicy`` satisfies ``ActivationPolicy``.
+
+All of them are wired in ``tests/conftest.py`` and ``tools/run_arms.py``; the fakes in
+``collie/fakes/`` stay as the isolation stand-ins that prove no arm depends on a concrete
+collaborator (``tests/test_arms_isolation.py``), not as substitutes for a missing module.
 
 The shapes are deliberately minimal — they state what the *arms* need, not what the owning
 module will offer, so neither side guesses at the other's design decisions.
