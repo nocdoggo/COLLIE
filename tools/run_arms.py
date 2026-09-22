@@ -7,12 +7,19 @@ stored records), and balances the ledger across the sweep. Run:
     uv run python -m tools.run_arms --split dev --episodes 18 --table
 
 What this is and is not. It IS the integration proof: one runner, one metered stack, the shared
-physical proposal call set, and the headroom band between stationary OR and the oracle. It is
-NOT a result: the LLM is a scripted transport serving canned payloads (valid action, default
-parameters, one ShockSpec proposal), the alert channel is the synthetic accurate-alert stand-in
-from the trigger demo (module 03 lands later), and the numbers say nothing about any arm's
-merit. Arms 8/9/10's activation spread *is* real (the scripted proposal drives them apart by
-construction, which is what the divergence test pins).
+physical proposal call set, and the headroom band between stationary OR and the oracle. Every
+collaborator is the owning module's real implementation — module 02's ``ShockSpecPrompter`` /
+``ShockSpecParser``, module 04's ``GridCompiler`` / ``OrCompilerController``, module 05's
+``VerifierActivationPolicy`` for arm 10 — so a proposal here is really registry-validated and
+really evidence-gated.
+
+It is NOT a result. Two inputs are deliberately synthetic and neither is a missing dependency:
+the LLM is a scripted transport serving canned payloads (valid action, default parameters, one
+ShockSpec proposal), and the alert channel is one synthetic accurate alert at ``onset - 1``
+rather than module 03's bank, so the ladder's shape does not depend on template sampling or on
+the bank's noise and decoy conditions. The numbers say nothing about any arm's merit. Arms
+8/9/10's activation spread *is* real (the scripted proposal drives them apart by construction,
+which is what the divergence test pins).
 
 Only ``dev`` episodes are ever touched; nothing here reads test material. The two upper-bound
 arms (AlertSpec parsing, oracle) are constructed with hidden truth by design and run with the
@@ -54,7 +61,6 @@ from collie.arms.llm_to_or import (
     LlmToOrArm,
 )
 from collie.arms.oracle import ORACLE_ARM_ID, OracleShockSpecArm, incident_to_payload
-from collie.arms.protocols import ProposalPayload
 from collie.arms.shockspec import (
     ARM8_ARM_ID,
     ARM9_ARM_ID,
@@ -67,15 +73,10 @@ from collie.contracts import (
     AlertKind,
     AlertMessage,
     ControlConfig,
-    Direction,
-    DurationBin,
     HiddenAlertSpec,
     HiddenIncident,
-    MagnitudeBin,
-    Persistence,
     ShockFamily,
     Split,
-    TargetStream,
 )
 from collie.control.controller import OrCompilerController
 from collie.control.grid import baseline_config_for
@@ -88,6 +89,7 @@ from collie.llm.client import RawResponse
 from collie.llm.demo import scripted_endpoint
 from collie.sim.loader import LoadedInstance, load_instance
 from collie.sim.runner import EpisodeRunner
+from collie.spec.adapters import ShockSpecParser, ShockSpecPrompter
 from collie.trigger.demo import DEMO_HORIZON, build_wrapped
 from collie.verify import VerifierActivationPolicy
 
@@ -100,7 +102,15 @@ DEMO_HORIZON_LOCAL = DEMO_HORIZON  # the official synthetic horizon (env contrac
 _DEMO_ACTION_QTY = 100
 """The scripted direct-action order, a round number near the dev demand level (~100/period)."""
 
-_SPEC_PROPOSAL_PREFIX = "spec-proposal|"
+_SPEC_PROPOSAL_MARKER = "bounded ShockSpec"
+"""Routes the scripted transport to the ShockSpec payload.
+
+Module 02 owns the real proposal prompt (``collie.spec.prompt.build_prompt``), so the demo does
+not invent a prefix of its own: this is a substring of that prompt's first line, and
+``tests/test_run_arms.py`` pins that it still matches a freshly built prompt, so a wording change
+on module 02's side fails a test instead of silently misrouting to the direct-action payload. A
+repair prompt appends to the same text, so attempt 2 routes identically.
+"""
 
 
 class _DemoTransport:
@@ -114,7 +124,7 @@ class _DemoTransport:
 
     def complete_metered(self, prompt: str, *, decoding, system: str | None = None) -> RawResponse:
         self.n_calls += 1
-        if prompt.startswith(_SPEC_PROPOSAL_PREFIX):
+        if _SPEC_PROPOSAL_MARKER in prompt:
             text = json.dumps(
                 {
                     "target_stream": "demand",
@@ -166,40 +176,17 @@ class _DemoTransport:
         return "item_id"
 
 
-class _DemoPrompter:
-    """Module-02 stand-in: a deterministic proposal prompt from observable fields only."""
+def spec_adapters() -> tuple[ShockSpecPrompter, ShockSpecParser]:
+    """One module-02 prompter/parser pair, for exactly one arm.
 
-    def prompt(self, obs) -> str:
-        alert = obs.alert.text if obs.alert else ""
-        return (
-            f"{_SPEC_PROPOSAL_PREFIX}p={obs.period}|on_hand={obs.on_hand}"
-            f"|transit={obs.in_transit_total}|prev_demand={obs.prev_demand}|alert={alert}"
-        )
-
-
-class _DemoParser:
-    """Module-02 stand-in: json -> ProposalPayload; None on anything unparseable."""
-
-    def parse(self, text: str) -> ProposalPayload | None:
-        try:
-            data = json.loads(text)
-            return ProposalPayload(
-                target_stream=TargetStream(data["target_stream"]),
-                shock_family=ShockFamily(data["shock_family"]),
-                direction=Direction(data["direction"]),
-                onset_window=tuple(data["onset_window"])
-                if data.get("onset_window") is not None
-                else None,
-                magnitude_bin=MagnitudeBin(data["magnitude_bin"])
-                if data.get("magnitude_bin") is not None
-                else None,
-                persistence=Persistence(data["persistence"]),
-                duration_bin=DurationBin(data["duration_bin"]),
-                evidence_refs=tuple(data.get("evidence_refs", ())),
-                prospective_signature=data["prospective_signature"],
-            )
-        except (KeyError, ValueError, TypeError, json.JSONDecodeError):
-            return None
+    The pair is per-arm, never shared: ``ShockSpecParser`` validates a proposal against the
+    evidence identifiers of its own prompter's last rendered prompt, so two arms sharing a pair
+    would validate against each other's evidence set (``collie/spec/adapters.py``). Arms 8/9/10
+    still share the *physical* call, because the prompt bytes are a pure function of the visible
+    history and the cache keys on them, not on which arm asked.
+    """
+    prompter = ShockSpecPrompter()
+    return prompter, ShockSpecParser(prompter)
 
 
 # ---------------------------------------------------------------------------
@@ -401,13 +388,14 @@ def run_ladder(
             (ARM9_ARM_ID, HeuristicRollbackActivation()),
             (ARM10_ARM_ID, VerifierActivationPolicy(episode_horizon=horizon)),
         ):
+            prompter, parser = spec_adapters()
             arms.append(
                 (
                     arm_id,
                     ShockSpecArm(
                         channel=channel(arm_id),
-                        prompter=_DemoPrompter(),
-                        parser=_DemoParser(),
+                        prompter=prompter,
+                        parser=parser,
                         compiler=compiler,
                         activation=activation,
                         baseline=OrCompilerController(
@@ -530,8 +518,10 @@ def render_table(rows: list[ArmRow], episodes: int) -> str:
     """The main-table shape on dev: one row per arm, every cell from stored records."""
     lines = [
         f"Module 06 arm ladder — dev split, {episodes} episodes, horizon {DEMO_HORIZON_LOCAL}.",
-        "Scripted LLM transport (canned payloads) and a synthetic accurate-alert stand-in —",
-        "the shape is real, the numbers are placeholder-grade and say nothing about merit.",
+        "Real collaborators throughout: module 02's prompter/parser, module 04's compiler and",
+        "controller, module 05's verifier activation policy on arm 10. Synthetic by choice:",
+        "a scripted LLM transport (canned payloads) and one accurate alert at onset-1 — so the",
+        "shape is real and the numbers are placeholder-grade, saying nothing about merit.",
         "",
         "| Arm | mean norm. reward | fill rate | calls | in tok | out tok | USD | p95 ms |",
         "|---|---|---|---|---|---|---|---|",
@@ -560,6 +550,35 @@ def render_headroom(rows: list[ArmRow]) -> str:
     )
 
 
+@dataclass(frozen=True)
+class ProposalSharing:
+    """Measured call sharing across arms 8/9/10, rather than an asserted collapse factor.
+
+    Every proposal decision point is charged to all three arms, so ``charged == 3 * points``
+    always. ``physical`` is only equal to ``points`` when all three arms rendered identical
+    prompt bytes there — true for the first proposal, where the three have not yet diverged,
+    and false for a second proposal after their own orders have moved the observable state
+    the module-02 prompt reports. Printing the measurement keeps the demo from claiming a
+    uniform collapse it does not have.
+    """
+
+    points: int
+    physical: int
+    charged: int
+
+
+def proposal_sharing(ledger: CallLedger) -> ProposalSharing:
+    """Restrict the ledger to arms 8/9/10 and count decision points, physical, and charged."""
+    spec_arms = {ARM8_ARM_ID, ARM9_ARM_ID, ARM10_ARM_ID}
+    charged = [c for c in ledger.charged_entries() if c.arm_id in spec_arms]
+    points = {(c.episode_id, c.period, c.attempt_index) for c in charged}
+    return ProposalSharing(
+        points=len(points),
+        physical=sum(1 for c in ledger.entries if c.physical and c.arm_id in spec_arms),
+        charged=len(charged),
+    )
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--split", default="dev", choices=["dev"], help="dev only, ever")
@@ -576,9 +595,12 @@ def main(argv: list[str] | None = None) -> int:
     print(table)
     physical = sum(1 for c in ledger.entries if c.physical)
     charged = len(ledger.charged_entries())
+    sharing = proposal_sharing(ledger)
     print(
-        f"\nledger: physical {physical}, charged {charged}, conserved; "
-        f"shared proposal calls across arms 8/9/10 collapse to one physical call each."
+        f"\nledger: physical {physical}, charged {charged}, conserved.\n"
+        f"arms 8/9/10 proposals: {sharing.points} decision points, {sharing.charged} charged "
+        f"copies, {sharing.physical} physical — identical prompt bytes share one physical call, "
+        f"and a second proposal stops sharing once the arms' own orders diverge."
     )
     return 0
 

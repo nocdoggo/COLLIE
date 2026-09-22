@@ -15,21 +15,27 @@ moves ``gamma`` alone (arrivals are the same expected timing, just less trustwor
 transit-pause moves both (delayed *and* less trustworthy); compound moves ``m`` and the supply
 pair together.
 
-**Tier 2 — the closure.** Module 02's registry of legal family-signature pairings has not landed
-on ``main`` yet (``docs/implementation/README.md``'s dependency graph). Until it does, the
-*frozen* ``ShockSpec`` validator in ``collie/contracts.py`` alone defines "legal", and it permits
-combinations no real generation path would produce — ``shock_family=demand_level`` paired with
+**Tier 2 — the closure.** This module's notion of "legal" is the *frozen* ``ShockSpec``
+validator in ``collie/contracts.py`` alone, and that validator permits combinations no real
+generation path would produce — ``shock_family=demand_level`` paired with
 ``target_stream=arrival``, for instance. A mapping that raised on those would crash an arm the
 day a fuzzer, an adversarial repair, or a wider registry produced one, so every one of them is
 given a fixed, deterministic assignment computed once at import time. Enough of them are
 routed onto the grid's otherwise-unreached points to make ``all_configs()`` fully reachable
 (``test_every_config_is_reachable``); every other currently-legal-but-unintended combination
-falls back to the baseline, i.e. behaves as if the model had abstained. When module 02's registry
-lands and narrows the legal space to the eight canonical shapes, tier 2 becomes dead code reached
-by nothing, which is expected: a total function is defined on the whole type even when most of
-the type is not expected to occur, the same discipline as an exhaustive ``match`` statement's
-``case _``. Reachability will then need to be re-derived from tier 1 alone, flagged here for
-Checkpoint 2 coordination with P3/P4.
+falls back to the baseline, i.e. behaves as if the model had abstained. A total function is
+defined on the whole type even when most of the type is not expected to occur, the same
+discipline as an exhaustive ``match`` statement's ``case _``.
+
+Module 02's registry of legal family-signature pairings has since landed
+(``collie.spec.registry.legal_pairs()``, seven actionable pairs), so the narrower space this
+tier was written to anticipate now exists — but it is *not* consumed here, deliberately: this
+module still maps over the frozen validator's type, and removing tier 2 would require
+re-deriving grid reachability from tier 1 alone. That removal is the open P1/P3 coordination
+item and is not made unilaterally. Note also that tier 1 admits one shape the registry does
+not, ``(temporary_pulse, demand_down, demand)``: module 02 registers ``sig_demand_pulse`` as
+``demand_up`` only, and ``tests/test_key_compatibility.py`` pins the resulting rejection so the
+divergence stays loud rather than leaking through as a level shift.
 
 The mapping table (tier 1, the part that matters) is registered in ``prereg/prereg_v1.yaml``,
 authored jointly with P4 in module 07 (``README.md``'s Checkpoint calendar has this at day 9).
@@ -214,7 +220,9 @@ def iter_legal_specs() -> Iterator[ShockSpec]:
 
     Enumerated, not sampled, so ``test_mapping_is_total_over_the_legal_space`` and
     ``test_every_config_is_reachable`` can assert against the whole space rather than a corner
-    of it. This will need to shrink to ``CANONICAL_SHAPES`` once module 02's registry lands.
+    of it. Narrowing this to ``CANONICAL_SHAPES`` now that ``collie.spec.registry`` has landed
+    is the open P1/P3 coordination item recorded in the module docstring, not a done deal:
+    grid reachability would have to be re-derived from tier 1 first.
     """
     yield _make_spec(
         ShockFamily.NO_CHANGE, Direction.NONE, None, TargetStream.NONE, tag="sig_no_change"

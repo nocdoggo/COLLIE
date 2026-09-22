@@ -110,7 +110,15 @@ if len(_BY_SPEC_SHAPE) != len(_REGISTERED):  # pragma: no cover - import-time re
 
 
 def resolve_construction(predictive_model: str) -> Construction:
-    """Resolve the exact key emitted by the deterministic compiler."""
+    """Resolve a construction by its own registered key.
+
+    This key space is module 05's, not module 04's: ``ControlConfig.predictive_model`` is
+    descriptive metadata about the controller's compiled belief and its twelve grid-derived
+    labels do not overlap these seven spec-semantic keys (``prereg/deviations.md``,
+    2026-09-18). The runtime path selects a construction from the ``ShockSpec`` through
+    :func:`resolve_spec`; this lookup is for registry inspection and for tests that name a
+    construction directly.
+    """
     try:
         return CONSTRUCTIONS[predictive_model]
     except KeyError as exc:

@@ -572,7 +572,7 @@ def test_every_keyword_maps_to_its_class_payload(rule_index, keyword) -> None:
 def test_keyword_matching_is_case_insensitive_substring() -> None:
     assert parse_alert_text("DEMAND SURGE IMMINENT") == DEMAND_UP_PAYLOAD
     # The table's sharpest consequence, pinned deliberately: substring matching means "port"
-    # fires inside "report". Provisional until module 03 owns alert parsing.
+    # fires inside "report". The table is module 06's control, reviewed at Gate 2.
     arrival = parse_alert_text("status report filed")
     assert arrival is not None and arrival.target_stream is TargetStream.ARRIVAL
 
