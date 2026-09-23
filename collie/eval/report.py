@@ -80,8 +80,18 @@ def report_manifest(
     prereg: Preregistration,
     freeze_path: Path | None = None,
     compatibility_options: dict[str, object] | None = None,
+    artifact_root: Path | None = None,
 ) -> dict[str, object]:
     """Build the audit manifest for rendered report artifacts."""
+
+    def artifact_path(path: Path) -> str:
+        if artifact_root is None:
+            return path.as_posix()
+        try:
+            return path.relative_to(artifact_root).as_posix()
+        except ValueError:
+            return path.as_posix()
+
     return {
         "schema_version": 1,
         "record_count": len(results),
@@ -98,7 +108,7 @@ def report_manifest(
         "compatibility_options": compatibility_options or {},
         "artifacts": [
             {
-                "path": str(path),
+                "path": artifact_path(path),
                 "sha256": _file_sha256(path),
             }
             for path in artifacts
@@ -508,6 +518,7 @@ def write_report_artifacts(
                 records_path=records_path,
                 prereg=prereg,
                 freeze_path=freeze_path,
+                artifact_root=out_dir,
                 compatibility_options={
                     "deployment_field": deployment_field,
                     "deployment_weights": deployment_weights,
