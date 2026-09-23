@@ -87,6 +87,14 @@ class _Parser:
         return None if text == "BAD" else self.payload
 
 
+class _SequenceParser:
+    def __init__(self, payloads: tuple[ProposalPayload, ...]):
+        self.payloads = iter(payloads)
+
+    def parse(self, text: str) -> ProposalPayload:
+        return next(self.payloads)
+
+
 def _factory(config: ControlConfig, demands: tuple[float, ...]) -> OrCompilerController:
     # No specific instance in scope here; every instance in this file carries the
     # ``make_instance`` default cap, so ``math.inf`` matches the contract exactly.
@@ -264,17 +272,43 @@ def test_the_two_proposal_cap_holds_through_the_real_wrapper(tmp_path) -> None:
     assert [s.proposal_index for s in arm._specs] == [1, 2]
 
 
+def test_second_proposal_recompiles_the_controller_and_provenance(tmp_path) -> None:
+    from dataclasses import replace
+
+    instance = make_instance(demand=(5.0,) * 8, lead_times=(0.0,) * 8)
+    _, _, metered = _harness(tmp_path)
+    second_payload = replace(PAYLOAD, magnitude_bin=MagnitudeBin.HIGH)
+    arm = _arm(
+        metered,
+        instance,
+        ImmediateActivation(),
+        arm_id=ARM8_ARM_ID,
+        trigger=_ScriptedTrigger({3, 5}),
+        parser=_SequenceParser((PAYLOAD, second_payload)),
+    )
+    outcome = EpisodeRunner(instance).run(arm)
+    first = outcome.decisions[2]
+    second = outcome.decisions[4]
+    assert first.active_spec is not None and first.active_spec.proposal_index == 1
+    assert second.active_spec is not None and second.active_spec.proposal_index == 2
+    expected = GridCompiler().compile(second.active_spec, current=arm.baseline_config)
+    assert second.control_config == expected
+    assert second.control_config != first.control_config
+
+
 def test_provenance_is_stamped_by_the_arm_not_the_model(tmp_path) -> None:
     instance = make_instance(demand=(5.0,) * 6, lead_times=(0.0,) * 6)
     transport, _, metered = _harness(tmp_path)
     arm = _arm(metered, instance, ImmediateActivation(), arm_id=ARM8_ARM_ID)
-    EpisodeRunner(instance).run(arm)
+    outcome = EpisodeRunner(instance).run(arm)
     (spec,) = arm._specs
     assert spec.tau_j == 5 and spec.proposal_index == 1
     assert spec.model_id == "scripted-fake-7b"
     assert spec.decoding_hash == "det-v1"
     (prompt,) = [p for p, _ in transport.seen]
     assert spec.prompt_hash == hashlib.sha256(prompt.encode()).hexdigest()
+    assert outcome.decisions[4].active_spec == spec
+    assert outcome.result.records[4].active_spec == spec
 
 
 def test_refutation_reverts_orders_to_baseline(tmp_path) -> None:

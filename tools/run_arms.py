@@ -32,7 +32,7 @@ import argparse
 import csv
 import json
 import tempfile
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 from collie.arms.base_stock import ARM1_ARM_ID, CappedBaseStockController
@@ -72,9 +72,12 @@ from collie.arms.shockspec import (
 from collie.contracts import (
     AlertKind,
     AlertMessage,
+    AnalysisClass,
     ControlConfig,
+    EpisodeResult,
     HiddenAlertSpec,
     HiddenIncident,
+    InformationCondition,
     ShockFamily,
     Split,
 )
@@ -82,8 +85,10 @@ from collie.control.controller import OrCompilerController
 from collie.control.grid import baseline_config_for
 from collie.control.mapping import GridCompiler
 from collie.data.families import generate_episode
-from collie.data.splits import FAMILIES, build_units
+from collie.data.splits import CONDITIONS, FAMILIES, Rollout, build_rollouts, build_units
 from collie.data.writer import write_pair
+from collie.eval.records import write_episode_results_jsonl
+from collie.eval.truth import EpisodeTruth, episode_truth_from_incident, write_episode_truth_jsonl
 from collie.llm import CallLedger, DiskCache, MeteredClient
 from collie.llm.client import RawResponse
 from collie.llm.demo import scripted_endpoint
@@ -236,28 +241,56 @@ def _train_samples(root: Path, relpath: str) -> tuple[tuple[str, float], ...]:
     return tuple((r[0], float(r[1])) for r in rows[1:])
 
 
+def _alert_text(incident: HiddenIncident, *, accurate: bool) -> str:
+    demand_side = incident.family in (
+        ShockFamily.DEMAND_LEVEL,
+        ShockFamily.TEMPORARY_PULSE,
+        ShockFamily.COMPOUND,
+    )
+    if not accurate:
+        demand_side = not demand_side
+    content = "demand increase expected" if demand_side else "shipment delay expected"
+    return f"[demo stand-in for module 03] supplier advisory: {content}"
+
+
 def _demo_alert(instance: LoadedInstance) -> dict[int, AlertMessage]:
     """One synthetic accurate alert at onset-1, the demo's labelled module-03 stand-in.
 
     The text is family-aware so the keyword-parser control has something to parse: a demand
     phrase on demand-side incidents, a shipment phrase on supply-side ones.
     """
+    condition = instance.spec.information_condition or InformationCondition.EARLY_ACCURATE
+    if condition is InformationCondition.NO_ALERT:
+        return {}
     onset = instance.incident.onset_period if instance.incident else None
+    if instance.incident is None:
+        period = 10
+        return {
+            period: AlertMessage(
+                alert_id=f"demo_alert_{condition.value}_{period}",
+                period=period,
+                text="[demo stand-in for module 03] supplier advisory: demand increase expected",
+            )
+        }
     if onset is None or onset <= 1:
         return {}
-    demand_side = instance.incident.family in (
-        ShockFamily.DEMAND_LEVEL,
-        ShockFamily.TEMPORARY_PULSE,
-        ShockFamily.COMPOUND,
-    )
-    content = "demand increase expected" if demand_side else "shipment delay expected"
+    period = onset if condition is InformationCondition.LATE_ACCURATE else onset - 1
+    accurate = condition is not InformationCondition.UNRELIABLE
     return {
-        onset - 1: AlertMessage(
-            alert_id=f"demo_alert_{onset - 1}",
-            period=onset - 1,
-            text=f"[demo stand-in for module 03] supplier advisory: {content}",
+        period: AlertMessage(
+            alert_id=f"demo_alert_{condition.value}_{period}",
+            period=period,
+            text=_alert_text(instance.incident, accurate=accurate),
         )
     }
+
+
+def _demo_template_ids(instance: LoadedInstance, alerts: dict[int, AlertMessage]) -> dict[int, str]:
+    if not alerts:
+        return {}
+    condition = instance.spec.information_condition or InformationCondition.EARLY_ACCURATE
+    split = instance.spec.split.value if instance.spec.split is not None else "dev"
+    return {period: f"tpl_{split}_{condition.value}" for period in alerts}
 
 
 def _hidden_alert_spec(incident: HiddenIncident) -> HiddenAlertSpec:
@@ -297,9 +330,28 @@ class ArmRow:
     p95_ms: float
 
 
+def _attach_calls(
+    results: dict[str, list[EpisodeResult]], ledger: CallLedger
+) -> dict[str, list[EpisodeResult]]:
+    calls: dict[tuple[str, str], list] = {}
+    for entry in ledger.charged_entries():
+        calls.setdefault((entry.episode_id, entry.arm_id), []).append(entry)
+    return {
+        arm_id: [
+            replace(result, calls=tuple(calls.get((result.episode_id, arm_id), ())))
+            for result in arm_results
+        ]
+        for arm_id, arm_results in results.items()
+    }
+
+
 def run_ladder(
-    instances: list[tuple[LoadedInstance, int]], root: Path
-) -> tuple[list[ArmRow], CallLedger]:
+    instances: list[tuple[LoadedInstance, int]],
+    root: Path,
+    *,
+    analysis_class: AnalysisClass = AnalysisClass.EXPLORATORY,
+    return_results: bool = False,
+) -> tuple[list[ArmRow], CallLedger] | tuple[list[ArmRow], CallLedger, tuple[EpisodeResult, ...]]:
     """Run every arm over every episode on one metered stack; return per-arm rows + ledger."""
     ledger = CallLedger()
     transport = _DemoTransport()
@@ -316,6 +368,7 @@ def run_ladder(
         train = _train_samples(root, spec.episode_id)
         prompt_spec = prompt_spec_from_episode(spec, train_samples=train)
         alerts = _demo_alert(instance)
+        template_ids = _demo_template_ids(instance, alerts)
         compiler = GridCompiler()
 
         horizon = spec.horizon
@@ -444,11 +497,9 @@ def run_ladder(
                 True,
             )
         )
-        # The two hidden-truth upper bounds run where the truth-to-vocabulary map is defined.
-        # Compound incidents are excluded: the oracle refuses them by design (a joint
-        # demand+supply construction is module 05's), so the headroom band below covers
-        # families 1-5 — stated on the table, never silently dropped.
-        if instance.incident is not None and instance.incident.family is not ShockFamily.COMPOUND:
+        # The two hidden-truth upper bounds run where the truth-to-vocabulary map is defined,
+        # including compound through the compiler's registered joint (both, mixed) shape.
+        if instance.incident is not None:
             arms.append(
                 (
                     ALERTSPEC_UB_ARM_ID,
@@ -489,11 +540,14 @@ def run_ladder(
             runner = EpisodeRunner(
                 instance,
                 alerts=alerts,
+                template_ids=template_ids,
+                analysis_class=analysis_class,
                 check_controller_isolation=isolation,
             )
             outcome = runner.run(controller)
             results.setdefault(arm_id, []).append(outcome.result)
 
+    results = _attach_calls(results, ledger)
     rows: list[ArmRow] = []
     per_arm = {t.arm_id: t for t in ledger.summary().per_arm}
     for arm_id, arm_results in results.items():
@@ -511,7 +565,243 @@ def run_ladder(
                 p95_ms=totals.p95_latency_ms if totals else 0.0,
             )
         )
+    if return_results:
+        flat = tuple(result for arm_results in results.values() for result in arm_results)
+        return rows, ledger, flat
     return rows, ledger
+
+
+def _interleaved_rollouts() -> tuple[Rollout, ...]:
+    grouped: dict[tuple[int, InformationCondition], list[Rollout]] = {}
+    for split in (Split.DEV, Split.CAL):
+        for rollout in build_rollouts(split):
+            if rollout.family is None or rollout.params is None:
+                continue
+            grouped.setdefault((rollout.family, rollout.information_condition), []).append(rollout)
+    ordered: list[Rollout] = []
+    for family in FAMILIES:
+        for condition in CONDITIONS:
+            rows = grouped[(family, condition)]
+            dev = [row for row in rows if row.split is Split.DEV]
+            cal = [row for row in rows if row.split is Split.CAL]
+            for i in range(max(len(dev), len(cal))):
+                if i < len(dev):
+                    ordered.append(dev[i])
+                if i < len(cal):
+                    ordered.append(cal[i])
+    return tuple(ordered)
+
+
+def pilot_instances(
+    root: Path, episodes: int
+) -> tuple[list[tuple[LoadedInstance, int]], tuple[EpisodeTruth, ...]]:
+    """Materialise a stratified dev/cal pilot sample and its evaluation-only truth sidecar."""
+    if episodes != 120:
+        raise ValueError("the generated pilot path is registered for --episodes 120")
+    strata = len(FAMILIES) * len(CONDITIONS)
+    null_episodes = len(CONDITIONS) * len(FAMILIES)
+    shocked_episodes = episodes - null_episodes
+    if shocked_episodes % strata != 0:
+        raise ValueError(f"--episodes minus null controls must be a multiple of {strata}")
+    per_stratum = shocked_episodes // strata
+    selected: list[Rollout] = []
+    grouped: dict[tuple[int, InformationCondition], list[Rollout]] = {}
+    for rollout in _interleaved_rollouts():
+        grouped.setdefault((int(rollout.family), rollout.information_condition), []).append(rollout)
+    for family in FAMILIES:
+        for condition in CONDITIONS:
+            rows = grouped[(family, condition)]
+            if len(rows) < per_stratum:
+                raise ValueError(
+                    f"not enough dev/cal rollouts for family {family} / {condition.value}"
+                )
+            selected.extend(rows[:per_stratum])
+
+    instances: list[tuple[LoadedInstance, int]] = []
+    truths: list[EpisodeTruth] = []
+    null_conditions = (
+        *(InformationCondition.NO_ALERT for _ in range(null_episodes // 2)),
+        *(InformationCondition.UNRELIABLE for _ in range(null_episodes // 2)),
+    )
+    for rollout_index, rollout in enumerate(selected):
+        assert rollout.params is not None
+        ep = generate_episode(seed=rollout.seed, horizon=DEMO_HORIZON_LOCAL, params=rollout.params)
+        write_pair(root, ep, relpath=rollout.rollout_id)
+        loaded = load_instance(
+            root / rollout.rollout_id,
+            episode_id=rollout.rollout_id,
+            promised_lead_time=int(rollout.promised_lead_time),
+            split=rollout.split,
+        )
+        spec = replace(
+            loaded.spec,
+            independent_unit_id=rollout.rollout_id,
+            information_condition=rollout.information_condition,
+        )
+        instance = replace(loaded, spec=spec)
+        instances.append((instance, rollout.seed))
+        assert instance.incident is not None
+        truths.append(
+            episode_truth_from_incident(
+                instance.spec.episode_id,
+                str(instance.spec.independent_unit_id),
+                instance.incident,
+            )
+        )
+        if rollout_index < null_episodes:
+            condition = null_conditions[rollout_index]
+            null_id = (
+                f"{rollout.split.value}/null/{rollout_index:02d}/s{rollout.seed}/{condition.value}"
+            )
+            null_episode_id = f"{rollout.rollout_id}__twin"
+            null_loaded = load_instance(
+                root / null_episode_id,
+                episode_id=null_episode_id,
+                promised_lead_time=int(rollout.promised_lead_time),
+                split=rollout.split,
+            )
+            null_spec = replace(
+                null_loaded.spec,
+                family=ShockFamily.NO_CHANGE,
+                independent_unit_id=null_id,
+                information_condition=condition,
+            )
+            instances.append((replace(null_loaded, spec=null_spec), rollout.seed))
+    return instances, tuple(truths)
+
+
+def dev_report_instances(root: Path, episodes: int) -> list[tuple[LoadedInstance, int]]:
+    """Materialise balanced dev rollouts for the section-07 report renderer."""
+    strata = len(FAMILIES) * len(CONDITIONS)
+    if episodes % strata != 0:
+        raise ValueError(f"--episodes must be a multiple of {strata} for dev report records")
+    per_stratum = episodes // strata
+    grouped: dict[tuple[int, InformationCondition], list[Rollout]] = {}
+    for rollout in build_rollouts(Split.DEV):
+        if rollout.family is None or rollout.params is None:
+            continue
+        grouped.setdefault((rollout.family, rollout.information_condition), []).append(rollout)
+
+    selected: list[Rollout] = []
+    for family in FAMILIES:
+        for condition in CONDITIONS:
+            rows = grouped[(family, condition)]
+            if len(rows) < per_stratum:
+                raise ValueError(
+                    f"--episodes {episodes} exceeds the dev report pool for family {family} / "
+                    f"{condition.value}; max is {len(rows) * strata}"
+                )
+            selected.extend(rows[:per_stratum])
+
+    instances: list[tuple[LoadedInstance, int]] = []
+    for rollout in selected:
+        assert rollout.params is not None
+        ep = generate_episode(seed=rollout.seed, horizon=DEMO_HORIZON_LOCAL, params=rollout.params)
+        write_pair(root, ep, relpath=rollout.rollout_id)
+        loaded = load_instance(
+            root / rollout.rollout_id,
+            episode_id=rollout.rollout_id,
+            promised_lead_time=int(rollout.promised_lead_time),
+            split=rollout.split,
+        )
+        spec = replace(
+            loaded.spec,
+            independent_unit_id=rollout.rollout_id,
+            information_condition=rollout.information_condition,
+        )
+        instances.append((replace(loaded, spec=spec), rollout.seed))
+    return instances
+
+
+@dataclass(frozen=True)
+class PilotRunArtifacts:
+    results: tuple[EpisodeResult, ...]
+    truths: tuple[EpisodeTruth, ...]
+    ledger: CallLedger
+
+
+def run_pilot_artifacts(
+    root: Path,
+    *,
+    episodes: int,
+    records_out: Path | None = None,
+    truth_out: Path | None = None,
+) -> PilotRunArtifacts:
+    instances, truths = pilot_instances(root, episodes)
+    _rows, ledger, results = run_ladder(
+        instances,
+        root,
+        analysis_class=AnalysisClass.CONFIRMATORY,
+        return_results=True,
+    )
+    ledger.assert_conserved()
+    if records_out is not None:
+        write_episode_results_jsonl(records_out, results)
+    if truth_out is not None:
+        write_episode_truth_jsonl(truth_out, truths)
+    return PilotRunArtifacts(results=results, truths=truths, ledger=ledger)
+
+
+def run_dev_record_artifacts(
+    root: Path,
+    *,
+    episodes: int,
+    records_out: Path,
+    shock_periods_out: Path | None = None,
+    baseline_inventory_out: Path | None = None,
+) -> tuple[EpisodeResult, ...]:
+    instances = dev_report_instances(root, episodes)
+    truths = {
+        instance.spec.episode_id: episode_truth_from_incident(
+            instance.spec.episode_id,
+            str(instance.spec.independent_unit_id),
+            instance.incident,
+        )
+        for instance, _seed in instances
+        if instance.incident is not None
+    }
+    _rows, ledger, results = run_ladder(
+        instances,
+        root,
+        analysis_class=AnalysisClass.EXPLORATORY,
+        return_results=True,
+    )
+    ledger.assert_conserved()
+    write_episode_results_jsonl(records_out, results)
+    if shock_periods_out is not None:
+        shock_periods_out.parent.mkdir(parents=True, exist_ok=True)
+        shock_periods_out.write_text(
+            json.dumps(
+                {
+                    episode_id: truth.final_shock_period
+                    for episode_id, truth in sorted(truths.items())
+                },
+                indent=2,
+                sort_keys=True,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+    if baseline_inventory_out is not None:
+        shock_periods = {
+            episode_id: truth.final_shock_period for episode_id, truth in truths.items()
+        }
+        baselines: dict[str, float] = {}
+        for result in results:
+            if result.arm_id != ARM1_ARM_ID or result.episode_id not in shock_periods:
+                continue
+            post_shock = [
+                record.on_hand_end
+                for record in result.records
+                if record.period > shock_periods[result.episode_id]
+            ]
+            baselines[result.episode_id] = sum(post_shock) / len(post_shock) if post_shock else 0.0
+        baseline_inventory_out.parent.mkdir(parents=True, exist_ok=True)
+        baseline_inventory_out.write_text(
+            json.dumps(baselines, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+    return results
 
 
 def render_table(rows: list[ArmRow], episodes: int) -> str:
@@ -584,10 +874,35 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--split", default="dev", choices=["dev"], help="dev only, ever")
     ap.add_argument("--episodes", type=int, default=18)
     ap.add_argument("--table", action="store_true", help="print the main-table shape")
+    ap.add_argument(
+        "--records-out",
+        type=Path,
+        help="write balanced dev EpisodeResult JSONL for collie.eval.report",
+    )
+    ap.add_argument(
+        "--shock-periods-out",
+        type=Path,
+        help="write JSON episode_id -> final shock period for report recovery metrics",
+    )
+    ap.add_argument(
+        "--baseline-inventory-out",
+        type=Path,
+        help="write JSON episode_id -> arm-1 post-shock baseline inventory for report metrics",
+    )
     args = ap.parse_args(argv)
 
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
+        if args.records_out is not None:
+            results = run_dev_record_artifacts(
+                root,
+                episodes=args.episodes,
+                records_out=args.records_out,
+                shock_periods_out=args.shock_periods_out,
+                baseline_inventory_out=args.baseline_inventory_out,
+            )
+            print(f"wrote dev records: {args.records_out} ({len(results)} arm-episode rows)")
+            return 0
         instances = dev_instances(root, args.episodes)
         rows, ledger = run_ladder(instances, root)
     ledger.assert_conserved()

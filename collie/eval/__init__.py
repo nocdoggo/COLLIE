@@ -27,16 +27,19 @@ from collie.eval.pilot import (
     evaluate_pilot,
     pilot_manifest_from_records,
     render_pilot_report,
+    validate_pilot_intervals,
     validate_pilot_record_count,
     write_pilot_manifest,
 )
 from collie.eval.prereg import Preregistration, load_preregistration
 from collie.eval.records import load_episode_results_jsonl, write_episode_results_jsonl
 from collie.eval.report import assert_report_tables_trace_to_records, report_manifest
+from collie.eval.truth import EpisodeTruth, load_episode_truth_jsonl, write_episode_truth_jsonl
 
 __all__ = [
     "CompatibilitySummary",
     "EndpointSummary",
+    "EpisodeTruth",
     "PairedInterval",
     "PilotDecision",
     "PilotManifest",
@@ -52,6 +55,7 @@ __all__ = [
     "evaluate_pilot",
     "holm_adjust",
     "load_episode_results_jsonl",
+    "load_episode_truth_jsonl",
     "load_preregistration",
     "paired_interval",
     "paired_randomization_pvalue",
@@ -59,8 +63,10 @@ __all__ = [
     "render_pilot_report",
     "report_manifest",
     "stratum_weighted_paired_interval",
+    "validate_pilot_intervals",
     "validate_pilot_record_count",
     "wilcoxon_signed_rank_pvalue",
     "write_episode_results_jsonl",
+    "write_episode_truth_jsonl",
     "write_pilot_manifest",
 ]

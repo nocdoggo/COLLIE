@@ -209,6 +209,7 @@ class EpisodeRunner:
                     llm_called=decision.llm_called,
                     lifecycle_state=decision.lifecycle_state,
                     active_spec_id=decision.active_spec_id,
+                    active_spec=decision.active_spec,
                     control_config=decision.control_config,
                     template_id=self.template_ids.get(period) if self.template_ids else None,
                 )

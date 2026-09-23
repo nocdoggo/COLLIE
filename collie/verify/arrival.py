@@ -15,9 +15,11 @@ from __future__ import annotations
 import argparse
 import itertools
 import math
+import multiprocessing
 import os
 import random
 from collections.abc import Iterable, Sequence
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from enum import StrEnum
 
@@ -827,7 +829,7 @@ def run_arrival_null_calibration(
         for chunk in chunks
         if chunk
     )
-    if workers == 1 or replications < 32 or not hasattr(os, "fork"):
+    if workers == 1 or replications < 32:
         activations = sum(_arrival_null_chunk(*argument) for argument in arguments)
     else:
         activations = _run_forked_chunks(tuple(arguments))
@@ -849,6 +851,9 @@ def run_arrival_null_calibration(
 
 def _run_forked_chunks(arguments: tuple[tuple[object, ...], ...]) -> int:
     """Use pipes rather than multiprocessing semaphores, which restricted audit hosts may disable."""
+    if not hasattr(os, "fork"):
+        return _run_spawned_chunks(arguments)
+
     children: list[tuple[int, int]] = []
     for argument in arguments:
         read_fd, write_fd = os.pipe()
@@ -874,6 +879,28 @@ def _run_forked_chunks(arguments: tuple[tuple[object, ...], ...]) -> int:
             raise RuntimeError(f"arrival calibration worker {pid} failed")
         total += int(payload.decode("ascii"))
     return total
+
+
+def _run_spawned_chunks(arguments: tuple[tuple[object, ...], ...]) -> int:
+    context = multiprocessing.get_context("spawn")
+    worker_count = max(1, len(arguments))
+    total = 0
+    with ProcessPoolExecutor(max_workers=worker_count, mp_context=context) as executor:
+        futures = {
+            executor.submit(_arrival_null_chunk_from_argument, argument): index
+            for index, argument in enumerate(arguments)
+        }
+        for future in as_completed(futures):
+            index = futures[future]
+            try:
+                total += future.result()
+            except BaseException as exc:
+                raise RuntimeError(f"arrival calibration worker local-{index} failed") from exc
+    return total
+
+
+def _arrival_null_chunk_from_argument(argument: tuple[object, ...]) -> int:
+    return _arrival_null_chunk(*argument)  # type: ignore[arg-type]
 
 
 def _arrival_null_chunk(

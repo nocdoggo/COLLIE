@@ -793,6 +793,22 @@ def test_alertspec_ub_rejects_a_nonpositive_alert_period() -> None:
                 MagnitudeBin.LOW,
             ),
         ),
+        (
+            HiddenIncident(
+                family=ShockFamily.COMPOUND,
+                onset_period=12,
+                magnitude=1.5,
+                duration=8,
+                conditional_independence=False,
+            ),
+            (
+                TargetStream.BOTH,
+                Direction.MIXED,
+                Persistence.TRANSIENT,
+                DurationBin.MEDIUM,
+                MagnitudeBin.MEDIUM,
+            ),
+        ),
     ],
 )
 def test_oracle_maps_truth_to_payload(incident, expected) -> None:
@@ -812,16 +828,6 @@ def test_oracle_maps_truth_to_payload(incident, expected) -> None:
 @pytest.mark.parametrize(
     ("incident", "match"),
     [
-        (
-            HiddenIncident(
-                family=ShockFamily.COMPOUND,
-                onset_period=12,
-                magnitude=1.5,
-                duration=8,
-                conditional_independence=False,
-            ),
-            "does not map",
-        ),
         (
             HiddenIncident(
                 family=ShockFamily.DEMAND_LEVEL,

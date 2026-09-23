@@ -2,13 +2,21 @@
 
 from __future__ import annotations
 
+import json
+
 import pytest
 
 from collie.arms.protocols import RepairingSpecPrompter, SpecParser, SpecPrompter
-from collie.contracts import AlertMessage, PeriodObservation, Split
+from collie.contracts import AlertMessage, InformationCondition, PeriodObservation, Split
 from collie.data.splits import FAMILIES, build_units
 from collie.spec.adapters import ShockSpecParser, ShockSpecPrompter
-from tools.run_arms import _SPEC_PROPOSAL_MARKER, dev_instances, main, spec_adapters
+from tools.run_arms import (
+    _SPEC_PROPOSAL_MARKER,
+    dev_instances,
+    dev_report_instances,
+    main,
+    spec_adapters,
+)
 
 
 def _pool_size() -> int:
@@ -37,6 +45,37 @@ def test_demo_smoke_six_episodes(capsys) -> None:
     assert "oracle_shockspec_headroom" in out
     assert "conserved" in out
     assert "arms 8/9/10 proposals:" in out
+
+
+def test_dev_report_instances_cover_every_registered_stratum(tmp_path) -> None:
+    instances = dev_report_instances(tmp_path, 24)
+    observed = {
+        (instance.spec.family, instance.spec.information_condition) for instance, _seed in instances
+    }
+    assert len(instances) == 24
+    assert {condition for _family, condition in observed} == set(InformationCondition)
+    assert len({family for family, _condition in observed}) == 5
+
+
+def test_dev_record_artifacts_write_operational_sidecars(tmp_path) -> None:
+    from collie.eval.records import load_episode_results_jsonl
+    from tools.run_arms import run_dev_record_artifacts
+
+    records_path = tmp_path / "dev_records.jsonl"
+    shock_path = tmp_path / "dev_shock_periods.json"
+    inventory_path = tmp_path / "dev_baseline_inventory.json"
+    results = run_dev_record_artifacts(
+        tmp_path,
+        episodes=24,
+        records_out=records_path,
+        shock_periods_out=shock_path,
+        baseline_inventory_out=inventory_path,
+    )
+    assert load_episode_results_jsonl(records_path) == results
+    shock_periods = json.loads(shock_path.read_text(encoding="utf-8"))
+    inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
+    assert set(shock_periods)
+    assert set(shock_periods) == set(inventory)
 
 
 def test_proposal_sharing_charges_every_decision_point_to_all_three_arms(tmp_path) -> None:

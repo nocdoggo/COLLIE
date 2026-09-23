@@ -8,13 +8,19 @@ from collie.contracts import (
     AnalysisClass,
     CallLog,
     ControlConfig,
+    Direction,
+    DurationBin,
     EpisodeResult,
     InformationCondition,
     LifecycleState,
+    MagnitudeBin,
     ParseOutcome,
+    Persistence,
     RunRecord,
     ShockFamily,
+    ShockSpec,
     Split,
+    TargetStream,
 )
 from collie.eval.records import (
     episode_result_from_dict,
@@ -25,6 +31,22 @@ from collie.eval.records import (
 
 
 def sample_result() -> EpisodeResult:
+    active_spec = ShockSpec(
+        target_stream=TargetStream.DEMAND,
+        shock_family=ShockFamily.DEMAND_LEVEL,
+        direction=Direction.DEMAND_UP,
+        onset_window=(-1, 1),
+        magnitude_bin=MagnitudeBin.MEDIUM,
+        persistence=Persistence.PERSISTENT,
+        duration_bin=DurationBin.LONGER,
+        evidence_refs=(),
+        prospective_signature="sig_demand_level_up",
+        tau_j=1,
+        proposal_index=1,
+        model_id="fake",
+        decoding_hash="decode",
+        prompt_hash="prompt",
+    )
     record = RunRecord(
         episode_id="episode-1",
         arm_id="arm",
@@ -44,6 +66,7 @@ def sample_result() -> EpisodeResult:
         llm_called=True,
         lifecycle_state=LifecycleState.ACTIVE,
         active_spec_id="spec-1",
+        active_spec=active_spec,
         control_config=ControlConfig(m=1.5, l_eff=2, gamma=0.25, predictive_model="demand"),
         template_id="tpl",
     )
@@ -89,6 +112,7 @@ def test_episode_result_json_round_trip() -> None:
     result = sample_result()
     payload = episode_result_to_dict(result)
     assert payload["records"][0]["lifecycle_state"] == "active"
+    assert payload["records"][0]["active_spec"]["shock_family"] == "demand_level"
     assert payload["records"][0]["control_config"]["predictive_model"] == "demand"
     assert payload["calls"][0]["outcome"] == "accepted_after_repair"
     assert episode_result_from_dict(payload) == result

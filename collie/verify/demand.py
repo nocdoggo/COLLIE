@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import math
+import os
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -507,9 +508,16 @@ def _demo(plot: Path | None) -> None:
         print(f"{period:>6} {value:>8.0f} {point.e_value:>14.6f} {point.threshold:>12.3f}  {state}")
 
     if plot is not None:
+        plot.parent.mkdir(parents=True, exist_ok=True)
+        os.environ.setdefault("MPLBACKEND", "Agg")
+        matplotlib_cache = plot.parent / ".matplotlib-cache"
+        matplotlib_cache.mkdir(exist_ok=True)
+        os.environ.setdefault("MPLCONFIGDIR", str(matplotlib_cache))
+        import matplotlib
+
+        matplotlib.use("Agg", force=True)
         import matplotlib.pyplot as plt
 
-        plot.parent.mkdir(parents=True, exist_ok=True)
         periods = [point.period for point in verifier.trace]
         evidence = [point.e_value for point in verifier.trace]
         figure, axis = plt.subplots(figsize=(7.2, 4.2))

@@ -39,6 +39,7 @@ REQUIRED_SECTIONS = (
     "oracle_mappings",
     "trust_region",
     "power_rule",
+    "pilot_policy",
     "go_criteria",
     "kill_thresholds",
     "kill_triggers",
@@ -178,6 +179,26 @@ def validate_preregistration(data: Mapping[str, Any], *, require_final: bool = T
     ]
     if require_final and non_numeric:
         raise ValueError(f"kill thresholds must be numeric: {non_numeric}")
+
+    pilot_policy = data["pilot_policy"]
+    if not isinstance(pilot_policy, Mapping):
+        raise ValueError("pilot_policy must be a mapping")
+    expected_policy = {
+        "independent_units": 120,
+        "call_budget_per_episode": 4,
+        "episode_horizon": 50,
+        "never_recovered_value": 51,
+        "formal_go_uses_confidence_bound": True,
+    }
+    mismatches = {
+        key: (pilot_policy.get(key), expected)
+        for key, expected in expected_policy.items()
+        if pilot_policy.get(key) != expected
+    }
+    if mismatches:
+        raise ValueError(
+            f"pilot_policy does not match registered implementation limits: {mismatches}"
+        )
 
     kill_triggers = data["kill_triggers"]
     if not isinstance(kill_triggers, list) or len(kill_triggers) != 8:

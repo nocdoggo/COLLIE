@@ -7,6 +7,8 @@ SHELL := /bin/bash
 BENCH := third_party/InventoryBench
 UV    := uv
 TABLE_RECORDS ?= reports/dev_records.jsonl
+TABLE_SHOCK_PERIODS ?= reports/dev_shock_periods.json
+TABLE_BASELINE_INVENTORY ?= reports/dev_baseline_inventory.json
 TABLE_OUT ?= reports/eval
 
 .DEFAULT_GOAL := help
@@ -90,7 +92,8 @@ freeze:  ## Task 19: hash every registered method file
 	$(UV) run python -m tools.freeze
 
 table-main:  ## Task 24: render the main table and Pareto frontiers
-	$(UV) run python -m collie.eval.report --table main --records $(TABLE_RECORDS) --out-dir $(TABLE_OUT)
+	$(UV) run python -m tools.run_arms --split dev --episodes 120 --records-out $(TABLE_RECORDS) --shock-periods-out $(TABLE_SHOCK_PERIODS) --baseline-inventory-out $(TABLE_BASELINE_INVENTORY)
+	$(UV) run python -m collie.eval.report --table main --records $(TABLE_RECORDS) --shock-periods $(TABLE_SHOCK_PERIODS) --baseline-inventory $(TABLE_BASELINE_INVENTORY) --out-dir $(TABLE_OUT)
 
 artifact:  ## Task 32: build the release bundle and reproducibility audit log
 	$(UV) run python -m tools.package_artifact

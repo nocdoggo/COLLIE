@@ -15,6 +15,8 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any
 
+from pydantic import BaseModel
+
 from collie.contracts import (
     AnalysisClass,
     CallLog,
@@ -25,6 +27,7 @@ from collie.contracts import (
     ParseOutcome,
     RunRecord,
     ShockFamily,
+    ShockSpec,
     Split,
 )
 
@@ -42,6 +45,8 @@ RECORD_SCHEMA_VERSION = 1
 def _enum_value(value: Any) -> Any:
     if isinstance(value, StrEnum):
         return value.value
+    if isinstance(value, BaseModel):
+        return value.model_dump(mode="json")
     if is_dataclass(value) and not isinstance(value, type):
         return {field.name: _enum_value(getattr(value, field.name)) for field in fields(value)}
     if isinstance(value, tuple | list):
@@ -92,6 +97,7 @@ def _control_config(data: Mapping[str, Any] | None) -> ControlConfig | None:
 
 
 def _run_record(data: Mapping[str, Any]) -> RunRecord:
+    active_spec = data.get("active_spec")
     return RunRecord(
         episode_id=str(data["episode_id"]),
         arm_id=str(data["arm_id"]),
@@ -111,6 +117,7 @@ def _run_record(data: Mapping[str, Any]) -> RunRecord:
         llm_called=bool(data.get("llm_called", False)),
         lifecycle_state=_optional_enum(LifecycleState, data.get("lifecycle_state")),
         active_spec_id=data.get("active_spec_id"),
+        active_spec=None if active_spec is None else ShockSpec.model_validate(active_spec),
         control_config=_control_config(data.get("control_config")),
         template_id=data.get("template_id"),
     )

@@ -1,59 +1,77 @@
 {
-  "complete": false,
+  "complete": true,
   "files": {
-    "collie/contracts.py": {
-      "bytes": 22232,
-      "lines": 673,
+    "collie/arms/oracle.py": {
+      "bytes": 8358,
+      "lines": 176,
       "missing": false,
-      "sha256": "727bb3e50d7f808374b600bceaed0456070241fdfdc78b5d5aa82419360eaee8"
+      "sha256": "5ea56ff46b473f5cc5e0a685f58a5b25c5cce76bbe5c26b4cb268ceb2eab30c9"
+    },
+    "collie/contracts.py": {
+      "bytes": 22314,
+      "lines": 675,
+      "missing": false,
+      "sha256": "5ce4a79976a039ff1a01925315fde2aa036f41cb014dc04a97172f2ec7324fab"
     },
     "collie/control/forecast.py": {
-      "bytes": 0,
-      "lines": 0,
-      "missing": true,
-      "sha256": null
+      "bytes": 2227,
+      "lines": 59,
+      "missing": false,
+      "sha256": "b3e9b897c470df9ce73e92fd96d07a24d55438175195d39a5020aa00d15e8032"
     },
     "collie/control/grid.py": {
-      "bytes": 0,
-      "lines": 0,
-      "missing": true,
-      "sha256": null
+      "bytes": 12694,
+      "lines": 282,
+      "missing": false,
+      "sha256": "9f727c2e2c5fd85aa01bd7752fda45542417eda7faf41c5b98a5c4c87db11b9a"
     },
     "collie/control/mapping.py": {
-      "bytes": 0,
-      "lines": 0,
-      "missing": true,
-      "sha256": null
+      "bytes": 18416,
+      "lines": 379,
+      "missing": false,
+      "sha256": "d3f4ecbaddc28530fde37be894d7441e50366cfab129fb2d38d5bad44b167cea"
+    },
+    "collie/eval/pilot.py": {
+      "bytes": 34873,
+      "lines": 897,
+      "missing": false,
+      "sha256": "15bc21f9a4de6531bd63f437f6e75c25ac84fe7375aa81b2f3f7c8341ddbd094"
+    },
+    "collie/eval/truth.py": {
+      "bytes": 6350,
+      "lines": 172,
+      "missing": false,
+      "sha256": "c810e29e351bff3e595e2080695a66e3938a117b31c9a5980681a9d652310907"
     },
     "collie/spec/registry.py": {
-      "bytes": 0,
-      "lines": 0,
-      "missing": true,
-      "sha256": null
+      "bytes": 4588,
+      "lines": 118,
+      "missing": false,
+      "sha256": "869d2dbc4fe159a3613271e0d8071386bc3abf886dae3b2c84ec611a02d83df5"
     },
     "collie/spec/schema.py": {
-      "bytes": 0,
-      "lines": 0,
-      "missing": true,
-      "sha256": null
+      "bytes": 4796,
+      "lines": 137,
+      "missing": false,
+      "sha256": "570a752d18ce8c01067eb52db641eb16f46ce2ec25a5feb32d645f2c26b5bfd9"
     },
     "collie/trigger/detectors.py": {
-      "bytes": 0,
-      "lines": 0,
-      "missing": true,
-      "sha256": null
+      "bytes": 14376,
+      "lines": 381,
+      "missing": false,
+      "sha256": "aa28402c45e80a3a9f0974890f56de773d72b158cd248c8c1a1aefb454eb1c42"
     },
     "collie/verify/alpha.py": {
-      "bytes": 0,
-      "lines": 0,
-      "missing": true,
-      "sha256": null
+      "bytes": 2682,
+      "lines": 82,
+      "missing": false,
+      "sha256": "e5f308463e709efcb34c60e5e9e2ee43d85d0f2bf7bcc7a761b9723d58433940"
     },
     "collie/verify/registry.py": {
-      "bytes": 0,
-      "lines": 0,
-      "missing": true,
-      "sha256": null
+      "bytes": 5130,
+      "lines": 147,
+      "missing": false,
+      "sha256": "50ac096f05afd26f4a7dafa4b8f83bd0055a46266d01898e119ebd598b61cad8"
     },
     "manifests/shockspec_v1.json": {
       "bytes": 1164231,
@@ -62,16 +80,36 @@
       "sha256": "bdc6502786d2891150f5a7697b180f40d0c40012f03557afa35d7c9dee15e41d"
     },
     "prereg/prereg_v1.yaml": {
-      "bytes": 3879,
-      "lines": 140,
+      "bytes": 10177,
+      "lines": 305,
       "missing": false,
-      "sha256": "0eb0ae3971751559aaf2edf172bb4427c652592f29931ee5e67a88ba9455aabc"
+      "sha256": "ed97e622403b7dbd58988fceaa6049d6d791d2d641fb3f50a04cfbde44544426"
+    },
+    "prereg/threshold_rationale.md": {
+      "bytes": 5951,
+      "lines": 77,
+      "missing": false,
+      "sha256": "957e43a249f4bce2fd3654135e40c73e191c044d0107fda67a47a28243ace225"
+    },
+    "tools/run_arms.py": {
+      "bytes": 37280,
+      "lines": 924,
+      "missing": false,
+      "sha256": "10e61511dd34c3466b319a8439234264308886a7e812f5826a358a8954b02548"
+    },
+    "tools/run_pilot.py": {
+      "bytes": 8618,
+      "lines": 239,
+      "missing": false,
+      "sha256": "e686ccc3668cbae429d914fd5ce60a6b2ed1d2b096b8105bf1a58a8b0e7a77e2"
     }
   },
-  "frozen_at": "2026-09-11",
+  "frozen_at": "2026-09-22",
   "gate": "gate2",
-  "git_sha": "f88fba1d98d9a1040c0ae468ce6cc580716c1641",
-  "manifest_sha256": "8ad6e7f88972dd9ea0f9b6dc47f2159b0c7eb8495b6d685cc7bf45dc8c9d6362",
+  "git_sha": "bdfcf5b20dc4ed6b1fa477526edf88370095aa7d",
+  "incomplete_reasons": [],
+  "manifest_sha256": "0ea38a72d976ade07c1a3e738ed11e9dddda4c5e0b4e961115d1d4a457a31167",
+  "preregistration_final": true,
   "registered_files": [
     "collie/contracts.py",
     "collie/spec/registry.py",
@@ -82,8 +120,14 @@
     "collie/verify/registry.py",
     "collie/verify/alpha.py",
     "collie/trigger/detectors.py",
+    "collie/arms/oracle.py",
+    "collie/eval/pilot.py",
+    "collie/eval/truth.py",
     "prereg/prereg_v1.yaml",
-    "manifests/shockspec_v1.json"
+    "prereg/threshold_rationale.md",
+    "manifests/shockspec_v1.json",
+    "tools/run_arms.py",
+    "tools/run_pilot.py"
   ],
   "rule": "A registered method file may change, but not quietly. Log a dated entry in prereg/deviations.md naming the file and quoting the new sha256, then re-run tools.freeze.",
   "schema_version": 1

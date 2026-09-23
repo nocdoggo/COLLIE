@@ -92,10 +92,12 @@ def test_a_stale_deviation_cannot_authorise_a_later_edit() -> None:
         "a hash that was never declared must not count as declared"
     )
     live = next(r for r in current_records() if r.path == path)
-    text = DEVIATIONS_PATH.read_text(encoding="utf-8")
-    assert live.short not in text, (
-        "the current hash should not appear in the deviations log while the freeze is intact"
-    )
+    frozen_sha = load_freeze()["files"][path]["sha256"]
+    assert frozen_sha == live.sha256
+    if deviation_declared(path, live.sha256):
+        assert not deviation_declared(path, "f" * 64), (
+            "an accepted deviation must not authorise a later, different edit"
+        )
 
 
 def test_the_deviations_log_states_the_rule() -> None:

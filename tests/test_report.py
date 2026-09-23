@@ -96,7 +96,7 @@ def prereg() -> Preregistration:
             "confirmatory_contrasts": [
                 {
                     "id": "arm10_vs_arm1",
-                    "treatment": "arm10_shockspec_eprocess",
+                    "treatment": "arm10_spec_eprocess",
                     "control": "arm1_capped_base_stock",
                 }
             ],
@@ -116,7 +116,7 @@ def prereg() -> Preregistration:
 def test_confirmatory_report_uses_registered_holm_ids() -> None:
     table = render_main_table(
         (
-            result("arm10_shockspec_eprocess", "u1", 12.0),
+            result("arm10_spec_eprocess", "u1", 12.0),
             result("arm1_capped_base_stock", "u1", 10.0),
         ),
         analysis_class=AnalysisClass.CONFIRMATORY,
@@ -134,7 +134,7 @@ def test_confirmatory_report_uses_registered_holm_ids() -> None:
 def test_report_renders_from_stored_records(tmp_path) -> None:
     path = tmp_path / "records.jsonl"
     results = (
-        result("arm10_shockspec_eprocess", "u1", 12.0),
+        result("arm10_spec_eprocess", "u1", 12.0),
         result("arm1_capped_base_stock", "u1", 10.0),
     )
     write_episode_results_jsonl(path, results)
@@ -142,7 +142,7 @@ def test_report_renders_from_stored_records(tmp_path) -> None:
     from collie.eval.records import load_episode_results_jsonl
 
     table = render_main_table(load_episode_results_jsonl(path), prereg=prereg())
-    assert "`arm10_shockspec_eprocess`" in table
+    assert "`arm10_spec_eprocess`" in table
     assert "cumulative_undiscounted_profit" in table
 
 
@@ -254,13 +254,21 @@ def test_report_manifest_hashes_record_contents() -> None:
 def test_efficiency_table_reports_auc_and_matched_budget_points() -> None:
     table = render_efficiency_table(
         (
-            result("arm10_shockspec_eprocess", "u1", 12.0, calls=2),
+            result("arm10_spec_eprocess", "u1", 12.0, calls=2),
             result("arm1_capped_base_stock", "u1", 10.0, calls=0),
         )
     )
     assert "auc_call_fraction" in table
     assert "token_frontier_profit" in table
     assert "dollar_frontier_profit" in table
+    assert "repair_calls" in table
+    assert "rejected_calls" in table
+    assert "latency_p50_ms" in table
+    assert "latency_p95_ms" in table
+    assert "actions_per_accepted_call" in table
+    matched_rows = [line for line in table.splitlines() if line.startswith("| matched_budget")]
+    assert matched_rows
+    assert all("`arm1_capped_base_stock`" in line for line in matched_rows)
 
 
 def test_operational_table_renders_metrics() -> None:

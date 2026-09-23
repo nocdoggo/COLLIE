@@ -9,6 +9,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
+from collie.arms.shockspec import ARM10_ARM_ID
 from collie.contracts import AnalysisClass, EpisodeResult, Split
 from collie.eval.efficiency import (
     FrontierPoint,
@@ -278,11 +279,14 @@ def _matched_budget_point(points: Sequence[FrontierPoint], *, reference_arm: str
     reference = next((point for point in points if point.arm == reference_arm), None)
     if reference is None:
         return min(points, key=lambda point: point.budget)
-    return min(points, key=lambda point: abs(point.budget - reference.budget))
+    candidates = [point for point in points if point.arm != reference_arm]
+    if not candidates:
+        return reference
+    return min(candidates, key=lambda point: abs(point.budget - reference.budget))
 
 
 def render_efficiency_table(
-    results: Sequence[EpisodeResult], *, reference_arm: str = "arm10_shockspec_eprocess"
+    results: Sequence[EpisodeResult], *, reference_arm: str = ARM10_ARM_ID
 ) -> str:
     """Render ledger summaries plus registered frontier diagnostics."""
     summaries = efficiency_summary(results)
@@ -296,16 +300,31 @@ def render_efficiency_table(
         "|---|---:|---|---:|---|",
     ]
     for summary in summaries:
+        actions_per_call = (
+            "n/a"
+            if summary.actions_per_accepted_call is None
+            else f"{summary.actions_per_accepted_call:.6g}"
+        )
         lines.extend(
             [
                 f"| ledger | `{summary.arm}` | attempted_calls | {summary.attempted_calls} | "
+                f"{_provenance(results, {summary.arm})} |",
+                f"| ledger | `{summary.arm}` | repair_calls | {summary.repair_calls} | "
+                f"{_provenance(results, {summary.arm})} |",
+                f"| ledger | `{summary.arm}` | rejected_calls | {summary.rejected_calls} | "
                 f"{_provenance(results, {summary.arm})} |",
                 f"| ledger | `{summary.arm}` | input_tokens | {summary.input_tokens} | "
                 f"{_provenance(results, {summary.arm})} |",
                 f"| ledger | `{summary.arm}` | output_tokens | {summary.output_tokens} | "
                 f"{_provenance(results, {summary.arm})} |",
+                f"| ledger | `{summary.arm}` | latency_p50_ms | "
+                f"{summary.latency_p50_ms:.6g} | {_provenance(results, {summary.arm})} |",
+                f"| ledger | `{summary.arm}` | latency_p95_ms | "
+                f"{summary.latency_p95_ms:.6g} | {_provenance(results, {summary.arm})} |",
                 f"| ledger | `{summary.arm}` | usd_cost | {summary.usd_cost:.6g} | "
                 f"{_provenance(results, {summary.arm})} |",
+                f"| ledger | `{summary.arm}` | actions_per_accepted_call | "
+                f"{actions_per_call} | {_provenance(results, {summary.arm})} |",
             ]
         )
     lines.append(

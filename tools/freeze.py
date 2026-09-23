@@ -32,8 +32,14 @@ REGISTERED_FILES = (
     "collie/verify/registry.py",
     "collie/verify/alpha.py",
     "collie/trigger/detectors.py",
+    "collie/arms/oracle.py",
+    "collie/eval/pilot.py",
+    "collie/eval/truth.py",
     "prereg/prereg_v1.yaml",
+    "prereg/threshold_rationale.md",
     "manifests/shockspec_v1.json",
+    "tools/run_arms.py",
+    "tools/run_pilot.py",
 )
 
 
@@ -85,6 +91,31 @@ def git_sha() -> str:
         raise RuntimeError("could not resolve git SHA for the method freeze") from exc
 
 
+def git_sha_is_ancestor(ancestor: str, descendant: str) -> bool:
+    """Return whether a recorded pre-freeze commit remains in the live history."""
+    if ancestor == descendant:
+        return True
+    try:
+        completed = subprocess.run(
+            ["git", "merge-base", "--is-ancestor", ancestor, descendant],
+            cwd=REPO_ROOT,
+            check=False,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+    except OSError:
+        return False
+    return completed.returncode == 0
+
+
+def preregistration_final_status() -> tuple[bool, str | None]:
+    try:
+        load_preregistration(require_final=True)
+    except (TypeError, ValueError) as exc:
+        return False, str(exc)
+    return True, None
+
+
 def load_freeze(path: Path | None = None) -> dict:
     target = path or FREEZE_PATH
     if not target.is_file():
@@ -96,13 +127,24 @@ def load_freeze(path: Path | None = None) -> dict:
 
 
 def render(frozen_at: str) -> str:
+    preregistration_final, preregistration_error = preregistration_final_status()
+    missing = missing_registered_files()
     payload = {
         "schema_version": SCHEMA_VERSION,
         "gate": GATE,
         "frozen_at": frozen_at,
         "git_sha": git_sha(),
         "registered_files": list(REGISTERED_FILES),
-        "complete": not missing_registered_files(),
+        "complete": not missing and preregistration_final,
+        "preregistration_final": preregistration_final,
+        "incomplete_reasons": [
+            *([f"missing registered files: {', '.join(missing)}"] if missing else []),
+            *(
+                [f"preregistration is not final: {preregistration_error}"]
+                if preregistration_error
+                else []
+            ),
+        ],
         "rule": (
             "A registered method file may change, but not quietly. Log a dated entry in "
             "prereg/deviations.md naming the file and quoting the new sha256, then re-run "
@@ -133,12 +175,16 @@ def render(frozen_at: str) -> str:
 
 
 def changed_records(
-    frozen_manifest: dict, records: tuple[FileRecord, ...], current_git_sha: str
+    frozen_manifest: dict,
+    records: tuple[FileRecord, ...],
+    current_git_sha: str,
+    *,
+    recorded_git_is_ancestor: bool | None = None,
 ) -> list[tuple[str, str, str]]:
     """Compare a frozen manifest to caller-supplied live records."""
     frozen = frozen_manifest["files"]
     changed = []
-    if frozen_manifest.get("git_sha") != current_git_sha:
+    if frozen_manifest.get("git_sha") != current_git_sha and recorded_git_is_ancestor is not True:
         changed.append(
             ("<git-sha>", frozen_manifest.get("git_sha", "<not frozen>"), current_git_sha)
         )
@@ -154,7 +200,14 @@ def changed_records(
 
 def drift() -> list[tuple[str, str, str]]:
     frozen_manifest = load_freeze()
-    return changed_records(frozen_manifest, current_records(), git_sha())
+    current = git_sha()
+    recorded = str(frozen_manifest.get("git_sha", ""))
+    return changed_records(
+        frozen_manifest,
+        current_records(),
+        current,
+        recorded_git_is_ancestor=git_sha_is_ancestor(recorded, current),
+    )
 
 
 def deviation_declared(path: str, new_sha: str) -> bool:
@@ -173,12 +226,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.check:
         frozen = load_freeze()
         if not frozen.get("complete", False):
-            missing = [
-                path for path, record in frozen.get("files", {}).items() if record.get("missing")
-            ]
+            reasons = frozen.get("incomplete_reasons") or ["unspecified incomplete freeze"]
             raise SystemExit(
-                "method freeze is incomplete; registered files were missing at freeze time: "
-                + ", ".join(missing)
+                "method freeze is incomplete: " + "; ".join(str(reason) for reason in reasons)
             )
         changed = drift()
         if not changed:
@@ -208,10 +258,11 @@ def main(argv: list[str] | None = None) -> int:
     FREEZE_PATH.write_text(render(frozen_at), encoding="utf-8")
     print(f"wrote {FREEZE_PATH} (frozen_at {frozen_at})")
     missing = missing_registered_files()
-    if missing:
-        print("WARNING: method freeze is incomplete; missing registered files:")
-        for rel in missing:
-            print(f"  {rel}")
+    final, _final_error = preregistration_final_status()
+    if missing or not final:
+        print("WARNING: method freeze is incomplete:")
+        for reason in json.loads(FREEZE_PATH.read_text(encoding="utf-8"))["incomplete_reasons"]:
+            print(f"  {reason}")
     for record in current_records():
         print(f"  {record.path}: {record.short} ({record.lines} lines)")
     prereg = load_preregistration(require_final=False)

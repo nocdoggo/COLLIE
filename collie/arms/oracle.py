@@ -88,11 +88,11 @@ def incident_to_payload(incident: HiddenIncident) -> ProposalPayload:
     Family determines ``(target_stream, direction)``: the demand families carry their
     multiplier's sign; a lead-time shift is a delay; a shipment loss or transit pause is an
     interruption. Persistence is TRANSIENT for a temporary pulse and PERSISTENT otherwise (the
-    demand-level and supply families all run to the horizon or are permanent effects). The
-    onset window is ``(0, 0)`` — the oracle knows the onset is *now*, which is exactly the
-    headroom being measured. The compound family is refused: one incident driving both streams
-    needs module 05's joint construction, not a marginal guess, and ``no_change`` is not an
-    incident.
+    demand-level and permanent supply families run to the horizon). Compound maps to the
+    registered joint ``(both, mixed)`` compiler shape; this does not multiply marginal evidence
+    because the oracle bypasses verification and only supplies the hidden-truth compiler upper
+    bound. The onset window is ``(0, 0)`` — the oracle knows the onset is *now*, which is exactly
+    the headroom being measured. ``no_change`` is not an incident.
     """
     family = incident.family
     if family in (ShockFamily.DEMAND_LEVEL, ShockFamily.TEMPORARY_PULSE):
@@ -109,13 +109,14 @@ def incident_to_payload(incident: HiddenIncident) -> ProposalPayload:
         stream, direction = TargetStream.ARRIVAL, Direction.ARRIVAL_DELAYED
     elif family in (ShockFamily.SHIPMENT_LOSS, ShockFamily.TRANSIT_PAUSE):
         stream, direction = TargetStream.ARRIVAL, Direction.ARRIVAL_INTERRUPTED
+    elif family is ShockFamily.COMPOUND:
+        stream, direction = TargetStream.BOTH, Direction.MIXED
     else:
-        raise ValueError(
-            f"the oracle does not map family {family!r}: compound incidents need module 05's "
-            "joint construction and no_change is not an incident"
-        )
+        raise ValueError(f"the oracle does not map family {family!r}: no_change is not an incident")
     persistence = (
-        Persistence.TRANSIENT if family is ShockFamily.TEMPORARY_PULSE else Persistence.PERSISTENT
+        Persistence.TRANSIENT
+        if family in (ShockFamily.TEMPORARY_PULSE, ShockFamily.COMPOUND)
+        else Persistence.PERSISTENT
     )
     return ProposalPayload(
         target_stream=stream,

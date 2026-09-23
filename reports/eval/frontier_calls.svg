@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="420" viewBox="0 0 640 420">
+<title>Profit vs realised calls</title>
+<rect width="100%" height="100%" fill="white"/>
+<text x="70" y="24" font-family="Arial" font-size="16">Profit vs realised calls</text>
+<line x1="70" y1="360" x2="610" y2="360" stroke="#222"/>
+<line x1="70" y1="40" x2="70" y2="360" stroke="#222"/>
+<polyline points="70.00,40.00" fill="none" stroke="#1b6f6a" stroke-width="2"/>
+<circle cx="84.49" cy="346.47" r="5" fill="#9aa5b1"><title>arm10_spec_eprocess: 1.77e+04</title></circle>
+<circle cx="610.00" cy="245.52" r="5" fill="#9aa5b1"><title>arm11_or_to_llm: 1.79e+04</title></circle>
+<circle cx="70.00" cy="360.00" r="5" fill="#9aa5b1"><title>arm1_capped_base_stock: 1.76e+04</title></circle>
+<circle cx="70.00" cy="345.17" r="5" fill="#9aa5b1"><title>arm2_telemetry_hmm_or: 1.77e+04</title></circle>
+<circle cx="610.00" cy="245.52" r="5" fill="#9aa5b1"><title>arm3_llm_direct: 1.79e+04</title></circle>
+<circle cx="84.49" cy="359.78" r="5" fill="#9aa5b1"><title>arm4_triggered_llm_direct: 1.76e+04</title></circle>
+<circle cx="610.00" cy="360.00" r="5" fill="#9aa5b1"><title>arm5_llm_to_or_every_period: 1.76e+04</title></circle>
+<circle cx="84.49" cy="360.00" r="5" fill="#9aa5b1"><title>arm6_llm_to_or_sparse: 1.76e+04</title></circle>
+<circle cx="84.49" cy="360.00" r="5" fill="#9aa5b1"><title>arm7_llm_to_or_persistent: 1.76e+04</title></circle>
+<circle cx="84.49" cy="85.07" r="5" fill="#9aa5b1"><title>arm8_spec_immediate: 1.84e+04</title></circle>
+<circle cx="84.49" cy="123.94" r="5" fill="#9aa5b1"><title>arm9_spec_heuristic_rollback: 1.83e+04</title></circle>
+<circle cx="70.00" cy="40.00" r="5" fill="#1b6f6a"><title>ctrl_alertspec_upper_bound: 1.85e+04</title></circle>
+<circle cx="70.00" cy="85.07" r="5" fill="#9aa5b1"><title>ctrl_cusum_to_compiler: 1.84e+04</title></circle>
+<circle cx="70.00" cy="84.25" r="5" fill="#9aa5b1"><title>ctrl_keyword_parser: 1.84e+04</title></circle>
+<circle cx="70.00" cy="124.82" r="5" fill="#9aa5b1"><title>oracle_shockspec_headroom: 1.83e+04</title></circle>
+<text x="320" y="402" font-family="Arial" font-size="12">Realised budget</text>
+<text x="12" y="210" font-family="Arial" font-size="12" transform="rotate(-90 12 210)">Mean profit</text>
+</svg>

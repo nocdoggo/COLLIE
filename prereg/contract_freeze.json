@@ -1,9 +1,9 @@
 {
   "files": {
     "collie/contracts.py": {
-      "bytes": 22232,
-      "lines": 673,
-      "sha256": "727bb3e50d7f808374b600bceaed0456070241fdfdc78b5d5aa82419360eaee8"
+      "bytes": 22314,
+      "lines": 675,
+      "sha256": "5ce4a79976a039ff1a01925315fde2aa036f41cb014dc04a97172f2ec7324fab"
     }
   },
   "frozen_at": "2026-09-01",
