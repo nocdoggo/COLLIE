@@ -137,3 +137,34 @@ def test_loader_reports_json_line_number(tmp_path) -> None:
     path.write_text(json.dumps(episode_result_to_dict(sample_result())) + "\n{bad\n")
     with pytest.raises(ValueError, match=r"bad\.jsonl:2"):
         load_episode_results_jsonl(path)
+
+
+def test_enum_value_recurses_into_sequences_and_mappings() -> None:
+    from collie.eval.records import _enum_value
+
+    assert _enum_value((Split.DEV, [ShockFamily.DEMAND_LEVEL])) == ["dev", ["demand_level"]]
+    assert _enum_value({"split": Split.CAL, "tags": (LifecycleState.ACTIVE,)}) == {
+        "split": "cal",
+        "tags": ["active"],
+    }
+
+
+def test_loader_rejects_unknown_record_type() -> None:
+    payload = episode_result_to_dict(sample_result())
+    payload["type"] = "RunRecord"
+    with pytest.raises(ValueError, match="unsupported record type"):
+        episode_result_from_dict(payload)
+
+
+def test_loader_skips_blank_lines(tmp_path) -> None:
+    path = tmp_path / "records.jsonl"
+    line = json.dumps(episode_result_to_dict(sample_result()))
+    path.write_text(line + "\n\n  \n" + line + "\n", encoding="utf-8")
+    assert load_episode_results_jsonl(path) == (sample_result(), sample_result())
+
+
+def test_loader_rejects_non_object_lines(tmp_path) -> None:
+    path = tmp_path / "records.jsonl"
+    path.write_text("[1, 2]\n", encoding="utf-8")
+    with pytest.raises(ValueError, match=r"records\.jsonl:1: record must be a JSON object"):
+        load_episode_results_jsonl(path)

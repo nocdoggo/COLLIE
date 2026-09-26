@@ -1,7 +1,15 @@
 from __future__ import annotations
 
+import pytest
+
 from collie.contracts import CallLog, EpisodeResult, ParseOutcome
-from collie.eval.efficiency import FrontierPoint, efficiency_summary, pareto_frontier
+from collie.eval.efficiency import (
+    FrontierPoint,
+    auc_over_call_fraction,
+    call_logs,
+    efficiency_summary,
+    pareto_frontier,
+)
 
 
 def result(arm: str, calls: tuple[CallLog, ...] = ()) -> EpisodeResult:
@@ -62,3 +70,25 @@ def test_pareto_uses_realised_budgets() -> None:
         ]
     )
     assert [p.arm for p in frontier] == ["cheap", "expensive"]
+
+
+def test_call_logs_flattens_every_episode_ledger() -> None:
+    entries = (log("a", outcome=ParseOutcome.ACCEPTED), log("b", outcome=ParseOutcome.FALLBACK))
+    results = (
+        result("a", (entries[0],)),
+        result("b", (entries[1],)),
+    )
+    assert call_logs(results) == entries
+
+
+def test_auc_requires_at_least_one_frontier_point() -> None:
+    with pytest.raises(ValueError, match="no frontier points"):
+        auc_over_call_fraction(())
+
+
+def test_auc_normalises_realised_call_budgets() -> None:
+    points = (
+        FrontierPoint("cheap", reward=10.0, budget=1.0),
+        FrontierPoint("expensive", reward=14.0, budget=2.0),
+    )
+    assert auc_over_call_fraction(points) == pytest.approx(11.0)

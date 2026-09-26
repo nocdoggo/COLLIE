@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+import pytest
+
 from collie.contracts import EpisodeResult, RunRecord
 from collie.eval.operational import (
     cvar10,
+    episode_operational_summary,
     max_stockout_streak,
     operational_summaries,
     post_recovery_excess_inventory,
     time_to_recovery,
+    worst_decile,
 )
 
 
@@ -104,3 +108,50 @@ def test_operational_summaries_include_recovery_inventory_when_shock_period_know
     values = {(row.arm, row.metric): row.value for row in rows}
     assert values[("a", "time_to_recovery")] == 3.0
     assert values[("a", "post_recovery_excess_inventory")] == 10.0
+
+
+def test_worst_decile_of_empty_input_is_empty() -> None:
+    assert worst_decile(()) == ()
+
+
+def test_cvar10_rejects_empty_sequences() -> None:
+    with pytest.raises(ValueError, match="empty sequence"):
+        cvar10(())
+
+
+def test_time_to_recovery_requires_a_positive_sustain_window() -> None:
+    with pytest.raises(ValueError, match="sustain must be positive"):
+        time_to_recovery((record(1, 100.0, 100.0),), shock_period=0, sustain=0)
+
+
+def test_post_recovery_excess_inventory_is_none_when_never_recovered() -> None:
+    records = tuple(record(t, 100.0, 80.0, on_hand_end=20.0) for t in range(1, 8))
+    assert post_recovery_excess_inventory(records, shock_period=2) is None
+
+
+def test_episode_operational_summary_reports_period_level_metrics() -> None:
+    sold = [100, 70, 95, 94, 96, 97, 98]
+    records = tuple(
+        record(t, 100.0, float(s), on_hand_end=20.0) for t, s in enumerate(sold, start=1)
+    )
+    result = EpisodeResult(
+        episode_id="e",
+        arm_id="a",
+        total_profit=10.0,
+        total_holding_cost=1.0,
+        total_reward=9.0,
+        total_demand=100.0,
+        total_sold=95.0,
+        total_lost_sales=5.0,
+        perfect_foresight=100.0,
+        normalized_reward=0.09,
+        records=records,
+        independent_unit_id="u",
+    )
+    summary = episode_operational_summary(result, shock_period=2)
+    assert summary["fill_rate"] == 0.95
+    assert summary["lost_sales_units"] == 5.0
+    assert summary["holding_cost"] == 1.0
+    assert summary["max_stockout_streak"] == 6
+    assert summary["time_to_recovery"] == 3
+    assert summary["post_recovery_excess_inventory"] == 20.0

@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from dataclasses import replace
+
+import pytest
+
 from collie.contracts import (
     Direction,
     DurationBin,
@@ -13,6 +17,7 @@ from collie.contracts import (
     TargetStream,
 )
 from collie.eval.truth import (
+    EpisodeTruth,
     episode_truth_from_incident,
     load_episode_truth_jsonl,
     shock_periods_from_truth,
@@ -112,3 +117,85 @@ def test_wrong_spec_exposure_checks_onset_coverage() -> None:
     misses_onset = _spec().model_copy(update={"onset_window": (-2, 0)})
     result = _result((_record(1, misses_onset),))
     assert wrong_spec_exposure(result, truth) == 1.0
+
+
+def test_episode_truth_describes_only_shocked_episodes() -> None:
+    base = dict(
+        episode_id="episode",
+        independent_unit_id="unit",
+        family=ShockFamily.DEMAND_LEVEL,
+        target_stream=TargetStream.DEMAND,
+        direction=Direction.DEMAND_UP,
+        onset_period=4,
+        magnitude_bin=MagnitudeBin.MEDIUM,
+        persistence=Persistence.PERSISTENT,
+        duration_bin=DurationBin.MEDIUM,
+        final_shock_period=8,
+    )
+    with pytest.raises(ValueError, match="no_change has no ShockSpec"):
+        EpisodeTruth(**{**base, "family": ShockFamily.NO_CHANGE})
+    with pytest.raises(ValueError, match="onset_period must be positive"):
+        EpisodeTruth(**{**base, "onset_period": 0})
+    with pytest.raises(ValueError, match="cannot precede onset"):
+        EpisodeTruth(**{**base, "final_shock_period": 3})
+
+
+def test_truth_loader_rejects_bad_lines_and_duplicate_episodes(tmp_path) -> None:
+    truth = episode_truth_from_incident("episode", "unit", _incident())
+    path = tmp_path / "truth.jsonl"
+    write_episode_truth_jsonl(path, (truth,))
+    good_line = path.read_text(encoding="utf-8").strip()
+
+    path.write_text('{"schema_version": 2, "type": "EpisodeTruth"}\n', encoding="utf-8")
+    with pytest.raises(ValueError, match="unsupported evaluation truth record"):
+        load_episode_truth_jsonl(path)
+
+    path.write_text("{bad\n", encoding="utf-8")
+    with pytest.raises(ValueError, match=r"truth\.jsonl:1: invalid JSON"):
+        load_episode_truth_jsonl(path)
+
+    path.write_text("[1, 2]\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="truth record must be an object"):
+        load_episode_truth_jsonl(path)
+
+    path.write_text(good_line + "\n\n" + good_line + "\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="duplicate evaluation truth"):
+        load_episode_truth_jsonl(path)
+
+
+def test_wrong_spec_exposure_requires_matching_provenance() -> None:
+    truth = episode_truth_from_incident("episode", "unit", _incident())
+    result = _result((_record(1, None),))
+    with pytest.raises(ValueError, match="ids do not match"):
+        wrong_spec_exposure(result, replace(truth, episode_id="other"))
+    with pytest.raises(ValueError, match="independent-unit ids do not match"):
+        wrong_spec_exposure(result, replace(truth, independent_unit_id="other"))
+
+
+def test_wrong_spec_exposure_is_zero_without_records() -> None:
+    truth = episode_truth_from_incident("episode", "unit", _incident())
+    assert wrong_spec_exposure(_result(()), truth) == 0.0
+
+
+def test_wrong_spec_exposure_requires_active_spec_provenance() -> None:
+    truth = episode_truth_from_incident("episode", "unit", _incident())
+    record = _record(1, None)
+    record = RunRecord(
+        episode_id=record.episode_id,
+        arm_id=record.arm_id,
+        period=record.period,
+        date=record.date,
+        on_hand_start=record.on_hand_start,
+        in_transit_start=record.in_transit_start,
+        order_quantity=record.order_quantity,
+        arrivals=record.arrivals,
+        demand=record.demand,
+        units_sold=record.units_sold,
+        lost_sales=record.lost_sales,
+        on_hand_end=record.on_hand_end,
+        period_profit=record.period_profit,
+        period_holding=record.period_holding,
+        active_spec_id="spec-1",
+    )
+    with pytest.raises(ValueError, match="active_spec provenance"):
+        wrong_spec_exposure(_result((record,)), truth)

@@ -21,6 +21,7 @@ from collie.control.mapping import CANONICAL_SHAPES, _make_spec, compile_spec
 from collie.eval.prereg import (
     load_preregistration,
     primary_stratum_weights,
+    registered_confirmatory_ids,
     render_preregistration_summary,
     validate_preregistration,
 )
@@ -285,3 +286,119 @@ def test_descendant_commit_does_not_invalidate_frozen_base_sha() -> None:
         recorded_git_is_ancestor=True,
     )
     assert changed == []
+
+
+def test_registered_ids_require_a_mapping_holm_family() -> None:
+    assert registered_confirmatory_ids({"holm_family": []}) == set()
+
+
+def test_registered_ids_require_a_member_list() -> None:
+    with pytest.raises(ValueError, match="members must be a list"):
+        registered_confirmatory_ids({"holm_family": {"members": "not-a-list"}})
+
+
+def test_registered_ids_require_mapping_members() -> None:
+    with pytest.raises(ValueError, match="must be a mapping"):
+        registered_confirmatory_ids({"holm_family": {"members": ["not-a-mapping"]}})
+
+
+def test_load_preregistration_rejects_non_mapping_yaml(tmp_path) -> None:
+    path = tmp_path / "prereg.yaml"
+    path.write_text("- a\n- b\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="did not parse to a mapping"):
+        load_preregistration(path, require_final=False)
+
+
+PREREG_VIOLATIONS = (
+    (
+        "missing_section",
+        lambda data: data.pop("metadata"),
+        "missing required sections",
+    ),
+    (
+        "draft",
+        lambda data: data["metadata"].update({"draft": True}),
+        "still marked metadata.draft=true",
+    ),
+    (
+        "placeholder",
+        lambda data: data["trust_region"].update({"definition": "TODO: register"}),
+        "contains a placeholder value",
+    ),
+    (
+        "endpoint_order",
+        lambda data: data.update({"primary_endpoints": list(reversed(data["primary_endpoints"]))}),
+        "must name profit and lost-sales units in order",
+    ),
+    (
+        "weights_not_mapping",
+        lambda data: data.update({"stratum_weights": []}),
+        "stratum_weights must be a mapping",
+    ),
+    (
+        "weight_section_not_mapping",
+        lambda data: data["stratum_weights"].update({"family": "demand_level"}),
+        "stratum_weights.family must be a mapping",
+    ),
+    (
+        "weight_not_numeric",
+        lambda data: data["stratum_weights"]["family"].update({"demand_level": "high"}),
+        "is not numeric",
+    ),
+    (
+        "weights_do_not_sum_to_one",
+        lambda data: data["stratum_weights"]["family"].update({"demand_level": 0.99}),
+        "not 1",
+    ),
+    (
+        "contrasts_not_three",
+        lambda data: data.update({"confirmatory_contrasts": []}),
+        "exactly three contrasts",
+    ),
+    (
+        "holm_not_six",
+        lambda data: data["holm_family"].update({"members": data["holm_family"]["members"][:5]}),
+        "exactly six endpoint-by-contrast tests",
+    ),
+    (
+        "holm_mismatch",
+        lambda data: data["holm_family"]["members"][0].update({"endpoint": "holding_cost"}),
+        "Holm family mismatch",
+    ),
+    (
+        "kill_thresholds_not_seven",
+        lambda data: data["kill_thresholds"].popitem(),
+        "exactly seven entries",
+    ),
+    (
+        "kill_threshold_not_numeric",
+        lambda data: data["kill_thresholds"].update({"false_activation_rate": "high"}),
+        "kill thresholds must be numeric",
+    ),
+    (
+        "pilot_policy_not_mapping",
+        lambda data: data.update({"pilot_policy": []}),
+        "pilot_policy must be a mapping",
+    ),
+    (
+        "pilot_policy_mismatch",
+        lambda data: data["pilot_policy"].update({"call_budget_per_episode": 5}),
+        "does not match registered implementation limits",
+    ),
+    (
+        "kill_triggers_not_eight",
+        lambda data: data.update({"kill_triggers": []}),
+        "exactly eight entries",
+    ),
+)
+
+
+@pytest.mark.parametrize(
+    ("mutation", "match"),
+    [pytest.param(mutation, match, id=case_id) for case_id, mutation, match in PREREG_VIOLATIONS],
+)
+def test_invalid_preregistrations_are_rejected(mutation, match) -> None:
+    data = final_prereg()
+    mutation(data)
+    with pytest.raises(ValueError, match=match):
+        validate_preregistration(data, require_final=True)

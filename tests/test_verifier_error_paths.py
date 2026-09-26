@@ -30,6 +30,7 @@ from collie.verify.arrival import (
     _changed_laws_for,
     _durations_for_family,
     _run_forked_chunks,
+    _run_spawned_chunks,
     _wilson,
     advance_counter,
     brute_force_sequence_probability,
@@ -375,6 +376,11 @@ def test_arrival_eprocess_and_calibration_guards(monkeypatch: pytest.MonkeyPatch
     )
     with pytest.raises(RuntimeError, match=r"worker .* failed"):
         _run_forked_chunks((("not", "a", "valid", "worker", "argument", "tuple"),))
+
+
+def test_spawned_arrival_worker_failure_surfaces_the_worker_index() -> None:
+    with pytest.raises(RuntimeError, match=r"worker local-.* failed"):
+        _run_spawned_chunks((("not", "a", "valid", "worker", "argument", "tuple"),))
 
 
 def test_demand_calibration_counts_an_activation(monkeypatch: pytest.MonkeyPatch) -> None:

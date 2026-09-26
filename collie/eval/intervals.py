@@ -103,7 +103,7 @@ def wilcoxon_signed_rank_pvalue(differences: Sequence[float]) -> float:
     n = len(diffs)
     mean = n * (n + 1) / 4.0
     variance = n * (n + 1) * (2 * n + 1) / 24.0
-    if variance == 0.0:
+    if variance == 0.0:  # pragma: no cover - n >= 1 after the zero filter, so variance > 0
         return 1.0
     return _two_sided_normal_pvalue((positive_rank_sum - mean) / np.sqrt(variance))
 

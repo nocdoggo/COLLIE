@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from collie.contracts import Direction, LifecycleState, ShockFamily, TargetStream
 from collie.eval.hypothesis import HypothesisCase, macro_f1, score_hypotheses
 
@@ -92,3 +94,13 @@ def test_wrong_spec_exposure_counts_correct_family_wrong_field() -> None:
     )
     assert metrics.wrong_family_activation == 0
     assert metrics.wrong_spec_exposure == 1
+
+
+def test_macro_f1_requires_at_least_one_label() -> None:
+    with pytest.raises(ValueError, match="no labels"):
+        macro_f1([], [])
+
+
+def test_score_hypotheses_requires_at_least_one_case() -> None:
+    with pytest.raises(ValueError, match="no hypothesis cases"):
+        score_hypotheses([])

@@ -78,7 +78,9 @@ def post_recovery_excess_inventory(
         return None
     first_period = shock_period + delay
     inventories = [r.on_hand_end for r in records if r.period >= first_period]
-    if not inventories:
+    # A non-None delay means the recovery window's first period is itself in records, so the
+    # comprehension below is never empty.
+    if not inventories:  # pragma: no cover
         return None
     return float(np.mean(inventories) - baseline_inventory)
 

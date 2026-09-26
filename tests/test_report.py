@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import json
+import runpy
+import sys
+from pathlib import Path
 
 import pytest
 
@@ -17,7 +20,11 @@ from collie.contracts import (
 from collie.eval.prereg import Preregistration
 from collie.eval.records import write_episode_results_jsonl
 from collie.eval.report import (
+    _filter_split,
+    _load_float_mapping,
+    _load_int_mapping,
     assert_report_tables_trace_to_records,
+    main,
     render_compatibility_table,
     render_efficiency_table,
     render_frontier_table,
@@ -26,6 +33,8 @@ from collie.eval.report import (
     report_manifest,
     write_report_artifacts,
 )
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 def result(
@@ -310,3 +319,156 @@ def test_compatibility_table_labels_the_harness() -> None:
     table = render_compatibility_table((result("arm", "u1", 12.0),), harness="eval")
     assert "official_normalized_reward_micro" in table
     assert "`eval`" in table
+
+
+def test_report_manifest_maps_artifact_paths_with_and_without_a_root(tmp_path) -> None:
+    inside = tmp_path / "out" / "main_table.md"
+    outside = tmp_path / "elsewhere.md"
+    manifest = report_manifest(
+        (result("arm", "u1", 12.0),),
+        artifacts=(inside, outside),
+        records_path=None,
+        prereg=prereg(),
+        artifact_root=tmp_path / "out",
+    )
+    paths = [artifact["path"] for artifact in manifest["artifacts"]]
+    assert "main_table.md" in paths
+    assert outside.as_posix() in paths
+    unrooted = report_manifest(
+        (result("arm", "u1", 12.0),),
+        artifacts=(outside,),
+        records_path=None,
+        prereg=prereg(),
+    )
+    assert unrooted["artifacts"][0]["path"] == outside.as_posix()
+
+
+def test_report_trace_guard_ignores_prose_and_headerless_tables(tmp_path) -> None:
+    path = tmp_path / "mixed.md"
+    path.write_text(
+        "\n".join(
+            [
+                "# Notes",
+                "",
+                "Prose without tables.",
+                "| a | b |",
+                "|---|---|",
+                "| 1 | 2 |",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    assert_report_tables_trace_to_records((path,))
+
+
+def test_report_trace_guard_flags_rows_shorter_than_the_source_header(tmp_path) -> None:
+    path = tmp_path / "short.md"
+    path.write_text(
+        "\n".join(
+            [
+                "| arm | metric | source |",
+                "|---|---|---|",
+                "| `a` | profit |",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="lack record provenance"):
+        assert_report_tables_trace_to_records((path,))
+
+
+def test_efficiency_table_refuses_to_match_budgets_over_no_points() -> None:
+    with pytest.raises(ValueError, match="cannot match budget over no points"):
+        render_efficiency_table(())
+
+
+def test_efficiency_table_matches_the_reference_arm_when_it_is_the_only_arm() -> None:
+    table = render_efficiency_table((result("arm10_spec_eprocess", "u1", 12.0, calls=1),))
+    matched_rows = [line for line in table.splitlines() if line.startswith("| matched_budget")]
+    assert matched_rows
+    assert all("`arm10_spec_eprocess`" in line for line in matched_rows)
+
+
+def test_filter_split_falls_back_to_all_records_for_unknown_or_unmatched_splits() -> None:
+    records = (
+        result("arm", "u1", 10.0, split=Split.DEV),
+        result("arm", "u2", 30.0, split=Split.CAL),
+    )
+    assert _filter_split(records, "dev") == records[:1]
+    assert _filter_split(records, "not-a-split") == records
+    assert _filter_split(records, "test") == records
+
+
+def test_cli_mapping_loaders_validate_json_objects(tmp_path) -> None:
+    assert _load_int_mapping(None) is None
+    assert _load_float_mapping(None) is None
+    path = tmp_path / "mapping.json"
+    path.write_text(json.dumps({"e": 2}), encoding="utf-8")
+    assert _load_int_mapping(path) == {"e": 2}
+    assert _load_float_mapping(path) == {"e": 2.0}
+    path.write_text("[1, 2]", encoding="utf-8")
+    with pytest.raises(SystemExit, match="must contain a JSON object"):
+        _load_int_mapping(path)
+    with pytest.raises(SystemExit, match="must contain a JSON object"):
+        _load_float_mapping(path)
+
+
+def test_report_cli_reports_missing_records(capsys) -> None:
+    assert main([]) == 2
+    assert "no stored run-record file" in capsys.readouterr().out
+
+
+def stored_results() -> tuple[EpisodeResult, ...]:
+    return (
+        result("arm10_spec_eprocess", "u1", 12.0, calls=1, split=Split.DEV),
+        result("arm1_capped_base_stock", "u1", 10.0, split=Split.DEV),
+    )
+
+
+def test_report_cli_renders_artifacts_from_stored_records(tmp_path, capsys) -> None:
+    records_path = tmp_path / "records.jsonl"
+    write_episode_results_jsonl(records_path, stored_results())
+    options = tmp_path / "options.json"
+    options.write_text(json.dumps({"e-u1-arm10_spec_eprocess": 2}), encoding="utf-8")
+    weights = tmp_path / "weights.json"
+    weights.write_text(json.dumps({"dev": 0.7, "cal": 0.3}), encoding="utf-8")
+    out_dir = tmp_path / "out"
+    assert (
+        main(
+            [
+                "--records",
+                str(records_path),
+                "--out-dir",
+                str(out_dir),
+                "--shock-periods",
+                str(options),
+                "--baseline-inventory",
+                str(options),
+                "--deployment-weights",
+                str(weights),
+            ]
+        )
+        == 0
+    )
+    printed = capsys.readouterr().out
+    assert "cumulative_undiscounted_profit" in printed
+    assert "wrote:" in printed
+    assert (out_dir / "main_table.md").is_file()
+    assert (out_dir / "report_manifest.json").is_file()
+
+
+def test_report_main_block_runs_in_process(tmp_path, monkeypatch, capsys) -> None:
+    """Mirror the CLI audit under the coverage tracer, which does not follow children."""
+    records_path = tmp_path / "records.jsonl"
+    write_episode_results_jsonl(records_path, stored_results())
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        ["report.py", "--records", str(records_path), "--out-dir", str(tmp_path / "out")],
+    )
+    with pytest.raises(SystemExit) as caught:
+        runpy.run_path(str(REPO_ROOT / "collie" / "eval" / "report.py"), run_name="__main__")
+    assert caught.value.code == 0
+    assert "wrote:" in capsys.readouterr().out

@@ -107,7 +107,9 @@ def auc_over_call_fraction(points: Sequence[FrontierPoint]) -> float:
     ordered = sorted((point.budget / max_budget, point.reward) for point in points)
     if ordered[0][0] > 0:
         ordered.insert(0, (0.0, ordered[0][1]))
-    if ordered[-1][0] < 1:
+    # The largest max-normalised budget is exactly 1.0 by construction, so the append below
+    # can never fire.
+    if ordered[-1][0] < 1:  # pragma: no cover
         ordered.append((1.0, ordered[-1][1]))
     xs = np.asarray([p[0] for p in ordered], dtype=float)
     ys = np.asarray([p[1] for p in ordered], dtype=float)

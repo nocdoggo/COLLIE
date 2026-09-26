@@ -1,12 +1,15 @@
 from __future__ import annotations
 
+import pandas as pd
 import pytest
 
 from collie.contracts import EpisodeResult, InformationCondition, ShockFamily, Split
 from collie.eval.endpoints import (
     aggregate_primary_endpoints,
     compatibility_summaries,
+    equal_weighted_mean,
     stratum_weighted_endpoints,
+    weighted_metric_by_field,
 )
 
 
@@ -95,3 +98,68 @@ def test_compatibility_summaries_report_micro_and_weighted_mixture() -> None:
     weighted = values[("a", "official_normalized_reward_split_mixture")]
     assert weighted.value == pytest.approx((0.1 * 0.70 + 0.3 * 0.15) / 0.85)
     assert weighted.harness == "eval"
+
+
+def frame() -> pd.DataFrame:
+    return pd.DataFrame(
+        [
+            {"arm": "a", "family": "demand_level", "split": "dev", "value": 10.0},
+            {"arm": "a", "family": "temporary_pulse", "split": "cal", "value": 30.0},
+        ]
+    )
+
+
+def test_weighted_metric_by_field_requires_its_columns() -> None:
+    with pytest.raises(ValueError, match="missing columns"):
+        weighted_metric_by_field(frame(), value_col="value", field="absent", weights={"dev": 1.0})
+
+
+def test_weighted_metric_by_field_requires_populated_strata() -> None:
+    with pytest.raises(ValueError, match="no populated strata"):
+        weighted_metric_by_field(frame(), value_col="value", field="split", weights={"test": 1.0})
+
+
+def test_equal_weighted_mean_requires_its_columns() -> None:
+    with pytest.raises(ValueError, match="missing columns"):
+        equal_weighted_mean(
+            frame(),
+            value_col="value",
+            strata=("family", "absent"),
+            weights={("demand_level", "x"): 1.0},
+        )
+
+
+def test_equal_weighted_mean_wraps_scalar_keys_and_checks_arity() -> None:
+    with pytest.raises(ValueError, match="does not match strata"):
+        equal_weighted_mean(
+            frame(),
+            value_col="value",
+            strata=("family", "split"),
+            weights={"demand_level": 1.0},
+        )
+    assert (
+        equal_weighted_mean(
+            frame(), value_col="value", strata=("family",), weights={"demand_level": 1.0}
+        )
+        == 10.0
+    )
+
+
+def test_equal_weighted_mean_skips_unpopulated_strata() -> None:
+    value = equal_weighted_mean(
+        frame(),
+        value_col="value",
+        strata=("family",),
+        weights={"demand_level": 0.5, "absent_family": 0.5},
+    )
+    assert value == 10.0
+
+
+def test_equal_weighted_mean_requires_at_least_one_populated_stratum() -> None:
+    with pytest.raises(ValueError, match="no populated strata"):
+        equal_weighted_mean(
+            frame(),
+            value_col="value",
+            strata=("family",),
+            weights={"absent_family": 1.0},
+        )

@@ -290,9 +290,40 @@ Not yet frozen. Task 19 establishes `prereg/freeze_manifest.json` at the end of 
 
 ## Gate 3 — pilot decision
 
-Not yet reached.
+### 2026-09-23 — pilot decision recorded: kill-or-reframe
 
-*No deviations recorded.*
+- **Decision:** kill-or-reframe, dated 2026-09-23 in `reports/pilot_report.md`, rendered from
+  `reports/pilot_records.jsonl` by the frozen pipeline (`tools/run_pilot.py`).
+- **Outcome:** 3 of 7 go criteria pass (`profit_lift`, `lost_sales_reduction`,
+  `wrong_family_exposure`); 2 of 8 kill-or-reframe triggers fire: `insufficient_headroom`
+  (oracle clears the registered lift bar on 2 of 6 family keys, threshold more than 3) and
+  `detector_indistinguishable` (arm 10 trails the detector-into-identical-compiler control
+  by 565.5 raw profit units per episode, interval entirely below zero).
+- **Recorded findings from the pre-merge audit (integration auditor, 2026-09-26):**
+  1. `cost_frontier` is unwinnable as implemented: the frontier frame includes the
+     hidden-truth upper-bound arms, whose zero cost and top reward dominate every deployable
+     arm, so no LLM-calling arm can ever sit on the realised frontier. The registered
+     definition does not name the competitor set. The computation is faithful to the
+     records; the criterion design is the defect. **The pilot decision is unaffected** (the
+     two kill triggers are robust), and the criterion needs a dated decision on the
+     competitor set before Gate 3 is re-run — after which this finding becomes a fix, not a
+     threshold move.
+  2. The aggregation-unit doctrine (`07` brief: four information conditions are paired
+     replays of one independent unit) conflicts with the frozen `pilot_policy
+     .independent_units: 120` counting: the harness stamps the condition into
+     `independent_unit_id`, so intervals are ~2x narrower than the brief's doctrine
+     prescribes. Under seed-collapsed intervals `profit_lift`'s go verdict flips to fail;
+     the overall decision is unchanged. The tension is frozen into the registration itself
+     and belongs to the Gate 3 conversation, not a code edit.
+  3. The pilot ran through scripted transport (`scripted-fake-7b`) and demo alerts, per
+     `tools/run_arms.py`'s own labelling: the arms, parser, compiler, verifier, and ledger
+     are the real frozen code path, but the LLM content and alert channel are synthetic.
+     The recorded numbers are integration-harness outputs; the go/kill machinery itself is
+     what the pilot validated. A pilot with real model content remains owed before any
+     confirmatory sweep.
+- **Blast radius:** none to any prior checkpoint result. The full held-out sweeps stay
+  deferred (brief, "Deferred past this sprint").
+
 
 ---
 

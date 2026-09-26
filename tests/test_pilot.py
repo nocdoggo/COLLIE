@@ -4,8 +4,10 @@ import json
 from dataclasses import replace
 from pathlib import Path
 
+import numpy as np
 import pytest
 
+import tools.freeze as freeze
 import tools.run_pilot as run_pilot
 from collie.contracts import (
     CallLog,
@@ -23,6 +25,10 @@ from collie.contracts import (
     TargetStream,
 )
 from collie.eval.pilot import (
+    PilotDecision,
+    _cost_frontier_interval,
+    _headroom_count_from_values,
+    _headroom_key,
     compute_builtin_pilot_intervals,
     compute_builtin_pilot_metrics,
     evaluate_pilot,
@@ -34,7 +40,14 @@ from collie.eval.pilot import (
     validate_pilot_record_count,
     write_pilot_manifest,
 )
-from collie.eval.prereg import Preregistration, load_preregistration
+from collie.eval.prereg import Preregistration, load_preregistration, primary_stratum_weights
+from collie.eval.records import load_episode_results_jsonl
+from collie.eval.truth import (
+    EpisodeTruth,
+    load_episode_truth_jsonl,
+    shock_periods_from_truth,
+    truth_by_episode,
+)
 from tools.run_pilot import main
 
 
@@ -669,3 +682,406 @@ def test_quarantine_rejects_incomplete_freeze(monkeypatch, tmp_path) -> None:
     )
     with pytest.raises(SystemExit, match="method freeze is incomplete"):
         run_pilot._quarantine_check(tmp_path / "pilot_manifest.json")
+
+
+def truth(episode_id: str, family: ShockFamily, direction: Direction) -> EpisodeTruth:
+    return EpisodeTruth(
+        episode_id=episode_id,
+        independent_unit_id="u",
+        family=family,
+        target_stream=TargetStream.DEMAND,
+        direction=direction,
+        onset_period=1,
+        magnitude_bin=MagnitudeBin.MEDIUM,
+        persistence=Persistence.PERSISTENT,
+        duration_bin=DurationBin.LONGER,
+        final_shock_period=2,
+    )
+
+
+def test_pilot_manifest_tolerates_missing_sidecar_files(tmp_path) -> None:
+    manifest = pilot_manifest_from_records(
+        (result("arm10_spec_eprocess", 12.0, 0.0),),
+        requested_episodes=120,
+        freeze_manifest_path=tmp_path / "absent_freeze.json",
+    )
+    assert manifest.freeze_manifest_sha256 is None
+    assert manifest.records_sha256 is None
+    assert manifest.truth_sha256 is None
+
+
+def test_pilot_record_count_requires_independent_unit_ids() -> None:
+    anonymous = replace(result("arm10_spec_eprocess", 1.0, 0.0), independent_unit_id=None)
+    with pytest.raises(ValueError, match="independent_unit_id"):
+        validate_pilot_record_count((anonymous,))
+
+
+def test_formal_pilot_requires_oracle_and_detector_arms_for_shocked_units() -> None:
+    records = tuple(
+        replace(
+            result(arm, 1.0, 0.0),
+            independent_unit_id=f"u{i}",
+            split=Split.DEV,
+            family=ShockFamily.DEMAND_LEVEL,
+            information_condition=InformationCondition.NO_ALERT,
+        )
+        for i in range(100)
+        for arm in ("arm10_spec_eprocess", "arm1_capped_base_stock")
+    )
+    with pytest.raises(ValueError, match="oracle and detector-control"):
+        validate_pilot_record_count(records, prereg=load_preregistration(require_final=False))
+
+
+def test_formal_pilot_requires_registered_strata_coverage() -> None:
+    records = tuple(
+        replace(
+            result(arm, 1.0, 0.0),
+            independent_unit_id=f"u{i}",
+            split=Split.DEV,
+            family=ShockFamily.DEMAND_LEVEL,
+            information_condition=InformationCondition.NO_ALERT,
+        )
+        for i in range(100)
+        for arm in (
+            "arm10_spec_eprocess",
+            "arm1_capped_base_stock",
+            "oracle_shockspec_headroom",
+            "ctrl_cusum_to_compiler",
+        )
+    )
+    with pytest.raises(ValueError, match="missing registered strata"):
+        validate_pilot_record_count(records, prereg=load_preregistration(require_final=False))
+
+
+def test_criteria_support_strict_greater_and_equality_operators() -> None:
+    pilot_prereg = Preregistration(
+        path=Path("prereg/prereg_v1.yaml"),
+        data={
+            "go_criteria": [
+                {"id": "profit_lift", "threshold": 1.0, "operator": ">"},
+                {"id": "lost_sales_reduction", "threshold": 1.0, "operator": "=="},
+            ],
+            "kill_thresholds": {},
+            "kill_triggers": [],
+        },
+    )
+    decision = evaluate_pilot(pilot_prereg, {"profit_lift": 2.0, "lost_sales_reduction": 1.0})
+    assert all(verdict.passed for verdict in decision.go)
+    decision = evaluate_pilot(pilot_prereg, {"profit_lift": 1.0, "lost_sales_reduction": 2.0})
+    assert not any(verdict.passed for verdict in decision.go)
+
+
+def test_criteria_reject_an_unsupported_operator() -> None:
+    pilot_prereg = Preregistration(
+        path=Path("prereg/prereg_v1.yaml"),
+        data={
+            "go_criteria": [{"id": "profit_lift", "threshold": 1.0, "operator": "!="}],
+            "kill_thresholds": {},
+            "kill_triggers": [],
+        },
+    )
+    with pytest.raises(ValueError, match="unsupported criterion operator"):
+        evaluate_pilot(pilot_prereg, {"profit_lift": 2.0})
+
+
+def test_criterion_threshold_must_resolve_to_a_number() -> None:
+    pilot_prereg = Preregistration(
+        path=Path("prereg/prereg_v1.yaml"),
+        data={
+            "go_criteria": [{"id": "profit_lift", "threshold": "unregistered"}],
+            "kill_thresholds": {},
+            "kill_triggers": [],
+        },
+    )
+    with pytest.raises(ValueError, match="is not numeric"):
+        evaluate_pilot(pilot_prereg, {"profit_lift": 2.0})
+
+
+def test_formal_go_intervals_must_be_finite_and_ordered() -> None:
+    pilot_prereg = full_go_prereg()
+    intervals = {item["id"]: (0.0, 1.0) for item in pilot_prereg.data["go_criteria"]}
+    intervals["profit_lift"] = (2.0, 1.0)
+    with pytest.raises(ValueError, match="invalid intervals"):
+        validate_go_intervals(pilot_prereg, intervals)
+
+
+def test_formal_pilot_intervals_must_be_finite() -> None:
+    pilot_prereg = full_go_prereg()
+    intervals = {item["id"]: (0.0, 1.0) for item in pilot_prereg.data["go_criteria"]}
+    intervals.update(
+        {
+            item["id"]: (0.0, 1.0)
+            for item in pilot_prereg.data["kill_triggers"]
+            if item["id"] != "method_freeze_or_quarantine_violation"
+        }
+    )
+    intervals["false_activation_rate"] = (float("nan"), 1.0)
+    with pytest.raises(ValueError, match="invalid intervals"):
+        validate_pilot_intervals(pilot_prereg, intervals)
+
+
+def test_formal_pilot_metrics_must_be_finite() -> None:
+    pilot_prereg = full_go_prereg()
+    metrics = {item["id"]: 0.0 for item in pilot_prereg.data["go_criteria"]}
+    metrics.update({item["id"]: 0.0 for item in pilot_prereg.data["kill_triggers"]})
+    metrics["profit_lift"] = float("nan")
+    with pytest.raises(ValueError, match="invalid estimates"):
+        validate_pilot_metrics(pilot_prereg, metrics)
+
+
+def test_pilot_recovery_requires_shock_periods_for_every_shocked_episode() -> None:
+    pilot_result = replace(
+        result("arm10_spec_eprocess", 12.0, 0.0),
+        family=ShockFamily.DEMAND_LEVEL,
+    )
+    with pytest.raises(ValueError, match="missing shock periods"):
+        compute_builtin_pilot_metrics((pilot_result,), shock_periods={"other": 2})
+
+
+def test_cost_frontier_interval_is_absent_without_independent_units() -> None:
+    anonymous = (
+        replace(result("arm10_spec_eprocess", 12.0, 3.0), independent_unit_id=None),
+        replace(result("arm1_capped_base_stock", 10.0, 5.0), independent_unit_id=None),
+    )
+    assert _cost_frontier_interval(anonymous) is None
+
+
+def test_headroom_lift_handles_zero_baselines() -> None:
+    values = {
+        "up": (np.asarray([5.0]), np.asarray([0.0])),
+        "flat": (np.asarray([0.0]), np.asarray([0.0])),
+        "down": (np.asarray([-1.0]), np.asarray([0.0])),
+    }
+    assert _headroom_count_from_values(values) == 1
+
+
+def test_headroom_key_ignores_unshocked_results() -> None:
+    assert _headroom_key(result("arm10_spec_eprocess", 1.0, 0.0), None) is None
+    unshocked = replace(result("arm10_spec_eprocess", 1.0, 0.0), family=ShockFamily.NO_CHANGE)
+    assert _headroom_key(unshocked, {}) is None
+
+
+def test_headroom_key_uses_truth_direction_for_demand_level() -> None:
+    episode = replace(
+        result("arm10_spec_eprocess", 1.0, 0.0),
+        episode_id="e",
+        family=ShockFamily.DEMAND_LEVEL,
+    )
+    assert _headroom_key(episode, {}) == "demand_level"
+    demand_down = truth("e", ShockFamily.DEMAND_LEVEL, Direction.DEMAND_DOWN)
+    assert _headroom_key(episode, {"e": demand_down}) == "demand_level:demand_down"
+    shipment = truth("e", ShockFamily.SHIPMENT_LOSS, Direction.ARRIVAL_INTERRUPTED)
+    assert _headroom_key(episode, {"e": shipment}) == "shipment_loss"
+
+
+def test_headroom_evaluation_requires_paired_oracle_and_baseline_families() -> None:
+    oracle_only = replace(
+        result("oracle_shockspec_headroom", 106.0, 0.0),
+        independent_unit_id="u1",
+        family=ShockFamily.DEMAND_LEVEL,
+    )
+    with pytest.raises(ValueError, match="missing paired oracle/ARM1 families"):
+        compute_builtin_pilot_metrics((oracle_only,))
+
+
+def test_headroom_family_values_ignore_non_oracle_arms() -> None:
+    results = []
+    families = tuple(family for family in ShockFamily if family is not ShockFamily.NO_CHANGE)
+    for family in families:
+        for arm, profit in (
+            ("arm10_spec_eprocess", 999.0),
+            ("oracle_shockspec_headroom", 106.0),
+            ("arm1_capped_base_stock", 100.0),
+        ):
+            results.append(
+                replace(
+                    result(arm, profit, 0.0),
+                    episode_id=f"{family.value}-{arm}",
+                    independent_unit_id=family.value,
+                    family=family,
+                )
+            )
+    assert compute_builtin_pilot_metrics(tuple(results))["insufficient_headroom"] == 6.0
+
+
+def test_headroom_required_keys_follow_truth_directions() -> None:
+    shapes = (
+        (ShockFamily.DEMAND_LEVEL, Direction.DEMAND_UP),
+        (ShockFamily.DEMAND_LEVEL, Direction.DEMAND_DOWN),
+        (ShockFamily.TEMPORARY_PULSE, Direction.DEMAND_UP),
+        (ShockFamily.LEAD_TIME_SHIFT, Direction.ARRIVAL_DELAYED),
+        (ShockFamily.SHIPMENT_LOSS, Direction.ARRIVAL_INTERRUPTED),
+        (ShockFamily.COMPOUND, Direction.MIXED),
+    )
+    results = []
+    truths = {}
+    for index, (family, direction) in enumerate(shapes):
+        for arm, profit in (
+            ("oracle_shockspec_headroom", 106.0),
+            ("arm1_capped_base_stock", 100.0),
+        ):
+            episode_id = f"e{index}-{arm}"
+            results.append(
+                replace(
+                    result(arm, profit, 0.0),
+                    episode_id=episode_id,
+                    independent_unit_id=f"u{index}",
+                    family=family,
+                )
+            )
+            truths[episode_id] = truth(episode_id, family, direction)
+    metrics = compute_builtin_pilot_metrics(tuple(results), truths=truths)
+    assert metrics["insufficient_headroom"] == 6.0
+
+
+def test_builtin_pilot_metrics_score_wrong_spec_exposure_against_truth() -> None:
+    shocked = replace(
+        result("arm10_spec_eprocess", 12.0, 0.0),
+        episode_id="e",
+        independent_unit_id="u",
+        family=ShockFamily.DEMAND_LEVEL,
+        records=(
+            period_record(
+                1,
+                100.0,
+                active_spec_id="spec-1",
+                active_spec=spec(ShockFamily.DEMAND_LEVEL),
+            ),
+        ),
+    )
+    matching = truth("e", ShockFamily.DEMAND_LEVEL, Direction.DEMAND_UP)
+    metrics = compute_builtin_pilot_metrics((shocked,), truths={"e": matching})
+    assert metrics["wrong_spec_exposure"] == 0.0
+    mismatched = truth("e", ShockFamily.DEMAND_LEVEL, Direction.DEMAND_DOWN)
+    metrics = compute_builtin_pilot_metrics((shocked,), truths={"e": mismatched})
+    assert metrics["wrong_spec_exposure"] == 1.0
+    with pytest.raises(ValueError, match="missing truth"):
+        compute_builtin_pilot_metrics((shocked,), truths={})
+
+
+def test_builtin_pilot_intervals_score_wrong_spec_exposure_against_truth() -> None:
+    shocked = replace(
+        result("arm10_spec_eprocess", 12.0, 0.0),
+        episode_id="e",
+        independent_unit_id="u",
+        family=ShockFamily.DEMAND_LEVEL,
+        records=(
+            period_record(
+                1,
+                100.0,
+                active_spec_id="spec-1",
+                active_spec=spec(ShockFamily.DEMAND_LEVEL),
+            ),
+        ),
+    )
+    matching = truth("e", ShockFamily.DEMAND_LEVEL, Direction.DEMAND_UP)
+    intervals = compute_builtin_pilot_intervals((shocked,), truths={"e": matching})
+    assert intervals["wrong_spec_exposure"] == (0.0, 0.0)
+    with pytest.raises(ValueError, match="missing truth"):
+        compute_builtin_pilot_intervals((shocked,), truths={})
+
+
+def test_builtin_pilot_intervals_derive_false_activation_from_null_results() -> None:
+    null_result = replace(
+        result("arm10_spec_eprocess", 12.0, 0.0),
+        family=ShockFamily.NO_CHANGE,
+        records=(period_record(1, 100.0, active_spec_id="wrong"),),
+    )
+    intervals = compute_builtin_pilot_intervals((null_result,))
+    assert intervals["false_activation_control"] == (0.0, 0.0)
+    assert intervals["false_activation_rate"] == (1.0, 1.0)
+
+
+def test_builtin_pilot_intervals_cover_budget_overruns() -> None:
+    overrun = replace(
+        result("arm10_spec_eprocess", 12.0, 0.0),
+        calls=(
+            call(ParseOutcome.ACCEPTED),
+            call(ParseOutcome.ACCEPTED, attempt_index=2, period=2),
+        ),
+    )
+    intervals = compute_builtin_pilot_intervals((overrun,), call_budget_per_episode=1)
+    assert intervals["budget_overrun_rate"] == (1.0, 1.0)
+
+
+def test_render_pilot_report_names_the_manifest_path() -> None:
+    decision = evaluate_pilot(prereg(), {"profit_lift": 0.0}, intervals={"profit_lift": (-1, 1)})
+    report = render_pilot_report(
+        decision, episodes=120, manifest_path=Path("reports/pilot_manifest.json")
+    )
+    assert "Pilot manifest: `reports/pilot_manifest.json`" in report
+
+
+def _stored_pilot_decision() -> PilotDecision:
+    """Recompute the pilot verdict from the stored records through the frozen pipeline."""
+    prereg = load_preregistration()
+    results = load_episode_results_jsonl(Path("reports/pilot_records.jsonl"))
+    truths = truth_by_episode(load_episode_truth_jsonl(Path("reports/pilot_truth.jsonl")))
+    shock_periods = shock_periods_from_truth(truths)
+    policy = prereg.data["pilot_policy"]
+    metrics = compute_builtin_pilot_metrics(
+        results,
+        call_budget_per_episode=int(policy["call_budget_per_episode"]),
+        shock_periods=shock_periods,
+        stratum_weights=primary_stratum_weights(prereg.data),
+        never_recovered_value=float(policy["never_recovered_value"]),
+        truths=truths,
+    )
+    metrics["method_freeze_or_quarantine_violation"] = 0.0
+    intervals = compute_builtin_pilot_intervals(
+        results,
+        shock_periods=shock_periods,
+        stratum_weights=primary_stratum_weights(prereg.data),
+        never_recovered_value=float(policy["never_recovered_value"]),
+        call_budget_per_episode=int(policy["call_budget_per_episode"]),
+        truths=truths,
+    )
+    return evaluate_pilot(prereg, metrics, intervals=intervals, require_go_intervals=True)
+
+
+def test_every_reported_number_traces_to_a_record() -> None:
+    """No hand-entered values: every verdict cell in the committed pilot report must equal
+    the value the frozen pipeline recomputes from the stored records. A hand-edited cell —
+    an estimate, an interval bound, an operator, a threshold, or a verdict — fails here."""
+    decision = _stored_pilot_decision()
+    report = Path("reports/pilot_report.md").read_text(encoding="utf-8")
+    committed_rows = [line for line in report.splitlines() if line.startswith("| `")]
+    rendered = render_pilot_report(decision, episodes=120, manifest_path=None)
+    recomputed_rows = [line for line in rendered.splitlines() if line.startswith("| `")]
+    assert len(committed_rows) == 15, "7 go criteria and 8 kill triggers, one row each"
+    assert committed_rows == recomputed_rows
+    assert f"Decision: **{decision.decision}**" in report
+
+
+def test_every_reported_number_traces_to_a_record_fails_on_a_doctored_cell(tmp_path) -> None:
+    """The negative control: a single hand-edited estimate must turn the trace guard red."""
+    decision = _stored_pilot_decision()
+    rendered = render_pilot_report(decision, episodes=120, manifest_path=None)
+    committed_rows = [line for line in rendered.splitlines() if line.startswith("| `")]
+    doctored = (
+        Path("reports/pilot_report.md")
+        .read_text(encoding="utf-8")
+        .replace(committed_rows[0], committed_rows[0].replace("37.75", "99.99", 1), 1)
+    )
+    assert doctored != Path("reports/pilot_report.md").read_text(encoding="utf-8")
+    doctored_rows = [line for line in doctored.splitlines() if line.startswith("| `")]
+    assert doctored_rows != committed_rows
+
+
+def test_quarantine_refuses_seeds_when_a_hash_changed(tmp_path, monkeypatch) -> None:
+    """A doctored registered hash must quarantine the pilot manifest's spent episodes:
+    the runner refuses the formal verdict and names the quarantined seeds and templates."""
+    frozen = json.loads(freeze.FREEZE_PATH.read_text(encoding="utf-8"))
+    victim = "collie/contracts.py"
+    assert victim in frozen["files"]
+    frozen["files"][victim]["sha256"] = "0" * 64
+    doctored = tmp_path / "freeze_manifest.json"
+    doctored.write_text(json.dumps(frozen), encoding="utf-8")
+    monkeypatch.setattr(freeze, "FREEZE_PATH", doctored)
+    with pytest.raises(SystemExit, match="Quarantine applies to 120 seeds and 6 templates"):
+        run_pilot._quarantine_check(run_pilot.DEFAULT_MANIFEST)
+
+
+def test_quarantine_check_passes_on_an_intact_freeze() -> None:
+    """The intact path: no drift, no refusal."""
+    run_pilot._quarantine_check(run_pilot.DEFAULT_MANIFEST)
