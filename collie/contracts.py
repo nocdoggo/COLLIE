@@ -475,6 +475,7 @@ class Decision:
     arm_id: str
     llm_called: bool = False
     active_spec_id: str | None = None
+    active_spec: ShockSpec | None = None
     control_config: ControlConfig | None = None
     lifecycle_state: LifecycleState | None = None
     triggered: bool = False
@@ -529,6 +530,7 @@ class RunRecord:
     llm_called: bool = False
     lifecycle_state: LifecycleState | None = None
     active_spec_id: str | None = None
+    active_spec: ShockSpec | None = None
     control_config: ControlConfig | None = None
     template_id: str | None = None
     """Analysis-side only. Language claims bootstrap jointly over seed and template, so this

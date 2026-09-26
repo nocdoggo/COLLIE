@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import random
 
 import pytest
@@ -120,3 +121,44 @@ def test_arrival_power_sanity_under_registered_loss_shift() -> None:
             break
     assert verifier.activated
     assert verifier.activation_period is not None
+
+
+@pytest.mark.slow
+def test_arrival_calibration_spawn_fallback_matches_the_sequential_path(monkeypatch) -> None:
+    """Hosts without os.fork take the multiprocessing 'spawn' fallback; results must not change."""
+    sequential = run_arrival_null_calibration(
+        family=ShockFamily.SHIPMENT_LOSS,
+        replications=64,
+        horizon=CALIBRATION_HORIZON,
+        workers=1,
+    )
+    assert sequential.activations > 0
+    monkeypatch.delattr(os, "fork")
+    spawned = run_arrival_null_calibration(
+        family=ShockFamily.SHIPMENT_LOSS,
+        replications=64,
+        horizon=CALIBRATION_HORIZON,
+        workers=2,
+    )
+    assert spawned.activations == sequential.activations
+    assert spawned.rate == sequential.rate
+    assert (spawned.wilson_low, spawned.wilson_high) == (
+        sequential.wilson_low,
+        sequential.wilson_high,
+    )
+
+
+def test_arrival_spawn_worker_unpacks_the_chunk_argument() -> None:
+    """Cover the spawn worker entry in-process; the tracer cannot follow spawned children."""
+    from collie.verify.arrival import _arrival_null_chunk, _arrival_null_chunk_from_argument
+
+    argument = (
+        ShockFamily.SHIPMENT_LOSS,
+        tuple(range(4)),
+        CALIBRATION_HORIZON,
+        CALIBRATION_PROPOSAL_PERIOD,
+        0.05,
+        20260908,
+        (1.0,) * CALIBRATION_HORIZON,
+    )
+    assert _arrival_null_chunk_from_argument(argument) == _arrival_null_chunk(*argument)

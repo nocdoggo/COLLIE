@@ -93,9 +93,52 @@ Two guards read this file:
 
 `collie/contracts.py` frozen. See `prereg/contract_freeze.json` for the recorded hash.
 
-*No deviations recorded.*
+### 2026-09-22 — active ShockSpec provenance is retained in output records
+
+- **Artefact:** `collie/contracts.py`, adding optional `active_spec` fields to `Decision` and
+  `RunRecord`.
+- **New sha256:** `5ce4a79976a0` (Gate 2's line-ending-normalised hash).
+- **What changed:** the immutable, policy-visible `ShockSpec` selected for an active decision is
+  copied into its period record alongside `active_spec_id`. JSONL loading remains backward
+  compatible: records written before this change load with `active_spec=None`.
+- **Why:** section 07 requires wrong-family activation and wrong-spec exposure to trace to stored
+  records. An identifier alone does not retain the predicted family or other registered fields,
+  so those metrics could not be computed or audited after an episode completed.
+- **Blast radius:** stored output rows become slightly larger. No policy input, verifier rule,
+  controller decision, or existing result changes; only analysis provenance is added. Formal pilot
+  evaluation now refuses an active identifier without its corresponding spec instead of counting
+  missing provenance as a correct-family activation.
 
 ## Gate 2 — registered method files
+
+### 2026-09-22 — pilot stratum weights aligned to stored ShockFamily labels
+
+- **Artefact:** `prereg/prereg_v1.yaml`, `prereg/threshold_rationale.md`.
+- **New sha256:** `ed97e622403b` for `prereg/prereg_v1.yaml`;
+  `957e43a249f4` for `prereg/threshold_rationale.md`.
+- **What changed:** the primary family weights now match the labels emitted in stored
+  `EpisodeResult` records: the two demand-level generator directions share the
+  `demand_level` label at combined weight `2/6`, and generator family 6 is the registered
+  `compound` incident. The stale standalone `transit_pause` primary stratum was removed from
+  the headline weighting table.
+- **Why:** the formal generated pilot records do not contain a standalone `transit_pause`
+  `ShockFamily`; family 6 materializes as the project-owned compound demand-and-supply shock.
+  Keeping a `transit_pause` headline stratum made the pilot guard fail on a stratum that the
+  registered generator cannot emit.
+- **Blast radius:** primary weighting now follows the actual persisted record vocabulary.
+  The six-family headroom diagnostic is unchanged: it still evaluates the six generator
+  families before they collapse to stored `ShockFamily` labels for headline aggregation.
+
+### 2026-09-22 — threshold rationale refreshed after compound oracle coverage landed
+
+- **Artefact:** `prereg/threshold_rationale.md`.
+- **New sha256:** `3b7a2e32163e`.
+- **What changed:** the exploratory dev-evidence paragraph now reports the compound oracle's
+  measured raw-profit lift (`0.008%`) instead of describing compound as unavailable.
+- **Why:** the compiler already registered a joint `(compound, mixed, both)` shape, so the oracle
+  and arm-ladder harness were completed to exercise it. The threshold itself did not change.
+- **Blast radius:** documentation of dev-only scale evidence. No go/kill value, confirmatory
+  endpoint, controller mapping, or held-out trajectory changed.
 
 ### 2026-09-21 — three claim-hygiene findings on the merged verifier, fenced as exploratory
 
@@ -247,9 +290,40 @@ Not yet frozen. Task 19 establishes `prereg/freeze_manifest.json` at the end of 
 
 ## Gate 3 — pilot decision
 
-Not yet reached.
+### 2026-09-23 — pilot decision recorded: kill-or-reframe
 
-*No deviations recorded.*
+- **Decision:** kill-or-reframe, dated 2026-09-23 in `reports/pilot_report.md`, rendered from
+  `reports/pilot_records.jsonl` by the frozen pipeline (`tools/run_pilot.py`).
+- **Outcome:** 3 of 7 go criteria pass (`profit_lift`, `lost_sales_reduction`,
+  `wrong_family_exposure`); 2 of 8 kill-or-reframe triggers fire: `insufficient_headroom`
+  (oracle clears the registered lift bar on 2 of 6 family keys, threshold more than 3) and
+  `detector_indistinguishable` (arm 10 trails the detector-into-identical-compiler control
+  by 565.5 raw profit units per episode, interval entirely below zero).
+- **Recorded findings from the pre-merge audit (integration auditor, 2026-09-26):**
+  1. `cost_frontier` is unwinnable as implemented: the frontier frame includes the
+     hidden-truth upper-bound arms, whose zero cost and top reward dominate every deployable
+     arm, so no LLM-calling arm can ever sit on the realised frontier. The registered
+     definition does not name the competitor set. The computation is faithful to the
+     records; the criterion design is the defect. **The pilot decision is unaffected** (the
+     two kill triggers are robust), and the criterion needs a dated decision on the
+     competitor set before Gate 3 is re-run — after which this finding becomes a fix, not a
+     threshold move.
+  2. The aggregation-unit doctrine (`07` brief: four information conditions are paired
+     replays of one independent unit) conflicts with the frozen `pilot_policy
+     .independent_units: 120` counting: the harness stamps the condition into
+     `independent_unit_id`, so intervals are ~2x narrower than the brief's doctrine
+     prescribes. Under seed-collapsed intervals `profit_lift`'s go verdict flips to fail;
+     the overall decision is unchanged. The tension is frozen into the registration itself
+     and belongs to the Gate 3 conversation, not a code edit.
+  3. The pilot ran through scripted transport (`scripted-fake-7b`) and demo alerts, per
+     `tools/run_arms.py`'s own labelling: the arms, parser, compiler, verifier, and ledger
+     are the real frozen code path, but the LLM content and alert channel are synthetic.
+     The recorded numbers are integration-harness outputs; the go/kill machinery itself is
+     what the pilot validated. A pilot with real model content remains owed before any
+     confirmatory sweep.
+- **Blast radius:** none to any prior checkpoint result. The full held-out sweeps stay
+  deferred (brief, "Deferred past this sprint").
+
 
 ---
 

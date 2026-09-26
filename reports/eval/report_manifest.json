@@ -1,0 +1,59 @@
+{
+  "artifacts": [
+    {
+      "path": "reports\\eval\\main_table.md",
+      "sha256": "6a9c830214860a80a8afd4ae12e8677d0d700aad974b3d963d0ddf01a3a14379"
+    },
+    {
+      "path": "reports\\eval\\operational.md",
+      "sha256": "51ce8fd8b70745986837391c07fbce7e023a86e70aafea96a4b73b480941d815"
+    },
+    {
+      "path": "reports\\eval\\compatibility.md",
+      "sha256": "0f86572059d095980816449f3c74b299e5c79e843395fc8b89d1d6377c9438ef"
+    },
+    {
+      "path": "reports\\eval\\frontier_calls.md",
+      "sha256": "784bb6ca71afe66f0d77348d7cd10f7d3999465d2fc3819f1ca136c25c53d980"
+    },
+    {
+      "path": "reports\\eval\\frontier_calls.svg",
+      "sha256": "f4a342233a91ebc1187dec742e33ed142dd41d44888bb9e1c157af4f91433a7f"
+    },
+    {
+      "path": "reports\\eval\\frontier_tokens.md",
+      "sha256": "bb41ec5629e8e78f7407e79a360c00918e0f6e352c5b046b24093dd464b16414"
+    },
+    {
+      "path": "reports\\eval\\frontier_tokens.svg",
+      "sha256": "4dbcc32773f3f1d01b027eaabeb99b82dfb4838373094d6c1f26111ea75ad1f7"
+    },
+    {
+      "path": "reports\\eval\\frontier_cost.md",
+      "sha256": "5d602dd35f7a52fbaab2fa334c0aba9e60a04d6b432136825f5c2a025d266e90"
+    },
+    {
+      "path": "reports\\eval\\frontier_cost.svg",
+      "sha256": "3c8068004e35714b87761a0bb2771e818a09a491aad44cba649d776283714dd1"
+    },
+    {
+      "path": "reports\\eval\\efficiency.md",
+      "sha256": "4c1a291dfad408d48f4f48e991af14a6fa63a5035a204ef3bd286f9346dd6407"
+    }
+  ],
+  "compatibility_options": {
+    "deployment_field": "split",
+    "deployment_weights": null,
+    "harness": "eval"
+  },
+  "freeze_file_sha256": "29ad8b76cd86f4fcd94ce2b5afad12f48feac6b7a992f3a8231619957134c862",
+  "freeze_path": "prereg\\freeze_manifest.json",
+  "independent_unit_count": 120,
+  "prereg_file_sha256": "84ef2967fc5ce743e00ae0c7fbaae6a5bae8843774f9356ee8ca9d73587171a9",
+  "prereg_path": "H:\\AI_Paper\\COLLIE\\prereg\\prereg_v1.yaml",
+  "record_count": 1800,
+  "records_file_sha256": "d5ef91c57fda2ceff112f760beaf90528c1f7e424672acc2c30b0f0151d4c05f",
+  "records_path": "reports\\dev_records.jsonl",
+  "records_sha256": "e9fc8c0da71ba4570030fc1bfbf4dac5863ab1dc41b1d47efd88e6dbcac841df",
+  "schema_version": 1
+}

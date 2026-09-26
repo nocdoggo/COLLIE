@@ -13,6 +13,7 @@ jobs:
         with:
           submodules: recursive
           lfs: false          # fetched explicitly below so the size is visible in the log
+          fetch-depth: 0      # the Gate 2 freeze's git-ancestor check needs full history
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5

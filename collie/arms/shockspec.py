@@ -324,10 +324,12 @@ class ShockSpecArm:
         if self.activation.is_active and latest is not None and experimental_decision is not None:
             quantity = experimental_decision.order_quantity
             active_spec_id = f"spec-{latest.proposal_index}@tau{latest.tau_j}"
+            active_spec = latest
             config = self._compiled
         else:
             quantity = baseline_decision.order_quantity
             active_spec_id = None
+            active_spec = None
             config = None
         self._history.note_dispatch(obs.period, quantity)
         return Decision(
@@ -337,6 +339,7 @@ class ShockSpecArm:
             llm_called=proposed,
             triggered=proposed,
             active_spec_id=active_spec_id,
+            active_spec=active_spec,
             control_config=config,
             lifecycle_state=lifecycle if latest is not None else None,
         )
@@ -422,6 +425,10 @@ class ShockSpecArm:
                 ),
             )
         self.activation.register(spec, baseline=self._baseline_stats(spec))
+        # A new accepted proposal supersedes the prior experimental controller.  The new
+        # activation policy decides whether compilation happens now or after fresh evidence.
+        self._experimental = None
+        self._compiled = None
         self._specs.append(spec)
         return True
 
