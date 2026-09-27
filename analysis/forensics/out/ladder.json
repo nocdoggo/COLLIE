@@ -1,0 +1,978 @@
+{
+  "activated_by_condition": {
+    "early_accurate": {
+      "median_delay": 3.5,
+      "n": 10
+    },
+    "late_accurate": {
+      "median_delay": 4.0,
+      "n": 8
+    },
+    "no_alert": {
+      "median_delay": 6.5,
+      "n": 2
+    },
+    "unreliable": {
+      "median_delay": 3.0,
+      "n": 11
+    }
+  },
+  "analysis_class": "exploratory",
+  "by_key": {
+    "compound": {
+      "arms": {
+        "arm10_spec_eprocess": {
+          "fill": 0.8493198014879031,
+          "gross": 17812.5,
+          "holding": 2826.5,
+          "lost": 787.625,
+          "n": 16,
+          "net": 14986.0
+        },
+        "arm1_capped_base_stock": {
+          "fill": 0.8492966704738394,
+          "gross": 17812.0,
+          "holding": 2525.25,
+          "lost": 787.75,
+          "n": 16,
+          "net": 15286.75
+        },
+        "arm2_telemetry_hmm_or": {
+          "fill": 0.8478980923649044,
+          "gross": 17783.0,
+          "holding": 2697.0,
+          "lost": 795.0,
+          "n": 16,
+          "net": 15086.0
+        },
+        "arm8_spec_immediate": {
+          "fill": 0.857535891435748,
+          "gross": 17985.5,
+          "holding": 6786.8125,
+          "lost": 744.375,
+          "n": 16,
+          "net": 11198.6875
+        },
+        "arm9_spec_heuristic_rollback": {
+          "fill": 0.8551765280012551,
+          "gross": 17934.5,
+          "holding": 6082.8125,
+          "lost": 757.125,
+          "n": 16,
+          "net": 11851.6875
+        },
+        "ctrl_alertspec_upper_bound": {
+          "fill": 0.8597341294074805,
+          "gross": 18031.0,
+          "holding": 8438.25,
+          "lost": 733.0,
+          "n": 16,
+          "net": 9592.75
+        },
+        "ctrl_cusum_to_compiler": {
+          "fill": 0.857535891435748,
+          "gross": 17985.5,
+          "holding": 6786.8125,
+          "lost": 744.375,
+          "n": 16,
+          "net": 11198.6875
+        },
+        "ctrl_keyword_parser": {
+          "fill": 0.855000123461612,
+          "gross": 17932.5,
+          "holding": 7184.5625,
+          "lost": 757.625,
+          "n": 16,
+          "net": 10747.9375
+        },
+        "oracle_shockspec_headroom": {
+          "fill": 0.8493429325019667,
+          "gross": 17813.0,
+          "holding": 3243.5,
+          "lost": 787.5,
+          "n": 16,
+          "net": 14569.5
+        }
+      },
+      "contrasts": {
+        "arm10_spec_eprocess_minus_ctrl": {
+          "gross": -173.0,
+          "net": 3787.3125
+        },
+        "arm9_spec_heuristic_rollback_minus_ctrl": {
+          "gross": -51.0,
+          "net": 653.0
+        },
+        "ctrl_alertspec_upper_bound_minus_ctrl": {
+          "gross": 45.5,
+          "net": -1605.9375
+        },
+        "ctrl_keyword_parser_minus_ctrl": {
+          "gross": -53.0,
+          "net": -450.75
+        },
+        "ctrl_minus_arm1": {
+          "gross": 173.5,
+          "net": -4088.0625
+        },
+        "oracle_shockspec_headroom_minus_ctrl": {
+          "gross": -172.5,
+          "net": 3370.8125
+        }
+      }
+    },
+    "demand_level:demand_down": {
+      "arms": {
+        "arm10_spec_eprocess": {
+          "fill": 0.9379838742737481,
+          "gross": 15800.0,
+          "holding": 3485.75,
+          "lost": 261.0,
+          "n": 16,
+          "net": 12314.25
+        },
+        "arm1_capped_base_stock": {
+          "fill": 0.9379838742737481,
+          "gross": 15800.0,
+          "holding": 3485.75,
+          "lost": 261.0,
+          "n": 16,
+          "net": 12314.25
+        },
+        "arm2_telemetry_hmm_or": {
+          "fill": 0.9299523065806429,
+          "gross": 15669.0,
+          "holding": 3197.25,
+          "lost": 293.75,
+          "n": 16,
+          "net": 12471.75
+        },
+        "arm8_spec_immediate": {
+          "fill": 0.9385734969152575,
+          "gross": 15810.0,
+          "holding": 7026.875,
+          "lost": 258.5,
+          "n": 16,
+          "net": 8783.125
+        },
+        "arm9_spec_heuristic_rollback": {
+          "fill": 0.9381312799341255,
+          "gross": 15802.5,
+          "holding": 6237.125,
+          "lost": 260.375,
+          "n": 16,
+          "net": 9565.375
+        },
+        "ctrl_alertspec_upper_bound": {
+          "fill": 0.9149400315779467,
+          "gross": 15409.0,
+          "holding": 1720.5,
+          "lost": 358.75,
+          "n": 16,
+          "net": 13688.5
+        },
+        "ctrl_cusum_to_compiler": {
+          "fill": 0.9385734969152575,
+          "gross": 15810.0,
+          "holding": 7026.875,
+          "lost": 258.5,
+          "n": 16,
+          "net": 8783.125
+        },
+        "ctrl_keyword_parser": {
+          "fill": 0.9384260912548801,
+          "gross": 15807.5,
+          "holding": 6671.0625,
+          "lost": 259.125,
+          "n": 16,
+          "net": 9136.4375
+        },
+        "oracle_shockspec_headroom": {
+          "fill": 0.9150669351312462,
+          "gross": 15411.0,
+          "holding": 1795.5,
+          "lost": 358.25,
+          "n": 16,
+          "net": 13615.5
+        }
+      },
+      "contrasts": {
+        "arm10_spec_eprocess_minus_ctrl": {
+          "gross": -10.0,
+          "net": 3531.125
+        },
+        "arm9_spec_heuristic_rollback_minus_ctrl": {
+          "gross": -7.5,
+          "net": 782.25
+        },
+        "ctrl_alertspec_upper_bound_minus_ctrl": {
+          "gross": -401.0,
+          "net": 4905.375
+        },
+        "ctrl_keyword_parser_minus_ctrl": {
+          "gross": -2.5,
+          "net": 353.3125
+        },
+        "ctrl_minus_arm1": {
+          "gross": 10.0,
+          "net": -3531.125
+        },
+        "oracle_shockspec_headroom_minus_ctrl": {
+          "gross": -399.0,
+          "net": 4832.375
+        }
+      }
+    },
+    "demand_level:demand_up": {
+      "arms": {
+        "arm10_spec_eprocess": {
+          "fill": 0.8962704922126068,
+          "gross": 21042.5,
+          "holding": 2304.3125,
+          "lost": 608.125,
+          "n": 16,
+          "net": 18738.1875
+        },
+        "arm1_capped_base_stock": {
+          "fill": 0.8877184853421485,
+          "gross": 20833.0,
+          "holding": 1475.75,
+          "lost": 660.5,
+          "n": 16,
+          "net": 19357.25
+        },
+        "arm2_telemetry_hmm_or": {
+          "fill": 0.9054932578564427,
+          "gross": 21258.0,
+          "holding": 1953.0,
+          "lost": 554.25,
+          "n": 16,
+          "net": 19305.0
+        },
+        "arm8_spec_immediate": {
+          "fill": 0.9438199773568825,
+          "gross": 22166.0,
+          "holding": 4897.625,
+          "lost": 327.25,
+          "n": 16,
+          "net": 17268.375
+        },
+        "arm9_spec_heuristic_rollback": {
+          "fill": 0.9438199773568825,
+          "gross": 22166.0,
+          "holding": 4897.625,
+          "lost": 327.25,
+          "n": 16,
+          "net": 17268.375
+        },
+        "ctrl_alertspec_upper_bound": {
+          "fill": 0.9439457250668757,
+          "gross": 22165.0,
+          "holding": 2948.25,
+          "lost": 327.5,
+          "n": 16,
+          "net": 19216.75
+        },
+        "ctrl_cusum_to_compiler": {
+          "fill": 0.9438199773568825,
+          "gross": 22166.0,
+          "holding": 4897.625,
+          "lost": 327.25,
+          "n": 16,
+          "net": 17268.375
+        },
+        "ctrl_keyword_parser": {
+          "fill": 0.933461729776187,
+          "gross": 21918.25,
+          "holding": 5317.125,
+          "lost": 389.1875,
+          "n": 16,
+          "net": 16601.125
+        },
+        "oracle_shockspec_headroom": {
+          "fill": 0.9412425142531888,
+          "gross": 22105.0,
+          "holding": 2904.25,
+          "lost": 342.5,
+          "n": 16,
+          "net": 19200.75
+        }
+      },
+      "contrasts": {
+        "arm10_spec_eprocess_minus_ctrl": {
+          "gross": -1123.5,
+          "net": 1469.8125
+        },
+        "arm9_spec_heuristic_rollback_minus_ctrl": {
+          "gross": 0.0,
+          "net": 0.0
+        },
+        "ctrl_alertspec_upper_bound_minus_ctrl": {
+          "gross": -1.0,
+          "net": 1948.375
+        },
+        "ctrl_keyword_parser_minus_ctrl": {
+          "gross": -247.75,
+          "net": -667.25
+        },
+        "ctrl_minus_arm1": {
+          "gross": 1333.0,
+          "net": -2088.875
+        },
+        "oracle_shockspec_headroom_minus_ctrl": {
+          "gross": -61.0,
+          "net": 1932.375
+        }
+      }
+    },
+    "lead_time_shift": {
+      "arms": {
+        "arm10_spec_eprocess": {
+          "fill": 0.7552824009541035,
+          "gross": 15372.0,
+          "holding": 1028.0,
+          "lost": 1244.75,
+          "n": 16,
+          "net": 14344.0
+        },
+        "arm1_capped_base_stock": {
+          "fill": 0.7552824009541035,
+          "gross": 15372.0,
+          "holding": 1028.0,
+          "lost": 1244.75,
+          "n": 16,
+          "net": 14344.0
+        },
+        "arm2_telemetry_hmm_or": {
+          "fill": 0.7554284904551867,
+          "gross": 15375.0,
+          "holding": 1078.25,
+          "lost": 1244.0,
+          "n": 16,
+          "net": 14296.75
+        },
+        "arm8_spec_immediate": {
+          "fill": 0.8489436576149627,
+          "gross": 17277.25,
+          "holding": 2125.25,
+          "lost": 768.4375,
+          "n": 16,
+          "net": 15152.0
+        },
+        "arm9_spec_heuristic_rollback": {
+          "fill": 0.8294078634099765,
+          "gross": 16878.75,
+          "holding": 1678.4375,
+          "lost": 868.0625,
+          "n": 16,
+          "net": 15200.3125
+        },
+        "ctrl_alertspec_upper_bound": {
+          "fill": 0.8798290878842603,
+          "gross": 17905.0,
+          "holding": 2022.25,
+          "lost": 611.5,
+          "n": 16,
+          "net": 15882.75
+        },
+        "ctrl_cusum_to_compiler": {
+          "fill": 0.8489436576149627,
+          "gross": 17277.25,
+          "holding": 2125.25,
+          "lost": 768.4375,
+          "n": 16,
+          "net": 15152.0
+        },
+        "ctrl_keyword_parser": {
+          "fill": 0.8624486656636223,
+          "gross": 17551.75,
+          "holding": 4603.625,
+          "lost": 699.8125,
+          "n": 16,
+          "net": 12948.125
+        },
+        "oracle_shockspec_headroom": {
+          "fill": 0.8720753096033569,
+          "gross": 17747.0,
+          "holding": 1987.25,
+          "lost": 651.0,
+          "n": 16,
+          "net": 15759.75
+        }
+      },
+      "contrasts": {
+        "arm10_spec_eprocess_minus_ctrl": {
+          "gross": -1905.25,
+          "net": -808.0
+        },
+        "arm9_spec_heuristic_rollback_minus_ctrl": {
+          "gross": -398.5,
+          "net": 48.3125
+        },
+        "ctrl_alertspec_upper_bound_minus_ctrl": {
+          "gross": 627.75,
+          "net": 730.75
+        },
+        "ctrl_keyword_parser_minus_ctrl": {
+          "gross": 274.5,
+          "net": -2203.875
+        },
+        "ctrl_minus_arm1": {
+          "gross": 1905.25,
+          "net": 808.0
+        },
+        "oracle_shockspec_headroom_minus_ctrl": {
+          "gross": 469.75,
+          "net": 607.75
+        }
+      }
+    },
+    "null": {
+      "arms": {
+        "arm10_spec_eprocess": {
+          "fill": 0.9271577914483662,
+          "gross": 18559.666666666668,
+          "holding": 2100.4583333333335,
+          "lost": 365.6666666666667,
+          "n": 24,
+          "net": 16459.208333333332
+        },
+        "arm1_capped_base_stock": {
+          "fill": 0.9271577914483662,
+          "gross": 18559.666666666668,
+          "holding": 2071.6666666666665,
+          "lost": 365.6666666666667,
+          "n": 24,
+          "net": 16488.0
+        },
+        "arm2_telemetry_hmm_or": {
+          "fill": 0.9255829048113132,
+          "gross": 18528.666666666668,
+          "holding": 2124.0,
+          "lost": 373.4166666666667,
+          "n": 24,
+          "net": 16404.666666666668
+        },
+        "arm8_spec_immediate": {
+          "fill": 0.9401740747952637,
+          "gross": 18821.166666666668,
+          "holding": 4663.666666666667,
+          "lost": 300.2916666666667,
+          "n": 24,
+          "net": 14157.5
+        },
+        "arm9_spec_heuristic_rollback": {
+          "fill": 0.9361101543917778,
+          "gross": 18737.666666666668,
+          "holding": 4079.1666666666665,
+          "lost": 321.1666666666667,
+          "n": 24,
+          "net": 14658.5
+        },
+        "ctrl_cusum_to_compiler": {
+          "fill": 0.9401740747952637,
+          "gross": 18821.166666666668,
+          "holding": 4663.666666666667,
+          "lost": 300.2916666666667,
+          "n": 24,
+          "net": 14157.5
+        },
+        "ctrl_keyword_parser": {
+          "fill": 0.939295927791401,
+          "gross": 18804.166666666668,
+          "holding": 5003.208333333333,
+          "lost": 304.5416666666667,
+          "n": 24,
+          "net": 13800.958333333334
+        }
+      },
+      "contrasts": {
+        "arm10_spec_eprocess_minus_ctrl": {
+          "gross": -261.5,
+          "net": 2301.708333333332
+        },
+        "arm9_spec_heuristic_rollback_minus_ctrl": {
+          "gross": -83.5,
+          "net": 501.0
+        },
+        "ctrl_keyword_parser_minus_ctrl": {
+          "gross": -17.0,
+          "net": -356.54166666666606
+        },
+        "ctrl_minus_arm1": {
+          "gross": 261.5,
+          "net": -2330.5
+        }
+      }
+    },
+    "shipment_loss": {
+      "arms": {
+        "arm10_spec_eprocess": {
+          "fill": 0.90700881974318,
+          "gross": 18021.0,
+          "holding": 2412.75,
+          "lost": 462.5,
+          "n": 16,
+          "net": 15608.25
+        },
+        "arm1_capped_base_stock": {
+          "fill": 0.90700881974318,
+          "gross": 18021.0,
+          "holding": 2412.75,
+          "lost": 462.5,
+          "n": 16,
+          "net": 15608.25
+        },
+        "arm2_telemetry_hmm_or": {
+          "fill": 0.9056378763305389,
+          "gross": 17994.0,
+          "holding": 2404.0,
+          "lost": 469.25,
+          "n": 16,
+          "net": 15590.0
+        },
+        "arm8_spec_immediate": {
+          "fill": 0.9248277156834218,
+          "gross": 18374.5,
+          "holding": 5089.8125,
+          "lost": 374.125,
+          "n": 16,
+          "net": 13284.6875
+        },
+        "arm9_spec_heuristic_rollback": {
+          "fill": 0.9180139720075938,
+          "gross": 18239.5,
+          "holding": 3618.875,
+          "lost": 407.875,
+          "n": 16,
+          "net": 14620.625
+        },
+        "ctrl_alertspec_upper_bound": {
+          "fill": 0.932625743316532,
+          "gross": 18529.0,
+          "holding": 4717.75,
+          "lost": 335.5,
+          "n": 16,
+          "net": 13811.25
+        },
+        "ctrl_cusum_to_compiler": {
+          "fill": 0.9248277156834218,
+          "gross": 18374.5,
+          "holding": 5089.8125,
+          "lost": 374.125,
+          "n": 16,
+          "net": 13284.6875
+        },
+        "ctrl_keyword_parser": {
+          "fill": 0.9225440969452883,
+          "gross": 18328.75,
+          "holding": 5398.375,
+          "lost": 385.5625,
+          "n": 16,
+          "net": 12930.375
+        },
+        "oracle_shockspec_headroom": {
+          "fill": 0.90700881974318,
+          "gross": 18021.0,
+          "holding": 2412.75,
+          "lost": 462.5,
+          "n": 16,
+          "net": 15608.25
+        }
+      },
+      "contrasts": {
+        "arm10_spec_eprocess_minus_ctrl": {
+          "gross": -353.5,
+          "net": 2323.5625
+        },
+        "arm9_spec_heuristic_rollback_minus_ctrl": {
+          "gross": -135.0,
+          "net": 1335.9375
+        },
+        "ctrl_alertspec_upper_bound_minus_ctrl": {
+          "gross": 154.5,
+          "net": 526.5625
+        },
+        "ctrl_keyword_parser_minus_ctrl": {
+          "gross": -45.75,
+          "net": -354.3125
+        },
+        "ctrl_minus_arm1": {
+          "gross": 353.5,
+          "net": -2323.5625
+        },
+        "oracle_shockspec_headroom_minus_ctrl": {
+          "gross": -353.5,
+          "net": 2323.5625
+        }
+      }
+    },
+    "temporary_pulse": {
+      "arms": {
+        "arm10_spec_eprocess": {
+          "fill": 0.9203423962529033,
+          "gross": 19194.5,
+          "holding": 2751.625,
+          "lost": 415.875,
+          "n": 16,
+          "net": 16442.875
+        },
+        "arm1_capped_base_stock": {
+          "fill": 0.9195501934489854,
+          "gross": 19178.0,
+          "holding": 2555.0,
+          "lost": 420.0,
+          "n": 16,
+          "net": 16623.0
+        },
+        "arm2_telemetry_hmm_or": {
+          "fill": 0.9196032162160793,
+          "gross": 19179.0,
+          "holding": 2664.25,
+          "lost": 419.75,
+          "n": 16,
+          "net": 16514.75
+        },
+        "arm8_spec_immediate": {
+          "fill": 0.933883582605554,
+          "gross": 19478.5,
+          "holding": 6577.4375,
+          "lost": 344.875,
+          "n": 16,
+          "net": 12901.0625
+        },
+        "arm9_spec_heuristic_rollback": {
+          "fill": 0.9258380848267518,
+          "gross": 19309.25,
+          "holding": 4984.75,
+          "lost": 387.1875,
+          "n": 16,
+          "net": 14324.5
+        },
+        "ctrl_alertspec_upper_bound": {
+          "fill": 0.9387325903510515,
+          "gross": 19580.0,
+          "holding": 7183.25,
+          "lost": 319.5,
+          "n": 16,
+          "net": 12396.75
+        },
+        "ctrl_cusum_to_compiler": {
+          "fill": 0.933883582605554,
+          "gross": 19478.5,
+          "holding": 6577.4375,
+          "lost": 344.875,
+          "n": 16,
+          "net": 12901.0625
+        },
+        "ctrl_keyword_parser": {
+          "fill": 0.9328833827854032,
+          "gross": 19457.5,
+          "holding": 6405.9375,
+          "lost": 350.125,
+          "n": 16,
+          "net": 13051.5625
+        },
+        "oracle_shockspec_headroom": {
+          "fill": 0.923954346834444,
+          "gross": 19270.0,
+          "holding": 2684.25,
+          "lost": 397.0,
+          "n": 16,
+          "net": 16585.75
+        }
+      },
+      "contrasts": {
+        "arm10_spec_eprocess_minus_ctrl": {
+          "gross": -284.0,
+          "net": 3541.8125
+        },
+        "arm9_spec_heuristic_rollback_minus_ctrl": {
+          "gross": -169.25,
+          "net": 1423.4375
+        },
+        "ctrl_alertspec_upper_bound_minus_ctrl": {
+          "gross": 101.5,
+          "net": -504.3125
+        },
+        "ctrl_keyword_parser_minus_ctrl": {
+          "gross": -21.0,
+          "net": 150.5
+        },
+        "ctrl_minus_arm1": {
+          "gross": 300.5,
+          "net": -3721.9375
+        },
+        "oracle_shockspec_headroom_minus_ctrl": {
+          "gross": -208.5,
+          "net": 3684.6875
+        }
+      }
+    }
+  },
+  "category_by_condition": {
+    "compound": {
+      "early_accurate": {
+        "activated": 4
+      },
+      "late_accurate": {
+        "activated": 3,
+        "blocked": 1
+      },
+      "no_alert": {
+        "blocked": 4
+      },
+      "unreliable": {
+        "activated": 4
+      }
+    },
+    "demand_level:demand_down": {
+      "early_accurate": {
+        "blocked": 4
+      },
+      "late_accurate": {
+        "blocked": 4
+      },
+      "no_alert": {
+        "blocked": 4
+      },
+      "unreliable": {
+        "blocked": 4
+      }
+    },
+    "demand_level:demand_up": {
+      "early_accurate": {
+        "activated": 3,
+        "blocked": 1
+      },
+      "late_accurate": {
+        "activated": 3,
+        "blocked": 1
+      },
+      "no_alert": {
+        "activated": 2,
+        "blocked": 2
+      },
+      "unreliable": {
+        "activated": 3,
+        "blocked": 1
+      }
+    },
+    "lead_time_shift": {
+      "early_accurate": {
+        "blocked": 4
+      },
+      "late_accurate": {
+        "blocked": 4
+      },
+      "no_alert": {
+        "no_fire": 4
+      },
+      "unreliable": {
+        "blocked": 4
+      }
+    },
+    "null": {
+      "early_accurate": {},
+      "late_accurate": {},
+      "no_alert": {
+        "no_fire": 12
+      },
+      "unreliable": {
+        "activated": 1,
+        "blocked": 11
+      }
+    },
+    "shipment_loss": {
+      "early_accurate": {
+        "blocked": 4
+      },
+      "late_accurate": {
+        "blocked": 4
+      },
+      "no_alert": {
+        "no_fire": 4
+      },
+      "unreliable": {
+        "blocked": 4
+      }
+    },
+    "temporary_pulse": {
+      "early_accurate": {
+        "activated": 3,
+        "blocked": 1
+      },
+      "late_accurate": {
+        "activated": 2,
+        "blocked": 2
+      },
+      "no_alert": {
+        "blocked": 2,
+        "no_fire": 2
+      },
+      "unreliable": {
+        "activated": 3,
+        "blocked": 1
+      }
+    }
+  },
+  "compiled_configs_active_periods": {
+    "arm10_spec_eprocess": {
+      "compound": {
+        "(1.5, 2, 1)": 29
+      },
+      "demand_level:demand_down": {},
+      "demand_level:demand_up": {
+        "(1.5, 2, 1)": 132
+      },
+      "lead_time_shift": {},
+      "null": {
+        "(1.5, 2, 1)": 6
+      },
+      "shipment_loss": {},
+      "temporary_pulse": {
+        "(1.5, 2, 1)": 32
+      }
+    },
+    "ctrl_alertspec_upper_bound": {
+      "compound": {
+        "(1.25, 3, 1)": 548
+      },
+      "demand_level:demand_down": {
+        "(0.75, 2, 1)": 508
+      },
+      "demand_level:demand_up": {
+        "(1.25, 2, 1)": 540
+      },
+      "lead_time_shift": {
+        "(1, 2, 1)": 272,
+        "(1, 3, 1)": 280
+      },
+      "shipment_loss": {
+        "(1, 2, 0.5)": 520
+      },
+      "temporary_pulse": {
+        "(1.5, 2, 1)": 564
+      }
+    },
+    "ctrl_cusum_to_compiler": {
+      "compound": {
+        "(1.5, 2, 1)": 523
+      },
+      "demand_level:demand_down": {
+        "(1.5, 2, 1)": 467
+      },
+      "demand_level:demand_up": {
+        "(1.5, 2, 1)": 500
+      },
+      "lead_time_shift": {
+        "(1.5, 1, 1)": 202,
+        "(1.5, 2, 1)": 208
+      },
+      "null": {
+        "(1.5, 2, 1)": 492
+      },
+      "shipment_loss": {
+        "(1.5, 2, 1)": 386
+      },
+      "temporary_pulse": {
+        "(1.5, 2, 1)": 483
+      }
+    },
+    "ctrl_keyword_parser": {
+      "compound": {
+        "(1, 2, 0)": 407
+      },
+      "demand_level:demand_down": {
+        "(1, 2, 0)": 377
+      },
+      "demand_level:demand_up": {
+        "(1, 2, 0)": 401
+      },
+      "lead_time_shift": {
+        "(1, 1, 0)": 202,
+        "(1, 2, 0)": 208
+      },
+      "null": {
+        "(1, 2, 0)": 492
+      },
+      "shipment_loss": {
+        "(1, 2, 0)": 386
+      },
+      "temporary_pulse": {
+        "(1, 2, 0)": 419
+      }
+    },
+    "oracle_shockspec_headroom": {
+      "compound": {
+        "(1.25, 3, 1)": 96
+      },
+      "demand_level:demand_down": {
+        "(0.75, 2, 1)": 492
+      },
+      "demand_level:demand_up": {
+        "(1.25, 2, 1)": 524
+      },
+      "lead_time_shift": {
+        "(1, 2, 1)": 264,
+        "(1, 3, 1)": 272
+      },
+      "shipment_loss": {
+        "(1, 2, 0.5)": 24
+      },
+      "temporary_pulse": {
+        "(1.5, 2, 1)": 40
+      }
+    }
+  },
+  "early_vs_unreliable_replicas": {
+    "arm10_spec_eprocess": {
+      "early_accurate_equals_unreliable": 24,
+      "seeds": 24
+    },
+    "arm8_spec_immediate": {
+      "early_accurate_equals_unreliable": 24,
+      "seeds": 24
+    },
+    "arm9_spec_heuristic_rollback": {
+      "early_accurate_equals_unreliable": 24,
+      "seeds": 24
+    },
+    "ctrl_cusum_to_compiler": {
+      "early_accurate_equals_unreliable": 24,
+      "seeds": 24
+    },
+    "ctrl_keyword_parser": {
+      "early_accurate_equals_unreliable": 24,
+      "seeds": 24
+    }
+  },
+  "perfect_language_bound_vs_detector": {
+    "gross": {
+      "mean_over_120": 18.0,
+      "null_mean": -261.5,
+      "shocked_mean": 87.875
+    },
+    "net": {
+      "mean_over_120": 1266.2083333333333,
+      "null_mean": 2330.5,
+      "shocked_mean": 1000.1354166666666
+    }
+  },
+  "provenance": "scripted transport (scripted-fake-7b, one fixed demand_up/medium ShockSpec payload) and demo alerts, through the real frozen arms, parser, compiler, verifier, and ledger",
+  "record_analysis_class": {
+    "confirmatory": 1752
+  },
+  "record_model_ids": {
+    "scripted-fake-7b": 18882
+  },
+  "wrong_family_activation": {
+    "by_key": {
+      "compound": 11,
+      "temporary_pulse": 8
+    },
+    "rate": 0.19791666666666666,
+    "shocked_episodes": 96,
+    "wrong_family_activated": 19
+  }
+}
