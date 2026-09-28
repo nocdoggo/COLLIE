@@ -1,0 +1,114 @@
+{
+  "alert_selection_rule": "bank-v1",
+  "alert_source": "bank",
+  "alert_sources": {
+    "bank:early_accurate": 20,
+    "bank:false_alert_null": 12,
+    "bank:late_accurate": 20,
+    "bank:unreliable": 20,
+    "none:bank_gap_demand_down": 16,
+    "none:no_alert": 20,
+    "none:silent_null": 12
+  },
+  "analysis_class": "exploratory",
+  "arms": [
+    "arm1_capped_base_stock",
+    "arm2_telemetry_hmm_or",
+    "arm8_spec_immediate",
+    "arm9_spec_heuristic_rollback",
+    "arm10_spec_eprocess",
+    "ctrl_cusum_to_compiler",
+    "ctrl_keyword_parser",
+    "ctrl_alertspec_upper_bound",
+    "oracle_shockspec_headroom"
+  ],
+  "decoding": "det-v1 (temperature 0.0, no seed), module 02 prompt, no system prompt",
+  "endpoint": {
+    "base_url": "memory://none",
+    "bills_thinking_as_output": false,
+    "extra_body": null,
+    "model_id": "scripted-fake-7b",
+    "name": "scripted-fake",
+    "price_date": "2026-09-06",
+    "price_input_per_mtok": 0.75,
+    "price_output_per_mtok": 3.75,
+    "supports_seed": true
+  },
+  "episodes": 120,
+  "git": {
+    "branch": "analysis/real-content-pilot",
+    "dirty_paths": [
+      "M .gitignore"
+    ],
+    "sha": "4ac16f9db9ebc5eedb693c6025730cb1846b4cbc"
+  },
+  "guard": null,
+  "ledger": {
+    "charged": 429,
+    "charged_usd": 0.54342375,
+    "per_arm": [
+      {
+        "accepted": 143,
+        "accepted_after_repair": 0,
+        "arm_id": "arm10_spec_eprocess",
+        "attempted": 143,
+        "input_tokens": 194301,
+        "output_tokens": 9438,
+        "p50_latency_ms": 0.0015320256352424622,
+        "p95_latency_ms": 0.006570015102624893,
+        "rejected": 0,
+        "usd_cost": 0.18111825
+      },
+      {
+        "accepted": 143,
+        "accepted_after_repair": 0,
+        "arm_id": "arm8_spec_immediate",
+        "attempted": 143,
+        "input_tokens": 194348,
+        "output_tokens": 9438,
+        "p50_latency_ms": 0.006480026058852673,
+        "p95_latency_ms": 0.007261056452989578,
+        "rejected": 0,
+        "usd_cost": 0.1811535
+      },
+      {
+        "accepted": 143,
+        "accepted_after_repair": 0,
+        "arm_id": "arm9_spec_heuristic_rollback",
+        "attempted": 143,
+        "input_tokens": 194346,
+        "output_tokens": 9438,
+        "p50_latency_ms": 0.0015030382201075554,
+        "p95_latency_ms": 0.0017229467630386353,
+        "rejected": 0,
+        "usd_cost": 0.181152
+      }
+    ],
+    "physical_this_invocation": 190
+  },
+  "llm_arms": [
+    "arm8_spec_immediate",
+    "arm9_spec_heuristic_rollback",
+    "arm10_spec_eprocess"
+  ],
+  "not_a_gate3_vote": true,
+  "outputs_sha256": {
+    "alerts.jsonl": "58afda2dc82906ae90309dff6601d4d0d3778422e626556c15a01fa661fb428f",
+    "ledger.csv": "c5657df7d928e907251018a436ea36e5dadc527ec44323710c4f081e157750ae",
+    "proposals.jsonl": "09e6625409a765520aefd5e9227c750d8a354c0d563a3bf7c97c669b0a3d67ad",
+    "records.jsonl.gz": "554874c12e106f01698a7ef3ee116484c0054a0e2be268d538d2db2c24b2d2a3"
+  },
+  "partial": false,
+  "records": 1032,
+  "rule_u": {
+    "arm10_coerced_abstentions": 0,
+    "by_reason": {},
+    "version": "U-v1"
+  },
+  "run_name": "scripted-bank",
+  "truth_identical_to_reports_pilot_truth": true,
+  "versions": {
+    "openai": "1.109.1",
+    "python": "3.12.11"
+  }
+}
