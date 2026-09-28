@@ -315,15 +315,20 @@ Not yet frozen. Task 19 establishes `prereg/freeze_manifest.json` at the end of 
   first proposal names the right family in 59/96 (Gemini) and 53/96 (Grok) shocked episodes,
   against 16/96 for the fixed payload. Against the fixed payload, arm 10 gains +198.0 (Gemini)
   and +146.2 (Grok) gross profit per episode, with seed-cluster bootstrap intervals that exclude
-  zero; on net reward its intervals include zero. Provider cost was $1.90 (Gemini) and $0.44
+  zero; on net reward its intervals include zero. The gross gain rests on few seeds: only 11
+  (Gemini) and 7 (Grok) of 24 seed clusters change, and a post-hoc exact sign-flip test over the
+  cluster means gives p = 0.06 and 0.08. Provider cost was $1.90 (Gemini) and $0.44
   (Grok); all 429 parses per endpoint were valid, with no refusals or retries.
 - **Findings for the team:**
   1. Module 02 accepts a shock proposal whose `persistence` or `duration_bin` is `none`; module
      05's `maximum_lifetime` raises on it, and the frozen stack aborts the run. A permanent fix
      (module 02 rejects the shape, or module 05 refuses it gracefully) needs a dated decision.
-  2. Magnitude bins disagree with the simulator: the truth is `low` in 80 of 96 shocked
-     episodes, while 68 of 74 (Gemini) and 73 of 75 (Grok) first proposals that name a shock say
-     medium or high.
+  2. Magnitude labels disagree: the truth bins `low` in 80 of 96 shocked episodes (all but the
+     temporary pulses; `collie/arms/oracle.py` marks the binning provisional), while every
+     non-distractor dev/cal template's alert spec says `medium`. The models' first shock
+     proposals say medium or high in 68 of 74 (Gemini) and 73 of 75 (Grok), so magnitude accuracy
+     here measures the label mismatch, not model calibration. The compiler reads the bin, so the
+     bank labels and the truth binning need to agree before any magnitude claim.
   3. The dev/cal alert bank has no demand-down template, so family 2's shocked episodes carried
      no alert.
   4. The one-period alert lead used for early-accurate and unreliable alerts comes from

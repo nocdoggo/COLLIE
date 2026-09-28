@@ -25,8 +25,10 @@ prompts both endpoints answered were identical; the frozen tree shows no drift.
   in 61% (Gemini) and 55% (Grok) of the 96 shocked episodes, against 17% for the fixed payload; on
   the 20 early-accurate episodes that carry a bank alert, 20/20 and 18/20. Fully correct proposals
   are rare (3/96 and 2/96), and magnitude is right in only 8/96 and 7/96, fewer than any field.
-  The truth is `low` in 80 of 96 episodes (`reports/pilot_truth.jsonl`), and post hoc, the models
-  almost always say medium or high.
+  That field measures a label mismatch more than the models: the truth is `low` in 80 of 96
+  episodes (`reports/pilot_truth.jsonl`), every non-distractor bank template specifies `medium`
+  (`collie/data/alerts/templates/{dev,cal}.yaml`), and post hoc, the models almost always say
+  medium or high.
 - **Family accuracy is lower under unreliable alerts, mostly through abstention.** Paired within
   seed, family accuracy is 0.60 lower (Gemini) and 0.50 lower (Grok) under unreliable than under
   early-accurate alerts (normal 95% intervals over the 20 seeds, [0.38, 0.82] and [0.28, 0.72];
@@ -36,7 +38,10 @@ prompts both endpoints answered were identical; the frozen tree shows no drift.
 - **Real content moves arm 10 on gross, not on net.** Against the fixed payload, arm 10 gains
   +198 b[15, 434] (Gemini) and +146 b[19, 319] (Grok) gross per episode; on net, which also
   charges holding, the change is -87 b[-322, 142] and -25 b[-227, 152] (`b[a, b]` is the
-  seed-cluster bootstrap 95% interval). Real content also lowers arm 9 on gross (-253 and -197,
+  seed-cluster bootstrap 95% interval). Post hoc, the gross gain rests on few seeds: only 11
+  (Gemini) and 7 (Grok) of the 24 seed clusters change at all, and an exact sign-flip test over
+  the cluster means gives p = 0.06 and 0.08 (computed from the run records). Real content also
+  lowers arm 9 on gross (-253 and -197,
   intervals excluding zero); arm 8's gross intervals include zero. Post hoc, the 16
   lead-time-shift episodes contribute about +190 of Gemini's +198 and about +148 to Grok's +146,
   more than all of it; the other families together add about +8 and -1.5.
@@ -138,10 +143,14 @@ number of calls. Grok: 178 calls, p50 0.9 s. Rule U (PLAN.md rule 5) fired twice
    stack aborts the run. Grok gave such an answer to 2 of its 143 distinct prompts (post hoc;
    Gemini 0 of 138). Rule U kept this pilot running; the permanent fix (module 02 rejects the
    shape, or module 05 refuses it gracefully) is a team decision.
-2. **Magnitude does not line up.** Of the first proposals that name a shock (nulls included), 68
-   of 74 (Gemini) and 73 of 75 (Grok) say medium or high (post hoc); the simulator's truth is low
-   in 80 of 96 shocked episodes (`reports/pilot_truth.jsonl`). The bins or the prompt's guidance
-   need a look before any magnitude-sensitive claim.
+2. **Magnitude labels do not line up.** The simulator's truth is low in 80 of 96 shocked
+   episodes (`reports/pilot_truth.jsonl`): the dev/cal demand-level multipliers (1.25 and 0.75)
+   bin low, as do the lead-time, loss and compound incidents; only temporary pulses bin medium
+   (`collie/arms/oracle.py` marks the binning provisional). Every non-distractor dev/cal template's alert spec says `medium`, and of
+   the first proposals that name a shock (nulls included), 68 of 74 (Gemini) and 73 of 75 (Grok)
+   say medium or high (post hoc). Magnitude accuracy therefore cannot be read as model
+   calibration until the bank labels and the truth binning agree; the compiler does read the bin
+   (`collie/control/mapping.py`).
 3. **The dev/cal bank has no demand-down template,** so family 2's shocked episodes got no alerts
    here.
 4. **The gross endpoint** charges no holding, so it credits arm 10's extra stock without its
