@@ -290,6 +290,50 @@ Not yet frozen. Task 19 establishes `prereg/freeze_manifest.json` at the end of 
 
 ## Gate 3 — pilot decision
 
+### 2026-09-28 — exploratory real-content pilot recorded; Gate 3 decision unchanged
+
+- **Artefacts:** `analysis/real_content_pilot/`. The plan (`PLAN.md`) was committed and pushed at
+  `4ac16f9` before any live call; the live runs (`out/gemini-bank/`, `out/grok-bank/`) were made
+  at `e0132ce`; the analysis is `out/evaluation.json` and the report `REPORT.md`. No frozen file
+  changed (`tools.freeze.drift()` is `[]`), and nothing in `reports/` was written.
+- **What ran:** the registered 120 dev/cal pilot episodes and nine arms, with live answers from
+  `gemini-3.8-flash` and `grok-4.20-0309-non-reasoning` (temperature 0, one run each) and module
+  03's dev/cal alert bank in place of the scripted transport and the demo alerts. A
+  `scripted-bank` reference keeps the fixed payload with the same bank alerts. `test.yaml` was
+  never opened, and every record is stamped exploratory. `PLAN.md` logs two deviations of its
+  own: a logging-only prompt digest, and post-hoc supporting counts added after the live results
+  were seen. Its Rule U-v1 gave arm 10 module 02's canonical abstention in place of 2 Grok answers
+  whose `duration_bin` was `none`, a shape module 05's lifecycle raises on (finding 1 below).
+- **Status:** exploratory. It is not a Gate 3 vote, and the 2026-09-23 decision stands. It meets
+  finding 3 of that entry only in part: the episodes are the ones the registered pilot already
+  spent and each endpoint ran once, so a confirmatory real-content run on fresh held-out seeds,
+  under a new registration, is still owed.
+- **Outcome:** the frozen readout stays `kill-or-reframe` in both live runs, on the same two
+  triggers. `insufficient_headroom` stays 2, as it does not depend on the transport.
+  `detector_indistinguishable` is -558.4 with the fixed payload and bank alerts, and -360.4
+  (Gemini) and -412.2 (Grok) live; the readout's interval stays below zero in every run. The
+  first proposal names the right family in 59/96 (Gemini) and 53/96 (Grok) shocked episodes,
+  against 16/96 for the fixed payload. Against the fixed payload, arm 10 gains +198.0 (Gemini)
+  and +146.2 (Grok) gross profit per episode, with seed-cluster bootstrap intervals that exclude
+  zero; on net reward its intervals include zero. Provider cost was $1.90 (Gemini) and $0.44
+  (Grok); all 429 parses per endpoint were valid, with no refusals or retries.
+- **Findings for the team:**
+  1. Module 02 accepts a shock proposal whose `persistence` or `duration_bin` is `none`; module
+     05's `maximum_lifetime` raises on it, and the frozen stack aborts the run. A permanent fix
+     (module 02 rejects the shape, or module 05 refuses it gracefully) needs a dated decision.
+  2. Magnitude bins disagree with the simulator: the truth is `low` in 80 of 96 shocked
+     episodes, while 68 of 74 (Gemini) and 73 of 75 (Grok) first proposals that name a shock say
+     medium or high.
+  3. The dev/cal alert bank has no demand-down template, so family 2's shocked episodes carried
+     no alert.
+  4. The one-period alert lead used for early-accurate and unreliable alerts comes from
+     `default_audit_config()` (`unreliable_offset: -1`), whose status is still
+     `pending_team_confirmation`, and the alert-bank rater audit has not run.
+  5. 97% of Gemini's billable output tokens are thinking tokens (p95 latency 28.7 s). A
+     thinking budget would change the endpoint and needs its own registration.
+- **Blast radius:** none. No registered number, threshold, criterion or endpoint moved, and no
+  prior result is invalidated.
+
 ### 2026-09-23 — pilot decision recorded: kill-or-reframe
 
 - **Decision:** kill-or-reframe, dated 2026-09-23 in `reports/pilot_report.md`, rendered from
