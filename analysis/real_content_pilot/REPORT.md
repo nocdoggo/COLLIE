@@ -148,9 +148,9 @@ number of calls. Grok: 178 calls, p50 0.9 s. Rule U (PLAN.md rule 5) fired twice
    bin low, as do the lead-time, loss and compound incidents; only temporary pulses bin medium
    (`collie/arms/oracle.py` marks the binning provisional). Every non-distractor dev/cal
    template's alert spec says `medium`, and of the first proposals that name a shock (nulls
-   included), 68 of 74 (Gemini) and 73 of 75 (Grok) say medium or high (post hoc). Magnitude accuracy therefore cannot be read as model
-   calibration until the bank labels and the truth binning agree; the compiler does read the bin
-   (`collie/control/mapping.py`).
+   included), 68 of 74 (Gemini) and 73 of 75 (Grok) say medium or high (post hoc). Magnitude
+   accuracy therefore cannot be read as model calibration until the bank labels and the truth
+   binning agree; the compiler does read the bin (`collie/control/mapping.py`).
 3. **The dev/cal bank has no demand-down template,** so family 2's shocked episodes got no alerts
    here.
 4. **The gross endpoint** charges no holding, so it credits arm 10's extra stock without its
