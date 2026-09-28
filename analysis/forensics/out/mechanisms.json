@@ -1,0 +1,454 @@
+{
+  "analysis_class": "exploratory",
+  "per_family": {
+    "compound": [
+      {
+        "arm1_on_hand_at_onset": 0.0,
+        "cluster": "dev/f6/s6050000",
+        "compiled": {
+          "gamma": 1.0,
+          "l_eff": 3,
+          "m": 1.25,
+          "predictive_model": "compound_demand_up_lead_time_delay"
+        },
+        "demand_window": [
+          19,
+          24
+        ],
+        "landing_of_order_placed_at": {
+          "-1": 23,
+          "-2": 19,
+          "-3": 18,
+          "0": 24,
+          "1": 24
+        },
+        "onset": 19,
+        "pause_periods": [
+          19,
+          21
+        ],
+        "promised_lead_time": 2
+      },
+      {
+        "arm1_on_hand_at_onset": 0.0,
+        "cluster": "cal/f6/s6060000",
+        "compiled": {
+          "gamma": 1.0,
+          "l_eff": 3,
+          "m": 1.25,
+          "predictive_model": "compound_demand_up_lead_time_delay"
+        },
+        "demand_window": [
+          14,
+          19
+        ],
+        "landing_of_order_placed_at": {
+          "-1": 18,
+          "-2": 14,
+          "-3": 13,
+          "0": 19,
+          "1": 19
+        },
+        "onset": 14,
+        "pause_periods": [
+          14,
+          16
+        ],
+        "promised_lead_time": 2
+      },
+      {
+        "arm1_on_hand_at_onset": 60.0,
+        "cluster": "dev/f6/s6050001",
+        "compiled": {
+          "gamma": 1.0,
+          "l_eff": 3,
+          "m": 1.25,
+          "predictive_model": "compound_demand_up_lead_time_delay"
+        },
+        "demand_window": [
+          20,
+          25
+        ],
+        "landing_of_order_placed_at": {
+          "-1": 25,
+          "-2": 20,
+          "-3": 19,
+          "0": 26,
+          "1": 26
+        },
+        "onset": 20,
+        "pause_periods": [
+          20,
+          23
+        ],
+        "promised_lead_time": 2
+      },
+      {
+        "arm1_on_hand_at_onset": 47.0,
+        "cluster": "cal/f6/s6060001",
+        "compiled": {
+          "gamma": 1.0,
+          "l_eff": 3,
+          "m": 1.25,
+          "predictive_model": "compound_demand_up_lead_time_delay"
+        },
+        "demand_window": [
+          18,
+          23
+        ],
+        "landing_of_order_placed_at": {
+          "-1": 23,
+          "-2": 18,
+          "-3": 17,
+          "0": 24,
+          "1": 24
+        },
+        "onset": 18,
+        "pause_periods": [
+          18,
+          21
+        ],
+        "promised_lead_time": 2
+      }
+    ],
+    "demand_level:demand_down": [
+      {
+        "cluster": "dev/f2/s2050000",
+        "compiled": {
+          "gamma": 1.0,
+          "l_eff": 2,
+          "m": 0.75,
+          "predictive_model": "demand_down"
+        },
+        "implied_over_true_level": {
+          "0": 1.0054166666666666,
+          "10": 0.9120588235294118,
+          "20": 0.8570454545454546,
+          "30": 0.8205555555555556
+        },
+        "onset": 20,
+        "promised_lead_time": 2
+      },
+      {
+        "cluster": "cal/f2/s2060000",
+        "compiled": {
+          "gamma": 1.0,
+          "l_eff": 2,
+          "m": 0.75,
+          "predictive_model": "demand_down"
+        },
+        "implied_over_true_level": {
+          "0": 0.9966666666666667,
+          "10": 0.906774193548387,
+          "20": 0.8763414634146343,
+          "33": 0.8553703703703703
+        },
+        "onset": 17,
+        "promised_lead_time": 2
+      },
+      {
+        "cluster": "dev/f2/s2050001",
+        "compiled": {
+          "gamma": 1.0,
+          "l_eff": 2,
+          "m": 0.75,
+          "predictive_model": "demand_down"
+        },
+        "implied_over_true_level": {
+          "0": 1.0065384615384616,
+          "10": 0.9402777777777778,
+          "20": 0.9067391304347827,
+          "28": 0.8851851851851852
+        },
+        "onset": 22,
+        "promised_lead_time": 2
+      },
+      {
+        "cluster": "cal/f2/s2060001",
+        "compiled": {
+          "gamma": 1.0,
+          "l_eff": 2,
+          "m": 0.75,
+          "predictive_model": "demand_down"
+        },
+        "implied_over_true_level": {
+          "0": 1.0184615384615385,
+          "10": 0.9525,
+          "20": 0.9121739130434783,
+          "28": 0.8664814814814815
+        },
+        "onset": 22,
+        "promised_lead_time": 2
+      }
+    ],
+    "demand_level:demand_up": [
+      {
+        "cluster": "dev/f1/s1050000",
+        "compiled": {
+          "gamma": 1.0,
+          "l_eff": 2,
+          "m": 1.25,
+          "predictive_model": "demand_up"
+        },
+        "implied_over_true_level": {
+          "0": 0.96,
+          "10": 1.0838709677419356,
+          "20": 1.1541463414634148,
+          "33": 1.199814814814815
+        },
+        "onset": 17,
+        "promised_lead_time": 2
+      },
+      {
+        "cluster": "cal/f1/s1060000",
+        "compiled": {
+          "gamma": 1.0,
+          "l_eff": 2,
+          "m": 1.25,
+          "predictive_model": "demand_up"
+        },
+        "implied_over_true_level": {
+          "0": 0.9263636363636364,
+          "10": 1.030625,
+          "20": 1.0595238095238093,
+          "32": 1.0862962962962963
+        },
+        "onset": 18,
+        "promised_lead_time": 2
+      },
+      {
+        "cluster": "dev/f1/s1050001",
+        "compiled": {
+          "gamma": 1.0,
+          "l_eff": 2,
+          "m": 1.25,
+          "predictive_model": "demand_up"
+        },
+        "implied_over_true_level": {
+          "0": 1.0495,
+          "10": 1.11,
+          "20": 1.17975,
+          "34": 1.2264814814814815
+        },
+        "onset": 16,
+        "promised_lead_time": 2
+      },
+      {
+        "cluster": "cal/f1/s1060001",
+        "compiled": {
+          "gamma": 1.0,
+          "l_eff": 2,
+          "m": 1.25,
+          "predictive_model": "demand_up"
+        },
+        "implied_over_true_level": {
+          "0": 0.9776923076923077,
+          "10": 1.0102777777777776,
+          "20": 1.0682608695652172,
+          "28": 1.0907407407407408
+        },
+        "onset": 22,
+        "promised_lead_time": 2
+      }
+    ],
+    "lead_time_shift": [
+      {
+        "cluster": "dev/f4/s4050000",
+        "compiled": {
+          "gamma": 1.0,
+          "l_eff": 2,
+          "m": 1.0,
+          "predictive_model": "lead_time_delay"
+        },
+        "compiled_offset": 1,
+        "onset": 20,
+        "promised_lead_time": 1,
+        "true_shift": 2
+      },
+      {
+        "cluster": "cal/f4/s4060000",
+        "compiled": {
+          "gamma": 1.0,
+          "l_eff": 2,
+          "m": 1.0,
+          "predictive_model": "lead_time_delay"
+        },
+        "compiled_offset": 1,
+        "onset": 16,
+        "promised_lead_time": 1,
+        "true_shift": 2
+      },
+      {
+        "cluster": "dev/f4/s4050001",
+        "compiled": {
+          "gamma": 1.0,
+          "l_eff": 3,
+          "m": 1.0,
+          "predictive_model": "lead_time_delay"
+        },
+        "compiled_offset": 1,
+        "onset": 18,
+        "promised_lead_time": 2,
+        "true_shift": 1
+      },
+      {
+        "cluster": "cal/f4/s4060001",
+        "compiled": {
+          "gamma": 1.0,
+          "l_eff": 3,
+          "m": 1.0,
+          "predictive_model": "lead_time_delay"
+        },
+        "compiled_offset": 1,
+        "onset": 16,
+        "promised_lead_time": 2,
+        "true_shift": 1
+      }
+    ],
+    "shipment_loss": [
+      {
+        "cluster": "dev/f5/s5050000",
+        "compiled": {
+          "gamma": 0.5,
+          "l_eff": 2,
+          "m": 1.0,
+          "predictive_model": "shipment_loss"
+        },
+        "first_order_after_burst_lands": 24,
+        "loss_periods": [
+          21,
+          21
+        ],
+        "onset": 21,
+        "promised_lead_time": 2,
+        "window_orders_that_land": 0
+      },
+      {
+        "cluster": "cal/f5/s5060000",
+        "compiled": {
+          "gamma": 0.5,
+          "l_eff": 2,
+          "m": 1.0,
+          "predictive_model": "shipment_loss"
+        },
+        "first_order_after_burst_lands": 22,
+        "loss_periods": [
+          19,
+          19
+        ],
+        "onset": 19,
+        "promised_lead_time": 2,
+        "window_orders_that_land": 0
+      },
+      {
+        "cluster": "dev/f5/s5050001",
+        "compiled": {
+          "gamma": 0.5,
+          "l_eff": 2,
+          "m": 1.0,
+          "predictive_model": "shipment_loss"
+        },
+        "first_order_after_burst_lands": 20,
+        "loss_periods": [
+          16,
+          17
+        ],
+        "onset": 16,
+        "promised_lead_time": 2,
+        "window_orders_that_land": 0
+      },
+      {
+        "cluster": "cal/f5/s5060001",
+        "compiled": {
+          "gamma": 0.5,
+          "l_eff": 2,
+          "m": 1.0,
+          "predictive_model": "shipment_loss"
+        },
+        "first_order_after_burst_lands": 26,
+        "loss_periods": [
+          22,
+          23
+        ],
+        "onset": 22,
+        "promised_lead_time": 2,
+        "window_orders_that_land": 0
+      }
+    ],
+    "temporary_pulse": [
+      {
+        "cluster": "dev/f3/s3050000",
+        "compiled": {
+          "gamma": 1.0,
+          "l_eff": 2,
+          "m": 1.5,
+          "predictive_model": "demand_up"
+        },
+        "onset": 15,
+        "order_at_onset_lands": 17,
+        "promised_lead_time": 2,
+        "pulse_periods": [
+          15,
+          16
+        ],
+        "pulse_periods_reachable_from_onset": 0,
+        "pulse_periods_reachable_from_onset_minus_1": 1
+      },
+      {
+        "cluster": "cal/f3/s3060000",
+        "compiled": {
+          "gamma": 1.0,
+          "l_eff": 2,
+          "m": 1.5,
+          "predictive_model": "demand_up"
+        },
+        "onset": 14,
+        "order_at_onset_lands": 16,
+        "promised_lead_time": 2,
+        "pulse_periods": [
+          14,
+          15
+        ],
+        "pulse_periods_reachable_from_onset": 0,
+        "pulse_periods_reachable_from_onset_minus_1": 1
+      },
+      {
+        "cluster": "dev/f3/s3050001",
+        "compiled": {
+          "gamma": 1.0,
+          "l_eff": 2,
+          "m": 1.5,
+          "predictive_model": "demand_up"
+        },
+        "onset": 18,
+        "order_at_onset_lands": 20,
+        "promised_lead_time": 2,
+        "pulse_periods": [
+          18,
+          20
+        ],
+        "pulse_periods_reachable_from_onset": 1,
+        "pulse_periods_reachable_from_onset_minus_1": 2
+      },
+      {
+        "cluster": "cal/f3/s3060001",
+        "compiled": {
+          "gamma": 1.0,
+          "l_eff": 2,
+          "m": 1.5,
+          "predictive_model": "demand_up"
+        },
+        "onset": 20,
+        "order_at_onset_lands": 22,
+        "promised_lead_time": 2,
+        "pulse_periods": [
+          20,
+          22
+        ],
+        "pulse_periods_reachable_from_onset": 1,
+        "pulse_periods_reachable_from_onset_minus_1": 2
+      }
+    ]
+  },
+  "provenance": "scripted transport (scripted-fake-7b, one fixed demand_up/medium ShockSpec payload) and demo alerts, through the real frozen arms, parser, compiler, verifier, and ledger"
+}

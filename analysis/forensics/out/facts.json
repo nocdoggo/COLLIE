@@ -1,0 +1,470 @@
+{
+  "analysis_class": "exploratory",
+  "arm8_vs_ctrl": {
+    "bit_identical": 120,
+    "episodes": 120
+  },
+  "collinearity": {
+    "episodes_with_arm_dependent_total_demand": 0,
+    "holding_cost_per_unit_values": [
+      1.0
+    ],
+    "profit_per_unit_values": [
+      4.0
+    ],
+    "records_checked": 1752,
+    "violations_of_profit_eq_p_times_sold": 0
+  },
+  "condition_replication": {
+    "arm10_spec_eprocess": {
+      "clusters": 24,
+      "clusters_with_one_trajectory": 14,
+      "mean_distinct_trajectories_per_cluster": 1.7083333333333333
+    },
+    "arm1_capped_base_stock": {
+      "clusters": 24,
+      "clusters_with_one_trajectory": 24,
+      "mean_distinct_trajectories_per_cluster": 1.0
+    },
+    "ctrl_cusum_to_compiler": {
+      "clusters": 24,
+      "clusters_with_one_trajectory": 0,
+      "mean_distinct_trajectories_per_cluster": 2.9166666666666665
+    },
+    "oracle_shockspec_headroom": {
+      "clusters": 24,
+      "clusters_with_one_trajectory": 24,
+      "mean_distinct_trajectories_per_cluster": 1.0
+    }
+  },
+  "detector_intervals": {
+    "holding": {
+      "estimate": -2871.9583333333335,
+      "n_episodes": 120,
+      "n_seed_clusters": 24,
+      "null_mean": -2563.2083333333335,
+      "registered_style_normal_n120": [
+        -3191.615364844288,
+        -2552.301301822379
+      ],
+      "seed_cluster_bootstrap": [
+        -3379.4216101694915,
+        -2384.9005535845363
+      ],
+      "seed_collapsed_normal": [
+        -3450.720327964851,
+        -2407.779672035149
+      ],
+      "shocked_mean": -2949.1458333333335
+    },
+    "lost": {
+      "estimate": 141.38333333333333,
+      "n_episodes": 120,
+      "n_seed_clusters": 24,
+      "null_mean": 65.375,
+      "registered_style_normal_n120": [
+        105.61384070360306,
+        177.1528259630636
+      ],
+      "seed_cluster_bootstrap": [
+        91.14094758064516,
+        199.82850672121563
+      ],
+      "seed_collapsed_normal": [
+        80.27515447125364,
+        213.13109552874636
+      ],
+      "shocked_mean": 160.38541666666666
+    },
+    "profit": {
+      "estimate": -565.5333333333333,
+      "n_episodes": 120,
+      "n_seed_clusters": 24,
+      "null_mean": -261.5,
+      "registered_style_normal_n120": [
+        -708.6113038522544,
+        -422.45536281441224
+      ],
+      "seed_cluster_bootstrap": [
+        -799.3140268848626,
+        -364.5637903225807
+      ],
+      "seed_collapsed_normal": [
+        -852.5243821149854,
+        -321.1006178850146
+      ],
+      "shocked_mean": -641.5416666666666
+    },
+    "reward": {
+      "estimate": 2306.425,
+      "n_episodes": 120,
+      "n_seed_clusters": 24,
+      "null_mean": 2301.7083333333335,
+      "registered_style_normal_n120": [
+        1932.9464532707343,
+        2679.903546729266
+      ],
+      "seed_cluster_bootstrap": [
+        1625.2590420081967,
+        2993.095085502421
+      ],
+      "seed_collapsed_normal": [
+        1586.8732141711312,
+        3098.001785828869
+      ],
+      "shocked_mean": 2307.6041666666665
+    }
+  },
+  "false_activation": {
+    "activated_null_episodes": [
+      "dev/f1/s1050001/unreliable__twin"
+    ],
+    "activated_null_units": [
+      "dev/null/14/s1050001/unreliable"
+    ],
+    "control_estimate": 0.9583333333333334,
+    "distinct_activated": 1,
+    "distinct_null_trajectories": 12,
+    "null_episodes": 24,
+    "registered_style_normal_interval": [
+      0.8766681673108311,
+      1.0399984993558355
+    ],
+    "wilson_interval_distinct": [
+      0.646120088858883,
+      0.9851349055950829
+    ],
+    "wilson_interval_n24": [
+      0.7975819352134406,
+      0.9926065438344942
+    ]
+  },
+  "fill_rates": {
+    "arm10_spec_eprocess": {
+      "all_episodes": 0.8875925962795992,
+      "n": 120,
+      "null": 0.9271577914483662,
+      "shocked": 0.8777012974874076
+    },
+    "arm11_or_to_llm": {
+      "all_episodes": 0.8968176489542177,
+      "n": 120,
+      "null": 0.9325690850257317,
+      "shocked": 0.8878797899363392
+    },
+    "arm1_capped_base_stock": {
+      "all_episodes": 0.8863436175211407,
+      "n": 120,
+      "null": 0.9271577914483662,
+      "shocked": 0.8761400740393341
+    },
+    "arm2_telemetry_hmm_or": {
+      "all_episodes": 0.8869850129361019,
+      "n": 120,
+      "null": 0.9255829048113132,
+      "shocked": 0.8773355399672992
+    },
+    "arm3_llm_direct": {
+      "all_episodes": 0.8968176489542177,
+      "n": 120,
+      "null": 0.9325690850257317,
+      "shocked": 0.8878797899363392
+    },
+    "arm4_triggered_llm_direct": {
+      "all_episodes": 0.8864793131278591,
+      "n": 120,
+      "null": 0.9276612691370841,
+      "shocked": 0.8761838241255528
+    },
+    "arm5_llm_to_or_every_period": {
+      "all_episodes": 0.8863436175211407,
+      "n": 120,
+      "null": 0.9271577914483662,
+      "shocked": 0.8761400740393341
+    },
+    "arm6_llm_to_or_sparse": {
+      "all_episodes": 0.8863436175211407,
+      "n": 120,
+      "null": 0.9271577914483662,
+      "shocked": 0.8761400740393341
+    },
+    "arm7_llm_to_or_persistent": {
+      "all_episodes": 0.8863436175211407,
+      "n": 120,
+      "null": 0.9271577914483662,
+      "shocked": 0.8761400740393341
+    },
+    "arm8_spec_immediate": {
+      "all_episodes": 0.9143793911739628,
+      "n": 120,
+      "null": 0.9401740747952637,
+      "shocked": 0.9079307202686376
+    },
+    "arm9_spec_heuristic_rollback": {
+      "all_episodes": 0.9086070582832336,
+      "n": 120,
+      "null": 0.9361101543917778,
+      "shocked": 0.9017312842560975
+    },
+    "ctrl_alertspec_upper_bound": {
+      "all_episodes": 0.9116345512673578,
+      "n": 96,
+      "null": null,
+      "shocked": 0.9116345512673578
+    },
+    "ctrl_cusum_to_compiler": {
+      "all_episodes": 0.9143793911739628,
+      "n": 120,
+      "null": 0.9401740747952637,
+      "shocked": 0.9079307202686376
+    },
+    "ctrl_keyword_parser": {
+      "all_episodes": 0.913827730876546,
+      "n": 120,
+      "null": 0.939295927791401,
+      "shocked": 0.9074606816478322
+    },
+    "oracle_shockspec_headroom": {
+      "all_episodes": 0.9014484763445637,
+      "n": 96,
+      "null": null,
+      "shocked": 0.9014484763445637
+    }
+  },
+  "headroom_seed_bootstrap": {
+    "per_seed_raw_lift": {
+      "compound": [
+        0.0,
+        0.0,
+        0.00021128248468201986,
+        0.0
+      ],
+      "demand_level:demand_down": [
+        -0.047136340598074,
+        -0.010401188707280832,
+        -0.011627906976744186,
+        -0.028654686741136474
+      ],
+      "demand_level:demand_up": [
+        0.04010532712173385,
+        0.05196881870877473,
+        0.07908020190689849,
+        0.07052669552669552
+      ],
+      "lead_time_shift": [
+        0.23920653442240372,
+        0.08983561009492938,
+        0.21735294117647058,
+        0.101301775147929
+      ],
+      "shipment_loss": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "temporary_pulse": [
+        0.002257799671592775,
+        0.008042328042328042,
+        0.002717959439682208,
+        0.006252605252188412
+      ]
+    },
+    "point_count": 2,
+    "seed_bootstrap_distribution": {
+      "1": 0.0729,
+      "2": 0.9271
+    },
+    "seed_bootstrap_interval": [
+      1.0,
+      2.0
+    ],
+    "seeds_per_family": {
+      "compound": 4,
+      "demand_level:demand_down": 4,
+      "demand_level:demand_up": 4,
+      "lead_time_shift": 4,
+      "shipment_loss": 4,
+      "temporary_pulse": 4
+    }
+  },
+  "null_duplicates": {
+    "distinct_null_trajectories": 12,
+    "distinct_seeds": 8,
+    "every_arm_identical_within_group": true,
+    "group_sizes": {
+      "cal/f1/s1060000|no_alert": 3,
+      "cal/f1/s1060000|unreliable": 1,
+      "cal/f1/s1060001|no_alert": 3,
+      "cal/f1/s1060001|unreliable": 1,
+      "cal/f2/s2060000|unreliable": 2,
+      "cal/f2/s2060001|unreliable": 2,
+      "dev/f1/s1050000|no_alert": 3,
+      "dev/f1/s1050000|unreliable": 1,
+      "dev/f1/s1050001|no_alert": 3,
+      "dev/f1/s1050001|unreliable": 1,
+      "dev/f2/s2050000|unreliable": 2,
+      "dev/f2/s2050001|unreliable": 2
+    },
+    "null_episodes": 24
+  },
+  "oracle_vs_arm1": {
+    "compound": {
+      "episodes": 16,
+      "order_differences_outside_oracle_window": 52,
+      "outcome_identical_to_arm1": 0
+    },
+    "demand_level:demand_down": {
+      "episodes": 16,
+      "order_differences_outside_oracle_window": 0,
+      "outcome_identical_to_arm1": 0
+    },
+    "demand_level:demand_up": {
+      "episodes": 16,
+      "order_differences_outside_oracle_window": 0,
+      "outcome_identical_to_arm1": 0
+    },
+    "lead_time_shift": {
+      "episodes": 16,
+      "order_differences_outside_oracle_window": 0,
+      "outcome_identical_to_arm1": 0
+    },
+    "shipment_loss": {
+      "episodes": 16,
+      "order_differences_outside_oracle_window": 0,
+      "outcome_identical_to_arm1": 16
+    },
+    "temporary_pulse": {
+      "episodes": 16,
+      "order_differences_outside_oracle_window": 24,
+      "outcome_identical_to_arm1": 0
+    }
+  },
+  "provenance": "scripted transport (scripted-fake-7b, one fixed demand_up/medium ShockSpec payload) and demo alerts, through the real frozen arms, parser, compiler, verifier, and ledger",
+  "record_counts": {
+    "arms_per_null_episode": 13,
+    "arms_per_shocked_episode": 15,
+    "episodes": 120,
+    "records": 1752
+  },
+  "recovery_time": {
+    "final_shock_periods_by_family": {
+      "compound": [
+        19,
+        23,
+        24,
+        25
+      ],
+      "demand_level:demand_down": [
+        50
+      ],
+      "demand_level:demand_up": [
+        50
+      ],
+      "lead_time_shift": [
+        50
+      ],
+      "shipment_loss": [
+        17,
+        19,
+        21,
+        23
+      ],
+      "temporary_pulse": [
+        15,
+        16,
+        20,
+        22
+      ]
+    },
+    "mean_by_family": {
+      "compound": 1.0,
+      "demand_level:demand_down": 51.0,
+      "demand_level:demand_up": 51.0,
+      "lead_time_shift": 51.0,
+      "shipment_loss": 4.0,
+      "temporary_pulse": 1.5
+    },
+    "never_recovered_by_family": {
+      "demand_level:demand_down": 16,
+      "demand_level:demand_up": 16,
+      "lead_time_shift": 16
+    },
+    "recovery_time_mean": 26.583333333333332
+  },
+  "registered_reproduction": {
+    "detector_estimate": -565.5333333333333,
+    "detector_interval": [
+      -708.6113038522543,
+      -422.4553628144123
+    ],
+    "detector_n_units": 120,
+    "headroom_count": 2,
+    "headroom_interval": [
+      2.0,
+      2.0
+    ],
+    "headroom_per_key": {
+      "compound": {
+        "arm1_mean": 17812.0,
+        "cvar10_lift": 0.0,
+        "n_rows": 16,
+        "oracle_mean": 17813.0,
+        "raw_lift": 5.614192679092747e-05
+      },
+      "demand_level:demand_down": {
+        "arm1_mean": 15800.0,
+        "cvar10_lift": -0.011627906976744186,
+        "n_rows": 16,
+        "oracle_mean": 15411.0,
+        "raw_lift": -0.024620253164556963
+      },
+      "demand_level:demand_up": {
+        "arm1_mean": 20833.0,
+        "cvar10_lift": 0.04010532712173385,
+        "n_rows": 16,
+        "oracle_mean": 22105.0,
+        "raw_lift": 0.06105697691163059
+      },
+      "lead_time_shift": {
+        "arm1_mean": 15372.0,
+        "cvar10_lift": 0.21735294117647058,
+        "n_rows": 16,
+        "oracle_mean": 17747.0,
+        "raw_lift": 0.15450169138693728
+      },
+      "shipment_loss": {
+        "arm1_mean": 18021.0,
+        "cvar10_lift": 0.0,
+        "n_rows": 16,
+        "oracle_mean": 18021.0,
+        "raw_lift": 0.0
+      },
+      "temporary_pulse": {
+        "arm1_mean": 19178.0,
+        "cvar10_lift": 0.008042328042328042,
+        "n_rows": 16,
+        "oracle_mean": 19270.0,
+        "raw_lift": 0.004797163416414642
+      }
+    },
+    "lost_sales_reduction_registered": 9.4375,
+    "lost_sales_reduction_unweighted": 7.55,
+    "profit_lift_registered": 37.75,
+    "profit_lift_unweighted": 30.2
+  },
+  "start_of_episode": {
+    "initial_on_hand_and_in_transit": [
+      [
+        0.0,
+        0.0
+      ]
+    ],
+    "leading_zero_sale_periods": {
+      "1": 120,
+      "2": 1632
+    },
+    "mean_share_of_demand_lost_in_leading_periods": 0.04182264073795358,
+    "records": 1752
+  }
+}

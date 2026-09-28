@@ -1,0 +1,3527 @@
+{
+  "analysis_class": "exploratory",
+  "firings": [
+    {
+      "alert_periods": [
+        17
+      ],
+      "cluster": "cal/f1/s1060000",
+      "condition": "early_accurate",
+      "detector_firings": [
+        23
+      ],
+      "episode_id": "cal/f1/s1060000/early_accurate",
+      "firings": [
+        17,
+        23
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "demand_level:demand_up",
+      "onset": 18,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "cal/f1/s1060000",
+      "condition": "no_alert",
+      "detector_firings": [],
+      "episode_id": "cal/f1/s1060000/early_accurate__twin",
+      "firings": [],
+      "first_latency": null,
+      "is_null": true,
+      "key": "null",
+      "onset": null,
+      "sources": []
+    },
+    {
+      "alert_periods": [
+        18
+      ],
+      "cluster": "cal/f1/s1060000",
+      "condition": "late_accurate",
+      "detector_firings": [
+        24
+      ],
+      "episode_id": "cal/f1/s1060000/late_accurate",
+      "firings": [
+        18,
+        24
+      ],
+      "first_latency": 0,
+      "is_null": false,
+      "key": "demand_level:demand_up",
+      "onset": 18,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "cal/f1/s1060000",
+      "condition": "no_alert",
+      "detector_firings": [],
+      "episode_id": "cal/f1/s1060000/late_accurate__twin",
+      "firings": [],
+      "first_latency": null,
+      "is_null": true,
+      "key": "null",
+      "onset": null,
+      "sources": []
+    },
+    {
+      "alert_periods": [],
+      "cluster": "cal/f1/s1060000",
+      "condition": "no_alert",
+      "detector_firings": [
+        21,
+        49
+      ],
+      "episode_id": "cal/f1/s1060000/no_alert",
+      "firings": [
+        21,
+        49
+      ],
+      "first_latency": 3,
+      "is_null": false,
+      "key": "demand_level:demand_up",
+      "onset": 18,
+      "sources": [
+        "detector",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "cal/f1/s1060000",
+      "condition": "no_alert",
+      "detector_firings": [],
+      "episode_id": "cal/f1/s1060000/no_alert__twin",
+      "firings": [],
+      "first_latency": null,
+      "is_null": true,
+      "key": "null",
+      "onset": null,
+      "sources": []
+    },
+    {
+      "alert_periods": [
+        17
+      ],
+      "cluster": "cal/f1/s1060000",
+      "condition": "unreliable",
+      "detector_firings": [
+        23
+      ],
+      "episode_id": "cal/f1/s1060000/unreliable",
+      "firings": [
+        17,
+        23
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "demand_level:demand_up",
+      "onset": 18,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        10
+      ],
+      "cluster": "cal/f1/s1060000",
+      "condition": "unreliable",
+      "detector_firings": [],
+      "episode_id": "cal/f1/s1060000/unreliable__twin",
+      "firings": [
+        10
+      ],
+      "first_latency": null,
+      "is_null": true,
+      "key": "null",
+      "onset": null,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        21
+      ],
+      "cluster": "cal/f1/s1060001",
+      "condition": "early_accurate",
+      "detector_firings": [
+        36
+      ],
+      "episode_id": "cal/f1/s1060001/early_accurate",
+      "firings": [
+        21,
+        36
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "demand_level:demand_up",
+      "onset": 22,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "cal/f1/s1060001",
+      "condition": "no_alert",
+      "detector_firings": [],
+      "episode_id": "cal/f1/s1060001/early_accurate__twin",
+      "firings": [],
+      "first_latency": null,
+      "is_null": true,
+      "key": "null",
+      "onset": null,
+      "sources": []
+    },
+    {
+      "alert_periods": [
+        22
+      ],
+      "cluster": "cal/f1/s1060001",
+      "condition": "late_accurate",
+      "detector_firings": [
+        36
+      ],
+      "episode_id": "cal/f1/s1060001/late_accurate",
+      "firings": [
+        22,
+        36
+      ],
+      "first_latency": 0,
+      "is_null": false,
+      "key": "demand_level:demand_up",
+      "onset": 22,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "cal/f1/s1060001",
+      "condition": "no_alert",
+      "detector_firings": [],
+      "episode_id": "cal/f1/s1060001/late_accurate__twin",
+      "firings": [],
+      "first_latency": null,
+      "is_null": true,
+      "key": "null",
+      "onset": null,
+      "sources": []
+    },
+    {
+      "alert_periods": [],
+      "cluster": "cal/f1/s1060001",
+      "condition": "no_alert",
+      "detector_firings": [
+        36,
+        46
+      ],
+      "episode_id": "cal/f1/s1060001/no_alert",
+      "firings": [
+        36,
+        46
+      ],
+      "first_latency": 14,
+      "is_null": false,
+      "key": "demand_level:demand_up",
+      "onset": 22,
+      "sources": [
+        "detector",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "cal/f1/s1060001",
+      "condition": "no_alert",
+      "detector_firings": [],
+      "episode_id": "cal/f1/s1060001/no_alert__twin",
+      "firings": [],
+      "first_latency": null,
+      "is_null": true,
+      "key": "null",
+      "onset": null,
+      "sources": []
+    },
+    {
+      "alert_periods": [
+        21
+      ],
+      "cluster": "cal/f1/s1060001",
+      "condition": "unreliable",
+      "detector_firings": [
+        36
+      ],
+      "episode_id": "cal/f1/s1060001/unreliable",
+      "firings": [
+        21,
+        36
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "demand_level:demand_up",
+      "onset": 22,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        10
+      ],
+      "cluster": "cal/f1/s1060001",
+      "condition": "unreliable",
+      "detector_firings": [],
+      "episode_id": "cal/f1/s1060001/unreliable__twin",
+      "firings": [
+        10
+      ],
+      "first_latency": null,
+      "is_null": true,
+      "key": "null",
+      "onset": null,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        16
+      ],
+      "cluster": "cal/f2/s2060000",
+      "condition": "early_accurate",
+      "detector_firings": [
+        22
+      ],
+      "episode_id": "cal/f2/s2060000/early_accurate",
+      "firings": [
+        16,
+        22
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "demand_level:demand_down",
+      "onset": 17,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        10
+      ],
+      "cluster": "cal/f2/s2060000",
+      "condition": "unreliable",
+      "detector_firings": [],
+      "episode_id": "cal/f2/s2060000/early_accurate__twin",
+      "firings": [
+        10
+      ],
+      "first_latency": null,
+      "is_null": true,
+      "key": "null",
+      "onset": null,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        17
+      ],
+      "cluster": "cal/f2/s2060000",
+      "condition": "late_accurate",
+      "detector_firings": [
+        27
+      ],
+      "episode_id": "cal/f2/s2060000/late_accurate",
+      "firings": [
+        17,
+        27
+      ],
+      "first_latency": 0,
+      "is_null": false,
+      "key": "demand_level:demand_down",
+      "onset": 17,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "cal/f2/s2060000",
+      "condition": "no_alert",
+      "detector_firings": [
+        22,
+        37
+      ],
+      "episode_id": "cal/f2/s2060000/no_alert",
+      "firings": [
+        22,
+        37
+      ],
+      "first_latency": 5,
+      "is_null": false,
+      "key": "demand_level:demand_down",
+      "onset": 17,
+      "sources": [
+        "detector",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        10
+      ],
+      "cluster": "cal/f2/s2060000",
+      "condition": "unreliable",
+      "detector_firings": [],
+      "episode_id": "cal/f2/s2060000/no_alert__twin",
+      "firings": [
+        10
+      ],
+      "first_latency": null,
+      "is_null": true,
+      "key": "null",
+      "onset": null,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        16
+      ],
+      "cluster": "cal/f2/s2060000",
+      "condition": "unreliable",
+      "detector_firings": [
+        22
+      ],
+      "episode_id": "cal/f2/s2060000/unreliable",
+      "firings": [
+        16,
+        22
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "demand_level:demand_down",
+      "onset": 17,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        21
+      ],
+      "cluster": "cal/f2/s2060001",
+      "condition": "early_accurate",
+      "detector_firings": [
+        37
+      ],
+      "episode_id": "cal/f2/s2060001/early_accurate",
+      "firings": [
+        21,
+        37
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "demand_level:demand_down",
+      "onset": 22,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        10
+      ],
+      "cluster": "cal/f2/s2060001",
+      "condition": "unreliable",
+      "detector_firings": [],
+      "episode_id": "cal/f2/s2060001/early_accurate__twin",
+      "firings": [
+        10
+      ],
+      "first_latency": null,
+      "is_null": true,
+      "key": "null",
+      "onset": null,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        22
+      ],
+      "cluster": "cal/f2/s2060001",
+      "condition": "late_accurate",
+      "detector_firings": [
+        37
+      ],
+      "episode_id": "cal/f2/s2060001/late_accurate",
+      "firings": [
+        22,
+        37
+      ],
+      "first_latency": 0,
+      "is_null": false,
+      "key": "demand_level:demand_down",
+      "onset": 22,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "cal/f2/s2060001",
+      "condition": "no_alert",
+      "detector_firings": [
+        37,
+        46
+      ],
+      "episode_id": "cal/f2/s2060001/no_alert",
+      "firings": [
+        37,
+        46
+      ],
+      "first_latency": 15,
+      "is_null": false,
+      "key": "demand_level:demand_down",
+      "onset": 22,
+      "sources": [
+        "detector",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        10
+      ],
+      "cluster": "cal/f2/s2060001",
+      "condition": "unreliable",
+      "detector_firings": [],
+      "episode_id": "cal/f2/s2060001/no_alert__twin",
+      "firings": [
+        10
+      ],
+      "first_latency": null,
+      "is_null": true,
+      "key": "null",
+      "onset": null,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        21
+      ],
+      "cluster": "cal/f2/s2060001",
+      "condition": "unreliable",
+      "detector_firings": [
+        37
+      ],
+      "episode_id": "cal/f2/s2060001/unreliable",
+      "firings": [
+        21,
+        37
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "demand_level:demand_down",
+      "onset": 22,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        13
+      ],
+      "cluster": "cal/f3/s3060000",
+      "condition": "early_accurate",
+      "detector_firings": [
+        19
+      ],
+      "episode_id": "cal/f3/s3060000/early_accurate",
+      "firings": [
+        13,
+        19
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "temporary_pulse",
+      "onset": 14,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        14
+      ],
+      "cluster": "cal/f3/s3060000",
+      "condition": "late_accurate",
+      "detector_firings": [
+        23
+      ],
+      "episode_id": "cal/f3/s3060000/late_accurate",
+      "firings": [
+        14,
+        23
+      ],
+      "first_latency": 0,
+      "is_null": false,
+      "key": "temporary_pulse",
+      "onset": 14,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "cal/f3/s3060000",
+      "condition": "no_alert",
+      "detector_firings": [
+        15
+      ],
+      "episode_id": "cal/f3/s3060000/no_alert",
+      "firings": [
+        15
+      ],
+      "first_latency": 1,
+      "is_null": false,
+      "key": "temporary_pulse",
+      "onset": 14,
+      "sources": [
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        13
+      ],
+      "cluster": "cal/f3/s3060000",
+      "condition": "unreliable",
+      "detector_firings": [
+        19
+      ],
+      "episode_id": "cal/f3/s3060000/unreliable",
+      "firings": [
+        13,
+        19
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "temporary_pulse",
+      "onset": 14,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        19
+      ],
+      "cluster": "cal/f3/s3060001",
+      "condition": "early_accurate",
+      "detector_firings": [
+        25
+      ],
+      "episode_id": "cal/f3/s3060001/early_accurate",
+      "firings": [
+        19,
+        25
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "temporary_pulse",
+      "onset": 20,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        20
+      ],
+      "cluster": "cal/f3/s3060001",
+      "condition": "late_accurate",
+      "detector_firings": [
+        26
+      ],
+      "episode_id": "cal/f3/s3060001/late_accurate",
+      "firings": [
+        20,
+        26
+      ],
+      "first_latency": 0,
+      "is_null": false,
+      "key": "temporary_pulse",
+      "onset": 20,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "cal/f3/s3060001",
+      "condition": "no_alert",
+      "detector_firings": [
+        23
+      ],
+      "episode_id": "cal/f3/s3060001/no_alert",
+      "firings": [
+        23
+      ],
+      "first_latency": 3,
+      "is_null": false,
+      "key": "temporary_pulse",
+      "onset": 20,
+      "sources": [
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        19
+      ],
+      "cluster": "cal/f3/s3060001",
+      "condition": "unreliable",
+      "detector_firings": [
+        25
+      ],
+      "episode_id": "cal/f3/s3060001/unreliable",
+      "firings": [
+        19,
+        25
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "temporary_pulse",
+      "onset": 20,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        15
+      ],
+      "cluster": "cal/f4/s4060000",
+      "condition": "early_accurate",
+      "detector_firings": [],
+      "episode_id": "cal/f4/s4060000/early_accurate",
+      "firings": [
+        15
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "lead_time_shift",
+      "onset": 16,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        16
+      ],
+      "cluster": "cal/f4/s4060000",
+      "condition": "late_accurate",
+      "detector_firings": [],
+      "episode_id": "cal/f4/s4060000/late_accurate",
+      "firings": [
+        16
+      ],
+      "first_latency": 0,
+      "is_null": false,
+      "key": "lead_time_shift",
+      "onset": 16,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "cal/f4/s4060000",
+      "condition": "no_alert",
+      "detector_firings": [],
+      "episode_id": "cal/f4/s4060000/no_alert",
+      "firings": [],
+      "first_latency": null,
+      "is_null": false,
+      "key": "lead_time_shift",
+      "onset": 16,
+      "sources": []
+    },
+    {
+      "alert_periods": [
+        15
+      ],
+      "cluster": "cal/f4/s4060000",
+      "condition": "unreliable",
+      "detector_firings": [],
+      "episode_id": "cal/f4/s4060000/unreliable",
+      "firings": [
+        15
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "lead_time_shift",
+      "onset": 16,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        15
+      ],
+      "cluster": "cal/f4/s4060001",
+      "condition": "early_accurate",
+      "detector_firings": [],
+      "episode_id": "cal/f4/s4060001/early_accurate",
+      "firings": [
+        15
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "lead_time_shift",
+      "onset": 16,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        16
+      ],
+      "cluster": "cal/f4/s4060001",
+      "condition": "late_accurate",
+      "detector_firings": [],
+      "episode_id": "cal/f4/s4060001/late_accurate",
+      "firings": [
+        16
+      ],
+      "first_latency": 0,
+      "is_null": false,
+      "key": "lead_time_shift",
+      "onset": 16,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "cal/f4/s4060001",
+      "condition": "no_alert",
+      "detector_firings": [],
+      "episode_id": "cal/f4/s4060001/no_alert",
+      "firings": [],
+      "first_latency": null,
+      "is_null": false,
+      "key": "lead_time_shift",
+      "onset": 16,
+      "sources": []
+    },
+    {
+      "alert_periods": [
+        15
+      ],
+      "cluster": "cal/f4/s4060001",
+      "condition": "unreliable",
+      "detector_firings": [],
+      "episode_id": "cal/f4/s4060001/unreliable",
+      "firings": [
+        15
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "lead_time_shift",
+      "onset": 16,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        18
+      ],
+      "cluster": "cal/f5/s5060000",
+      "condition": "early_accurate",
+      "detector_firings": [],
+      "episode_id": "cal/f5/s5060000/early_accurate",
+      "firings": [
+        18
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "shipment_loss",
+      "onset": 19,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        19
+      ],
+      "cluster": "cal/f5/s5060000",
+      "condition": "late_accurate",
+      "detector_firings": [],
+      "episode_id": "cal/f5/s5060000/late_accurate",
+      "firings": [
+        19
+      ],
+      "first_latency": 0,
+      "is_null": false,
+      "key": "shipment_loss",
+      "onset": 19,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "cal/f5/s5060000",
+      "condition": "no_alert",
+      "detector_firings": [],
+      "episode_id": "cal/f5/s5060000/no_alert",
+      "firings": [],
+      "first_latency": null,
+      "is_null": false,
+      "key": "shipment_loss",
+      "onset": 19,
+      "sources": []
+    },
+    {
+      "alert_periods": [
+        18
+      ],
+      "cluster": "cal/f5/s5060000",
+      "condition": "unreliable",
+      "detector_firings": [],
+      "episode_id": "cal/f5/s5060000/unreliable",
+      "firings": [
+        18
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "shipment_loss",
+      "onset": 19,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        21
+      ],
+      "cluster": "cal/f5/s5060001",
+      "condition": "early_accurate",
+      "detector_firings": [],
+      "episode_id": "cal/f5/s5060001/early_accurate",
+      "firings": [
+        21
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "shipment_loss",
+      "onset": 22,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        22
+      ],
+      "cluster": "cal/f5/s5060001",
+      "condition": "late_accurate",
+      "detector_firings": [],
+      "episode_id": "cal/f5/s5060001/late_accurate",
+      "firings": [
+        22
+      ],
+      "first_latency": 0,
+      "is_null": false,
+      "key": "shipment_loss",
+      "onset": 22,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "cal/f5/s5060001",
+      "condition": "no_alert",
+      "detector_firings": [],
+      "episode_id": "cal/f5/s5060001/no_alert",
+      "firings": [],
+      "first_latency": null,
+      "is_null": false,
+      "key": "shipment_loss",
+      "onset": 22,
+      "sources": []
+    },
+    {
+      "alert_periods": [
+        21
+      ],
+      "cluster": "cal/f5/s5060001",
+      "condition": "unreliable",
+      "detector_firings": [],
+      "episode_id": "cal/f5/s5060001/unreliable",
+      "firings": [
+        21
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "shipment_loss",
+      "onset": 22,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        13
+      ],
+      "cluster": "cal/f6/s6060000",
+      "condition": "early_accurate",
+      "detector_firings": [
+        19
+      ],
+      "episode_id": "cal/f6/s6060000/early_accurate",
+      "firings": [
+        13,
+        19
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "compound",
+      "onset": 14,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        14
+      ],
+      "cluster": "cal/f6/s6060000",
+      "condition": "late_accurate",
+      "detector_firings": [
+        20
+      ],
+      "episode_id": "cal/f6/s6060000/late_accurate",
+      "firings": [
+        14,
+        20
+      ],
+      "first_latency": 0,
+      "is_null": false,
+      "key": "compound",
+      "onset": 14,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "cal/f6/s6060000",
+      "condition": "no_alert",
+      "detector_firings": [
+        18
+      ],
+      "episode_id": "cal/f6/s6060000/no_alert",
+      "firings": [
+        18
+      ],
+      "first_latency": 4,
+      "is_null": false,
+      "key": "compound",
+      "onset": 14,
+      "sources": [
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        13
+      ],
+      "cluster": "cal/f6/s6060000",
+      "condition": "unreliable",
+      "detector_firings": [
+        19
+      ],
+      "episode_id": "cal/f6/s6060000/unreliable",
+      "firings": [
+        13,
+        19
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "compound",
+      "onset": 14,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        17
+      ],
+      "cluster": "cal/f6/s6060001",
+      "condition": "early_accurate",
+      "detector_firings": [
+        23
+      ],
+      "episode_id": "cal/f6/s6060001/early_accurate",
+      "firings": [
+        17,
+        23
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "compound",
+      "onset": 18,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        18
+      ],
+      "cluster": "cal/f6/s6060001",
+      "condition": "late_accurate",
+      "detector_firings": [
+        24
+      ],
+      "episode_id": "cal/f6/s6060001/late_accurate",
+      "firings": [
+        18,
+        24
+      ],
+      "first_latency": 0,
+      "is_null": false,
+      "key": "compound",
+      "onset": 18,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "cal/f6/s6060001",
+      "condition": "no_alert",
+      "detector_firings": [
+        23
+      ],
+      "episode_id": "cal/f6/s6060001/no_alert",
+      "firings": [
+        23
+      ],
+      "first_latency": 5,
+      "is_null": false,
+      "key": "compound",
+      "onset": 18,
+      "sources": [
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        17
+      ],
+      "cluster": "cal/f6/s6060001",
+      "condition": "unreliable",
+      "detector_firings": [
+        23
+      ],
+      "episode_id": "cal/f6/s6060001/unreliable",
+      "firings": [
+        17,
+        23
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "compound",
+      "onset": 18,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        16
+      ],
+      "cluster": "dev/f1/s1050000",
+      "condition": "early_accurate",
+      "detector_firings": [
+        25
+      ],
+      "episode_id": "dev/f1/s1050000/early_accurate",
+      "firings": [
+        16,
+        25
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "demand_level:demand_up",
+      "onset": 17,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "dev/f1/s1050000",
+      "condition": "no_alert",
+      "detector_firings": [],
+      "episode_id": "dev/f1/s1050000/early_accurate__twin",
+      "firings": [],
+      "first_latency": null,
+      "is_null": true,
+      "key": "null",
+      "onset": null,
+      "sources": []
+    },
+    {
+      "alert_periods": [
+        17
+      ],
+      "cluster": "dev/f1/s1050000",
+      "condition": "late_accurate",
+      "detector_firings": [
+        25
+      ],
+      "episode_id": "dev/f1/s1050000/late_accurate",
+      "firings": [
+        17,
+        25
+      ],
+      "first_latency": 0,
+      "is_null": false,
+      "key": "demand_level:demand_up",
+      "onset": 17,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "dev/f1/s1050000",
+      "condition": "no_alert",
+      "detector_firings": [],
+      "episode_id": "dev/f1/s1050000/late_accurate__twin",
+      "firings": [],
+      "first_latency": null,
+      "is_null": true,
+      "key": "null",
+      "onset": null,
+      "sources": []
+    },
+    {
+      "alert_periods": [],
+      "cluster": "dev/f1/s1050000",
+      "condition": "no_alert",
+      "detector_firings": [
+        25,
+        31
+      ],
+      "episode_id": "dev/f1/s1050000/no_alert",
+      "firings": [
+        25,
+        31
+      ],
+      "first_latency": 8,
+      "is_null": false,
+      "key": "demand_level:demand_up",
+      "onset": 17,
+      "sources": [
+        "detector",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "dev/f1/s1050000",
+      "condition": "no_alert",
+      "detector_firings": [],
+      "episode_id": "dev/f1/s1050000/no_alert__twin",
+      "firings": [],
+      "first_latency": null,
+      "is_null": true,
+      "key": "null",
+      "onset": null,
+      "sources": []
+    },
+    {
+      "alert_periods": [
+        16
+      ],
+      "cluster": "dev/f1/s1050000",
+      "condition": "unreliable",
+      "detector_firings": [
+        25
+      ],
+      "episode_id": "dev/f1/s1050000/unreliable",
+      "firings": [
+        16,
+        25
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "demand_level:demand_up",
+      "onset": 17,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        10
+      ],
+      "cluster": "dev/f1/s1050000",
+      "condition": "unreliable",
+      "detector_firings": [],
+      "episode_id": "dev/f1/s1050000/unreliable__twin",
+      "firings": [
+        10
+      ],
+      "first_latency": null,
+      "is_null": true,
+      "key": "null",
+      "onset": null,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        15
+      ],
+      "cluster": "dev/f1/s1050001",
+      "condition": "early_accurate",
+      "detector_firings": [
+        23
+      ],
+      "episode_id": "dev/f1/s1050001/early_accurate",
+      "firings": [
+        15,
+        23
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "demand_level:demand_up",
+      "onset": 16,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "dev/f1/s1050001",
+      "condition": "no_alert",
+      "detector_firings": [],
+      "episode_id": "dev/f1/s1050001/early_accurate__twin",
+      "firings": [],
+      "first_latency": null,
+      "is_null": true,
+      "key": "null",
+      "onset": null,
+      "sources": []
+    },
+    {
+      "alert_periods": [
+        16
+      ],
+      "cluster": "dev/f1/s1050001",
+      "condition": "late_accurate",
+      "detector_firings": [
+        23
+      ],
+      "episode_id": "dev/f1/s1050001/late_accurate",
+      "firings": [
+        16,
+        23
+      ],
+      "first_latency": 0,
+      "is_null": false,
+      "key": "demand_level:demand_up",
+      "onset": 16,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "dev/f1/s1050001",
+      "condition": "no_alert",
+      "detector_firings": [],
+      "episode_id": "dev/f1/s1050001/late_accurate__twin",
+      "firings": [],
+      "first_latency": null,
+      "is_null": true,
+      "key": "null",
+      "onset": null,
+      "sources": []
+    },
+    {
+      "alert_periods": [],
+      "cluster": "dev/f1/s1050001",
+      "condition": "no_alert",
+      "detector_firings": [
+        23,
+        32
+      ],
+      "episode_id": "dev/f1/s1050001/no_alert",
+      "firings": [
+        23,
+        32
+      ],
+      "first_latency": 7,
+      "is_null": false,
+      "key": "demand_level:demand_up",
+      "onset": 16,
+      "sources": [
+        "detector",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "dev/f1/s1050001",
+      "condition": "no_alert",
+      "detector_firings": [],
+      "episode_id": "dev/f1/s1050001/no_alert__twin",
+      "firings": [],
+      "first_latency": null,
+      "is_null": true,
+      "key": "null",
+      "onset": null,
+      "sources": []
+    },
+    {
+      "alert_periods": [
+        15
+      ],
+      "cluster": "dev/f1/s1050001",
+      "condition": "unreliable",
+      "detector_firings": [
+        23
+      ],
+      "episode_id": "dev/f1/s1050001/unreliable",
+      "firings": [
+        15,
+        23
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "demand_level:demand_up",
+      "onset": 16,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        10
+      ],
+      "cluster": "dev/f1/s1050001",
+      "condition": "unreliable",
+      "detector_firings": [],
+      "episode_id": "dev/f1/s1050001/unreliable__twin",
+      "firings": [
+        10
+      ],
+      "first_latency": null,
+      "is_null": true,
+      "key": "null",
+      "onset": null,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        19
+      ],
+      "cluster": "dev/f2/s2050000",
+      "condition": "early_accurate",
+      "detector_firings": [
+        28
+      ],
+      "episode_id": "dev/f2/s2050000/early_accurate",
+      "firings": [
+        19,
+        28
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "demand_level:demand_down",
+      "onset": 20,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        10
+      ],
+      "cluster": "dev/f2/s2050000",
+      "condition": "unreliable",
+      "detector_firings": [
+        43
+      ],
+      "episode_id": "dev/f2/s2050000/early_accurate__twin",
+      "firings": [
+        10,
+        43
+      ],
+      "first_latency": null,
+      "is_null": true,
+      "key": "null",
+      "onset": null,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        20
+      ],
+      "cluster": "dev/f2/s2050000",
+      "condition": "late_accurate",
+      "detector_firings": [
+        28
+      ],
+      "episode_id": "dev/f2/s2050000/late_accurate",
+      "firings": [
+        20,
+        28
+      ],
+      "first_latency": 0,
+      "is_null": false,
+      "key": "demand_level:demand_down",
+      "onset": 20,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "dev/f2/s2050000",
+      "condition": "no_alert",
+      "detector_firings": [
+        28,
+        37
+      ],
+      "episode_id": "dev/f2/s2050000/no_alert",
+      "firings": [
+        28,
+        37
+      ],
+      "first_latency": 8,
+      "is_null": false,
+      "key": "demand_level:demand_down",
+      "onset": 20,
+      "sources": [
+        "detector",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        10
+      ],
+      "cluster": "dev/f2/s2050000",
+      "condition": "unreliable",
+      "detector_firings": [
+        43
+      ],
+      "episode_id": "dev/f2/s2050000/no_alert__twin",
+      "firings": [
+        10,
+        43
+      ],
+      "first_latency": null,
+      "is_null": true,
+      "key": "null",
+      "onset": null,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        19
+      ],
+      "cluster": "dev/f2/s2050000",
+      "condition": "unreliable",
+      "detector_firings": [
+        28
+      ],
+      "episode_id": "dev/f2/s2050000/unreliable",
+      "firings": [
+        19,
+        28
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "demand_level:demand_down",
+      "onset": 20,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        21
+      ],
+      "cluster": "dev/f2/s2050001",
+      "condition": "early_accurate",
+      "detector_firings": [
+        27
+      ],
+      "episode_id": "dev/f2/s2050001/early_accurate",
+      "firings": [
+        21,
+        27
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "demand_level:demand_down",
+      "onset": 22,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        10
+      ],
+      "cluster": "dev/f2/s2050001",
+      "condition": "unreliable",
+      "detector_firings": [],
+      "episode_id": "dev/f2/s2050001/early_accurate__twin",
+      "firings": [
+        10
+      ],
+      "first_latency": null,
+      "is_null": true,
+      "key": "null",
+      "onset": null,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        22
+      ],
+      "cluster": "dev/f2/s2050001",
+      "condition": "late_accurate",
+      "detector_firings": [
+        28
+      ],
+      "episode_id": "dev/f2/s2050001/late_accurate",
+      "firings": [
+        22,
+        28
+      ],
+      "first_latency": 0,
+      "is_null": false,
+      "key": "demand_level:demand_down",
+      "onset": 22,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "dev/f2/s2050001",
+      "condition": "no_alert",
+      "detector_firings": [
+        27,
+        44
+      ],
+      "episode_id": "dev/f2/s2050001/no_alert",
+      "firings": [
+        27,
+        44
+      ],
+      "first_latency": 5,
+      "is_null": false,
+      "key": "demand_level:demand_down",
+      "onset": 22,
+      "sources": [
+        "detector",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        10
+      ],
+      "cluster": "dev/f2/s2050001",
+      "condition": "unreliable",
+      "detector_firings": [],
+      "episode_id": "dev/f2/s2050001/no_alert__twin",
+      "firings": [
+        10
+      ],
+      "first_latency": null,
+      "is_null": true,
+      "key": "null",
+      "onset": null,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        21
+      ],
+      "cluster": "dev/f2/s2050001",
+      "condition": "unreliable",
+      "detector_firings": [
+        27
+      ],
+      "episode_id": "dev/f2/s2050001/unreliable",
+      "firings": [
+        21,
+        27
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "demand_level:demand_down",
+      "onset": 22,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        14
+      ],
+      "cluster": "dev/f3/s3050000",
+      "condition": "early_accurate",
+      "detector_firings": [],
+      "episode_id": "dev/f3/s3050000/early_accurate",
+      "firings": [
+        14
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "temporary_pulse",
+      "onset": 15,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        15
+      ],
+      "cluster": "dev/f3/s3050000",
+      "condition": "late_accurate",
+      "detector_firings": [],
+      "episode_id": "dev/f3/s3050000/late_accurate",
+      "firings": [
+        15
+      ],
+      "first_latency": 0,
+      "is_null": false,
+      "key": "temporary_pulse",
+      "onset": 15,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "dev/f3/s3050000",
+      "condition": "no_alert",
+      "detector_firings": [],
+      "episode_id": "dev/f3/s3050000/no_alert",
+      "firings": [],
+      "first_latency": null,
+      "is_null": false,
+      "key": "temporary_pulse",
+      "onset": 15,
+      "sources": []
+    },
+    {
+      "alert_periods": [
+        14
+      ],
+      "cluster": "dev/f3/s3050000",
+      "condition": "unreliable",
+      "detector_firings": [],
+      "episode_id": "dev/f3/s3050000/unreliable",
+      "firings": [
+        14
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "temporary_pulse",
+      "onset": 15,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        17
+      ],
+      "cluster": "dev/f3/s3050001",
+      "condition": "early_accurate",
+      "detector_firings": [],
+      "episode_id": "dev/f3/s3050001/early_accurate",
+      "firings": [
+        17
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "temporary_pulse",
+      "onset": 18,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        18
+      ],
+      "cluster": "dev/f3/s3050001",
+      "condition": "late_accurate",
+      "detector_firings": [],
+      "episode_id": "dev/f3/s3050001/late_accurate",
+      "firings": [
+        18
+      ],
+      "first_latency": 0,
+      "is_null": false,
+      "key": "temporary_pulse",
+      "onset": 18,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "dev/f3/s3050001",
+      "condition": "no_alert",
+      "detector_firings": [],
+      "episode_id": "dev/f3/s3050001/no_alert",
+      "firings": [],
+      "first_latency": null,
+      "is_null": false,
+      "key": "temporary_pulse",
+      "onset": 18,
+      "sources": []
+    },
+    {
+      "alert_periods": [
+        17
+      ],
+      "cluster": "dev/f3/s3050001",
+      "condition": "unreliable",
+      "detector_firings": [],
+      "episode_id": "dev/f3/s3050001/unreliable",
+      "firings": [
+        17
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "temporary_pulse",
+      "onset": 18,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        19
+      ],
+      "cluster": "dev/f4/s4050000",
+      "condition": "early_accurate",
+      "detector_firings": [],
+      "episode_id": "dev/f4/s4050000/early_accurate",
+      "firings": [
+        19
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "lead_time_shift",
+      "onset": 20,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        20
+      ],
+      "cluster": "dev/f4/s4050000",
+      "condition": "late_accurate",
+      "detector_firings": [],
+      "episode_id": "dev/f4/s4050000/late_accurate",
+      "firings": [
+        20
+      ],
+      "first_latency": 0,
+      "is_null": false,
+      "key": "lead_time_shift",
+      "onset": 20,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "dev/f4/s4050000",
+      "condition": "no_alert",
+      "detector_firings": [],
+      "episode_id": "dev/f4/s4050000/no_alert",
+      "firings": [],
+      "first_latency": null,
+      "is_null": false,
+      "key": "lead_time_shift",
+      "onset": 20,
+      "sources": []
+    },
+    {
+      "alert_periods": [
+        19
+      ],
+      "cluster": "dev/f4/s4050000",
+      "condition": "unreliable",
+      "detector_firings": [],
+      "episode_id": "dev/f4/s4050000/unreliable",
+      "firings": [
+        19
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "lead_time_shift",
+      "onset": 20,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        17
+      ],
+      "cluster": "dev/f4/s4050001",
+      "condition": "early_accurate",
+      "detector_firings": [],
+      "episode_id": "dev/f4/s4050001/early_accurate",
+      "firings": [
+        17
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "lead_time_shift",
+      "onset": 18,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        18
+      ],
+      "cluster": "dev/f4/s4050001",
+      "condition": "late_accurate",
+      "detector_firings": [],
+      "episode_id": "dev/f4/s4050001/late_accurate",
+      "firings": [
+        18
+      ],
+      "first_latency": 0,
+      "is_null": false,
+      "key": "lead_time_shift",
+      "onset": 18,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "dev/f4/s4050001",
+      "condition": "no_alert",
+      "detector_firings": [],
+      "episode_id": "dev/f4/s4050001/no_alert",
+      "firings": [],
+      "first_latency": null,
+      "is_null": false,
+      "key": "lead_time_shift",
+      "onset": 18,
+      "sources": []
+    },
+    {
+      "alert_periods": [
+        17
+      ],
+      "cluster": "dev/f4/s4050001",
+      "condition": "unreliable",
+      "detector_firings": [],
+      "episode_id": "dev/f4/s4050001/unreliable",
+      "firings": [
+        17
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "lead_time_shift",
+      "onset": 18,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        20
+      ],
+      "cluster": "dev/f5/s5050000",
+      "condition": "early_accurate",
+      "detector_firings": [],
+      "episode_id": "dev/f5/s5050000/early_accurate",
+      "firings": [
+        20
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "shipment_loss",
+      "onset": 21,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        21
+      ],
+      "cluster": "dev/f5/s5050000",
+      "condition": "late_accurate",
+      "detector_firings": [],
+      "episode_id": "dev/f5/s5050000/late_accurate",
+      "firings": [
+        21
+      ],
+      "first_latency": 0,
+      "is_null": false,
+      "key": "shipment_loss",
+      "onset": 21,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "dev/f5/s5050000",
+      "condition": "no_alert",
+      "detector_firings": [],
+      "episode_id": "dev/f5/s5050000/no_alert",
+      "firings": [],
+      "first_latency": null,
+      "is_null": false,
+      "key": "shipment_loss",
+      "onset": 21,
+      "sources": []
+    },
+    {
+      "alert_periods": [
+        20
+      ],
+      "cluster": "dev/f5/s5050000",
+      "condition": "unreliable",
+      "detector_firings": [],
+      "episode_id": "dev/f5/s5050000/unreliable",
+      "firings": [
+        20
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "shipment_loss",
+      "onset": 21,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        15
+      ],
+      "cluster": "dev/f5/s5050001",
+      "condition": "early_accurate",
+      "detector_firings": [],
+      "episode_id": "dev/f5/s5050001/early_accurate",
+      "firings": [
+        15
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "shipment_loss",
+      "onset": 16,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        16
+      ],
+      "cluster": "dev/f5/s5050001",
+      "condition": "late_accurate",
+      "detector_firings": [],
+      "episode_id": "dev/f5/s5050001/late_accurate",
+      "firings": [
+        16
+      ],
+      "first_latency": 0,
+      "is_null": false,
+      "key": "shipment_loss",
+      "onset": 16,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "dev/f5/s5050001",
+      "condition": "no_alert",
+      "detector_firings": [],
+      "episode_id": "dev/f5/s5050001/no_alert",
+      "firings": [],
+      "first_latency": null,
+      "is_null": false,
+      "key": "shipment_loss",
+      "onset": 16,
+      "sources": []
+    },
+    {
+      "alert_periods": [
+        15
+      ],
+      "cluster": "dev/f5/s5050001",
+      "condition": "unreliable",
+      "detector_firings": [],
+      "episode_id": "dev/f5/s5050001/unreliable",
+      "firings": [
+        15
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "shipment_loss",
+      "onset": 16,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        18
+      ],
+      "cluster": "dev/f6/s6050000",
+      "condition": "early_accurate",
+      "detector_firings": [],
+      "episode_id": "dev/f6/s6050000/early_accurate",
+      "firings": [
+        18
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "compound",
+      "onset": 19,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        19
+      ],
+      "cluster": "dev/f6/s6050000",
+      "condition": "late_accurate",
+      "detector_firings": [],
+      "episode_id": "dev/f6/s6050000/late_accurate",
+      "firings": [
+        19
+      ],
+      "first_latency": 0,
+      "is_null": false,
+      "key": "compound",
+      "onset": 19,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "dev/f6/s6050000",
+      "condition": "no_alert",
+      "detector_firings": [
+        22
+      ],
+      "episode_id": "dev/f6/s6050000/no_alert",
+      "firings": [
+        22
+      ],
+      "first_latency": 3,
+      "is_null": false,
+      "key": "compound",
+      "onset": 19,
+      "sources": [
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        18
+      ],
+      "cluster": "dev/f6/s6050000",
+      "condition": "unreliable",
+      "detector_firings": [],
+      "episode_id": "dev/f6/s6050000/unreliable",
+      "firings": [
+        18
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "compound",
+      "onset": 19,
+      "sources": [
+        "alert"
+      ]
+    },
+    {
+      "alert_periods": [
+        19
+      ],
+      "cluster": "dev/f6/s6050001",
+      "condition": "early_accurate",
+      "detector_firings": [
+        25
+      ],
+      "episode_id": "dev/f6/s6050001/early_accurate",
+      "firings": [
+        19,
+        25
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "compound",
+      "onset": 20,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        20
+      ],
+      "cluster": "dev/f6/s6050001",
+      "condition": "late_accurate",
+      "detector_firings": [
+        26
+      ],
+      "episode_id": "dev/f6/s6050001/late_accurate",
+      "firings": [
+        20,
+        26
+      ],
+      "first_latency": 0,
+      "is_null": false,
+      "key": "compound",
+      "onset": 20,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [],
+      "cluster": "dev/f6/s6050001",
+      "condition": "no_alert",
+      "detector_firings": [
+        25
+      ],
+      "episode_id": "dev/f6/s6050001/no_alert",
+      "firings": [
+        25
+      ],
+      "first_latency": 5,
+      "is_null": false,
+      "key": "compound",
+      "onset": 20,
+      "sources": [
+        "detector"
+      ]
+    },
+    {
+      "alert_periods": [
+        19
+      ],
+      "cluster": "dev/f6/s6050001",
+      "condition": "unreliable",
+      "detector_firings": [
+        25
+      ],
+      "episode_id": "dev/f6/s6050001/unreliable",
+      "firings": [
+        19,
+        25
+      ],
+      "first_latency": -1,
+      "is_null": false,
+      "key": "compound",
+      "onset": 20,
+      "sources": [
+        "alert",
+        "detector"
+      ]
+    }
+  ],
+  "observability_per_seed": [
+    {
+      "arrival_residual_decision_period": null,
+      "arrival_residual_latency": null,
+      "episode_id": "cal/f1/s1060000/early_accurate",
+      "family": 1,
+      "is_null": false,
+      "loss_signal_decision_period": null,
+      "loss_signal_latency": null,
+      "onset": 18,
+      "promised_lead_time": 2
+    },
+    {
+      "arrival_residual_decision_period": null,
+      "arrival_residual_latency": null,
+      "episode_id": "cal/f1/s1060000/early_accurate__twin",
+      "family": 1,
+      "is_null": true,
+      "loss_signal_decision_period": null,
+      "loss_signal_latency": null,
+      "onset": null,
+      "promised_lead_time": 2
+    },
+    {
+      "arrival_residual_decision_period": null,
+      "arrival_residual_latency": null,
+      "episode_id": "cal/f1/s1060001/early_accurate",
+      "family": 1,
+      "is_null": false,
+      "loss_signal_decision_period": null,
+      "loss_signal_latency": null,
+      "onset": 22,
+      "promised_lead_time": 2
+    },
+    {
+      "arrival_residual_decision_period": null,
+      "arrival_residual_latency": null,
+      "episode_id": "cal/f1/s1060001/early_accurate__twin",
+      "family": 1,
+      "is_null": true,
+      "loss_signal_decision_period": null,
+      "loss_signal_latency": null,
+      "onset": null,
+      "promised_lead_time": 2
+    },
+    {
+      "arrival_residual_decision_period": null,
+      "arrival_residual_latency": null,
+      "episode_id": "cal/f2/s2060000/early_accurate",
+      "family": 2,
+      "is_null": false,
+      "loss_signal_decision_period": null,
+      "loss_signal_latency": null,
+      "onset": 17,
+      "promised_lead_time": 2
+    },
+    {
+      "arrival_residual_decision_period": null,
+      "arrival_residual_latency": null,
+      "episode_id": "cal/f2/s2060000/early_accurate__twin",
+      "family": 2,
+      "is_null": true,
+      "loss_signal_decision_period": null,
+      "loss_signal_latency": null,
+      "onset": null,
+      "promised_lead_time": 2
+    },
+    {
+      "arrival_residual_decision_period": null,
+      "arrival_residual_latency": null,
+      "episode_id": "cal/f2/s2060001/early_accurate",
+      "family": 2,
+      "is_null": false,
+      "loss_signal_decision_period": null,
+      "loss_signal_latency": null,
+      "onset": 22,
+      "promised_lead_time": 2
+    },
+    {
+      "arrival_residual_decision_period": null,
+      "arrival_residual_latency": null,
+      "episode_id": "cal/f2/s2060001/early_accurate__twin",
+      "family": 2,
+      "is_null": true,
+      "loss_signal_decision_period": null,
+      "loss_signal_latency": null,
+      "onset": null,
+      "promised_lead_time": 2
+    },
+    {
+      "arrival_residual_decision_period": null,
+      "arrival_residual_latency": null,
+      "episode_id": "cal/f3/s3060000/early_accurate",
+      "family": 3,
+      "is_null": false,
+      "loss_signal_decision_period": null,
+      "loss_signal_latency": null,
+      "onset": 14,
+      "promised_lead_time": 2
+    },
+    {
+      "arrival_residual_decision_period": null,
+      "arrival_residual_latency": null,
+      "episode_id": "cal/f3/s3060001/early_accurate",
+      "family": 3,
+      "is_null": false,
+      "loss_signal_decision_period": null,
+      "loss_signal_latency": null,
+      "onset": 20,
+      "promised_lead_time": 2
+    },
+    {
+      "arrival_residual_decision_period": 18,
+      "arrival_residual_latency": 2,
+      "episode_id": "cal/f4/s4060000/early_accurate",
+      "family": 4,
+      "is_null": false,
+      "loss_signal_decision_period": null,
+      "loss_signal_latency": null,
+      "onset": 16,
+      "promised_lead_time": 1
+    },
+    {
+      "arrival_residual_decision_period": 19,
+      "arrival_residual_latency": 3,
+      "episode_id": "cal/f4/s4060001/early_accurate",
+      "family": 4,
+      "is_null": false,
+      "loss_signal_decision_period": null,
+      "loss_signal_latency": null,
+      "onset": 16,
+      "promised_lead_time": 2
+    },
+    {
+      "arrival_residual_decision_period": 22,
+      "arrival_residual_latency": 3,
+      "episode_id": "cal/f5/s5060000/early_accurate",
+      "family": 5,
+      "is_null": false,
+      "loss_signal_decision_period": 20,
+      "loss_signal_latency": 1,
+      "onset": 19,
+      "promised_lead_time": 2
+    },
+    {
+      "arrival_residual_decision_period": 25,
+      "arrival_residual_latency": 3,
+      "episode_id": "cal/f5/s5060001/early_accurate",
+      "family": 5,
+      "is_null": false,
+      "loss_signal_decision_period": 23,
+      "loss_signal_latency": 1,
+      "onset": 22,
+      "promised_lead_time": 2
+    },
+    {
+      "arrival_residual_decision_period": 16,
+      "arrival_residual_latency": 2,
+      "episode_id": "cal/f6/s6060000/early_accurate",
+      "family": 6,
+      "is_null": false,
+      "loss_signal_decision_period": null,
+      "loss_signal_latency": null,
+      "onset": 14,
+      "promised_lead_time": 2
+    },
+    {
+      "arrival_residual_decision_period": 20,
+      "arrival_residual_latency": 2,
+      "episode_id": "cal/f6/s6060001/early_accurate",
+      "family": 6,
+      "is_null": false,
+      "loss_signal_decision_period": null,
+      "loss_signal_latency": null,
+      "onset": 18,
+      "promised_lead_time": 2
+    },
+    {
+      "arrival_residual_decision_period": null,
+      "arrival_residual_latency": null,
+      "episode_id": "dev/f1/s1050000/early_accurate",
+      "family": 1,
+      "is_null": false,
+      "loss_signal_decision_period": null,
+      "loss_signal_latency": null,
+      "onset": 17,
+      "promised_lead_time": 2
+    },
+    {
+      "arrival_residual_decision_period": null,
+      "arrival_residual_latency": null,
+      "episode_id": "dev/f1/s1050000/early_accurate__twin",
+      "family": 1,
+      "is_null": true,
+      "loss_signal_decision_period": null,
+      "loss_signal_latency": null,
+      "onset": null,
+      "promised_lead_time": 2
+    },
+    {
+      "arrival_residual_decision_period": null,
+      "arrival_residual_latency": null,
+      "episode_id": "dev/f1/s1050001/early_accurate",
+      "family": 1,
+      "is_null": false,
+      "loss_signal_decision_period": null,
+      "loss_signal_latency": null,
+      "onset": 16,
+      "promised_lead_time": 2
+    },
+    {
+      "arrival_residual_decision_period": null,
+      "arrival_residual_latency": null,
+      "episode_id": "dev/f1/s1050001/early_accurate__twin",
+      "family": 1,
+      "is_null": true,
+      "loss_signal_decision_period": null,
+      "loss_signal_latency": null,
+      "onset": null,
+      "promised_lead_time": 2
+    },
+    {
+      "arrival_residual_decision_period": null,
+      "arrival_residual_latency": null,
+      "episode_id": "dev/f2/s2050000/early_accurate",
+      "family": 2,
+      "is_null": false,
+      "loss_signal_decision_period": null,
+      "loss_signal_latency": null,
+      "onset": 20,
+      "promised_lead_time": 2
+    },
+    {
+      "arrival_residual_decision_period": null,
+      "arrival_residual_latency": null,
+      "episode_id": "dev/f2/s2050000/early_accurate__twin",
+      "family": 2,
+      "is_null": true,
+      "loss_signal_decision_period": null,
+      "loss_signal_latency": null,
+      "onset": null,
+      "promised_lead_time": 2
+    },
+    {
+      "arrival_residual_decision_period": null,
+      "arrival_residual_latency": null,
+      "episode_id": "dev/f2/s2050001/early_accurate",
+      "family": 2,
+      "is_null": false,
+      "loss_signal_decision_period": null,
+      "loss_signal_latency": null,
+      "onset": 22,
+      "promised_lead_time": 2
+    },
+    {
+      "arrival_residual_decision_period": null,
+      "arrival_residual_latency": null,
+      "episode_id": "dev/f2/s2050001/early_accurate__twin",
+      "family": 2,
+      "is_null": true,
+      "loss_signal_decision_period": null,
+      "loss_signal_latency": null,
+      "onset": null,
+      "promised_lead_time": 2
+    },
+    {
+      "arrival_residual_decision_period": null,
+      "arrival_residual_latency": null,
+      "episode_id": "dev/f3/s3050000/early_accurate",
+      "family": 3,
+      "is_null": false,
+      "loss_signal_decision_period": null,
+      "loss_signal_latency": null,
+      "onset": 15,
+      "promised_lead_time": 2
+    },
+    {
+      "arrival_residual_decision_period": null,
+      "arrival_residual_latency": null,
+      "episode_id": "dev/f3/s3050001/early_accurate",
+      "family": 3,
+      "is_null": false,
+      "loss_signal_decision_period": null,
+      "loss_signal_latency": null,
+      "onset": 18,
+      "promised_lead_time": 2
+    },
+    {
+      "arrival_residual_decision_period": 22,
+      "arrival_residual_latency": 2,
+      "episode_id": "dev/f4/s4050000/early_accurate",
+      "family": 4,
+      "is_null": false,
+      "loss_signal_decision_period": null,
+      "loss_signal_latency": null,
+      "onset": 20,
+      "promised_lead_time": 1
+    },
+    {
+      "arrival_residual_decision_period": 21,
+      "arrival_residual_latency": 3,
+      "episode_id": "dev/f4/s4050001/early_accurate",
+      "family": 4,
+      "is_null": false,
+      "loss_signal_decision_period": null,
+      "loss_signal_latency": null,
+      "onset": 18,
+      "promised_lead_time": 2
+    },
+    {
+      "arrival_residual_decision_period": 24,
+      "arrival_residual_latency": 3,
+      "episode_id": "dev/f5/s5050000/early_accurate",
+      "family": 5,
+      "is_null": false,
+      "loss_signal_decision_period": 22,
+      "loss_signal_latency": 1,
+      "onset": 21,
+      "promised_lead_time": 2
+    },
+    {
+      "arrival_residual_decision_period": 19,
+      "arrival_residual_latency": 3,
+      "episode_id": "dev/f5/s5050001/early_accurate",
+      "family": 5,
+      "is_null": false,
+      "loss_signal_decision_period": 17,
+      "loss_signal_latency": 1,
+      "onset": 16,
+      "promised_lead_time": 2
+    },
+    {
+      "arrival_residual_decision_period": 21,
+      "arrival_residual_latency": 2,
+      "episode_id": "dev/f6/s6050000/early_accurate",
+      "family": 6,
+      "is_null": false,
+      "loss_signal_decision_period": null,
+      "loss_signal_latency": null,
+      "onset": 19,
+      "promised_lead_time": 2
+    },
+    {
+      "arrival_residual_decision_period": 22,
+      "arrival_residual_latency": 2,
+      "episode_id": "dev/f6/s6050001/early_accurate",
+      "family": 6,
+      "is_null": false,
+      "loss_signal_decision_period": null,
+      "loss_signal_latency": null,
+      "onset": 20,
+      "promised_lead_time": 2
+    }
+  ],
+  "provenance": "scripted transport (scripted-fake-7b, one fixed demand_up/medium ShockSpec payload) and demo alerts, through the real frozen arms, parser, compiler, verifier, and ledger",
+  "summary": {
+    "arrival_observability": {
+      "by_family": {
+        "1": {
+          "arrival_residual_latency": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "loss_signal_latency": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "seeds": 4
+        },
+        "2": {
+          "arrival_residual_latency": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "loss_signal_latency": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "seeds": 4
+        },
+        "3": {
+          "arrival_residual_latency": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "loss_signal_latency": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "seeds": 4
+        },
+        "4": {
+          "arrival_residual_latency": [
+            2,
+            3,
+            2,
+            3
+          ],
+          "loss_signal_latency": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "seeds": 4
+        },
+        "5": {
+          "arrival_residual_latency": [
+            3,
+            3,
+            3,
+            3
+          ],
+          "loss_signal_latency": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "seeds": 4
+        },
+        "6": {
+          "arrival_residual_latency": [
+            2,
+            2,
+            2,
+            2
+          ],
+          "loss_signal_latency": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "seeds": 4
+        }
+      },
+      "false_signals_on_demand_families_and_twins": 0,
+      "identity_violations": 0,
+      "trajectories_checked": 32
+    },
+    "detector_power_no_alert": {
+      "compound": {
+        "distinct_seeds": 4,
+        "fired_at_all": 4,
+        "fired_at_or_after_onset": 4,
+        "latencies": [
+          3,
+          4,
+          5,
+          5
+        ]
+      },
+      "demand_level:demand_down": {
+        "distinct_seeds": 4,
+        "fired_at_all": 4,
+        "fired_at_or_after_onset": 4,
+        "latencies": [
+          5,
+          5,
+          8,
+          15
+        ]
+      },
+      "demand_level:demand_up": {
+        "distinct_seeds": 4,
+        "fired_at_all": 4,
+        "fired_at_or_after_onset": 4,
+        "latencies": [
+          3,
+          7,
+          8,
+          14
+        ]
+      },
+      "lead_time_shift": {
+        "distinct_seeds": 4,
+        "fired_at_all": 0,
+        "fired_at_or_after_onset": 0,
+        "latencies": []
+      },
+      "null": {
+        "distinct_seeds": 4,
+        "fired_at_all": 0,
+        "fired_at_or_after_onset": 0,
+        "latencies": []
+      },
+      "shipment_loss": {
+        "distinct_seeds": 4,
+        "fired_at_all": 0,
+        "fired_at_or_after_onset": 0,
+        "latencies": []
+      },
+      "temporary_pulse": {
+        "distinct_seeds": 4,
+        "fired_at_all": 2,
+        "fired_at_or_after_onset": 2,
+        "latencies": [
+          1,
+          3
+        ]
+      }
+    },
+    "firing_table": {
+      "compound": {
+        "early_accurate": {
+          "detector_firings_before_onset": 0,
+          "episodes": 4,
+          "fired": 4,
+          "firings_per_episode": 1.75,
+          "first_firing_source": {
+            "alert": 4,
+            "detector": 0
+          },
+          "first_latency": [
+            -1,
+            -1,
+            -1,
+            -1
+          ]
+        },
+        "late_accurate": {
+          "detector_firings_before_onset": 0,
+          "episodes": 4,
+          "fired": 4,
+          "firings_per_episode": 1.75,
+          "first_firing_source": {
+            "alert": 4,
+            "detector": 0
+          },
+          "first_latency": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "no_alert": {
+          "detector_firings_before_onset": 0,
+          "episodes": 4,
+          "fired": 4,
+          "firings_per_episode": 1.0,
+          "first_firing_source": {
+            "alert": 0,
+            "detector": 4
+          },
+          "first_latency": [
+            4,
+            5,
+            3,
+            5
+          ]
+        },
+        "unreliable": {
+          "detector_firings_before_onset": 0,
+          "episodes": 4,
+          "fired": 4,
+          "firings_per_episode": 1.75,
+          "first_firing_source": {
+            "alert": 4,
+            "detector": 0
+          },
+          "first_latency": [
+            -1,
+            -1,
+            -1,
+            -1
+          ]
+        }
+      },
+      "demand_level:demand_down": {
+        "early_accurate": {
+          "detector_firings_before_onset": 0,
+          "episodes": 4,
+          "fired": 4,
+          "firings_per_episode": 2.0,
+          "first_firing_source": {
+            "alert": 4,
+            "detector": 0
+          },
+          "first_latency": [
+            -1,
+            -1,
+            -1,
+            -1
+          ]
+        },
+        "late_accurate": {
+          "detector_firings_before_onset": 0,
+          "episodes": 4,
+          "fired": 4,
+          "firings_per_episode": 2.0,
+          "first_firing_source": {
+            "alert": 4,
+            "detector": 0
+          },
+          "first_latency": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "no_alert": {
+          "detector_firings_before_onset": 0,
+          "episodes": 4,
+          "fired": 4,
+          "firings_per_episode": 2.0,
+          "first_firing_source": {
+            "alert": 0,
+            "detector": 4
+          },
+          "first_latency": [
+            5,
+            15,
+            8,
+            5
+          ]
+        },
+        "unreliable": {
+          "detector_firings_before_onset": 0,
+          "episodes": 4,
+          "fired": 4,
+          "firings_per_episode": 2.0,
+          "first_firing_source": {
+            "alert": 4,
+            "detector": 0
+          },
+          "first_latency": [
+            -1,
+            -1,
+            -1,
+            -1
+          ]
+        }
+      },
+      "demand_level:demand_up": {
+        "early_accurate": {
+          "detector_firings_before_onset": 0,
+          "episodes": 4,
+          "fired": 4,
+          "firings_per_episode": 2.0,
+          "first_firing_source": {
+            "alert": 4,
+            "detector": 0
+          },
+          "first_latency": [
+            -1,
+            -1,
+            -1,
+            -1
+          ]
+        },
+        "late_accurate": {
+          "detector_firings_before_onset": 0,
+          "episodes": 4,
+          "fired": 4,
+          "firings_per_episode": 2.0,
+          "first_firing_source": {
+            "alert": 4,
+            "detector": 0
+          },
+          "first_latency": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "no_alert": {
+          "detector_firings_before_onset": 0,
+          "episodes": 4,
+          "fired": 4,
+          "firings_per_episode": 2.0,
+          "first_firing_source": {
+            "alert": 0,
+            "detector": 4
+          },
+          "first_latency": [
+            3,
+            14,
+            8,
+            7
+          ]
+        },
+        "unreliable": {
+          "detector_firings_before_onset": 0,
+          "episodes": 4,
+          "fired": 4,
+          "firings_per_episode": 2.0,
+          "first_firing_source": {
+            "alert": 4,
+            "detector": 0
+          },
+          "first_latency": [
+            -1,
+            -1,
+            -1,
+            -1
+          ]
+        }
+      },
+      "lead_time_shift": {
+        "early_accurate": {
+          "detector_firings_before_onset": 0,
+          "episodes": 4,
+          "fired": 4,
+          "firings_per_episode": 1.0,
+          "first_firing_source": {
+            "alert": 4,
+            "detector": 0
+          },
+          "first_latency": [
+            -1,
+            -1,
+            -1,
+            -1
+          ]
+        },
+        "late_accurate": {
+          "detector_firings_before_onset": 0,
+          "episodes": 4,
+          "fired": 4,
+          "firings_per_episode": 1.0,
+          "first_firing_source": {
+            "alert": 4,
+            "detector": 0
+          },
+          "first_latency": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "no_alert": {
+          "detector_firings_before_onset": 0,
+          "episodes": 4,
+          "fired": 0,
+          "firings_per_episode": 0.0,
+          "first_firing_source": {
+            "alert": 0,
+            "detector": 0
+          },
+          "first_latency": []
+        },
+        "unreliable": {
+          "detector_firings_before_onset": 0,
+          "episodes": 4,
+          "fired": 4,
+          "firings_per_episode": 1.0,
+          "first_firing_source": {
+            "alert": 4,
+            "detector": 0
+          },
+          "first_latency": [
+            -1,
+            -1,
+            -1,
+            -1
+          ]
+        }
+      },
+      "null": {
+        "no_alert": {
+          "detector_firings_before_onset": 0,
+          "episodes": 12,
+          "fired": 0,
+          "firings_per_episode": 0.0,
+          "first_firing_source": {
+            "alert": 0,
+            "detector": 0
+          },
+          "first_latency": []
+        },
+        "unreliable": {
+          "detector_firings_before_onset": 0,
+          "episodes": 12,
+          "fired": 12,
+          "firings_per_episode": 1.1666666666666667,
+          "first_firing_source": {
+            "alert": 12,
+            "detector": 0
+          },
+          "first_latency": []
+        }
+      },
+      "shipment_loss": {
+        "early_accurate": {
+          "detector_firings_before_onset": 0,
+          "episodes": 4,
+          "fired": 4,
+          "firings_per_episode": 1.0,
+          "first_firing_source": {
+            "alert": 4,
+            "detector": 0
+          },
+          "first_latency": [
+            -1,
+            -1,
+            -1,
+            -1
+          ]
+        },
+        "late_accurate": {
+          "detector_firings_before_onset": 0,
+          "episodes": 4,
+          "fired": 4,
+          "firings_per_episode": 1.0,
+          "first_firing_source": {
+            "alert": 4,
+            "detector": 0
+          },
+          "first_latency": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "no_alert": {
+          "detector_firings_before_onset": 0,
+          "episodes": 4,
+          "fired": 0,
+          "firings_per_episode": 0.0,
+          "first_firing_source": {
+            "alert": 0,
+            "detector": 0
+          },
+          "first_latency": []
+        },
+        "unreliable": {
+          "detector_firings_before_onset": 0,
+          "episodes": 4,
+          "fired": 4,
+          "firings_per_episode": 1.0,
+          "first_firing_source": {
+            "alert": 4,
+            "detector": 0
+          },
+          "first_latency": [
+            -1,
+            -1,
+            -1,
+            -1
+          ]
+        }
+      },
+      "temporary_pulse": {
+        "early_accurate": {
+          "detector_firings_before_onset": 0,
+          "episodes": 4,
+          "fired": 4,
+          "firings_per_episode": 1.5,
+          "first_firing_source": {
+            "alert": 4,
+            "detector": 0
+          },
+          "first_latency": [
+            -1,
+            -1,
+            -1,
+            -1
+          ]
+        },
+        "late_accurate": {
+          "detector_firings_before_onset": 0,
+          "episodes": 4,
+          "fired": 4,
+          "firings_per_episode": 1.5,
+          "first_firing_source": {
+            "alert": 4,
+            "detector": 0
+          },
+          "first_latency": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "no_alert": {
+          "detector_firings_before_onset": 0,
+          "episodes": 4,
+          "fired": 2,
+          "firings_per_episode": 0.5,
+          "first_firing_source": {
+            "alert": 0,
+            "detector": 2
+          },
+          "first_latency": [
+            1,
+            3
+          ]
+        },
+        "unreliable": {
+          "detector_firings_before_onset": 0,
+          "episodes": 4,
+          "fired": 4,
+          "firings_per_episode": 1.5,
+          "first_firing_source": {
+            "alert": 4,
+            "detector": 0
+          },
+          "first_latency": [
+            -1,
+            -1,
+            -1,
+            -1
+          ]
+        }
+      }
+    },
+    "first_firing_source": {
+      "alert": 84,
+      "detector": 14,
+      "none": 22
+    },
+    "gap_by_actionability": {
+      "demand_visible": {
+        "categories": {
+          "activated": 30,
+          "blocked": 32,
+          "no_fire": 2
+        },
+        "contribution_gross": -212.06666666666666,
+        "contribution_net": 1644.0083333333334,
+        "n": 64,
+        "seed_cluster_interval_gross": [
+          -323.8066749379653,
+          -99.95934523809531
+        ],
+        "seed_cluster_interval_net": [
+          1085.2192527576,
+          2270.0473025121064
+        ],
+        "share_of_total_gross": 0.37498526464694093,
+        "share_of_total_net": 0.7127950543951498
+      },
+      "null": {
+        "categories": {
+          "activated": 1,
+          "blocked": 11,
+          "no_fire": 12
+        },
+        "contribution_gross": -52.3,
+        "contribution_net": 460.34166666666664,
+        "n": 24,
+        "seed_cluster_interval_gross": [
+          -83.50055970149253,
+          -23.74074074074074
+        ],
+        "seed_cluster_interval_net": [
+          207.3,
+          713.9685461956519
+        ],
+        "share_of_total_gross": 0.09247907579865614,
+        "share_of_total_net": 0.19959099761174398
+      },
+      "supply_alert_only": {
+        "categories": {
+          "blocked": 24
+        },
+        "contribution_gross": -301.1666666666667,
+        "contribution_net": 202.075,
+        "n": 24,
+        "seed_cluster_interval_gross": [
+          -580.1796610169491,
+          -84.83870967741936
+        ],
+        "seed_cluster_interval_net": [
+          -144.46314484126984,
+          590.5336206896546
+        ],
+        "share_of_total_gross": 0.532535659554403,
+        "share_of_total_net": 0.0876139479931062
+      },
+      "supply_no_alert": {
+        "categories": {
+          "no_fire": 8
+        },
+        "contribution_gross": 0.0,
+        "contribution_net": 0.0,
+        "n": 8,
+        "seed_cluster_interval_gross": [
+          0.0,
+          0.0
+        ],
+        "seed_cluster_interval_net": [
+          0.0,
+          0.0
+        ],
+        "share_of_total_gross": -0.0,
+        "share_of_total_net": 0.0
+      },
+      "total_gross": -565.5333333333333,
+      "total_net": 2306.425
+    },
+    "gap_by_cell": {
+      "cells": {
+        "compound": {
+          "early_accurate": {
+            "contribution_gross": -7.266666666666667,
+            "contribution_net": 117.73333333333333,
+            "fired": 4,
+            "n": 4
+          },
+          "late_accurate": {
+            "contribution_gross": -4.266666666666667,
+            "contribution_net": 134.35833333333332,
+            "fired": 4,
+            "n": 4
+          },
+          "no_alert": {
+            "contribution_gross": -4.266666666666667,
+            "contribution_net": 135.15,
+            "fired": 4,
+            "n": 4
+          },
+          "unreliable": {
+            "contribution_gross": -7.266666666666667,
+            "contribution_net": 117.73333333333333,
+            "fired": 4,
+            "n": 4
+          }
+        },
+        "demand_level:demand_down": {
+          "early_accurate": {
+            "contribution_gross": -0.3333333333333333,
+            "contribution_net": 127.56666666666666,
+            "fired": 4,
+            "n": 4
+          },
+          "late_accurate": {
+            "contribution_gross": -0.3333333333333333,
+            "contribution_net": 126.24166666666666,
+            "fired": 4,
+            "n": 4
+          },
+          "no_alert": {
+            "contribution_gross": -0.3333333333333333,
+            "contribution_net": 89.44166666666666,
+            "fired": 4,
+            "n": 4
+          },
+          "unreliable": {
+            "contribution_gross": -0.3333333333333333,
+            "contribution_net": 127.56666666666666,
+            "fired": 4,
+            "n": 4
+          }
+        },
+        "demand_level:demand_up": {
+          "early_accurate": {
+            "contribution_gross": -42.56666666666667,
+            "contribution_net": 50.84166666666667,
+            "fired": 4,
+            "n": 4
+          },
+          "late_accurate": {
+            "contribution_gross": -40.333333333333336,
+            "contribution_net": 48.85,
+            "fired": 4,
+            "n": 4
+          },
+          "no_alert": {
+            "contribution_gross": -24.333333333333332,
+            "contribution_net": 45.44166666666667,
+            "fired": 4,
+            "n": 4
+          },
+          "unreliable": {
+            "contribution_gross": -42.56666666666667,
+            "contribution_net": 50.84166666666667,
+            "fired": 4,
+            "n": 4
+          }
+        },
+        "lead_time_shift": {
+          "early_accurate": {
+            "contribution_gross": -86.43333333333334,
+            "contribution_net": -37.21666666666667,
+            "fired": 4,
+            "n": 4
+          },
+          "late_accurate": {
+            "contribution_gross": -81.16666666666667,
+            "contribution_net": -33.3,
+            "fired": 4,
+            "n": 4
+          },
+          "no_alert": {
+            "contribution_gross": 0.0,
+            "contribution_net": 0.0,
+            "fired": 0,
+            "n": 4
+          },
+          "unreliable": {
+            "contribution_gross": -86.43333333333334,
+            "contribution_net": -37.21666666666667,
+            "fired": 4,
+            "n": 4
+          }
+        },
+        "null": {
+          "no_alert": {
+            "contribution_gross": 0.0,
+            "contribution_net": 0.0,
+            "fired": 0,
+            "n": 12
+          },
+          "unreliable": {
+            "contribution_gross": -52.3,
+            "contribution_net": 460.34166666666664,
+            "fired": 12,
+            "n": 12
+          }
+        },
+        "shipment_loss": {
+          "early_accurate": {
+            "contribution_gross": -17.666666666666668,
+            "contribution_net": 102.21666666666667,
+            "fired": 4,
+            "n": 4
+          },
+          "late_accurate": {
+            "contribution_gross": -11.8,
+            "contribution_net": 105.375,
+            "fired": 4,
+            "n": 4
+          },
+          "no_alert": {
+            "contribution_gross": 0.0,
+            "contribution_net": 0.0,
+            "fired": 0,
+            "n": 4
+          },
+          "unreliable": {
+            "contribution_gross": -17.666666666666668,
+            "contribution_net": 102.21666666666667,
+            "fired": 4,
+            "n": 4
+          }
+        },
+        "temporary_pulse": {
+          "early_accurate": {
+            "contribution_gross": -12.666666666666666,
+            "contribution_net": 132.24166666666667,
+            "fired": 4,
+            "n": 4
+          },
+          "late_accurate": {
+            "contribution_gross": -10.333333333333334,
+            "contribution_net": 134.41666666666666,
+            "fired": 4,
+            "n": 4
+          },
+          "no_alert": {
+            "contribution_gross": -2.2,
+            "contribution_net": 73.34166666666667,
+            "fired": 2,
+            "n": 4
+          },
+          "unreliable": {
+            "contribution_gross": -12.666666666666666,
+            "contribution_net": 132.24166666666667,
+            "fired": 4,
+            "n": 4
+          }
+        }
+      },
+      "sum": -565.5333333333334
+    }
+  }
+}
