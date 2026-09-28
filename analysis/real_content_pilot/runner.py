@@ -58,6 +58,7 @@ from analysis.real_content_pilot.transport import (
     CallCapReached,
     GuardedTransport,
     SpendCapReached,
+    prompt_digest,
 )
 from collie.arms.base_stock import ARM1_ARM_ID, CappedBaseStockController
 from collie.arms.controls import (
@@ -94,6 +95,7 @@ from collie.control.mapping import GridCompiler
 from collie.eval.records import episode_result_to_dict
 from collie.eval.truth import EpisodeTruth, write_episode_truth_jsonl
 from collie.llm import CallLedger, DiskCache, MeteredClient
+from collie.llm.cache import cache_key
 from collie.llm.client import (
     ArmCallChannel,
     EndpointConfig,
@@ -233,9 +235,23 @@ class RecordingParser:
         entry = self.ledger.entries[-1]
         if entry.call_id != self.channel.last_call_id:
             raise RuntimeError("proposal log out of step with the ledger")
-        tau_j = self.inner.prompter.bundle.tau_j
+        bundle = self.inner.prompter.bundle
+        tau_j = bundle.tau_j
         if tau_j != entry.period:
             raise RuntimeError("prompt tau_j and ledger period disagree")
+        # The exact prompt sent: the ledger's prompt_hash is the cache key, which folds in the
+        # model id, so it cannot show that two endpoints saw the same prompt. Rebuild the text,
+        # prove it is the one sent by recomputing the cache key, and log a model-free digest.
+        prompt = bundle.text if entry.attempt_index == 1 else self.inner.prompter.repair_prompt()
+        sent = cache_key(
+            model_id=entry.model_id,
+            prompt=prompt,
+            state=f"{entry.episode_id}#{entry.period}#a{entry.attempt_index}",
+            decoding_hash=entry.decoding_hash,
+            system=None,
+        )
+        if sent != entry.prompt_hash:
+            raise RuntimeError("rebuilt prompt does not match the prompt that was sent")
         reason = None
         if payload is not None and self.rule_u_horizon is not None:
             reason = rule_u_reason(payload, tau_j=tau_j, horizon=self.rule_u_horizon)
@@ -247,6 +263,7 @@ class RecordingParser:
             "call_id": entry.call_id,
             "cache_hit": entry.cache_hit,
             "prompt_key": entry.prompt_hash,
+            "prompt_sha256": prompt_digest(prompt),
             "parsed": payload is not None,
             "error": error,
             "payload": None if payload is None else _payload_dict(payload),

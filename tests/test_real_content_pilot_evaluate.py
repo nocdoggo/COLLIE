@@ -245,7 +245,8 @@ def test_smoke_projection_recovers_the_reference_cost_for_the_same_transport(tmp
     assert summary["provider_calls"] == guard.physical_calls > 0
     assert summary["refused"] == summary["retries"] == summary["errors"] == 0
     projection = summary["projection"]
-    assert projection["matched_prompts"] > 0
+    # The spend log and the proposal log share the model-free prompt digest: every call matches.
+    assert projection["matched_prompts"] == summary["provider_calls"]
     assert projection["live_to_scripted_input_token_ratio"] == pytest.approx(1.0)
     with (REFERENCE / "ledger.csv").open(encoding="utf-8", newline="") as handle:
         actual = sum(

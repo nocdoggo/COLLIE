@@ -613,6 +613,10 @@ def test_bank_run_survives_every_legal_proposal_shape(tmp_path) -> None:
             "none" in (payload["persistence"], payload["duration_bin"]) or p["period"] >= 50
         )
         assert p["arm10_coerced_abstention"] == (unregistrable and p["arm_id"] == ARM10_ARM_ID)
+    # Every row carries the model-free digest of the prompt it answered (rebuilt and checked
+    # against the cache key inside RecordingParser, repairs included).
+    assert all(len(p["prompt_sha256"]) == 64 for p in run.proposals)
+    assert any(p["attempt_index"] == 2 for p in run.proposals)
     # Arms 8 and 9 answered the same shared calls with the model's payload, uncoerced.
     by_call = {}
     for p in parsed:

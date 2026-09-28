@@ -234,6 +234,7 @@ def proposal_events(proposals: Sequence[dict]) -> pd.DataFrame:
                 "rule_u_reason": row.get("rule_u_reason"),
                 "payload": row["payload"],
                 "prompt_key": row["prompt_key"],
+                "prompt_sha256": row.get("prompt_sha256"),
             }
         )
     frame = pd.DataFrame(rows).sort_values(["episode_id", "arm", "tau"], kind="stable")
@@ -297,7 +298,7 @@ def first_proposals(run: Run, truths: dict[str, dict]) -> pd.DataFrame:
             "outcome": "no_call",
             "category": "no_call",
             "repaired": False,
-            "prompt_key": None,
+            "prompt_sha256": None,
             "arm10_coerced": False,
         }
         event = first.get(episode_id)
@@ -310,7 +311,7 @@ def first_proposals(run: Run, truths: dict[str, dict]) -> pd.DataFrame:
                 outcome=event.outcome,
                 category=payload_key(payload) if event.outcome == "shock" else event.outcome,
                 repaired=bool(event.repaired),
-                prompt_key=event.prompt_key,
+                prompt_sha256=event.prompt_sha256,
             )
             twin = arm10_first.get(episode_id)
             row["arm10_coerced"] = bool(twin is not None and twin.coerced)
@@ -665,7 +666,11 @@ def agreement(first_a: pd.DataFrame, first_b: pd.DataFrame) -> dict:
     fam_b = shocked.family_ok_b.astype(bool)
     return {
         "episodes_called_by_both": len(called),
-        "identical_first_prompt": int((called.prompt_key_a == called.prompt_key_b).sum()),
+        "identical_first_prompt": int(
+            (
+                called.prompt_sha256_a.notna() & (called.prompt_sha256_a == called.prompt_sha256_b)
+            ).sum()
+        ),
         "same_category": _rate(called.category_a == called.category_b),
         "kappa_category": _kappa(list(called.category_a), list(called.category_b)),
         "shocked_family_ok": {
@@ -813,17 +818,18 @@ def smoke_summary(name: str, *, reference: str = "scripted-bank", root: Path = O
     calls = [row for row in (run.spend or []) if row["event"] == "call"]
     if not calls:
         raise ValueError(f"{name}: no provider calls in spend_log.jsonl")
-    ref_tokens = {
-        row["prompt_hash"]: int(row["input_tokens"])
-        for row in ref.ledger
-        if row["physical"] == "true"
-    }
-    live_tokens = {
-        row["prompt_hash"]: int(row["input_tokens"])
-        for row in run.ledger
-        if row["physical"] == "true" and row["attempt_index"] == "1"
-    }
-    matched = [(live_tokens[k], ref_tokens[k]) for k in live_tokens if k in ref_tokens]
+    # Match provider calls to reference calls by the model-free prompt digest, which the spend
+    # log and the proposal log share (the ledger's prompt_hash folds in the model id).
+    charged = [row for row in ref.ledger if row["physical"] == "false"]
+    ref_input = {row["call_id"]: int(row["input_tokens"]) for row in charged}
+    ref_by_digest: dict[str, int] = {}
+    for row in ref.proposals:
+        ref_by_digest.setdefault(row["prompt_sha256"], ref_input[row["call_id"]])
+    matched = [
+        (int(call["prompt_tokens"]), ref_by_digest[call["prompt_sha256"]])
+        for call in calls
+        if call["status"] == "ok" and call["prompt_sha256"] in ref_by_digest
+    ]
     ratio = float(np.mean([live / scripted for live, scripted in matched])) if matched else None
     price_in = float(run.manifest["endpoint"]["price_input_per_mtok"])
     price_out = float(run.manifest["endpoint"]["price_output_per_mtok"])
@@ -832,13 +838,28 @@ def smoke_summary(name: str, *, reference: str = "scripted-bank", root: Path = O
         raise ValueError(f"{name}: no proposal was made; pick smoke episodes whose trigger fires")
     fallback_rate = sum(not row["parsed"] for row in first_attempts) / len(first_attempts)
     mean_out = float(np.mean([int(row["billable_output_tokens"]) for row in calls]))
+    # Volumes: the reference's physical calls; and, as an upper bound, every call unshared except
+    # an episode's first (which is model-independent, so always shared by arms 8-10).
     ref_physical = [int(row["input_tokens"]) for row in ref.ledger if row["physical"] == "true"]
-    ref_charged = sum(1 for row in ref.ledger if row["physical"] == "false")
-    base = None
-    if ratio is not None:
-        base = (
-            sum(ref_physical) * ratio * price_in + len(ref_physical) * mean_out * price_out
-        ) / 1e6
+    first_period: dict[str, int] = {}
+    for row in charged:
+        episode, period = row["episode_id"], int(row["period"])
+        first_period[episode] = min(first_period.get(episode, period), period)
+    unshared, seen = [], set()
+    for row in charged:
+        episode = row["episode_id"]
+        if int(row["period"]) == first_period[episode]:
+            if episode in seen:
+                continue
+            seen.add(episode)
+        unshared.append(int(row["input_tokens"]))
+
+    def cost(tokens: Sequence[int]) -> float | None:
+        if ratio is None:
+            return None
+        return (sum(tokens) * ratio * price_in + len(tokens) * mean_out * price_out) / 1e6
+
+    expected, upper = cost(ref_physical), cost(unshared)
     return _clean(
         {
             "run": name,
@@ -867,14 +888,13 @@ def smoke_summary(name: str, *, reference: str = "scripted-bank", root: Path = O
                 "matched_prompts": len(matched),
                 "live_to_scripted_input_token_ratio": ratio,
                 "reference_physical_calls": len(ref_physical),
-                "reference_charged_calls": ref_charged,
-                "expected_usd": None if base is None else base * (1.0 + fallback_rate),
-                "worst_case_usd": None
-                if base is None
-                else base * 2.0 * ref_charged / len(ref_physical),
-                "note": "expected: reference physical calls, each repaired at the smoke's "
-                "first-attempt fallback rate; worst case: no call shared across arms and every "
-                "call repaired",
+                "unshared_calls": len(unshared),
+                "expected_usd": None if expected is None else expected * (1.0 + fallback_rate),
+                "unshared_usd": None if upper is None else upper * (1.0 + fallback_rate),
+                "worst_case_usd": None if upper is None else upper * 2.0,
+                "note": "expected: the reference's physical calls; unshared: only each "
+                "episode's first call shared by arms 8-10; both repaired at the smoke's "
+                "first-attempt fallback rate. Worst case: unshared, every call repaired.",
             },
         }
     )

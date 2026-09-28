@@ -164,4 +164,12 @@ uv run python -m analysis.real_content_pilot.evaluate --runs gemini-bank grok-ba
 
 ## Deviations
 
-None yet.
+1. **Logging only (2026-09-28, after both smoke runs, before either full run).** The ledger's
+   `prompt_hash` is the cache key, which folds in the model id, so it cannot show that Gemini and
+   Grok answered the same first prompt, and the smoke projection matched no smoke call to the
+   reference. `RecordingParser` now rebuilds the exact prompt each parse answered, checks it
+   against the cache key, and logs its model-free digest `prompt_sha256` (the digest
+   `spend_log.jsonl` already records). The agreement check and the smoke projection use it; the
+   projection also reports an upper bound in which only each episode's first call is shared.
+   `scripted-bank` was re-run (records, ledger and alerts byte-identical; only the proposal log
+   gained the field) and both smoke runs were replayed from cache, with no provider call.

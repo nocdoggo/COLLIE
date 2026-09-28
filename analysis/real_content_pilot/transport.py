@@ -78,6 +78,12 @@ def retry_after_seconds(exc: BaseException) -> float | None:
     return None
 
 
+def prompt_digest(prompt: str, system: str | None = None) -> str:
+    """The model-free digest of one request's text, as ``spend_log.jsonl`` and the proposal log
+    record it. (The ledger's ``prompt_hash`` is the cache key, which folds in the model id.)"""
+    return hashlib.sha256(f"{system or ''}\x00{prompt}".encode()).hexdigest()
+
+
 def _short(exc: BaseException) -> str:
     return f"{type(exc).__name__}: {exc}"[:400]
 
@@ -143,7 +149,7 @@ class GuardedTransport:
             wait = self.min_interval_s - (self.clock() - self._last_call)
             if wait > 0:
                 self.sleep(wait)
-        digest = hashlib.sha256(f"{system or ''}\x00{prompt}".encode()).hexdigest()
+        digest = prompt_digest(prompt, system)
         status = "ok"
         attempt = 0
         started = time.perf_counter()
