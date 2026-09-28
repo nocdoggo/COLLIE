@@ -209,6 +209,13 @@ def test_two_identical_runs_agree_fully_and_replay_the_non_llm_arms(tmp_path) ->
         effects = evaluation["runs"][name]["q7"]
         assert effects["arm10|gross"]["n"] == 120 and effects["arm8|net|shocked"]["n"] == 96
         assert all(cell["mean"] == 0.0 for cell in effects.values())
+        extra = evaluation["runs"][name]["post_hoc"]
+        by_family = extra["arm10_content_effect_by_family"].values()
+        assert sum(cell["n"] for cell in by_family) == 120
+        assert all(cell["gross"] == cell["net"] == 0.0 for cell in by_family)
+        repeated = extra["repeated_prompts"]
+        assert repeated["prompts"] > 0 and repeated["identical_payload"] == repeated["prompts"]
+    assert "## Post hoc" in render(evaluation)
     pair = evaluation["agreement"]["copy-a|copy-b"]
     assert pair["identical_first_prompt"] == pair["episodes_called_by_both"] > 0
     assert pair["same_category"]["rate"] == 1.0

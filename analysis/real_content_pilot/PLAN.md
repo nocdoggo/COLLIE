@@ -174,3 +174,10 @@ uv run python -m analysis.real_content_pilot.evaluate --runs gemini-bank grok-ba
    `scripted-bank` was re-run at that commit: its alerts are byte-identical, its records and
    ledger identical except the wall-clock `latency_ms`, and its proposal log identical except the
    new field. Both smoke runs were replayed from cache, with no provider call.
+2. **Post-hoc supporting counts (after the live results were seen).** `evaluate.py` gained a
+   `post_hoc` block and a matching section in `out/evaluation.md`: arm 10's content effect by
+   family, the magnitudes the first proposals claim, how long each LLM arm holds a spec, distinct
+   and none-field prompts, whether prompts sent more than once got the same answer, and which
+   false-alert nulls arm 10 activated on. None of it is a pre-registered analysis, and
+   `REPORT.md` marks each use. The markdown renderer also escapes `|` inside table cells. Every
+   pre-registered number is unchanged.

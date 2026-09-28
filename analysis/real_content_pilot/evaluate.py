@@ -17,7 +17,9 @@ is committed before any live call:
 * **Q7** the content effect: each LLM arm's live outcome minus its scripted-reference outcome,
   episode by episode (everything else is shared);
 * cross-endpoint agreement on the shared first proposal, and an integrity check that the six
-  arms which never call the model replay the reference exactly.
+  arms which never call the model replay the reference exactly;
+* a ``post_hoc`` block of supporting counts, added after the live results were seen (PLAN.md
+  deviation 2) and labelled as such in both outputs.
 
 Run::
 
@@ -691,6 +693,83 @@ def agreement(first_a: pd.DataFrame, first_b: pd.DataFrame) -> dict:
 NON_LLM_ARMS = tuple(arm for arm in ARMS if arm not in LLM_ARMS)
 
 
+def post_hoc(run: Run, reference: Run) -> dict:
+    """Supporting counts added after the live results were seen. Not in PLAN.md; labelled so.
+
+    Where arm 10's content effect sits by family; the magnitudes the first proposals claim when
+    they name a shock; how long each LLM arm holds a spec; distinct prompts and none-field
+    answers (Rule U's trigger); whether identical prompts sent under different episode ids got
+    the same answer at temperature 0; and which false-alert nulls arm 10 activated on.
+    """
+    live = episode_frame(run.raw).set_index(["episode_id", "arm"])
+    base = episode_frame(reference.raw).set_index(["episode_id", "arm"])
+    a10, b10 = live.xs(ARM10, level="arm"), base.xs(ARM10, level="arm")
+    by_family = {}
+    for key in sorted(a10.key.unique()):
+        mask = a10.key == key
+        by_family[key] = {
+            "n": int(mask.sum()),
+            **{
+                endpoint: float((a10.loc[mask, column] - b10.loc[mask, column]).mean())
+                for endpoint, column in ENDPOINTS
+            },
+        }
+    events = proposal_events(run.proposals)
+    first_shocks = events[(events.arm == ARM8) & (events.event_index == 1)]
+    first_shocks = first_shocks[first_shocks.outcome == "shock"]
+    answers: dict[str, dict[str, str]] = {}
+    for row in run.proposals:
+        text = json.dumps(row["payload"], sort_keys=True) if row["parsed"] else "parse_fail"
+        answers.setdefault(row["prompt_sha256"], {})[row["prompt_key"]] = text
+    repeated = {digest: keys for digest, keys in answers.items() if len(keys) > 1}
+
+    def family(text: str) -> str:
+        if text == "parse_fail":
+            return text
+        payload = json.loads(text)
+        return f"{payload['shock_family']}:{payload['direction']}"
+
+    none_fields = {
+        row["prompt_sha256"]
+        for row in run.proposals
+        if row["parsed"]
+        and not row["abstention"]
+        and "none" in (row["payload"]["persistence"], row["payload"]["duration_bin"])
+    }
+    false_alert_nulls = [
+        row["episode_id"]
+        for row in run.raw
+        if row["arm_id"] == ARM10
+        and parse_episode_id(row["episode_id"])["is_null"]
+        and row["information_condition"] == "unreliable"
+        and any(p.get("active_spec_id") for p in row["records"])
+    ]
+    return {
+        "arm10_content_effect_by_family": by_family,
+        "first_shock_magnitudes": dict(Counter(p["magnitude_bin"] for p in first_shocks.payload)),
+        "mean_active_periods": {
+            LABEL[arm]: {
+                "live": float(live.xs(arm, level="arm").n_active.mean()),
+                "reference": float(base.xs(arm, level="arm").n_active.mean()),
+            }
+            for arm in LLM_ARMS
+        },
+        "distinct_prompts": len(answers),
+        "prompts_answered_with_a_none_field": len(none_fields),
+        "repeated_prompts": {
+            "prompts": len(repeated),
+            "calls": sum(len(keys) for keys in repeated.values()),
+            "identical_payload": sum(
+                1 for keys in repeated.values() if len(set(keys.values())) == 1
+            ),
+            "same_family_direction": sum(
+                1 for keys in repeated.values() if len({family(t) for t in keys.values()}) == 1
+            ),
+        },
+        "arm10_active_false_alert_nulls": sorted(false_alert_nulls),
+    }
+
+
 def content_effect(run: Run, reference: Run) -> dict:
     """Q7: the same arm and episode, live content minus the scripted reference's fixed payload.
 
@@ -771,6 +850,7 @@ def evaluate(runs: Sequence[str], *, reference: str | None, root: Path = OUT_ROO
         if reference_run is not None and run.name in runs:
             entry["integrity"] = non_llm_integrity(run, reference_run)
             entry["q7"] = content_effect(run, reference_run)
+            entry["post_hoc"] = post_hoc(run, reference_run)
         if run.proposals is not None:
             first = first_proposals(run, truths)
             firsts[run.name] = first
@@ -921,7 +1001,9 @@ def _kn(rate: dict) -> str:
 
 def _table(header: Sequence[str], rows: Iterable[Sequence]) -> list[str]:
     lines = ["| " + " | ".join(header) + " |", "|" + "|".join("---" for _ in header) + "|"]
-    lines.extend("| " + " | ".join(str(cell) for cell in row) + " |" for row in rows)
+    lines.extend(
+        "| " + " | ".join(str(cell).replace("|", "\\|") for cell in row) + " |" for row in rows
+    )
     return [*lines, ""]
 
 
@@ -1289,6 +1371,61 @@ def render(evaluation: dict) -> str:
                 "same answer",
                 "kappa",
                 "family ok both/a/b/neither",
+            ],
+            rows,
+        )
+    ph_names = [n for n in names if "post_hoc" in runs[n]]
+    if ph_names:
+        lines += [
+            "## Post hoc (added after the live results were seen; not in PLAN.md)",
+            "",
+            "Arm 10 content effect by family, gross / net per episode:",
+            "",
+        ]
+        families = sorted(
+            {k for n in ph_names for k in runs[n]["post_hoc"]["arm10_content_effect_by_family"]}
+        )
+        rows = []
+        for key in families:
+            row = [key]
+            for n in ph_names:
+                cell = runs[n]["post_hoc"]["arm10_content_effect_by_family"].get(key)
+                row.append(
+                    "n/a"
+                    if cell is None
+                    else f"{cell['gross']:+,.1f} / {cell['net']:+,.1f} (n = {cell['n']})"
+                )
+            rows.append(row)
+        lines += _table(["family", *ph_names], rows)
+        rows = []
+        for n in ph_names:
+            ph = runs[n]["post_hoc"]
+            rep = ph["repeated_prompts"]
+            rows.append(
+                [
+                    n,
+                    ", ".join(f"{k}: {v}" for k, v in sorted(ph["first_shock_magnitudes"].items())),
+                    ", ".join(
+                        f"{arm} {v['live']:.1f} vs {v['reference']:.1f}"
+                        for arm, v in ph["mean_active_periods"].items()
+                    ),
+                    ph["distinct_prompts"],
+                    ph["prompts_answered_with_a_none_field"],
+                    f"{rep['identical_payload']}/{rep['prompts']} identical, "
+                    f"{rep['same_family_direction']}/{rep['prompts']} same family "
+                    f"({rep['calls']} calls)",
+                    ", ".join(ph["arm10_active_false_alert_nulls"]) or "none",
+                ]
+            )
+        lines += _table(
+            [
+                "run",
+                "first-proposal shock magnitudes",
+                "active periods, live vs reference",
+                "distinct prompts",
+                "none-field answers",
+                "prompts sent more than once",
+                "arm10 active on false-alert nulls",
             ],
             rows,
         )
