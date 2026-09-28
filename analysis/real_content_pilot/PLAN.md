@@ -171,5 +171,6 @@ uv run python -m analysis.real_content_pilot.evaluate --runs gemini-bank grok-ba
    against the cache key, and logs its model-free digest `prompt_sha256` (the digest
    `spend_log.jsonl` already records). The agreement check and the smoke projection use it; the
    projection also reports an upper bound in which only each episode's first call is shared.
-   `scripted-bank` was re-run (records, ledger and alerts byte-identical; only the proposal log
-   gained the field) and both smoke runs were replayed from cache, with no provider call.
+   `scripted-bank` was re-run at that commit: its alerts are byte-identical, its records and
+   ledger identical except the wall-clock `latency_ms`, and its proposal log identical except the
+   new field. Both smoke runs were replayed from cache, with no provider call.
