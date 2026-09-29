@@ -26,7 +26,7 @@ from pathlib import Path
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402
+import matplotlib.pyplot as plt
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 FIGURES_DIR = SCRIPT_DIR.parent / "figures"
@@ -78,6 +78,11 @@ def _style() -> None:
             "pdf.fonttype": 42,
         }
     )
+
+
+def _signed(value: float) -> str:
+    """A signed, comma-grouped integer with a true minus sign."""
+    return f"{value:+,.0f}".replace("-", "\u2212")
 
 
 def _save(fig, name: str) -> None:
@@ -182,16 +187,23 @@ def fig1_episode() -> None:
     ax_a.text(t[-1] + 0.6, mass[-1], "hedge $\\Pi_t$", color=INK, va="center", fontsize=7)
     ax_a.text(t[-1] + 0.6, gate[-1] - 0.14, "gate", color=INK, va="center", fontsize=7)
     ax_a.text(onset + 0.4, 1.02, "onset", color=MUTED, fontsize=6.5, va="bottom")
-    ax_a.text(proposal[0] - 0.4, 1.02, "proposal", color=MUTED, fontsize=6.5, va="bottom",
-              ha="right")
+    ax_a.text(
+        proposal[0] - 0.4, 1.02, "proposal", color=MUTED, fontsize=6.5, va="bottom", ha="right"
+    )
     ax_a.set_title("(a) commitment to the lead-time hypothesis", loc="left", color=INK)
 
     ax_b.axhline(0, color=RULE, lw=0.6)
     ax_b.plot(t, gate_net, color=CONTROL, lw=1.2, ls="--", zorder=3)
     ax_b.plot(t, cth, color=EVIDENCE, lw=1.4, zorder=4)
-    ax_b.text(t[-1] + 0.6, cth[-1], f"hedge {cth[-1]:+,.0f}", color=INK, va="center", fontsize=7)
-    ax_b.text(t[-1] + 0.6, gate_net[-1], f"gate {gate_net[-1]:+,.0f}", color=INK, va="center",
-              fontsize=7)
+    ax_b.text(t[-1] + 0.6, cth[-1], f"hedge {_signed(cth[-1])}", color=INK, va="center", fontsize=7)
+    ax_b.text(
+        t[-1] + 0.6,
+        gate_net[-1],
+        f"gate {_signed(gate_net[-1])}",
+        color=INK,
+        va="center",
+        fontsize=7,
+    )
     ax_b.set_ylabel("net vs arm 1")
     ax_b.set_xlabel("period")
     ax_b.set_title("(b) cumulative net reward minus the baseline", loc="left", color=INK)
@@ -293,8 +305,16 @@ def fig2_models() -> None:
     ax_c.axvline(0, color=RULE, lw=0.6)
     ax_c.set_xlabel("net vs arm 1, per episode")
     ax_c.set_title("(c) verified commitment", loc="left", pad=20)
-    ax_c.legend(loc="lower left", bbox_to_anchor=(0.0, 1.0), ncol=2, frameon=False, fontsize=6.5,
-                handletextpad=0.3, columnspacing=1.2, borderaxespad=0.0)
+    ax_c.legend(
+        loc="lower left",
+        bbox_to_anchor=(0.0, 1.0),
+        ncol=2,
+        frameon=False,
+        fontsize=6.5,
+        handletextpad=0.3,
+        columnspacing=1.2,
+        borderaxespad=0.0,
+    )
     _save(fig, "fig2_models")
 
 

@@ -8,7 +8,7 @@ in-transit stock is a single scalar with no shipment ages. Every cell is an inte
 reimplementation is checked for exact equality rather than a tolerance: it matches the official
 pipeline with a maximum absolute difference of $0.0$ over 648 comparisons, and our arm~1
 reproduces all 1{,}320 published baseline order sequences bit for bit. That reproduction
-exposed a \emph{harness divergence}~\label{sec:divergence}: the benchmark's legacy simulator keeps
+exposed a \emph{harness divergence}\label{sec:divergence}: the benchmark's legacy simulator keeps
 a lost shipment in in-transit stock forever, while its submission path never adds it. The
 published baseline score of $0.4447$ belongs to the legacy simulator; under the authoritative
 submission path the same policy scores $0.5208$, and the difference is exactly the 440
