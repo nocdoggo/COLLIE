@@ -24,19 +24,14 @@ far worse: arm~8 lost 2{,}549 and 2{,}624 per episode.
 
 \subsection{The fresh-seed confirmation}
 
-Table~\ref{tab:confirm} gives the primary contrasts on the 240 fresh episodes. Certify-then-hedge
-beats the gate by $309$ (Gemini) and $179$ (Grok) net per episode and arm~1 by $178$ and $163$;
-all four one-sided tests reject after Holm correction (largest $p = 0.0031$). In a post hoc check
-without the six clusters that a structural test had touched before registration, the four
-contrasts are $+329$, $+188$, $+163$ and $+145$ (largest $p = 0.0024$). Gross profit agrees on
-both primary contrasts. On the 48 null episodes the method is non-inferior to arm~1 at the
-registered margin of $-25$ with both models (Gemini $-3.2$ $[-8.2, -0.1]$, Grok $+1.9$
-$[-1.7, 8.2]$). With Gemini the small loss is distinguishable from zero; post hoc, it comes from
-the 24 false-alert twins ($-6.4$ $[-16.1, -0.3]$, worst episode $-105$), since silent twins
-rarely trigger. The gate itself is no better than arm~1 on fresh seeds ($-131$ and $-16$ net,
-intervals including zero), and acting at once loses $2{,}046$ and $2{,}284$.
-Fig.~\ref{fig:models} repeats the confirmation with four further proposer models: every interval
-for the method against the gate and against arm~1 excludes zero.
+Table~\ref{tab:confirm} gives the primary contrasts on the 240 fresh episodes: all four
+one-sided tests reject after Holm correction (largest $p = 0.0031$), and post hoc, without the six
+clusters a structural test had touched before registration, the contrasts are $+329$, $+188$,
+$+163$ and $+145$ (largest $p = 0.0024$). On the 48 null episodes the method is non-inferior to
+arm~1 at the registered margin of $-25$ (Gemini $-3.2$ $[-8.2, -0.1]$, Grok $+1.9$
+$[-1.7, 8.2]$); post hoc, Gemini's small loss comes from the false-alert twins. The gate is no
+better than arm~1 on fresh seeds, and with four further proposer models
+(Fig.~\ref{fig:models}) every interval for the method against the gate and arm~1 excludes zero.
 
 \begin{table}[!tb]
 \caption{Fresh-seed confirmation (registered; exploratory with respect to the project's
@@ -66,11 +61,8 @@ hedge $-$ content-free & Gemini & $+9\ [-5, 24]$ & $+10$ \\
 \end{tabular}
 \end{table}
 
-The gross column shows the endpoint trap of our first registration in its plainest form. Among
-the arms in Table~\ref{tab:confirm}, acting at once looks \emph{best} on gross profit ($+501$),
-because gross profit charges no holding and so pays for over-stocking, while on net it is the
-worst by a wide margin; the hedge's contrast with acting at once changes sign too. Every claim
-here is on net.
+Gross profit charges no holding, so it ranks acting at once \emph{best} ($+501$) though
+it is the worst on net: the endpoint trap of our first registration. Every claim here is on net.
 
 \begin{figure*}[!t]
 \centering
@@ -87,79 +79,68 @@ once vary widely with the model; the hedge's gain does not, and it stays within 
 
 \subsection{Where the gain comes from}
 
-Against arm~1 the gain is concentrated in one family: by the registered per-family readout,
-the 32 shocked lead-time episodes supply 96\% of it. The method earns $+1{,}286$ (Gemini) and
-$+1{,}177$ (Grok) per lead-time episode, against $+90$ and $+88$ per demand fall and $+95$ and
-$+80$ per pulse, and gives back about $40$ per compound and $3$ per loss episode. The following
-readouts are post hoc. Every shocked family's seed-cluster interval excludes zero except the demand
-rise, where the method's $-83$ is not distinguishable from arm~1 ($[-200, 21]$ and
-$[-204, 26]$). Without the lead-time
-units (their episodes and twins) the method is $+9$ $[-24, 43]$ and $+7$ $[-25, 36]$ against
-arm~1. Against the gate the advantage is broader with Gemini: without those units the method
-still leads by $+227$ $[82, 408]$, because the gate compiles the stated magnitude and loses
-$1{,}057$ per demand-rise episode; with Grok the difference, $+58$ $[-1, 134]$, is not
-distinguishable from zero. Two mechanisms carry
-the lead-time gain. The first is timing: the hedge commits partially as soon as evidence
-accumulates, where the gate commits all at once a median of 11 periods after the proposal. The
-second is sizing: the gate compiles the stated size (one, two or three periods), which was
-wrong in 7 of Gemini's 17 lead-time proposals and 6 of Grok's 11 (true shifts were one or two
-periods), while the within-hypothesis posterior estimates the offset from receipts (Fig.~\ref{fig:episode}). Both
-are statistical, which the next result makes explicit.
+By the registered per-family readout, the 32 shocked lead-time episodes supply 96\% of the gain
+over arm~1 ($+1{,}286$ and $+1{,}177$ per episode, against $+80$ to $+95$ per demand fall and
+pulse, and about $-40$ and $-3$ per compound and loss episode). Post hoc, every shocked family's
+interval excludes zero except the demand rise ($-83$; $[-200, 21]$ and $[-204, 26]$). Without the
+lead-time units the method is $+9$ $[-24, 43]$ and $+7$ $[-25, 36]$ against arm~1; against the
+gate it still leads by $+227$ $[82, 408]$ with Gemini, whose gate loses $1{,}057$ per demand-rise
+episode by compiling the stated magnitude, while with Grok $+58$ $[-1, 134]$ is not
+distinguishable from zero. Two mechanisms carry the lead-time gain: timing, as the hedge
+commits partially as evidence accumulates while the gate commits all at once a median of 11
+periods after the proposal; and sizing, as the gate compiles the stated size, wrong in 7 of
+Gemini's 17 lead-time proposals and 6 of Grok's 11 (true shifts were one or two periods), while
+the hedge estimates the offset from receipts (Fig.~\ref{fig:episode}).
 
 \subsection{What the language contributes}
 
-The content-free variant calls no model but is timed by the same alerts. It earns $+169$
-$[48, 312]$ against arm~1, and the method's net reward is not distinguishable from it ($+9$
-$[-5, 24]$ with Gemini, $-6$ $[-29, 11]$ with Grok); with the four further models the difference
-runs from $-43$ to $0$, with intervals below zero for Llama~3.1~8B and GPT-3.5 Turbo. At this
-cost ratio, then, a certified hypothesis search timed by alerts recovers the headroom without
-detectable help from the text. What the model's family label changes is commitment on null
-episodes: the summed shock mass falls from $0.83$ (content-free) to $0.52$ with Gemini and
-$0.46$ with Grok. Post hoc, these cuts of 37\% and 45\% (intervals $[33, 57]\%$ and
-$[42, 61]\%$) fall almost entirely on false-alert twins, with no detectable change in null
-reward ($-2$ $[-8, 2]$ and $+3$ $[-0.04, 8.4]$). Naming any family has this effect, right or
-wrong, because it moves prior weight off the hypotheses the model does not name. Trusting the
-family alone ($\lambda = 0$) cuts null commitment further, to $0.18$ and $0.06$, but costs net
-reward against the content-free arm with Grok ($-83$ $[-169, -13]$) and Llama~3.1~8B ($-192$),
-and is not distinguishable from it with Gemini ($-16$ $[-66, 27]$); hence the hedged prior.
-Post hoc, re-running the method's variants on the same episodes with each model's answers held
-fixed, the weight matters less than the rule: $\lambda = 0.5$ or $0.75$ is not distinguishable
-from $0.25$, while committing to the compiled target once the shock mass reaches $1/2$ changes
-net reward by $-56$ $[-97, -19]$ and $-62$ $[-108, -21]$ per episode ($-370$ and $-368$ at
+The content-free variant calls no model but is timed by the same alerts; it earns $+169$
+$[48, 312]$ against arm~1, and at $p/h = 4$ the method is not distinguishable from it ($+9$
+$[-5, 24]$ with Gemini, $-6$ $[-29, 11]$ with Grok; $-43$ to $0$ with the four further models,
+below zero for Llama~3.1~8B and GPT-3.5 Turbo). What the model's label changes is commitment on
+null episodes: the summed shock mass falls from $0.83$ to $0.52$ and $0.46$, cuts that post hoc
+fall almost entirely on false-alert twins with no detectable change in null reward, because
+naming any family, right or wrong, moves prior weight off the others. Trusting the family alone
+($\lambda = 0$) cuts it to $0.18$ and $0.06$ but costs net reward against the content-free arm
+with Grok ($-83$ $[-169, -13]$) and Llama~3.1~8B ($-192$); hence the hedged prior. Post hoc,
+with each model's answers held fixed, the weight matters less than the rule: $\lambda = 0.5$ or
+$0.75$ is not distinguishable from $0.25$, while committing once the shock mass reaches $1/2$
+changes net reward by $-56$ $[-97, -19]$ and $-62$ $[-108, -21]$ ($-370$ and $-368$ at
 $p/h = 19$).
 
-\subsection{Cost ratio}
+\subsection{Cost ratios and noisy lead times}
+\label{sec:stage-d}
 
-The confirmation fixed $p/h = 4$, the middle of InventoryBench's three ratios. Post hoc, we
-replayed its 240 episodes at $p/h = 1$, $2$, $9$ and $19$, holding each model's answers at what it
-said under $p/h = 4$. The prompt shows the margin, the inventory position and the order and
-arrival history, all of which change with the ratio, so the model-calling arms are a
-counterfactual with the answer fixed; the others are exact, and at $p/h = 4$ the replay
-reproduces every registered record. The method beats the gate at every ratio with both models
-($+85$ to $+722$, every interval above zero). Its gain over arm~1 is small when one period of holding costs the
-whole margin ($p/h = 1$: $+16$ $[-14, 47]$ and $+10$ $[-18, 40]$) and grows with the margin, to
-$+1{,}056$ $[398, 1{,}850]$ and $+991$ $[376, 1{,}739]$ at $p/h = 19$, where it no longer rests
-on lead-time shifts alone ($+125$ $[43, 227]$ and $+121$ $[38, 224]$ without those units). Part
-of that growth is scale, since every reward grows with $p$: as a share of arm~1's net reward the
-gain is 0.5\% and 0.3\% at $p/h = 1$, 1.1\% and 1.0\% at 4, and 1.2\% at 19 with both models.
-The text's share moves with the ratio too: with Gemini the method beats the content-free control
-at $p/h = 9$ ($+47$ $[6, 97]$) and $19$ ($+84$ $[18, 166]$), while with Grok the label costs a
-little at $p/h = 1$ ($-5$ $[-10, -0.02]$) and is not distinguishable from zero at the other
-ratios.
+A second registered stage ran the frozen method on a new pool of 48 units at the benchmark's two
+other ratios, $p/h = 19$ and $1$, and at $p/h = 4$ on eight lead-time units whose per-order lead
+times carry the registered arrival law's noise (clipped at four periods), with Holm's correction
+within each family of tests. At $p/h = 19$ the method beat the gate by $+597$ $[323, 917]$
+(Gemini) and $+631$ $[265, 1{,}085]$ (Grok) and arm~1 by $+979$ $[364, 1{,}703]$ and $+896$
+$[322, 1{,}569]$ (1.2\% and 1.1\% of arm~1's net reward), and the text earned something: against
+the content-free variant $+82$ $[35, 138]$ with Gemini, while with Grok it is not
+distinguishable ($-2$ $[-75, 59]$); five of the six tests reject. On null episodes, however, the
+method lost 22 per episode with both models ($[-65, 5]$), so non-inferiority at the registered
+$-25$ is not established at this ratio (a margin scaled by $p/4$ is met, descriptively). At
+$p/h = 1$ it beat the gate by $+189$ $[103, 288]$ and $+45$ $[10, 86]$ (both reject) and is not
+distinguishable from arm~1 or, read two-sided, from the content-free variant. Per unit of price
+the gain over arm~1 barely moves between the ratios ($+41$ $[-1, 79]$ and $+43$ $[2, 80]$). On
+noisy lead times the gain over arm~1, $+254$ $[-141, 629]$ and $+187$ $[-149, 469]$, was not
+confirmed (exact $p = 0.14$ and $0.15$ over eight clusters); descriptively it came from the four
+units whose lead rose by two periods, and two of the four one-period units lost. A post-hoc
+replay of the confirmation's episodes, answers held fixed, had pointed the same way ($+84$
+$[18, 166]$ for the text with Gemini at $p/h = 19$).
 
 \subsection{Model scale}
 
 The ladder ran 20 of the 21 models on the 120 pilot episodes (StepFun's slowest reasoning model
 had not finished at the time of writing). First proposals named the right family and direction
-in 0 to 59 of 96 shocked episodes. Llama~3.2 1B never produced a non-abstaining \shockspec{},
-so every proposal fell back to the baseline, and Qwen~2.5 7B abstained or failed on almost every
-call. Acting on proposals at once lost between nothing (Llama~3.2 1B) and $3{,}656$ net
-per episode (Gemini~2.5 Flash-Lite, which almost never abstains). Contrary to the stage's
+in 0 to 59 of 96 shocked episodes; Llama~3.2 1B never produced a non-abstaining \shockspec{},
+and Qwen~2.5 7B abstained or failed on almost every call. Acting at once lost between nothing
+(Llama~3.2 1B) and $3{,}656$ per episode (Gemini~2.5 Flash-Lite). Contrary to the stage's
 registered expectation that this loss would grow as perception falls, it grows with how readily
-a model commits, and being right does not protect it: across the 20 models commitment and
-accuracy move together (post hoc, $r = 0.86$), and the most accurate models lose among the most.
-The gate stayed between $-300$ and $+3$ against arm~1 and acted on a false alert in at most one
-of 12 null episodes; contrary to the same expectation, its interval lay below zero on two models (Gemini~2.5 Flash $-294$ $[-567, -45]$, GPT-3.5 Turbo $-60$ $[-151, -1]$).
-Certify-then-hedge's development replays (no claim) had point estimates between $+107$ and
-$+158$ on every model, including those that produced nothing usable, against $+136$ for its
-content-free variant.
+a model commits, and commitment and accuracy move together (post hoc, $r = 0.86$). The gate
+stayed between $-300$ and $+3$ against arm~1 and acted on a false alert in at most one of 12 null
+episodes; contrary to the same expectation, its interval lay below zero on two models
+(Gemini~2.5 Flash $-294$ $[-567, -45]$, GPT-3.5 Turbo $-60$ $[-151, -1]$). The hedge's
+development replays (no claim) had point estimates between $+107$ and $+158$ on every model,
+against $+136$ for its content-free variant.

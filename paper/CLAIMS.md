@@ -97,17 +97,27 @@ paper is rounded once from them or from `confirm.json` (never from a rounded val
 | Gate's interval below zero on Gemini 2.5 Flash -294 [-567, -45] and GPT-3.5 Turbo -60 [-151, -1], contrary to stage A's registered expectation | `posthoc.json` `ladder.gate_interval_below_zero`; `PLAN.md` stage A item 6 | established |
 | Hedge point estimates +107 to +158 on every model; content-free +136 | `ladder.json` `cth_arm1_net_dev`, `cth_uniform_arm1_net_dev` (from `out/dev/ladder_dev.json`) | development |
 
-## 3b. Cost ratio (Section VIII-E)
+## 3b. Cost ratios and noisy lead times: stage D (Abstract, Section I, VII, VIII-E, X, XI)
+
+Registered at `fae3714` with pre-run amendments DA1 to DA12 (`PLAN.md`); all six runs complete at
+`a38eb64`; `d.<family>.tests["<contrast>|<model>"]` and `d.<family>.holm` in `confirm_d.json`,
+`d.runs.<run>` its per-run readout, and `rd` the registered secondaries in `readout_d.json`.
 
 | Claim | Evidence | Status |
 |---|---|---|
 | InventoryBench uses p/h = 1, 4 and 19 | `docs/env_contract.md` section 8.2 | established |
-| The replay ran p/h = 1, 2, 9 and 19; it reproduces every registered record at p/h = 4; no call at any ratio lacked a recorded answer | `sensitivity.json` `reproduction_at_registered_ratio`, `replay` | established |
-| The prompt shows margin, inventory position and order and arrival history | `collie/spec/prompt.py` `build_prompt` | established |
-| Hedge - gate +85 to +722 over ratios and models, every interval above zero | `sens.<run>.<ratio>["cth-arm10\|net"]` (min 85.46 Grok p/h 1, max 722.34 Gemini p/h 19) | post hoc |
-| Hedge - arm 1 at 1: +16 [-14, 47], +10 [-18, 40]; at 19: +1,056 [398, 1,850], +991 [376, 1,739]; without the lead-time units at 19: +125 [43, 227], +121 [38, 224] | `sens.<run>.<ratio>["cth-arm1\|net"]`, `["cth-arm1\|net\|without_lead_time_units"]` | post hoc |
-| As a share of arm 1's net: 0.5% and 0.3% at 1, 1.1% and 1.0% at 4, 1.2% at 19 | `sens.<run>.<ratio>["cth-arm1\|net\|share_of_arm1_net"]` (0.00532, 0.00343; 0.01128, 0.01029; 0.01250, 0.01173) | post hoc |
-| Hedge - content-free with Gemini: +47 [6, 97] at 9, +84 [18, 166] at 19; with Grok -5 [-10, -0.02] at 1, intervals including zero elsewhere | `sens.<run>.<ratio>["cth-uniform\|net"]` | post hoc |
+| New pool of 48 units at p/h = 19 and 1; eight lead-time units at p/h = 4 with the registered arrival law's noise, clipped at four periods; Holm within each family | `PLAN.md` stage D, DA10; `stage_d.py` `LEAD_RULE`; `out/<run>/stage_d.json` | registered |
+| Before any stage D call, an independent audit of the registration led to dated amendments that changed no hypothesis, pool or cap | `PLAN.md` "Stage D amendments" (DA1 to DA12) | registered |
+| p/h = 19: hedge - gate +597 [323, 917], +631 [265, 1,085]; hedge - arm 1 +979 [364, 1,703], +896 [322, 1,569]; hedge - content-free +82 [35, 138] (Gemini), -2 [-75, 59] (Grok); five of six tests reject | `d.high_margin.tests` (596.57 [322.85, 917.04]; 631.36 [265.01, 1084.56]; 979.26 [364.41, 1702.74]; 895.79 [322.32, 1568.97]; 81.53 [35.12, 138.10]; -1.95 [-74.61, 58.69]); `d.high_margin.holm` | established |
+| Gain over arm 1 is 1.2% and 1.1% of arm 1's net reward at p/h = 19 | `rd.runs.d19-<model>.share_of_arm1_net["cth-arm1"].share` (0.01163, 0.01064) | established |
+| p/h = 19 null episodes: -22 [-65, 5] with both models; non-inferiority at -25 not established; a margin scaled by p/4 (-119) is met, descriptively | `d.runs.d19-<model>.null_safety` (-21.96 [-64.65, 4.79]; -21.56 [-64.59, 5.35]); `rd.runs.d19-<model>.null_safety_scaled` (margin -118.75); `PLAN.md` DA4 | established |
+| p/h = 1: hedge - gate +189 [103, 288], +45 [10, 86], both reject; hedge - arm 1 not distinguishable (+10 [-25, 52], +4 [-28, 43]); text two-sided not distinguishable | `d.low_margin.tests`, `.holm`; `d.runs.d1-<model>.contrasts["cth-arm1\|net"]` (10.06 [-24.53, 51.81]; 4.41 [-27.59, 43.25]), `["cth-uniform\|net"]` (5.63 [-0.72, 13.31]; -0.03 [-5.47, 5.23]) | established |
+| Per unit of price, hedge - arm 1 changes by +41 [-1, 79] and +43 [2, 80] (c19/19 - c1) | `rd.across_ratios.<model>["cth-arm1"].per_unit_of_p` (41.48 [-0.83, 78.98]; 42.73 [2.21, 79.88]) | established |
+| Noisy lead: hedge - arm 1 +254 [-141, 629], +187 [-149, 469], not confirmed (exact p 0.14, 0.15; eight clusters) | `d.noisy_lead.tests` (253.65 [-141.48, 628.71], p_exact 0.13672; 187.20 [-149.33, 469.15], p_exact 0.14844) | established |
+| Descriptively, the noisy-lead gain came from the four two-period units, and two of the four one-period units lost | `rd.runs.dsl-<model>.stratum.by_unit` (units 14 and 18 negative with both models) and `.by_shift` | established (descriptive, untested) |
+| The post-hoc replay of stage C's episodes had the text's gain with Gemini at p/h = 19 at +84 [18, 166] | `sens.fresh-gemini-3.8-flash.19["cth-uniform\|net"]` (84.18 [17.57, 166.11]) | post hoc |
+| Abstract: gains over the gate confirmed at the two other ratios, over the baseline at the higher one; the answer added 82 with Gemini, not detectably with Grok; no-shock losses not shown within the margin; noisy-lead gain not confirmed | the rows above | established |
+| Conclusion: beat the gate at all three ratios and the baseline at the middle and highest | `confirm.json` holm_primary; `d.high_margin.holm`, `d.low_margin.holm` | established |
 
 ## 4. The method and its guarantees (Section VI)
 

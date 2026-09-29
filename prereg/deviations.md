@@ -290,6 +290,34 @@ Not yet frozen. Task 19 establishes `prereg/freeze_manifest.json` at the end of 
 
 ## Gate 3 — pilot decision
 
+### 2026-09-29 — commitment study stage D recorded (cost ratios and noisy lead times); Gate 3 decision unchanged
+
+- **Artefacts:** `analysis/commitment/PLAN.md` (stage D, registered at `fae3714`; pre-run
+  amendments DA1 to DA12 at `33f77b4`), `stage_d.py`, `confirm_d.py`, `readout_d.py`, the six
+  runs under `analysis/commitment/out/d19-*`, `d1-*`, `dsl-*`, and `out/confirm_d.json`,
+  `out/readout_d.json`; the stage D section of `REPORT.md`. No frozen file changed
+  (`tools.freeze.drift()` is `[]`), nothing in `reports/` was written, and `test.yaml` was never
+  opened. Exploratory with respect to Gate 3.
+- **What ran:** the stage C method, arms and evaluator rules on a new pool of 48 units (base
+  200000) at InventoryBench's other two cost ratios, p/h = 19 and 1, and on the reserved
+  stochastic-lead stratum (8 family-4 units) at p/h = 4, with Gemini 3.8 and Grok 4.20; all six
+  runs completed at `a38eb64`, and nothing was evaluated before the last one finished.
+- **Pre-run amendments:** an independent audit of the registration and a fact-check of the study
+  notes led to DA1 to DA12 before any stage D call. The evaluator now refuses any run but the
+  registered one and decides the 8-cluster test by exact enumeration; the stratum's leads are
+  clipped at 4 (a lead of 5 is outside the registered arrival null and made arm 10's e-process
+  raise); the two registered secondaries were defined; the lead-time shift sizes in the study
+  notes were corrected (two periods from a baseline lead of 1, one from 2). None changed a
+  hypothesis, a family, a pool or a cap.
+- **Outcome (Holm within each family):** at p/h = 19, hedge minus gate and hedge minus arm 1
+  reject with both models, and hedge minus the content-free control (the text's value) rejects
+  with Gemini (+81.5) but not Grok (-1.9); null safety at the registered -25 margin is not
+  established there (-22.0 and -21.6). At p/h = 1, hedge minus gate rejects with both. On noisy
+  lead times, hedge minus arm 1 does not reject with either model (+253.7 and +187.2, exact p
+  0.137 and 0.148).
+- **Cost:** $12.49.
+- **Blast radius:** none. No registered number, threshold, criterion or endpoint moved.
+
 ### 2026-09-29 — commitment study recorded: certify-then-hedge confirmed on fresh seeds; Gate 3 decision unchanged
 
 - **Artefacts:** `analysis/commitment/` (plan `PLAN.md`, report `REPORT.md`, method `cth.py`,

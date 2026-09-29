@@ -7,7 +7,8 @@ confirmation: its method, hypotheses, tests and evaluator were committed and pus
 the fresh pool earlier (a scripted structural test computed outcomes on 6 of the 48 clusters) and
 an interim look at one primary run. The plan and every amendment are in `PLAN.md`; the frozen
 tree shows no drift. Numbers below come from `out/confirm.json` (stage C), `out/posthoc.json` and
-`out/sensitivity.json` and `out/ablation.json` (post hoc on stage C), `out/dev/dev1.json` (stage B) and the run outputs
+`out/sensitivity.json` and `out/ablation.json` (post hoc on stage C), `out/confirm_d.json` and
+`out/readout_d.json` (stage D), `out/dev/dev1.json` (stage B) and the run outputs
 under `out/` (stage A), unless a sentence names another source.
 
 ## The method
@@ -177,6 +178,56 @@ p/h = 4 and with both models at p/h = 19.
 **Cost.** Stage C provider cost $6.51: Gemini 3.8 $4.55, Grok 4.20 $1.09, GPT-3.5 $0.45,
 DeepSeek-V3 $0.22, Gemini 2.5 Flash-Lite $0.13, Llama 3.1 8B $0.06.
 
+## Stage D: cost ratios and noisy lead times (registered)
+
+Registered at `fae3714` before any stage D call, with pre-run amendments DA1 to DA12 at `33f77b4`
+(from an independent audit of the registration and a fact-check; none changed a hypothesis, a
+family, a pool or a cap). The six runs (`d19-`, `d1-` and `dsl-` for Gemini 3.8 and Grok 4.20)
+completed at `a38eb64`, with nothing but their own output directories and the owner's
+`.gitignore` edit dirty; nothing was evaluated before all six had finished. Evaluation:
+`confirm_d.py` (`out/confirm_d.json`); registered secondaries: `readout_d.py`
+(`out/readout_d.json`). Stage D pool: seeds `family * 1e6 + 200000 + i`, `i = 0..7`, 240 episodes,
+48 clusters, run at p/h = 19 and 1. Stratum: family 4, `i = 12..19` of base 100000, 40 episodes,
+8 clusters, p/h = 4, each order's lead `min(4, max(0, L_t + xi_t))` (DA10); after onset every unit
+has lead 3 plus noise, on leads 1 to 4 with probabilities (2, 27, 48, 22) / 99.
+
+| Family (Holm within) | Test | Gemini 3.8 | Grok 4.20 |
+|---|---|---|---|
+| High margin, p/h = 19 | D1 hedge - gate | +596.6 b[322.8, 917.0], p 0.00001, reject | +631.4 b[265.0, 1,084.6], p 0.00009, reject |
+| | D2 hedge - arm 1 | +979.3 b[364.4, 1,702.7], p 0.00019, reject | +895.8 b[322.3, 1,569.0], p 0.00060, reject |
+| | D3 hedge - content-free | +81.5 b[35.1, 138.1], p 0.00003, reject | -1.9 b[-74.6, 58.7], p 0.52, no |
+| Low margin, p/h = 1 | D4 hedge - gate | +188.5 b[103.0, 287.5], p 0.00001, reject | +45.2 b[10.1, 85.7], p 0.010, reject |
+| Noisy lead, p/h = 4 | D5 hedge - arm 1 | +253.7 b[-141.5, 628.7], exact p 0.137, no | +187.2 b[-149.3, 469.2], exact p 0.148, no |
+
+Readings (every contrast is net reward per episode; b[...] is the 95% seed-cluster interval):
+
+- *High margin.* Five of the six tests reject. The text's value (D3) rejects with Gemini only.
+  The gate itself is above arm 1 at this ratio: +382.7 b[-36.5, 866.5] and +264.4 b[1.9, 591.8].
+  Acting at once loses 1,298.6 and 1,450.4 net (gross +1,496.1 and +1,586.1).
+- *Null safety at p/h = 19* (registered secondary, margin -25 in currency, DA4): -22.0
+  b[-64.6, 4.8] and -21.6 b[-64.6, 5.4]; non-inferiority is **not** established with either
+  model. At the margin scaled by p/4 (-118.75; descriptive) it holds.
+- *Low margin.* D4 rejects with both. Hedge - arm 1 over all 240 episodes: +10.1 b[-24.5, 51.8]
+  (non-inferior at -25, barely) and +4.4 b[-27.6, 43.3] (not non-inferior); the text, read
+  two-sided, is not distinguishable from zero (+5.6 b[-0.7, 13.3], -0.0 b[-5.5, 5.2]). Null
+  safety holds at -25 (-3.5 b[-7.0, -0.8], -3.3 b[-6.7, -0.7]); at the scaled margin (-6.25)
+  it does not (descriptive).
+- *Across ratios* (registered secondary, per unit of p, `c19 / 19 - c1 / 1`, paired by episode):
+  hedge - arm 1 +41.5 b[-0.8, 79.0] and +42.7 b[2.2, 79.9]; hedge - gate -157.1 b[-253.9, -75.1]
+  and -12.0 b[-51.8, 25.5]; hedge - content-free -1.3 b[-7.7, 4.0] and -0.1 b[-4.9, 4.9]. As a
+  share of arm 1's net reward, hedge - arm 1 is 1.16% b[0.42, 2.05] and 1.06% b[0.38, 1.89] at
+  p/h = 19, 0.34% and 0.15% (intervals include zero) at p/h = 1.
+- *Noisy lead times.* D5 does not reject. Descriptively (DA11, untested), the gain comes from
+  the four two-period units (per shocked episode +788.9 and +634.1; share of the total gain above
+  one, 1.24 and 1.36), while among the one-period units 14 and 18 lose (-1,038.2 and -144.5 with
+  Gemini, -980.5 and -154.5 with Grok) and 15 and 19 gain. The hedge still beats the gate here:
+  +251.3 b[16.6, 439.9] and +273.7 b[50.9, 451.7] (secondary). Null safety holds (+0.4 and +1.25).
+- *Cost:* $12.49 (Gemini 3.8 $4.78, $5.00, $0.49; Grok 4.20 $1.07, $1.07, $0.08).
+
+The post-hoc replay on stage C's episodes (below) had predicted the direction of every stage D
+main-pool result, including the text's value with Gemini at p/h = 19 (+84 b[18, 166] there,
++81.5 registered).
+
 ## Stage B: development (no claim)
 
 On the 120 spent pilot episodes, replaying arm 10's cached answers at no cost, the method scored
@@ -235,6 +286,8 @@ real-content pilot's two banks, reused here.
 - A2: StepFun (four models, shadow-priced flat-rate plan) and OpenRouter (eleven open-weight or
   legacy models) added before any call on them.
 - A3: StepFun shadow caps raised to $4 so `step-3.7-flash` runs.
+- A4: the `step-5-preview` full run stopped on a provider timeout after 61 calls and was
+  restarted from its cache under the same name and cap.
 - C1: fresh layout reduced from 72 to 48 units before any call: the dev/cal alert bank has four
   accurate templates per family and split, and module 03's renderer refuses repeated texts.
 - C2: an empty model echo is re-requested (up to three times, all attempts billed) instead of
@@ -244,15 +297,22 @@ real-content pilot's two banks, reused here.
   by the pre-registration structural test; the C1 layout materialised early (no arms); the
   Gemini manifest's end-of-run SHA; Rule U applies to arm 10 only; the stage B guarantees
   restated (known null, exact prior constants, the gate as an analogy).
+- C3 erratum (dated): arm 10's e-process does not certify the model's full spec; the evidence is
+  largely shared with the hedge's, and what differs is its use.
+- DA1 to DA12 (stage D, before any call): the evaluator refuses any run but the registered one
+  and decides D5 by the exact flip test; the two secondaries defined (`readout_d.py`); the
+  stratum's leads clipped at 4 (a lead of 5 made arm 10's e-process raise); the true lead-time
+  shift sizes corrected (two periods from a baseline of 1, one from 2); D5's reading, a
+  comparator's provenance and the handling of stopped runs fixed.
 - Stage B tuned on the spent pilot episodes.
 
 ## What this does not show
 
-The simulator's lead times are deterministic, which makes a lead-time shift easy to size from
-receipts; at p/h = 4 the gain rests on that family. One cost ratio (p/h = 4) was confirmed; the
-others are replayed with the models' answers held fixed. The exposure bound needs a known null;
-the demand e-processes estimate theirs from the pre-proposal prefix, and the Monte Carlo puts
+The simulator's lead times are deterministic outside stage D's stratum, which makes a
+lead-time shift easy to size from receipts; at p/h = 4 the gain rests on that family, and on
+noisy lead times (8 units) the gain over arm 1 was not confirmed. Null safety at p/h = 19 is not
+established at the registered margin. The exposure bound needs a known null; the demand e-processes estimate theirs from the pre-proposal prefix, and the Monte Carlo puts
 the stopped exposure at 2.0 to 2.7 times the budget at early firings in the cells matched to the
 null episodes (up to 3.2 in others). The regret bound covers the one-period surrogate, not realised multi-period
-cost. No claim is made about language understanding; at the registered cost ratio the text adds
-no net value over the alert-timed content-free control.
+cost. No claim is made about language understanding; at p/h = 4 the text adds no net value
+over the alert-timed content-free control, and at p/h = 19 it adds value with Gemini only.

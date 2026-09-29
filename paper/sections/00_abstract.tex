@@ -3,26 +3,26 @@
 % special characters, footnotes or math; this one follows the same rule.
 
 \begin{abstract}
-Language models often name the right kind of shock in an operational alert, but a wrong
-reading moves real orders. We study a replenishment controller
-that asks a language model only what changed, in a closed typed vocabulary, and tests the
-answer with an anytime-valid e-process on data that arrive after the proposal. A preregistered
-pilot of the natural design, which lets a hypothesis act only once its e-process crosses a Ville
-threshold, was stopped at its own decision gate, and a rerun with live models showed why: the
-gate acted late and rarely. We propose
-certify-then-hedge. The e-process no longer switches the controller on; it prices a fixed set of
-action-aligned hypotheses, the model's answer only reweights them and dates the one it names, the size of the shock is
-estimated from the data, and the order is the critical fractile of the resulting
+Language models often read operational alerts correctly, but a wrong reading moves real
+orders. We study a replenishment controller that asks a language model only
+what changed, in a closed typed vocabulary, and tests the answer with an anytime-valid e-process
+on data that arrive after the proposal. A preregistered pilot of the natural design, which lets a
+hypothesis act once its e-process crosses a Ville threshold, was stopped at its own
+decision gate; with live models the gate acted late and rarely. We propose certify-then-hedge.
+The e-process no longer switches the controller on but prices a fixed set of action-aligned
+hypotheses, the model's answer only reweights them and dates the one it names, the size of the
+shock is estimated from the data, and the order is the critical fractile of the resulting
 posterior-predictive mixture. Under a known null, the expected exposure to a false hypothesis
 stays within the frozen error budget, whatever the model says. In an exploratory test registered
-before its live runs, on 240 fresh episodes with Gemini and Grok as proposers,
-certify-then-hedge improved net reward per episode over the gate by 309 and 179 and over the
-operations research baseline by 178 and 163; all four tests survived Holm correction, and losses
-on no-shock episodes stayed within the registered margin. Nearly all of the gain over the
-baseline came from lead-time shifts. A variant that ignores the model's answer, timed by the same
-alerts, earned about as much; post hoc, the model's label cut commitment on no-shock episodes by
-37 and 45 percent with no detectable change in reward. Acting on proposals at once lost 1,478 to
-3,181 in net reward per episode across six models.
+before its live runs, on 240 fresh episodes with Gemini and Grok as proposers, the method
+improved net reward per episode over the gate by 309 and 179 and over the base-stock
+baseline by 178 and 163, with losses on no-shock episodes within the registered margin. Nearly all of the gain over the baseline came from
+lead-time shifts, and an alert-timed variant that ignores the model's answer earned about as
+much. A second registered stage confirmed the gains over the gate at the
+benchmark's two other cost ratios and over the baseline at the higher one, where the model's
+answer added 82 per episode with Gemini, not detectably with Grok, and no-shock losses were
+not shown to stay within the margin; on noisy lead times the gain over the
+baseline was not confirmed.
 \end{abstract}
 
 \hfill
