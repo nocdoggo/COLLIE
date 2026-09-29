@@ -145,7 +145,7 @@ def run_variant(task: tuple[str, str]) -> list[dict]:
 
 def _ci(diff: pd.Series, clusters: pd.Series) -> dict:
     lo, hi = cluster_bootstrap(diff, clusters, resamples=RESAMPLES)
-    return {"mean": round(float(diff.mean()), 1), "b": [round(lo, 1), round(hi, 1)]}
+    return {"mean": float(diff.mean()), "b": [float(lo), float(hi)]}
 
 
 def summarise(frame: pd.DataFrame, bank: str, variant: str) -> dict:
@@ -161,13 +161,13 @@ def summarise(frame: pd.DataFrame, bank: str, variant: str) -> dict:
             out[f"vs_{label}|{endpoint}"] = _ci(diff, meta["cluster"])
     diff = ours["net"] - stored[("net", ARM1)].reindex(ours.index)
     nulls = meta["is_null"]
-    out["null_net_vs_arm1"] = round(float(diff[nulls].mean()), 1)
-    out["null_worst_vs_arm1"] = round(float(diff[nulls].min()), 1)
-    out["null_exposure"] = round(float(ours.loc[nulls, "exposure"].mean()), 3)
-    out["null_max_mass"] = round(float(ours.loc[nulls, "max_mass"].max()), 3)
+    out["null_net_vs_arm1"] = float(diff[nulls].mean())
+    out["null_worst_vs_arm1"] = float(diff[nulls].min())
+    out["null_exposure"] = float(ours.loc[nulls, "exposure"].mean())
+    out["null_max_mass"] = float(ours.loc[nulls, "max_mass"].max())
     fam = meta["fam"].where(~nulls, other=0)
     out["by_family_net_vs_arm1"] = {
-        str(int(f)): round(float(diff[fam == f].mean()), 1) for f in sorted(fam.unique())
+        str(int(f)): float(diff[fam == f].mean()) for f in sorted(fam.unique())
     }
     return out
 

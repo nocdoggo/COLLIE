@@ -37,6 +37,7 @@ import pandas as pd
 
 from analysis.commitment import confirm
 from analysis.commitment.ladder import run_name as ladder_run_name
+from analysis.commitment.readout_d import true_shift
 
 OUT = confirm.OUT
 RUNS = (
@@ -123,9 +124,16 @@ def exposure_by_hypothesis(log: pd.DataFrame, null_ids) -> dict:
     return out
 
 
+STATED_PERIODS = {"low": 1, "medium": 2, "high": 3}
+"""The lead-time shift each magnitude bin compiles to, on top of the running lead
+(``collie/control/mapping.py``: l_eff 2, 3, 4 against a reference of 1)."""
+
+
 def lead_time_proposals(run: str) -> dict:
-    """Arm 10 on the shocked lead-time episodes: the first lead-time proposal's magnitude, and
-    periods from that proposal to the gate's first active period."""
+    """Arm 10 on the shocked lead-time episodes: the first lead-time proposal's magnitude, its
+    stated size against the true shift (two periods from a baseline lead of 1, one from 2; every
+    family-4 unit moves to a lead of 3), and periods from that proposal to the gate's first active
+    period."""
     truth = {r["episode_id"]: r for r in confirm._jsonl(OUT / run / "truth.jsonl")}
     shocked = {e for e in truth if f"/f{LEAD_TIME_FAMILY}/" in e and not e.endswith("__twin")}
     first: dict[str, dict] = {}
@@ -144,14 +152,18 @@ def lead_time_proposals(run: str) -> dict:
         if active:
             delays.append(min(active) - first[r["episode_id"]]["period"])
     magnitudes: dict[str, int] = {}
-    for p in first.values():
+    versus = {"right": 0, "too_large": 0, "too_small": 0}
+    for episode, p in first.items():
         key = str(p["payload"]["magnitude_bin"])
         magnitudes[key] = magnitudes.get(key, 0) + 1
+        stated, true = STATED_PERIODS[key], true_shift(episode)
+        versus["right" if stated == true else "too_large" if stated > true else "too_small"] += 1
     return {
         "shocked_episodes": len(shocked),
         "true_magnitudes": sorted({str(truth[e].get("magnitude_bin")) for e in shocked}),
         "with_lead_time_proposal": len(first),
         "first_proposal_magnitude": magnitudes,
+        "first_proposal_vs_true_shift": versus,
         "gate_activated": len(delays),
         "gate_delay_median": float(np.median(delays)) if delays else None,
         "gate_delays": sorted(delays),

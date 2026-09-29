@@ -103,8 +103,13 @@ text, carries the gain.
   or wrong, moves prior weight off the others; the content-free control's null mass sits mostly on
   the pulse hypothesis (0.69 of 0.83).
 - *Lead-time proposals.* Gemini named a lead-time shift in 17 of the 32 lead-time episodes
-  (medium 8, high 3, low 6) and Grok in 11 (medium 10, high 1); every true shift was one period.
-  The gate activated a median of 11 periods after the proposal with both.
+  (medium 8, high 3, low 6) and Grok in 11 (medium 10, high 1). Every family-4 unit moves to a
+  lead of 3, so the true shift is two periods for the units with a baseline of 1 and one period
+  for those with a baseline of 2 (PLAN.md, DA8; an earlier version of this report said every
+  true shift was one period). Reading low, medium and high as one, two and three periods, as the
+  gate compiles them, Gemini's first proposal had the right size in 10 of 17 (5 too large, 2 too
+  small) and Grok's in 5 of 11 (6 too large). The gate activated a median of 11 periods after
+  the proposal with both.
 - *Endpoint sign.* Gross and net disagree in sign for at once - arm 1 and hedge - at once (both
   endpoints' intervals exclude zero) and for the gate - arm 1 point estimate (its net interval
   includes zero), on both primary models; every claim here is on net.
@@ -133,7 +138,7 @@ share over the content-free control is distinguishable from zero with Gemini at 
 and with Grok at p/h = 1, where it is negative. All post hoc, on the confirmation's own
 episodes; `sensitivity.json` holds 6 contrasts x 2 endpoints x 5 ratios x 2 models.
 
-**Cost.** Stage C provider cost $6.50: Gemini 3.8 $4.55, Grok 4.20 $1.09, GPT-3.5 $0.45,
+**Cost.** Stage C provider cost $6.51: Gemini 3.8 $4.55, Grok 4.20 $1.09, GPT-3.5 $0.45,
 DeepSeek-V3 $0.22, Gemini 2.5 Flash-Lite $0.13, Llama 3.1 8B $0.06.
 
 ## Stage B: development (no claim)
@@ -168,7 +173,7 @@ stage B development replay (arm 10's cached answers, no calls), so it carries no
 | gpt-4o-mini | OpenAI | 2024-07 | legacy | 29/96 | 0 | -1,741 | -1 | +111 | 11/12, 1/12 | $0.07 |
 | gpt-oss-20b | OpenAI | 2025-08 | 21B-MoE | 49/96 | 21 | -2,626 | -176 | +149 | 6/12, 0/12 | $0.05 |
 | step-3.5-flash | StepFun | 2026-01 | mid | 49/96 | 29 | -3,339 | -156 | +146 | 12/12, 1/12 | $0.37 |
-| step-3.5-flash-2603 | StepFun | 2026-03 | mid | 50/96 | 26 | -3,269 | -141 | +154 | 12/12, 1/12 | $0.37 |
+| step-3.5-flash-2603 | StepFun | 2026-03 | mid | 50/96 | 26 | -3,269 | -141 | +155 | 12/12, 1/12 | $0.37 |
 | step-3.7-flash | StepFun | 2026-05 | mid | 53/96 | 29 | -3,051 | -201 | +153 | 12/12, 1/12 | $1.72 |
 | grok-build-0.1 | xAI | 2025-08 | small | 28/96 | 53 | -2,002 | +3 | +144 | 3/12, 0/12 | $1.28 |
 | grok-4.20 | xAI | 2026-03 | mid | 53/96 | 20 | -2,624 | -172 | +154 | 9/12, 1/12 | $0.44 |
@@ -176,7 +181,8 @@ stage B development replay (arm 10's cached answers, no calls), so it carries no
 Readings. Perception ranges from 0/96 to 59/96: Llama 3.2 1B never produces a non-abstaining
 `ShockSpec`, so every proposal falls back to arm 1, and 3B produces seven (all demand up), on
 which acting at once loses 28 b[-54, -6]. The loss from acting at once ranges from zero to
--3,656 and grows with how readily a model commits; across the rungs commitment and accuracy move
+-3,656 and, contrary to stage A's registered expectation (item 6) that it would grow as
+perception falls, grows with how readily a model commits; across the rungs commitment and accuracy move
 together (post hoc, `posthoc.json` `ladder`: r = 0.86; loss against either, r = -0.90), so
 being right does not protect a model: Qwen 2.5 7B (2/96 right, 63 first-proposal abstentions)
 loses 61, while Gemini 2.5 Flash-Lite (55/96 right, 5 abstentions) loses 3,656. The gate stays

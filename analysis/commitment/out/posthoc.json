@@ -323,6 +323,11 @@
      "high": 2,
      "medium": 13
     },
+    "first_proposal_vs_true_shift": {
+     "right": 7,
+     "too_large": 8,
+     "too_small": 0
+    },
     "gate_activated": 14,
     "gate_delay_median": 11.0,
     "gate_delays": [
@@ -577,6 +582,11 @@
      "high": 1,
      "medium": 5
     },
+    "first_proposal_vs_true_shift": {
+     "right": 2,
+     "too_large": 4,
+     "too_small": 0
+    },
     "gate_activated": 6,
     "gate_delay_median": 11.0,
     "gate_delays": [
@@ -824,6 +834,11 @@
      "high": 3,
      "low": 6,
      "medium": 8
+    },
+    "first_proposal_vs_true_shift": {
+     "right": 10,
+     "too_large": 5,
+     "too_small": 2
     },
     "gate_activated": 17,
     "gate_delay_median": 11.0,
@@ -1082,6 +1097,11 @@
      "high": 2,
      "medium": 8
     },
+    "first_proposal_vs_true_shift": {
+     "right": 5,
+     "too_large": 5,
+     "too_small": 0
+    },
     "gate_activated": 4,
     "gate_delay_median": 11.0,
     "gate_delays": [
@@ -1326,6 +1346,11 @@
     "first_proposal_magnitude": {
      "high": 1,
      "medium": 10
+    },
+    "first_proposal_vs_true_shift": {
+     "right": 5,
+     "too_large": 6,
+     "too_small": 0
     },
     "gate_activated": 11,
     "gate_delay_median": 11.0,
@@ -1576,6 +1601,11 @@
    },
    "lead_time_proposals": {
     "first_proposal_magnitude": {},
+    "first_proposal_vs_true_shift": {
+     "right": 0,
+     "too_large": 0,
+     "too_small": 0
+    },
     "gate_activated": 0,
     "gate_delay_median": null,
     "gate_delays": [],
