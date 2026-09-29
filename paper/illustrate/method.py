@@ -65,7 +65,7 @@ G_Y0, G_Y1 = Y0, 0.59
 G_STRIP = 0.155
 C_Y0, C_Y1 = 0.645, Y1
 GAP = 0.14
-WIDTHS = (1.33, 1.38, 2.32, 1.54)
+WIDTHS = (1.33, 1.38, X1 - X0 - 3 * GAP - 1.33 - 1.38 - 1.54, 1.54)  # (c) takes the rest
 
 LAMBDA = 0.25
 HYPS = ["demand up", "demand down", "lead-time shift", "upward pulse"]
@@ -221,7 +221,7 @@ def card_spec(c: Canvas, x: float, w: float) -> None:
     sc = small_caps("ShockSpec", FS_T, FS_S)
     runs = [("(a)", FS_T, space)]
     runs += [(s, fs, 0.0) for s, fs in sc[:-1]] + [(sc[-1][0], sc[-1][1], space)]
-    runs += [(r"at firing $\tau_j$", FS_T, 0.0)]
+    runs += [(r"at firing $j$", FS_T, 0.0)]
     top = open_card(c, "card a", x, w, S.NEUTRAL, runs)
     y = top - 0.11
     c.t(x + w / 2, y, r"one record per firing, $j \leq 2$", fs=FS_S, ha="center", **ITAL)
@@ -275,7 +275,7 @@ def card_spec(c: Canvas, x: float, w: float) -> None:
     c.line([bx + 0.03, bx + 0.06], [(ya + yb) / 2] * 2, color=S.HEDGE, lw=0.7, zorder=4)
     c.t(tx, bl((ya + yb) / 2, FS_S), r"names $\hat k_j$", fs=FS_S)
     c.line([bx, bx + 0.06], [rows[2]] * 2, color=S.HEDGE, lw=0.7, zorder=4)
-    c.t(tx, bl(rows[2], FS_S), r"dates $E_{j\hat k_j}$", fs=FS_S)
+    c.t(tx, bl(rows[2], FS_S), r"dates $\hat k_j$", fs=FS_S)
     c.line(
         [bx0 + 0.03, bx1 - 0.03], [rule, rule], color=S.tint(S.NEUTRAL, 0.35), lw=0.5, zorder=3.3
     )
@@ -288,7 +288,7 @@ def card_spec(c: Canvas, x: float, w: float) -> None:
     # No named hypothesis, then what the model may not write.
     c.inside("card a", x + 0.025, C_Y0 + 0.02, x + w - 0.025, top - 0.01)
     y = r_bot - 0.115
-    c.t(x + w / 2, y, r"abstain, no parse, or outside $\mathcal{H}$:", fs=FS_S, ha="center", **ITAL)
+    c.t(x + w / 2, y, r"abstain, unparsed, or outside $\mathcal{H}$:", fs=FS_S, ha="center", **ITAL)
     c.t(x + w / 2, y - 0.118, r"no $\hat k_j$ is named", fs=FS_S, ha="center", **ITAL)
     y -= 0.25
     c.t(x + w / 2, y, "the model cannot write", fs=FS_S, ha="center", **ITAL)
@@ -314,7 +314,7 @@ def card_prior(c: Canvas, x: float, w: float) -> None:
     c.t(
         x + w / 2,
         y,
-        r"mass $a_j\,w_{jk}$ to each $k \in \mathcal{H}$",
+        r"prior $w_{jk}$: each $k$'s share of $a_j$",
         fs=FS_S,
         ha="center",
         **ITAL,
@@ -453,10 +453,10 @@ def card_certify(c: Canvas, x: float, w: float) -> dict:
 
     notes = [
         (r"one e-process per $(j,k)$,", S.INK),
-        (r"$E_{jk,\tau_j}=1$, data after $\tau_j$;", S.INK),
+        (r"$E_{jk}=1$ at $\tau_j$, data after it;", S.INK),
         (r"anytime valid under $\mathbb{P}_0$;", S.INK),
         ("the model's onset", S.INK_2),
-        (r"window dates $E_{j\hat k_j}$", S.INK_2),
+        (r"window dates $\hat k_j$", S.INK_2),
     ]
     notes_w = max(c.width(s, fs=FS_S) for s, _ in notes)
     nx = xr - notes_w
@@ -499,7 +499,7 @@ def card_certify(c: Canvas, x: float, w: float) -> dict:
             zorder=4.5 if named else 4,
         )
         c.dot(float(xmap(1.0)), float(ymap(v[-1])), S.HYP[hyp], ms=2.8 if named else 2.2)
-    c.t(px0 - 0.03, bl(ymap(0), FS_S), "1", fs=FS_S, ha="right", color=S.INK_2)
+    c.t(px0 - 0.03, bl(ymap(0), FS_S), "0", fs=FS_S, ha="right", color=S.INK_2)
     CLEAR.append(c.t(px0, bl(py1 - 0.022, FS_S), r"$\log E$", fs=FS_S, ha="center", color=S.INK_2))
     ylab = py0 - 0.1
     c.t(xs0, ylab, r"$\tau_j$", fs=FS_S, ha="center", color=S.INK_2)
@@ -552,7 +552,7 @@ def card_certify(c: Canvas, x: float, w: float) -> dict:
     rx = c.extent(frac)[2] + 0.2
     c.line([rx - 0.1] * 2, [fy0 + 0.05, fy1 - 0.05], color=S.tint(S.HEDGE, 0.45), lw=0.6)
     c.t(rx, bl(fy1 - 0.07, FS_S), r"$N_t=\Sigma_{j,k}\,a_j w_{jk} E_{jk,t}$", fs=FS_S)
-    c.t(rx, bl(fy1 - 0.172, FS_S), r"$A_t=\Sigma_{j:\tau_j<t}\Sigma_k\,a_j w_{jk}$", fs=FS_S)
+    c.t(rx, bl(fy1 - 0.172, FS_S), r"$A_t$: the $a_j$ fired before $t$", fs=FS_S)
     c.t(rx, bl(fy1 - 0.274, FS_S), r"$\Pi_t=\Sigma_{j,k}\,\pi_{jk,t}$", fs=FS_S)
 
     # Size from the data.
@@ -574,7 +574,7 @@ def card_certify(c: Canvas, x: float, w: float) -> dict:
     c.t(tx, bl(y, FS_S), "learned from 5 pseudo-observations", fs=FS_S)
     y -= pitch
     c.swatch(lx, y, S.HYP[NAMED], 0.05)
-    c.t(tx, bl(y, FS_S), r"offset $\Delta\in\{1,2,3\}$ and start, from receipts", fs=FS_S)
+    c.t(tx, bl(y, FS_S), r"offset $\Delta\in\{1,2,3\}$ and start, from arrivals", fs=FS_S)
     y -= pitch
     c.t(tx, bl(y, FS_S), r"$\Rightarrow$ law $G_{jk,t}$, not the model's magnitude bin", fs=FS_S)
     c.inside(None)
@@ -652,8 +652,8 @@ def card_hedge(c: Canvas, x: float, w: float) -> dict:
     # Direct labels: the two parts of the mixture by leaders to where they part from it.
     y_row = py1 - 0.05
     for s, ha, xa, ua, part, col in (
-        (r"$(1-\Pi_t)F_{0,t}$", "left", px0, 0.39, null, S.BASE),
-        (r"$\Sigma\,\pi_{jk,t}G_{jk,t}$", "right", px1, 0.53, hyp, S.HYP[NAMED]),
+        (r"$(1-\Pi_t)f_{0,t}$", "left", px0, 0.39, null, S.BASE),
+        (r"$\Sigma\,\pi_{jk,t}\,g_{jk,t}$", "right", px1, 0.53, hyp, S.HYP[NAMED]),
     ):
         art = c.t(xa, bl(y_row, FS_S), s, fs=FS_S, ha=ha, color=col)
         CLEAR.append(art)
@@ -696,7 +696,7 @@ def card_hedge(c: Canvas, x: float, w: float) -> dict:
     c.t(
         x + w / 2,
         bl((by0 + by1) / 2, FS_S),
-        r"$\Pi_t=0$: $q_t$ is arm 1's order, bit for bit",
+        r"nothing live: $q_t$ is arm 1's, bit for bit",
         fs=FS_S,
         ha="center",
     )
@@ -871,8 +871,8 @@ def _assert_content(c: Canvas, cert: dict, hedge: dict) -> None:
     assert joined.count("schematic") == 2, "both schematic plots must say so"
     stripped = re.sub(r"\$[^$]*\$", "", joined).replace("arm 1", "")
     nums = re.findall(r"\d[\d,.]*\d|\d", stripped)
-    # 1 is the e-processes' start (the y tick in (c)); 5 the pseudo-observations.
-    assert sorted(nums) == ["1", "5"], f"numbers outside the registered constants: {nums}"
+    # 0 is log E at the e-processes' start (the y tick in (c)); 5 the pseudo-observations.
+    assert sorted(nums) == ["0", "5"], f"numbers outside the registered constants: {nums}"
     for k in HYPS:
         assert k in texts, f"hypothesis {k} missing"
     for key in ("shock_family", "direction", "onset_window"):

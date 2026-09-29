@@ -29,8 +29,8 @@ from matplotlib.lines import Line2D
 from matplotlib.patches import FancyBboxPatch, Polygon, Rectangle
 
 FIGURES_DIR = Path(__file__).resolve().parent.parent / "figures"
-TEXT_WIDTH = 7.16  # IEEE two-column text width (in)
-COLUMN_WIDTH = 3.5  # IEEE column width (in)
+TEXT_WIDTH = 516 / 72.27  # IEEEtran \textwidth, 43pc (in), so LaTeX never rescales a figure
+COLUMN_WIDTH = 252 / 72.27  # IEEEtran \columnwidth, 21pc (in)
 PT = 1 / 72
 
 INK = "#1f2328"
