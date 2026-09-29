@@ -193,3 +193,21 @@ def test_the_cost_ratio_replay_serves_by_decision_point_and_counts_misses():
     assert transport.complete_metered("any prompt", decoding=None).text == ABSTAIN
     assert transport.misses == [("arm10", "dev/f1/s1/no_alert", 13)]
     assert transport.served == 2
+
+
+def test_stage_d_pools_are_disjoint_from_stage_c_and_each_other():
+    from analysis.commitment.confirm_d import FAMILIES
+    from analysis.commitment.episodes import fresh_units, stochastic_lead_units
+    from analysis.commitment.stage_d import D_BASE, STOCHASTIC_UNITS
+
+    stage_c = {u.seed for u in fresh_units(12)}
+    stratum = {u.seed for u in stochastic_lead_units(n_units=STOCHASTIC_UNITS)}
+    stage_d = {u.seed for u in fresh_units(8, base=D_BASE)}
+    assert len(stage_d) == 48 and len(stratum) == 8
+    assert not stage_d & stage_c and not stage_d & stratum and not stratum & stage_c
+    assert {f: s["profit"] for f, s in FAMILIES.items()} == {
+        "high_margin": 19.0,
+        "low_margin": 1.0,
+        "noisy_lead": 4.0,
+    }
+    assert sum(len(s["tests"]) for s in FAMILIES.values()) == 5

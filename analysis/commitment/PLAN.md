@@ -301,3 +301,89 @@ say. None changes a run, a rule, a cap or a number; post-hoc checks are in `out/
    name enters with `lam` times the content-free weight, a cost of exactly `log(1 / lam)` nats
    (log 4), and the named one with `lam + (1 - lam) |H|` times it, a saving of
    `log(lam + (1 - lam) |H|)` (log 3.25); `log(|H| / lam)` is a valid but loose bound on the cost.
+
+## Stage D. Cost ratios and noisy lead times
+
+Registered 2026-09-29, before any stage D run on its pools. Exploratory with respect to Gate 3,
+as stages A to C are. Stage D asks two questions that stage C left open and that its post-hoc
+readouts (`out/sensitivity.json`, `out/posthoc.json`) raised on stage C's own episodes: does the
+method keep its advantage at InventoryBench's other two cost ratios, and does the model's text
+earn anything when stockouts dominate; and does the lead-time gain survive noisy lead times.
+
+**Frozen.** Every stage C file at its current hash, unchanged since the stage C runs (first 16 hex
+of sha256): `cth.py` 343835b85d32a69e, `arms.py` 6d1f468e43a5f9f9, `registry.py`
+73c7952dc77b80ef, `runner.py` c753ef5e9e348aa2, `episodes.py` 4f0d9df15c05ca7e, `endpoints.py`
+1051f372754f6e25 (after C2), `confirm.py` 7b7db9f47db8476b; and two new files, `stage_d.py`
+38b79c716fe02836 (swaps the runner's layout for stage D's pools, for one call, and records the
+pool in `stage_d.json`) and `confirm_d.py` 1c924d0e5699f91b (the evaluator). Any later change to
+these files is a logged deviation. The method under test is `arm12_cth` exactly as in stage C,
+with stage C's arm set (`confirm`), trigger, alert rule `bank-v1` and Rule U on arm 10 only. The
+cost ratio reaches the arms only through the instance (the critical fractile each arm reads from
+its observations) and through the prompt, which shows the margin.
+
+**Episodes.**
+
+- *Stage D pool:* seeds `family * 1_000_000 + 200_000 + i`, `i = 0..7` in every family (48
+  units; disjoint from every registered pool, from stage C's reserved `100_000 + 0..23` and from
+  the throwaway `900_000` pool), built exactly as stage C's layout: four conditions plus a twin
+  per unit, 24 silent and 24 false-alert twins, 240 episodes, one cluster per unit. Run twice,
+  at `p = 19` and at `p = 1` (`h = 1`), the benchmark's other two ratios; the demand, lead-time
+  and alert paths are the same at both.
+- *Stochastic-lead stratum:* the stratum reserved in `episodes.py` (family 4, seeds
+  `4_000_000 + 100_000 + i`, `i = 12..19`; 8 units, the bank's text capacity for one family; 32
+  shocked episodes and 8 twins, 4 silent and 4 false-alert; 40 episodes, 8 clusters), at `p = 4`.
+  Each order's lead time is `max(0, L_t + xi_t)` with `xi_t` iid on `{-2, ..., 2}` with
+  probabilities `(2, 27, 48, 18, 4) / 99`. For the four units whose baseline lead is 2 this is,
+  before onset, the registered arrival null's delay law (without its loss and pause terms); for
+  the four whose baseline lead is 1 it is that law shifted down one period and truncated at
+  zero, and after their one-period shift it is the registered law itself. The lead-time
+  e-process's null therefore roughly matches the generator for half the units and is
+  conservative for the other half, while the demand e-processes keep the plug-in null.
+
+**Endpoints (models).** `gemini-3.8-flash` and `grok-4.20` only. Runs, each through
+`python -m analysis.commitment.stage_d`: `d19-<model>` (`--pool main --profit 19`), `d1-<model>`
+(`--pool main --profit 1`), `dsl-<model>` (`--pool stochastic --profit 4`). Caps: $8, $8 and $2
+for Gemini 3.8; $2, $2 and $1 for Grok 4.20. Each run first smokes three episodes under its full
+run name (main pool: `dev/f4/s4200000/early_accurate`, `dev/f1/s1200000/unreliable`,
+`dev/f1/s1200000/no_alert__twin`; stratum: `dev/f4/s4100012/early_accurate`,
+`dev/f4/s4100012/unreliable`, `dev/f4/s4100012/no_alert__twin`) and goes ahead only if the
+smoke's cost scaled to the run's episodes stays below its cap. Nothing is evaluated until all
+six full runs have finished.
+
+**Primary hypotheses** (net reward = `total_reward` per episode, all episodes of the run;
+one-sided cluster sign-flip p-values and seed-cluster bootstrap intervals exactly as stage C
+computes them; Holm's step-down at 0.05 within each family, each family controlling its own
+error rate):
+
+- *High margin* (`p/h = 19`, 48 clusters), per model: D1 `arm12_cth - arm10 > 0`; D2
+  `arm12_cth - arm1 > 0`; D3 `arm12_cth - ctrl_cth_uniform > 0`, the value of the text. 6 tests.
+- *Low margin* (`p/h = 1`, 48 clusters), per model: D4 `arm12_cth - arm10 > 0`. 2 tests.
+- *Noisy lead* (`p/h = 4`, stochastic stratum, 8 clusters), per model: D5
+  `arm12_cth - arm1 > 0`. 2 tests. With 8 clusters the smallest attainable p is about 1/256.
+
+Each test is reported for its model; a hypothesis holds for a model when its Holm-adjusted test
+rejects.
+
+**Secondary (no multiplicity claim).** Stage C's full readout for every run (`confirm.evaluate_run`:
+every stage C contrast on net and gross, null safety against arm 1 with the -25 margin, net by
+family, exposure, perception, cost). For each low-margin run, the non-inferiority of
+`arm12_cth - arm1` over all 240 episodes at the same margin. The text's value at `p/h = 1`
+(`arm12_cth - ctrl_cth_uniform`) is read from its two-sided interval, since the post-hoc replay
+showed it negative there with Grok. Paired across ratios on the stage D pool, the change in each
+contrast from `p = 1` to `p = 19`, and each gain as a share of arm 1's net reward.
+
+**What the plan expects** (from the post-hoc replay on stage C's episodes and the throwaway
+development check; neither is evidence here): D1, D2 and D4 to reject with both models; D3 with
+Gemini more likely than with Grok; D5 to reject if the content-free development gain on noisy
+lead times (+506 per shocked episode on throwaway seeds, against +884 with deterministic leads)
+carries over to the method.
+
+**Prior contact.** Development used the throwaway pool only: a scripted structural run of both
+stage D layouts through `stage_d.py` and `confirm_d.py` (`base 900_000`, all eleven arms), and a
+content-free check of arm 1 and `ctrl_cth_uniform` on noisy lead times. No stage D seed has been
+materialised or run: `base 200_000` has never been used, and a search of the working tree, the
+repository history and the scratch directories finds no output for the stratum's seeds
+(`4100012` to `4100019`), which `episodes.py` has reserved since `662c7e5`.
+
+**Evaluator.** `python -m analysis.commitment.confirm_d` writes `out/confirm_d.json`; it refuses a
+run whose pool, ratio or episode count differs from the registered one.
