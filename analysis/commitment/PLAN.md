@@ -387,3 +387,120 @@ repository history and the scratch directories finds no output for the stratum's
 
 **Evaluator.** `python -m analysis.commitment.confirm_d` writes `out/confirm_d.json`; it refuses a
 run whose pool, ratio or episode count differs from the registered one.
+
+### Stage D amendments (before any stage D call)
+
+Logged 2026-09-29, before any stage D call (smokes included), from a pre-run audit of the
+registration by an independent reviewer and a fact-check of the study notes. Numbered DA so as
+not to collide with the hypotheses D1 to D5. None changes a hypothesis, a family, a pool or a
+cap. DA1, DA2 and DA7 change `confirm_d.py`, DA10 changes the stratum's lead-time generator in
+`stage_d.py`, and DA3 and DA11 add `readout_d.py` (new hashes below).
+
+- **DA1 (evaluator: registered runs only).** `confirm_d.check_run` checked the pool by its label
+  alone, so a 240-episode run on any base would have passed. It now refuses a run unless
+  `stage_d.json` records the registered base (200000 for the main pool, 100000 for the
+  stratum), the episodes' unit seeds are exactly the registered pool's (48 main-pool seeds;
+  4100012 to 4100019), the manifest says `partial: false`, arm set `confirm` and the run's own
+  name, and its ladder rung is the run name's model with that rung's served model id (the
+  endpoint block's own name is the project's base configuration, `gemini-primary` or
+  `grok-hosted-confirmation`). `--throwaway-base` runs the same checks on the
+  throwaway pool for structural tests (skipping the model and run-name checks) and marks the
+  output not confirmatory.
+- **DA2 (flip test).** Stage C's flip test compares draws with the observed mean at an absolute
+  tolerance of `1e-12`; with net rewards about 19 times stage C's, rounding could drop the
+  all-positive pattern. The tolerance is now `1e-9 * max(1, |observed|)`. With 16 clusters or
+  fewer the p-value is the exact enumeration over all `2^k` sign patterns, and the exact value
+  decides; this applies to D5 (8 clusters, smallest p `1/256`). D1 to D4 (48 clusters) keep
+  stage C's 100,000 random flips with the same seed. `confirm_d.json` stores both p-values and
+  stage C's rule next to them. On the throwaway structural runs the new evaluator reproduces
+  every mean, interval and p-value of the registered one.
+- **DA3 (the two secondaries, defined).** `readout_d.py` (new, `out/readout_d.json`) computes
+  them. (i) *Across ratios:* per model, for hedge - gate, hedge - arm 1 and hedge -
+  content-free on net reward, the per-episode change from `d1-<model>` to `d19-<model>`,
+  paired by episode id (the two runs share the pool, the paths and the alerts; the readout
+  refuses different episode sets), with its mean and a two-sided 95% seed-cluster bootstrap over
+  the 48 paired clusters (stage C's seed and 10,000 draws). (ii) *Share of arm 1:* for every
+  run and each of those contrasts, the mean gain over arm 1's mean net reward, with a
+  ratio-of-means interval from the same cluster draws. It also reports, descriptively, the
+  null-safety contrast against the margin scaled by `p / 4` (DA4) and, on the lead-time units,
+  hedge - arm 1 by true shift size (DA8).
+- **DA4 (scale).** Profit is `p` times units sold, so contrasts in currency scale with `p`, and
+  a change from `p = 1` to `p = 19` in currency is mostly that scale. The across-ratio change is
+  therefore read per unit of `p` (`c19 / 19 - c1 / 1` per episode); the currency change is
+  reported beside it. The primaries D1 to D5 are within one ratio and are unaffected. The null
+  safety margin stays -25 in currency as registered; the margin scaled by `p / 4` (-118.75 at
+  `p = 19`, -6.25 at `p = 1`) is descriptive.
+- **DA5 (what the expectations rest on).** Stage D's model answers are new paid calls at each
+  ratio, and the prompt shows the margin, so the models may answer differently at `p = 19` and
+  `p = 1` than at `p = 4`. The post-hoc replay behind "What the plan expects" held stage C's
+  answers fixed; it is not a like-for-like prediction, and D3 and D4 can include answer changes
+  caused by the margin.
+- **DA6 (models).** Only the default two-model evaluation is confirmatory. `--models` with a
+  subset would shrink the Holm families (6 to 3, 2 to 1); it is refused unless
+  `--not-confirmatory` is given, which marks the output. No evaluation of any kind, on any
+  subset, before all six runs have finished.
+- **DA7 (completeness).** The episode count counted ids across all arms, and the contrast
+  silently drops unpaired episodes. Every arm a contrast reads (the eight arms of stage C's
+  contrasts) must now have every episode, or the run is refused. The alert upper bound and the
+  oracle run on shocked episodes only, by design, and enter no contrast.
+- **DA8 (the lead-time shift sizes).** Every family-4 unit moves to a lead of 3
+  (`COMBO_A[4] = ((1, 3), (2, 3))`, cycling every two units): units `i = 0, 1, 4, 5, ...`
+  (`(i // 2)` even) have a baseline lead of 1 and shift by two periods; units `i = 2, 3, 6, 7,
+  ...` have a baseline of 2 and shift by one. The study notes said every true shift was one
+  period; that was wrong (the `low` magnitude bin in `truth.jsonl` for supply families is a
+  binning convention, not a shift size). The gate compiles `medium` as +2 on the running lead,
+  exact for the baseline-1 units. In the stratum paragraph above, the sentence that the
+  baseline-1 units have the registered law itself after a one-period shift is wrong: after onset
+  every stratum unit's lead is 3 plus noise, the registered delay law shifted up one period
+  (clipped at 4 by DA10); before onset the reading above stands (the lead-time null roughly
+  matches the generator for the baseline-2 units and is conservative for the baseline-1
+  units). Stage C's post-hoc reading of the models' lead-time proposals is corrected
+  in `REPORT.md`.
+- **DA9 (runs that stop).** A run that stops at its spend cap or on a provider error after its
+  smoke passed is resumed from its cache under the same name by calling `stage_d.py` directly
+  (not the driver, whose smoke projection would count the aborted run's spend). A cap stop is
+  resumed with the cap raised by at most $4 (Gemini 3.8) or $1 (Grok 4.20), within the study's
+  budget; each resumption is logged here as a dated amendment. A run that cannot complete is
+  reported as incomplete, and the evaluator records its hypothesis family as not evaluated, with
+  the reason, rather than testing the other model alone (no single-model Holm, DA6); the other
+  families are evaluated as registered.
+
+- **DA10 (the stratum's leads stay inside the arrival null).** After onset every stratum unit's
+  lead is `3 + xi`, on 1 to 5, and a lead of 5 (probability 4/99 per order) is outside the
+  registered arrival null's finite support (delays 0 to 4). The null explains such a receipt
+  only through its small pause term or not at all; then `ArrivalForwardFilter.step` raises. The
+  certify-then-hedge arms catch it and drop their lead-time hypothesis for the episode, but
+  nothing between arm 10's e-process and the runner catches it, so one such receipt would abort
+  a run with no records. The reviewer's development check (throwaway units 12 to 19, 12
+  synthetic noise draws, scripted proposals that name the true family) found arm 10 raising in
+  15 of 288 alerted episode runs, and in at least one unit of 4 of the 12 synthetic strata; the
+  throwaway structural run had not exercised the path because its scripted proposals were
+  demand rises. The stratum's leads are therefore clipped to 4: `min(4, max(0, L_t + xi_t))`,
+  the twin's likewise, in `stage_d.py`'s stratum builder (`episodes.py` is unchanged; the rule
+  is recorded in `stage_d.json` as `lead_rule`). After onset the lead's law is (2, 27, 48, 22) /
+  99 on leads 1 to 4. The same check rerun (same 12 draws): without the clip, arm 10 raised in 15 of 288 episode
+  runs and the method dropped its lead-time hypothesis in 15 episodes; with it, 0 and 0. The main pool is
+  unaffected.
+- **DA11 (reading D5).** The stratum's mix is fixed by the unit index: units 12, 13, 16 and 17
+  have a baseline lead of 1 and shift by two periods, units 14, 15, 18 and 19 a baseline of 2 and
+  shift by one, so shift size is confounded with the baseline and with how well the lead-time
+  null matches the pre-onset noise. On throwaway units the content-free arm's gain comes mostly
+  from the two-period units, and its sign on the one-period units varies. D5 stays as
+  registered; it is read as "the gain survives noisy leads across the stratum's mix of one- and
+  two-period shifts", its evidence being the sign consistency of the 8 unit-level gains (the
+  exact test's smallest p is 1/256), with the 8-cluster bootstrap interval descriptive.
+  `readout_d.py` reports, descriptively and without tests (4 clusters per shift size, smallest
+  p 1/16): hedge - arm 1 per unit and per shift size, the two-period units' share of the gain,
+  per information condition (the no-alert episodes are not structurally zero: the demand
+  detector fires on some family-4 paths, and then the arms consult the model), and null
+  exposure and null safety per baseline lead (4 twins each, 2 of them false-alert). The
+  stratum's exposure is not pooled with the main pool's.
+- **DA12 (provenance and launch).** "What the plan expects" compares +506 (content-free gain per
+  shocked episode on throwaway units 12 to 19 with noisy leads, computed before DA10's clip)
+  with +884 (throwaway units 0 to 7, deterministic): different units. On the same units 12 to 19
+  with deterministic leads the reviewer measured +1,115, so noise removed about 55% of the gain
+  there. Every run is launched exactly as registered, through the driver, which passes
+  `--profit` and `--spend-cap-usd` explicitly (the runner's own defaults are p = 4 and $2).
+
+New hashes (first 16 hex of sha256): `confirm_d.py` f52005a900552931, `stage_d.py`
+d77e2e2b4c792fb8, `readout_d.py` 51b152001901b8af. Every other stage C and D file is unchanged.

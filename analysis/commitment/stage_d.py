@@ -9,7 +9,8 @@ and records which pool it used next to the run's manifest (``stage_d.json``):
   twins and alerts as stage C). Run at ``--profit 19`` and ``--profit 1``.
 * ``--pool stochastic``: the stochastic-lead stratum reserved in ``episodes.py`` (family 4,
   ``i = 12..19`` of stage C's base, 8 units, 40 episodes), whose per-order lead-time noise is
-  the registered arrival null's delay law. Run at ``--profit 4``.
+  the registered arrival null's delay law, with leads clipped to 4 (amendment DA10). Run at
+  ``--profit 4``.
 
 ``--base`` moves either pool (the structural tests use ``THROWAWAY_BASE``); every other argument
 goes to ``analysis.commitment.runner`` unchanged.
@@ -24,12 +25,14 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 from collections.abc import Sequence
 from pathlib import Path
 from unittest import mock
 
 import analysis.commitment.arms  # noqa: F401  (registers the confirm arm set)
 import analysis.commitment.runner as runner
+from analysis.commitment import episodes
 from analysis.commitment.episodes import (
     FRESH_BASE,
     STOCHASTIC_FIRST_INDEX,
@@ -41,6 +44,20 @@ D_BASE = 200_000
 N_PER_FAMILY = 8
 STOCHASTIC_UNITS = 8
 """Module 03's dev/cal bank renders distinct texts for four units per split and family."""
+LEAD_CEILING = 4
+"""Amendment DA10: the registered arrival null's largest finite delay. After onset every stratum
+unit's lead is ``3 + xi`` on 1..5, and a lead of 5 is impossible under that null (arm 10's
+e-process raises on it and would abort the run), so the stratum's leads are clipped to 4."""
+LEAD_RULE = "min(4, max(0, L_t + xi_t)); twin min(4, max(0, L_base + xi_t)); inf kept"
+_NOISY_LEAD_TIMES = episodes.noisy_lead_times
+
+
+def clipped_noisy_lead_times(lead_times: Sequence[float], xi: Sequence[int]) -> tuple[float, ...]:
+    """``episodes.noisy_lead_times`` with finite leads clipped to ``LEAD_CEILING`` (DA10)."""
+    return tuple(
+        value if math.isinf(value) else min(float(LEAD_CEILING), value)
+        for value in _NOISY_LEAD_TIMES(lead_times, xi)
+    )
 
 
 def layout_builder(pool: str, base: int):
@@ -52,13 +69,16 @@ def layout_builder(pool: str, base: int):
     elif pool == "stochastic":
 
         def build(root: Path, n_per_family: int, *, profit: float):
-            return build_stochastic_lead_layout(
-                root,
-                base=base,
-                first_index=STOCHASTIC_FIRST_INDEX,
-                n_units=STOCHASTIC_UNITS,
-                profit=profit,
-            )
+            with mock.patch.object(episodes, "noisy_lead_times", clipped_noisy_lead_times):
+                layout = build_stochastic_lead_layout(
+                    root,
+                    base=base,
+                    first_index=STOCHASTIC_FIRST_INDEX,
+                    n_units=STOCHASTIC_UNITS,
+                    profit=profit,
+                )
+            layout.manifest["lead_noise"]["rule"] = LEAD_RULE
+            return layout
 
     else:
         raise ValueError(f"unknown pool {pool!r}")
@@ -105,6 +125,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                         f"{STOCHASTIC_FIRST_INDEX + STOCHASTIC_UNITS - 1}"
                     ),
                     "note": "run_manifest.json says layout 'fresh'; this file names the pool",
+                    **({"lead_rule": LEAD_RULE} if args.pool == "stochastic" else {}),
                 },
                 indent=2,
                 sort_keys=True,

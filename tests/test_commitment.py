@@ -211,3 +211,101 @@ def test_stage_d_pools_are_disjoint_from_stage_c_and_each_other():
         "noisy_lead": 4.0,
     }
     assert sum(len(s["tests"]) for s in FAMILIES.values()) == 5
+
+
+def test_stage_d_flip_test_is_exact_on_few_clusters_and_scale_free():
+    import numpy as np
+    import pandas as pd
+
+    from analysis.commitment.confirm_d import sign_flip
+
+    clusters = pd.Series(np.repeat(np.arange(8), 5))
+    values = pd.Series(np.full(40, 1.5e5)) + pd.Series(np.arange(40) * 0.37)
+    p = sign_flip(values, clusters)
+    assert p["p_exact"] == pytest.approx(1 / 256)
+    assert p["p_mc"] > 100 / 100_001
+    wide = sign_flip(pd.Series(np.ones(96)), pd.Series(np.repeat(np.arange(48), 2)))
+    assert "p_exact" not in wide
+
+
+def test_stage_d_evaluator_refuses_a_run_off_the_registered_pool(tmp_path):
+    import gzip
+    import json
+
+    from analysis.commitment import confirm
+    from analysis.commitment.confirm_d import check_run
+
+    run = tmp_path / "d19-gemini-3.8-flash"
+    run.mkdir()
+    (run / "stage_d.json").write_text(json.dumps({"pool": "main", "base": 900_000}))
+    stage_c = json.loads((confirm.OUT / "fresh-gemini-3.8-flash" / "run_manifest.json").read_text())
+    manifest = {
+        "profit": 19.0,
+        "partial": False,
+        "arm_set": "confirm",
+        "run_name": run.name,
+        "endpoint": stage_c["endpoint"],
+        "ladder_rung": stage_c["ladder_rung"],
+    }
+    (run / "run_manifest.json").write_text(json.dumps(manifest))
+    rows = [
+        {"episode_id": e, "arm_id": arm, "total_reward": 1.0, "total_profit": 1.0}
+        for e in ("dev/f1/s1900000/early_accurate", "dev/f1/s1900000/no_alert__twin")
+        for arm in (confirm.CTH, confirm.ARM1)
+    ]
+    with gzip.open(run / "records.jsonl.gz", "wt") as handle:
+        handle.write("\n".join(json.dumps(r) for r in rows) + "\n")
+    with pytest.raises(ValueError) as refused:
+        check_run(tmp_path, "high_margin", "gemini-3.8-flash")
+    message = str(refused.value)
+    for problem in ("base 900000", "2 episodes", "unit seeds", confirm.ARM10):
+        assert problem in message
+    assert "ladder rung" not in message  # a real manifest's endpoint block passes the model check
+    manifest["ladder_rung"] = {**stage_c["ladder_rung"], "name": "grok-4.20"}
+    (run / "run_manifest.json").write_text(json.dumps(manifest))
+    with pytest.raises(ValueError, match=r"ladder rung 'grok-4\.20'"):
+        check_run(tmp_path, "high_margin", "gemini-3.8-flash")
+
+
+def test_stage_d_readout_true_shift_and_ratio_interval():
+    import numpy as np
+    import pandas as pd
+
+    from analysis.commitment.readout_d import ratio_interval, true_shift
+
+    # family 4 cycles (1 -> 3), (1 -> 3), (2 -> 3), (2 -> 3) over the unit index
+    assert [true_shift(f"dev/f4/s{4_900_000 + i}/early_accurate") for i in range(4)] == [2, 2, 1, 1]
+    clusters = pd.Series(np.repeat(np.arange(10), 3))
+    num, den = pd.Series(np.arange(30.0)), pd.Series(np.full(30, 100.0))
+    r = ratio_interval(num, den, clusters)
+    assert r["share"] == pytest.approx(num.sum() / den.sum())
+    assert r["b"][0] < r["share"] < r["b"][1]
+
+
+def test_stage_d_stratum_leads_stay_inside_the_arrival_null(tmp_path):
+    from analysis.commitment.episodes import THROWAWAY_BASE, lead_noise, stochastic_lead_units
+    from analysis.commitment.stage_d import (
+        LEAD_CEILING,
+        LEAD_RULE,
+        clipped_noisy_lead_times,
+        layout_builder,
+    )
+
+    assert clipped_noisy_lead_times((3.0, 3.0, 1.0, math.inf), (2, 1, -2, 2)) == (
+        4.0,
+        4.0,
+        0.0,
+        math.inf,
+    )
+    layout = layout_builder("stochastic", THROWAWAY_BASE)(tmp_path, 8, profit=4.0)
+    assert layout.manifest["lead_noise"]["rule"] == LEAD_RULE
+    leads = [
+        lead
+        for instance, _ in layout.instances
+        for lead in instance.supply.lead_times
+        if not math.isinf(lead)
+    ]
+    assert max(leads) == LEAD_CEILING
+    # the clip binds: some unit's post-onset lead would be 3 + 2 = 5 without it
+    noise = [lead_noise(u.seed) for u in stochastic_lead_units(base=THROWAWAY_BASE, n_units=8)]
+    assert any(2 in xi for xi in noise)
