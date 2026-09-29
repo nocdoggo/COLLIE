@@ -24,6 +24,7 @@ Usage::
 from __future__ import annotations
 
 import argparse
+import gzip
 import json
 import platform
 import re
@@ -35,6 +36,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import analysis.real_content_pilot.runner as rcp
+from analysis.commitment.cth import CertifyThenHedgeArm
 from analysis.commitment.endpoints import LADDER, EchoCheckedClient
 from analysis.commitment.episodes import Layout, build_layout, layout_alerts
 from analysis.commitment.registry import ARM_SETS
@@ -86,6 +88,8 @@ class Run:
     episode_ids: tuple[str, ...]
     partial: bool
     arm_ids: tuple[str, ...]
+    sidecar: tuple[dict, ...] = ()
+    """Per-period shock mass of every arm that keeps a ``log`` (certify-then-hedge)."""
 
 
 def run_pilot_layout(*, endpoint, transport, cache_dir: Path, episode_ids, arm_set: str) -> Run:
@@ -153,6 +157,7 @@ def run_fresh_layout(
             )
 
         results: dict[str, list[EpisodeResult]] = {}
+        sidecar: list[dict] = []
         for instance, seed in instances:
             channel = alerts[instance.spec.episode_id]
             for arm_id, controller, isolation in builder(
@@ -166,6 +171,17 @@ def run_fresh_layout(
                     check_controller_isolation=isolation,
                 ).run(controller)
                 results.setdefault(arm_id, []).append(outcome.result)
+                log = controller.log if isinstance(controller, CertifyThenHedgeArm) else ()
+                for period, mass, top in log:
+                    sidecar.append(
+                        {
+                            "arm_id": arm_id,
+                            "episode_id": instance.spec.episode_id,
+                            "period": period,
+                            "shock_mass": mass,
+                            "top": top,
+                        }
+                    )
         attached = _attach_calls(results, ledger)
         ledger.assert_conserved()
         flat = tuple(result for arm_results in attached.values() for result in arm_results)
@@ -182,6 +198,7 @@ def run_fresh_layout(
             tuple(i.spec.episode_id for i, _ in instances),
             partial,
             tuple(results),
+            tuple(sidecar),
         )
 
 
@@ -194,6 +211,11 @@ def write_outputs(run: Run, *, out_dir: Path, local_dir: Path, meta: dict) -> di
     rcp._write_jsonl(out_dir / "alerts.jsonl", [run.alerts[e].to_row() for e in run.episode_ids])
     write_episode_truth_jsonl(out_dir / "truth.jsonl", run.truths)
     rcp._write_jsonl(local_dir / "responses.jsonl", run.responses)
+    if run.sidecar:
+        body = "".join(json.dumps(row, sort_keys=True) + "\n" for row in run.sidecar)
+        (out_dir / "cth_log.jsonl.gz").write_bytes(
+            gzip.compress(body.encode("utf-8"), compresslevel=9, mtime=0)
+        )
     summary = run.ledger.summary()
     manifest = {
         "analysis_class": "exploratory",

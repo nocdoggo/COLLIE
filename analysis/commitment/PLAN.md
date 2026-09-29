@@ -164,3 +164,65 @@ target iff the shock mass is at least 1/2) and `linear` (target interpolated by 
 **Development readout** (`out/dev/*.json`): each variant against the stored arm 1, arm 8 and arm
 10 of every cached bank (the real-content pilot's three and the stage A ladder's), net and gross,
 with seed-cluster bootstrap intervals; null-episode harm and exposure; net by family.
+
+## Stage C. Fresh-seed confirmation
+
+Registered 2026-09-28, before any fresh-seed run that produces outcomes. Frozen at this commit
+(first 16 hex of sha256): `cth.py` 343835b85d32a69e, `arms.py` 6d1f468e43a5f9f9, `registry.py`
+73c7952dc77b80ef, `runner.py` c753ef5e9e348aa2, `episodes.py` 4f0d9df15c05ca7e, `endpoints.py`
+eac79a2094ff81db, `confirm.py` 7b7db9f47db8476b. Any later change to these files is a logged
+deviation.
+
+**Method under test.** `arm12_cth`: certify-then-hedge with `lam = 0.25`, the Bayes-mixture
+hedge, `n0 = 5`, persistence prior 1/2, lead-time offsets {1, 2, 3}, the hypothesis set and prior
+budget of stage B, and no other tuning. Comparators in the same run: `arm12b_cth_llm`
+(`lam = 0`), `ctrl_cth_uniform` (`lam = 1`, content-free, no model call), arm 1, arm 2, arm 8,
+arm 10, the detector and keyword controls, and the two hidden-truth references (AlertSpec upper
+bound, oracle). Arm 9 is dropped: it enters no stage C contrast.
+
+**Episodes.** The reserved fresh pool of `episodes.py`: seeds `family * 1_000_000 + 100_000 + i`,
+`i = 0..11` for each of the six families (72 units, disjoint from every registered pool), dev/cal
+labels alternating by `i`, set-A combos only, generator onsets; four paired conditions per unit
+plus one unshocked twin (36 silent, 36 false-alert, balanced by family and split); 360 episodes;
+`p = 4`, `h = 1`, no order cap, horizon 50; module 03 bank alerts under rule `bank-v1`
+(family 2 again has no demand-down template and so no alert). One cluster per unit.
+
+**Endpoints (models).** Primary: `gemini-3.8-flash` and `grok-4.20` (the real-content pilot's
+two). Secondary, descriptive, for the model-scale readout: `gemini-2.5-flash-lite` (older,
+over-commits), `llama-3.1-8b` (small open model, frequent schema failures), `deepseek-v3` (large
+open model) and `gpt-3.5-turbo` (legacy). Caps: $12 (Gemini 3.8), $3 (Grok 4.20), $1 each for the
+others ($2 for `gpt-3.5-turbo`). Each endpoint first runs a 3-episode smoke under the full run's
+name (`dev/f4/s4100000/early_accurate`, `dev/f1/s1100000/unreliable`,
+`dev/f1/s1100000/no_alert__twin`); the full run goes ahead only if the smoke's cost scaled to 360
+episodes stays below the cap.
+
+**Primary hypotheses** (net reward = `total_reward`, per episode, all 360 episodes; one-sided):
+
+- H1: `arm12_cth - arm10 > 0`, on each primary endpoint.
+- H2: `arm12_cth - arm1 > 0`, on each primary endpoint.
+
+p-values: cluster sign-flip test on the 72 cluster sums (100,000 Monte Carlo flips, seed
+20260927); Holm's step-down over the four tests at 0.05. H1 (or H2) is confirmed when both of its
+tests reject. Estimates are reported with the seed-cluster bootstrap 95% interval (10,000
+draws, same seed). Gross profit (`total_profit`, the frozen Gate 3 endpoint) is reported for
+every contrast and decides nothing.
+
+**Secondary (no multiplicity claim):** `arm12_cth - arm8`; the value of language
+`arm12_cth - ctrl_cth_uniform` and `arm12b_cth_llm - ctrl_cth_uniform`; `ctrl_cth_uniform - arm1`;
+`arm10 - arm1` and `arm8 - arm1` (the gate and immediate action on fresh seeds); null safety,
+`arm12_cth - arm1` on the 72 null twins, non-inferior if its bootstrap lower bound exceeds -25
+per episode; exposure, the mean over null twins of the summed per-period shock mass (sidecar
+`cth_log.jsonl.gz`); net by family; first-proposal perception and provider cost. The secondary
+models get the same table, read descriptively along the model-quality axis.
+
+**Declared departures.** (1) Certify-then-hedge acts on a hypothesis before any activation
+threshold is crossed, which departs from the frozen contract's wording that a hypothesis
+influences orders only while ACTIVE (`collie/contracts.py` docstring); it is a new, declared arm,
+not a reading of arm 10. (2) Net reward is this study's primary endpoint; Gate 3's frozen primary
+(gross profit) is reported, never used to decide. (3) The fresh units are outside the frozen
+manifest; they carry dev/cal labels only so that dev/cal templates render.
+
+**Disclosed prior exposure.** A structural test of the fresh-layout runner (scripted transport,
+`--n-per-family 1`: units `i = 0` of each family, 30 episodes) was run on 2026-09-28 before this
+registration; only record counts and sidecar row counts were read. Stage B tuned the method on the
+120 spent pilot episodes and the stage A ladder banks.
