@@ -246,3 +246,12 @@ silent, 24 false-alert), 240 episodes. Nothing else changes; the frozen files ar
 (`--n-per-family` is a runtime argument). Caps scale by 2/3: $8 (Gemini 3.8), $2 (Grok 4.20), $1
 each for the secondary models. With 48 clusters, H2 (versus arm 1) is expected to have moderate
 power at the development effect size; H1 (versus arm 10) keeps high power.
+
+**C2 (2026-09-29, during the secondary runs).** The `deepseek-v3` full run aborted after 209
+calls: one OpenRouter response carried an empty model field, which the echo check refused as a
+mismatch. An empty field names no model, so `endpoints.py` now re-requests such a response up to
+three times and bills every attempt's tokens; a named mismatch is still refused at once (new
+sha256 prefix `1051f372754f6e25`; test `test_an_empty_echo_is_retried_and_billed`). Nothing else
+changes. The primary runs are unaffected: `grok-4.20` finished before the change without an empty
+echo, and `gemini-3.8-flash` runs on the code it started with. `deepseek-v3` is re-run from its
+cache (the 209 answered calls are replayed, not re-bought).

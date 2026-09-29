@@ -37,6 +37,9 @@ from collie.llm.client import (
 )
 
 PRICE_DATE = "2026-09-28"
+EMPTY_ECHO_RETRIES = 3
+"""Stage C amendment C2: a response whose model field is empty is re-requested up to three times,
+with every attempt's tokens billed; a named mismatch is still refused at once."""
 KEY_DIR = Path(__file__).resolve().parents[2] / "cloud_endpoint"
 OPENAI_COMPAT = {
     "stepfun": ("https://api.stepfun.ai/step_plan/v1", "STEPFUN_API_KEY", KEY_DIR / "stepfun.key"),
@@ -177,8 +180,17 @@ class EchoCheckedClient(OpenAICompatClient):
             kwargs["seed"] = decoding.seed
         if self._endpoint.extra_body is not None:
             kwargs["extra_body"] = dict(self._endpoint.extra_body)
-        response = self._client.chat.completions.create(**kwargs)
-        served = str(getattr(response, "model", "") or "").removeprefix("models/")
+        spent = [0, 0, 0]  # prompt, completion, total over every attempt
+        for _attempt in range(1 + EMPTY_ECHO_RETRIES):
+            response = self._client.chat.completions.create(**kwargs)
+            usage = response.usage
+            if usage is not None:
+                spent[0] += usage.prompt_tokens
+                spent[1] += usage.completion_tokens
+                spent[2] += usage.total_tokens
+            served = str(getattr(response, "model", "") or "").removeprefix("models/")
+            if served:  # an empty echo carries no model name at all: ask again
+                break
         if served not in self._served_as:
             raise ServedModelMismatch(
                 f"requested {self._endpoint.model_id!r} but the response says {served!r}"
@@ -187,7 +199,7 @@ class EchoCheckedClient(OpenAICompatClient):
             raise MissingUsageError(f"{self._endpoint.name!r} returned no usage")
         return RawResponse(
             text=response.choices[0].message.content or "",
-            prompt_tokens=response.usage.prompt_tokens,
-            completion_tokens=response.usage.completion_tokens,
-            total_tokens=response.usage.total_tokens,
+            prompt_tokens=spent[0],
+            completion_tokens=spent[1],
+            total_tokens=spent[2],
         )

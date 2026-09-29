@@ -160,3 +160,24 @@ def test_fresh_layout_renders_bank_alerts(tmp_path) -> None:
     assert len(layout.instances) == 60 and len(alerts) == 60
     sources = {a.source for a in alerts.values()}
     assert "bank:early_accurate" in sources and "bank:false_alert_null" in sources
+
+
+def test_an_empty_echo_is_retried_and_billed() -> None:
+    rung = LADDER["deepseek-v3"]
+    client = EchoCheckedClient.__new__(EchoCheckedClient)
+    client._endpoint = rung.endpoint()
+    client._served_as = rung.served_as
+    replies = iter(["", "deepseek/deepseek-chat"])
+
+    def create(**_):
+        usage = SimpleNamespace(prompt_tokens=3, completion_tokens=1, total_tokens=4)
+        message = SimpleNamespace(content="OK")
+        return SimpleNamespace(
+            model=next(replies), usage=usage, choices=[SimpleNamespace(message=message)]
+        )
+
+    client._client = SimpleNamespace(
+        chat=SimpleNamespace(completions=SimpleNamespace(create=create))
+    )
+    raw = client.complete_metered("hi", decoding=DECODING_REGISTRY["det-v1"])
+    assert raw.text == "OK" and raw.total_tokens == 8 and raw.prompt_tokens == 6
