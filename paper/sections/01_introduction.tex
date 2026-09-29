@@ -1,5 +1,27 @@
 \section{Introduction}
 
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=\textwidth]{fig1_overview.pdf}
+\caption{The registered gate and certify-then-hedge on the same input, one fresh-seed episode
+chosen post hoc to show the mechanism: of the 32 lead-time episodes, it is the gate's third-worst
+and the hedge's tenth-lowest. \textbf{(a)}~At period~13 the alert yields a \shockspec{} from
+Gemini~3.8 Flash (six of its nine fields shown) naming a lead-time shift of \emph{medium}
+magnitude; the true shift is one period, from period~14. \textbf{(b)}~The gate tests the stated
+hypothesis alone and, once $E_{j,t} \ge 1/\alpha_j$, from period~24 (eleven periods after the
+alert) switches all at once to the configuration compiled from the stated magnitude, two extra
+periods. \textbf{(c)}~Certify-then-hedge keeps the fixed set $\mathcal{H}$, which the answer only
+reweights (prior $a_j w_{jk}$, with $a_j$ the firing's share of the error budget $A$), prices each
+hypothesis by its own \protect\eprocess{}, estimates a one-period shift from the data (from
+period~18, by replay of the frozen arm) and orders the $p/(p+h)$ quantile of the
+posterior-predictive mixture. Its bound needs a known null and arrival law; as run, a null
+simulation puts $\Expect_0[\Pi_\sigma]$ at up to $2.7A$ (Section~\ref{sec:limitations}). Each lane
+ends in the episode from period~10 (every series is zero before it): commitment and cumulative
+net reward against arm~1. Over all 32 lead-time episodes the hedge gains $+1{,}286$ per episode
+on arm~1 (registered readout) and the gate, post hoc, $+414$.}
+\label{fig:overview}
+\end{figure*}
+
 Language models are being proposed for replenishment decisions. On InventoryBench, 1{,}320 multi-period
 lost-sales replenishment instances, the strongest published language-model strategy lets the
 model name an order quantity every period and applies it untested~\cite{inventorybench}.
@@ -29,25 +51,11 @@ answer only reweights that set (and fixes the onset window of the hypothesis it 
 with a uniform prior so that a wrong answer has bounded cost. The size of a shock is estimated
 from the data rather than taken from the model, and the order is the critical fractile of the
 posterior-predictive mixture, so the controller moves toward a hypothesis as fast as the
-evidence for it grows (Fig.~\ref{fig:episode}). Under a known null and arrival law, the construction keeps the
+evidence for it grows (Fig.~\ref{fig:overview}). Under a known null and arrival law, the construction keeps the
 gate's error budget as a bound on expected exposure to a false hypothesis at every stopping
 time, whatever the model says, and in the single-hypothesis case the gate's threshold is
 analogous to a posterior-odds rule.
 
-\begin{figure}[!t]
-\centering
-\includegraphics[width=\columnwidth]{fig1_episode.pdf}
-\caption{One fresh-seed episode, a lead-time shift of one period with an accurate early
-alert (Gemini~3.8 as the proposer), chosen post hoc to show the mechanism: it is the gate's
-third-worst of the 32 lead-time episodes. \textbf{(a)}~The gate (dashed) commits fully ten periods after onset;
-certify-then-hedge (solid) shows its posterior shock mass $\Pi_t$, which weights the
-hypothesis in the order's mixture quantile.
-\textbf{(b)}~Cumulative net reward against the baseline. The model said the shift was
-``medium'', which the gate compiles as two periods; certify-then-hedge estimated one from the
-receipts. Final: $+198$ against $-2{,}358$; over all 32 lead-time episodes, $+1{,}286$
-(registered) and, post hoc, $+414$ per episode.}
-\label{fig:episode}
-\end{figure}
 
 \subsection*{Contributions}
 

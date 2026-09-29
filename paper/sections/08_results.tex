@@ -35,29 +35,32 @@ better than arm~1 on fresh seeds, and with four further proposer models
 
 \begin{table}[!tb]
 \caption{Fresh-seed confirmation (registered; exploratory with respect to the project's
-preregistration), 240 episodes, 48 seed clusters, $p/h = 4$. Mean paired difference per
-episode, net reward, with the 95\% seed-cluster bootstrap interval; gross profit in the last
-column. $^\ast$Primary tests, all rejected after Holm correction.}
+preregistration): 240 episodes, 48 seed clusters, $p/h = 4$. Mean paired difference per episode
+in net reward, with the 95\% seed-cluster bootstrap interval, and in gross profit. Shaded rows
+are the primary tests; \yes{} marks a test that rejects after Holm correction.}
 \label{tab:confirm}
 \centering
 \footnotesize
 \setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}llrr@{}}
-\toprule
-Contrast & Model & Net $[95\%]$ & Gross \\
-\midrule
-hedge $-$ gate$^\ast$ & Gemini & $+309\ [173, 472]$ & $+85$ \\
-                      & Grok   & $+179\ [87, 281]$  & $+139$ \\
-hedge $-$ arm 1$^\ast$ & Gemini & $+178\ [55, 326]$ & $+280$ \\
-                       & Grok   & $+163\ [48, 300]$ & $+262$ \\
-gate $-$ arm 1         & Gemini & $-131\ [-316, 28]$ & $+195$ \\
-                       & Grok   & $-16\ [-104, 75]$  & $+123$ \\
-at once $-$ arm 1      & Gemini & $-2{,}046\ [-2{,}612, -1{,}478]$ & $+501$ \\
-                       & Grok   & $-2{,}284\ [-2{,}849, -1{,}710]$ & $+501$ \\
-content-free $-$ arm 1 & either & $+169\ [48, 312]$ & $+270$ \\
-hedge $-$ content-free & Gemini & $+9\ [-5, 24]$ & $+10$ \\
-                       & Grok   & $-6\ [-29, 11]$ & $-8$ \\
-\bottomrule
+\renewcommand{\arraystretch}{1.08}
+\begin{tabular}{@{}llrrc@{}}
+\toprule[0.9pt]
+\rowcolor{headtint}
+\textbf{Contrast} & \textbf{Model} & \textbf{Net} $[95\%]$ & \textbf{Gross} & \textbf{Holm} \\
+\midrule[0.6pt]
+\rowcolor{hedgerow} hedge $-$ gate & Gemini & $+309\ [173, 472]$ & $+85$ & \yes \\
+\rowcolor{hedgerow}                & Grok   & $+179\ [87, 281]$  & $+139$ & \yes \\
+\rowcolor{hedgerow} hedge $-$ arm 1 & Gemini & $+178\ [55, 326]$ & $+280$ & \yes \\
+\rowcolor{hedgerow}                 & Grok   & $+163\ [48, 300]$ & $+262$ & \yes \\
+\midrule[0.4pt]
+gate $-$ arm 1         & Gemini & $-131\ [-316, 28]$ & $+195$ & \\
+                       & Grok   & $-16\ [-104, 75]$  & $+123$ & \\
+\rowcolor{zebra} at once $-$ arm 1 & Gemini & $-2{,}046\ [-2{,}612, -1{,}478]$ & $+501$ & \\
+\rowcolor{zebra}                   & Grok   & $-2{,}284\ [-2{,}849, -1{,}710]$ & $+501$ & \\
+content-free $-$ arm 1 & either & $+169\ [48, 312]$ & $+270$ & \\
+\rowcolor{zebra} hedge $-$ content-free & Gemini & $+9\ [-5, 24]$ & $+10$ & \\
+\rowcolor{zebra}                        & Grok   & $-6\ [-29, 11]$ & $-8$ & \\
+\bottomrule[0.9pt]
 \end{tabular}
 \end{table}
 
@@ -66,7 +69,7 @@ it is the worst on net: the endpoint trap of our first registration. Every claim
 
 \begin{figure*}[!t]
 \centering
-\includegraphics[width=\textwidth]{fig2_models.pdf}
+\includegraphics[width=\textwidth]{fig3_models.pdf}
 \caption{The fresh-seed confirmation with six proposer models (240 episodes each).
 \textbf{(a)}~First proposals naming the right family and direction, among the 170 shocked
 episodes where the trigger fired. \textbf{(b)}~Acting on proposals at once (arm~8) against
@@ -92,7 +95,7 @@ timing, as the hedge
 commits partially as evidence accumulates while the gate commits all at once a median of 11
 periods after the proposal; and sizing, as the gate compiles the stated size, wrong in 7 and 6
 of those proposals (true shifts were one or two periods), while
-the hedge estimates the offset from receipts (Fig.~\ref{fig:episode}).
+the hedge estimates the offset from receipts (Fig.~\ref{fig:overview}).
 
 \subsection{What the language contributes}
 
@@ -114,25 +117,50 @@ $p/h = 19$).
 \subsection{Cost ratios and noisy lead times}
 \label{sec:stage-d}
 
+\begin{table}[!tb]
+\caption{Second registered stage: net reward per episode against the named arm, mean with 95\%
+seed-cluster interval. Shaded rows are registered tests (\yes{}/\no{}: rejects or not after
+Holm's correction within its setting); the other rows are registered non-inferiority checks at
+$-25$, over all episodes or on the null episodes only (null) (\yes{}/\no{}: established or not). The noisy-lead intervals, over eight clusters, are
+descriptive.}
+\label{tab:staged}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.08}
+\begin{tabular}{@{}llrr@{}}
+\toprule[0.9pt]
+\rowcolor{headtint}
+\textbf{Setting} & \textbf{Hedge minus} & \textbf{Gemini} & \textbf{Grok} \\
+\midrule[0.6pt]
+\rowcolor{hedgerow} $p/h = 19$ & gate & $+597\ [323, 917]$ \yes & $+631\ [265, 1{,}085]$ \yes \\
+\rowcolor{hedgerow} & arm 1 & $+979\ [364, 1{,}703]$ \yes & $+896\ [322, 1{,}569]$ \yes \\
+\rowcolor{hedgerow} & content-free & $+82\ [35, 138]$ \yes & $-2\ [-75, 59]$ \no \\
+ & arm 1 (null) & $-22\ [-65, 5]$ \no & $-22\ [-65, 5]$ \no \\
+\midrule[0.4pt]
+\rowcolor{hedgerow} $p/h = 1$ & gate & $+189\ [103, 288]$ \yes & $+45\ [10, 86]$ \yes \\
+ & arm 1 & $+10\ [-24.5, 51.8]$ \yes & $+4\ [-27.6, 43.3]$ \no \\
+\midrule[0.4pt]
+\rowcolor{hedgerow} noisy lead & arm 1 & $+254\ [-141, 629]$ \no & $+187\ [-149, 469]$ \no \\
+\bottomrule[0.9pt]
+\end{tabular}
+\end{table}
+
 A second registered stage, exploratory with respect to Gate~3, ran the frozen method on a new
-pool of 48 units at the benchmark's other ratios, $p/h = 19$ and $1$, and at $p/h = 4$ on eight
-lead-time units whose lead times carry the registered arrival law's noise (clipped at four
-periods), with Holm's correction within each family of tests. At $p/h = 19$ the method beat the
-gate by $+597$ $[323, 917]$ (Gemini) and $+631$ $[265, 1{,}085]$ (Grok) and arm~1 by $+979$
-$[364, 1{,}703]$ and $+896$ $[322, 1{,}569]$, and against the content-free variant the text
-earned $+82$ $[35, 138]$ with Gemini ($+84$ $[18, 166]$ in a post-hoc replay of the first
-stage's episodes) but $-2$ $[-75, 59]$ with Grok; five of the six tests reject. On null episodes
-the difference from arm~1 is $-22$ $[-65, 5]$ with each model, so non-inferiority at $-25$ is not
-established. At $p/h = 1$ the method beat the gate by $+189$ $[103, 288]$ and $+45$ $[10, 86]$
-(both reject; the gate itself loses to arm~1 there), is not distinguishable from arm~1 ($+10$
-$[-24.5, 51.8]$, just non-inferior at $-25$; $+4$ $[-27.6, 43.3]$, not non-inferior) or,
-two-sided, from the content-free variant, and loses a little on null episodes ($-3.5$
-$[-7.0, -0.8]$, $-3.3$ $[-6.7, -0.7]$). Per unit of price the gain over arm~1 rises from
-$p/h = 1$ to $19$ with Grok ($+43$ $[2, 80]$; Gemini $+41$ $[-1, 79]$). On noisy lead times the
-gain over arm~1, $+254$ and $+187$, was not confirmed (exact $p = 0.14$ and $0.15$; six of eight
-unit gains positive with each model; descriptive intervals $[-141, 629]$ and $[-149, 469]$); it
-came from the four units whose lead rose by two periods, while the one-period units lost on
-average (shift size is confounded with the baseline lead).
+pool of 48 units at the benchmark's two other ratios, $p/h = 19$ and $1$, and at $p/h = 4$ on
+eight lead-time units whose lead times carry the registered arrival law's noise (clipped at four
+periods), with Holm's correction within each setting (Table~\ref{tab:staged}). At $p/h = 19$
+the method beat the gate and arm~1 with both models, and the text earned something with Gemini
+but not with Grok (a post-hoc replay of the first stage's episodes had put Gemini's text gain at
+$+84$ $[18, 166]$); non-inferiority on null episodes is not established there. At $p/h = 1$ the
+method beat the gate with both models (the gate itself loses to arm~1 there), is not
+distinguishable from arm~1 or, two-sided, from the content-free variant, and loses a little on
+null episodes ($-3.5$ $[-7.0, -0.8]$ and $-3.3$ $[-6.7, -0.7]$, within the margin). Per unit of
+price the gain over arm~1 rises from $p/h = 1$ to $19$ with Grok ($+43$ $[2, 80]$; Gemini $+41$
+$[-1, 79]$). On noisy lead times the gain was not confirmed (exact $p = 0.14$ and $0.15$); six
+of eight unit gains were positive with each model, the four units whose lead rose by two periods
+carried it, and the one-period units lost on average (descriptive; shift size is confounded with
+the baseline lead).
 
 \subsection{Model scale}
 

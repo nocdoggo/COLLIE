@@ -1,6 +1,26 @@
 \section{Certify, Then Hedge}
 \label{sec:hedge}
 
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=\textwidth]{fig2_method.pdf}
+\caption{How certify-then-hedge turns a \shockspec{} into an order (Section~\ref{sec:hedge}), on
+the lead-time example of Fig.~\ref{fig:overview}; the curves are schematic.
+\textbf{(a)}~At firing $j$ (stopping time $\tau_j$) the model fills a closed schema. The hedge
+reads its family and direction, which name the hypothesis $\hat k_j$, and its onset window, which
+dates that hypothesis's \protect\eprocess{}; the other six only have to validate.
+\textbf{(b)}~Each $k$ in the fixed set $\mathcal{H}$ gets prior mass $a_j w_{jk}$~\eqref{eq:prior};
+loss bursts, transit pauses and compound shocks carry no hypothesis by design.
+\textbf{(c)}~One \protect\eprocess{} per $(j,k)$ sets the predictable posterior mass
+$\pi_{jk,t}$ from $E_{jk,t-1}$~\eqref{eq:posterior}; the size of the shock, and with it the law
+$G_{jk,t}$, comes from the data. \textbf{(d)}~The target $x_t$ is the $p/(p+h)$ quantile of the
+posterior-predictive mixture~\eqref{eq:hedge}, sketched as densities; $x^0_t$ is arm~1's.
+\textbf{(e)}~In the regret bound, $V_t$ is the value of acting on the hypotheses if they were
+true; the exposure bound needs the known-null premise, fragile as run
+(Section~\ref{sec:limitations}).}
+\label{fig:method}
+\end{figure*}
+
 The registered gate of Section~\ref{sec:verify} answers one question, whether a
 hypothesis may act, and answers it late: it waits until $E_{j,t}$ crosses
 $1/\alpha_j$ and then acts on the magnitude the model stated. With live models
@@ -12,7 +32,7 @@ alert states a size.
 Certify-then-hedge keeps the \eprocess{} and changes what it is used for. The
 \eprocess{} no longer switches a controller on; it prices the hypothesis, and the
 controller hedges between the baseline and the hypothesis according to that
-price.
+price. Fig.~\ref{fig:method} follows one firing through the construction.
 
 \subsection{Hypotheses and the language prior}
 

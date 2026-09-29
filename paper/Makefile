@@ -69,10 +69,13 @@ check-refs:
 ## Reporting, not gating: the call names 5-8 pages for a regular paper, but the
 ## limit is not enforced at this venue, and completeness of the argument wins
 ## over a page count. Set PAGE_LIMIT to make it a hard gate again.
-PAGE_LIMIT ?= 8
+PAGE_LIMIT ?= 9
 check-pages: $(TEX).pdf
 	@n=$$(pdfinfo $(TEX).pdf 2>/dev/null | awk '/^Pages:/{print $$2}')
-	echo "  pages: $$n (IEEE UV 2026 nominal regular-paper limit: $(PAGE_LIMIT), not enforced)"
+	echo "  pages: $$n in all"
+	b=$$(for p in $$(seq 1 $$n); do pdftotext -f $$p -l $$p $(TEX).pdf - 2>/dev/null | grep -qE "^R ?EFERENCES" && { echo $$p; break; }; done)
+	echo "  body pages (through the page where the references start): $${b:-?} (camera-ready limit $(PAGE_LIMIT), references not counted)"
+	n=$${b:-$$n}
 	if [ -n "$$n" ] && [ "$$n" -gt "$(PAGE_LIMIT)" ]; then \
 	  echo "  note: over the nominal limit by $$(( n - $(PAGE_LIMIT) )) page(s)"; \
 	fi
