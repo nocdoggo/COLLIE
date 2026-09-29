@@ -1,11 +1,12 @@
 """Snapshot openFDA's drug-shortage records (public domain, CC0; https://open.fda.gov/license/).
 
-Each run writes ``data/fda_shortages_<YYYY-MM-DD>.json`` (the full result list, in API order).
+Each run writes ``external_data/openfda/fda_shortages_<YYYY-MM-DD>.json`` (git-ignored): the full
+result list, in API order.
 Repeated snapshots give realised recoveries for notices that state an expected one.
 
 Usage::
 
-    uv run python -m analysis.coling.fetch_fda [--out-dir analysis/coling/data]
+    uv run python -m analysis.coling.fetch_fda [--out-dir external_data/openfda]
 """
 
 from __future__ import annotations
@@ -23,7 +24,11 @@ PAGE = 1000
 def fetch() -> list[dict]:
     rows: list[dict] = []
     while True:
-        with urllib.request.urlopen(URL.format(limit=PAGE, skip=len(rows)), timeout=60) as r:
+        req = urllib.request.Request(
+            URL.format(limit=PAGE, skip=len(rows)),
+            headers={"User-Agent": "collie-research-fetch/0.1 (academic research; polite, cached)"},
+        )
+        with urllib.request.urlopen(req, timeout=60) as r:
             payload = json.load(r)
         rows += payload["results"]
         if len(rows) >= payload["meta"]["results"]["total"] or not payload["results"]:
@@ -32,7 +37,7 @@ def fetch() -> list[dict]:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="python -m analysis.coling.fetch_fda")
-    ap.add_argument("--out-dir", type=Path, default=Path(__file__).parent / "data")
+    ap.add_argument("--out-dir", type=Path, default=Path("external_data/openfda"))
     args = ap.parse_args(argv)
     rows = fetch()
     args.out_dir.mkdir(parents=True, exist_ok=True)
