@@ -1,55 +1,58 @@
 \section{Related Work}
 \label{sec:related}
 
-Which ingredient is new? None. The handshake is.
+\textbf{Anytime-valid checks on language-model outputs.} POPPER runs
+agent-designed falsification experiments under Type-I error
+control~\cite{popper}; E-valuator stops failing agent trajectories with a
+sequential test on verifier scores~\cite{e-valuator}. Conformal Selective
+Acting certifies with Ville-type \eprocess{}es when a fine-tuned model may
+act~\cite{csa}, and in Propose, Don't Judge a frozen anytime-valid referee
+admits agent-proposed factors~\cite{propose-dont-judge}. All four, like
+our registered gate, accept or refuse at an evidence threshold.
+Certify-then-hedge hedges instead: the model only reweights a fixed,
+action-aligned hypothesis set (and sets its hypothesis's onset window), the
+prior-weighted \eprocess{}es become posterior odds, and the order is a
+Bayes-mixture base-stock quantile. With one hypothesis and $\lambda = 0$ the
+posterior's MAP decision is the gate's activation rule, up to one unit of
+threshold; the exposure bound holds for any model output
+(Theorem~\ref{thm:exposure}).
 
-\textbf{Language models for operations.} InventoryBench established the
-complementarity this paper starts from, and its four strategies are our arms 1,
-3, 5 and 11~\cite{inventorybench}. A design-time session can synthesize reusable
-operations research algorithms outright~\cite{llm-or-algorithms}, and InvEvolve
-evolves white-box inventory policies online~\cite{invevolve}. Our model does the
-opposite of both: it estimates the environment rather than the policy, writes no
-code, and every action stays fixed-form operations research. InvEvolve has no
-public code artifact as of our search, so any comparison against it must be
-labeled a faithful reimplementation, and we have not implemented one. Language
-models reach the operations loop in other shapes as well: as a multi-agent
-inventory manager~\cite{invagent}, as a reader of event text for demand
-forecasting~\cite{eventcast}, and as a human-in-the-loop instruction channel
-into a controller~\cite{instructmpc}; the same replenishment setting has a
-multi-agent reinforcement-learning benchmark~\cite{mabim}, and text-game agent
-evaluation has its own benchmark~\cite{textarena}. Field evidence supports the
-interface shape: judgmental adjustment of a forecast input
-raised profitability by 4.92 percent on average in a retail
-experiment~\cite{kesavan-field}, and average United States import shipping delay
-rose by 21 days between 2018 and 2024~\cite{carreras-valle-delays}.
+\textbf{Anytime-valid inference.} We take e-values and Ville's inequality as
+given~\cite{vovk-wang-evalues, ramdas-savi, ville} and read an \eprocess{} as a
+bettor's wealth~\cite{shafer-betting}. Universal inference builds a valid e-value
+for a composite null by data splitting, the split likelihood-ratio
+statistic~\cite{universal-inference}; we use a plug-in demand null instead, so
+our guarantees hold only as far as it does
+(Section~\ref{sec:limitations}). Gr\"unwald's e-posterior has risk bounds that
+loosen, not fail, when its e-collection, the analogue of a prior, is chosen
+badly~\cite{grunwald-eposterior}, and e-values keep Type-I risk control when the
+loss is chosen after the data~\cite{grunwald-beyond-np}. Certify-then-hedge
+multiplies prior weights by \eprocess{}es where a Bayes posterior uses
+likelihood ratios, so a wrong language prior costs at most
+$\log(|\mathcal{H}|/\lambda)$ nats of evidence relative to trusting the true
+family outright, and no validity.
 
-\textbf{When to call, and what to commit to.} Event-triggered invocation with
-threshold, CUSUM, sequential probability ratio~\cite{wald-sprt},
-Bayesian~\cite{bocpd} and learned rules is already
-established~\cite{event-triggered-llm}. Agents ask the same when-to-call
-question of themselves, answered by gating over fast-slow planning~\cite{asscg},
-budgeted replanning~\cite{brace} and learned model routing~\cite{routellm}, so
-we treat invocation as fixed infrastructure and claim nothing about it. Structuring a plan as falsifiable commitments with confirming
-and falsifying evidence, and running a hypothesis lifecycle with provenance and
-belief updates, also exist already~\cite{fcpagent, hep}. What differs here is
-that the commitment parameterizes an \emph{exogenous stochastic model} whose
-influence is authorized by a preregistered sequential statistic and compiled into
-inventory-control inputs, so the object is tested rather than merely recorded.
+\textbf{Inventory under uncertain information.} In inventory theory, advance
+demand information is a reliable signal that offsets lead
+time~\cite{hariharan-zipkin} and makes state-dependent base-stock policies
+optimal~\cite{gallego-ozer}. With the demand law unknown, the classical answers
+are Bayesian updating~\cite{scarf-bayes} and a min-max order over all laws
+with given mean and variance~\cite{scarf-minmax}. Our signal is text of
+unknown reliability that only splits a fixed prior budget. Unlike a Bayesian
+order, the mass that moves ours comes from \eprocess{}es that stay valid
+whatever working likelihood sizes the shock; unlike the min-max order, it stays
+near arm~1 until evidence arrives.
 
-\textbf{Statistics and inventory theory.} We use e-values and anytime-valid
-inference as given~\cite{vovk-wang-evalues, ramdas-savi, grunwald-safe-testing},
-with the classical sequential and changepoint machinery behind them~\cite{ville,
-wald-sprt, page-cusum, lorden, hinkley-changepoint}. The
-nearest construction is the e-detector, which sums
-processes started at every time and controls the average run
-length~\cite{e-detectors}, while we start one only at model-selected stopping
-times and control per-episode false activation by budget splitting. A theorem-backed
-\emph{retirement} rule would need confidence sequences~\cite{howard-confseq},
-specifically the forward and backward confidence-sequence intersection
-test~\cite{shekhar-backward-cs}, which we do not adopt, which is why
-our retirement rules are labeled empirical. The controller is the textbook
-one~\cite{clark-scarf, zipkin-foundations}, with base-stock heuristics for
-lost-sales systems, censored demand included, long
-established~\cite{zipkin-lost-sales, huh-lost-sales}, and our transit-pause
-semantics follow an established simulation convention in which material already
-moving stops progressing~\cite{stockpyl}.
+\textbf{Language models in operations.} On InventoryBench, language
+models augmented with operations research outperform either
+alone~\cite{inventorybench}. Language models read event text into
+demand forecasts~\cite{eventcast} and turn context into predicted disturbances
+for a model predictive controller~\cite{instructmpc}; LLM-SAA optimizes
+decisions such as the newsvendor under model-generated
+distributions~\cite{llm-saa}; agents record plans as falsifiable commitments and
+hypotheses with a tracked lifecycle~\cite{fcpagent, hep}. STOCKTAKE finds a
+knowing-doing gap: models detect 84 to 88\% of hidden failures, yet where stress
+persists 34 to 43\% of correctly diagnosed stress weeks still end in a
+stockout~\cite{stocktake}. Certify-then-hedge takes no order and no demand
+distribution from the model; shock sizes come from the data, and the order
+moves toward a hypothesis only as its \eprocess{} grows.
