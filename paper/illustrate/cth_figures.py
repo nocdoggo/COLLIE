@@ -3,7 +3,9 @@
 
   fig1_overview  the gate and certify-then-hedge on one shared input, each lane ending in one
                  fresh-seed lead-time episode (drawn by overview.py from data/fig1_episode.csv)
-  fig2_models    the registered fresh-seed confirmation across six language models
+  fig2_method    how certify-then-hedge turns a ShockSpec into an order (drawn by method.py;
+                 schematic curves, the registered constants)
+  fig3_models    the registered fresh-seed confirmation across six language models
 
 Each renderer first writes its plotted numbers to illustrate/data/<name>.csv, then draws from
 that file, so the figure can be checked against a table. Run from the repository with
@@ -264,7 +266,7 @@ def fig1_overview() -> None:
 # -- figure 2 -----------------------------------------------------------------
 
 
-def data_fig2_models() -> Path:
+def data_fig3_models() -> Path:
     confirm = json.loads((OUT / "confirm.json").read_text())["runs"]
     rows = []
     for run, label in MODELS:
@@ -288,7 +290,7 @@ def data_fig2_models() -> Path:
             ]
         )
     return _write_csv(
-        "fig2_models",
+        "fig3_models",
         [
             "model",
             "run",
@@ -313,10 +315,10 @@ def data_fig2_models() -> Path:
     )
 
 
-def fig2_models() -> None:
+def fig3_models() -> None:
     import style as S
 
-    rows = _read_csv(data_fig2_models())
+    rows = _read_csv(data_fig3_models())
     labels = [r["model"] for r in rows]
     primary = {"Gemini 3.8 Flash", "Grok 4.20"}
     n = len(rows)
@@ -451,10 +453,16 @@ def fig2_models() -> None:
         columnspacing=1.0,
         borderaxespad=0.0,
     )
-    S.save(fig, "fig2_models")
+    S.save(fig, "fig3_models")
 
 
-FIGURES = {"fig1_overview": fig1_overview, "fig2_models": fig2_models}
+def fig2_method() -> None:
+    import method
+
+    method.render(FIGURES_DIR)
+
+
+FIGURES = {"fig1_overview": fig1_overview, "fig2_method": fig2_method, "fig3_models": fig3_models}
 
 
 def main(argv: list[str]) -> int:

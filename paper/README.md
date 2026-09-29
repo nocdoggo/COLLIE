@@ -56,7 +56,8 @@ hand, and the renderers read every value from the committed outputs.
 | Figure | Where | What it carries |
 | --- | --- | --- |
 | `fig1_overview` | Sec. I, full width | The gate and certify-then-hedge on one shared input: (a) the alert, the model's ShockSpec and the truth; (b) the gate lane and (c) the hedge lane, each ending in the same fresh-seed lead-time episode (chosen post hoc; the caption says so), with the exposure bound under the hedge |
-| `fig2_models` | Sec. VIII, full width | The fresh-seed confirmation with six proposer models: perception, acting at once, and the gate and the hedge against arm 1, with the content-free control as a band |
+| `fig2_method` | Sec. VI, full width | How certify-then-hedge turns a ShockSpec into an order: (a) the fields the hedge reads, (b) the prior over the fixed set, (c) the e-processes and posterior, with sizing from the data, (d) the mixture quantile, (e) the guarantees and their premise; schematic curves |
+| `fig3_models` | Sec. VIII, full width | The fresh-seed confirmation with six proposer models: perception, acting at once, and the gate and the hedge against arm 1, with the content-free control as a band |
 
 All figures share `illustrate/style.py`: a warm rounded frame, cards with tinted header strips,
 centred panel titles, and STIX fonts that embed as TrueType. **Blue is certify-then-hedge**,
@@ -224,7 +225,7 @@ The submitted draft (Overleaf `68f996d`, imported at `0967e30`) was rewritten ar
 commitment study in `analysis/commitment/` (`PLAN.md` for the registered stages and their
 amendments, `REPORT.md` for the readout). The paper's numbers come from:
 
-- `analysis/commitment/out/confirm.json`: the registered stage C evaluation (Table I, Fig. 2);
+- `analysis/commitment/out/confirm.json`: the registered stage C evaluation (Table I, Fig. 3);
 - `analysis/commitment/out/confirm_d.json` and `readout_d.json`: the registered stage D
   evaluation and its registered secondaries;
 - `analysis/commitment/out/posthoc.json`, `sensitivity.json` and `ablation.json`: post-hoc

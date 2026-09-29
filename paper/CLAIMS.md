@@ -26,7 +26,7 @@ evaluation (`confirm_d.py`) and `readout_d.json` its registered secondaries (`re
 `readout_d.json`'s `runs.<run>`. All of them store unrounded values; every integer in the
 paper is rounded once from them or from `confirm.json` (never from a rounded value).
 
-## 1. The fresh-seed confirmation (Abstract, Section VIII-B, Table I, Fig. 2)
+## 1. The fresh-seed confirmation (Abstract, Section VIII-B, Table I, Fig. 3)
 
 | Claim | Evidence | Status |
 |---|---|---|
@@ -48,7 +48,7 @@ paper is rounded once from them or from `confirm.json` (never from a rounded val
 | The content-free control is timed by the same alerts (no model call) | `analysis/commitment/arms.py` (same `alert_or_detector` trigger); no `ctrl_cth_uniform` row in any ledger | established |
 | Gross column of Table I | `c["...\|gross"]` means (85.05, 138.95, 279.95, 261.75, 194.9, 122.8, 500.75, 501.25, 270.18, 9.77, -8.43) | established |
 | Four secondary models: every hedge-vs-gate and hedge-vs-arm-1 interval excludes zero | `c["cth-arm10\|net"]`, `c["cth-arm1\|net"]` for the four secondary runs | established |
-| Fig. 2 values (perception, arm 8, arm 10, hedge vs arm 1, content-free band) | `paper/illustrate/data/fig2_models.csv`, written by `paper/illustrate/cth_figures.py` from `confirm.json` | established |
+| Fig. 3 values (perception, arm 8, arm 10, hedge vs arm 1, content-free band) | `paper/illustrate/data/fig3_models.csv`, written by `paper/illustrate/cth_figures.py` from `confirm.json` | established |
 | Right family and direction among the 170 shocked episodes where the trigger fired | `runs.<run>.perception.arm8_spec_immediate` | established |
 
 ## 1b. Where the gain comes from, and the language (Section VIII-C, VIII-D)

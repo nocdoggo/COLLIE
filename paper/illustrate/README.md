@@ -10,6 +10,7 @@ and facts it will draw to `data/` (CSV or JSON, read from the committed study ou
 | `cth_figures.py` | Entry point; writes the data sidecars and renders every figure by name |
 | `style.py` | The house style shared by every figure: palette, STIX fonts, frame, cards, tags, chips, glyphs |
 | `overview.py` | Fig. 1, the gate and certify-then-hedge on one shared input |
+| `method.py` | Fig. 2, how certify-then-hedge turns a ShockSpec into an order (schematic curves) |
 | `data/` | The sidecars each figure is drawn from |
 
 ## Usage
@@ -64,4 +65,5 @@ normal-vision separation floors on a light surface (worst-pair CVD ΔE 24.7 prot
 | Name | Where | Drawn from |
 | --- | --- | --- |
 | `fig1_overview` | Fig. 1, Sec. I, full width | `data/fig1_episode.csv` (plotted series), `data/fig1_episode_meta.json` (alert, ShockSpec, offsets, replayed posterior) |
-| `fig2_models` | Sec. VIII, full width | `data/fig2_models.csv` (the fresh-seed confirmation across six models) |
+| `fig2_method` | Fig. 2, Sec. VI, full width | the registered constants only (λ, \|H\|); its curves are schematic and labelled so |
+| `fig3_models` | Fig. 3, Sec. VIII, full width | `data/fig3_models.csv` (the fresh-seed confirmation across six models) |

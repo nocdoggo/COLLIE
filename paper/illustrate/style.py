@@ -290,6 +290,7 @@ class Canvas:
 def save(fig, name: str, out_dir: Path | None = None) -> None:
     out = out_dir or FIGURES_DIR
     out.mkdir(parents=True, exist_ok=True)
-    fig.savefig(out / f"{name}.pdf", pad_inches=0.0)
+    # No creation date, so re-rendering unchanged data leaves the PDF byte-identical.
+    fig.savefig(out / f"{name}.pdf", pad_inches=0.0, metadata={"CreationDate": None})
     fig.savefig(out / f"{name}.png", dpi=300, pad_inches=0.0)
     plt.close(fig)
