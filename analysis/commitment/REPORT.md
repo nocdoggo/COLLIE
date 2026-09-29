@@ -3,10 +3,12 @@
 Exploratory with respect to Gate 3: nothing here re-votes the registered pilot, and the
 2026-09-23 kill-or-reframe decision stands. Within the study, stage C is a registered
 confirmation: its method, hypotheses, tests and evaluator were committed and pushed
-(`9d8e97f`, 2026-09-28) before any fresh-seed outcome existed. The plan and every amendment are
-in `PLAN.md`; the frozen tree shows no drift. Numbers below come from `out/confirm.json` (stage
-C), `out/dev/dev1.json` (stage B) and the run outputs under `out/` (stage A), unless a sentence
-names another source.
+(`9d8e97f`, 2026-09-28) before its live runs; amendment C3 in `PLAN.md` discloses what touched
+the fresh pool earlier (a scripted structural test computed outcomes on 6 of the 48 clusters) and
+an interim look at one primary run. The plan and every amendment are in `PLAN.md`; the frozen
+tree shows no drift. Numbers below come from `out/confirm.json` (stage C), `out/posthoc.json` and
+`out/sensitivity.json` (post hoc on stage C), `out/dev/dev1.json` (stage B) and the run outputs
+under `out/` (stage A), unless a sentence names another source.
 
 ## The method
 
@@ -14,20 +16,28 @@ names another source.
 action-aligned hypothesis set (demand up, demand down, lead-time shift, demand pulse) is
 registered. Hypothesis `h` of firing `j` gets prior mass `a_j * w_jh`, with `a_j = 0.05 * 2^-j`
 (the frozen alpha schedule) and `w_jh = lam / 4 + (1 - lam) * 1{h is the model's family}`; the
-model's answer sets these weights and nothing else. Each hypothesis has its own module 05
+model's answer sets these weights and, for the hypothesis it names, the onset window of its
+e-process, and nothing else. Each hypothesis has its own module 05
 e-process, started after the proposal and fed every later period. The posterior shock mass is
 proportional to `a_j w_jh E_jh`; the shock's size comes from a working likelihood of the visible
 data, never from the model's magnitude bin; and the order is the `p/(p+h)` quantile of the
 posterior-predictive mixture, which equals arm 1's order exactly when no hypothesis is live.
 Families module 04 cannot profitably act on (compound, shipment loss, transit pause) carry no
 hypothesis. `lam = 0.25` is the method, `lam = 0` trusts the model's family alone, and `lam = 1`
-is a content-free control that never calls the model.
+is a content-free control that never calls the model (it is still timed by the shared trigger,
+alerts included).
 
-Guarantees (proof sketches in `paper/sections/06_method_hedge.tex`, conditional on module 05's
-null): for every stopping time the expected shock mass under the null is at most
-`A = sum a_j <= 0.0375`, whatever the model outputs; the one-period newsvendor regret against arm
-1 is at most the posterior odds times the value of the hypotheses; and the registered gate is,
-up to one unit of threshold, this posterior's most-probable-hypothesis rule.
+Guarantees (proof sketches in `paper/sections/06_method_hedge.tex`): under a null whose baseline
+is known, for every stopping time the expected shock mass is at most `A = sum a_j <= 0.0375`,
+whatever the model outputs, and the one-period newsvendor regret against arm 1 is at most the
+posterior odds times the value of the hypotheses. The demand e-processes as run estimate their
+null from the pre-proposal prefix; the null Monte Carlo (`out/mc_exposure.md`) finds no cell
+clearly above a bound with the baseline known, and 2.0 to 2.7 times `A` for the stopped exposure
+with the plug-in null and a first firing at period 10. Against the content-free arm, a family the
+model does not name costs exactly `log(1 / lam)` nats of evidence (log 4) and the named one saves
+`log(lam + (1 - lam) |H|)` (log 3.25). With one hypothesis and `lam = 0` the gate's threshold is
+a posterior-odds rule of the same form; it is an analogy, since the gate certifies the model's
+full spec and the hedge a canonical one.
 
 ## Stage C: registered confirmation on fresh seeds
 
@@ -67,12 +77,51 @@ models) and worst on net.
 demand down +90 / +88, pulse +95 / +80, demand up -83 / -83, compound -40 / -40, shipment loss
 -3 / -3, null -3 / +2. The gain is where the oracle headroom is.
 
-**Language.** The hedge is within about ten of the content-free control on net with the primary
-models and within -43 to +1 with the others. The model's family label mainly lowers commitment on
+**Language.** The hedge is not distinguishable from the content-free control on net with the
+primary models (+9.3 b[-4.9, 23.6], -6.2 b[-28.7, 10.7]) and runs from -43 to +1 against it with
+the others (below zero for Llama 3.1 8B and GPT-3.5 Turbo). The model's family label mainly lowers commitment on
 null episodes: mean summed shock mass on the 48 nulls is 0.83 for the content-free control,
 0.45 to 0.52 for the hedge, and 0.04 to 0.18 when the model's family is trusted alone (`lam =
-0`), which in turn costs net reward (-16 to -192 against content-free). On this simulator the
-certified search, not the language, carries the gain.
+0`), which in turn costs net reward (-16 to -192 against content-free; Grok -82.9 b[-169.0,
+-13.4]). On this simulator, at this cost ratio, the certified search timed by alerts, not the
+text, carries the gain.
+
+**Post hoc** (`out/posthoc.json`, written after the results were seen; decides nothing):
+
+- *Where the gain comes from.* The lead-time family supplies 96% of hedge - arm 1 (Gemini 96.0%,
+  Grok 96.3%). Without the 8 lead-time units (40 clusters) hedge - arm 1 is +9.0 b[-23.9, 42.5]
+  and +6.6 b[-24.6, 36.1]; hedge - gate stays +226.8 b[82.3, 408.1] with Gemini (+58.1
+  b[-0.8, 133.6] with Grok), because the gate loses 1,057 per demand-rise episode with Gemini.
+- *Without the six structural-test clusters* (units `i = 0`, 42 clusters): H1 +328.6 and +187.7,
+  H2 +162.8 and +145.3, every one-sided p at most 0.0024.
+- *Null episodes.* The Gemini null loss is on the 24 false-alert twins (-6.4 b[-16.1, -0.3],
+  worst -105); the 24 silent twins are -0.0 b[-0.4, 0.2] (21 never trigger). Hedge - content-free
+  on the 48 nulls: -2.0 b[-8.1, 1.7] (Gemini), +3.1 b[-0.04, 8.4] (Grok).
+- *Exposure.* Hedge over content-free null exposure: 0.631 b[0.429, 0.668] (Gemini) and 0.553
+  b[0.392, 0.581] (Grok), cuts of 37% and 45%, almost all on false-alert twins. Naming any family,
+  right or wrong, moves prior weight off the others.
+- *Endpoint sign.* Gross and net disagree in sign for gate - arm 1, at once - arm 1 and hedge - at
+  once on both primary models; every claim here is on net.
+
+**Cost ratio** (`sensitivity.py`, `out/sensitivity.json`; exploratory replay). The 240 fresh
+episodes and all eleven arms re-run at p/h = 1, 2, 9 and 19 (InventoryBench uses 1, 4 and 19),
+each model-calling arm served the answer its model gave at the same (arm, episode, period) under
+p/h = 4. The prompt shows the price and inventory, so this approximates those arms; the others
+are exact. At p/h = 4 the replay reproduces all 2,544 registered records of each primary run
+exactly, and no call at any ratio lacked a recorded answer.
+
+| p/h | hedge - gate (Gemini / Grok) | hedge - arm 1 | hedge - content-free |
+|---|---|---|---|
+| 1 | +228 b[109, 376] / +86 b[30, 151] | +16 b[-14, 47] / +10 b[-18, 40] | +1 / -5 |
+| 2 | +259 / +114 | +67 b[8, 135] / +55 b[2, 118] | +9 / -3 |
+| 4 | +309 / +179 | +178 / +163 | +9 / -6 |
+| 9 | +454 / +357 | +485 b[182, 853] / +447 b[168, 785] | +47 b[6, 97] / +10 b[-34, 59] |
+| 19 | +722 b[400, 1,095] / +694 b[324, 1,138] | +1,056 b[398, 1,850] / +991 b[376, 1,739] | +84 b[18, 166] / +19 b[-38, 87] |
+
+The hedge beats the gate at every ratio. Its gain over arm 1 vanishes at p/h = 1 and grows with
+the ratio; at p/h = 19 it no longer rests on lead-time shifts alone (+120 b[40, 219] and +117
+b[38, 218] without family 4). The text's share over the content-free control becomes visible at
+p/h = 9 and 19 with Gemini only. Post hoc, on the confirmation's own episodes, ten comparisons.
 
 **Cost.** Stage C provider cost $6.50: Gemini 3.8 $4.55, Grok 4.20 $1.09, GPT-3.5 $0.45,
 DeepSeek-V3 $0.22, Gemini 2.5 Flash-Lite $0.13, Llama 3.1 8B $0.06.
@@ -87,8 +136,8 @@ live arm matches the replay on 120/120 episodes of the scripted bank.
 ## Stage A: model ladder on the pilot episodes
 
 The registered 120 pilot episodes with every rung that has finished (`out/ladder.json`,
-`out/ladder.md`; `gpt-oss-20b`, `step-3.7-flash` and `step-5-preview` were still running when
-this was written, and `gemini-3-flash-preview` was dropped under A1). The hedge column is the
+`out/ladder.md`; `step-5-preview`, a slow reasoning model, was still running when this was
+written, and `gemini-3-flash-preview` was dropped under A1). The hedge column is the
 stage B development replay (arm 10's cached answers, no calls), so it carries no claim.
 
 | model | developer | released | size | right family / 96 | first-proposal abstain | at once - arm 1 (net) | gate - arm 1 (net) | hedge - arm 1 (net, dev) | false-alert nulls acted on (at once / gate) | cost |
@@ -107,8 +156,10 @@ stage B development replay (arm 10's cached answers, no calls), so it carries no
 | llama-3.3-70b | Meta | 2024-12 | 70B | 24/96 | 51 | -1,641 | -158 | +136 | 2/12, 0/12 | $0.03 |
 | gpt-3.5-turbo | OpenAI | 2023-05 | legacy | 26/96 | 25 | -1,821 | -60 | +148 | 11/12, 1/12 | $0.17 |
 | gpt-4o-mini | OpenAI | 2024-07 | legacy | 29/96 | 0 | -1,741 | -1 | +111 | 11/12, 1/12 | $0.07 |
+| gpt-oss-20b | OpenAI | 2025-08 | 21B-MoE | 49/96 | 21 | -2,626 | -176 | +149 | 6/12, 0/12 | $0.05 |
 | step-3.5-flash | StepFun | 2026-01 | mid | 49/96 | 29 | -3,339 | -156 | +146 | 12/12, 1/12 | $0.37 |
 | step-3.5-flash-2603 | StepFun | 2026-03 | mid | 50/96 | 26 | -3,269 | -141 | +154 | 12/12, 1/12 | $0.37 |
+| step-3.7-flash | StepFun | 2026-05 | mid | 53/96 | 29 | -3,051 | -201 | +153 | 12/12, 1/12 | $1.72 |
 | grok-build-0.1 | xAI | 2025-08 | small | 28/96 | 53 | -2,002 | +3 | +144 | 3/12, 0/12 | $1.28 |
 | grok-4.20 | xAI | 2026-03 | mid | 53/96 | 20 | -2,624 | -172 | +154 | 9/12, 1/12 | $0.44 |
 
@@ -118,8 +169,8 @@ to -3,656 and tracks how readily a model commits rather than how often it is rig
 (2/96 right, 63 first-proposal abstentions) loses 61, while Gemini 2.5 Flash-Lite (55/96 right,
 5 abstentions) loses 3,656. The gate stays between -300 and +3. The hedge's development replay
 gains +107 to +158 on every rung; the content-free variant gains +136 on the same episodes.
-Stage A cost $2.87 for the Gemini and Grok rungs plus the OpenRouter and StepFun rungs in
-`out/ladder.json`.
+Rung costs in `out/ladder.json` sum to $8.34 over the 20 finished rungs, of which $2.34 is the
+real-content pilot's two banks, reused here.
 
 ## Amendments and disclosures
 
@@ -131,14 +182,19 @@ Stage A cost $2.87 for the Gemini and Grok rungs plus the OpenRouter and StepFun
   accurate templates per family and split, and module 03's renderer refuses repeated texts.
 - C2: an empty model echo is re-requested (up to three times, all attempts billed) instead of
   aborting; the `deepseek-v3` secondary run was re-run from its cache.
-- Disclosed: a structural smoke of the fresh-layout runner (scripted, units `i = 0`) before
-  registration, read for counts only; stage B tuned on the spent pilot episodes.
+- C3: disclosures from an independent audit that reproduced every registered number: an interim
+  look at the Grok primary run while Gemini's ran; outcomes computed (not read) on units `i = 0`
+  by the pre-registration structural test; the C1 layout materialised early (no arms); the
+  Gemini manifest's end-of-run SHA; Rule U applies to arm 10 only; the stage B guarantees
+  restated (known null, exact prior constants, the gate as an analogy).
+- Stage B tuned on the spent pilot episodes.
 
 ## What this does not show
 
 The simulator's lead times are deterministic, which makes a lead-time shift easy to size from
-receipts; the gain rests on that family. One cost ratio (p/h = 4) was confirmed. The exposure
-bound is conditional on module 05's null, whose demand parameters are estimated from the
-pre-proposal prefix. The regret bound covers the one-period surrogate, not realised multi-period
-cost. No claim is made about language understanding, and on these data language adds no net
-value over the content-free control.
+receipts; at p/h = 4 the gain rests on that family. One cost ratio (p/h = 4) was confirmed; the
+others are replayed with the models' answers held fixed. The exposure bound needs a known null;
+the demand e-processes estimate theirs from the pre-proposal prefix, and the Monte Carlo puts
+the stopped exposure at 2 to 3 times the budget at early firings. The regret bound covers the one-period surrogate, not realised multi-period
+cost. No claim is made about language understanding; at the registered cost ratio the text adds
+no net value over the alert-timed content-free control.

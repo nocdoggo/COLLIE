@@ -181,3 +181,15 @@ def test_an_empty_echo_is_retried_and_billed() -> None:
     )
     raw = client.complete_metered("hi", decoding=DECODING_REGISTRY["det-v1"])
     assert raw.text == "OK" and raw.total_tokens == 8 and raw.prompt_tokens == 6
+
+
+def test_the_cost_ratio_replay_serves_by_decision_point_and_counts_misses():
+    from analysis.commitment.sensitivity import ABSTAIN, _ReplayTransport
+
+    transport = _ReplayTransport({("arm10", "dev/f1/s1/no_alert", 12): "recorded"})
+    transport.context = ("arm10", "dev/f1/s1/no_alert", 12)
+    assert transport.complete_metered("any prompt", decoding=None).text == "recorded"
+    transport.context = ("arm10", "dev/f1/s1/no_alert", 13)
+    assert transport.complete_metered("any prompt", decoding=None).text == ABSTAIN
+    assert transport.misses == [("arm10", "dev/f1/s1/no_alert", 13)]
+    assert transport.served == 2

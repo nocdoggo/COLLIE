@@ -255,3 +255,49 @@ sha256 prefix `1051f372754f6e25`; test `test_an_empty_echo_is_retried_and_billed
 changes. The primary runs are unaffected: `grok-4.20` finished before the change without an empty
 echo, and `gemini-3.8-flash` runs on the code it started with. `deepseek-v3` is re-run from its
 cache (the 209 answered calls are replayed, not re-bought).
+
+**C3 (2026-09-29, after the runs: disclosures from an independent audit).** A second session
+recomputed `out/confirm.json` from the run files without `confirm.py` and matched every registered
+number exactly (means, bootstrap intervals, sign-flip p-values, Holm, secondaries); it found no
+leakage in `cth.py`. It also found the following departures from what this plan and `episodes.py`
+say. None changes a run, a rule, a cap or a number; post-hoc checks are in `out/posthoc.json`.
+
+1. *Interim look.* At 02:57:39Z, 22 s after the `grok-4.20` full run finished, the registered
+   evaluator was run on that run alone (H1 and H2 for Grok) while the `gemini-3.8-flash` primary
+   run was still going and before C2 was written. Nothing changed after it except C2, which
+   concerns an unrelated transport failure in a secondary run.
+2. *Outcomes on units `i = 0`.* The structural test disclosed above computed outcomes for all
+   eleven arms on the 30 episodes of units `i = 0` (6 of the 48 clusters), contrary to
+   `episodes.py`'s "sealed" docstring and to "no run has touched" at the top of this plan; the
+   outcomes were not read. Without those six clusters, H1 is +328.6 (Gemini 3.8) and +187.7 (Grok
+   4.20) and H2 +162.8 and +145.3, every one-sided sign-flip p at most 0.0024.
+3. *Layout materialised early.* At 23:53Z on 2026-09-28, before stages A and C were registered,
+   a smoke check of an earlier `episodes.py` wrote the data and truth files of units `i = 0..7`
+   (the later C1 layout) to a scratch directory and counted them; no arm ran on them.
+4. *Manifest SHA.* `runner.py` stamps `run_manifest.json`'s `git.sha` when a run ends, so
+   `fresh-gemini-3.8-flash` records `4eb361b` (C2) although it started and ran at `f1a289a` with
+   the pre-C2 `endpoints.py`; `invocations.jsonl` records the starting SHA. The frozen hashes match
+   at every commit a run used.
+5. *Rule U.* Rule U-v1 applies to arm 10 only: `arms.py` gives the certify-then-hedge arms
+   `rule_u_horizon=None` (they read only family and direction and always register canonical
+   specs). On `grok-4.20`, Rule U turned 7 of arm 10's answers into abstentions; 4 of the same
+   answers registered `demand_up` for arm 12.
+6. *Evaluator and strata.* `confirm.py` at its frozen hash is the only confirmatory evaluator. The
+   stochastic-lead stratum in `episodes.py` is not part of stage C. An unregistered parallel
+   implementation (untracked `cth_core.py`, `evaluate.py`, `evidence.py`, `hypotheses.py` and
+   later files) sat in this directory during the runs; no run imported it (arm 12's and the
+   content-free arm's committed orders reproduce exactly from the frozen `cth.py` and the logged
+   answers), and it was moved out at about 04:05Z.
+7. *C1's caps.* "Caps scale by 2/3" is inexact for the secondary models (set at $1 each, not
+   $0.67; `gpt-3.5-turbo` from $2 to $1). Every run stayed under a strict 2/3 scaling.
+8. *Stage B's guarantees, restated.* (1) holds when every e-process is a nonnegative
+   supermartingale under the null. The demand e-processes use module 05's plug-in prefix null
+   (mean and spread from the periods before `tau_j`), which the audit's simulation found
+   anti-conservative at the early firings that occurred; the bound is exact for a known null and
+   approximate as run. (3) holds only with `lam = 0`, one live hypothesis and the same e-process;
+   arm 10 certifies the model's full spec (magnitude, persistence, duration) while the method
+   certifies a canonical spec, and the `map` ablation thresholds the total shock mass, so it is
+   an analogy, not an identity. (4) Against the content-free arm, a hypothesis the model does not
+   name enters with `lam` times the content-free weight, a cost of exactly `log(1 / lam)` nats
+   (log 4), and the named one with `lam + (1 - lam) |H|` times it, a saving of
+   `log(lam + (1 - lam) |H|)` (log 3.25); `log(|H| / lam)` is a valid but loose bound on the cost.
