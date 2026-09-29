@@ -3,14 +3,17 @@
 
 Asking a language model what changed, in a closed vocabulary, and testing the answer on later
 data is a sound interface; letting the test switch the answer on is not enough: the registered
-gate acted late and rarely, on whatever size the model stated. Certify-then-hedge keeps the
+gate acted late or not at all, on whatever size the model stated. Certify-then-hedge keeps the
 certificate and changes its use: the \eprocess{} prices hypotheses, the data size them, and the
-controller hedges at the critical fractile of the resulting mixture. Under a known null that
+controller hedges at the critical fractile of the resulting mixture. Under a known null and arrival law that
 rule keeps the gate's error budget as a bound on expected exposure for any model output, and in
 exploratory tests registered before their live runs it beat the gate at all three of the
 benchmark's cost ratios and the operations research baseline at the middle and highest, with two
-proposer models. On this simulator the value came mostly from mechanisms the alert-timed
-content-free control shares, concentrated in lead-time shifts; the text cut commitment on
-no-shock episodes and, when stockouts dominate, added value with one of the two models. Whether
-text earns more where it says what the data reveal only late, under a null the guarantee fully
-covers and with stochastic lead times, is the question this design can now answer.
+proposer models, though at the highest non-inferiority on no-shock episodes was not
+established and on noisy lead times the gain over the baseline was not confirmed. On this
+simulator the value came mostly from mechanisms the alert-timed content-free control shares,
+concentrated in lead-time shifts; the text cut commitment on no-shock episodes and, when
+stockouts dominate, added value with one of the two models. Whether text earns more where it
+says what the data reveal only late, under a null the guarantee fully covers and on
+InventoryBench's own stochastic lead times and lost shipments, is the question this design can
+now answer.

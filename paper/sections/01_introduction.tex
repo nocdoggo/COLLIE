@@ -16,15 +16,12 @@ the proposal, decides whether the claim may touch an order. We preregistered the
 version of the last step, a \emph{gate} that lets a hypothesis act only once its \eprocess{}
 crosses the Ville threshold $1/\alpha_j$, and ran a pilot against a frozen decision rule.
 
-The gate failed its own decision rule. With scripted model content the registered pilot read
-\emph{kill-or-reframe}: only two of six shock families left a clairvoyant enough headroom, and a
-detector compiled without language beat the gate on the registered gross-profit endpoint. An
-exploratory rerun with live Gemini and Grok answers showed why the gate could not use real
-content. It rarely acted on a false alarm (1 of 12 false-alert episodes with each model), but it
-acted on fewer than half of the right-family proposals (43\% and 39\%), a median of 10 and 11
-periods after they were made, and when it acted it compiled whatever magnitude the model had
-stated, though no alert states a size. The gross-profit endpoint hid part of
-this, since it charges no holding and so rewards over-stocking (Section~\ref{sec:results}).
+The gate failed its own decision rule: the registered pilot read \emph{kill-or-reframe}, and
+an exploratory rerun with live Gemini and Grok answers showed why. The gate rarely acted on a
+false alarm (1 of 12 false-alert episodes with each model), but it acted on fewer than half of
+the right-family proposals (43\% and 39\%), a median of 10 and 11 periods after they were made,
+and then compiled whatever magnitude the model had stated, though no alert states a size
+(Section~\ref{sec:results}).
 
 This paper replaces the gate with \emph{certify-then-hedge}. The \eprocess{} no longer switches
 the controller on; it prices a fixed set of action-aligned hypotheses. The language model's
@@ -32,10 +29,10 @@ answer only reweights that set (and fixes the onset window of the hypothesis it 
 with a uniform prior so that a wrong answer has bounded cost. The size of a shock is estimated
 from the data rather than taken from the model, and the order is the critical fractile of the
 posterior-predictive mixture, so the controller moves toward a hypothesis as fast as the
-evidence for it grows (Fig.~\ref{fig:episode}). Under a known null, the construction keeps the
+evidence for it grows (Fig.~\ref{fig:episode}). Under a known null and arrival law, the construction keeps the
 gate's error budget as a bound on expected exposure to a false hypothesis at every stopping
-time, whatever the model says, and in the single-hypothesis case the gate's threshold is a
-posterior-odds rule of the same form.
+time, whatever the model says, and in the single-hypothesis case the gate's threshold is
+analogous to a posterior-odds rule.
 
 \begin{figure}[!t]
 \centering
@@ -57,20 +54,21 @@ receipts. Final: $+198$ against $-2{,}358$; over all 32 lead-time episodes, $+1{
 \begin{itemize}\itemsep0pt
 \item \textbf{Certify-then-hedge}, a graded commitment rule for typed language-model
       hypotheses in a closed control loop, with an exposure bound that holds for any model
-      output under a known null and an odds-regret bound in cost units, and a simulation of how
-      far the bound slips under the plug-in null we ran (Section~\ref{sec:hedge}).
+      output under a known null and arrival law, an odds-regret bound in cost units, and a
+      simulation of how far the bound slips under the null we ran (Section~\ref{sec:hedge}).
 \item \textbf{Two registered tests on fresh seeds}, exploratory with respect to the project's
       preregistration. At the middle cost ratio, against the gate and against the operations
       research baseline, with two proposer models, all four primary tests survive Holm
       correction and losses on no-shock episodes stay within the registered margin. At the
-      benchmark's other two ratios the gains over the gate hold, and at the higher one the
-      model's answer adds value with one of the two models; on noisy lead times the gain over
-      the baseline is not confirmed (Section~\ref{sec:results}).
+      benchmark's other two ratios the gains over the gate hold; at the higher one so does the
+      gain over the baseline, and the model's answer adds value with one of the two models, but
+      non-inferiority on no-shock episodes is not established there; on noisy lead times the
+      gain over the baseline is not confirmed (Section~\ref{sec:results}).
 \item \textbf{An account of where the gain comes from.} Against the baseline it comes almost
       entirely from lead-time shifts, and an alert-timed variant that ignores the model's
-      answer earns about as much with the two primary models (and more with two weaker ones);
+      answer is not distinguishable from it with the two primary models;
       the model's label lowers commitment on no-shock episodes and, post hoc, shows no
-      detectable change in their reward. A model ladder (20 of 21 models run) shows that acting on proposals at once
+      detectable change in their reward. A model ladder (20 of 21 models run) shows, post hoc, that acting on proposals at once
       loses more the more readily a model commits, and that being right does not protect it.
 \item \textbf{The negative pilot and the audit trail}: the gate's registered failure, every
       deviation and disclosure, and the audited benchmark divergence that motivated the

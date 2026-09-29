@@ -21,8 +21,8 @@ A deterministic compiler maps a \shockspec{} to a point of a registered 72-point
 applies it to the running configuration $(m, L_{\mathrm{eff}}, \gamma)$ of a capped base-stock
 controller, a demand multiplier, an effective lead time and a pipeline discount: the
 multiplier is set, the lead time grows by the point's offset from a reference of one period
-(low, medium and high add one, two and three periods to the running lead, which starts at the
-promised lead), and the discount scales the running one. With $\bar d_t$ and $s_{d,t}$ the running mean and
+(a lead-time shift's low, medium and high add one, two and three periods to the running lead,
+initially the promised lead), and the discount scales the running one. With $\bar d_t$ and $s_{d,t}$ the running mean and
 standard deviation of observed demand and $z^\star = \Phi^{-1}(p/(p+h))$,
 \begin{align}
 S_t &= m(1+L_{\mathrm{eff}})\bar d_t + z^\star\sqrt{1+L_{\mathrm{eff}}}\,s_{d,t}, \notag\\
@@ -30,6 +30,6 @@ q_t &= \min\bigl(\lceil S_t - I_t - \gamma P_t\rceil^+,\, C_t,\, \hat C_t\bigr),
 \label{eq:controller}
 \end{align}
 where $\hat C_t$ is the published baseline's smoother. At the baseline configuration this
-controller reproduces arm~1 bit for bit, so every arm runs the published policy whenever no
+controller reproduces arm~1 bit for bit, so every hypothesis-driven arm runs the published policy whenever no
 hypothesis acts. The compiler reads the model's magnitude bin as a severity rank, which is
 where the gate inherits the model's magnitude errors.

@@ -1,14 +1,14 @@
 \section{Limitations}
 \label{sec:limitations}
 
-\textbf{One simulator, 48 units per pool.} All evidence comes from our generator. At
-$p/h = 4$ its lead times are deterministic, so a lead-time shift appears in the receipts without
-noise, and that is where the gain sits: lead-time shifts, a sixth of the shocked episodes, carry
+\textbf{One simulator, small pools.} All evidence comes from our generator. Outside the
+noisy-lead stratum its lead times are deterministic, so a lead-time shift appears in the receipts
+without noise, and that is where the gain sits: at $p/h = 4$ lead-time shifts, a sixth of the shocked episodes, carry
 about 171 of the 178 per-episode gain over arm~1 with Gemini and 157 of 163 with Grok. With
 noisy lead times the gain over arm~1 was not confirmed on eight units, and the one-period
-shifts sometimes lost. The method has not been run on InventoryBench's own instances, a third of
-which have stochastic lead times with lost shipments; each pool has 48 units rather than the
-registered 72, because the alert bank yields distinct texts for only eight units per family.
+shifts lost on average (descriptive). The method has not been run on InventoryBench's own instances, a third of
+which have stochastic lead times with lost shipments; the fresh pools have 48 units (the confirmation
+registered 72) because the alert bank yields distinct texts for only eight units per family.
 
 \textbf{What the theorems cover.} Theorems~\ref{thm:exposure}
 and~\ref{thm:regret} assume an exact null, and the arm as run lies outside it: its
@@ -31,13 +31,12 @@ moving the order. Post hoc, crediting each period's mass to its leading hypothes
 pulse-led periods carry 0.69 of the control's 0.83 and 0.32 and 0.38 of the hedge's 0.52
 and 0.46, so most of what the model's label removes is that mass.
 
-\textbf{Status of the evidence.} Relative to Gate~3 this study is exploratory,
-and Gate~3's registered decision on the pilot, \emph{kill-or-reframe}, stands.
-The method was developed on the 120 spent pilot episodes; both later stages were
-registered, with the code frozen by hash, before their live runs. The plan
-discloses a structural test on six of the 48 first-stage units beforehand, an
-interim look at one model's run, three departures from the original registration
-(net reward as the primary endpoint, action before any activation threshold, fresh
-units outside the frozen manifest), an independent audit that reproduced every
-registered number, and the second stage's pre-run amendments; none changed a run's
-hypotheses, pool or cap.
+\textbf{Status of the evidence.} Relative to Gate~3 this study is exploratory, and
+Gate~3's decision, \emph{kill-or-reframe}, stands. The method was developed on the spent
+pilot episodes; both later stages were registered, code frozen by hash, before their live
+runs. The plan discloses a structural test on six first-stage units, an interim look at one
+run, three departures from the original registration (net reward as endpoint, action before
+any activation threshold, fresh units outside the frozen manifest), an audit that reproduced
+every registered first-stage number, and the second stage's pre-run amendments, which changed
+no hypothesis or cap (one clipped the noisy stratum's lead times). The second stage did not
+establish null safety at $p/h = 19$, nor non-inferiority against arm~1 at $p/h = 1$ with Grok.

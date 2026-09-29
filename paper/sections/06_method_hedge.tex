@@ -21,7 +21,7 @@ register a fixed, action-aligned hypothesis set $\mathcal{H}$: demand up, demand
 down, lead-time shift and an upward demand pulse. The other families (\texttt{shipment\_loss},
 \texttt{transit\_pause}, \texttt{compound}) carry no hypothesis by design: an order
 placed at onset cannot land before a loss burst or a pause ends, and in the pilot's
-forensic replay even a clairvoyant acting at onset gained nothing on loss bursts or
+forensic replay even a clairvoyant acting at onset gained under 1\% on loss bursts or
 compound shocks once its foresight of demand noise was removed. Hypothesis $k \in \mathcal{H}$ of firing
 $j$ receives prior mass $a_j w_{jk}$ with
 \begin{equation}
@@ -122,12 +122,11 @@ $(1-\Pi_t)\bigl(c_{F_0}(x_t)-c_{F_0}(x^0_t)\bigr) \le
 $\Pi_t/(1-\Pi_t) = N_{t-1}/(1-A_t) \le \tilde N_{t-1}/(1-A)$ with
 $\Expect_0[\tilde N_{t-1}] \le A$. \hfill$\square$
 
-The premise is where the guarantee is fragile. Our demand \eprocess{}es, as
-registered, estimate the null's mean and spread from the periods before $\tau_j$,
-and the simulator's delays are deterministic rather than the registered arrival
-law. A null simulation of the frozen arm finds no cell clearly above a bound where
-the premise holds, and $\Expect_0[\Pi_\sigma]$ up to 2.7 times $A$ in the cells
-matched to our null episodes (Section~\ref{sec:limitations}).
+The premise is fragile as run: the demand \eprocess{}es estimate the null's mean and spread
+from the periods before $\tau_j$, and outside the noisy-lead stratum the simulator's delays are
+deterministic, not the registered arrival law; a null simulation puts
+$\Expect_0[\Pi_\sigma]$ at up to 2.7 times $A$ in the cells matched to our null episodes
+(Section~\ref{sec:limitations}).
 
 Two further properties follow from \eqref{eq:prior} and \eqref{eq:posterior}.
 First, with one hypothesis and $\lambda = 0$ the posterior odds are

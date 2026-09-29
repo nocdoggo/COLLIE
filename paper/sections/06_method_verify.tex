@@ -23,7 +23,7 @@ shipment ledger; compound hypotheses split their budget over two separate
 
 \textbf{The registered gate.} Arm~10 allocates $\alpha_j = \alpha 2^{-j}$ to proposal $j$ (at
 most two per episode, $\alpha = 0.05$) and lets proposal $j$ act, on its compiled configuration,
-from the first $t$ with $E_{j,t} \ge 1/\alpha_j$.
+from the decision after the first $t$ with $E_{j,t} \ge 1/\alpha_j$.
 
 \begin{theorem}
 \label{thm:activation}
@@ -35,8 +35,8 @@ Ville's inequality~\cite{ville} bounds each crossing by $\alpha_j$ and a union b
 rest. The guarantee is \emph{model-conditional}: it presumes $p_0$ is the true law. Two
 implementation facts weaken it in ways we measured rather than assumed. The demand null's mean
 and variance are estimated from the pre-proposal prefix, which makes the test anti-conservative
-for short prefixes; and the registered arrival null is a diffuse lead-time law while our
-generator's lead times are deterministic, which makes the gate's arrival test slow but,
-empirically, conservative (for the hedge's exposure it is not; Section~\ref{sec:hedge}). None of
+for short prefixes; and the registered arrival null is a diffuse lead-time law while our lead
+times are deterministic outside the noisy-lead stratum, which makes the gate's arrival test slow
+but, empirically, conservative (for the hedge's exposure it is not; Section~\ref{sec:limitations}). None of
 the theorems in this paper covers wrong-family activation, realized profit, or
 refutation and expiry rules, which are registered operational rules rather than certified ones.

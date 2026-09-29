@@ -301,18 +301,24 @@ Not yet frozen. Task 19 establishes `prereg/freeze_manifest.json` at the end of 
 - **What ran:** the stage C method, arms and evaluator rules on a new pool of 48 units (base
   200000) at InventoryBench's other two cost ratios, p/h = 19 and 1, and on the reserved
   stochastic-lead stratum (8 family-4 units) at p/h = 4, with Gemini 3.8 and Grok 4.20; all six
-  runs completed at `a38eb64`, and nothing was evaluated before the last one finished.
+  runs completed at `a38eb64`, which differs from `33f77b4` in no stage C or D code file (the
+  registered hashes match), and nothing was evaluated before the last one finished.
 - **Pre-run amendments:** an independent audit of the registration and a fact-check of the study
   notes led to DA1 to DA12 before any stage D call. The evaluator now refuses any run but the
   registered one and decides the 8-cluster test by exact enumeration; the stratum's leads are
   clipped at 4 (a lead of 5 is outside the registered arrival null and made arm 10's e-process
-  raise); the two registered secondaries were defined; the lead-time shift sizes in the study
-  notes were corrected (two periods from a baseline lead of 1, one from 2). None changed a
-  hypothesis, a family, a pool or a cap.
+  raise); the two registered secondaries were defined, with across-ratio changes read per unit of
+  price and the -25 margin kept in currency (DA4); D5 is read by the sign consistency of its eight
+  units, with descriptive per-unit and per-shift readouts (DA11); the lead-time shift sizes in the
+  study notes were corrected (two periods from a baseline lead of 1, one from 2). None changed a
+  hypothesis, a family or a cap.
 - **Outcome (Holm within each family):** at p/h = 19, hedge minus gate and hedge minus arm 1
   reject with both models, and hedge minus the content-free control (the text's value) rejects
   with Gemini (+81.5) but not Grok (-1.9); null safety at the registered -25 margin is not
-  established there (-22.0 and -21.6). At p/h = 1, hedge minus gate rejects with both. On noisy
+  established there (-22.0 and -21.6). At p/h = 1, hedge minus gate rejects with both; the
+  registered non-inferiority of hedge minus arm 1 over all episodes holds only just with Gemini
+  (lower bound -24.5) and fails with Grok (-27.6), and the method loses a little on null episodes
+  (-3.5 and -3.3, within the margin). On noisy
   lead times, hedge minus arm 1 does not reject with either model (+253.7 and +187.2, exact p
   0.137 and 0.148).
 - **Cost:** $12.49.
