@@ -19,7 +19,11 @@ Paths are relative to the repository root. `confirm.json` is
 refers to its `runs` object, and `c[...]` to `runs.<run>.contrasts[...]`. `posthoc.json` and
 `sensitivity.json` are the post-hoc readouts in the same directory (`posthoc.py`,
 `sensitivity.py`); `ph.<run>` refers to `posthoc.json`'s `runs.<run>`, and `sens.<run>.<ratio>` to
-`sensitivity.json`'s `results.<run>.<ratio>`. Both store unrounded values; every integer in the
+`sensitivity.json`'s `results.<run>.<ratio>`; `abl.<run>.<ratio>` to `ablation.json`'s
+`results.<run>.<ratio>` (`ablation.py`, post hoc). `confirm_d.json` is the registered stage D
+evaluation (`confirm_d.py`) and `readout_d.json` its registered secondaries (`readout_d.py`);
+`d.<family>` refers to `confirm_d.json`'s `families.<family>` and `rd.<run>` to
+`readout_d.json`'s `runs.<run>`. All of them store unrounded values; every integer in the
 paper is rounded once from them or from `confirm.json` (never from a rounded value).
 
 ## 1. The fresh-seed confirmation (Abstract, Section VIII-B, Table I, Fig. 2)
@@ -51,19 +55,21 @@ paper is rounded once from them or from `confirm.json` (never from a rounded val
 
 | Claim | Evidence | Status |
 |---|---|---|
-| Gain by family (+1,286 / +1,177 lead time; +90 / +88 demand fall; +95 / +80 pulse; -83 demand rise; about -40 compound; about -3 loss) | `runs.<run>.by_family_net_cth_minus_arm1` (generator families 4, 2, 3, 1, 6, 5) | established |
+| Gain by family (+1,286 / +1,177 lead time; +90 / +88 demand fall; +95 / +80 pulse; about -40 compound; about -3 loss) | `runs.<run>.by_family_net_cth_minus_arm1` (generator families 4, 2, 3, 6, 5) | established |
+| Post hoc, every shocked family's interval excludes zero except the demand rise: -83 [-200, 21] (Gemini), -83 [-204, 26] (Grok) | `ph.<run>.gain_source["by_family_cth-arm1\|net"]["1"]` (-83.38 [-200.00, 21.09]; -83.44 [-203.88, 25.60]); families 2 to 6 exclude zero | post hoc |
 | The 32 shocked lead-time episodes supply 96% of hedge - arm 1 | arithmetic on the registered per-family readout: 32 x 1285.53 / (240 x 178.47) = 0.960, Grok 0.963; `ph.<run>.gain_source.lead_time_episodes_share` | established |
-| Without the lead-time units (episodes and twins): hedge - arm 1 +9 [-24, 43] and +7 [-25, 36]; hedge - gate +227 [82, 408] (Gemini), +58 [-1, 134] (Grok) | `ph.<run>.gain_source["cth-arm1\|net\|without_lead_time_units"]` (9.04 [-23.88, 42.52], 6.55 [-24.55, 36.08]), `["cth-arm10\|net\|without_lead_time_units"]` | post hoc |
+| Without the lead-time units (episodes and twins): hedge - arm 1 +9 [-24, 43] and +7 [-25, 36]; hedge - gate +227 [82, 408] (Gemini), +58 [-1, 134] (Grok, not distinguishable from zero) | `ph.<run>.gain_source["cth-arm1\|net\|without_lead_time_units"]` (9.04 [-23.88, 42.52], 6.55 [-24.55, 36.08]), `["cth-arm10\|net\|without_lead_time_units"]` (226.81 [82.28, 408.13]; 58.09 [-0.76, 133.59]) | post hoc |
 | The gate loses 1,057 per demand-rise episode with Gemini | `ph.fresh-gemini-3.8-flash.gain_source.by_family_net["arm10-arm1"]["1"]` (-1056.59) | post hoc |
-| The stated lead-time size was wrong in 7 of 17 Gemini proposals (5 too large, 2 too small) and 6 of 11 Grok (all too large); true shifts were one or two periods (every family-4 unit moves to a lead of 3 from 1 or 2) | `ph.runs.<run>.lead_time_proposals.first_proposal_vs_true_shift` ({right 10, too_large 5, too_small 2}; {5, 6, 0}); `collie/data/splits.py` `COMBO_A[4]`; PLAN.md DA8 | post hoc |
+| The stated lead-time size was wrong in 7 of 17 Gemini proposals (5 too large, 2 too small) and 6 of 11 Grok (all too large); true shifts were one or two periods (every family-4 unit moves to a lead of 3 from 1 or 2) | `ph.<run>.lead_time_proposals.first_proposal_vs_true_shift` ({right 10, too_large 5, too_small 2}; {5, 6, 0}); `collie/data/splits.py` `COMBO_A[4]`; PLAN.md DA8 | post hoc |
 | The gate compiles medium as two periods | `collie/control/mapping.py` (medium: effective lead 3 against a reference of 1) | established |
 | The gate commits a median of 11 periods after the lead-time proposal | `ph.<run>.lead_time_proposals.gate_delay_median` (11 and 11) | post hoc |
 | Null commitment 0.83 (content-free), 0.52 and 0.46 (hedge), 0.18 and 0.06 (model family only) | `runs.<run>.exposure.<arm>.null_exposure_mean` | established |
 | Cuts of 37% and 45%, intervals [33, 57]% and [42, 61]%, almost all on false-alert twins | `ph.<run>.null_exposure.all_twins` (ratio 0.631 [0.429, 0.668], 0.553 [0.392, 0.581], 10,000 valid draws); `false_alert_twins` vs `silent_twins` (the silent-twin ratio is not estimable: 3 clusters) | post hoc |
 | No detectable change in null reward: -2 [-8, 2], +3 [-0.04, 8.4] | `ph.<run>.null_cth_minus_uniform` (-1.98 [-8.08, 1.71]; 3.15 [-0.042, 8.40]) | post hoc |
 | Model family only: -83 [-169, -13] (Grok), -192 (Llama 3.1 8B) against content-free; -16 [-66, 27] (Gemini) | `c["cth_llm-uniform\|net"]` | established |
+| Post hoc, answers held fixed: lambda 0.5 and 0.75 not distinguishable from 0.25; committing at shock mass 1/2 (MAP) changes net reward by -56 [-97, -19] and -62 [-108, -21] at p/h = 4, -370 and -368 at 19 | `abl.<run>.<ratio>.variants.<vid>["minus_cth\|net"]` (lam0.5: -2.45 [-9.07, 4.19], +1.87 [-3.60, 8.49]; lam0.75: -4.25 [-13.71, 5.80], +4.79 [-5.14, 17.56]; map: -55.90 [-97.42, -19.03], -61.68 [-108.18, -21.21]; at 19: -370.23, -368.48); the method's own variant reproduces its registered records exactly (`checks`) | post hoc |
 | Fig. 1 episode: +198 (hedge) and -2,358 (gate); model said "medium"; true shift one period; onset 14 | `paper/illustrate/data/fig1_episode.csv` (onset read from `truth.jsonl`); `fresh-gemini-3.8-flash/proposals.jsonl` for `dev/f4/s4100006/early_accurate` | established |
-| Fig. 1 episode was chosen: the gate's third-worst of the 32 lead-time episodes; family averages +1,286 (hedge) and +414 (gate) | arm 10 - arm 1 sorted over family 4 in `records.jsonl.gz`; `ph.fresh-gemini-3.8-flash.gain_source.by_family_net["arm10-arm1"]["4"]` (414.31) | post hoc |
+| Fig. 1 episode was chosen post hoc: the gate's third-worst of the 32 lead-time episodes; the gate's family average +414 (labelled post hoc in the caption; the hedge's +1,286 is the registered per-family readout) | arm 10 - arm 1 sorted over family 4 in `records.jsonl.gz`; `ph.fresh-gemini-3.8-flash.gain_source.by_family_net["arm10-arm1"]["4"]` (414.31) | post hoc |
 
 ## 2. The pilots and the gate (Section I, Section VIII-A)
 
@@ -74,10 +80,10 @@ paper is rounded once from them or from `confirm.json` (never from a rounded val
 | The detector gap is +2,306 on net | `analysis/kill_trigger_forensics.md` sections 3 and 5 | established |
 | Real-content pilot: 59/96 and 53/96 right family | `analysis/real_content_pilot/out/evaluation.json` Q1 | established |
 | Gate rarely acted on a false alarm with live models: 1 of 12 false-alert nulls each | same, Q6 `false_alert.arm10.any_active` | established |
-| Gate activated 43% / 39% of right-family proposals, median 10 / 11 periods | same, Q3 | established |
+| Gate activated 43% / 39% of right-family proposals, median 10 / 11 periods; refuted none of them (0 of 67, 0 of 74) | same, Q3 (`q3.arm10.right.refuted`) | established |
 | Gate minus arm 1 -234 / -172 net; acting at once -2,549 / -2,624 | same, Q4 | established |
 | Magnitude matched the truth bin in 8/96 and 7/96, a label mismatch rather than calibration: the provisional truth binning puts 80 of 96 shocks in low; the hidden alert-spec label of every non-distractor template is medium; no alert text states a size | same, Q1; `collie/data/alerts/templates/{dev,cal}.yaml` alert specs; `prereg/deviations.md` 2026-09-28 finding 2 | established |
-| Excluded families: the compiled oracle gained nothing on loss bursts or compound shocks in the pilot | `analysis/kill_trigger_forensics.md` section 2 (compiled oracle gross +0.00%, +0.01%) | established |
+| Excluded families: an onset clairvoyant gains nothing on loss bursts or compound shocks once its foresight of demand noise is removed | `analysis/kill_trigger_forensics.md` sections 2.1-2.2 (clairvoyant at onset gross +1.96% / +0.72%, twin-differenced -0.22% / -1.58%; `analysis/forensics/out/q1_clairvoyant.json`); the compiled oracle's +0.00% on loss bursts is not evidence (dispatch-window bug, section 2.3) | established |
 
 ## 3. Model scale (Section VIII-F)
 
@@ -114,10 +120,10 @@ paper is rounded once from them or from `confirm.json` (never from a rounded val
 | Live arm equals the development replay (scripted content) on 120/120 episodes | stage B check recorded in `analysis/commitment/REPORT.md` | established |
 | Theorem 1 (exposure, stopping times of the decision filtration) and Theorem 2 (odds regret), proof sketches via the augmented budget process, under a known null and the registered arrival law | `paper/sections/06_method_hedge.tex` | established (proof) |
 | Where the premise holds no simulated cell is clearly above a bound; with deterministic delays a named lead-time hypothesis reaches 1.24 times its per-decision budget; with the plug-in null, in the matched cells at period 10, E[Pi_sigma] is 2.0 to 2.7 times A and P(sup >= 1/2) 2.3 to 3.7 times its bound, up to 3.2 and 4.7 in other cells | `analysis/commitment/out/mc_exposure.md` and `.json` (`mc_exposure.py`) | established (simulation) |
-| With one hypothesis and lambda = 0 the gate's threshold is a posterior-odds rule of the same form (an analogy: the gate certifies the full spec, the hedge a canonical one) | algebra in Section VI; `cth.py` canonical specs vs `collie/verify/arrival.py` alternatives | established |
+| With one hypothesis and lambda = 0 the gate's threshold is a posterior-odds rule of the same form (an analogy, not an identity: for a named demand or pulse hypothesis the e-process is the same, and for a lead-time shift the magnitude only selects the delay tilt; the gate acts all at once on the compiled stated magnitude, the hedge sizes the shock from the data) | algebra in Section VI; `collie/verify/demand.py` (`from_spec`, `for_level_change` mix over `MAGNITUDE_SETS`), `collie/verify/arrival.py` (`_changed_laws_for`: low and medium one tilt, high another); `cth.py` canonical specs | established |
 | Against the content-free arm a wrong or missing family costs exactly log(1/lambda) = log 4 nats; the named one saves log(lambda + (1 - lambda)|H|) = log 3.25 | algebra in Section VI; weights in `cth.py` | established |
 | The model's answer sets the prior weights and the named hypothesis's onset window, nothing else | `cth.py` (`_build`, `_maybe_propose`) | established |
-| The content-free control's null mass sits mostly on the pulse hypothesis (0.69 of 0.83) | `ph.<run>.null_exposure.by_top_hypothesis.ctrl_cth_uniform.pulse_up` | post hoc |
+| Crediting each period's shock mass to its leading hypothesis, pulse-led periods carry 0.69 of the content-free control's 0.83 and 0.32 / 0.38 of the hedge's 0.52 / 0.46, so most of the label's cut is that mass | `ph.<run>.null_exposure.by_top_hypothesis.<arm>.pulse_up` (0.6944; 0.3235, 0.3767), `runs.<run>.exposure.<arm>.null_exposure_mean` (0.8285; 0.5231, 0.4583); `posthoc.py` `exposure_by_hypothesis` | post hoc |
 
 ## 5. Testbed (Section II)
 

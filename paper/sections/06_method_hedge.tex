@@ -5,9 +5,10 @@ The registered gate of Section~\ref{sec:verify} answers one question, whether a
 hypothesis may act, and answers it late: it waits until $E_{j,t}$ crosses
 $1/\alpha_j$ and then acts on the magnitude the model stated. With live models
 (Section~\ref{sec:results}) both halves of that design failed in the same place: the
-gate refuted almost nothing that was true, but it activated less than half of the
-right-family proposals, a median of 10 to 11 periods after the proposal, and when it
-did act, the stated magnitude rarely matched the truth.
+gate refuted none of the right-family proposals (0 of 67 and 0 of 74), but it
+activated less than half of them, a median of 10 to 11 periods after the proposal,
+and when it did act it compiled whatever magnitude the model had stated, though no
+alert states a size.
 Certify-then-hedge keeps the \eprocess{} and changes what it is used for. The
 \eprocess{} no longer switches a controller on; it prices the hypothesis, and the
 controller hedges between the baseline and the hypothesis according to that
@@ -19,8 +20,9 @@ At each trigger firing $j$ (a stopping time $\tau_j$, at most two per episode) w
 register a fixed, action-aligned hypothesis set $\mathcal{H}$: demand up, demand
 down, lead-time shift and an upward demand pulse. The other families (\texttt{shipment\_loss},
 \texttt{transit\_pause}, \texttt{compound}) carry no hypothesis by design: an order
-placed at onset cannot land before a loss burst or a pause ends, and the compiled
-oracle gained nothing on loss bursts or compound shocks in the pilot. Hypothesis $k \in \mathcal{H}$ of firing
+placed at onset cannot land before a loss burst or a pause ends, and in the pilot's
+forensic replay even a clairvoyant acting at onset gained nothing on loss bursts or
+compound shocks once its foresight of demand noise was removed. Hypothesis $k \in \mathcal{H}$ of firing
 $j$ receives prior mass $a_j w_{jk}$ with
 \begin{equation}
 a_j = \alpha\,2^{-j}, \qquad
@@ -96,7 +98,7 @@ $\Prob_0(\sup_t \Pi_t \ge c) \le A(1-c)/\bigl(c(1-A)\bigr)$.
 \end{theorem}
 
 \emph{Proof sketch.} Add the budget of firings yet to come,
-$\tilde N_t = N_t + \sum_{j:\tau_j \ge t} a_j$. Because the weights are fixed at
+$\tilde N_t = N_t + \sum_{j:\tau_j > t} a_j$. Because the weights are fixed at
 each $\tau_j$ and sum to at most one, $\tilde N$ is a nonnegative supermartingale
 with $\tilde N_0 \le A$. Since $A_t \le A$ and $N \le \tilde N$,
 $\Pi_t \le \tilde N_{t-1}/(1-A+\tilde N_{t-1})$, which is concave and increasing, so
@@ -131,9 +133,12 @@ Two further properties follow from \eqref{eq:prior} and \eqref{eq:posterior}.
 First, with one hypothesis and $\lambda = 0$ the posterior odds are
 $a_j E_{j,t}/(1-a_j)$, so thresholding $E_{j,t}$ at $1/\alpha_j$, as the gate
 does, is up to one unit of threshold acting when that hypothesis is the more
-probable. The correspondence is structural rather than numerical: the gate
-certifies the model's full \shockspec{}, magnitude included, while the hedge
-certifies a canonical one. Second, the language model can move evidence but not
+probable. This is an analogy, not an identity. The evidence is largely shared: for a
+named demand or pulse hypothesis the gate's \eprocess{} mixes over the registered
+multipliers whatever magnitude the model states, and for a lead-time shift the
+magnitude only selects the delay tilt. What differs is its use: the gate switches all
+at once to the configuration compiled from the stated magnitude, while the hedge sizes
+the shock from the data and weights it by its posterior mass. Second, the language model can move evidence but not
 validity. A hypothesis the model does not name enters with $\lambda$ times its
 content-free weight, so a wrong or missing family costs exactly
 $\log(1/\lambda)$ nats of evidence against the arm with $\lambda = 1$ ($\log 4$

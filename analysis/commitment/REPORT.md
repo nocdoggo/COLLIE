@@ -36,8 +36,11 @@ clearly above a bound with the baseline known, and 2.0 to 2.7 times `A` for the 
 with the plug-in null and a first firing at period 10. Against the content-free arm, a family the
 model does not name costs exactly `log(1 / lam)` nats of evidence (log 4) and the named one saves
 `log(lam + (1 - lam) |H|)` (log 3.25). With one hypothesis and `lam = 0` the gate's threshold is
-a posterior-odds rule of the same form; it is an analogy, since the gate certifies the model's
-full spec and the hedge a canonical one.
+a posterior-odds rule of the same form; it is an analogy, not an identity: for a named demand
+or pulse hypothesis the two e-processes coincide (the gate's mixes over the registered
+multipliers whatever magnitude is stated), for a lead-time shift the magnitude only selects the
+delay tilt, and the gate then acts all at once on the compiled stated magnitude while the hedge
+sizes the shock from the data.
 
 ## Stage C: registered confirmation on fresh seeds
 
@@ -90,8 +93,10 @@ text, carries the gain.
 
 - *Where the gain comes from.* The 32 shocked lead-time episodes supply 96% of hedge - arm 1
   (Gemini 96.0%, Grok 96.3%; with their twins, 95.8% and 96.7%). Without the 8 lead-time units
-  (40 clusters) hedge - arm 1 is +9.0 b[-23.9, 42.5] and +6.6 b[-24.6, 36.1]; hedge - gate stays +226.8 b[82.3, 408.1] with Gemini (+58.1
-  b[-0.8, 133.6] with Grok), because the gate loses 1,057 per demand-rise episode with Gemini.
+  (40 clusters) hedge - arm 1 is +9.0 b[-23.9, 42.5] and +6.6 b[-24.6, 36.1]; hedge - gate stays +226.8 b[82.3, 408.1] with Gemini, because the gate loses 1,057 per demand-rise episode;
+  with Grok, +58.1 b[-0.8, 133.6] is not distinguishable from zero. Per family, every shocked
+  family's interval excludes zero except the demand rise (-83.4 b[-200.0, 21.1] and -83.4
+  b[-203.9, 25.6]; `gain_source["by_family_cth-arm1|net"]`).
 - *Without the six structural-test clusters* (units `i = 0`, 42 clusters): H1 +328.6 and +187.7,
   H2 +162.8 and +145.3; the largest one-sided p is 0.0024.
 - *Null episodes.* The Gemini null loss is on the 24 false-alert twins (-6.4 b[-16.1, -0.3],
@@ -100,8 +105,9 @@ text, carries the gain.
 - *Exposure.* Hedge over content-free null exposure: 0.631 b[0.429, 0.668] (Gemini) and 0.553
   b[0.392, 0.581] (Grok), cuts of 37% and 45%, almost all on false-alert twins (the silent-twin
   ratio is not estimable: only 3 clusters carry content-free exposure). Naming any family, right
-  or wrong, moves prior weight off the others; the content-free control's null mass sits mostly on
-  the pulse hypothesis (0.69 of 0.83).
+  or wrong, moves prior weight off the others. Crediting each period's mass to its leading
+  hypothesis, pulse-led periods carry 0.69 of the content-free control's 0.83 and 0.32 and 0.38
+  of the hedge's 0.52 and 0.46, so most of the label's cut is that mass.
 - *Lead-time proposals.* Gemini named a lead-time shift in 17 of the 32 lead-time episodes
   (medium 8, high 3, low 6) and Grok in 11 (medium 10, high 1). Every family-4 unit moves to a
   lead of 3, so the true shift is two periods for the units with a baseline of 1 and one period
