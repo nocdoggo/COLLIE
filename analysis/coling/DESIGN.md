@@ -61,7 +61,7 @@ Generate the shock first, then render the text, so every label is exact by const
 - **Complementarity.** For each episode compute the telemetry reveal time (the first period at
   which a telemetry-only detector identifies family and magnitude at a fixed error level) and
   vary the alert's lead over it; report the value of text as a function of that lead.
-- **Templates and scale.** A new bank under `analysis/aacl/templates/` (never in frozen
+- **Templates and scale.** A new bank under `analysis/coling/templates/` (never in frozen
   `collie/`), with held-out wording families and human paraphrases, and at least 24 templates
   per family and class so that a layout holds 24 or more units per family (144+ units against
   the UV study's 48). If templates are drafted with a model, use a family that is not among the
@@ -78,7 +78,7 @@ The method is the UV paper's contribution; here it is the instrument.
 - *Size prior from text.* For the named hypothesis, replace the uniform prior over the
   within-hypothesis size grid (`cth.py`: `_within_demand` over `MAGNITUDE_SETS`, `_lt_posterior`
   over offsets 1 to 3) by `q` on the stated bin and `1 - q` over the rest, in a subclass under
-  `analysis/aacl/` (never in the frozen `cth.py`). The exposure guarantee concerns prior mass and
+  `analysis/coling/` (never in the frozen `cth.py`). The exposure guarantee concerns prior mass and
   e-process validity, not sizing, so it is unchanged. Section 6 shows this buys little on the UV
   simulator.
 - *Future onset.* Register the named hypothesis of a warning with an e-process that starts at the

@@ -18,7 +18,7 @@ true shift is 2 from a baseline lead of 1 and 1 from 2).
 
 Usage (from the repository root)::
 
-    uv run python -m analysis.aacl.dev_text_size [--profits 4 19] [--out <scratch>/x.json]
+    uv run python -m analysis.coling.dev_text_size [--profits 4 19] [--out <scratch>/x.json]
 """
 
 from __future__ import annotations
@@ -207,7 +207,7 @@ def run_task(task: tuple[float, float, float, str]) -> list[dict]:
 
 
 def main(argv=None) -> int:
-    ap = argparse.ArgumentParser(prog="python -m analysis.aacl.dev_text_size")
+    ap = argparse.ArgumentParser(prog="python -m analysis.coling.dev_text_size")
     ap.add_argument("--profits", nargs="+", type=float, default=[4.0, 19.0])
     ap.add_argument("--q-read", nargs="+", type=float, default=[0.5, 0.9, 1.0])
     ap.add_argument("--size-q", type=float, default=0.8)
