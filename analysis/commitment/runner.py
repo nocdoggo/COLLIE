@@ -62,11 +62,16 @@ _RUN_NAME = re.compile(r"^[a-z0-9][a-z0-9._-]{0,63}$")
 
 
 def build_live(
-    name: str, *, spend_log: Path, spend_cap_usd: float, max_physical_calls: int
+    name: str,
+    *,
+    spend_log: Path,
+    spend_cap_usd: float,
+    max_physical_calls: int,
+    timeout_s: float = LIVE_TIMEOUT_S,
 ) -> tuple[EndpointConfig, GuardedTransport]:
     rung = LADDER[name]
     endpoint = rung.endpoint()
-    inner = EchoCheckedClient(endpoint, rung.served_as, timeout=LIVE_TIMEOUT_S, max_retries=0)
+    inner = EchoCheckedClient(endpoint, rung.served_as, timeout=timeout_s, max_retries=0)
     guard = GuardedTransport(
         inner=inner,
         endpoint=endpoint,
@@ -275,6 +280,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     ap.add_argument("--spend-cap-usd", type=float, default=2.0)
     ap.add_argument("--max-physical-calls", type=int, default=1500)
     ap.add_argument("--allow-live", action="store_true")
+    ap.add_argument(
+        "--timeout-s",
+        type=float,
+        default=LIVE_TIMEOUT_S,
+        help="client timeout per live call (s); changes no prompt, decoding or cached answer",
+    )
     ap.add_argument("--out-root", type=Path, default=OUT_ROOT)
     ap.add_argument("--local-root", type=Path, default=LOCAL_ROOT)
     args = ap.parse_args(argv)
@@ -296,6 +307,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             spend_log=out_dir / "spend_log.jsonl",
             spend_cap_usd=args.spend_cap_usd,
             max_physical_calls=args.max_physical_calls,
+            timeout_s=args.timeout_s,
         )
         guard = transport
     else:
@@ -310,6 +322,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         "profit": args.profit if args.layout == "fresh" else 4.0,
         "spend_cap_usd": args.spend_cap_usd,
         "max_physical_calls": args.max_physical_calls,
+        "timeout_s": args.timeout_s,
         "git_sha": rcp._git("rev-parse", "HEAD"),
     }
     t0 = time.perf_counter()
