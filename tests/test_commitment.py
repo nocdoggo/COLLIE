@@ -309,3 +309,13 @@ def test_stage_d_stratum_leads_stay_inside_the_arrival_null(tmp_path):
     # the clip binds: some unit's post-onset lead would be 3 + 2 = 5 without it
     noise = [lead_noise(u.seed) for u in stochastic_lead_units(base=THROWAWAY_BASE, n_units=8)]
     assert any(2 in xi for xi in noise)
+
+
+def test_the_ablation_covers_the_prior_weight_and_the_decision_rule():
+    from analysis.commitment.ablation import METHOD_LAM, variants
+
+    ids = {vid: (lam, scheme) for vid, lam, scheme in variants()}
+    assert ids["abl_lam0.25_hedge"] == (METHOD_LAM, "hedge")  # the method itself, the check
+    assert ids["abl_lam1_hedge"] == (1.0, "hedge")  # the content-free control, the check
+    assert {s for lam, s in ids.values() if lam == METHOD_LAM} == {"hedge", "map", "linear"}
+    assert len(ids) == 8

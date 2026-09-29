@@ -1,0 +1,122 @@
+{
+ "p=19": {
+  "q_read=0.5": {
+   "method_minus_arm1": 1018.8083333333333,
+   "method_minus_uniform": 181.975,
+   "sized_minus_method": {
+    "b": [
+     -5.896458333333333,
+     0.5086458333333316
+    ],
+    "mean": -2.15
+   },
+   "sized_minus_method_by_family": {
+    "1": -13.3125,
+    "2": 1.75,
+    "3": -1.8125,
+    "4": -0.75,
+    "5": 0.0,
+    "6": 0.0
+   }
+  },
+  "q_read=0.9": {
+   "method_minus_arm1": 1018.8083333333333,
+   "method_minus_uniform": 181.975,
+   "sized_minus_method": {
+    "b": [
+     -0.05885416666666664,
+     9.2459375
+    ],
+    "mean": 3.904166666666667
+   },
+   "sized_minus_method_by_family": {
+    "1": 26.28125,
+    "2": 11.625,
+    "3": -4.40625,
+    "4": -2.21875,
+    "5": 0.0,
+    "6": 0.0
+   }
+  },
+  "q_read=1": {
+   "method_minus_arm1": 1018.8083333333333,
+   "method_minus_uniform": 181.975,
+   "sized_minus_method": {
+    "b": [
+     -0.13364583333333332,
+     9.209062499999996
+    ],
+    "mean": 3.8291666666666666
+   },
+   "sized_minus_method_by_family": {
+    "1": 24.6875,
+    "2": 13.75,
+    "3": -5.59375,
+    "4": -2.125,
+    "5": 0.0,
+    "6": 0.0
+   }
+  }
+ },
+ "p=4": {
+  "q_read=0.5": {
+   "method_minus_arm1": 170.39166666666668,
+   "method_minus_uniform": 42.61666666666667,
+   "sized_minus_method": {
+    "b": [
+     -0.4084375,
+     2.0835416666666657
+    ],
+    "mean": 0.7333333333333333
+   },
+   "sized_minus_method_by_family": {
+    "1": 4.34375,
+    "2": 0.40625,
+    "3": 0.75,
+    "4": 0.09375,
+    "5": 0.0,
+    "6": 0.0
+   }
+  },
+  "q_read=0.9": {
+   "method_minus_arm1": 170.39166666666668,
+   "method_minus_uniform": 42.61666666666667,
+   "sized_minus_method": {
+    "b": [
+     -0.004166666666666667,
+     3.575
+    ],
+    "mean": 1.6875
+   },
+   "sized_minus_method_by_family": {
+    "1": 7.34375,
+    "2": 2.40625,
+    "3": 2.78125,
+    "4": 0.21875,
+    "5": 0.0,
+    "6": 0.0
+   }
+  },
+  "q_read=1": {
+   "method_minus_arm1": 170.39166666666668,
+   "method_minus_uniform": 42.61666666666667,
+   "sized_minus_method": {
+    "b": [
+     0.925,
+     4.325
+    ],
+    "mean": 2.45
+   },
+   "sized_minus_method_by_family": {
+    "1": 11.625,
+    "2": 3.875,
+    "3": 2.71875,
+    "4": 0.25,
+    "5": 0.0,
+    "6": 0.0
+   }
+  }
+ },
+ "size_q": 0.8,
+ "status": "development only, throwaway pool; no claim"
+}

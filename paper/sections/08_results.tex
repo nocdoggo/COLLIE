@@ -5,7 +5,8 @@
 \subsection{Why the gate was stopped}
 
 The registered Gate~3 pilot read \emph{kill-or-reframe} on two triggers. The first was
-headroom: even a clairvoyant that knows the shock at onset clears the registered 5\% profit bar
+headroom: on the registered gross-profit endpoint, even a clairvoyant that knows the shock at
+onset clears the 5\% bar
 on only two of six families (a demand rise and a lead-time shift), because pulses, loss bursts
 and the compound family's transit pauses are over before an order placed at onset can land, and
 a demand fall offers little to recover. The second compared the gate with a detector compiled
@@ -86,15 +87,18 @@ once vary widely with the model; the hedge's gain does not, and it stays within 
 
 \subsection{Where the gain comes from}
 
-Against arm~1 the gain is where the headroom is, and it is concentrated: by the registered
-per-family readout, the 32 shocked lead-time episodes supply 96\% of it. The method earns
-$+1{,}286$ (Gemini) and $+1{,}177$ (Grok) per lead-time episode, against $+90$ and $+88$ per
-demand fall and $+95$ and $+80$ per pulse; it gives back $83$ per demand rise, about $40$ per
-compound and $3$ per loss episode. The following readouts are post hoc. Without the lead-time
+Against arm~1 the gain is concentrated in one family: by the registered per-family readout,
+the 32 shocked lead-time episodes supply 96\% of it. The method earns $+1{,}286$ (Gemini) and
+$+1{,}177$ (Grok) per lead-time episode, against $+90$ and $+88$ per demand fall and $+95$ and
+$+80$ per pulse, and gives back about $40$ per compound and $3$ per loss episode. The following
+readouts are post hoc. Every shocked family's seed-cluster interval excludes zero except the demand
+rise, where the method's $-83$ is not distinguishable from arm~1 ($[-200, 21]$ and
+$[-204, 26]$). Without the lead-time
 units (their episodes and twins) the method is $+9$ $[-24, 43]$ and $+7$ $[-25, 36]$ against
-arm~1. Against the gate the advantage is broader: without those units the method still leads by
-$+227$ $[82, 408]$ with Gemini ($+58$ $[-1, 134]$ with Grok), because the gate compiles the
-stated magnitude and loses $1{,}057$ per demand-rise episode with Gemini. Two mechanisms carry
+arm~1. Against the gate the advantage is broader with Gemini: without those units the method
+still leads by $+227$ $[82, 408]$, because the gate compiles the stated magnitude and loses
+$1{,}057$ per demand-rise episode; with Grok the difference, $+58$ $[-1, 134]$, is not
+distinguishable from zero. Two mechanisms carry
 the lead-time gain. The first is timing: the hedge commits partially as soon as evidence
 accumulates, where the gate commits all at once a median of 11 periods after the proposal. The
 second is sizing: the gate compiles the stated size (one, two or three periods), which was
@@ -118,6 +122,11 @@ wrong, because it moves prior weight off the hypotheses the model does not name.
 family alone ($\lambda = 0$) cuts null commitment further, to $0.18$ and $0.06$, but costs net
 reward against the content-free arm with Grok ($-83$ $[-169, -13]$) and Llama~3.1~8B ($-192$),
 and is not distinguishable from it with Gemini ($-16$ $[-66, 27]$); hence the hedged prior.
+Post hoc, re-running the method's variants on the same episodes with each model's answers held
+fixed, the weight matters less than the rule: $\lambda = 0.5$ or $0.75$ is not distinguishable
+from $0.25$, while committing to the compiled target once the shock mass reaches $1/2$ changes
+net reward by $-56$ $[-97, -19]$ and $-62$ $[-108, -21]$ per episode ($-370$ and $-368$ at
+$p/h = 19$).
 
 \subsection{Cost ratio}
 

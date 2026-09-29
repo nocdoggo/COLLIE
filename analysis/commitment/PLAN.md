@@ -14,6 +14,9 @@ The study has three stages:
 - **C. Fresh-seed confirmation** (appended before its runs): the frozen method against the
   registered arms on a reserved seed pool no run has touched (`episodes.py`).
 
+*Note (2026-09-29).* A fourth stage was added later: **D. Cost ratios and noisy lead times**
+(registered before its runs at the end of this plan, with pre-run amendments DA1 to DA12).
+
 ## Stage A. Model ladder on the pilot episodes
 
 Registered 2026-09-28, before any ladder call.
@@ -127,6 +130,12 @@ of the full 120-episode runs: `step-3.5-flash` $0.39, `step-3.5-flash-2603` $0.8
 prices with no cash consequence; the StepFun caps are raised from $2.00 to $4.00 (shadow) so that
 `step-3.7-flash` runs. Its smoke parses are disclosed as seen (15/15 valid, 3 abstentions). No
 other rule changes. The OpenRouter projections were all below their caps ($0.03 to $0.21).
+
+**A4 (2026-09-29, during the `step-5-preview` full run).** The full run stopped at 07:25 UTC on a
+provider timeout (`openai.APITimeoutError`) after 61 calls, with no outputs beyond the smoke run's.
+It was restarted at 07:26 UTC under the same name and cap, from its answer cache (the 61 answers
+replay at no cost), following the stage C precedent (C2). No rule changes; its shadow spend stays
+within the $4.00 cap.
 
 ## Stage B. Method development: certify-then-hedge
 
@@ -301,6 +310,15 @@ say. None changes a run, a rule, a cap or a number; post-hoc checks are in `out/
    name enters with `lam` times the content-free weight, a cost of exactly `log(1 / lam)` nats
    (log 4), and the named one with `lam + (1 - lam) |H|` times it, a saving of
    `log(lam + (1 - lam) |H|)` (log 3.25); `log(|H| / lam)` is a valid but loose bound on the cost.
+
+   *Erratum (2026-09-29).* In (3) above, "arm 10 certifies the model's full spec (magnitude,
+   persistence, duration)" is wrong about the e-process: for a demand or pulse proposal arm 10's
+   e-process mixes over the registered multipliers whatever magnitude is stated
+   (`collie/verify/demand.py`), for a lead-time shift the magnitude only selects the delay tilt
+   (`collie/verify/arrival.py`), and persistence and duration set only the operational expiry.
+   What differs is the use of the evidence: arm 10 switches to the configuration compiled from
+   the stated magnitude, the method sizes the shock from the data. The conclusion (an analogy,
+   not an identity) stands.
 
 ## Stage D. Cost ratios and noisy lead times
 

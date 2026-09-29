@@ -8,7 +8,8 @@ costs. It must return one \shockspec{}, valid JSON under a closed schema: a
 \texttt{shock\_family} (\texttt{no\_change}, \texttt{demand\_level}, \texttt{temporary\_pulse},
 \texttt{lead\_time\_shift}, \texttt{shipment\_loss}, \texttt{transit\_pause} or
 \texttt{compound}), a target stream, a direction, an onset window relative to $\tau_j$, a
-magnitude bin, persistence and duration bins, and evidence references. The system stamps
+magnitude bin, persistence and duration bins, evidence references and a registered
+prospective signature. The system stamps
 $\tau_j$, the proposal index, the model identifier and the prompt hash. The model cannot write
 an order, a threshold, a likelihood or code; an invalid answer gets one repair attempt and then
 falls back to the baseline, and \texttt{no\_change} is an accepted abstention. Two facts make
@@ -16,9 +17,12 @@ the later test admissible: \textbf{(A3)} the hypothesis is drawn from a vocabula
 any test episode, and \textbf{(A4)} it is $\Filt_{\tau_j}$-measurable at the stopping time
 $\tau_j$, so its evidence starts at $\tau_j + 1$ and the periods that motivated it never count.
 
-A deterministic compiler maps a \shockspec{} to a configuration $(m, L_{\mathrm{eff}}, \gamma)$
-of a capped base-stock controller: a demand multiplier, an effective lead time and a pipeline
-discount, from a registered 72-point grid. With $\bar d_t$ and $s_{d,t}$ the running mean and
+A deterministic compiler maps a \shockspec{} to a point of a registered 72-point grid and
+applies it to the running configuration $(m, L_{\mathrm{eff}}, \gamma)$ of a capped base-stock
+controller, a demand multiplier, an effective lead time and a pipeline discount: the
+multiplier is set, the lead time grows by the point's offset from a reference of one period
+(low, medium and high add one, two and three periods to the running lead, which starts at the
+promised lead), and the discount scales the running one. With $\bar d_t$ and $s_{d,t}$ the running mean and
 standard deviation of observed demand and $z^\star = \Phi^{-1}(p/(p+h))$,
 \begin{align}
 S_t &= m(1+L_{\mathrm{eff}})\bar d_t + z^\star\sqrt{1+L_{\mathrm{eff}}}\,s_{d,t}, \notag\\

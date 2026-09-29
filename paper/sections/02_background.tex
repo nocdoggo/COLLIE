@@ -4,7 +4,8 @@
 \textbf{The audited benchmark.} InventoryBench~\cite{inventorybench} has 1{,}320 lost-sales
 instances (720 synthetic, 600 from weekly apparel sales). Each period the policy orders, then
 receives, then sells, then pays holding on ending stock; demand is observed uncensored, and
-in-transit stock is a single scalar with no shipment ages. Every cell is an integer, so our
+in-transit stock is a single scalar with no shipment ages. Every demand, profit and
+holding-cost cell is an integer, so our
 reimplementation is checked for exact equality rather than a tolerance: it matches the official
 pipeline with a maximum absolute difference of $0.0$ over 648 comparisons, and our arm~1
 reproduces all 1{,}320 published baseline order sequences bit for bit. That reproduction
@@ -20,8 +21,11 @@ families, a demand-level shift up or down, a temporary demand pulse, a lead-time
 shipment-loss burst, and a compound demand-and-pause shock, with the onset drawn in periods
 14 to 22 of 50. Each unit is replayed under four information conditions: no alert, an accurate
 alert one period before onset, the same alert two periods after onset, and an unreliable alert
-(overstated, ambiguous or a distractor), drawn from a bank of team-written templates; each
-unit also has an unshocked twin that serves as a null episode, silent or with a false alert.
+(overstated, ambiguous or a distractor), drawn from a bank of team-written templates. The
+bank has no demand-fall template, so demand-fall units carry no alert in any condition and
+only the demand detector can open a proposal on them. Each unit also has an unshocked twin
+that serves as a null episode, silent or with a false alert.
 Profit is 4 and holding 1 per unit, so the critical fractile is $0.8$. The reward we report is
-\emph{net}, profit minus holding, which is the benchmark's own score; gross profit, the
-endpoint of our first registration, charges no holding and is reported alongside.
+\emph{net}, profit minus holding, per episode: the quantity the benchmark divides by the
+perfect-foresight profit to form its score; gross profit, the endpoint of our first
+registration, charges no holding and is reported alongside.

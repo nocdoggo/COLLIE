@@ -205,6 +205,10 @@ def readout(run: str) -> dict:
                 ("arm10-arm1", confirm.ARM10),
             )
         },
+        "by_family_cth-arm1|net": {
+            str(f): _contrast(frame, confirm.CTH, confirm.ARM1, meta["fam"] == f)
+            for f in sorted(meta["fam"].unique())
+        },
     }
 
     untouched = meta["unit_index"] != STRUCTURAL_TEST_INDEX

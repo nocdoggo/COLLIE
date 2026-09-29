@@ -1,0 +1,1319 @@
+{
+ "results": {
+  "fresh-gemini-3.8-flash": {
+   "19": {
+    "checks": {
+     "lam0_hedge_vs_arm12b_cth_llm": {
+      "episodes": 240,
+      "episodes_differing": 1,
+      "max_abs_diff_gross": 0.0,
+      "max_abs_diff_net": 12.0,
+      "missing": 0
+     },
+     "lam1_hedge_vs_ctrl_cth_uniform": {
+      "episodes": 240,
+      "episodes_differing": 0,
+      "max_abs_diff_gross": 0.0,
+      "max_abs_diff_net": 0.0,
+      "missing": 0
+     }
+    },
+    "variants": {
+     "abl_lam0.1_hedge": {
+      "lam": 0.1,
+      "minus_arm10|net": {
+       "b": [
+        388.89510416666667,
+        1058.908020833333
+       ],
+       "mean": 699.65,
+       "n": 240,
+       "p_one_sided": 9.99990000099999e-06
+      },
+      "minus_arm1|net": {
+       "b": [
+        385.1884375,
+        1826.7002083333332
+       ],
+       "mean": 1032.8833333333334,
+       "n": 240,
+       "p_one_sided": 9.99990000099999e-06
+      },
+      "minus_cth|net": {
+       "b": [
+        -59.513125,
+        3.1255208333333258
+       ],
+       "mean": -22.6875,
+       "n": 240,
+       "p_one_sided": 0.8964310356896431
+      },
+      "null_exposure": 0.36520127083333337,
+      "null_net_minus_arm1": -1.25,
+      "replay": {
+       "calls": 277,
+       "recorded_unused": 0,
+       "replay_misses": 0
+      },
+      "scheme": "hedge"
+     },
+     "abl_lam0.25_hedge": {
+      "lam": 0.25,
+      "minus_arm10|net": {
+       "b": [
+        399.6790625,
+        1094.5732291666668
+       ],
+       "mean": 722.3375,
+       "n": 240,
+       "p_one_sided": 9.99990000099999e-06
+      },
+      "minus_arm1|net": {
+       "b": [
+        398.19364583333333,
+        1849.8063541666659
+       ],
+       "mean": 1055.5708333333334,
+       "n": 240,
+       "p_one_sided": 9.99990000099999e-06
+      },
+      "minus_cth|net": {
+       "b": [
+        0.0,
+        0.0
+       ],
+       "mean": 0.0,
+       "n": 240,
+       "p_one_sided": 1.0
+      },
+      "null_exposure": 0.5231648958333334,
+      "null_net_minus_arm1": -1.1666666666666667,
+      "replay": {
+       "calls": 277,
+       "recorded_unused": 0,
+       "replay_misses": 0
+      },
+      "scheme": "hedge"
+     },
+     "abl_lam0.25_linear": {
+      "lam": 0.25,
+      "minus_arm10|net": {
+       "b": [
+        337.97125,
+        837.1289583333331
+       ],
+       "mean": 570.4291666666667,
+       "n": 240,
+       "p_one_sided": 9.99990000099999e-06
+      },
+      "minus_arm1|net": {
+       "b": [
+        347.14781250000004,
+        1577.0964583333332
+       ],
+       "mean": 903.6625,
+       "n": 240,
+       "p_one_sided": 9.99990000099999e-06
+      },
+      "minus_cth|net": {
+       "b": [
+        -278.2948958333333,
+        -45.71802083333343
+       ],
+       "mean": -151.90833333333333,
+       "n": 240,
+       "p_one_sided": 0.996890031099689
+      },
+      "null_exposure": 0.5231641666666668,
+      "null_net_minus_arm1": -2.7916666666666665,
+      "replay": {
+       "calls": 277,
+       "recorded_unused": 0,
+       "replay_misses": 0
+      },
+      "scheme": "linear"
+     },
+     "abl_lam0.25_map": {
+      "lam": 0.25,
+      "minus_arm10|net": {
+       "b": [
+        204.09270833333335,
+        528.2802083333333
+       ],
+       "mean": 352.10833333333335,
+       "n": 240,
+       "p_one_sided": 9.99990000099999e-06
+      },
+      "minus_arm1|net": {
+       "b": [
+        255.21479166666666,
+        1217.1158333333328
+       ],
+       "mean": 685.3416666666667,
+       "n": 240,
+       "p_one_sided": 2.999970000299997e-05
+      },
+      "minus_cth|net": {
+       "b": [
+        -649.1496875,
+        -130.5820833333335
+       ],
+       "mean": -370.2291666666667,
+       "n": 240,
+       "p_one_sided": 0.999390006099939
+      },
+      "null_exposure": 0.5231653541666667,
+      "null_net_minus_arm1": -2.625,
+      "replay": {
+       "calls": 277,
+       "recorded_unused": 0,
+       "replay_misses": 0
+      },
+      "scheme": "map"
+     },
+     "abl_lam0.5_hedge": {
+      "lam": 0.5,
+      "minus_arm10|net": {
+       "b": [
+        396.17364583333335,
+        1101.1465624999998
+       ],
+       "mean": 723.1541666666667,
+       "n": 240,
+       "p_one_sided": 9.99990000099999e-06
+      },
+      "minus_arm1|net": {
+       "b": [
+        400.7475,
+        1856.2077083333334
+       ],
+       "mean": 1056.3875,
+       "n": 240,
+       "p_one_sided": 9.99990000099999e-06
+      },
+      "minus_cth|net": {
+       "b": [
+        -16.691770833333333,
+        21.758749999999992
+       ],
+       "mean": 0.8166666666666667,
+       "n": 240,
+       "p_one_sided": 0.4693953060469395
+      },
+      "null_exposure": 0.6719090625,
+      "null_net_minus_arm1": -2.9791666666666665,
+      "replay": {
+       "calls": 277,
+       "recorded_unused": 0,
+       "replay_misses": 0
+      },
+      "scheme": "hedge"
+     },
+     "abl_lam0.75_hedge": {
+      "lam": 0.75,
+      "minus_arm10|net": {
+       "b": [
+        377.565625,
+        1066.2227083333332
+       ],
+       "mean": 697.75,
+       "n": 240,
+       "p_one_sided": 9.99990000099999e-06
+      },
+      "minus_arm1|net": {
+       "b": [
+        388.20916666666665,
+        1811.3001041666662
+       ],
+       "mean": 1030.9833333333333,
+       "n": 240,
+       "p_one_sided": 9.99990000099999e-06
+      },
+      "minus_cth|net": {
+       "b": [
+        -65.45447916666667,
+        13.696354166666659
+       ],
+       "mean": -24.5875,
+       "n": 240,
+       "p_one_sided": 0.8766112338876612
+      },
+      "null_exposure": 0.7649309375,
+      "null_net_minus_arm1": -3.9791666666666665,
+      "replay": {
+       "calls": 277,
+       "recorded_unused": 0,
+       "replay_misses": 0
+      },
+      "scheme": "hedge"
+     },
+     "abl_lam0_hedge": {
+      "lam": 0.0,
+      "minus_arm10|net": {
+       "b": [
+        287.768125,
+        845.4558333333333
+       ],
+       "mean": 543.0083333333333,
+       "n": 240,
+       "p_one_sided": 9.99990000099999e-06
+      },
+      "minus_arm1|net": {
+       "b": [
+        293.95135416666665,
+        1609.6340624999998
+       ],
+       "mean": 876.2416666666667,
+       "n": 240,
+       "p_one_sided": 9.99990000099999e-06
+      },
+      "minus_cth|net": {
+       "b": [
+        -364.95875,
+        -30.515416666666685
+       ],
+       "mean": -179.32916666666668,
+       "n": 240,
+       "p_one_sided": 0.986540134598654
+      },
+      "null_exposure": 0.1842191875,
+      "null_net_minus_arm1": -0.875,
+      "replay": {
+       "calls": 277,
+       "recorded_unused": 0,
+       "replay_misses": 0
+      },
+      "scheme": "hedge"
+     },
+     "abl_lam1_hedge": {
+      "lam": 1.0,
+      "minus_arm10|net": {
+       "b": [
+        340.04375,
+        981.0820833333332
+       ],
+       "mean": 638.1583333333333,
+       "n": 240,
+       "p_one_sided": 9.99990000099999e-06
+      },
+      "minus_arm1|net": {
+       "b": [
+        360.2685416666667,
+        1717.2058333333332
+       ],
+       "mean": 971.3916666666667,
+       "n": 240,
+       "p_one_sided": 8.99991000089999e-05
+      },
+      "minus_cth|net": {
+       "b": [
+        -166.11343749999997,
+        -17.574166666666677
+       ],
+       "mean": -84.17916666666666,
+       "n": 240,
+       "p_one_sided": 0.989350106498935
+      },
+      "null_exposure": 0.8286404375000002,
+      "null_net_minus_arm1": -6.854166666666667,
+      "replay": {
+       "calls": 0,
+       "recorded_unused": 277,
+       "replay_misses": 0
+      },
+      "scheme": "hedge"
+     }
+    }
+   },
+   "4": {
+    "checks": {
+     "lam0.25_hedge_vs_arm12_cth": {
+      "episodes": 240,
+      "episodes_differing": 0,
+      "max_abs_diff_gross": 0.0,
+      "max_abs_diff_net": 0.0,
+      "missing": 0
+     },
+     "lam0_hedge_vs_arm12b_cth_llm": {
+      "episodes": 240,
+      "episodes_differing": 1,
+      "max_abs_diff_gross": 0.0,
+      "max_abs_diff_net": 7.0,
+      "missing": 0
+     },
+     "lam1_hedge_vs_ctrl_cth_uniform": {
+      "episodes": 240,
+      "episodes_differing": 0,
+      "max_abs_diff_gross": 0.0,
+      "max_abs_diff_net": 0.0,
+      "missing": 0
+     }
+    },
+    "variants": {
+     "abl_lam0.1_hedge": {
+      "lam": 0.1,
+      "minus_arm10|net": {
+       "b": [
+        169.55031250000002,
+        467.4215625
+       ],
+       "mean": 304.9,
+       "n": 240,
+       "p_one_sided": 9.99990000099999e-06
+      },
+      "minus_arm1|net": {
+       "b": [
+        54.10625,
+        316.9188541666667
+       ],
+       "mean": 174.24583333333334,
+       "n": 240,
+       "p_one_sided": 0.0024299757002429977
+      },
+      "minus_cth|net": {
+       "b": [
+        -12.741979166666667,
+        2.7709374999999987
+       ],
+       "mean": -4.220833333333333,
+       "n": 240,
+       "p_one_sided": 0.8471815281847181
+      },
+      "null_exposure": 0.365196,
+      "null_net_minus_arm1": -3.3958333333333335,
+      "replay": {
+       "calls": 277,
+       "recorded_unused": 0,
+       "replay_misses": 0
+      },
+      "scheme": "hedge"
+     },
+     "abl_lam0.25_hedge": {
+      "lam": 0.25,
+      "minus_arm10|net": {
+       "b": [
+        172.5690625,
+        472.1034375
+       ],
+       "mean": 309.12083333333334,
+       "n": 240,
+       "p_one_sided": 9.99990000099999e-06
+      },
+      "minus_arm1|net": {
+       "b": [
+        54.824895833333336,
+        325.52916666666664
+       ],
+       "mean": 178.46666666666667,
+       "n": 240,
+       "p_one_sided": 0.0027899721002789973
+      },
+      "minus_cth|net": {
+       "b": [
+        0.0,
+        0.0
+       ],
+       "mean": 0.0,
+       "n": 240,
+       "p_one_sided": 1.0
+      },
+      "null_exposure": 0.5231446666666668,
+      "null_net_minus_arm1": -3.2291666666666665,
+      "replay": {
+       "calls": 277,
+       "recorded_unused": 0,
+       "replay_misses": 0
+      },
+      "scheme": "hedge"
+     },
+     "abl_lam0.25_linear": {
+      "lam": 0.25,
+      "minus_arm10|net": {
+       "b": [
+        171.05291666666668,
+        467.6591666666667
+       ],
+       "mean": 306.1666666666667,
+       "n": 240,
+       "p_one_sided": 9.99990000099999e-06
+      },
+      "minus_arm1|net": {
+       "b": [
+        54.27979166666667,
+        318.41687499999995
+       ],
+       "mean": 175.5125,
+       "n": 240,
+       "p_one_sided": 0.0027099729002709972
+      },
+      "minus_cth|net": {
+       "b": [
+        -9.608333333333333,
+        2.1502083333333304
+       ],
+       "mean": -2.9541666666666666,
+       "n": 240,
+       "p_one_sided": 0.7957920420795792
+      },
+      "null_exposure": 0.5231713333333333,
+      "null_net_minus_arm1": -3.75,
+      "replay": {
+       "calls": 277,
+       "recorded_unused": 0,
+       "replay_misses": 0
+      },
+      "scheme": "linear"
+     },
+     "abl_lam0.25_map": {
+      "lam": 0.25,
+      "minus_arm10|net": {
+       "b": [
+        129.79583333333332,
+        407.5128125
+       ],
+       "mean": 253.22083333333333,
+       "n": 240,
+       "p_one_sided": 9.99990000099999e-06
+      },
+      "minus_arm1|net": {
+       "b": [
+        27.7871875,
+        233.82593749999998
+       ],
+       "mean": 122.56666666666666,
+       "n": 240,
+       "p_one_sided": 0.00959990400095999
+      },
+      "minus_cth|net": {
+       "b": [
+        -97.42083333333333,
+        -19.03322916666667
+       ],
+       "mean": -55.9,
+       "n": 240,
+       "p_one_sided": 0.996490035099649
+      },
+      "null_exposure": 0.5231715208333334,
+      "null_net_minus_arm1": -4.958333333333333,
+      "replay": {
+       "calls": 277,
+       "recorded_unused": 0,
+       "replay_misses": 0
+      },
+      "scheme": "map"
+     },
+     "abl_lam0.5_hedge": {
+      "lam": 0.5,
+      "minus_arm10|net": {
+       "b": [
+        171.05020833333333,
+        468.14624999999984
+       ],
+       "mean": 306.675,
+       "n": 240,
+       "p_one_sided": 9.99990000099999e-06
+      },
+      "minus_arm1|net": {
+       "b": [
+        53.65947916666667,
+        321.5714583333333
+       ],
+       "mean": 176.02083333333334,
+       "n": 240,
+       "p_one_sided": 0.0032599674003259966
+      },
+      "minus_cth|net": {
+       "b": [
+        -9.070833333333333,
+        4.187604166666665
+       ],
+       "mean": -2.4458333333333333,
+       "n": 240,
+       "p_one_sided": 0.7552824471755283
+      },
+      "null_exposure": 0.6718633124999999,
+      "null_net_minus_arm1": -3.625,
+      "replay": {
+       "calls": 277,
+       "recorded_unused": 0,
+       "replay_misses": 0
+      },
+      "scheme": "hedge"
+     },
+     "abl_lam0.75_hedge": {
+      "lam": 0.75,
+      "minus_arm10|net": {
+       "b": [
+        169.33687500000002,
+        466.2058333333333
+       ],
+       "mean": 304.8666666666667,
+       "n": 240,
+       "p_one_sided": 9.99990000099999e-06
+      },
+      "minus_arm1|net": {
+       "b": [
+        51.320729166666666,
+        319.4902083333333
+       ],
+       "mean": 174.2125,
+       "n": 240,
+       "p_one_sided": 0.003879961200387996
+      },
+      "minus_cth|net": {
+       "b": [
+        -13.7125,
+        5.804270833333331
+       ],
+       "mean": -4.254166666666666,
+       "n": 240,
+       "p_one_sided": 0.7915520844791553
+      },
+      "null_exposure": 0.7648535208333334,
+      "null_net_minus_arm1": -2.625,
+      "replay": {
+       "calls": 277,
+       "recorded_unused": 0,
+       "replay_misses": 0
+      },
+      "scheme": "hedge"
+     },
+     "abl_lam0_hedge": {
+      "lam": 0.0,
+      "minus_arm10|net": {
+       "b": [
+        149.65645833333335,
+        447.0569791666666
+       ],
+       "mean": 283.85,
+       "n": 240,
+       "p_one_sided": 9.99990000099999e-06
+      },
+      "minus_arm1|net": {
+       "b": [
+        44.35427083333334,
+        288.61572916666665
+       ],
+       "mean": 153.19583333333333,
+       "n": 240,
+       "p_one_sided": 0.002999970000299997
+      },
+      "minus_cth|net": {
+       "b": [
+        -65.69333333333333,
+        8.904895833333322
+       ],
+       "mean": -25.270833333333332,
+       "n": 240,
+       "p_one_sided": 0.8905810941890581
+      },
+      "null_exposure": 0.1842191875,
+      "null_net_minus_arm1": -4.5625,
+      "replay": {
+       "calls": 277,
+       "recorded_unused": 0,
+       "replay_misses": 0
+      },
+      "scheme": "hedge"
+     },
+     "abl_lam1_hedge": {
+      "lam": 1.0,
+      "minus_arm10|net": {
+       "b": [
+        164.93739583333334,
+        460.2795833333332
+       ],
+       "mean": 299.77916666666664,
+       "n": 240,
+       "p_one_sided": 9.99990000099999e-06
+      },
+      "minus_arm1|net": {
+       "b": [
+        48.232083333333335,
+        312.28822916666644
+       ],
+       "mean": 169.125,
+       "n": 240,
+       "p_one_sided": 0.004809951900480995
+      },
+      "minus_cth|net": {
+       "b": [
+        -23.600104166666668,
+        4.941770833333331
+       ],
+       "mean": -9.341666666666667,
+       "n": 240,
+       "p_one_sided": 0.8904010959890402
+      },
+      "null_exposure": 0.8285278749999999,
+      "null_net_minus_arm1": -1.25,
+      "replay": {
+       "calls": 0,
+       "recorded_unused": 277,
+       "replay_misses": 0
+      },
+      "scheme": "hedge"
+     }
+    }
+   }
+  },
+  "fresh-grok-4.20": {
+   "19": {
+    "checks": {
+     "lam0_hedge_vs_arm12b_cth_llm": {
+      "episodes": 240,
+      "episodes_differing": 4,
+      "max_abs_diff_gross": 0.0,
+      "max_abs_diff_net": 10.0,
+      "missing": 0
+     },
+     "lam1_hedge_vs_ctrl_cth_uniform": {
+      "episodes": 240,
+      "episodes_differing": 0,
+      "max_abs_diff_gross": 0.0,
+      "max_abs_diff_net": 0.0,
+      "missing": 0
+     }
+    },
+    "variants": {
+     "abl_lam0.1_hedge": {
+      "lam": 0.1,
+      "minus_arm10|net": {
+       "b": [
+        303.07635416666665,
+        1035.7269791666665
+       ],
+       "mean": 637.1416666666667,
+       "n": 240,
+       "p_one_sided": 9.99990000099999e-06
+      },
+      "minus_arm1|net": {
+       "b": [
+        345.74093750000003,
+        1650.9485416666662
+       ],
+       "mean": 933.3416666666667,
+       "n": 240,
+       "p_one_sided": 9.99990000099999e-06
+      },
+      "minus_cth|net": {
+       "b": [
+        -122.081875,
+        -7.090416666666685
+       ],
+       "mean": -57.233333333333334,
+       "n": 240,
+       "p_one_sided": 0.983040169598304
+      },
+      "null_exposure": 0.2745105625,
+      "null_net_minus_arm1": 1.6041666666666667,
+      "replay": {
+       "calls": 277,
+       "recorded_unused": 0,
+       "replay_misses": 0
+      },
+      "scheme": "hedge"
+     },
+     "abl_lam0.25_hedge": {
+      "lam": 0.25,
+      "minus_arm10|net": {
+       "b": [
+        323.85677083333337,
+        1138.2022916666663
+       ],
+       "mean": 694.375,
+       "n": 240,
+       "p_one_sided": 9.99990000099999e-06
+      },
+      "minus_arm1|net": {
+       "b": [
+        375.936875,
+        1739.1663541666665
+       ],
+       "mean": 990.575,
+       "n": 240,
+       "p_one_sided": 9.99990000099999e-06
+      },
+      "minus_cth|net": {
+       "b": [
+        0.0,
+        0.0
+       ],
+       "mean": 0.0,
+       "n": 240,
+       "p_one_sided": 1.0
+      },
+      "null_exposure": 0.4582914999999999,
+      "null_net_minus_arm1": 2.4375,
+      "replay": {
+       "calls": 277,
+       "recorded_unused": 0,
+       "replay_misses": 0
+      },
+      "scheme": "hedge"
+     },
+     "abl_lam0.25_linear": {
+      "lam": 0.25,
+      "minus_arm10|net": {
+       "b": [
+        267.15739583333334,
+        839.0020833333332
+       ],
+       "mean": 526.0,
+       "n": 240,
+       "p_one_sided": 9.99990000099999e-06
+      },
+      "minus_arm1|net": {
+       "b": [
+        319.0704166666667,
+        1438.1238541666664
+       ],
+       "mean": 822.2,
+       "n": 240,
+       "p_one_sided": 9.99990000099999e-06
+      },
+      "minus_cth|net": {
+       "b": [
+        -311.1927083333333,
+        -49.090000000000025
+       ],
+       "mean": -168.375,
+       "n": 240,
+       "p_one_sided": 0.9960000399996
+      },
+      "null_exposure": 0.45826341666666665,
+      "null_net_minus_arm1": 3.25,
+      "replay": {
+       "calls": 277,
+       "recorded_unused": 0,
+       "replay_misses": 0
+      },
+      "scheme": "linear"
+     },
+     "abl_lam0.25_map": {
+      "lam": 0.25,
+      "minus_arm10|net": {
+       "b": [
+        156.0871875,
+        530.5553125
+       ],
+       "mean": 325.89166666666665,
+       "n": 240,
+       "p_one_sided": 7.999920000799993e-05
+      },
+      "minus_arm1|net": {
+       "b": [
+        234.58979166666668,
+        1107.771875
+       ],
+       "mean": 622.0916666666667,
+       "n": 240,
+       "p_one_sided": 2.999970000299997e-05
+      },
+      "minus_cth|net": {
+       "b": [
+        -654.9043750000001,
+        -124.88145833333337
+       ],
+       "mean": -368.48333333333335,
+       "n": 240,
+       "p_one_sided": 0.9988100118998811
+      },
+      "null_exposure": 0.45829279166666664,
+      "null_net_minus_arm1": 1.3958333333333333,
+      "replay": {
+       "calls": 277,
+       "recorded_unused": 0,
+       "replay_misses": 0
+      },
+      "scheme": "map"
+     },
+     "abl_lam0.5_hedge": {
+      "lam": 0.5,
+      "minus_arm10|net": {
+       "b": [
+        327.22281250000003,
+        1168.7605208333332
+       ],
+       "mean": 710.7833333333333,
+       "n": 240,
+       "p_one_sided": 9.99990000099999e-06
+      },
+      "minus_arm1|net": {
+       "b": [
+        386.0921875,
+        1769.6479166666663
+       ],
+       "mean": 1006.9833333333333,
+       "n": 240,
+       "p_one_sided": 9.99990000099999e-06
+      },
+      "minus_cth|net": {
+       "b": [
+        -4.3377083333333335,
+        40.6875
+       ],
+       "mean": 16.408333333333335,
+       "n": 240,
+       "p_one_sided": 0.08618913810861892
+      },
+      "null_exposure": 0.6309485833333333,
+      "null_net_minus_arm1": 2.25,
+      "replay": {
+       "calls": 277,
+       "recorded_unused": 0,
+       "replay_misses": 0
+      },
+      "scheme": "hedge"
+     },
+     "abl_lam0.75_hedge": {
+      "lam": 0.75,
+      "minus_arm10|net": {
+       "b": [
+        319.6373958333333,
+        1170.8826041666664
+       ],
+       "mean": 705.5666666666667,
+       "n": 240,
+       "p_one_sided": 1.999980000199998e-05
+      },
+      "minus_arm1|net": {
+       "b": [
+        379.8215625,
+        1767.0776041666663
+       ],
+       "mean": 1001.7666666666667,
+       "n": 240,
+       "p_one_sided": 2.999970000299997e-05
+      },
+      "minus_cth|net": {
+       "b": [
+        -24.45958333333333,
+        48.49166666666667
+       ],
+       "mean": 11.191666666666666,
+       "n": 240,
+       "p_one_sided": 0.2803471965280347
+      },
+      "null_exposure": 0.7394572083333332,
+      "null_net_minus_arm1": 1.4791666666666667,
+      "replay": {
+       "calls": 277,
+       "recorded_unused": 0,
+       "replay_misses": 0
+      },
+      "scheme": "hedge"
+     },
+     "abl_lam0_hedge": {
+      "lam": 0.0,
+      "minus_arm10|net": {
+       "b": [
+        124.06625000000001,
+        500.1889583333333
+       ],
+       "mean": 288.78333333333336,
+       "n": 240,
+       "p_one_sided": 2.999970000299997e-05
+      },
+      "minus_arm1|net": {
+       "b": [
+        142.20031250000002,
+        1194.1240624999998
+       ],
+       "mean": 584.9833333333333,
+       "n": 240,
+       "p_one_sided": 0.00010999890001099989
+      },
+      "minus_cth|net": {
+       "b": [
+        -779.2190625000001,
+        -114.00343750000008
+       ],
+       "mean": -405.59166666666664,
+       "n": 240,
+       "p_one_sided": 0.999430005699943
+      },
+      "null_exposure": 0.0622935,
+      "null_net_minus_arm1": 0.5833333333333334,
+      "replay": {
+       "calls": 277,
+       "recorded_unused": 0,
+       "replay_misses": 0
+      },
+      "scheme": "hedge"
+     },
+     "abl_lam1_hedge": {
+      "lam": 1.0,
+      "minus_arm10|net": {
+       "b": [
+        291.82916666666665,
+        1142.4387499999998
+       ],
+       "mean": 675.1916666666667,
+       "n": 240,
+       "p_one_sided": 4.999950000499995e-05
+      },
+      "minus_arm1|net": {
+       "b": [
+        360.2685416666667,
+        1717.2058333333332
+       ],
+       "mean": 971.3916666666667,
+       "n": 240,
+       "p_one_sided": 8.99991000089999e-05
+      },
+      "minus_cth|net": {
+       "b": [
+        -87.23072916666666,
+        38.32229166666664
+       ],
+       "mean": -19.183333333333334,
+       "n": 240,
+       "p_one_sided": 0.6985930140698593
+      },
+      "null_exposure": 0.8286404375000002,
+      "null_net_minus_arm1": -6.854166666666667,
+      "replay": {
+       "calls": 0,
+       "recorded_unused": 277,
+       "replay_misses": 0
+      },
+      "scheme": "hedge"
+     }
+    }
+   },
+   "4": {
+    "checks": {
+     "lam0.25_hedge_vs_arm12_cth": {
+      "episodes": 240,
+      "episodes_differing": 0,
+      "max_abs_diff_gross": 0.0,
+      "max_abs_diff_net": 0.0,
+      "missing": 0
+     },
+     "lam0_hedge_vs_arm12b_cth_llm": {
+      "episodes": 240,
+      "episodes_differing": 4,
+      "max_abs_diff_gross": 0.0,
+      "max_abs_diff_net": 18.0,
+      "missing": 0
+     },
+     "lam1_hedge_vs_ctrl_cth_uniform": {
+      "episodes": 240,
+      "episodes_differing": 0,
+      "max_abs_diff_gross": 0.0,
+      "max_abs_diff_net": 0.0,
+      "missing": 0
+     }
+    },
+    "variants": {
+     "abl_lam0.1_hedge": {
+      "lam": 0.1,
+      "minus_arm10|net": {
+       "b": [
+        79.8871875,
+        258.17312499999997
+       ],
+       "mean": 164.30416666666667,
+       "n": 240,
+       "p_one_sided": 0.0001999980000199998
+      },
+      "minus_arm1|net": {
+       "b": [
+        41.66135416666667,
+        278.6255208333333
+       ],
+       "mean": 148.42916666666667,
+       "n": 240,
+       "p_one_sided": 0.003039969600303997
+      },
+      "minus_cth|net": {
+       "b": [
+        -32.30083333333333,
+        -1.2291666666666667
+       ],
+       "mean": -14.454166666666667,
+       "n": 240,
+       "p_one_sided": 0.971540284597154
+      },
+      "null_exposure": 0.27451102083333334,
+      "null_net_minus_arm1": 1.5,
+      "replay": {
+       "calls": 277,
+       "recorded_unused": 0,
+       "replay_misses": 0
+      },
+      "scheme": "hedge"
+     },
+     "abl_lam0.25_hedge": {
+      "lam": 0.25,
+      "minus_arm10|net": {
+       "b": [
+        87.39135416666667,
+        280.90979166666665
+       ],
+       "mean": 178.75833333333333,
+       "n": 240,
+       "p_one_sided": 0.0001999980000199998
+      },
+      "minus_arm1|net": {
+       "b": [
+        47.752187500000005,
+        299.7330208333333
+       ],
+       "mean": 162.88333333333333,
+       "n": 240,
+       "p_one_sided": 0.0031199688003119967
+      },
+      "minus_cth|net": {
+       "b": [
+        0.0,
+        0.0
+       ],
+       "mean": 0.0,
+       "n": 240,
+       "p_one_sided": 1.0
+      },
+      "null_exposure": 0.4582915416666667,
+      "null_net_minus_arm1": 1.8958333333333333,
+      "replay": {
+       "calls": 277,
+       "recorded_unused": 0,
+       "replay_misses": 0
+      },
+      "scheme": "hedge"
+     },
+     "abl_lam0.25_linear": {
+      "lam": 0.25,
+      "minus_arm10|net": {
+       "b": [
+        83.3275,
+        265.1252083333332
+       ],
+       "mean": 169.7375,
+       "n": 240,
+       "p_one_sided": 0.0002099979000209998
+      },
+      "minus_arm1|net": {
+       "b": [
+        44.915625,
+        283.1270833333333
+       ],
+       "mean": 153.8625,
+       "n": 240,
+       "p_one_sided": 0.003019969800301997
+      },
+      "minus_cth|net": {
+       "b": [
+        -21.3459375,
+        -0.016562500000001517
+       ],
+       "mean": -9.020833333333334,
+       "n": 240,
+       "p_one_sided": 0.95020049799502
+      },
+      "null_exposure": 0.45829108333333335,
+      "null_net_minus_arm1": 0.8541666666666666,
+      "replay": {
+       "calls": 277,
+       "recorded_unused": 0,
+       "replay_misses": 0
+      },
+      "scheme": "linear"
+     },
+     "abl_lam0.25_map": {
+      "lam": 0.25,
+      "minus_arm10|net": {
+       "b": [
+        50.50822916666667,
+        194.10781249999994
+       ],
+       "mean": 117.07916666666667,
+       "n": 240,
+       "p_one_sided": 0.0005099949000509995
+      },
+      "minus_arm1|net": {
+       "b": [
+        20.492187500000004,
+        199.3309374999999
+       ],
+       "mean": 101.20416666666667,
+       "n": 240,
+       "p_one_sided": 0.011339886601133988
+      },
+      "minus_cth|net": {
+       "b": [
+        -108.17802083333333,
+        -21.207812500000006
+       ],
+       "mean": -61.67916666666667,
+       "n": 240,
+       "p_one_sided": 0.99820001799982
+      },
+      "null_exposure": 0.4582916458333333,
+      "null_net_minus_arm1": 1.1666666666666667,
+      "replay": {
+       "calls": 277,
+       "recorded_unused": 0,
+       "replay_misses": 0
+      },
+      "scheme": "map"
+     },
+     "abl_lam0.5_hedge": {
+      "lam": 0.5,
+      "minus_arm10|net": {
+       "b": [
+        87.578125,
+        284.30541666666664
+       ],
+       "mean": 180.625,
+       "n": 240,
+       "p_one_sided": 0.00021999780002199978
+      },
+      "minus_arm1|net": {
+       "b": [
+        48.4059375,
+        302.9592708333333
+       ],
+       "mean": 164.75,
+       "n": 240,
+       "p_one_sided": 0.0035899641003589965
+      },
+      "minus_cth|net": {
+       "b": [
+        -3.6041666666666665,
+        8.4875
+       ],
+       "mean": 1.8666666666666667,
+       "n": 240,
+       "p_one_sided": 0.2860771392286077
+      },
+      "null_exposure": 0.63100525,
+      "null_net_minus_arm1": 0.3125,
+      "replay": {
+       "calls": 277,
+       "recorded_unused": 0,
+       "replay_misses": 0
+      },
+      "scheme": "hedge"
+     },
+     "abl_lam0.75_hedge": {
+      "lam": 0.75,
+      "minus_arm10|net": {
+       "b": [
+        87.9271875,
+        290.4502083333333
+       ],
+       "mean": 183.54583333333332,
+       "n": 240,
+       "p_one_sided": 0.00027999720002799973
+      },
+      "minus_arm1|net": {
+       "b": [
+        48.45302083333333,
+        309.40854166666657
+       ],
+       "mean": 167.67083333333332,
+       "n": 240,
+       "p_one_sided": 0.004249957500424996
+      },
+      "minus_cth|net": {
+       "b": [
+        -5.137708333333333,
+        17.558749999999993
+       ],
+       "mean": 4.7875,
+       "n": 240,
+       "p_one_sided": 0.23478765212347877
+      },
+      "null_exposure": 0.73937425,
+      "null_net_minus_arm1": 0.3541666666666667,
+      "replay": {
+       "calls": 277,
+       "recorded_unused": 0,
+       "replay_misses": 0
+      },
+      "scheme": "hedge"
+     },
+     "abl_lam0_hedge": {
+      "lam": 0.0,
+      "minus_arm10|net": {
+       "b": [
+        33.85125,
+        181.79895833333327
+       ],
+       "mean": 102.04166666666667,
+       "n": 240,
+       "p_one_sided": 0.0025799742002579973
+      },
+      "minus_arm1|net": {
+       "b": [
+        5.6540625,
+        193.9897916666665
+       ],
+       "mean": 86.16666666666667,
+       "n": 240,
+       "p_one_sided": 0.03645963540364596
+      },
+      "minus_cth|net": {
+       "b": [
+        -144.2525,
+        -21.49958333333334
+       ],
+       "mean": -76.71666666666667,
+       "n": 240,
+       "p_one_sided": 0.996080039199608
+      },
+      "null_exposure": 0.0622935,
+      "null_net_minus_arm1": -0.6458333333333334,
+      "replay": {
+       "calls": 277,
+       "recorded_unused": 0,
+       "replay_misses": 0
+      },
+      "scheme": "hedge"
+     },
+     "abl_lam1_hedge": {
+      "lam": 1.0,
+      "minus_arm10|net": {
+       "b": [
+        86.9275,
+        295.1420833333333
+       ],
+       "mean": 185.0,
+       "n": 240,
+       "p_one_sided": 0.0003099969000309997
+      },
+      "minus_arm1|net": {
+       "b": [
+        48.232083333333335,
+        312.28822916666644
+       ],
+       "mean": 169.125,
+       "n": 240,
+       "p_one_sided": 0.004809951900480995
+      },
+      "minus_cth|net": {
+       "b": [
+        -10.6834375,
+        28.66729166666666
+       ],
+       "mean": 6.241666666666666,
+       "n": 240,
+       "p_one_sided": 0.3113468865311347
+      },
+      "null_exposure": 0.8285278749999999,
+      "null_net_minus_arm1": -1.25,
+      "replay": {
+       "calls": 0,
+       "recorded_unused": 277,
+       "replay_misses": 0
+      },
+      "scheme": "hedge"
+     }
+    }
+   }
+  }
+ },
+ "status": "exploratory, post hoc; model answers held fixed (arm12_cth's)"
+}

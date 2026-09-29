@@ -7,7 +7,7 @@ confirmation: its method, hypotheses, tests and evaluator were committed and pus
 the fresh pool earlier (a scripted structural test computed outcomes on 6 of the 48 clusters) and
 an interim look at one primary run. The plan and every amendment are in `PLAN.md`; the frozen
 tree shows no drift. Numbers below come from `out/confirm.json` (stage C), `out/posthoc.json` and
-`out/sensitivity.json` (post hoc on stage C), `out/dev/dev1.json` (stage B) and the run outputs
+`out/sensitivity.json` and `out/ablation.json` (post hoc on stage C), `out/dev/dev1.json` (stage B) and the run outputs
 under `out/` (stage A), unless a sentence names another source.
 
 ## The method
@@ -36,8 +36,11 @@ clearly above a bound with the baseline known, and 2.0 to 2.7 times `A` for the 
 with the plug-in null and a first firing at period 10. Against the content-free arm, a family the
 model does not name costs exactly `log(1 / lam)` nats of evidence (log 4) and the named one saves
 `log(lam + (1 - lam) |H|)` (log 3.25). With one hypothesis and `lam = 0` the gate's threshold is
-a posterior-odds rule of the same form; it is an analogy, since the gate certifies the model's
-full spec and the hedge a canonical one.
+a posterior-odds rule of the same form; it is an analogy, not an identity: for a named demand
+or pulse hypothesis the two e-processes coincide (the gate's mixes over the registered
+multipliers whatever magnitude is stated), for a lead-time shift the magnitude only selects the
+delay tilt, and the gate then acts all at once on the compiled stated magnitude while the hedge
+sizes the shock from the data.
 
 ## Stage C: registered confirmation on fresh seeds
 
@@ -90,8 +93,10 @@ text, carries the gain.
 
 - *Where the gain comes from.* The 32 shocked lead-time episodes supply 96% of hedge - arm 1
   (Gemini 96.0%, Grok 96.3%; with their twins, 95.8% and 96.7%). Without the 8 lead-time units
-  (40 clusters) hedge - arm 1 is +9.0 b[-23.9, 42.5] and +6.6 b[-24.6, 36.1]; hedge - gate stays +226.8 b[82.3, 408.1] with Gemini (+58.1
-  b[-0.8, 133.6] with Grok), because the gate loses 1,057 per demand-rise episode with Gemini.
+  (40 clusters) hedge - arm 1 is +9.0 b[-23.9, 42.5] and +6.6 b[-24.6, 36.1]; hedge - gate stays +226.8 b[82.3, 408.1] with Gemini, because the gate loses 1,057 per demand-rise episode;
+  with Grok, +58.1 b[-0.8, 133.6] is not distinguishable from zero. Per family, every shocked
+  family's interval excludes zero except the demand rise (-83.4 b[-200.0, 21.1] and -83.4
+  b[-203.9, 25.6]; `gain_source["by_family_cth-arm1|net"]`).
 - *Without the six structural-test clusters* (units `i = 0`, 42 clusters): H1 +328.6 and +187.7,
   H2 +162.8 and +145.3; the largest one-sided p is 0.0024.
 - *Null episodes.* The Gemini null loss is on the 24 false-alert twins (-6.4 b[-16.1, -0.3],
@@ -100,8 +105,9 @@ text, carries the gain.
 - *Exposure.* Hedge over content-free null exposure: 0.631 b[0.429, 0.668] (Gemini) and 0.553
   b[0.392, 0.581] (Grok), cuts of 37% and 45%, almost all on false-alert twins (the silent-twin
   ratio is not estimable: only 3 clusters carry content-free exposure). Naming any family, right
-  or wrong, moves prior weight off the others; the content-free control's null mass sits mostly on
-  the pulse hypothesis (0.69 of 0.83).
+  or wrong, moves prior weight off the others. Crediting each period's mass to its leading
+  hypothesis, pulse-led periods carry 0.69 of the content-free control's 0.83 and 0.32 and 0.38
+  of the hedge's 0.52 and 0.46, so most of the label's cut is that mass.
 - *Lead-time proposals.* Gemini named a lead-time shift in 17 of the 32 lead-time episodes
   (medium 8, high 3, low 6) and Grok in 11 (medium 10, high 1). Every family-4 unit moves to a
   lead of 3, so the true shift is two periods for the units with a baseline of 1 and one period
@@ -137,6 +143,36 @@ reward the gain is 0.5% / 0.3% at p/h = 1, 1.1% / 1.0% at 4 and 1.2% / 1.2% at 1
 share over the content-free control is distinguishable from zero with Gemini at p/h = 9 and 19,
 and with Grok at p/h = 1, where it is negative. All post hoc, on the confirmation's own
 episodes; `sensitivity.json` holds 6 contrasts x 2 endpoints x 5 ratios x 2 models.
+
+**Ablations** (`ablation.py`, `out/ablation.json`; post hoc, exploratory). Variants of the
+method re-run on stage C's 240 fresh episodes, each served, at every decision point, the answer
+text the model gave `arm12_cth` in the registered run (so the counterfactual is "the same answer
+at the same decision point"; the shared trigger fixes the decision points). At p/h = 4 the
+`lam = 0.25` hedge reproduces `arm12_cth`'s 240 records exactly and `lam = 1` reproduces
+`ctrl_cth_uniform`'s, at p/h = 4 and 19; no variant called at a period without a recorded
+answer. `lam = 0` is not `arm12b_cth_llm`, which made its own calls (their records differ on 1
+and 4 episodes). Contrasts are each variant minus the method (`lam = 0.25`, hedge rule) on net
+reward, with seed-cluster intervals; at p/h = 19 the comparators come from the cost-ratio replay.
+The method's own null exposure is 0.523 / 0.458.
+
+| variant | minus the method, p/h = 4 (Gemini / Grok) | p/h = 19 | null exposure (Gemini / Grok) |
+|---|---|---|---|
+| lam 0 (label only) | -25 b[-66, 9] / -77 b[-144, -21] | -179 b[-365, -31] / -406 b[-779, -114] | 0.184 / 0.062 |
+| lam 0.1 | -4 b[-13, 3] / -14 b[-32, -1] | -23 b[-60, 3] / -57 b[-122, -7] | 0.365 / 0.275 |
+| lam 0.5 | -2 b[-9, 4] / +2 b[-4, 8] | +1 b[-17, 22] / +16 b[-4, 41] | 0.672 / 0.631 |
+| lam 0.75 | -4 b[-14, 6] / +5 b[-5, 18] | -25 b[-65, 14] / +11 b[-24, 48] | 0.765 / 0.739 |
+| lam 1 (content-free) | -9 b[-24, 5] / +6 b[-11, 29] | -84 b[-166, -18] / -19 b[-87, 38] | 0.829 / 0.829 |
+| linear rule, lam 0.25 | -3 b[-10, 2] / -9 b[-21, -0.02] | -152 b[-278, -46] / -168 b[-311, -49] | 0.523 / 0.458 |
+| MAP rule, lam 0.25 | -56 b[-97, -19] / -62 b[-108, -21] | -370 b[-649, -131] / -368 b[-655, -125] | 0.523 / 0.458 |
+
+The graded rule matters more than the prior weight. Committing to the compiled target once the
+shock mass reaches 1/2 (MAP) loses about 56 and 62 per episode at p/h = 4 and about 370 at
+p/h = 19, every interval below zero; interpolating the target by the shock mass (linear) costs
+little at p/h = 4 and 152 and 168 at 19. At `lam = 0.5` and `0.75` the net outcome is not
+distinguishable from the method's with either model, while null exposure rises with `lam`;
+smaller weights on the uniform part cost with Grok (`lam = 0.1`: -14 at p/h = 4, -57 at 19), and
+trusting the label alone (`lam = 0`) gives the lowest null exposure but loses with Grok at
+p/h = 4 and with both models at p/h = 19.
 
 **Cost.** Stage C provider cost $6.51: Gemini 3.8 $4.55, Grok 4.20 $1.09, GPT-3.5 $0.45,
 DeepSeek-V3 $0.22, Gemini 2.5 Flash-Lite $0.13, Llama 3.1 8B $0.06.
