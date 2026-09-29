@@ -7,15 +7,15 @@ manuscripts due October 15, 2026).
 
 This is the **camera-ready draft**. Every number comes from a committed output under
 `analysis/`, and every substantive claim traces to its evidence and status in
-[`CLAIMS.md`](CLAIMS.md). The only placeholders left are the team's: the author block and the
-acknowledgment (section 3 below).
+[`CLAIMS.md`](CLAIMS.md). The only placeholders left are the team's: the author block (section 3
+below). The paper has no acknowledgment section.
 
 ## Build
 
 ```bash
 make              # -> main.pdf
 make check        # structural checks, no TeX toolchain needed
-make check-pages  # page count against the venue's 8-page limit
+make check-pages  # body pages (up to the references) against the 9-page camera-ready limit
 make figures      # re-render the two figures from the committed study outputs (uv environment)
 ```
 
@@ -42,27 +42,28 @@ Section order, as `main.tex` inputs them:
 ```
 00_abstract   01_introduction   02_background   03_setup   04_interface
 06_method_verify   06_method_hedge   07_design   08_results
-10_related_work   11_limitations   12_conclusion   13_acknowledgment
+10_related_work   11_limitations   12_conclusion
 ```
 
-Sponsor acknowledgments belong in `\thanks` in the author block, not in
-`sections/13_acknowledgment.tex`.
+There is no acknowledgment section; any sponsor note would go in `\thanks` in the author block.
 
 ## Figures
 
-Both figures are rendered by `illustrate/cth_figures.py` (`make figures`) into `figures/` as a
+The figures are rendered by `illustrate/cth_figures.py` (`make figures`) into `figures/` as a
 PDF, which `\includegraphics` picks up, plus a PNG preview. Nothing in `figures/` is edited by
-hand, and the renderer reads every value from the committed outputs.
+hand, and the renderers read every value from the committed outputs.
 
 | Figure | Where | What it carries |
 | --- | --- | --- |
-| `fig1_episode` | Sec. I, one column | One fresh-seed lead-time episode (chosen to show the mechanism; the caption says so): the gate's step against the hedge's posterior shock mass, and cumulative net reward against arm 1 |
+| `fig1_overview` | Sec. I, full width | The gate and certify-then-hedge on one shared input: (a) the alert, the model's ShockSpec and the truth; (b) the gate lane and (c) the hedge lane, each ending in the same fresh-seed lead-time episode (chosen post hoc; the caption says so), with the exposure bound under the hedge |
 | `fig2_models` | Sec. VIII, full width | The fresh-seed confirmation with six proposer models: perception, acting at once, and the gate and the hedge against arm 1, with the content-free control as a band |
 
-Two accents only: **blue is the evidence path** (certify-then-hedge) and **orange is the
-control path** (the gate); everything else is neutral grey. The pair clears the colour-vision
-deficiency and normal-vision separation floors on a light surface (worst-pair CVD ΔE 24.7
-protan, normal ΔE 33.6), and every coloured series also differs in marker or line style.
+All figures share `illustrate/style.py`: a warm rounded frame, cards with tinted header strips,
+centred panel titles, and STIX fonts that embed as TrueType. **Blue is certify-then-hedge**,
+**orange is the gate**, grey is the operations research baseline; the four hypotheses keep one
+hue each. The blue and orange pair clears the colour-vision deficiency and normal-vision
+separation floors on a light surface (worst-pair CVD ΔE 24.7 protan, normal ΔE 33.6), and
+every coloured series also differs in marker or line style.
 
 ---
 
@@ -77,7 +78,7 @@ redirect). Each fact below was read off that page.
 | Conference | 8th IEEE International Conference on Universal Village (IEEE UV 2026) |
 | Dates, mode | October 17 to 20, 2026, virtual and local |
 | Theme | "Human-Centered AI Transformation for Future Empowerment: Explainable & Human-Intelligible Understanding, Intent-Aware Reasoning & Accountable Decision-Making, Human-Authorized AI Action, and Human-Supervised Reflective Learning" |
-| Regular paper length | **5 to 8 pages** (CFP: "REGULAR PAPERS (5-8 pages)") |
+| Regular paper length | **5 to 8 pages** in the CFP ("REGULAR PAPERS (5-8 pages)"); for the camera-ready the organisers allow **9 pages, references not counted** (owner, 2026-09-29) |
 | Short paper length | 3 to 4 pages (CFP: "SHORT PAPERS (3-4 pages)") |
 | Template | IEEE two-column conference template (`\documentclass[conference]{IEEEtran}`) |
 | Paper size | US Letter, explicitly "not A4" |
@@ -99,7 +100,7 @@ this draft's.
 
 **Assumptions used where a fact was not stated.** The CFP does not mention
 over-length pages, page charges, or an appendix allowance. The draft carries no
-appendix, and it fits the 8 pages.
+appendix, and its body fits the 9 camera-ready pages (references excluded).
 
 **Formatting asks, all honoured.** `hyperref` is loaded with `[hidelinks]`, so
 no URL or address is underlined or coloured. IEEEtran's conference mode emits no
@@ -136,8 +137,7 @@ below must equal that output exactly.
 | File | `\pending` | `\pcell` | What is missing |
 |---|---:|---:|---|
 | `main.tex` | 3 | 0 | author list, affiliation, email |
-| `sections/13_acknowledgment.tex` | 1 | 0 | funding, compute, readers of the draft |
-| **Total** | **4** | **0** | **4 markers** |
+| **Total** | **3** | **0** | **3 markers** |
 
 At camera-ready the team also sets the session designation and re-enables the header and the
 page-1 copyright footer in `main.tex` (section 1).
@@ -241,7 +241,7 @@ draft (2026-09-29) are what `CLAIMS.md` reflects.
 
 ## 6. Open questions for the team
 
-1. The author block, the acknowledgment and the session designation (section 3).
+1. The author block and the session designation (section 3). No acknowledgment section is needed.
 2. Whether the abstract should be cut toward IEEE's usual 150-250 words; it is 294 words, inside
    the call's 100-300.
 

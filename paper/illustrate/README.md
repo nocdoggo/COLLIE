@@ -1,61 +1,67 @@
 # illustrate/ — figure renderers
 
-Scripts in this folder generate every figure the paper includes; nothing in
-`../figures/` is edited by hand.
+Scripts in this folder generate every figure the paper includes; nothing in `../figures/` is
+edited by hand. `cth_figures.py` is the entry point: for each figure it first writes the numbers
+and facts it will draw to `data/` (CSV or JSON, read from the committed study outputs in
+`analysis/commitment/out/`), then renders from those files.
 
-The paper's two figures come from `cth_figures.py`, which reads the committed study outputs in
-`analysis/commitment/out/` and writes a CSV sidecar per figure to `data/` before drawing it.
-`figures.py` rendered the submitted draft's three figures (`fig1_overview`, `fig2_method`,
-`fig3_frontier`); it and those files are kept for reference and are no longer included.
+| File | What it does |
+| --- | --- |
+| `cth_figures.py` | Entry point; writes the data sidecars and renders every figure by name |
+| `style.py` | The house style shared by every figure: palette, STIX fonts, frame, cards, tags, chips, glyphs |
+| `overview.py` | Fig. 1, the gate and certify-then-hedge on one shared input |
+| `data/` | The sidecars each figure is drawn from |
 
 ## Usage
 
 ```bash
-uv run python paper/illustrate/cth_figures.py               # both figures, from the repo root
-uv run python paper/illustrate/cth_figures.py fig2_models   # one figure by name
+uv run python paper/illustrate/cth_figures.py                 # every figure, from the repo root
+uv run python paper/illustrate/cth_figures.py fig1_overview   # one figure by name
 ```
 
-Or `make figures` from `paper/`. The repository's `uv` environment has matplotlib. The rendered
-PDFs are tracked in git, so building the paper never requires this step.
+Or `make figures` from `paper/`. The rendered PDFs are tracked in git, so building the paper
+never requires this step. `fig1_overview` replays the frozen method arm on its episode (a few
+seconds) and stops unless the replay reproduces the recorded total reward exactly.
 
 ## Conventions
 
-- One renderer function per figure, registered by name in the `FIGURES` dict in
-  `figures.py`; the name is the output base name in `figures/`.
-- Each figure is written twice: `<name>.pdf` (vector, included by LaTeX via
-  `\includegraphics`) and `<name>.png` (300 dpi preview).
-- `main.tex` sets `\graphicspath{{figures/}}`, so section files include figures
-  by bare name: `\includegraphics[width=\textwidth]{fig1_overview.pdf}`.
-- Sizing matches the IEEE two-column grid: `SINGLE_COLUMN_IN = 3.5`,
-  `DOUBLE_COLUMN_IN = 7.16`; label text is 8 pt serif per IEEE guidance. Keep
-  every mark inside that width — anything drawn past it widens the tight
-  bounding box and silently shrinks the whole figure when LaTeX scales it back.
-- Diagram panels use an axes whose data units are inches (`_diagram_axes`), so a
-  width of `0.9` in the drawing code is 0.9 inches on the page and rounded
-  corners keep one radius throughout.
-- Figure data lives in `illustrate/data/` as JSON or CSV sidecars; renderers
-  read the sidecars, they never hard-code measurements.
+- One renderer per figure, registered by name in `FIGURES` in `cth_figures.py`; the name is the
+  output base name in `figures/`. Each figure is written as `<name>.pdf` (vector, included by
+  LaTeX) and `<name>.png` (300 dpi preview).
+- `main.tex` sets `\graphicspath{{figures/}}`, so sections include figures by bare name.
+- Sizes follow the IEEE grid (`style.TEXT_WIDTH = 7.16`, `style.COLUMN_WIDTH = 3.5` in); text is
+  at least 6.5 pt. Figures are saved at their exact size (no tight bounding box), so LaTeX never
+  rescales them.
+- Diagrams are drawn on a `style.Canvas`, an axes in inch units with text measurement, so layout
+  code can place and check text exactly.
+- Renderers assert what they draw: every number against its sidecar, text inside its card, no
+  overlapping text, panel titles centred over their panels.
+- Renderers never hard-code a measured quantity; facts come from the sidecars.
 
-## Colour
+## Style
 
-Two accents, and each one means the same thing in every figure:
+Following the owner's house style: a warm rounded outer frame, cards with a tinted header strip
+and a same-hue border, **bold panel titles centred over their panels**, chips, check and cross
+marks, and zebra rows. STIX fonts match the IEEE body text and embed as TrueType.
+
+Colour roles are fixed across figures and tables:
 
 | Role | Hex | What wears it |
 | --- | --- | --- |
-| **Evidence** | `#2a78d6` | the e-process, its threshold, the gate |
-| **Control** | `#eb6834` | the compiler, the configuration, the order |
+| Certify-then-hedge | `#2a78d6` | the method, its shock mass and bound |
+| Registered gate | `#eb6834` | arm 10, its switch and compiled size |
+| Baseline | `#6b7280` | arm 1 (operations research base stock) |
+| Hypotheses | teal, green, purple, amber | lead-time shift, demand up, demand down, upward pulse |
+| Verdicts | `#2e8b57` / `#c8453a` | check (right or rejects) and cross (wrong or does not) |
 
-Everything else is neutral grey chrome. Colour never carries identity on its
-own: every coloured path is also a distinct line style and every coloured band
-is also labelled, because these figures are printed and often in black and
-white, where the two accents sit only about 30 grey levels apart. The pair
-clears the colour-vision-deficiency and normal-vision separation floors on a
-light surface (worst-pair CVD ΔE 24.7 protan, normal ΔE 33.6).
+Colour never carries identity on its own: every coloured series also has its own line style or
+marker and a direct label. The blue and orange pair clears the colour-vision-deficiency and
+normal-vision separation floors on a light surface (worst-pair CVD ΔE 24.7 protan, normal ΔE
+33.6).
 
 ## Current figures
 
-| Name | Output | Notes |
+| Name | Where | Drawn from |
 | --- | --- | --- |
-| `fig1_overview` | `figures/fig1_overview.pdf`, `.png` | Fig. 1, full text width. (a) the handshake: WHEN / WHAT / WHETHER over the pipeline, the gate as a valve, the dashed baseline bypass, the dotted closed loop. (b) the running episode, **schematic** — no measured quantity appears in it. |
-| `fig2_method` | `figures/fig2_method.pdf`, `.png` | Fig. 2, full text width. One key, two consumers: the frozen `ShockSpec`, the registered key, the verifier branch upward and the compiler branch downward, meeting again at the gate. |
-| `fig3_frontier` | `figures/fig3_frontier.pdf`, `.png` | Fig. 3, one column. Reads `data/frontier.csv`. The calls axis is registered and drawn; the profit columns are empty, and the renderer draws a PENDING panel until they are filled. Fill them and the figure completes with no code change. |
+| `fig1_overview` | Fig. 1, Sec. I, full width | `data/fig1_episode.csv` (plotted series), `data/fig1_episode_meta.json` (alert, ShockSpec, offsets, replayed posterior) |
+| `fig2_models` | Sec. VIII, full width | `data/fig2_models.csv` (the fresh-seed confirmation across six models) |

@@ -11,8 +11,8 @@
 %%
 %% Camera-ready draft. Every number comes from a committed output, and every
 %% substantive claim is traced to its evidence in CLAIMS.md. The only markers
-%% left are \pending{...} placeholders for the team (author block and
-%% acknowledgment), listed in README.md; `make check` counts them. Run
+%% left are \pending{...} placeholders for the team (the author block), listed in
+%% README.md; `make check` counts them. Run
 %% `make figures` to re-render the two figures from the committed outputs.
 
 \documentclass[conference]{IEEEtran}
@@ -41,7 +41,18 @@
 %%% --- Graphics ----------------------------------------------------------------
 \usepackage{graphicx}
 \graphicspath{{figures/}}   % all figures live in figures/
-\usepackage{xcolor}
+\usepackage[table]{xcolor}
+\usepackage{pifont}
+% Figure palette, shared with paper/illustrate/style.py.
+\definecolor{hedgeblue}{HTML}{2A78D6}
+\definecolor{gateorange}{HTML}{EB6834}
+\definecolor{goodgreen}{HTML}{2E8B57}
+\definecolor{badred}{HTML}{C8453A}
+\definecolor{headtint}{HTML}{DCE7F5}
+\definecolor{hedgerow}{HTML}{EEF4FC}
+\definecolor{zebra}{HTML}{F4F5F7}
+\newcommand{\yes}{{\color{goodgreen}\ding{51}}}
+\newcommand{\no}{{\color{badred}\ding{55}}}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning,fit,calc,backgrounds,decorations.pathreplacing}
 \usepackage{pgfplots}
@@ -196,8 +207,6 @@ Inventory Control}
 \input{sections/10_related_work}
 \input{sections/11_limitations}
 \input{sections/12_conclusion}
-% Sponsor acknowledgments belong in \thanks in the author block, not here.
-\input{sections/13_acknowledgment}
 
 %%% --- References -------------------------------------------------------------------
 % Only entries cited with \cite{...} appear in the References section.
