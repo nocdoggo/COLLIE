@@ -70,3 +70,19 @@ including the two existing ones, against the committed `scripted-bank` reference
 
 Reading rules are the real-content pilot's: a contrast is called different from zero only when
 its seed-cluster bootstrap interval excludes zero.
+
+### Stage A amendments (logged before the full runs)
+
+**A1 (2026-09-28, after the smoke runs, before any full run).** Smoke projections of the full
+120-episode cost (the real-content pilot's `smoke_summary`): `gemini-2.5-flash-lite` $0.05,
+`gemini-3.1-flash-lite` $0.12, `gemini-2.5-flash` $1.55, `gemini-3-flash-preview` $2.55,
+`grok-build-0.1` $1.511. Under the registered rule:
+
+- `gemini-3-flash-preview` is **not run**: its projection exceeds its $2.00 cap, and single calls
+  took up to 6.6 minutes. It is neither older nor smaller than the remaining rungs.
+- `grok-build-0.1`'s cap is raised from $1.50 to $2.00: its projection exceeds the cap by $0.011,
+  and it is the only older Grok the provider still serves. Disclosed: all 15 of its smoke parses
+  were abstentions, which is seen before this change; the change is to the spend cap only.
+
+The full runs are `gemini-2.5-flash-lite`, `gemini-3.1-flash-lite`, `gemini-2.5-flash` and
+`grok-build-0.1`. The stage A total cap becomes $5.25.
