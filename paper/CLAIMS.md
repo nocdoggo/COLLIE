@@ -89,10 +89,10 @@ paper is rounded once from them or from `confirm.json` (never from a rounded val
 
 | Claim | Evidence | Status |
 |---|---|---|
-| 21 models from seven developers; 20 finished at writing | `analysis/commitment/endpoints.py` `LADDER` (22 rungs, one dropped under A1); `analysis/commitment/out/ladder.json` `rungs`, `missing_or_partial` | established |
-| Perception 0 to 59 of 96; Llama 3.2 1B never non-abstaining; Qwen 2.5 7B mostly abstains | `ladder.json` `family_right`, `abstain_first`, `arm8_arm1_net`; `out/ladder-*/proposals.jsonl` | established |
+| 21 models from seven developers, all run | `analysis/commitment/endpoints.py` `LADDER` (22 rungs, one dropped under A1); `analysis/commitment/out/ladder.json` `rungs` (21), `missing_or_partial` (only the dropped rung) | established |
+| Perception 0 to 65 of 96 (Step 5 Preview the highest; it finished under a 900 s request timeout (from about 11:03 UTC; 82 of its 179 answers) instead of the registered 180 s, a logged deviation that admitted 13 answers slower than 180 s on their first attempt; without it 0 to 59); Llama 3.2 1B never non-abstaining; Qwen 2.5 7B mostly abstains | `ladder.json` `family_right`, `abstain_first`, `arm8_arm1_net`; `out/ladder-*/proposals.jsonl` | established |
 | Acting at once 0 (Llama 3.2 1B) to -3,656 (Gemini 2.5 Flash-Lite) | `ladder.json` `arm8_arm1_net` | established |
-| Loss grows with commitment, contrary to stage A's registered expectation that it would grow as perception falls; commitment and accuracy move together (r = 0.86); the most accurate models lose among the most | `posthoc.json` `ladder.pearson` (committed_vs_family_right 0.859; loss vs committed -0.905, vs family_right -0.901) | post hoc |
+| Loss grows with commitment, contrary to stage A's registered expectation that it would grow as perception falls; commitment and accuracy move together (r = 0.86); the most accurate models lose among the most | `posthoc.json` `ladder.pearson` (committed_vs_family_right 0.862; loss vs committed -0.909, vs family_right -0.906) | post hoc |
 | Gate between -300 and +3; at most 1 of 12 false alerts acted on | `ladder.json` `arm10_arm1_net`, `false_alert_active_arm10` | established |
 | Gate's interval below zero on Gemini 2.5 Flash -294 [-567, -45] and GPT-3.5 Turbo -60 [-151, -1], contrary to stage A's registered expectation | `posthoc.json` `ladder.gate_interval_below_zero`; `PLAN.md` stage A item 6 | established |
 | Hedge point estimates +107 to +158 on every model; content-free +136 | `ladder.json` `cth_arm1_net_dev`, `cth_uniform_arm1_net_dev` (from `out/dev/ladder_dev.json`) | development |
