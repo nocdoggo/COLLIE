@@ -1,0 +1,136 @@
+{
+  "alert_selection_rule": "bank-v1",
+  "alert_source": "bank",
+  "alert_sources": {
+    "bank:early_accurate": 20,
+    "bank:false_alert_null": 12,
+    "bank:late_accurate": 20,
+    "bank:unreliable": 20,
+    "none:bank_gap_demand_down": 16,
+    "none:no_alert": 20,
+    "none:silent_null": 12
+  },
+  "analysis_class": "exploratory",
+  "arm_set": "nine",
+  "arms": [
+    "arm1_capped_base_stock",
+    "arm2_telemetry_hmm_or",
+    "arm8_spec_immediate",
+    "arm9_spec_heuristic_rollback",
+    "arm10_spec_eprocess",
+    "ctrl_cusum_to_compiler",
+    "ctrl_keyword_parser",
+    "ctrl_alertspec_upper_bound",
+    "oracle_shockspec_headroom"
+  ],
+  "decoding": "det-v1 (temperature 0.0, no seed), module 02 prompt, no system prompt",
+  "endpoint": {
+    "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/",
+    "bills_thinking_as_output": true,
+    "extra_body": null,
+    "model_id": "gemini-2.5-flash",
+    "name": "gemini-primary:gemini-2.5-flash",
+    "price_date": "2026-09-28",
+    "price_input_per_mtok": 0.3,
+    "price_output_per_mtok": 2.5,
+    "supports_seed": false
+  },
+  "episodes": 120,
+  "git": {
+    "branch": "method/graded-commitment",
+    "dirty_paths": [
+      "M .gitignore",
+      " M analysis/commitment/runner.py",
+      "?? analysis/commitment/out/"
+    ],
+    "sha": "bff52da12d7be3d95e3f664dde7624b1ca738290"
+  },
+  "guard": {
+    "max_physical_calls": 1500,
+    "physical_calls_this_invocation": 0,
+    "physical_calls_total": 181,
+    "refusals_this_invocation": 0,
+    "retries_this_invocation": 0,
+    "spend_cap_usd": 2.0,
+    "usd_this_invocation": 0.0,
+    "usd_total": 1.3354916000000003
+  },
+  "ladder_rung": {
+    "model_id": "gemini-2.5-flash",
+    "name": "gemini-2.5-flash",
+    "price_input_per_mtok": 0.3,
+    "price_output_per_mtok": 2.5,
+    "provider": "gemini",
+    "released": "2025-06",
+    "served_as": [
+      "gemini-2.5-flash"
+    ],
+    "tier": "mid"
+  },
+  "layout": "pilot",
+  "ledger": {
+    "charged": 436,
+    "charged_usd": 2.9945801000000003,
+    "per_arm": [
+      {
+        "accepted": 140,
+        "accepted_after_repair": 3,
+        "arm_id": "arm10_spec_eprocess",
+        "attempted": 146,
+        "input_tokens": 279664,
+        "output_tokens": 364252,
+        "p50_latency_ms": 0.0014120014384388924,
+        "p95_latency_ms": 0.002403976395726204,
+        "rejected": 3,
+        "usd_cost": 0.9945292
+      },
+      {
+        "accepted": 141,
+        "accepted_after_repair": 2,
+        "arm_id": "arm8_spec_immediate",
+        "attempted": 145,
+        "input_tokens": 277167,
+        "output_tokens": 365355,
+        "p50_latency_ms": 0.0014830147847533226,
+        "p95_latency_ms": 0.004005967639386654,
+        "rejected": 2,
+        "usd_cost": 0.9965376
+      },
+      {
+        "accepted": 141,
+        "accepted_after_repair": 2,
+        "arm_id": "arm9_spec_heuristic_rollback",
+        "attempted": 145,
+        "input_tokens": 277161,
+        "output_tokens": 368146,
+        "p50_latency_ms": 0.0013730023056268692,
+        "p95_latency_ms": 0.0023440225049853325,
+        "rejected": 2,
+        "usd_cost": 1.0035133
+      }
+    ],
+    "physical_this_invocation": 0
+  },
+  "n_per_family": null,
+  "not_a_gate3_vote": true,
+  "outputs_sha256": {
+    "alerts.jsonl": "58afda2dc82906ae90309dff6601d4d0d3778422e626556c15a01fa661fb428f",
+    "ledger.csv": "a69ce40028c7c039319d1272bdec66585c229c771108c983001dc7d2a44acccc",
+    "proposals.jsonl": "1b3652c3cccf127506fe83a1fac4b6724e2061255be87c7563381a2dbd7f7b1c",
+    "records.jsonl.gz": "1cd9f27c57f0ae529b1ae5850fbf7fe961424213a96b44ed832ffe788394720c",
+    "truth.jsonl": "0d30aa2c366d1c0995de049b3e20fb5c8a1e8f31fbc926f17cd7d62f2a4f0221"
+  },
+  "partial": false,
+  "profit": 4.0,
+  "records": 1032,
+  "rule_u": {
+    "arm10_coerced_abstentions": 30,
+    "version": "U-v1"
+  },
+  "run_name": "ladder-gemini-2.5-flash",
+  "truth_identical_to_reports_pilot_truth": true,
+  "versions": {
+    "openai": "1.109.1",
+    "python": "3.12.11"
+  }
+}

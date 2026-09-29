@@ -210,6 +210,11 @@ def write_outputs(run: Run, *, out_dir: Path, local_dir: Path, meta: dict) -> di
         "episodes": len(run.episode_ids),
         "arms": list(run.arm_ids),
         "records": len(run.results),
+        "truth_identical_to_reports_pilot_truth": (
+            rcp.truth_matches_stored(run.truths)
+            if meta.get("layout") == "pilot" and not run.partial
+            else None
+        ),
         "ledger": {
             "physical_this_invocation": summary.physical,
             "charged": summary.charged,

@@ -1,0 +1,138 @@
+{
+  "alert_selection_rule": "bank-v1",
+  "alert_source": "bank",
+  "alert_sources": {
+    "bank:early_accurate": 20,
+    "bank:false_alert_null": 12,
+    "bank:late_accurate": 20,
+    "bank:unreliable": 20,
+    "none:bank_gap_demand_down": 16,
+    "none:no_alert": 20,
+    "none:silent_null": 12
+  },
+  "analysis_class": "exploratory",
+  "arm_set": "nine",
+  "arms": [
+    "arm1_capped_base_stock",
+    "arm2_telemetry_hmm_or",
+    "arm8_spec_immediate",
+    "arm9_spec_heuristic_rollback",
+    "arm10_spec_eprocess",
+    "ctrl_cusum_to_compiler",
+    "ctrl_keyword_parser",
+    "ctrl_alertspec_upper_bound",
+    "oracle_shockspec_headroom"
+  ],
+  "decoding": "det-v1 (temperature 0.0, no seed), module 02 prompt, no system prompt",
+  "endpoint": {
+    "base_url": "https://api.x.ai/v1",
+    "bills_thinking_as_output": true,
+    "extra_body": null,
+    "model_id": "grok-build-0.1",
+    "name": "grok-hosted-confirmation:grok-build-0.1",
+    "price_date": "2026-09-28",
+    "price_input_per_mtok": 1.0,
+    "price_output_per_mtok": 2.0,
+    "supports_seed": true
+  },
+  "episodes": 120,
+  "git": {
+    "branch": "method/graded-commitment",
+    "dirty_paths": [
+      "M .gitignore",
+      " M analysis/commitment/runner.py",
+      "?? ACL_2027.zip",
+      "?? analysis/commitment/out/"
+    ],
+    "sha": "bff52da12d7be3d95e3f664dde7624b1ca738290"
+  },
+  "guard": {
+    "max_physical_calls": 1500,
+    "physical_calls_this_invocation": 0,
+    "physical_calls_total": 151,
+    "refusals_this_invocation": 0,
+    "retries_this_invocation": 0,
+    "spend_cap_usd": 2.0,
+    "usd_this_invocation": 0.0,
+    "usd_total": 1.2828819999999992
+  },
+  "ladder_rung": {
+    "model_id": "grok-build-0.1",
+    "name": "grok-build-0.1",
+    "price_input_per_mtok": 1.0,
+    "price_output_per_mtok": 2.0,
+    "provider": "grok",
+    "released": "2025-08",
+    "served_as": [
+      "grok-build-0.1",
+      "grok-code-fast-1"
+    ],
+    "tier": "small"
+  },
+  "layout": "pilot",
+  "ledger": {
+    "charged": 429,
+    "charged_usd": 3.592302,
+    "per_arm": [
+      {
+        "accepted": 143,
+        "accepted_after_repair": 0,
+        "arm_id": "arm10_spec_eprocess",
+        "attempted": 143,
+        "input_tokens": 251868,
+        "output_tokens": 474487,
+        "p50_latency_ms": 0.0014120014384388924,
+        "p95_latency_ms": 0.0016130506992340088,
+        "rejected": 0,
+        "usd_cost": 1.200842
+      },
+      {
+        "accepted": 143,
+        "accepted_after_repair": 0,
+        "arm_id": "arm8_spec_immediate",
+        "attempted": 143,
+        "input_tokens": 251868,
+        "output_tokens": 471931,
+        "p50_latency_ms": 0.0014620600268244743,
+        "p95_latency_ms": 0.0029640505090355873,
+        "rejected": 0,
+        "usd_cost": 1.19573
+      },
+      {
+        "accepted": 143,
+        "accepted_after_repair": 0,
+        "arm_id": "arm9_spec_heuristic_rollback",
+        "attempted": 143,
+        "input_tokens": 251868,
+        "output_tokens": 471931,
+        "p50_latency_ms": 0.001401989720761776,
+        "p95_latency_ms": 0.0015120021998882294,
+        "rejected": 0,
+        "usd_cost": 1.19573
+      }
+    ],
+    "physical_this_invocation": 0
+  },
+  "n_per_family": null,
+  "not_a_gate3_vote": true,
+  "outputs_sha256": {
+    "alerts.jsonl": "58afda2dc82906ae90309dff6601d4d0d3778422e626556c15a01fa661fb428f",
+    "ledger.csv": "d0b0df053024c80a9074332433e29e0dfe9c90b45d4181f4fd852e762e842166",
+    "proposals.jsonl": "8680214e868322a8dc46f506f15be09de8785449c6aab77ed6624a65f38064fc",
+    "records.jsonl.gz": "87429c62a5596dad0404b67fb8d96ce34da271425a14151a82c781d40405d332",
+    "truth.jsonl": "0d30aa2c366d1c0995de049b3e20fb5c8a1e8f31fbc926f17cd7d62f2a4f0221"
+  },
+  "partial": false,
+  "profit": 4.0,
+  "records": 1032,
+  "rule_u": {
+    "arm10_coerced_abstentions": 0,
+    "version": "U-v1"
+  },
+  "run_name": "ladder-grok-build-0.1",
+  "truth_identical_to_reports_pilot_truth": true,
+  "versions": {
+    "openai": "1.109.1",
+    "python": "3.12.11"
+  }
+}
