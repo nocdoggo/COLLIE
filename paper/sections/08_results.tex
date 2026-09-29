@@ -1,0 +1,100 @@
+\section{Results}
+\label{sec:results}
+\label{sec:experiments}
+
+\subsection{Why the gate was stopped}
+
+The registered Gate~3 pilot read \emph{kill-or-reframe} on two triggers. The first was
+headroom: even a clairvoyant that knows the shock at onset clears the registered 5\% profit bar
+on only two of six families (a demand rise and a lead-time shift), because pulses, loss bursts
+and pauses are over before an order placed at onset can land. The second compared the gate with
+a detector compiled without language and found it behind by 566 per episode in gross profit;
+forensic replays traced that gap to the endpoint, since on net reward the same contrast is
+$+2{,}306$. The exploratory pilot then gave the gate real model content. Gemini and Grok named
+the right family and direction in 59 and 53 of 96 shocked episodes (a scripted fixed answer
+manages 16), yet the gate activated only 43\% and 39\% of the right-family proposals, a median of
+10 and 11 periods after the proposal, and ended at $-234$ and $-172$ net per episode against
+arm~1 with intervals including zero. The magnitude field was right in 8 and 7 of 96 episodes,
+partly because the alert templates themselves label every non-distractor shock
+\emph{medium}. Acting at once was far worse: arm~8 lost 2{,}549 and 2{,}624 per episode.
+
+\subsection{The registered confirmation}
+
+Table~\ref{tab:confirm} gives the primary contrasts on the 240 fresh episodes. Certify-then-hedge
+beats the gate by $309$ (Gemini) and $179$ (Grok) net per episode and arm~1 by $179$ and $163$;
+all four one-sided tests reject after Holm correction (largest adjusted threshold $0.05$,
+largest $p = 0.0031$). Gross profit agrees on both contrasts. On the 48 null episodes the method
+is non-inferior to arm~1 with both models (Gemini $-3.2$ $[-8.2, -0.1]$, Grok $+1.9$
+$[-1.7, 8.2]$, margin $-25$). The gate itself is no better than arm~1 on fresh seeds
+($-131$ and $-16$ net, intervals including zero), and acting at once loses $2{,}046$ and
+$2{,}284$. Fig.~\ref{fig:models} repeats the confirmation with four further proposer models;
+every interval for the method against the gate and against arm~1 excludes zero.
+
+\begin{table}[!tb]
+\caption{Registered confirmation on 240 fresh episodes (48 seed clusters). Mean paired
+difference per episode, net reward, with the 95\% seed-cluster bootstrap interval; gross profit
+in the last column. $^\ast$Primary tests, all rejected after Holm correction.}
+\label{tab:confirm}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}llrr@{}}
+\toprule
+Contrast & Model & Net $[95\%]$ & Gross \\
+\midrule
+hedge $-$ gate$^\ast$ & Gemini & $+309\ [173, 472]$ & $+85$ \\
+                      & Grok   & $+179\ [87, 281]$  & $+139$ \\
+hedge $-$ arm 1$^\ast$ & Gemini & $+179\ [55, 326]$ & $+280$ \\
+                       & Grok   & $+163\ [48, 300]$ & $+262$ \\
+gate $-$ arm 1         & Gemini & $-131\ [-316, 28]$ & $+195$ \\
+                       & Grok   & $-16\ [-104, 75]$  & $+123$ \\
+at once $-$ arm 1      & Gemini & $-2{,}046\ [-2{,}612, -1{,}478]$ & $+501$ \\
+                       & Grok   & $-2{,}284\ [-2{,}849, -1{,}710]$ & $+501$ \\
+content-free $-$ arm 1 & either & $+169\ [48, 312]$ & $+270$ \\
+hedge $-$ content-free & Gemini & $+9\ [-5, 24]$ & $+10$ \\
+                       & Grok   & $-6\ [-29, 11]$ & $-8$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The gross column shows the endpoint trap of our first registration in its plainest form. Acting
+at once looks \emph{best} on gross profit ($+501$), because gross profit charges no holding and
+so pays for over-stocking, while on net it is the worst arm by a wide margin.
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=\textwidth]{fig2_models.pdf}
+\caption{The registered confirmation with six proposer models (240 fresh episodes each).
+\textbf{(a)}~First proposals naming the right family and direction, among the 170 shocked
+episodes where the trigger fired. \textbf{(b)}~Acting on proposals at once (arm~8) against
+arm~1, net per episode. \textbf{(c)}~The gate (arm~10) and certify-then-hedge against arm~1,
+with 95\% seed-cluster intervals. Perception and the harm of acting at once vary widely with the
+model; the certified hedge's gain does not.}
+\label{fig:models}
+\end{figure*}
+
+\subsection{Where the gain comes from}
+
+The gain is where the headroom is. Against arm~1, certify-then-hedge earns $+1{,}286$ (Gemini)
+and $+1{,}177$ (Grok) per lead-time episode, $+90$ and $+88$ per demand-fall episode and $+95$
+and $+80$ per pulse episode; it gives back $83$ per demand-rise episode, about $40$ per compound
+episode and about $3$ per loss episode, and $3$ or less per null. Two mechanisms carry the
+lead-time gain. The first is sizing: the model called
+most one-period lead-time shifts \emph{medium}, which the gate compiles as two periods, while
+the within-hypothesis posterior recovered the true offset from receipts (Fig.~\ref{fig:episode}).
+The second is timing: the hedge commits partially as soon as the evidence starts to accumulate
+rather than all at once ten periods later. Both are statistical, which the next result makes
+explicit.
+
+\subsection{What the language contributes}
+
+The content-free variant, which never calls a model, earns $+169$ $[48, 312]$ against arm~1, and
+the method is within $\pm 10$ of it on net with both primary models ($+9$ and $-6$; with the four
+further models, $-43$ to $+1$). On this simulator, then, a well-certified hypothesis search
+recovers the available headroom without language. What the model's family label does change is
+commitment on no-shock episodes: the summed shock mass on null episodes falls from $0.83$
+(content-free) to $0.46$ to $0.52$ with the hedged prior, about 45\% less. Trusting the model's
+family alone ($\lambda = 0$) cuts that further, to $0.04$ to $0.18$, but costs net reward
+($-16$ and $-83$ against content-free with Gemini and Grok, $-192$ with Llama~3.1~8B), which is
+why the prior is hedged. Section~\ref{sec:hedge}'s bound makes the trade explicit: a wrong family
+costs at most $\log(|\mathcal{H}|/\lambda) = \log 16$ nats of evidence.

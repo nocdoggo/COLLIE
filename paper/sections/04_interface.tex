@@ -1,0 +1,31 @@
+\section{The Interface: What the Model May Say}
+\label{sec:spec}
+\label{sec:compile}
+
+At a proposal period $\tau_j$ the model sees only information in $\Filt_{\tau_j}$: product
+text, any alert visible then, the demand and arrival history, the inventory position and the
+costs. It must return one \shockspec{}, valid JSON under a closed schema: a
+\texttt{shock\_family} (\texttt{no\_change}, \texttt{demand\_level}, \texttt{temporary\_pulse},
+\texttt{lead\_time\_shift}, \texttt{shipment\_loss}, \texttt{transit\_pause} or
+\texttt{compound}), a target stream, a direction, an onset window relative to $\tau_j$, a
+magnitude bin, persistence and duration bins, and evidence references. The system stamps
+$\tau_j$, the proposal index, the model identifier and the prompt hash. The model cannot write
+an order, a threshold, a likelihood or code; an invalid answer gets one repair attempt and then
+falls back to the baseline, and \texttt{no\_change} is an accepted abstention. Two facts make
+the later test admissible: \textbf{(A3)} the hypothesis is drawn from a vocabulary frozen before
+any test episode, and \textbf{(A4)} it is $\Filt_{\tau_j}$-measurable at the stopping time
+$\tau_j$, so its evidence starts at $\tau_j + 1$ and the periods that motivated it never count.
+
+A deterministic compiler maps a \shockspec{} to a configuration $(m, L_{\mathrm{eff}}, \gamma)$
+of a capped base-stock controller: a demand multiplier, an effective lead time and a pipeline
+discount, from a registered 72-point grid. With $\bar d_t$ and $s_{d,t}$ the running mean and
+standard deviation of observed demand and $z^\star = \Phi^{-1}(p/(p+h))$,
+\begin{align}
+S_t &= m(1+L_{\mathrm{eff}})\bar d_t + z^\star\sqrt{1+L_{\mathrm{eff}}}\,s_{d,t}, \notag\\
+q_t &= \min\bigl(\lceil S_t - I_t - \gamma P_t\rceil^+,\, C_t,\, \hat C_t\bigr),
+\label{eq:controller}
+\end{align}
+where $\hat C_t$ is the published baseline's smoother. At the baseline configuration this
+controller reproduces arm~1 bit for bit, so every arm runs the published policy whenever no
+hypothesis acts. The compiler reads the model's magnitude bin as a severity rank, which is
+where the gate inherits the model's magnitude errors.

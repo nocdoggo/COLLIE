@@ -1,0 +1,53 @@
+\section{Study Design}
+\label{sec:design}
+\label{sec:triggers}
+\label{sec:ladder}
+
+\textbf{Trigger.} Every model-consulting arm shares one frozen trigger: a proposal opportunity
+opens when an alert arrives or a CUSUM on observed demand~\cite{page-cusum} crosses a threshold
+set on development nulls, with a five-period refractory window and at most two firings per
+episode. The trigger reads only exogenous streams, so all arms fire in the same periods and see
+the same first prompt.
+
+\textbf{Arms.} Arm~1 is the published capped base-stock policy. Arm~8 acts on a proposal at once
+(the compiled configuration of the latest \shockspec{}, forever); arm~10 is the gate of
+Section~\ref{sec:verify}. Certify-then-hedge runs with $\lambda = 0.25$ (the method), with
+$\lambda = 0$ (the model's family only), and with $\lambda = 1$ (content-free: the same trigger
+and machinery, no model call). Controls complete the ladder: a telemetry-only hidden-Markov
+policy (arm~2), the detector compiled without language, a keyword parser of the alert text, the
+alert's hidden specification compiled at onset minus one (a perfect-reading upper bound), and a
+hidden-truth oracle.
+
+\textbf{Models.} The proposers are called at temperature 0 with no system prompt, and every
+response's echoed model name is checked, because one provider silently served retired model
+names as a newer model. The primary models are Gemini~3.8 Flash and Grok~4.20 (non-reasoning).
+The model-scale study adds 19 more: older and smaller Gemini and Grok models, four StepFun
+reasoning models, and eleven open-weight or legacy models through OpenRouter (Llama~3.2 1B and
+3B, 3.1 8B, 3.3 70B; Qwen~2.5 7B and 72B; Gemma~3 27B; DeepSeek-V3; gpt-oss-20b; GPT-3.5 Turbo
+and GPT-4o-mini).
+
+\textbf{Registration trail.} Every stage was committed and pushed before its outcomes were
+seen, and every change after that is a dated amendment in the study plan. (i) The Gate~3 pilot,
+registered with a frozen decision rule, ran arms 1 to 10 on 120 development and calibration
+episodes (24 seeds) with scripted model content; it read \emph{kill-or-reframe}. (ii) An
+exploratory pilot replayed the same 120 episodes with live Gemini and Grok answers and the real
+alert bank. (iii) The model ladder ran the same episodes with the remaining models. (iv)
+Certify-then-hedge was developed on those spent episodes only, where its numbers carry no
+claim. (v) The confirmation froze the method's code by hash and registered its hypotheses,
+tests and evaluator before any fresh episode was run.
+
+\textbf{Fresh seeds.} The confirmation draws 48 units (eight per family) from a seed pool
+disjoint from every registered pool, each replayed under the four information conditions plus
+one unshocked twin, silent or with a false demand alert, balanced by family: 192 shocked and 48
+null episodes. The registration asked for 72 units; the alert bank's renderer refused the
+layout because it has four accurate templates per family and split, so the plan was amended to
+48 before any model call. The seed of a unit, with its four conditions and its twin, is the
+cluster.
+
+\textbf{Statistics.} Contrasts are per-episode paired differences of net reward, averaged over
+all 240 episodes, with seed-cluster bootstrap 95\% intervals (10{,}000 draws) and one-sided
+cluster sign-flip $p$-values (100{,}000 flips). The primary family is certify-then-hedge against
+the gate and against arm~1, on each primary model, with Holm's correction~\cite{holm-multitest}
+at 0.05. Null safety is non-inferiority of certify-then-hedge against arm~1 on the 48 null
+episodes with a margin of $-25$ per episode, and exposure is the summed per-period shock mass
+$\Pi_t$ on null episodes.

@@ -64,12 +64,11 @@ arm~1's own $F_{0,t} = \mathcal{N}\bigl((1+L)\bar d_t,\,(1+L)s_{d,t}^2\bigr)$.
 
 The order-up-to requirement is the critical fractile $\beta = p/(p+h)$ of the
 posterior-predictive mixture of requirement $Y - \gamma P_t$,
-\begin{equation}
-x_t = \inf\Bigl\{x :
-(1-\Pi_t)\,F_{0,t}(x + P_t) + \sum_{j,h}\pi_{jh,t}\,G_{jh,t}(x + \gamma_{h} P_t)
-\ge \beta\Bigr\},
+\begin{multline}
+x_t = \inf\Bigl\{x : (1-\Pi_t)\,F_{0,t}(x + P_t) \\
++ \sum_{j,h}\pi_{jh,t}\,G_{jh,t}(x + \gamma_{h} P_t) \ge \beta\Bigr\},
 \label{eq:hedge}
-\end{equation}
+\end{multline}
 and the order is $q_t = \min(\max(0,\lceil x_t - I_t\rceil), C_t, \hat C_t)$ with
 the published smoother $\hat C_t$ unchanged. When no hypothesis is live,
 $\Pi_t = 0$ and $q_t$ is arm~1's order bit for bit.
