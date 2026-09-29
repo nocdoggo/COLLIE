@@ -1,0 +1,151 @@
+{
+  "alert_selection_rule": "bank-v1",
+  "alert_source": "bank",
+  "alert_sources": {
+    "bank:early_accurate": 20,
+    "bank:false_alert_null": 12,
+    "bank:late_accurate": 20,
+    "bank:unreliable": 20,
+    "none:bank_gap_demand_down": 16,
+    "none:no_alert": 20,
+    "none:silent_null": 12
+  },
+  "analysis_class": "exploratory",
+  "arm_set": "nine",
+  "arms": [
+    "arm1_capped_base_stock",
+    "arm2_telemetry_hmm_or",
+    "arm8_spec_immediate",
+    "arm9_spec_heuristic_rollback",
+    "arm10_spec_eprocess",
+    "ctrl_cusum_to_compiler",
+    "ctrl_keyword_parser",
+    "ctrl_alertspec_upper_bound",
+    "oracle_shockspec_headroom"
+  ],
+  "decoding": "det-v1 (temperature 0.0, no seed), module 02 prompt, no system prompt",
+  "endpoint": {
+    "base_url": "https://openrouter.ai/api/v1",
+    "bills_thinking_as_output": true,
+    "extra_body": null,
+    "model_id": "meta-llama/llama-3.2-3b-instruct",
+    "name": "openrouter:meta-llama/llama-3.2-3b-instruct",
+    "price_date": "2026-09-28",
+    "price_input_per_mtok": 0.05,
+    "price_output_per_mtok": 0.33,
+    "supports_seed": false
+  },
+  "episodes": 120,
+  "git": {
+    "branch": "method/graded-commitment",
+    "dirty_paths": [
+      "M .gitignore",
+      "?? analysis/commitment/REPORT.md",
+      "?? analysis/commitment/ladder.py",
+      "?? analysis/commitment/out/ladder-deepseek-v3/",
+      "?? analysis/commitment/out/ladder-gemma-3-27b/",
+      "?? analysis/commitment/out/ladder-gpt-3.5-turbo/",
+      "?? analysis/commitment/out/ladder-gpt-4o-mini/",
+      "?? analysis/commitment/out/ladder-gpt-oss-20b/",
+      "?? analysis/commitment/out/ladder-llama-3.1-8b/",
+      "?? analysis/commitment/out/ladder-llama-3.2-1b/",
+      "?? analysis/commitment/out/ladder-llama-3.2-3b/",
+      "?? analysis/commitment/out/ladder-llama-3.3-70b/",
+      "?? analysis/commitment/out/ladder-qwen-2.5-72b/",
+      "?? analysis/commitment/out/ladder-qwen-2.5-7b/",
+      "?? analysis/commitment/out/ladder-step-3.5-flash-2603/",
+      "?? analysis/commitment/out/ladder-step-3.5-flash/",
+      "?? analysis/commitment/out/ladder-step-3.7-flash/",
+      "?? analysis/commitment/out/ladder-step-5-preview/"
+    ],
+    "sha": "2add1615a84f2bc6a244f50b2363ac3be7d1caf7"
+  },
+  "guard": {
+    "max_physical_calls": 1500,
+    "physical_calls_this_invocation": 269,
+    "physical_calls_total": 279,
+    "refusals_this_invocation": 0,
+    "retries_this_invocation": 0,
+    "spend_cap_usd": 0.5,
+    "usd_this_invocation": 0.035504189999999984,
+    "usd_total": 0.036623429999999985
+  },
+  "ladder_rung": {
+    "model_id": "meta-llama/llama-3.2-3b-instruct",
+    "name": "llama-3.2-3b",
+    "price_input_per_mtok": 0.05,
+    "price_output_per_mtok": 0.33,
+    "provider": "openrouter",
+    "released": "2024-09",
+    "served_as": [
+      "meta-llama/llama-3.2-3b-instruct"
+    ],
+    "tier": "3B"
+  },
+  "layout": "pilot",
+  "ledger": {
+    "charged": 837,
+    "charged_usd": 0.10987029000000001,
+    "per_arm": [
+      {
+        "accepted": 7,
+        "accepted_after_repair": 0,
+        "arm_id": "arm10_spec_eprocess",
+        "attempted": 279,
+        "input_tokens": 445197,
+        "output_tokens": 43526,
+        "p50_latency_ms": 0.0025240005925297737,
+        "p95_latency_ms": 0.0033950200304389,
+        "rejected": 272,
+        "usd_cost": 0.036623430000000005
+      },
+      {
+        "accepted": 7,
+        "accepted_after_repair": 0,
+        "arm_id": "arm8_spec_immediate",
+        "attempted": 279,
+        "input_tokens": 445197,
+        "output_tokens": 43526,
+        "p50_latency_ms": 915.4751970199868,
+        "p95_latency_ms": 6502.327034948394,
+        "rejected": 272,
+        "usd_cost": 0.036623430000000005
+      },
+      {
+        "accepted": 7,
+        "accepted_after_repair": 0,
+        "arm_id": "arm9_spec_heuristic_rollback",
+        "attempted": 279,
+        "input_tokens": 445197,
+        "output_tokens": 43526,
+        "p50_latency_ms": 0.0028050271794199944,
+        "p95_latency_ms": 0.0035850098356604576,
+        "rejected": 272,
+        "usd_cost": 0.036623430000000005
+      }
+    ],
+    "physical_this_invocation": 269
+  },
+  "n_per_family": null,
+  "not_a_gate3_vote": true,
+  "outputs_sha256": {
+    "alerts.jsonl": "58afda2dc82906ae90309dff6601d4d0d3778422e626556c15a01fa661fb428f",
+    "ledger.csv": "aa6cc95e3e5f64bee50e13fe3d8e742c0fa2538f735f8dc7bdcb6e2bce1530f4",
+    "proposals.jsonl": "ff6e92a58da57bf789fe302addccad8f86ace3d507841f6d63669bfb9f53f190",
+    "records.jsonl.gz": "87f7b240e9aee2b19813098ed68fe8d237730f6c284d7224b2ad251505feb862",
+    "truth.jsonl": "0d30aa2c366d1c0995de049b3e20fb5c8a1e8f31fbc926f17cd7d62f2a4f0221"
+  },
+  "partial": false,
+  "profit": 4.0,
+  "records": 1032,
+  "rule_u": {
+    "arm10_coerced_abstentions": 0,
+    "version": "U-v1"
+  },
+  "run_name": "ladder-llama-3.2-3b",
+  "truth_identical_to_reports_pilot_truth": true,
+  "versions": {
+    "openai": "1.109.1",
+    "python": "3.12.11"
+  }
+}

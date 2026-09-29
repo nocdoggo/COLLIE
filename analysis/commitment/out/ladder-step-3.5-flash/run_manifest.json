@@ -1,0 +1,150 @@
+{
+  "alert_selection_rule": "bank-v1",
+  "alert_source": "bank",
+  "alert_sources": {
+    "bank:early_accurate": 20,
+    "bank:false_alert_null": 12,
+    "bank:late_accurate": 20,
+    "bank:unreliable": 20,
+    "none:bank_gap_demand_down": 16,
+    "none:no_alert": 20,
+    "none:silent_null": 12
+  },
+  "analysis_class": "exploratory",
+  "arm_set": "nine",
+  "arms": [
+    "arm1_capped_base_stock",
+    "arm2_telemetry_hmm_or",
+    "arm8_spec_immediate",
+    "arm9_spec_heuristic_rollback",
+    "arm10_spec_eprocess",
+    "ctrl_cusum_to_compiler",
+    "ctrl_keyword_parser",
+    "ctrl_alertspec_upper_bound",
+    "oracle_shockspec_headroom"
+  ],
+  "decoding": "det-v1 (temperature 0.0, no seed), module 02 prompt, no system prompt",
+  "endpoint": {
+    "base_url": "https://api.stepfun.ai/step_plan/v1",
+    "bills_thinking_as_output": true,
+    "extra_body": null,
+    "model_id": "step-3.5-flash",
+    "name": "stepfun:step-3.5-flash",
+    "price_date": "2026-09-28",
+    "price_input_per_mtok": 0.1,
+    "price_output_per_mtok": 0.3,
+    "supports_seed": false
+  },
+  "episodes": 120,
+  "git": {
+    "branch": "method/graded-commitment",
+    "dirty_paths": [
+      "M .gitignore",
+      "?? analysis/commitment/REPORT.md",
+      "?? analysis/commitment/out/ladder-deepseek-v3/",
+      "?? analysis/commitment/out/ladder-gemma-3-27b/",
+      "?? analysis/commitment/out/ladder-gpt-3.5-turbo/",
+      "?? analysis/commitment/out/ladder-gpt-4o-mini/",
+      "?? analysis/commitment/out/ladder-gpt-oss-20b/",
+      "?? analysis/commitment/out/ladder-llama-3.1-8b/",
+      "?? analysis/commitment/out/ladder-llama-3.2-1b/",
+      "?? analysis/commitment/out/ladder-llama-3.2-3b/",
+      "?? analysis/commitment/out/ladder-llama-3.3-70b/",
+      "?? analysis/commitment/out/ladder-qwen-2.5-72b/",
+      "?? analysis/commitment/out/ladder-qwen-2.5-7b/",
+      "?? analysis/commitment/out/ladder-step-3.5-flash-2603/",
+      "?? analysis/commitment/out/ladder-step-3.5-flash/",
+      "?? analysis/commitment/out/ladder-step-3.7-flash/",
+      "?? analysis/commitment/out/ladder-step-5-preview/"
+    ],
+    "sha": "2add1615a84f2bc6a244f50b2363ac3be7d1caf7"
+  },
+  "guard": {
+    "max_physical_calls": 1500,
+    "physical_calls_this_invocation": 169,
+    "physical_calls_total": 175,
+    "refusals_this_invocation": 0,
+    "retries_this_invocation": 0,
+    "spend_cap_usd": 2.0,
+    "usd_this_invocation": 0.3576775000000001,
+    "usd_total": 0.3697519000000001
+  },
+  "ladder_rung": {
+    "model_id": "step-3.5-flash",
+    "name": "step-3.5-flash",
+    "price_input_per_mtok": 0.1,
+    "price_output_per_mtok": 0.3,
+    "provider": "stepfun",
+    "released": "2026-01",
+    "served_as": [
+      "step-3.5-flash"
+    ],
+    "tier": "mid"
+  },
+  "layout": "pilot",
+  "ledger": {
+    "charged": 442,
+    "charged_usd": 0.9232127,
+    "per_arm": [
+      {
+        "accepted": 138,
+        "accepted_after_repair": 5,
+        "arm_id": "arm10_spec_eprocess",
+        "attempted": 148,
+        "input_tokens": 248320,
+        "output_tokens": 970926,
+        "p50_latency_ms": 0.002683955244719982,
+        "p95_latency_ms": 46533.70124392677,
+        "rejected": 5,
+        "usd_cost": 0.3161098
+      },
+      {
+        "accepted": 139,
+        "accepted_after_repair": 4,
+        "arm_id": "arm8_spec_immediate",
+        "attempted": 147,
+        "input_tokens": 246584,
+        "output_tokens": 926544,
+        "p50_latency_ms": 24559.308639960364,
+        "p95_latency_ms": 73580.33168292604,
+        "rejected": 4,
+        "usd_cost": 0.3026216
+      },
+      {
+        "accepted": 139,
+        "accepted_after_repair": 4,
+        "arm_id": "arm9_spec_heuristic_rollback",
+        "attempted": 147,
+        "input_tokens": 246584,
+        "output_tokens": 932743,
+        "p50_latency_ms": 0.0030240043997764587,
+        "p95_latency_ms": 0.0038460129871964455,
+        "rejected": 4,
+        "usd_cost": 0.3044813
+      }
+    ],
+    "physical_this_invocation": 169
+  },
+  "n_per_family": null,
+  "not_a_gate3_vote": true,
+  "outputs_sha256": {
+    "alerts.jsonl": "58afda2dc82906ae90309dff6601d4d0d3778422e626556c15a01fa661fb428f",
+    "ledger.csv": "3f5c3cfdf29bf2a0df6197ecee09a1949251db35e2c76f3a1f1ca38f185a65d1",
+    "proposals.jsonl": "03fbcea685082faec9fd6aee99fc1510eb86aec2c099d8c844e14a17177c780e",
+    "records.jsonl.gz": "5c86ac998d61b0e64af2fc048583fd5ed0c99d5f6734b2dfdbf612d0cb5e74a4",
+    "truth.jsonl": "0d30aa2c366d1c0995de049b3e20fb5c8a1e8f31fbc926f17cd7d62f2a4f0221"
+  },
+  "partial": false,
+  "profit": 4.0,
+  "records": 1032,
+  "rule_u": {
+    "arm10_coerced_abstentions": 1,
+    "version": "U-v1"
+  },
+  "run_name": "ladder-step-3.5-flash",
+  "truth_identical_to_reports_pilot_truth": true,
+  "versions": {
+    "openai": "1.109.1",
+    "python": "3.12.11"
+  }
+}

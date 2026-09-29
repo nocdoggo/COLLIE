@@ -1,0 +1,883 @@
+{
+ "analysis_class": "exploratory",
+ "cth_uniform_arm1_net_dev": {
+  "b": [
+   -0.8,
+   333.1
+  ],
+  "mean": 136.0
+ },
+ "missing_or_partial": [
+  "gemini-3-flash-preview",
+  "step-3.7-flash",
+  "step-5-preview",
+  "gpt-oss-20b"
+ ],
+ "registered_in": "analysis/commitment/PLAN.md, stage A (with A1-A3)",
+ "rungs": [
+  {
+   "abstain_first": 5,
+   "arm10_arm1_net": {
+    "cluster_bootstrap": [
+     -755.985126,
+     47.598858
+    ],
+    "clusters": 24,
+    "mean": -300.2,
+    "n": 120,
+    "normal": [
+     -582.536005,
+     -17.863995
+    ]
+   },
+   "arm8_arm1_net": {
+    "cluster_bootstrap": [
+     -5121.767746,
+     -2437.522434
+    ],
+    "clusters": 24,
+    "mean": -3655.675,
+    "n": 120,
+    "normal": [
+     -4410.285243,
+     -2901.064757
+    ]
+   },
+   "cth_arm1_net_dev": {
+    "b": [
+     12.3,
+     357.5
+    ],
+    "mean": 153.9
+   },
+   "developer": "Google",
+   "false_alert_active_arm10": 1,
+   "false_alert_active_arm8": 12,
+   "family_right": 55,
+   "latency_p50_ms": 546.214,
+   "parse_attempts": 429,
+   "parse_valid": 429,
+   "released": "2025-07",
+   "rung": "gemini-2.5-flash-lite",
+   "shocked": 96,
+   "tier": "small",
+   "usd": 0.047396
+  },
+  {
+   "abstain_first": 18,
+   "arm10_arm1_net": {
+    "cluster_bootstrap": [
+     -567.189555,
+     -45.370208
+    ],
+    "clusters": 24,
+    "mean": -293.958333,
+    "n": 120,
+    "normal": [
+     -522.763135,
+     -65.153532
+    ]
+   },
+   "arm8_arm1_net": {
+    "cluster_bootstrap": [
+     -4465.293427,
+     -2133.098246
+    ],
+    "clusters": 24,
+    "mean": -3188.333333,
+    "n": 120,
+    "normal": [
+     -3888.217927,
+     -2488.44874
+    ]
+   },
+   "cth_arm1_net_dev": {
+    "b": [
+     11.2,
+     327.4
+    ],
+    "mean": 141.0
+   },
+   "developer": "Google",
+   "false_alert_active_arm10": 1,
+   "false_alert_active_arm8": 12,
+   "family_right": 59,
+   "latency_p50_ms": 10687.819,
+   "parse_attempts": 436,
+   "parse_valid": 429,
+   "released": "2025-06",
+   "rung": "gemini-2.5-flash",
+   "shocked": 96,
+   "tier": "mid",
+   "usd": 1.335492
+  },
+  {
+   "abstain_first": 23,
+   "arm10_arm1_net": {
+    "cluster_bootstrap": [
+     -593.952116,
+     65.884888
+    ],
+    "clusters": 24,
+    "mean": -234.833333,
+    "n": 120,
+    "normal": [
+     -470.514237,
+     0.847571
+    ]
+   },
+   "arm8_arm1_net": {
+    "cluster_bootstrap": [
+     -3874.957406,
+     -1761.84108
+    ],
+    "clusters": 24,
+    "mean": -2722.666667,
+    "n": 120,
+    "normal": [
+     -3335.232186,
+     -2110.101147
+    ]
+   },
+   "cth_arm1_net_dev": {
+    "b": [
+     10.8,
+     366.7
+    ],
+    "mean": 156.0
+   },
+   "developer": "Google",
+   "false_alert_active_arm10": 1,
+   "false_alert_active_arm8": 12,
+   "family_right": 52,
+   "latency_p50_ms": 705.4545,
+   "parse_attempts": 429,
+   "parse_valid": 429,
+   "released": "2026-05",
+   "rung": "gemini-3.1-flash-lite",
+   "shocked": 96,
+   "tier": "small",
+   "usd": 0.107162
+  },
+  {
+   "abstain_first": 24,
+   "arm10_arm1_net": {
+    "cluster_bootstrap": [
+     -505.465365,
+     26.1339
+    ],
+    "clusters": 24,
+    "mean": -233.525,
+    "n": 120,
+    "normal": [
+     -468.185378,
+     1.135378
+    ]
+   },
+   "arm8_arm1_net": {
+    "cluster_bootstrap": [
+     -3811.706818,
+     -1533.048784
+    ],
+    "clusters": 24,
+    "mean": -2548.95,
+    "n": 120,
+    "normal": [
+     -3211.283532,
+     -1886.616468
+    ]
+   },
+   "cth_arm1_net_dev": {
+    "b": [
+     7.2,
+     366.7
+    ],
+    "mean": 154.3
+   },
+   "developer": "Google",
+   "false_alert_active_arm10": 1,
+   "false_alert_active_arm8": 12,
+   "family_right": 59,
+   "latency_p50_ms": 7307.8685,
+   "parse_attempts": 429,
+   "parse_valid": 429,
+   "released": "2026-09",
+   "rung": "gemini-3.8-flash",
+   "shocked": 96,
+   "tier": "mid",
+   "usd": 1.902461
+  },
+  {
+   "abstain_first": 53,
+   "arm10_arm1_net": {
+    "cluster_bootstrap": [
+     -87.871392,
+     128.544603
+    ],
+    "clusters": 24,
+    "mean": 3.258333,
+    "n": 120,
+    "normal": [
+     -79.220617,
+     85.737284
+    ]
+   },
+   "arm8_arm1_net": {
+    "cluster_bootstrap": [
+     -3353.18668,
+     -969.278391
+    ],
+    "clusters": 24,
+    "mean": -2002.05,
+    "n": 120,
+    "normal": [
+     -2686.661795,
+     -1317.438205
+    ]
+   },
+   "cth_arm1_net_dev": {
+    "b": [
+     2.7,
+     350.2
+    ],
+    "mean": 143.5
+   },
+   "developer": "xAI",
+   "false_alert_active_arm10": 0,
+   "false_alert_active_arm8": 3,
+   "family_right": 28,
+   "latency_p50_ms": 32684.143,
+   "parse_attempts": 429,
+   "parse_valid": 429,
+   "released": "2025-08",
+   "rung": "grok-build-0.1",
+   "shocked": 96,
+   "tier": "small",
+   "usd": 1.282882
+  },
+  {
+   "abstain_first": 20,
+   "arm10_arm1_net": {
+    "cluster_bootstrap": [
+     -427.182653,
+     57.803167
+    ],
+    "clusters": 24,
+    "mean": -171.625,
+    "n": 120,
+    "normal": [
+     -379.636521,
+     36.386521
+    ]
+   },
+   "arm8_arm1_net": {
+    "cluster_bootstrap": [
+     -3667.612534,
+     -1712.024179
+    ],
+    "clusters": 24,
+    "mean": -2623.975,
+    "n": 120,
+    "normal": [
+     -3261.528203,
+     -1986.421797
+    ]
+   },
+   "cth_arm1_net_dev": {
+    "b": [
+     11.6,
+     360.3
+    ],
+    "mean": 154.0
+   },
+   "developer": "xAI",
+   "false_alert_active_arm10": 1,
+   "false_alert_active_arm8": 9,
+   "family_right": 53,
+   "latency_p50_ms": 926.878,
+   "parse_attempts": 429,
+   "parse_valid": 429,
+   "released": "2026-03",
+   "rung": "grok-4.20",
+   "shocked": 96,
+   "tier": "mid",
+   "usd": 0.43748
+  },
+  {
+   "abstain_first": 29,
+   "arm10_arm1_net": {
+    "cluster_bootstrap": [
+     -413.370381,
+     67.482958
+    ],
+    "clusters": 24,
+    "mean": -156.5,
+    "n": 120,
+    "normal": [
+     -369.463082,
+     56.463082
+    ]
+   },
+   "arm8_arm1_net": {
+    "cluster_bootstrap": [
+     -4782.546136,
+     -2156.759476
+    ],
+    "clusters": 24,
+    "mean": -3338.641667,
+    "n": 120,
+    "normal": [
+     -4112.141751,
+     -2565.141582
+    ]
+   },
+   "cth_arm1_net_dev": {
+    "b": [
+     8.7,
+     348.1
+    ],
+    "mean": 146.3
+   },
+   "developer": "StepFun",
+   "false_alert_active_arm10": 1,
+   "false_alert_active_arm8": 12,
+   "family_right": 49,
+   "latency_p50_ms": 26665.35,
+   "parse_attempts": 442,
+   "parse_valid": 429,
+   "released": "2026-01",
+   "rung": "step-3.5-flash",
+   "shocked": 96,
+   "tier": "mid",
+   "usd": 0.369752
+  },
+  {
+   "abstain_first": 26,
+   "arm10_arm1_net": {
+    "cluster_bootstrap": [
+     -399.722485,
+     84.462076
+    ],
+    "clusters": 24,
+    "mean": -141.425,
+    "n": 120,
+    "normal": [
+     -355.486701,
+     72.636701
+    ]
+   },
+   "arm8_arm1_net": {
+    "cluster_bootstrap": [
+     -4692.180017,
+     -2084.838573
+    ],
+    "clusters": 24,
+    "mean": -3269.45,
+    "n": 120,
+    "normal": [
+     -4029.269818,
+     -2509.630182
+    ]
+   },
+   "cth_arm1_net_dev": {
+    "b": [
+     7.3,
+     367.6
+    ],
+    "mean": 154.5
+   },
+   "developer": "StepFun",
+   "false_alert_active_arm10": 1,
+   "false_alert_active_arm8": 12,
+   "family_right": 50,
+   "latency_p50_ms": 24833.154,
+   "parse_attempts": 435,
+   "parse_valid": 429,
+   "released": "2026-03",
+   "rung": "step-3.5-flash-2603",
+   "shocked": 96,
+   "tier": "mid",
+   "usd": 0.371394
+  },
+  {
+   "abstain_first": 5,
+   "arm10_arm1_net": {
+    "cluster_bootstrap": [
+     0.0,
+     0.0
+    ],
+    "clusters": 24,
+    "mean": 0.0,
+    "n": 120,
+    "normal": [
+     0.0,
+     0.0
+    ]
+   },
+   "arm8_arm1_net": {
+    "cluster_bootstrap": [
+     0.0,
+     0.0
+    ],
+    "clusters": 24,
+    "mean": 0.0,
+    "n": 120,
+    "normal": [
+     0.0,
+     0.0
+    ]
+   },
+   "cth_arm1_net_dev": {
+    "b": [
+     1.3,
+     256.9
+    ],
+    "mean": 106.8
+   },
+   "developer": "Meta",
+   "false_alert_active_arm10": 0,
+   "false_alert_active_arm8": 0,
+   "family_right": 0,
+   "latency_p50_ms": 1050.0595,
+   "parse_attempts": 804,
+   "parse_valid": 90,
+   "released": "2024-09",
+   "rung": "llama-3.2-1b",
+   "shocked": 96,
+   "tier": "1B",
+   "usd": 0.093235
+  },
+  {
+   "abstain_first": 0,
+   "arm10_arm1_net": {
+    "cluster_bootstrap": [
+     0.0,
+     0.0
+    ],
+    "clusters": 24,
+    "mean": 0.0,
+    "n": 120,
+    "normal": [
+     0.0,
+     0.0
+    ]
+   },
+   "arm8_arm1_net": {
+    "cluster_bootstrap": [
+     -53.477773,
+     -5.768519
+    ],
+    "clusters": 24,
+    "mean": -28.233333,
+    "n": 120,
+    "normal": [
+     -52.295668,
+     -4.170999
+    ]
+   },
+   "cth_arm1_net_dev": {
+    "b": [
+     1.2,
+     256.9
+    ],
+    "mean": 106.8
+   },
+   "developer": "Meta",
+   "false_alert_active_arm10": 0,
+   "false_alert_active_arm8": 2,
+   "family_right": 0,
+   "latency_p50_ms": 942.761,
+   "parse_attempts": 837,
+   "parse_valid": 21,
+   "released": "2024-09",
+   "rung": "llama-3.2-3b",
+   "shocked": 96,
+   "tier": "3B",
+   "usd": 0.036623
+  },
+  {
+   "abstain_first": 0,
+   "arm10_arm1_net": {
+    "cluster_bootstrap": [
+     -365.354612,
+     2.831084
+    ],
+    "clusters": 24,
+    "mean": -173.808333,
+    "n": 120,
+    "normal": [
+     -310.626071,
+     -36.990596
+    ]
+   },
+   "arm8_arm1_net": {
+    "cluster_bootstrap": [
+     -2919.980624,
+     -1615.81361
+    ],
+    "clusters": 24,
+    "mean": -2266.925,
+    "n": 120,
+    "normal": [
+     -2689.049708,
+     -1844.800292
+    ]
+   },
+   "cth_arm1_net_dev": {
+    "b": [
+     -7.9,
+     305.6
+    ],
+    "mean": 119.7
+   },
+   "developer": "Meta",
+   "false_alert_active_arm10": 1,
+   "false_alert_active_arm8": 12,
+   "family_right": 19,
+   "latency_p50_ms": 380.418,
+   "parse_attempts": 503,
+   "parse_valid": 370,
+   "released": "2024-07",
+   "rung": "llama-3.1-8b",
+   "shocked": 96,
+   "tier": "8B",
+   "usd": 0.020187
+  },
+  {
+   "abstain_first": 51,
+   "arm10_arm1_net": {
+    "cluster_bootstrap": [
+     -453.197425,
+     80.048979
+    ],
+    "clusters": 24,
+    "mean": -158.316667,
+    "n": 120,
+    "normal": [
+     -363.945103,
+     47.31177
+    ]
+   },
+   "arm8_arm1_net": {
+    "cluster_bootstrap": [
+     -2584.646101,
+     -871.584905
+    ],
+    "clusters": 24,
+    "mean": -1640.591667,
+    "n": 120,
+    "normal": [
+     -2207.961371,
+     -1073.221962
+    ]
+   },
+   "cth_arm1_net_dev": {
+    "b": [
+     2.3,
+     341.0
+    ],
+    "mean": 136.2
+   },
+   "developer": "Meta",
+   "false_alert_active_arm10": 0,
+   "false_alert_active_arm8": 2,
+   "family_right": 24,
+   "latency_p50_ms": 2828.157,
+   "parse_attempts": 470,
+   "parse_valid": 420,
+   "released": "2024-12",
+   "rung": "llama-3.3-70b",
+   "shocked": 96,
+   "tier": "70B",
+   "usd": 0.034479
+  },
+  {
+   "abstain_first": 63,
+   "arm10_arm1_net": {
+    "cluster_bootstrap": [
+     0.0,
+     0.0
+    ],
+    "clusters": 24,
+    "mean": 0.0,
+    "n": 120,
+    "normal": [
+     0.0,
+     0.0
+    ]
+   },
+   "arm8_arm1_net": {
+    "cluster_bootstrap": [
+     -163.8125,
+     0.0
+    ],
+    "clusters": 24,
+    "mean": -61.283333,
+    "n": 120,
+    "normal": [
+     -145.863119,
+     23.296452
+    ]
+   },
+   "cth_arm1_net_dev": {
+    "b": [
+     1.3,
+     256.9
+    ],
+    "mean": 106.8
+   },
+   "developer": "Alibaba",
+   "false_alert_active_arm10": 0,
+   "false_alert_active_arm8": 0,
+   "family_right": 2,
+   "latency_p50_ms": 818.752,
+   "parse_attempts": 567,
+   "parse_valid": 342,
+   "released": "2024-10",
+   "rung": "qwen-2.5-7b",
+   "shocked": 96,
+   "tier": "7B",
+   "usd": 0.036364
+  },
+  {
+   "abstain_first": 26,
+   "arm10_arm1_net": {
+    "cluster_bootstrap": [
+     -663.852522,
+     20.11051
+    ],
+    "clusters": 24,
+    "mean": -299.958333,
+    "n": 120,
+    "normal": [
+     -548.873375,
+     -51.043292
+    ]
+   },
+   "arm8_arm1_net": {
+    "cluster_bootstrap": [
+     -3783.328116,
+     -1896.702679
+    ],
+    "clusters": 24,
+    "mean": -2780.591667,
+    "n": 120,
+    "normal": [
+     -3478.032371,
+     -2083.150963
+    ]
+   },
+   "cth_arm1_net_dev": {
+    "b": [
+     3.3,
+     365.6
+    ],
+    "mean": 150.7
+   },
+   "developer": "Alibaba",
+   "false_alert_active_arm10": 1,
+   "false_alert_active_arm8": 12,
+   "family_right": 44,
+   "latency_p50_ms": 3720.543,
+   "parse_attempts": 494,
+   "parse_valid": 390,
+   "released": "2024-09",
+   "rung": "qwen-2.5-72b",
+   "shocked": 96,
+   "tier": "72B",
+   "usd": 0.135029
+  },
+  {
+   "abstain_first": 13,
+   "arm10_arm1_net": {
+    "cluster_bootstrap": [
+     -193.795283,
+     104.451908
+    ],
+    "clusters": 24,
+    "mean": -55.175,
+    "n": 120,
+    "normal": [
+     -162.88364,
+     52.53364
+    ]
+   },
+   "arm8_arm1_net": {
+    "cluster_bootstrap": [
+     -2956.298294,
+     -1523.620317
+    ],
+    "clusters": 24,
+    "mean": -2211.541667,
+    "n": 120,
+    "normal": [
+     -2690.750103,
+     -1732.33323
+    ]
+   },
+   "cth_arm1_net_dev": {
+    "b": [
+     2.4,
+     378.2
+    ],
+    "mean": 158.0
+   },
+   "developer": "Google",
+   "false_alert_active_arm10": 1,
+   "false_alert_active_arm8": 12,
+   "family_right": 51,
+   "latency_p50_ms": 3865.633,
+   "parse_attempts": 429,
+   "parse_valid": 429,
+   "released": "2025-03",
+   "rung": "gemma-3-27b",
+   "shocked": 96,
+   "tier": "27B",
+   "usd": 0.037201
+  },
+  {
+   "abstain_first": 37,
+   "arm10_arm1_net": {
+    "cluster_bootstrap": [
+     -423.036176,
+     61.94458
+    ],
+    "clusters": 24,
+    "mean": -162.8,
+    "n": 120,
+    "normal": [
+     -385.574919,
+     59.974919
+    ]
+   },
+   "arm8_arm1_net": {
+    "cluster_bootstrap": [
+     -2528.436968,
+     -1009.833451
+    ],
+    "clusters": 24,
+    "mean": -1727.233333,
+    "n": 120,
+    "normal": [
+     -2262.857914,
+     -1191.608752
+    ]
+   },
+   "cth_arm1_net_dev": {
+    "b": [
+     10.3,
+     351.1
+    ],
+    "mean": 149.9
+   },
+   "developer": "DeepSeek",
+   "false_alert_active_arm10": 0,
+   "false_alert_active_arm8": 3,
+   "family_right": 45,
+   "latency_p50_ms": 3516.051,
+   "parse_attempts": 432,
+   "parse_valid": 427,
+   "released": "2024-12",
+   "rung": "deepseek-v3",
+   "shocked": 96,
+   "tier": "671B-MoE",
+   "usd": 0.08911
+  },
+  {
+   "abstain_first": 25,
+   "arm10_arm1_net": {
+    "cluster_bootstrap": [
+     -151.187161,
+     -0.77193
+    ],
+    "clusters": 24,
+    "mean": -59.95,
+    "n": 120,
+    "normal": [
+     -141.21215,
+     21.31215
+    ]
+   },
+   "arm8_arm1_net": {
+    "cluster_bootstrap": [
+     -2386.845173,
+     -1234.91955
+    ],
+    "clusters": 24,
+    "mean": -1820.858333,
+    "n": 120,
+    "normal": [
+     -2276.732874,
+     -1364.983793
+    ]
+   },
+   "cth_arm1_net_dev": {
+    "b": [
+     5.7,
+     354.3
+    ],
+    "mean": 147.7
+   },
+   "developer": "OpenAI",
+   "false_alert_active_arm10": 1,
+   "false_alert_active_arm8": 11,
+   "family_right": 26,
+   "latency_p50_ms": 1233.573,
+   "parse_attempts": 477,
+   "parse_valid": 384,
+   "released": "2023-05",
+   "rung": "gpt-3.5-turbo",
+   "shocked": 96,
+   "tier": "legacy",
+   "usd": 0.169868
+  },
+  {
+   "abstain_first": 0,
+   "arm10_arm1_net": {
+    "cluster_bootstrap": [
+     -3.655199,
+     0.0
+    ],
+    "clusters": 24,
+    "mean": -1.3,
+    "n": 120,
+    "normal": [
+     -2.767473,
+     0.167473
+    ]
+   },
+   "arm8_arm1_net": {
+    "cluster_bootstrap": [
+     -2209.050539,
+     -1328.04587
+    ],
+    "clusters": 24,
+    "mean": -1741.308333,
+    "n": 120,
+    "normal": [
+     -2110.257629,
+     -1372.359038
+    ]
+   },
+   "cth_arm1_net_dev": {
+    "b": [
+     2.3,
+     261.5
+    ],
+    "mean": 111.4
+   },
+   "developer": "OpenAI",
+   "false_alert_active_arm10": 1,
+   "false_alert_active_arm8": 11,
+   "family_right": 29,
+   "latency_p50_ms": 1849.7835,
+   "parse_attempts": 582,
+   "parse_valid": 291,
+   "released": "2024-07",
+   "rung": "gpt-4o-mini",
+   "shocked": 96,
+   "tier": "legacy",
+   "usd": 0.068449
+  }
+ ]
+}
