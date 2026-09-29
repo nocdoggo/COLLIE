@@ -14,20 +14,41 @@ label only selects templates. Parameters follow the dev/cal combo discipline exa
 ``k``-th unit of a split and family takes ``COMBO_A[family][k % len]`` (set A only; the held-out
 combos and extrapolation slices never appear), and the onset is the generator's own draw.
 
-Each unit yields the four paired information conditions plus one unshocked twin. Twins alternate
-silent (``k`` even) and false-alert (``k`` odd) within a family and split, so nulls are balanced
-over families rather than concentrated in families 1-2 as in the registered pilot.
+Every builder takes a keyword ``base`` (default ``FRESH_BASE``). The confirmation seeds are
+sealed until the registered run: structural tests and scripted end-to-end checks use the
+throwaway pool ``THROWAWAY_BASE`` (900_000) instead, which is checked against the registered
+pools in the same way.
+
+Each unit yields the four paired information conditions plus one unshocked twin. Within a family,
+units ``i % 4 in {0, 3}`` get a silent twin and the others a false-alert twin, so every block of
+four units holds two of each, one per split; nulls are therefore balanced over families and
+splits rather than concentrated in families 1-2 as in the registered pilot.
 
 Alerts come from module 03's renderer (``render_condition_batch``) through an in-memory manifest
 in the frozen manifest's row format, with the pilot's template-selection rule ``bank-v1`` applied
 to the split-local slot index ``SLOT_BASE + k``. Only ``dev.yaml`` and ``cal.yaml`` are loaded.
+
+Stochastic-lead stratum (exploratory). :func:`build_stochastic_lead_layout` builds family-4 units
+``i = 12 .. 23`` (seeds disjoint from the main layout's ``i = 0 .. 11``) with the same unit
+construction, conditions, twins and alerts, but with noisy per-order lead times. For the order
+placed in period ``t`` the lead time is ``max(0, L_t + xi_t)``, where ``L_t`` is the generator's
+deterministic lead (the baseline lead before onset, the disrupted lead from onset) and the
+``xi_t`` are iid with the pmf ``LEAD_NOISE_PMF`` on ``LEAD_NOISE_SUPPORT``, drawn from
+``numpy.random.default_rng(seed + LEAD_NOISE_SEED_OFFSET)``. The twin uses the same ``xi_t``
+around the baseline lead (``max(0, L_base + xi_t)``, no shift), so episode and twin agree on
+every pre-onset lead time. Lost shipments (``inf``) are left as they are. The noise is applied to
+the ``GeneratedEpisode`` before :func:`collie.data.writer.write_pair`; the generator and the
+incident record are unchanged.
 """
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+import math
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, replace
 from pathlib import Path
+
+import numpy as np
 
 from analysis.real_content_pilot.alerts import (
     ALERT_ID,
@@ -49,7 +70,7 @@ from collie.data.alerts.audit import default_audit_config
 from collie.data.alerts.bank import render_alert
 from collie.data.alerts.conditions import render_condition_batch
 from collie.data.families import generate_episode
-from collie.data.families.base import DEFAULT_BASELINE_LEAD_TIME, FamilyParams
+from collie.data.families.base import DEFAULT_BASELINE_LEAD_TIME, FamilyParams, GeneratedEpisode
 from collie.data.splits import (
     COMBO_A,
     CONDITIONS,
@@ -64,6 +85,12 @@ from collie.sim.loader import LoadedInstance, load_instance
 from collie.trigger.demo import DEMO_HORIZON
 
 FRESH_BASE = 100_000
+"""The confirmation pool. Sealed: no arm is run and no outcome is computed on it before the
+registered run."""
+THROWAWAY_BASE = 900_000
+"""The pool for structural tests and scripted end-to-end checks. Supports no claim."""
+FAMILY_STRIDE = 1_000_000
+"""Seeds of one family occupy ``family * FAMILY_STRIDE + [0, FAMILY_STRIDE)``."""
 SLOT_BASE = 100
 """Split-local template slot index offset: ``tpl_{split}_f{family}_{SLOT_BASE + k}``."""
 FAMILY_NAMES = {
@@ -74,6 +101,19 @@ FAMILY_NAMES = {
     5: "shipment_loss",
     6: "compound",
 }
+
+STOCHASTIC_FAMILY = 4
+STOCHASTIC_FIRST_INDEX = 12
+STOCHASTIC_N_UNITS = 12
+LEAD_NOISE_SEED_OFFSET = 7_000_000
+"""The noise generator for a unit with seed ``s`` is ``default_rng(s + LEAD_NOISE_SEED_OFFSET)``."""
+LEAD_NOISE_SUPPORT = (-2, -1, 0, 1, 2)
+LEAD_NOISE_PMF = (2 / 99, 27 / 99, 48 / 99, 18 / 99, 4 / 99)
+"""P(xi = -2, -1, 0, 1, 2) = (2, 27, 48, 18, 4) / 99: the finite delays of
+``collie.verify.arrival.REGISTERED_NULL_LAW``, (0.02, 0.27, 0.48, 0.18, 0.04) on delays 0..4,
+renormalised over the finite delays (sum 0.99; the 0.01 loss mass is dropped) and centred on
+their mode, delay 2. The mean of xi is -5/99."""
+STOCHASTIC_LEAD_STRATUM = "stochastic_lead"
 
 
 @dataclass(frozen=True)
@@ -99,7 +139,8 @@ class FreshUnit:
 
     @property
     def null_condition(self) -> InformationCondition:
-        return InformationCondition.NO_ALERT if self.k % 2 == 0 else InformationCondition.UNRELIABLE
+        silent = self.index % 4 in (0, 3)
+        return InformationCondition.NO_ALERT if silent else InformationCondition.UNRELIABLE
 
     @property
     def null_episode_id(self) -> str:
@@ -107,37 +148,110 @@ class FreshUnit:
         return f"{self.rollout_id(InformationCondition.NO_ALERT)}__twin"
 
 
-def fresh_seed(family: int, index: int) -> int:
-    return family * 1_000_000 + FRESH_BASE + index
+def fresh_seed(family: int, index: int, *, base: int = FRESH_BASE) -> int:
+    if base < 0 or index < 0 or base + index >= FAMILY_STRIDE:
+        raise ValueError(
+            f"base {base} + index {index} must lie in [0, {FAMILY_STRIDE}) so that seeds stay "
+            "inside their family's range"
+        )
+    return family * FAMILY_STRIDE + base + index
 
 
-def fresh_units(n_per_family: int) -> tuple[FreshUnit, ...]:
+def fresh_unit(family: int, index: int, *, base: int = FRESH_BASE) -> FreshUnit:
+    """The ``index``-th unit of ``family``: dev for even ``index``, cal for odd, combo set A."""
+    split = Split.DEV if index % 2 == 0 else Split.CAL
+    k = index // 2
+    combo = COMBO_A[family][k % len(COMBO_A[family])]
+    params = FamilyParams(family, **combo_params(family, combo))
+    promised = (
+        params.baseline_lead_time
+        if params.baseline_lead_time is not None
+        else DEFAULT_BASELINE_LEAD_TIME
+    )
+    seed = fresh_seed(family, index, base=base)
+    return FreshUnit(family, index, seed, split, k, params, int(promised))
+
+
+def fresh_units(n_per_family: int, *, base: int = FRESH_BASE) -> tuple[FreshUnit, ...]:
     if n_per_family < 1 or n_per_family > 1_000:
         raise ValueError("n_per_family must be in 1..1000")
-    units = []
-    for family in FAMILIES:
-        for i in range(n_per_family):
-            split = Split.DEV if i % 2 == 0 else Split.CAL
-            k = i // 2
-            combo = COMBO_A[family][k % len(COMBO_A[family])]
-            params = FamilyParams(family, **combo_params(family, combo))
-            promised = (
-                params.baseline_lead_time
-                if params.baseline_lead_time is not None
-                else DEFAULT_BASELINE_LEAD_TIME
-            )
-            units.append(
-                FreshUnit(family, i, fresh_seed(family, i), split, k, params, int(promised))
-            )
+    units = [fresh_unit(family, i, base=base) for family in FAMILIES for i in range(n_per_family)]
     assert_fresh_pool(units)
     return tuple(units)
 
 
-def assert_fresh_pool(units: Sequence[FreshUnit]) -> None:
+def assert_fresh_pool(
+    units: Sequence[FreshUnit],
+    *,
+    name: str = "fresh_commitment",
+    others: Mapping[str, frozenset[int]] | None = None,
+) -> None:
+    """Raise unless ``units`` have distinct seeds disjoint from every registered pool and from
+    every pool in ``others``."""
     pool = frozenset(u.seed for u in units)
     if len(pool) != len(units):
         raise ValueError("duplicate fresh seeds")
-    assert_seed_pools_disjoint({**seed_pools(), "fresh_commitment": pool})
+    pools = {**seed_pools(), **(others or {})}
+    if name in pools:
+        raise ValueError(f"pool name {name!r} is already taken")
+    assert_seed_pools_disjoint({**pools, name: pool})
+
+
+def stochastic_lead_units(
+    *,
+    base: int = FRESH_BASE,
+    first_index: int = STOCHASTIC_FIRST_INDEX,
+    n_units: int = STOCHASTIC_N_UNITS,
+) -> tuple[FreshUnit, ...]:
+    """Family-4 units ``first_index .. first_index + n_units - 1`` of the pool at ``base``.
+
+    Checked disjoint from the registered pools, from the main layout's units ``0 ..
+    first_index - 1`` of every family, and (as integers) from the noise generators' seeds.
+    """
+    if first_index < 0:
+        raise ValueError("first_index must be non-negative")
+    if n_units < 1 or n_units > 1_000:
+        raise ValueError("n_units must be in 1..1000")
+    units = tuple(
+        fresh_unit(STOCHASTIC_FAMILY, i, base=base)
+        for i in range(first_index, first_index + n_units)
+    )
+    others = {
+        "stochastic_lead_noise": frozenset(u.seed + LEAD_NOISE_SEED_OFFSET for u in units),
+    }
+    if first_index > 0:
+        others["fresh_commitment"] = frozenset(u.seed for u in fresh_units(first_index, base=base))
+    assert_fresh_pool(units, name="fresh_commitment_stochastic_lead", others=others)
+    return units
+
+
+def lead_noise(seed: int, horizon: int = DEMO_HORIZON) -> tuple[int, ...]:
+    """The unit's ``xi_1 .. xi_horizon``, iid ``LEAD_NOISE_PMF`` on ``LEAD_NOISE_SUPPORT``."""
+    rng = np.random.default_rng(seed + LEAD_NOISE_SEED_OFFSET)
+    draws = rng.choice(len(LEAD_NOISE_SUPPORT), size=horizon, p=np.asarray(LEAD_NOISE_PMF))
+    return tuple(LEAD_NOISE_SUPPORT[int(j)] for j in draws)
+
+
+def noisy_lead_times(lead_times: Sequence[float], xi: Sequence[int]) -> tuple[float, ...]:
+    """``max(0, L_t + xi_t)`` per order period; ``inf`` (a lost shipment) is kept."""
+    out = []
+    for value, noise in zip(lead_times, xi, strict=True):
+        if math.isinf(value):
+            out.append(value)
+            continue
+        if value != int(value):
+            raise ValueError(f"non-integer lead time {value}")
+        out.append(float(max(0, int(value) + int(noise))))
+    return tuple(out)
+
+
+def stochastic_lead_episode(ep: GeneratedEpisode, xi: Sequence[int]) -> GeneratedEpisode:
+    """``ep`` with the same noise ``xi`` added to the episode's and the twin's lead times."""
+    return replace(
+        ep,
+        lead_times=noisy_lead_times(ep.lead_times, xi),
+        twin_lead_times=noisy_lead_times(ep.twin_lead_times, xi),
+    )
 
 
 @dataclass
@@ -148,6 +262,7 @@ class Layout:
     units: tuple[FreshUnit, ...]
     profit: float
     holding: float
+    stratum: str = "main"
 
     @property
     def episode_ids(self) -> tuple[str, ...]:
@@ -155,15 +270,71 @@ class Layout:
 
 
 def build_layout(
-    root: Path, n_per_family: int, *, profit: float = 4.0, holding: float = 1.0
+    root: Path,
+    n_per_family: int,
+    *,
+    profit: float = 4.0,
+    holding: float = 1.0,
+    base: int = FRESH_BASE,
 ) -> Layout:
     """Materialise every unit's four conditions and its twin under ``root``."""
-    units = fresh_units(n_per_family)
+    units = fresh_units(n_per_family, base=base)
+    episodes = [generate_episode(seed=u.seed, horizon=DEMO_HORIZON, params=u.params) for u in units]
+    return _materialise(root, units, episodes, profit=profit, holding=holding)
+
+
+def build_stochastic_lead_layout(
+    root: Path,
+    *,
+    base: int = FRESH_BASE,
+    first_index: int = STOCHASTIC_FIRST_INDEX,
+    n_units: int = STOCHASTIC_N_UNITS,
+    profit: float = 4.0,
+    holding: float = 1.0,
+) -> Layout:
+    """Materialise the stochastic-lead stratum (module docstring) under ``root``."""
+    units = stochastic_lead_units(base=base, first_index=first_index, n_units=n_units)
+    episodes = []
+    for unit in units:
+        ep = generate_episode(seed=unit.seed, horizon=DEMO_HORIZON, params=unit.params)
+        episodes.append(stochastic_lead_episode(ep, lead_noise(unit.seed, len(ep.demand))))
+    manifest_extra = {
+        "stratum": STOCHASTIC_LEAD_STRATUM,
+        "lead_noise": {
+            "pmf": list(LEAD_NOISE_PMF),
+            "rule": "max(0, L_t + xi_t); twin max(0, L_base + xi_t); inf kept",
+            "seed_offset": LEAD_NOISE_SEED_OFFSET,
+            "support": list(LEAD_NOISE_SUPPORT),
+        },
+    }
+    row_extra = {u.seed: {"lead_noise_seed": u.seed + LEAD_NOISE_SEED_OFFSET} for u in units}
+    return _materialise(
+        root,
+        units,
+        episodes,
+        profit=profit,
+        holding=holding,
+        stratum=STOCHASTIC_LEAD_STRATUM,
+        manifest_extra=manifest_extra,
+        row_extra=row_extra,
+    )
+
+
+def _materialise(
+    root: Path,
+    units: Sequence[FreshUnit],
+    episodes: Sequence[GeneratedEpisode],
+    *,
+    profit: float,
+    holding: float,
+    stratum: str = "main",
+    manifest_extra: Mapping[str, object] | None = None,
+    row_extra: Mapping[int, Mapping[str, object]] | None = None,
+) -> Layout:
     instances: list[tuple[LoadedInstance, int]] = []
     truths: list[EpisodeTruth] = []
     rows: list[dict] = []
-    for unit in units:
-        ep = generate_episode(seed=unit.seed, horizon=DEMO_HORIZON, params=unit.params)
+    for unit, ep in zip(units, episodes, strict=True):
         onset = int(ep.incident.onset_period)
         for condition in CONDITIONS:
             rollout_id = unit.rollout_id(condition)
@@ -195,6 +366,7 @@ def build_layout(
                     "template_id": (
                         None if condition is InformationCondition.NO_ALERT else unit.slot
                     ),
+                    **(row_extra or {}).get(unit.seed, {}),
                 }
             )
         null_loaded = load_instance(
@@ -210,8 +382,8 @@ def build_layout(
             information_condition=unit.null_condition,
         )
         instances.append((replace(null_loaded, spec=null_spec), unit.seed))
-    manifest = {"horizon": DEMO_HORIZON, "rollouts": rows}
-    return Layout(instances, tuple(truths), manifest, units, profit, holding)
+    manifest = {"horizon": DEMO_HORIZON, "rollouts": rows, **(manifest_extra or {})}
+    return Layout(instances, tuple(truths), manifest, tuple(units), profit, holding, stratum)
 
 
 def layout_alerts(layout: Layout) -> dict[str, EpisodeAlerts]:

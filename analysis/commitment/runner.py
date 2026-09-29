@@ -29,7 +29,7 @@ import platform
 import re
 import tempfile
 import time
-from collections.abc import Callable, Sequence
+from collections.abc import Sequence
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -37,6 +37,7 @@ from pathlib import Path
 import analysis.real_content_pilot.runner as rcp
 from analysis.commitment.endpoints import LADDER, EchoCheckedClient
 from analysis.commitment.episodes import Layout, build_layout, layout_alerts
+from analysis.commitment.registry import ARM_SETS
 from analysis.real_content_pilot.alerts import SELECTION_RULE, EpisodeAlerts
 from analysis.real_content_pilot.transport import (
     CallCapReached,
@@ -56,14 +57,6 @@ OUT_ROOT = REPO / "analysis" / "commitment" / "out"
 LOCAL_ROOT = REPO / "results" / "commitment"
 LIVE_TIMEOUT_S = 180.0
 _RUN_NAME = re.compile(r"^[a-z0-9][a-z0-9._-]{0,63}$")
-
-ArmBuilder = Callable[..., list[tuple[str, object, bool]]]
-ARM_SETS: dict[str, ArmBuilder] = {"nine": rcp.build_arms}
-"""Arm-set name -> builder with ``rcp.build_arms``'s signature. Extended by the arms module."""
-
-
-def register_arm_set(name: str, builder: ArmBuilder) -> None:
-    ARM_SETS[name] = builder
 
 
 def build_live(

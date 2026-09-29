@@ -120,3 +120,47 @@ parameter count (the Llama series 1B, 3B, 8B, 70B and the Qwen pair 7B, 72B are 
 within-family size comparisons). Small models are expected to fail the module 02 schema more
 often; parse failures, repairs and fallbacks are reported per rung as part of the result.
 Stage A's cap becomes $5.25 plus $17.00 for these rungs.
+
+## Stage B. Method development: certify-then-hedge
+
+Written 2026-09-28. Stage B is development: it supports no claim, tuning is allowed, and its
+numbers are post hoc on the 120 spent pilot episodes. Its development runs are offline replays
+with no model calls (`dev.py`); the harness was written and first run on the same day as this
+text. Everything that stage C tests is frozen at the end of stage B, in stage C's registration.
+
+**Method** (`cth.py`, `CertifyThenHedgeArm`). At each trigger firing `j` (at most two, the frozen
+trigger's limit), a fixed action-aligned hypothesis set `H = {demand_up, demand_down, lead_time,
+pulse_up}` is registered with prior mass `a_j * w_jh`, where `a_j = alpha * 2^-j` is the frozen
+alpha schedule and `w_jh = lam / |H| + (1 - lam) * 1{h = the LLM's family}`. Each hypothesis has
+its own module 05 e-process from a canonical legal spec (the LLM's onset window for the LLM's
+hypothesis, the widest registered window otherwise), conditioned through `tau_j` and fed every
+later period. The posterior shock mass of `(j, h)` is proportional to `a_j w_jh E_jh,t-1`. The
+size of the shock comes from the data (a working likelihood over the registered multipliers,
+starts and durations; lead-time offsets 1-3 from visible receipts and in-transit), never from the
+LLM's magnitude bin. The order-up-to requirement is the `p / (p + h)` quantile of the
+posterior-predictive mixture; with no live hypothesis the arm orders exactly as arm 1. Families
+module 04 cannot profitably act on (compound, shipment_loss, transit_pause) carry no hypothesis.
+
+**Variants.** `lam = 0.25` (the method), `lam = 0` (LLM family only), `lam = 1` (content-free: no
+model call, the same trigger and machinery), and the decision-rule ablations `map` (compiled
+target iff the shock mass is at least 1/2) and `linear` (target interpolated by the shock mass).
+
+**Guarantees stated for the paper** (proof sketches in the manuscript; all conditional on module
+05's null holding, which the plug-in demand null only approximates):
+
+1. Exposure: `N_t = sum a_j w_jh E_jh,t` is a nonnegative supermartingale under the null with
+   `N_0 <= A = sum a_j <= 3 alpha / 4`; the shock mass `pi_t <= N_t / (1 - A + N_t)`, so for every
+   stopping time `sigma`, `E_0[pi_sigma] <= A` and `P_0(sup_t pi_t >= c) <= A (1 - c) / (c (1 - A))`.
+   This holds for any LLM output, including abstentions, wrong families and adversarial content.
+2. Odds-regret in cost units: per period, the newsvendor surrogate regret against arm 1's target
+   is at most `pi_t / (1 - pi_t) * V_t`, where `V_t` is the value of acting on the hypotheses if
+   they were true; hence `E_0[sum_t regret_t] <= T A Vbar / (1 - A)`.
+3. The registered gate is, up to one unit of threshold, the MAP decision of this posterior
+   (`a_j E / (1 - a_j) >= 1` iff `E >= 1 / a_j - 1`).
+4. Hedged prior: `E` of the LLM's hypothesis enters with at least `(1 - lam) a_j`, and every
+   hypothesis keeps at least `lam a_j / |H|`, so a wrong LLM family costs at most `log(|H| / lam)`
+   nats of evidence relative to the content-free arm, and a right one saves up to that much.
+
+**Development readout** (`out/dev/*.json`): each variant against the stored arm 1, arm 8 and arm
+10 of every cached bank (the real-content pilot's three and the stage A ladder's), net and gross,
+with seed-cluster bootstrap intervals; null-episode harm and exposure; net by family.
