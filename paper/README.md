@@ -225,8 +225,10 @@ commitment study in `analysis/commitment/` (`PLAN.md` for the registered stages 
 amendments, `REPORT.md` for the readout). The paper's numbers come from:
 
 - `analysis/commitment/out/confirm.json`: the registered stage C evaluation (Table I, Fig. 2);
-- `analysis/commitment/out/posthoc.json` and `sensitivity.json`: post-hoc readouts, labelled
-  post hoc wherever the paper uses them;
+- `analysis/commitment/out/confirm_d.json` and `readout_d.json`: the registered stage D
+  evaluation and its registered secondaries;
+- `analysis/commitment/out/posthoc.json`, `sensitivity.json` and `ablation.json`: post-hoc
+  readouts, labelled post hoc wherever the paper uses them;
 - `analysis/commitment/out/mc_exposure.json`: the null exposure simulation;
 - `analysis/commitment/out/ladder.json`: the model ladder;
 - `analysis/real_content_pilot/out/evaluation.json`, `analysis/kill_trigger_forensics.md` and

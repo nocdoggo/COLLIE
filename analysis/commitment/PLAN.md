@@ -14,6 +14,9 @@ The study has three stages:
 - **C. Fresh-seed confirmation** (appended before its runs): the frozen method against the
   registered arms on a reserved seed pool no run has touched (`episodes.py`).
 
+*Note (2026-09-29).* A fourth stage was added later: **D. Cost ratios and noisy lead times**
+(registered before its runs at the end of this plan, with pre-run amendments DA1 to DA12).
+
 ## Stage A. Model ladder on the pilot episodes
 
 Registered 2026-09-28, before any ladder call.
