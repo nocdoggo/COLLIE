@@ -55,7 +55,7 @@ paper is rounded once from them or from `confirm.json` (never from a rounded val
 | The 32 shocked lead-time episodes supply 96% of hedge - arm 1 | arithmetic on the registered per-family readout: 32 x 1285.53 / (240 x 178.47) = 0.960, Grok 0.963; `ph.<run>.gain_source.lead_time_episodes_share` | established |
 | Without the lead-time units (episodes and twins): hedge - arm 1 +9 [-24, 43] and +7 [-25, 36]; hedge - gate +227 [82, 408] (Gemini), +58 [-1, 134] (Grok) | `ph.<run>.gain_source["cth-arm1\|net\|without_lead_time_units"]` (9.04 [-23.88, 42.52], 6.55 [-24.55, 36.08]), `["cth-arm10\|net\|without_lead_time_units"]` | post hoc |
 | The gate loses 1,057 per demand-rise episode with Gemini | `ph.fresh-gemini-3.8-flash.gain_source.by_family_net["arm10-arm1"]["1"]` (-1056.59) | post hoc |
-| Models oversized lead-time shifts: medium or high in 11 of 17 Gemini proposals and 11 of 11 Grok; every true shift one period (low) | `ph.<run>.lead_time_proposals.first_proposal_magnitude`, `true_magnitudes` | post hoc |
+| The stated lead-time size was wrong in 7 of 17 Gemini proposals (5 too large, 2 too small) and 6 of 11 Grok (all too large); true shifts were one or two periods (every family-4 unit moves to a lead of 3 from 1 or 2) | `ph.runs.<run>.lead_time_proposals.first_proposal_vs_true_shift` ({right 10, too_large 5, too_small 2}; {5, 6, 0}); `collie/data/splits.py` `COMBO_A[4]`; PLAN.md DA8 | post hoc |
 | The gate compiles medium as two periods | `collie/control/mapping.py` (medium: effective lead 3 against a reference of 1) | established |
 | The gate commits a median of 11 periods after the lead-time proposal | `ph.<run>.lead_time_proposals.gate_delay_median` (11 and 11) | post hoc |
 | Null commitment 0.83 (content-free), 0.52 and 0.46 (hedge), 0.18 and 0.06 (model family only) | `runs.<run>.exposure.<arm>.null_exposure_mean` | established |
@@ -76,7 +76,7 @@ paper is rounded once from them or from `confirm.json` (never from a rounded val
 | Gate rarely acted on a false alarm with live models: 1 of 12 false-alert nulls each | same, Q6 `false_alert.arm10.any_active` | established |
 | Gate activated 43% / 39% of right-family proposals, median 10 / 11 periods | same, Q3 | established |
 | Gate minus arm 1 -234 / -172 net; acting at once -2,549 / -2,624 | same, Q4 | established |
-| Magnitude right 8/96 and 7/96; templates label every non-distractor shock medium | same, Q1; `collie/data/alerts/templates/{dev,cal}.yaml` alert specs | established |
+| Magnitude matched the truth bin in 8/96 and 7/96, a label mismatch rather than calibration: the provisional truth binning puts 80 of 96 shocks in low; the hidden alert-spec label of every non-distractor template is medium; no alert text states a size | same, Q1; `collie/data/alerts/templates/{dev,cal}.yaml` alert specs; `prereg/deviations.md` 2026-09-28 finding 2 | established |
 | Excluded families: the compiled oracle gained nothing on loss bursts or compound shocks in the pilot | `analysis/kill_trigger_forensics.md` section 2 (compiled oracle gross +0.00%, +0.01%) | established |
 
 ## 3. Model scale (Section VIII-F)
@@ -84,9 +84,9 @@ paper is rounded once from them or from `confirm.json` (never from a rounded val
 | Claim | Evidence | Status |
 |---|---|---|
 | 21 models from seven developers; 20 finished at writing | `analysis/commitment/endpoints.py` `LADDER` (22 rungs, one dropped under A1); `analysis/commitment/out/ladder.json` `rungs`, `missing_or_partial` | established |
-| Perception 0 to 59 of 96; Llama 3.2 1B never non-abstaining; 3B seven demand-up specs, arm 8 -28 [-54, -6]; Qwen 2.5 7B mostly abstains | `ladder.json` `family_right`, `abstain_first`, `arm8_arm1_net`; `out/ladder-*/proposals.jsonl` | established |
+| Perception 0 to 59 of 96; Llama 3.2 1B never non-abstaining; Qwen 2.5 7B mostly abstains | `ladder.json` `family_right`, `abstain_first`, `arm8_arm1_net`; `out/ladder-*/proposals.jsonl` | established |
 | Acting at once 0 (Llama 3.2 1B) to -3,656 (Gemini 2.5 Flash-Lite) | `ladder.json` `arm8_arm1_net` | established |
-| Loss grows with commitment; commitment and accuracy move together (r = 0.86); the most accurate models lose among the most | `posthoc.json` `ladder.pearson` (committed_vs_family_right 0.859; loss vs committed -0.905, vs family_right -0.901) | post hoc |
+| Loss grows with commitment, contrary to stage A's registered expectation that it would grow as perception falls; commitment and accuracy move together (r = 0.86); the most accurate models lose among the most | `posthoc.json` `ladder.pearson` (committed_vs_family_right 0.859; loss vs committed -0.905, vs family_right -0.901) | post hoc |
 | Gate between -300 and +3; at most 1 of 12 false alerts acted on | `ladder.json` `arm10_arm1_net`, `false_alert_active_arm10` | established |
 | Gate's interval below zero on Gemini 2.5 Flash -294 [-567, -45] and GPT-3.5 Turbo -60 [-151, -1], contrary to stage A's registered expectation | `posthoc.json` `ladder.gate_interval_below_zero`; `PLAN.md` stage A item 6 | established |
 | Hedge point estimates +107 to +158 on every model; content-free +136 | `ladder.json` `cth_arm1_net_dev`, `cth_uniform_arm1_net_dev` (from `out/dev/ladder_dev.json`) | development |
