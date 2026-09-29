@@ -1,0 +1,123 @@
+\section{Certify, Then Hedge}
+\label{sec:hedge}
+
+The registered gate of Section~\ref{sec:verify} answers one question, whether a
+hypothesis may act, and answers it late: it waits until $E_{j,t}$ crosses
+$1/\alpha_j$ and then acts on the magnitude the model stated. Our pilot showed both
+halves of that design failing in the same place (Section~\ref{sec:results}): the
+gate refutes almost nothing that is true, but it activates less than half of the
+right-family proposals and a median of ten periods after the proposal, and when it
+does act, the stated magnitude is the least reliable field the model produces.
+Certify-then-hedge keeps the \eprocess{} and changes what it is used for. The
+\eprocess{} no longer switches a controller on; it prices the hypothesis, and the
+controller hedges between the baseline and the hypothesis in proportion to that
+price.
+
+\subsection{Hypotheses and the language prior}
+
+At each trigger firing $j$ (a stopping time $\tau_j$, at most two per episode) we
+register a fixed, action-aligned hypothesis set
+$\mathcal{H} = \{\text{demand up}, \text{demand down}, \text{lead-time shift},
+\text{demand pulse}\}$. Families on which the compiler has no profitable action
+(\texttt{shipment\_loss}, \texttt{transit\_pause}, \texttt{compound}; their
+clairvoyant headroom is zero or negative) carry no hypothesis. Hypothesis
+$h \in \mathcal{H}$ of firing $j$ receives prior mass $a_j w_{jh}$ with
+\begin{equation}
+a_j = \alpha\,2^{-j}, \qquad
+w_{jh} = \frac{\lambda}{|\mathcal{H}|} + (1-\lambda)\,\Ind\{h = \hat h_j\},
+\label{eq:prior}
+\end{equation}
+where $\hat h_j$ is the family the language model names in its \shockspec{} (none
+if it abstains or names a family outside $\mathcal{H}$) and $\lambda\in[0,1]$ is
+a registered hedge. The model therefore sets \emph{prior weights} and nothing
+else: $\lambda = 1$ is a content-free arm that never calls the model, and
+$\lambda = 0$ trusts the model's family alone. The allocation $a_j$ is the
+frozen budget of Theorem~\ref{thm:activation}; it is spent on masses rather than
+thresholds.
+
+\subsection{Certification, posterior and sizing}
+
+Each $(j,h)$ carries its own \eprocess{} $E_{jh,t}$ of the form
+\eqref{eq:eprocess}, started strictly after $\tau_j$ and built from a canonical
+specification of $h$ (with the model's onset window when $h = \hat h_j$). Every
+hypothesis keeps receiving evidence after a later firing, so nothing is lost to
+supersession. With $A_t = \sum_{j:\tau_j < t}\sum_h a_j w_{jh}$ and
+$N_t = \sum_{j,h} a_j w_{jh} E_{jh,t}$, the predictable posterior mass of $(j,h)$
+at decision $t$ is
+\begin{equation}
+\pi_{jh,t} = \frac{a_j w_{jh}\, E_{jh,t-1}}{1 - A_t + N_{t-1}},
+\qquad
+\Pi_t = \sum_{j,h} \pi_{jh,t}.
+\label{eq:posterior}
+\end{equation}
+Validity of what follows needs nothing from the \emph{size} of a shock, so the
+size comes from the data rather than the model's magnitude bin. Within a demand
+hypothesis a working likelihood of the visible demand path weighs every
+registered multiplier, start and duration, and the post-change level is learned
+conjugately from an anchor at the pre-onset mean; within the lead-time hypothesis
+the same likelihood of visible receipts and the in-transit total weighs offsets
+$\Delta \in \{1,2,3\}$ and starts. Each $(j,h)$ thus contributes a predictive law
+$G_{jh,t}$ for demand over the protection interval, and the null contributes
+arm~1's own $F_{0,t} = \mathcal{N}\bigl((1+L)\bar d_t,\,(1+L)s_{d,t}^2\bigr)$.
+
+\subsection{The hedge}
+
+The order-up-to requirement is the critical fractile $\beta = p/(p+h)$ of the
+posterior-predictive mixture of requirement $Y - \gamma P_t$,
+\begin{equation}
+x_t = \inf\Bigl\{x :
+(1-\Pi_t)\,F_{0,t}(x + P_t) + \sum_{j,h}\pi_{jh,t}\,G_{jh,t}(x + \gamma_{h} P_t)
+\ge \beta\Bigr\},
+\label{eq:hedge}
+\end{equation}
+and the order is $q_t = \min(\max(0,\lceil x_t - I_t\rceil), C_t, \hat C_t)$ with
+the published smoother $\hat C_t$ unchanged. When no hypothesis is live,
+$\Pi_t = 0$ and $q_t$ is arm~1's order bit for bit.
+
+\subsection{Guarantees}
+
+Write $\Prob_0$ for the global no-change null under which every $E_{jh}$ is a
+nonnegative supermartingale with unit start (the model-conditional premise of
+Theorem~\ref{thm:activation}).
+
+\begin{theorem}[Exposure]
+\label{thm:exposure}
+For every stopping time $\sigma$ and every language-model output, including
+abstention, a wrong family or adversarial content,
+$\Expect_0[\Pi_\sigma] \le A \le 3\alpha/4$ and, for $c\in(0,1)$,
+$\Prob_0(\sup_t \Pi_t \ge c) \le A(1-c)/\bigl(c(1-A)\bigr)$.
+\end{theorem}
+
+\emph{Proof sketch.} $N$ is a nonnegative supermartingale with $N_0 \le A$
+because the weights are fixed at each $\tau_j$ and sum to at most one, so
+optional stopping gives $\Expect_0[N_\sigma] \le A$. Since
+$\Pi = N/(1-A+N)$ is concave and increasing in $N$, Jensen's inequality gives the
+first bound; Ville's inequality applied to $N/A$ gives the second. \hfill$\square$
+
+\begin{theorem}[Odds regret]
+\label{thm:regret}
+Let $c_F(x)$ be the one-period newsvendor cost of target $x$ under law $F$, $x^0_t$
+arm~1's target and $V_t = c_{G_t}(x^0_t) - \min_x c_{G_t}(x)$ the value of acting
+on the hypotheses if they were true. Then
+$c_{F_0}(x_t) - c_{F_0}(x^0_t) \le \frac{\Pi_t}{1-\Pi_t}\,V_t$, so under
+$\Prob_0$ the expected cumulative surrogate regret is at most
+$T A \bar V/(1-A)$.
+\end{theorem}
+
+\emph{Proof sketch.} $x_t$ minimises $(1-\Pi_t)c_{F_0} + \Pi_t c_{G_t}$, so
+$(1-\Pi_t)\bigl(c_{F_0}(x_t)-c_{F_0}(x^0_t)\bigr) \le
+\Pi_t\bigl(c_{G_t}(x^0_t)-c_{G_t}(x_t)\bigr) \le \Pi_t V_t$; apply
+Theorem~\ref{thm:exposure}. \hfill$\square$
+
+Two consequences follow directly. First, with a single hypothesis and
+$\lambda = 0$, the posterior odds are $a_j E_{j,t}/(1-a_j)$, so the registered
+gate $E_{j,t} \ge 1/\alpha_j$ is, up to one unit of threshold, the MAP decision of
+this posterior: certify-then-hedge replaces the gate's step with the Bayes action.
+Second, the language model can move evidence but not validity. By
+\eqref{eq:prior} every hypothesis keeps prior weight at least $\lambda/|\mathcal{H}|$,
+so a wrong family costs at most $\log(|\mathcal{H}|/\lambda)$ nats of evidence
+against the content-free arm, a right one saves up to
+$\log\bigl(1 + (1-\lambda)|\mathcal{H}|/\lambda\bigr)$, and neither changes the
+bounds above. The theorems are stated for the one-period surrogate that the
+controller optimises; lost sales, the smoother and the zero floor make realised
+multi-period cost an empirical matter, which Section~\ref{sec:results} measures.
