@@ -111,8 +111,9 @@ The method is the UV paper's contribution; here it is the instrument.
   on the real-text subset against realised outcomes.
 - Decision-weighted error: replace one read field with the truth, recompile, and measure the
   change in cost; this links NLP errors to consequences.
-- Dose-response across models: value of text against reading accuracy. The UV ladder's finding
-  (commitment, not accuracy, drives the loss from acting at once) is re-tested on new data, not
+- Dose-response across models: value of text against reading accuracy. The UV ladder's post hoc
+  finding (the loss from acting at once grows with how readily a model commits; commitment and
+  accuracy move together, so being right does not protect a model) is re-tested on new data, not
   re-reported.
 - Human ceiling: two annotators on a sample, for agreement and ambiguous alerts.
 - Baselines reviewers expect: a rule-based extractor, a small fine-tuned extractor,

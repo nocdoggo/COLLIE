@@ -18,6 +18,7 @@ The blue and orange pair was validated with a colour-vision checker (protan dE 2
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 import matplotlib
@@ -288,9 +289,20 @@ class Canvas:
 
 
 def save(fig, name: str, out_dir: Path | None = None) -> None:
+    """Write ``name``.pdf and ``name``.png. Each is written to a temporary file and renamed into
+    place, so an editor preview or LaTeX never reads a half-written figure; with no creation
+    date, re-rendering unchanged data leaves the PDF byte-identical."""
     out = out_dir or FIGURES_DIR
     out.mkdir(parents=True, exist_ok=True)
-    # No creation date, so re-rendering unchanged data leaves the PDF byte-identical.
-    fig.savefig(out / f"{name}.pdf", pad_inches=0.0, metadata={"CreationDate": None})
-    fig.savefig(out / f"{name}.png", dpi=300, pad_inches=0.0)
+    for ext, kwargs in (
+        ("pdf", {"metadata": {"CreationDate": None}}),
+        ("png", {"dpi": 300}),
+    ):
+        final = out / f"{name}.{ext}"
+        tmp = out / f".{name}.{os.getpid()}.tmp.{ext}"  # per process: renders may run side by side
+        try:
+            fig.savefig(tmp, format=ext, pad_inches=0.0, **kwargs)
+            tmp.replace(final)
+        finally:
+            tmp.unlink(missing_ok=True)
     plt.close(fig)

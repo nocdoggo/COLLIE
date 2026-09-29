@@ -143,6 +143,52 @@ def test_the_echo_check_refuses_a_rerouted_model() -> None:
                 client.complete_metered("hi", decoding=decoding)
 
 
+def test_the_runner_timeout_defaults_to_the_registered_180_s(monkeypatch, tmp_path) -> None:
+    """The transport rules stage A adopts set a 180 s request timeout; `--timeout-s` (amendment
+    A4) must default to it and reach the live client unchanged, from the command line down."""
+    import inspect
+
+    import analysis.commitment.runner as runner
+    import analysis.real_content_pilot.runner as pilot
+
+    assert runner.LIVE_TIMEOUT_S == pilot.LIVE_TIMEOUT_S == 180.0
+    assert inspect.signature(runner.build_live).parameters["timeout_s"].default == 180.0
+
+    seen = {}
+
+    class Client:
+        def __init__(self, endpoint, served_as, *, timeout, max_retries):
+            seen.update(timeout=timeout, max_retries=max_retries)
+
+    class Guard:
+        def __init__(self, **kwargs):
+            pass
+
+    class Stop(Exception):
+        pass
+
+    real_build = runner.build_live
+
+    def build(name, **kwargs):
+        real_build(name, **kwargs)  # reaches the stub client, which records the timeout
+        raise Stop
+
+    rung = SimpleNamespace(endpoint=lambda: "endpoint", served_as="model")
+    monkeypatch.setattr(runner, "EchoCheckedClient", Client)
+    monkeypatch.setattr(runner, "GuardedTransport", Guard)
+    monkeypatch.setattr(runner, "LADDER", {"rung": rung})
+    monkeypatch.setattr(runner, "build_live", build)
+    argv = ["--layout", "pilot", "--endpoint", "rung", "--run-name", "t", "--allow-live"]
+    argv += ["--out-root", str(tmp_path / "o"), "--local-root", str(tmp_path / "l")]
+    with pytest.raises(Stop):
+        runner.main(argv)
+    assert seen == {"timeout": 180.0, "max_retries": 0}
+    with pytest.raises(Stop):
+        runner.main([*argv, "--timeout-s", "900"])
+    assert seen["timeout"] == 900.0
+    assert not (tmp_path / "o").exists() and not (tmp_path / "l").exists()
+
+
 def test_every_ladder_rung_has_a_dated_price_and_a_key_path() -> None:
     for rung in LADDER.values():
         endpoint = rung.endpoint()

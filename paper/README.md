@@ -1,7 +1,7 @@
 # COLLIE — IEEE UV 2026 paper
 
-Working repository for the COLLIE paper, *Certify, Then Hedge: Graded Commitment to
-Language-Model Shock Hypotheses in Inventory Control*, for the 8th IEEE International
+Working repository for the COLLIE paper, *Certify, Then Hedge: Weighing Language-Model Shock
+Hypotheses by Anytime-Valid Evidence in Inventory Control*, for the 8th IEEE International
 Conference on Universal Village (IEEE UV2026, virtual and local, October 17–20, 2026; final
 manuscripts due October 15, 2026).
 

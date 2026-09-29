@@ -80,7 +80,7 @@ Checks run on 2026-09-29. Only items the verifier marked `exists=true` are cited
   - UV must be cited in the third person, disclosed on the form, and its differences stated.
   - Because the published UV paper reveals the authors' names, the preprint answer on the ARR form should be treated as "non-anonymous version exists" (see 1.4).
 - **The UV paper already reports several things the follow-up planned** (repo: `paper/sections/08_results.tex`, `paper/sections/02_background.tex`, `paper/sections/11_limitations.tex`):
-  - A 21-model ladder (20 of 21 run), with first-proposal family and direction accuracy from 0 to 59 of 96 shocked episodes, and commitment and accuracy moving together (post hoc r = 0.86).
+  - A 21-model ladder (all 21 run), with first-proposal family and direction accuracy from 0 to 65 of 96 shocked episodes, and commitment and accuracy moving together (post hoc r = 0.86).
   - False alerts on null twins, and an unreliable-alert condition (overstated, ambiguous or distractor).
   - A content-free control.
   - The magnitude "label mismatch".
@@ -378,7 +378,7 @@ Repo observations that motivate the design:
 - **Hallucinated fields when the text is silent.** The correct answer is null or abstain. Report selective accuracy against abstention rate.
 - An error taxonomy: stream confusion (demand versus supply), direction flips, magnitude misbinning, unit errors, timing errors, distractor uptake, and wrong-entity uptake.
 - **Decision-weighted error:** replace one field with the truth, recompile, and measure the change in cost. This ties NLP errors to consequences and is the main bridge between NLP and OR.
-- Across the ladder: reading accuracy against net reward, and whether reading accuracy predicts decision value. The UV paper found that commitment, not accuracy, drove losses for immediate action; this must be re-tested, not re-reported.
+- Across the ladder: reading accuracy against net reward, and whether reading accuracy predicts decision value. The UV ladder found, post hoc, that the loss from acting at once grew with how readily a model commits and that, since commitment and accuracy moved together, being right did not protect a model; this must be re-tested, not re-reported.
 - Control multiplicity for model comparisons (Holm, or anytime-valid e-Holm as in BB-EDGE).
 - Human baseline: two annotators per sampled alert. Agreement sets a ceiling and flags truly ambiguous alerts.
 

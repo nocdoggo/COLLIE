@@ -22681,6 +22681,1086 @@
    "variant": "cth"
   },
   {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f1/s1050000/no_alert",
+   "exposure": 16.431194,
+   "gross": 21888.0,
+   "max_mass": 0.999902,
+   "net": 19876.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f1/s1050000/no_alert__twin",
+   "exposure": 0.0,
+   "gross": 19144.0,
+   "max_mass": 0.0,
+   "net": 17469.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f1/s1060000/no_alert",
+   "exposure": 4.279396,
+   "gross": 19820.0,
+   "max_mass": 0.644573,
+   "net": 18023.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f1/s1060000/no_alert__twin",
+   "exposure": 0.0,
+   "gross": 17628.0,
+   "max_mass": 0.0,
+   "net": 15489.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f1/s1050001/no_alert",
+   "exposure": 16.083213,
+   "gross": 22516.0,
+   "max_mass": 0.999996,
+   "net": 20846.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f1/s1050001/no_alert__twin",
+   "exposure": 0.0,
+   "gross": 19620.0,
+   "max_mass": 0.0,
+   "net": 17672.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f1/s1060001/no_alert",
+   "exposure": 0.130782,
+   "gross": 20016.0,
+   "max_mass": 0.025,
+   "net": 18533.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f1/s1060001/no_alert__twin",
+   "exposure": 0.0,
+   "gross": 18224.0,
+   "max_mass": 0.0,
+   "net": 16115.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f1/s1050000/early_accurate",
+   "exposure": 27.971861,
+   "gross": 22496.0,
+   "max_mass": 1.0,
+   "net": 20366.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f1/s1050000/early_accurate__twin",
+   "exposure": 0.0,
+   "gross": 19144.0,
+   "max_mass": 0.0,
+   "net": 17469.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f1/s1060000/early_accurate",
+   "exposure": 31.755526,
+   "gross": 20344.0,
+   "max_mass": 1.0,
+   "net": 17767.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f1/s1060000/early_accurate__twin",
+   "exposure": 0.0,
+   "gross": 17628.0,
+   "max_mass": 0.0,
+   "net": 15489.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f1/s1050001/early_accurate",
+   "exposure": 26.578793,
+   "gross": 22684.0,
+   "max_mass": 1.0,
+   "net": 20921.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f1/s1050001/early_accurate__twin",
+   "exposure": 0.0,
+   "gross": 19620.0,
+   "max_mass": 0.0,
+   "net": 17672.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f1/s1060001/early_accurate",
+   "exposure": 12.506607,
+   "gross": 20380.0,
+   "max_mass": 0.993586,
+   "net": 18740.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f1/s1060001/early_accurate__twin",
+   "exposure": 0.0,
+   "gross": 18224.0,
+   "max_mass": 0.0,
+   "net": 16115.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f1/s1050000/late_accurate",
+   "exposure": 24.748253000000002,
+   "gross": 22364.0,
+   "max_mass": 1.0,
+   "net": 20211.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f1/s1050000/late_accurate__twin",
+   "exposure": 0.0,
+   "gross": 19144.0,
+   "max_mass": 0.0,
+   "net": 17469.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f1/s1060000/late_accurate",
+   "exposure": 8.61532,
+   "gross": 19900.0,
+   "max_mass": 0.94385,
+   "net": 18006.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f1/s1060000/late_accurate__twin",
+   "exposure": 0.0,
+   "gross": 17628.0,
+   "max_mass": 0.0,
+   "net": 15489.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f1/s1050001/late_accurate",
+   "exposure": 26.498483,
+   "gross": 22660.0,
+   "max_mass": 1.0,
+   "net": 20868.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f1/s1050001/late_accurate__twin",
+   "exposure": 0.0,
+   "gross": 19620.0,
+   "max_mass": 0.0,
+   "net": 17672.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f1/s1060001/late_accurate",
+   "exposure": 13.106591,
+   "gross": 20448.0,
+   "max_mass": 0.994529,
+   "net": 18678.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f1/s1060001/late_accurate__twin",
+   "exposure": 0.0,
+   "gross": 18224.0,
+   "max_mass": 0.0,
+   "net": 16115.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f1/s1050000/unreliable",
+   "exposure": 27.726403,
+   "gross": 22488.0,
+   "max_mass": 1.0,
+   "net": 20361.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f1/s1050000/unreliable__twin",
+   "exposure": 0.081823,
+   "gross": 19148.0,
+   "max_mass": 0.025,
+   "net": 17470.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f1/s1060000/unreliable",
+   "exposure": 31.175334,
+   "gross": 20256.0,
+   "max_mass": 1.0,
+   "net": 17728.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f1/s1060000/unreliable__twin",
+   "exposure": 0.149949,
+   "gross": 17628.0,
+   "max_mass": 0.055192,
+   "net": 15483.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f1/s1050001/unreliable",
+   "exposure": 22.179109,
+   "gross": 22640.0,
+   "max_mass": 1.0,
+   "net": 20972.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f1/s1050001/unreliable__twin",
+   "exposure": 1.632244,
+   "gross": 19624.0,
+   "max_mass": 0.560486,
+   "net": 17664.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f1/s1060001/unreliable",
+   "exposure": 12.5067,
+   "gross": 20380.0,
+   "max_mass": 0.993586,
+   "net": 18740.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f1/s1060001/unreliable__twin",
+   "exposure": 0.215477,
+   "gross": 18232.0,
+   "max_mass": 0.049775,
+   "net": 16119.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f2/s2050000/no_alert",
+   "exposure": 11.756048,
+   "gross": 14652.0,
+   "max_mass": 0.99881,
+   "net": 11038.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f2/s2050000/no_alert__twin",
+   "exposure": 0.12845600000000001,
+   "gross": 17312.0,
+   "max_mass": 0.025,
+   "net": 14499.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f2/s2060000/no_alert",
+   "exposure": 11.983231,
+   "gross": 15576.0,
+   "max_mass": 0.986326,
+   "net": 12814.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f2/s2060000/no_alert__twin",
+   "exposure": 0.131466,
+   "gross": 18480.0,
+   "max_mass": 0.038518,
+   "net": 16512.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f2/s2050001/no_alert",
+   "exposure": 0.202225,
+   "gross": 16464.0,
+   "max_mass": 0.088708,
+   "net": 13741.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f2/s2050001/no_alert__twin",
+   "exposure": 0.092377,
+   "gross": 18916.0,
+   "max_mass": 0.025,
+   "net": 17357.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f2/s2060001/no_alert",
+   "exposure": 0.474401,
+   "gross": 16152.0,
+   "max_mass": 0.210887,
+   "net": 12082.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f2/s2060001/no_alert__twin",
+   "exposure": 0.13392300000000001,
+   "gross": 18776.0,
+   "max_mass": 0.026013,
+   "net": 15977.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f2/s2050000/early_accurate",
+   "exposure": 9.336141,
+   "gross": 14608.0,
+   "max_mass": 0.982787,
+   "net": 10835.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f2/s2050000/early_accurate__twin",
+   "exposure": 0.12845600000000001,
+   "gross": 17312.0,
+   "max_mass": 0.025,
+   "net": 14499.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f2/s2060000/early_accurate",
+   "exposure": 17.890687,
+   "gross": 15396.0,
+   "max_mass": 0.998993,
+   "net": 12778.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f2/s2060000/early_accurate__twin",
+   "exposure": 0.131466,
+   "gross": 18480.0,
+   "max_mass": 0.038518,
+   "net": 16512.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f2/s2050001/early_accurate",
+   "exposure": 0.202225,
+   "gross": 16464.0,
+   "max_mass": 0.088708,
+   "net": 13741.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f2/s2050001/early_accurate__twin",
+   "exposure": 0.092377,
+   "gross": 18916.0,
+   "max_mass": 0.025,
+   "net": 17357.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f2/s2060001/early_accurate",
+   "exposure": 0.474401,
+   "gross": 16152.0,
+   "max_mass": 0.210887,
+   "net": 12082.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f2/s2060001/early_accurate__twin",
+   "exposure": 0.13392300000000001,
+   "gross": 18776.0,
+   "max_mass": 0.026013,
+   "net": 15977.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f2/s2050000/late_accurate",
+   "exposure": 11.756048,
+   "gross": 14652.0,
+   "max_mass": 0.99881,
+   "net": 11038.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f2/s2060000/late_accurate",
+   "exposure": 17.654595,
+   "gross": 15404.0,
+   "max_mass": 0.998892,
+   "net": 12778.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f2/s2050001/late_accurate",
+   "exposure": 0.249551,
+   "gross": 16464.0,
+   "max_mass": 0.088708,
+   "net": 13743.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f2/s2060001/late_accurate",
+   "exposure": 0.474401,
+   "gross": 16152.0,
+   "max_mass": 0.210887,
+   "net": 12082.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f2/s2050000/unreliable",
+   "exposure": 11.549613,
+   "gross": 14656.0,
+   "max_mass": 0.998599,
+   "net": 11029.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f2/s2060000/unreliable",
+   "exposure": 17.654595,
+   "gross": 15404.0,
+   "max_mass": 0.998892,
+   "net": 12778.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f2/s2050001/unreliable",
+   "exposure": 0.236721,
+   "gross": 16464.0,
+   "max_mass": 0.088708,
+   "net": 13743.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f2/s2060001/unreliable",
+   "exposure": 0.5997020000000001,
+   "gross": 16152.0,
+   "max_mass": 0.270347,
+   "net": 12082.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f3/s3050000/no_alert",
+   "exposure": 0.0,
+   "gross": 19132.0,
+   "max_mass": 0.0,
+   "net": 16297.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f3/s3060000/no_alert",
+   "exposure": 0.082104,
+   "gross": 19488.0,
+   "max_mass": 0.025,
+   "net": 16389.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f3/s3050001/no_alert",
+   "exposure": 0.0,
+   "gross": 19192.0,
+   "max_mass": 0.0,
+   "net": 17754.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f3/s3060001/no_alert",
+   "exposure": 0.589803,
+   "gross": 18900.0,
+   "max_mass": 0.059006,
+   "net": 16050.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f3/s3050000/early_accurate",
+   "exposure": 8.553131,
+   "gross": 19152.0,
+   "max_mass": 0.938514,
+   "net": 16259.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f3/s3060000/early_accurate",
+   "exposure": 21.151397,
+   "gross": 19448.0,
+   "max_mass": 0.707406,
+   "net": 16646.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f3/s3050001/early_accurate",
+   "exposure": 0.217724,
+   "gross": 19200.0,
+   "max_mass": 0.025,
+   "net": 17764.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f3/s3060001/early_accurate",
+   "exposure": 29.966019,
+   "gross": 18748.0,
+   "max_mass": 0.999973,
+   "net": 16415.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f3/s3050000/late_accurate",
+   "exposure": 6.922658,
+   "gross": 19144.0,
+   "max_mass": 0.819221,
+   "net": 16247.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f3/s3060000/late_accurate",
+   "exposure": 0.082104,
+   "gross": 19488.0,
+   "max_mass": 0.025,
+   "net": 16389.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f3/s3050001/late_accurate",
+   "exposure": 0.099746,
+   "gross": 19192.0,
+   "max_mass": 0.025,
+   "net": 17751.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f3/s3060001/late_accurate",
+   "exposure": 0.213439,
+   "gross": 18900.0,
+   "max_mass": 0.025,
+   "net": 16044.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f3/s3050000/unreliable",
+   "exposure": 8.553131,
+   "gross": 19152.0,
+   "max_mass": 0.938514,
+   "net": 16259.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f3/s3060000/unreliable",
+   "exposure": 3.723501,
+   "gross": 19488.0,
+   "max_mass": 0.261197,
+   "net": 16419.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f3/s3050001/unreliable",
+   "exposure": 0.053708,
+   "gross": 19192.0,
+   "max_mass": 0.00625,
+   "net": 17753.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f3/s3060001/unreliable",
+   "exposure": 29.967333,
+   "gross": 18792.0,
+   "max_mass": 0.999991,
+   "net": 16151.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f4/s4050000/no_alert",
+   "exposure": 0.0,
+   "gross": 13600.0,
+   "max_mass": 0.0,
+   "net": 12674.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f4/s4060000/no_alert",
+   "exposure": 0.0,
+   "gross": 13712.0,
+   "max_mass": 0.0,
+   "net": 13006.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f4/s4050001/no_alert",
+   "exposure": 0.0,
+   "gross": 16900.0,
+   "max_mass": 0.0,
+   "net": 15433.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f4/s4060001/no_alert",
+   "exposure": 0.0,
+   "gross": 17276.0,
+   "max_mass": 0.0,
+   "net": 16263.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f4/s4050000/early_accurate",
+   "exposure": 20.495839,
+   "gross": 17496.0,
+   "max_mass": 0.999913,
+   "net": 15981.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f4/s4060000/early_accurate",
+   "exposure": 24.473575,
+   "gross": 17588.0,
+   "max_mass": 0.999986,
+   "net": 15431.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f4/s4050001/early_accurate",
+   "exposure": 22.505759,
+   "gross": 18236.0,
+   "max_mass": 0.999966,
+   "net": 15781.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f4/s4060001/early_accurate",
+   "exposure": 25.045186,
+   "gross": 18548.0,
+   "max_mass": 0.999987,
+   "net": 16427.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f4/s4050000/late_accurate",
+   "exposure": 17.597914,
+   "gross": 17020.0,
+   "max_mass": 0.999662,
+   "net": 15620.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f4/s4060000/late_accurate",
+   "exposure": 21.351651,
+   "gross": 17236.0,
+   "max_mass": 0.999938,
+   "net": 15367.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f4/s4050001/late_accurate",
+   "exposure": 19.604958,
+   "gross": 18032.0,
+   "max_mass": 0.999861,
+   "net": 15697.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f4/s4060001/late_accurate",
+   "exposure": 21.65084,
+   "gross": 18444.0,
+   "max_mass": 0.999948,
+   "net": 16469.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f4/s4050000/unreliable",
+   "exposure": 20.495839,
+   "gross": 17496.0,
+   "max_mass": 0.999913,
+   "net": 15981.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f4/s4060000/unreliable",
+   "exposure": 19.09056,
+   "gross": 16612.0,
+   "max_mass": 0.999832,
+   "net": 14713.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f4/s4050001/unreliable",
+   "exposure": 16.023432,
+   "gross": 17888.0,
+   "max_mass": 0.999291,
+   "net": 15797.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f4/s4060001/unreliable",
+   "exposure": 25.045186,
+   "gross": 18548.0,
+   "max_mass": 0.999987,
+   "net": 16427.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f5/s5050000/no_alert",
+   "exposure": 0.0,
+   "gross": 18532.0,
+   "max_mass": 0.0,
+   "net": 16589.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f5/s5060000/no_alert",
+   "exposure": 0.0,
+   "gross": 17704.0,
+   "max_mass": 0.0,
+   "net": 14847.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f5/s5050001/no_alert",
+   "exposure": 0.0,
+   "gross": 17140.0,
+   "max_mass": 0.0,
+   "net": 15459.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f5/s5060001/no_alert",
+   "exposure": 0.0,
+   "gross": 18708.0,
+   "max_mass": 0.0,
+   "net": 15538.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f5/s5050000/early_accurate",
+   "exposure": 0.04913,
+   "gross": 18536.0,
+   "max_mass": 0.00625,
+   "net": 16593.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f5/s5060000/early_accurate",
+   "exposure": 0.081253,
+   "gross": 17704.0,
+   "max_mass": 0.007895,
+   "net": 14844.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f5/s5050001/early_accurate",
+   "exposure": 0.05923,
+   "gross": 17144.0,
+   "max_mass": 0.006798,
+   "net": 15460.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f5/s5060001/early_accurate",
+   "exposure": 0.096416,
+   "gross": 18708.0,
+   "max_mass": 0.02273,
+   "net": 15535.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f5/s5050000/late_accurate",
+   "exposure": 0.03983,
+   "gross": 18536.0,
+   "max_mass": 0.00625,
+   "net": 16591.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f5/s5060000/late_accurate",
+   "exposure": 0.047581,
+   "gross": 17704.0,
+   "max_mass": 0.00625,
+   "net": 14843.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f5/s5050001/late_accurate",
+   "exposure": 0.060228000000000004,
+   "gross": 17140.0,
+   "max_mass": 0.017333,
+   "net": 15453.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f5/s5060001/late_accurate",
+   "exposure": 0.382683,
+   "gross": 18708.0,
+   "max_mass": 0.186925,
+   "net": 15542.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f5/s5050000/unreliable",
+   "exposure": 0.04913,
+   "gross": 18536.0,
+   "max_mass": 0.00625,
+   "net": 16593.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f5/s5060000/unreliable",
+   "exposure": 0.081253,
+   "gross": 17704.0,
+   "max_mass": 0.007895,
+   "net": 14844.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f5/s5050001/unreliable",
+   "exposure": 0.05923,
+   "gross": 17144.0,
+   "max_mass": 0.006798,
+   "net": 15460.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f5/s5060001/unreliable",
+   "exposure": 0.096416,
+   "gross": 18708.0,
+   "max_mass": 0.02273,
+   "net": 15535.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f6/s6050000/no_alert",
+   "exposure": 0.368797,
+   "gross": 18940.0,
+   "max_mass": 0.025876,
+   "net": 16713.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f6/s6060000/no_alert",
+   "exposure": 0.051059,
+   "gross": 18124.0,
+   "max_mass": 0.00625,
+   "net": 15573.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f6/s6050001/no_alert",
+   "exposure": 0.041735,
+   "gross": 16876.0,
+   "max_mass": 0.00625,
+   "net": 14556.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f6/s6060001/no_alert",
+   "exposure": 0.044892,
+   "gross": 17316.0,
+   "max_mass": 0.00625,
+   "net": 14266.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f6/s6050000/early_accurate",
+   "exposure": 1.653562,
+   "gross": 18932.0,
+   "max_mass": 0.202888,
+   "net": 16704.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f6/s6060000/early_accurate",
+   "exposure": 1.848754,
+   "gross": 18124.0,
+   "max_mass": 0.338296,
+   "net": 15508.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f6/s6050001/early_accurate",
+   "exposure": 28.0018,
+   "gross": 16464.0,
+   "max_mass": 0.999999,
+   "net": 14184.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f6/s6060001/early_accurate",
+   "exposure": 0.7378129999999999,
+   "gross": 17316.0,
+   "max_mass": 0.263059,
+   "net": 14211.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f6/s6050000/late_accurate",
+   "exposure": 0.05462,
+   "gross": 18936.0,
+   "max_mass": 0.013312,
+   "net": 16743.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f6/s6060000/late_accurate",
+   "exposure": 0.060497,
+   "gross": 18124.0,
+   "max_mass": 0.007468,
+   "net": 15573.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f6/s6050001/late_accurate",
+   "exposure": 24.912423,
+   "gross": 16476.0,
+   "max_mass": 0.989624,
+   "net": 14294.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f6/s6060001/late_accurate",
+   "exposure": 0.06278,
+   "gross": 17316.0,
+   "max_mass": 0.007181,
+   "net": 14265.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f6/s6050000/unreliable",
+   "exposure": 1.653562,
+   "gross": 18932.0,
+   "max_mass": 0.202888,
+   "net": 16704.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f6/s6060000/unreliable",
+   "exposure": 1.848754,
+   "gross": 18124.0,
+   "max_mass": 0.338296,
+   "net": 15508.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "dev/f6/s6050001/unreliable",
+   "exposure": 28.0018,
+   "gross": 16464.0,
+   "max_mass": 0.999999,
+   "net": 14184.0,
+   "variant": "cth"
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "episode_id": "cal/f6/s6060001/unreliable",
+   "exposure": 0.7378129999999999,
+   "gross": 17316.0,
+   "max_mass": 0.263059,
+   "net": 14211.0,
+   "variant": "cth"
+  },
+  {
    "bank": "scripted-bank",
    "episode_id": "dev/f1/s1050000/no_alert",
    "exposure": 14.68066,
@@ -24943,6 +26023,65 @@
    }
   },
   {
+   "bank": "ladder-step-5-preview",
+   "by_family_net_vs_arm1": {
+    "0": -2.125,
+    "1": 57.5,
+    "2": 84.75,
+    "3": 38.6875,
+    "4": 1097.6875,
+    "5": -0.375,
+    "6": -86.9375
+   },
+   "null_exposure": 0.12716404166666667,
+   "null_max_mass": 0.560486,
+   "null_net_vs_arm1": -2.125,
+   "null_worst_vs_arm1": -8.0,
+   "variant": "cth",
+   "vs_arm10|gross": {
+    "b": [
+     31.50033051295611,
+     231.23911007025762
+    ],
+    "mean": 124.93333333333334
+   },
+   "vs_arm10|net": {
+    "b": [
+     115.1597693032015,
+     579.8696271929824
+    ],
+    "mean": 325.43333333333334
+   },
+   "vs_arm1|gross": {
+    "b": [
+     61.46565566458519,
+     556.018103448276
+    ],
+    "mean": 276.9
+   },
+   "vs_arm1|net": {
+    "b": [
+     10.256008064516132,
+     372.0928874813711
+    ],
+    "mean": 158.41666666666666
+   },
+   "vs_arm8|gross": {
+    "b": [
+     -317.6553423992229,
+     -44.177955665024584
+    ],
+    "mean": -188.33333333333334
+   },
+   "vs_arm8|net": {
+    "b": [
+     2351.6890264423077,
+     4895.309665944943
+    ],
+    "mean": 3508.0
+   }
+  },
+  {
    "bank": "scripted-bank",
    "by_family_net_vs_arm1": {
     "0": -2.125,
@@ -26238,6 +27377,65 @@
      4518.904314516129
     ],
     "mean": 3187.4
+   }
+  },
+  {
+   "bank": "ladder-step-5-preview",
+   "by_family_net_vs_arm1": {
+    "0": -0.9166666666666666,
+    "1": 42.875,
+    "2": 82.0,
+    "3": 20.375,
+    "4": 1003.4375,
+    "5": -0.9375,
+    "6": -126.3125
+   },
+   "null_exposure": 0.23228595833333332,
+   "null_max_mass": 0.360693,
+   "null_net_vs_arm1": -0.9166666666666666,
+   "null_worst_vs_arm1": -8.0,
+   "variant": "cth_uniform",
+   "vs_arm10|gross": {
+    "b": [
+     16.19584745762712,
+     198.9888038277512
+    ],
+    "mean": 102.56666666666666
+   },
+   "vs_arm10|net": {
+    "b": [
+     97.4038451012589,
+     553.1183438155138
+    ],
+    "mean": 303.025
+   },
+   "vs_arm1|gross": {
+    "b": [
+     55.741991525423735,
+     515.4308401639346
+    ],
+    "mean": 254.53333333333333
+   },
+   "vs_arm1|net": {
+    "b": [
+     -0.8243773946360152,
+     333.0627779649596
+    ],
+    "mean": 136.00833333333333
+   },
+   "vs_arm8|gross": {
+    "b": [
+     -352.01268656716417,
+     -54.36749999999999
+    ],
+    "mean": -210.7
+   },
+   "vs_arm8|net": {
+    "b": [
+     2332.5214912280703,
+     4867.635347222222
+    ],
+    "mean": 3485.5916666666667
    }
   }
  ]

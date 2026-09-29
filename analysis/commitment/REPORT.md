@@ -263,9 +263,9 @@ live arm matches the replay on 120/120 episodes of the scripted bank.
 
 ## Stage A: model ladder on the pilot episodes
 
-The registered 120 pilot episodes with every rung that has finished (`out/ladder.json`,
-`out/ladder.md`; `step-5-preview`, a slow reasoning model, was still running when this was
-written, and `gemini-3-flash-preview` was dropped under A1). The hedge column is the
+The registered 120 pilot episodes with all 21 rungs (`out/ladder.json`, `out/ladder.md`;
+`gemini-3-flash-preview` was dropped under A1; `step-5-preview`, a slow reasoning model, finished
+on 2026-09-29 at 13:41 UTC after the restarts recorded in A4). The hedge column is the
 stage B development replay (arm 10's cached answers, no calls), so it carries no claim.
 
 | model | developer | released | size | right family / 96 | first-proposal abstain | at once - arm 1 (net) | gate - arm 1 (net) | hedge - arm 1 (net, dev) | false-alert nulls acted on (at once / gate) | cost |
@@ -285,26 +285,29 @@ stage B development replay (arm 10's cached answers, no calls), so it carries no
 | gpt-3.5-turbo | OpenAI | 2023-05 | legacy | 26/96 | 25 | -1,821 | -60 | +148 | 11/12, 1/12 | $0.17 |
 | gpt-4o-mini | OpenAI | 2024-07 | legacy | 29/96 | 0 | -1,741 | -1 | +111 | 11/12, 1/12 | $0.07 |
 | gpt-oss-20b | OpenAI | 2025-08 | 21B-MoE | 49/96 | 21 | -2,626 | -176 | +149 | 6/12, 0/12 | $0.05 |
-| step-3.5-flash | StepFun | 2026-01 | mid | 49/96 | 29 | -3,339 | -156 | +146 | 12/12, 1/12 | $0.37 |
+| step-3.5-flash | StepFun | 2026-01 | mid | 49/96 | 29 | -3,339 | -157 | +146 | 12/12, 1/12 | $0.37 |
 | step-3.5-flash-2603 | StepFun | 2026-03 | mid | 50/96 | 26 | -3,269 | -141 | +155 | 12/12, 1/12 | $0.37 |
 | step-3.7-flash | StepFun | 2026-05 | mid | 53/96 | 29 | -3,051 | -201 | +153 | 12/12, 1/12 | $1.72 |
+| step-5-preview | StepFun | 2026-09 | large | 65/96 | 17 | -3,350 | -167 | +158 | 12/12, 1/12 | $1.71 |
 | grok-build-0.1 | xAI | 2025-08 | small | 28/96 | 53 | -2,002 | +3 | +144 | 3/12, 0/12 | $1.28 |
 | grok-4.20 | xAI | 2026-03 | mid | 53/96 | 20 | -2,624 | -172 | +154 | 9/12, 1/12 | $0.44 |
 
-Readings. Perception ranges from 0/96 to 59/96: Llama 3.2 1B never produces a non-abstaining
+Readings. Perception ranges from 0/96 to 65/96 (`step-5-preview`): Llama 3.2 1B never produces a non-abstaining
 `ShockSpec`, so every proposal falls back to arm 1, and 3B produces seven (all demand up), on
 which acting at once loses 28 b[-54, -6]. The loss from acting at once ranges from zero to
 -3,656 and, contrary to stage A's registered expectation (item 6) that it would grow as
 perception falls, grows with how readily a model commits; across the rungs commitment and accuracy move
-together (post hoc, `posthoc.json` `ladder`: r = 0.86; loss against either, r = -0.90), so
+together (post hoc, `posthoc.json` `ladder`: r = 0.86; loss against either, r = -0.91), so
 being right does not protect a model: Qwen 2.5 7B (2/96 right, 63 first-proposal abstentions)
-loses 61, while Gemini 2.5 Flash-Lite (55/96 right, 5 abstentions) loses 3,656. The gate stays
+loses 61, while Gemini 2.5 Flash-Lite (55/96 right, 5 abstentions) loses 3,656 and the most
+accurate rung, `step-5-preview` (65/96), loses 3,350. The gate stays
 between -300 and +3; contrary to stage A's registered expectation (item 6), its interval lies
 below zero on two rungs, Gemini 2.5 Flash -294 b[-567, -45] and GPT-3.5 Turbo -60 b[-151, -1].
 The hedge's development replay has point estimates of +107 to +158 on every rung (the interval
 includes zero for Llama 3.1 8B); the content-free variant gains +136 on the same episodes.
-Rung costs in `out/ladder.json` sum to $8.34 over the 20 finished rungs, of which $2.34 is the
-real-content pilot's two banks, reused here.
+Rung costs in `out/ladder.json` sum to $10.05 over the 21 rungs (StepFun's four, $4.17, are
+shadow prices on a flat-rate plan), of which $2.34 is the real-content pilot's two banks, reused
+here.
 
 ## Amendments and disclosures
 
@@ -312,8 +315,12 @@ real-content pilot's two banks, reused here.
 - A2: StepFun (four models, shadow-priced flat-rate plan) and OpenRouter (eleven open-weight or
   legacy models) added before any call on them.
 - A3: StepFun shadow caps raised to $4 so `step-3.7-flash` runs.
-- A4: the `step-5-preview` full run stopped on a provider timeout after 61 calls and was
-  restarted from its cache under the same name and cap.
+- A4: the `step-5-preview` full run stopped on provider timeouts several times and was resumed
+  from its cache under the same name and cap. From about 11:03 UTC its request timeout was 900 s,
+  not the 180 s of the transport rules stage A adopts (a logged deviation; `runner.py`, frozen by
+  hash in stages C and D, gained a `--timeout-s` flag defaulting to 180 s). No prompt, decoding or
+  cached answer changed, but 13 of its 179 answers took 184 to 372 s on their first attempt and
+  were accepted only because of the longer timeout. It finished at 13:41 UTC for $1.71 (shadow).
 - C1: fresh layout reduced from 72 to 48 units before any call: the dev/cal alert bank has four
   accurate templates per family and split, and module 03's renderer refuses repeated texts.
 - C2: an empty model echo is re-requested (up to three times, all attempts billed) instead of

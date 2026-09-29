@@ -164,9 +164,9 @@ the baseline lead).
 
 \subsection{Model scale}
 
-The ladder ran 20 of the 21 models on the 120 pilot episodes (StepFun's slowest reasoning model
-had not finished at the time of writing). First proposals named the right family and direction
-in 0 to 59 of 96 shocked episodes. Acting at once lost between nothing (Llama~3.2 1B, which never
+The ladder ran all 21 models on the 120 pilot episodes; the slowest, Step~5 Preview, finished
+under a longer request timeout than registered, a logged deviation that admitted 13 slow answers.
+First proposals named the right family and direction in 0 to 65 of 96 shocked episodes. Acting at once lost between nothing (Llama~3.2 1B, which never
 produced a usable \shockspec{}) and $3{,}656$ per episode (Gemini~2.5 Flash-Lite). Contrary to the stage's
 registered expectation that this loss would grow as perception falls, it grows with how readily
 a model commits, and commitment and accuracy move together (post hoc, $r = 0.86$). The gate
