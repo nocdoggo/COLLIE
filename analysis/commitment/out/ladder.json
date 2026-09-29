@@ -9,9 +9,7 @@
  },
  "missing_or_partial": [
   "gemini-3-flash-preview",
-  "step-3.7-flash",
-  "step-5-preview",
-  "gpt-oss-20b"
+  "step-5-preview"
  ],
  "registered_in": "analysis/commitment/PLAN.md, stage A (with A1-A3)",
  "rungs": [
@@ -400,6 +398,54 @@
    "usd": 0.371394
   },
   {
+   "abstain_first": 29,
+   "arm10_arm1_net": {
+    "cluster_bootstrap": [
+     -556.330425,
+     95.157532
+    ],
+    "clusters": 24,
+    "mean": -201.333333,
+    "n": 120,
+    "normal": [
+     -437.336385,
+     34.669718
+    ]
+   },
+   "arm8_arm1_net": {
+    "cluster_bootstrap": [
+     -4441.76875,
+     -1895.441035
+    ],
+    "clusters": 24,
+    "mean": -3051.391667,
+    "n": 120,
+    "normal": [
+     -3792.857841,
+     -2309.925492
+    ]
+   },
+   "cth_arm1_net_dev": {
+    "b": [
+     6.0,
+     367.1
+    ],
+    "mean": 153.3
+   },
+   "developer": "StepFun",
+   "false_alert_active_arm10": 1,
+   "false_alert_active_arm8": 12,
+   "family_right": 53,
+   "latency_p50_ms": 34190.167,
+   "parse_attempts": 432,
+   "parse_valid": 429,
+   "released": "2026-05",
+   "rung": "step-3.7-flash",
+   "shocked": 96,
+   "tier": "mid",
+   "usd": 1.716046
+  },
+  {
    "abstain_first": 5,
    "arm10_arm1_net": {
     "cluster_bootstrap": [
@@ -782,6 +828,54 @@
    "shocked": 96,
    "tier": "671B-MoE",
    "usd": 0.08911
+  },
+  {
+   "abstain_first": 21,
+   "arm10_arm1_net": {
+    "cluster_bootstrap": [
+     -421.939775,
+     31.253534
+    ],
+    "clusters": 24,
+    "mean": -176.425,
+    "n": 120,
+    "normal": [
+     -399.729454,
+     46.879454
+    ]
+   },
+   "arm8_arm1_net": {
+    "cluster_bootstrap": [
+     -3715.906376,
+     -1690.064494
+    ],
+    "clusters": 24,
+    "mean": -2626.458333,
+    "n": 120,
+    "normal": [
+     -3251.50817,
+     -2001.408497
+    ]
+   },
+   "cth_arm1_net_dev": {
+    "b": [
+     0.4,
+     363.4
+    ],
+    "mean": 149.3
+   },
+   "developer": "OpenAI",
+   "false_alert_active_arm10": 0,
+   "false_alert_active_arm8": 6,
+   "family_right": 49,
+   "latency_p50_ms": 22701.77,
+   "parse_attempts": 498,
+   "parse_valid": 412,
+   "released": "2025-08",
+   "rung": "gpt-oss-20b",
+   "shocked": 96,
+   "tier": "21B-MoE",
+   "usd": 0.053056
   },
   {
    "abstain_first": 25,

@@ -1,0 +1,138 @@
+{
+  "alert_selection_rule": "bank-v1",
+  "alert_source": "bank",
+  "alert_sources": {
+    "bank:early_accurate": 20,
+    "bank:false_alert_null": 12,
+    "bank:late_accurate": 20,
+    "bank:unreliable": 20,
+    "none:bank_gap_demand_down": 16,
+    "none:no_alert": 20,
+    "none:silent_null": 12
+  },
+  "analysis_class": "exploratory",
+  "arm_set": "nine",
+  "arms": [
+    "arm1_capped_base_stock",
+    "arm2_telemetry_hmm_or",
+    "arm8_spec_immediate",
+    "arm9_spec_heuristic_rollback",
+    "arm10_spec_eprocess",
+    "ctrl_cusum_to_compiler",
+    "ctrl_keyword_parser",
+    "ctrl_alertspec_upper_bound",
+    "oracle_shockspec_headroom"
+  ],
+  "decoding": "det-v1 (temperature 0.0, no seed), module 02 prompt, no system prompt",
+  "endpoint": {
+    "base_url": "https://openrouter.ai/api/v1",
+    "bills_thinking_as_output": true,
+    "extra_body": null,
+    "model_id": "openai/gpt-oss-20b",
+    "name": "openrouter:openai/gpt-oss-20b",
+    "price_date": "2026-09-28",
+    "price_input_per_mtok": 0.018,
+    "price_output_per_mtok": 0.09,
+    "supports_seed": false
+  },
+  "episodes": 120,
+  "git": {
+    "branch": "method/graded-commitment",
+    "dirty_paths": [
+      "M .gitignore",
+      "?? analysis/commitment/out/ladder-gpt-oss-20b/",
+      "?? analysis/commitment/out/ladder-step-3.7-flash/",
+      "?? analysis/commitment/out/ladder-step-5-preview/",
+      "?? analysis/commitment/sensitivity.py"
+    ],
+    "sha": "2df0a2304c8626c132c808f2ed8591c8f05ab121"
+  },
+  "guard": {
+    "max_physical_calls": 1500,
+    "physical_calls_this_invocation": 193,
+    "physical_calls_total": 202,
+    "refusals_this_invocation": 0,
+    "retries_this_invocation": 1,
+    "spend_cap_usd": 0.5,
+    "usd_this_invocation": 0.045586925999999986,
+    "usd_total": 0.05305634999999999
+  },
+  "ladder_rung": {
+    "model_id": "openai/gpt-oss-20b",
+    "name": "gpt-oss-20b",
+    "price_input_per_mtok": 0.018,
+    "price_output_per_mtok": 0.09,
+    "provider": "openrouter",
+    "released": "2025-08",
+    "served_as": [
+      "openai/gpt-oss-20b"
+    ],
+    "tier": "21B-MoE"
+  },
+  "layout": "pilot",
+  "ledger": {
+    "charged": 498,
+    "charged_usd": 0.10280915999999998,
+    "per_arm": [
+      {
+        "accepted": 120,
+        "accepted_after_repair": 19,
+        "arm_id": "arm10_spec_eprocess",
+        "attempted": 166,
+        "input_tokens": 279274,
+        "output_tokens": 448441,
+        "p50_latency_ms": 0.0029549701139330864,
+        "p95_latency_ms": 42916.19574197102,
+        "rejected": 27,
+        "usd_cost": 0.045386621999999995
+      },
+      {
+        "accepted": 120,
+        "accepted_after_repair": 17,
+        "arm_id": "arm8_spec_immediate",
+        "attempted": 166,
+        "input_tokens": 278291,
+        "output_tokens": 263580,
+        "p50_latency_ms": 20209.233989939094,
+        "p95_latency_ms": 69130.30179508496,
+        "rejected": 29,
+        "usd_cost": 0.028731437999999998
+      },
+      {
+        "accepted": 120,
+        "accepted_after_repair": 16,
+        "arm_id": "arm9_spec_heuristic_rollback",
+        "attempted": 166,
+        "input_tokens": 278290,
+        "output_tokens": 263132,
+        "p50_latency_ms": 0.003325054422020912,
+        "p95_latency_ms": 0.00401597935706377,
+        "rejected": 30,
+        "usd_cost": 0.028691099999999997
+      }
+    ],
+    "physical_this_invocation": 193
+  },
+  "n_per_family": null,
+  "not_a_gate3_vote": true,
+  "outputs_sha256": {
+    "alerts.jsonl": "58afda2dc82906ae90309dff6601d4d0d3778422e626556c15a01fa661fb428f",
+    "ledger.csv": "b8f66fdae9a3f240076a5eccaa180753a9da43812532328d1de62233a3817c49",
+    "proposals.jsonl": "557bb96636cb6ecce09e7e98d81663e0f5870cc02104a0259bb8c014b4ee6d5f",
+    "records.jsonl.gz": "df54af5663accf9787f234eeb932cc1b54c467b70e2bede1f2bb1400fbe19cd9",
+    "truth.jsonl": "0d30aa2c366d1c0995de049b3e20fb5c8a1e8f31fbc926f17cd7d62f2a4f0221"
+  },
+  "partial": false,
+  "profit": 4.0,
+  "records": 1032,
+  "rule_u": {
+    "arm10_coerced_abstentions": 24,
+    "version": "U-v1"
+  },
+  "run_name": "ladder-gpt-oss-20b",
+  "truth_identical_to_reports_pilot_truth": true,
+  "versions": {
+    "openai": "1.109.1",
+    "python": "3.12.11"
+  }
+}
