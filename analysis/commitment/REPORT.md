@@ -7,7 +7,7 @@ confirmation: its method, hypotheses, tests and evaluator were committed and pus
 the fresh pool earlier (a scripted structural test computed outcomes on 6 of the 48 clusters) and
 an interim look at one primary run. The plan and every amendment are in `PLAN.md`; the frozen
 tree shows no drift. Numbers below come from `out/confirm.json` (stage C), `out/posthoc.json` and
-`out/sensitivity.json` (post hoc on stage C), `out/dev/dev1.json` (stage B) and the run outputs
+`out/sensitivity.json` and `out/ablation.json` (post hoc on stage C), `out/dev/dev1.json` (stage B) and the run outputs
 under `out/` (stage A), unless a sentence names another source.
 
 ## The method
@@ -137,6 +137,36 @@ reward the gain is 0.5% / 0.3% at p/h = 1, 1.1% / 1.0% at 4 and 1.2% / 1.2% at 1
 share over the content-free control is distinguishable from zero with Gemini at p/h = 9 and 19,
 and with Grok at p/h = 1, where it is negative. All post hoc, on the confirmation's own
 episodes; `sensitivity.json` holds 6 contrasts x 2 endpoints x 5 ratios x 2 models.
+
+**Ablations** (`ablation.py`, `out/ablation.json`; post hoc, exploratory). Variants of the
+method re-run on stage C's 240 fresh episodes, each served, at every decision point, the answer
+text the model gave `arm12_cth` in the registered run (so the counterfactual is "the same answer
+at the same decision point"; the shared trigger fixes the decision points). At p/h = 4 the
+`lam = 0.25` hedge reproduces `arm12_cth`'s 240 records exactly and `lam = 1` reproduces
+`ctrl_cth_uniform`'s, at p/h = 4 and 19; no variant called at a period without a recorded
+answer. `lam = 0` is not `arm12b_cth_llm`, which made its own calls (their records differ on 1
+and 4 episodes). Contrasts are each variant minus the method (`lam = 0.25`, hedge rule) on net
+reward, with seed-cluster intervals; at p/h = 19 the comparators come from the cost-ratio replay.
+The method's own null exposure is 0.523 / 0.458.
+
+| variant | minus the method, p/h = 4 (Gemini / Grok) | p/h = 19 | null exposure (Gemini / Grok) |
+|---|---|---|---|
+| lam 0 (label only) | -25 b[-66, 9] / -77 b[-144, -21] | -179 b[-365, -31] / -406 b[-779, -114] | 0.184 / 0.062 |
+| lam 0.1 | -4 b[-13, 3] / -14 b[-32, -1] | -23 b[-60, 3] / -57 b[-122, -7] | 0.365 / 0.275 |
+| lam 0.5 | -2 b[-9, 4] / +2 b[-4, 8] | +1 b[-17, 22] / +16 b[-4, 41] | 0.672 / 0.631 |
+| lam 0.75 | -4 b[-14, 6] / +5 b[-5, 18] | -25 b[-65, 14] / +11 b[-24, 48] | 0.765 / 0.739 |
+| lam 1 (content-free) | -9 b[-24, 5] / +6 b[-11, 29] | -84 b[-166, -18] / -19 b[-87, 38] | 0.829 / 0.829 |
+| linear rule, lam 0.25 | -3 b[-10, 2] / -9 b[-21, -0.02] | -152 b[-278, -46] / -168 b[-311, -49] | 0.523 / 0.458 |
+| MAP rule, lam 0.25 | -56 b[-97, -19] / -62 b[-108, -21] | -370 b[-649, -131] / -368 b[-655, -125] | 0.523 / 0.458 |
+
+The graded rule matters more than the prior weight. Committing to the compiled target once the
+shock mass reaches 1/2 (MAP) loses about 56 and 62 per episode at p/h = 4 and about 370 at
+p/h = 19, every interval below zero; interpolating the target by the shock mass (linear) costs
+little at p/h = 4 and 152 and 168 at 19. At `lam = 0.5` and `0.75` the net outcome is not
+distinguishable from the method's with either model, while null exposure rises with `lam`;
+smaller weights on the uniform part cost with Grok (`lam = 0.1`: -14 at p/h = 4, -57 at 19), and
+trusting the label alone (`lam = 0`) gives the lowest null exposure but loses with Grok at
+p/h = 4 and with both models at p/h = 19.
 
 **Cost.** Stage C provider cost $6.51: Gemini 3.8 $4.55, Grok 4.20 $1.09, GPT-3.5 $0.45,
 DeepSeek-V3 $0.22, Gemini 2.5 Flash-Lite $0.13, Llama 3.1 8B $0.06.
