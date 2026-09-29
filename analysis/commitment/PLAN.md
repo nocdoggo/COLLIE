@@ -226,3 +226,16 @@ manifest; they carry dev/cal labels only so that dev/cal templates render.
 `--n-per-family 1`: units `i = 0` of each family, 30 episodes) was run on 2026-09-28 before this
 registration; only record counts and sidecar row counts were read. Stage B tuned the method on the
 120 spent pilot episodes and the stage A ladder banks.
+
+### Stage C amendments
+
+**C1 (2026-09-28, after a failed smoke start, before any model call or outcome).** The first
+smoke start refused the 72-unit layout inside module 03's own renderer (`render_condition_batch`:
+"repeated rollout text", units `f4 s4100000` and `f4 s4100008`): the dev/cal bank has four
+accurate templates per split and family, so under rule `bank-v1` at most four units per split,
+eight per family, get distinct texts. No provider call was made and no record was written. The
+layout becomes `i = 0..7` per family: 48 units (clusters), 192 shocked episodes and 48 twins (24
+silent, 24 false-alert), 240 episodes. Nothing else changes; the frozen files are untouched
+(`--n-per-family` is a runtime argument). Caps scale by 2/3: $8 (Gemini 3.8), $2 (Grok 4.20), $1
+each for the secondary models. With 48 clusters, H2 (versus arm 1) is expected to have moderate
+power at the development effect size; H1 (versus arm 10) keeps high power.
