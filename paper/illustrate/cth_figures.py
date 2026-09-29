@@ -124,6 +124,10 @@ def data_fig1_episode() -> Path:
             row = json.loads(line)
             if row["episode_id"] == EPISODE_ID and row["arm_id"] == CTH:
                 mass[row["period"]] = row["shock_mass"]
+    with (OUT / EPISODE_RUN / "truth.jsonl").open() as handle:
+        truth = next(
+            json.loads(line) for line in handle if json.loads(line)["episode_id"] == EPISODE_ID
+        )
     rows, cum = [], {CTH: 0.0, ARM10: 0.0, ARM8: 0.0}
     for t in sorted(records[ARM1]):
         base = records[ARM1][t]
@@ -143,6 +147,7 @@ def data_fig1_episode() -> Path:
                 round(cum[CTH], 1),
                 round(cum[ARM10], 1),
                 round(cum[ARM8], 1),
+                truth["onset_period"],
             ]
         )
     return _write_csv(
@@ -156,6 +161,7 @@ def data_fig1_episode() -> Path:
             "cum_net_cth_minus_arm1",
             "cum_net_gate_minus_arm1",
             "cum_net_immediate_minus_arm1",
+            "onset",
         ],
         rows,
     )
@@ -167,7 +173,7 @@ def fig1_episode() -> None:
     mass = [float(r["cth_shock_mass"]) for r in rows]
     gate = [int(r["gate_active"]) for r in rows]
     proposal = [int(r["period"]) for r in rows if r["proposal"] == "1"]
-    onset = 14  # the episode's truth (analysis/commitment/out/<run>/truth.jsonl)
+    onset = int(rows[0]["onset"])
     cth = [float(r["cum_net_cth_minus_arm1"]) for r in rows]
     gate_net = [float(r["cum_net_gate_minus_arm1"]) for r in rows]
 
@@ -229,11 +235,11 @@ def data_fig2_models() -> Path:
                 perception["called_shocked"],
                 perception["parse_fail"],
                 perception["abstain"],
-                *(round(v, 1) for v in (c["arm8-arm1|net"]["mean"], *c["arm8-arm1|net"]["b"])),
-                *(round(v, 1) for v in (c["arm10-arm1|net"]["mean"], *c["arm10-arm1|net"]["b"])),
-                *(round(v, 1) for v in (c["cth-arm1|net"]["mean"], *c["cth-arm1|net"]["b"])),
+                *(round(v, 3) for v in (c["arm8-arm1|net"]["mean"], *c["arm8-arm1|net"]["b"])),
+                *(round(v, 3) for v in (c["arm10-arm1|net"]["mean"], *c["arm10-arm1|net"]["b"])),
+                *(round(v, 3) for v in (c["cth-arm1|net"]["mean"], *c["cth-arm1|net"]["b"])),
                 *(
-                    round(v, 1)
+                    round(v, 3)
                     for v in (c["uniform-arm1|net"]["mean"], *c["uniform-arm1|net"]["b"])
                 ),
             ]

@@ -4,54 +4,42 @@
 \textbf{Anytime-valid checks on language-model outputs.} POPPER runs
 agent-designed falsification experiments under Type-I error
 control~\cite{popper}; E-valuator stops failing agent trajectories with a
-sequential test on verifier scores~\cite{e-valuator}. Conformal Selective
+sequential test on verifier scores~\cite{e-valuator}; Conformal Selective
 Acting certifies with Ville-type \eprocess{}es when a fine-tuned model may
-act~\cite{csa}, and in Propose, Don't Judge a frozen anytime-valid referee
-admits agent-proposed factors~\cite{propose-dont-judge}. All four, like
-our registered gate, accept or refuse at an evidence threshold.
-Certify-then-hedge hedges instead: the model only reweights a fixed,
-action-aligned hypothesis set (and sets its hypothesis's onset window), the
-prior-weighted \eprocess{}es become posterior odds, and the order is a
-Bayes-mixture base-stock quantile. With one hypothesis and $\lambda = 0$ the
-gate's threshold is a posterior-odds rule of the same form, and under a known
-null the exposure bound holds for any model output
-(Theorem~\ref{thm:exposure}).
+act~\cite{csa}; and in Propose, Don't Judge a frozen anytime-valid referee
+admits agent-proposed factors~\cite{propose-dont-judge}. All four, like our
+registered gate, accept or refuse at an evidence threshold. Certify-then-hedge
+hedges instead: the model only reweights a fixed, action-aligned hypothesis set,
+the prior-weighted \eprocess{}es become posterior odds, and the order is a
+Bayes-mixture base-stock quantile.
 
 \textbf{Anytime-valid inference.} We take e-values and Ville's inequality as
 given~\cite{vovk-wang-evalues, ramdas-savi, ville} and read an \eprocess{} as a
-bettor's wealth~\cite{shafer-betting}. Universal inference builds a valid e-value
-for a composite null by data splitting, the split likelihood-ratio
-statistic~\cite{universal-inference}; we use a plug-in demand null instead, so
-our guarantees hold only as far as it does
+bettor's wealth~\cite{shafer-betting}. Universal inference builds valid e-values
+for composite nulls by data splitting~\cite{universal-inference}; we use a
+plug-in demand null instead, so our guarantee holds only as far as it does
 (Section~\ref{sec:limitations}). Gr\"unwald's e-posterior has risk bounds that
 loosen, not fail, when its e-collection, the analogue of a prior, is chosen
 badly~\cite{grunwald-eposterior}, and e-values keep Type-I risk control when the
-loss is chosen after the data~\cite{grunwald-beyond-np}. Certify-then-hedge
-multiplies prior weights by \eprocess{}es where a Bayes posterior uses
-likelihood ratios, so a wrong or missing family costs $\log(1/\lambda)$ nats
-of evidence against the content-free prior, and no validity.
+loss is chosen after the data~\cite{grunwald-beyond-np}; our hedged prior plays
+that role for the language model's answer.
 
-\textbf{Inventory under uncertain information.} In inventory theory, advance
-demand information is a reliable signal that offsets lead
-time~\cite{hariharan-zipkin} and makes state-dependent base-stock policies
-optimal~\cite{gallego-ozer}. With the demand law unknown, the classical answers
-are Bayesian updating~\cite{scarf-bayes} and a min-max order over all laws
-with given mean and variance~\cite{scarf-minmax}. Our signal is text of
-unknown reliability that only splits a fixed prior budget. Unlike a Bayesian
-order, the mass that moves ours comes from \eprocess{}es that stay valid
-whatever working likelihood sizes the shock; unlike the min-max order, it stays
-near arm~1 until evidence arrives.
+\textbf{Inventory under uncertain information.} Advance demand information
+offsets lead time~\cite{hariharan-zipkin} and makes state-dependent base-stock
+policies optimal~\cite{gallego-ozer}; with the demand law unknown, the classical
+answers are Bayesian updating~\cite{scarf-bayes} and a min-max
+order~\cite{scarf-minmax}. Our signal is text of unknown reliability that only
+splits a fixed prior budget, and the mass that moves the order comes from
+\eprocess{}es, so the order stays near arm~1 until evidence arrives.
 
-\textbf{Language models in operations.} On InventoryBench, language
-models augmented with operations research outperform either
-alone~\cite{inventorybench}. Language models read event text into
-demand forecasts~\cite{eventcast} and turn context into predicted disturbances
-for a model predictive controller~\cite{instructmpc}; LLM-SAA optimizes
-decisions such as the newsvendor under model-generated
-distributions~\cite{llm-saa}; agents record plans as falsifiable commitments and
-hypotheses with a tracked lifecycle~\cite{fcpagent, hep}. STOCKTAKE finds a
+\textbf{Language models in operations.} On InventoryBench, language models
+augmented with operations research outperform either
+alone~\cite{inventorybench}. Language models read event text into demand
+forecasts~\cite{eventcast}, turn context into predicted disturbances for model
+predictive control~\cite{instructmpc}, generate distributions for
+newsvendor-type decisions~\cite{llm-saa}, and record plans as falsifiable
+commitments or tracked hypotheses~\cite{fcpagent, hep}. STOCKTAKE finds a
 knowing-doing gap: models detect 84 to 88\% of hidden failures, yet where stress
 persists 34 to 43\% of correctly diagnosed stress weeks still end in a
 stockout~\cite{stocktake}. Certify-then-hedge takes no order and no demand
-distribution from the model; shock sizes come from the data, and the order
-moves toward a hypothesis only as its \eprocess{} grows.
+distribution from the model.

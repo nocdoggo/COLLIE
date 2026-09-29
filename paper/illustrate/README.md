@@ -3,17 +3,20 @@
 Scripts in this folder generate every figure the paper includes; nothing in
 `../figures/` is edited by hand.
 
+The paper's two figures come from `cth_figures.py`, which reads the committed study outputs in
+`analysis/commitment/out/` and writes a CSV sidecar per figure to `data/` before drawing it.
+`figures.py` rendered the submitted draft's three figures (`fig1_overview`, `fig2_method`,
+`fig3_frontier`); it and those files are kept for reference and are no longer included.
+
 ## Usage
 
 ```bash
-python3 illustrate/figures.py                 # render all figures into ../figures/
-python3 illustrate/figures.py fig1_overview   # render one figure by name
-python3 illustrate/figures.py --list          # list registered figures
+uv run python paper/illustrate/cth_figures.py               # both figures, from the repo root
+uv run python paper/illustrate/cth_figures.py fig2_models   # one figure by name
 ```
 
-Or `make figures` from the repository root. Requires `matplotlib`
-(`pip install matplotlib`). The rendered PDFs are tracked in git, so building
-the paper never requires this step.
+Or `make figures` from `paper/`. The repository's `uv` environment has matplotlib. The rendered
+PDFs are tracked in git, so building the paper never requires this step.
 
 ## Conventions
 

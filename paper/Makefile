@@ -43,10 +43,10 @@ else
 	@exit 1
 endif
 
-## re-render the scripted figures into figures/ (needs matplotlib)
-## TikZ/pgfplots figures under figures/*.tex are built by LaTeX and need nothing here.
+## re-render the paper's two figures into figures/ from the committed study outputs
+## (run from the repository's uv environment, which has matplotlib)
 figures:
-	@python3 illustrate/figures.py
+	@cd .. && uv run python paper/illustrate/cth_figures.py
 
 ## every structural check; no TeX required
 check:

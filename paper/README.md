@@ -1,23 +1,22 @@
 # COLLIE — IEEE UV 2026 paper
 
-Working repository for the COLLIE paper, targeting the 8th IEEE International
-Conference on Universal Village (IEEE UV2026, virtual and local, October 17–20,
-2026, theme "Human-Centered AI Transformation for Future Empowerment").
+Working repository for the COLLIE paper, *Certify, Then Hedge: Graded Commitment to
+Language-Model Shock Hypotheses in Inventory Control*, for the 8th IEEE International
+Conference on Universal Village (IEEE UV2026, virtual and local, October 17–20, 2026; final
+manuscripts due October 15, 2026).
 
-This repository holds the **first complete draft**. The method, the
-audited-benchmark findings, the arm ladder and the claim discipline are written;
-the sweeps are still running, so **every experimental result is a placeholder** —
-each missing number sits in a `\pending{}` slot whose shape matches the result
-table that will fill it. Every substantive claim traces to its evidence in
-[`CLAIMS.md`](CLAIMS.md).
+This is the **camera-ready draft**. Every number comes from a committed output under
+`analysis/`, and every substantive claim traces to its evidence and status in
+[`CLAIMS.md`](CLAIMS.md). The only placeholders left are the team's: the author block and the
+acknowledgment (section 3 below).
 
 ## Build
 
 ```bash
 make              # -> main.pdf
 make check        # structural checks, no TeX toolchain needed
-make check-pages  # page count against the venue's nominal limit (reports, does not gate)
-make figures      # re-render the scripted figures in illustrate/ (needs matplotlib)
+make check-pages  # page count against the venue's 8-page limit
+make figures      # re-render the two figures from the committed study outputs (uv environment)
 ```
 
 `make` uses `latexmk` when it is on PATH and falls back to a
@@ -29,23 +28,20 @@ processing.
 
 | Path | Purpose |
 | --- | --- |
-| `main.tex` | Top-level file: IEEEtran conference preamble, `\pending` convention, notation shorthands, author block, UV2026 header/footer, section order, bibliography |
-| `sections/` | One numbered `.tex` file per section, input by `main.tex` in order |
-| `figures/` | Rendered figures, PDF plus a PNG preview, tracked so that building the paper never requires matplotlib; `main.tex` sets `\graphicspath{{figures/}}` |
-| `illustrate/` | The renderers. `figures.py` draws every figure; `illustrate/data/` holds the CSV sidecars they read. See `illustrate/README.md` |
-| `citations.bib` | The paper's bibliography, 40 entries; `IEEEabrv.bib` (journal abbreviations) is loaded before it |
+| `main.tex` | Top-level file: IEEEtran conference preamble, `\pending` convention, notation shorthands, author block, the (commented) UV2026 header/footer, section order, bibliography |
+| `sections/` | One `.tex` file per section, input by `main.tex` in order |
+| `figures/` | Rendered figures, PDF plus a PNG preview, tracked so that building the paper never requires matplotlib |
+| `illustrate/` | `cth_figures.py` renders both figures from `analysis/commitment/out/`; `illustrate/data/` holds the CSV sidecars it writes. `figures.py` and its three figures belong to the submitted draft and are retired |
+| `citations.bib` | The bibliography, 54 entries (26 cited); `IEEEabrv.bib` (journal abbreviations) is loaded before it |
 | `check.py` | Structural checks, no TeX needed; run via `make check` |
 | `CLAIMS.md` | Every substantive claim → its evidence → its status |
-| `conference_paper_instructions.tex` | Venue-provided annotated sample; formatting reference, not part of the paper |
-| `IEEEtran.bst`, `IEEEtran_HOWTO.pdf` | IEEEtran bibliography style and class documentation |
-| `IEEEexample.bib` | Ready-made BibTeX entry patterns for every reference type; copy patterns into `citations.bib` |
+| `IEEEtran.bst` | IEEEtran bibliography style (forces "et al." above five authors) |
 
 Section order, as `main.tex` inputs them:
 
 ```
-00_abstract   01_introduction   02_background      03_setup
-04_method_spec   05_method_compile   06_method_verify
-07_triggers_alerts   08_ladder_accounting   09_experiments
+00_abstract   01_introduction   02_background   03_setup   04_interface
+06_method_verify   06_method_hedge   07_design   08_results
 10_related_work   11_limitations   12_conclusion   13_acknowledgment
 ```
 
@@ -54,28 +50,19 @@ Sponsor acknowledgments belong in `\thanks` in the author block, not in
 
 ## Figures
 
-All three figures are rendered by `illustrate/figures.py` into `figures/` as a
-PDF, which `\includegraphics` picks up, plus a 300 dpi PNG preview. Nothing in
-`figures/` is edited by hand.
+Both figures are rendered by `illustrate/cth_figures.py` (`make figures`) into `figures/` as a
+PDF, which `\includegraphics` picks up, plus a PNG preview. Nothing in `figures/` is edited by
+hand, and the renderer reads every value from the committed outputs.
 
 | Figure | Where | What it carries |
 | --- | --- | --- |
-| `fig1_overview` | Sec. I, full width | (a) the handshake — the three brackets WHEN / WHAT / WHETHER over the pipeline, the gate drawn as a valve, the dashed baseline bypass, the dotted closed loop; (b) the running episode, schematic |
-| `fig2_method` | Sec. IV, full width | One key, two consumers: the frozen `ShockSpec`, the registered key, and the two branches — verifier registry upward, compiler and the 72-point grid downward — meeting again at the gate |
-| `fig3_frontier` | Sec. IX, one column | The reward-against-compute slot. The calls axis is registered in advance and drawn; the profit endpoint is pending, and the panel says so |
+| `fig1_episode` | Sec. I, one column | One fresh-seed lead-time episode (chosen to show the mechanism; the caption says so): the gate's step against the hedge's posterior shock mass, and cumulative net reward against arm 1 |
+| `fig2_models` | Sec. VIII, full width | The fresh-seed confirmation with six proposer models: perception, acting at once, and the gate and the hedge against arm 1, with the content-free control as a band |
 
-Two accents only, and each means the same thing in both figures: **blue is the
-evidence path** (the e-process, its threshold, the gate) and **orange is the
-control path** (the compiler, the configuration, the order). Everything else is
-neutral grey. Colour never carries identity alone — every coloured path is also
-a distinct line style and every band is also labelled — because these figures
-are printed, often in black and white. The pair clears the colour-vision
-deficiency and normal-vision separation floors on a light surface (worst-pair
-CVD ΔE 24.7 protan, normal ΔE 33.6).
-
-`fig3_frontier` reads `illustrate/data/frontier.csv`, which carries one row per
-arm with the registered call budget filled in and the profit columns empty. Fill
-those columns and the figure completes with no code change.
+Two accents only: **blue is the evidence path** (certify-then-hedge) and **orange is the
+control path** (the gate); everything else is neutral grey. The pair clears the colour-vision
+deficiency and normal-vision separation floors on a light surface (worst-pair CVD ΔE 24.7
+protan, normal ΔE 33.6), and every coloured series also differs in marker or line style.
 
 ---
 
@@ -112,8 +99,7 @@ this draft's.
 
 **Assumptions used where a fact was not stated.** The CFP does not mention
 over-length pages, page charges, or an appendix allowance. The draft carries no
-appendix. It does run past the nominal 8 pages: see section 2 on why, and
-`make check-pages` for the current count.
+appendix, and it fits the 8 pages.
 
 **Formatting asks, all honoured.** `hyperref` is loaded with `[hidelinks]`, so
 no URL or address is underlined or coloured. IEEEtran's conference mode emits no
@@ -130,27 +116,9 @@ session designation.
 
 ## 2. Build status
 
-The machine this draft was written on has a full TeX toolchain, so the build was
-run rather than assumed:
-
-```
-pdfTeX 3.141592653-2.6-1.40.29 (TeX Live 2026)
-latexmk 4.88 (9 March 2026)
-IEEEtran.cls, IEEEtran.bst  present in texmf-dist
-```
-
-Last clean build: **10 pages**, US Letter (612 x 792 pt), zero undefined
-references, zero undefined citations, zero LaTeX warnings on the final pass, and
-exactly one overfull box, 5.4 pt, in the Section V compiler table (the
-registered-mapping tabular). `make check` exits 0.
-
-**On the page count.** The call names 5 to 8 pages for a regular paper, but the
-limit is not enforced at this venue, and a self-contained argument is worth more
-than two pages saved. The draft is therefore written to be complete rather than
-to fit: the per-family validity table and the reward-against-compute figure,
-both of which an earlier 8-page revision had cut, are in. `make check-pages`
-reports the count and names the nominal limit; it no longer fails. Run
-`make check-pages PAGE_LIMIT=8` to turn it back into a hard gate.
+Last clean build (2026-09-29, TeX Live 2026, latexmk 4.88): **8 pages** including references,
+US Letter (612 x 792 pt), zero undefined references or citations, zero overfull boxes, and both
+columns of the last page full. `make check` exits 0.
 
 Build products, `main.pdf` included, are ignored by `.gitignore` and are
 regenerated by `make`. The rendered figures under `figures/` are the exception:
@@ -162,58 +130,21 @@ matplotlib. Regenerate them with `make figures`.
 ## 3. Placeholder inventory
 
 The `\pending` convention is mandatory: a half-filled draft must be impossible to
-mistake for a finished one. `python3 check.py pending` prints this table and its
-total, and the total below must equal that output exactly.
+mistake for a finished one. `python3 check.py pending` prints this table's total, and the total
+below must equal that output exactly.
 
 | File | `\pending` | `\pcell` | What is missing |
 |---|---:|---:|---|
 | `main.tex` | 3 | 0 | author list, affiliation, email |
-| `sections/00_abstract.tex` | 1 | 0 | headline result sentence |
-| `sections/01_introduction.tex` | 1 | 0 | nothing numeric; the marker is the standing note that every result cell is pending |
-| `sections/07_triggers_alerts.tex` | 1 | 0 | inter-rater agreement, templates pruned for leakage |
-| `sections/08_ladder_accounting.tex` | 0 | 51 | Table I: 15 arms and controls by three endpoints (45 cells), plus 3 contrasts by two endpoints (6 cells) |
-| `sections/09_experiments.tex` | 3 | 0 | the Fig. 3 frontier; activation ablation; null-audit calibration and fragility; content against timing; efficiency; operational, hypothesis and traced-case tables |
-| `sections/11_limitations.tex` | 2 | 0 | headroom band under the integrated pipeline; integration status, pilot verdict, frozen registration hash |
-| `sections/12_conclusion.tex` | 1 | 0 | final result paragraph |
 | `sections/13_acknowledgment.tex` | 1 | 0 | funding, compute, readers of the draft |
-| **Total** | **13** | **51** | **64 markers** |
+| **Total** | **4** | **0** | **4 markers** |
 
-`sections/02_background.tex`, `03_setup.tex`, `04_method_spec.tex`,
-`05_method_compile.tex`, `06_method_verify.tex` and `10_related_work.tex` carry
-no placeholders: everything in them is either established today or cited.
-
-Two `\pending` markers are the convention demonstrating itself rather than a
-missing number — the one in the introduction and the one opening Section IX both
-render as a red marker inline, so a reader meets the convention before meeting a
-result slot. They are counted above because the grep counts them.
+At camera-ready the team also sets the session designation and re-enables the header and the
+page-1 copyright footer in `main.tex` (section 1).
 
 ---
 
-## 4. Completeness over page count
-
-An earlier revision was compressed to 8 pages and two display items were folded
-into prose to make it fit. Both are now back, because the limit is not enforced
-and a reader should not have to reconstruct a register from a paragraph:
-
-1. **The per-family validity table** (Table III) is restored in
-   `sections/06_method_verify.tex`. The prose around it was rewritten rather
-   than left as-is: the table carries the enumeration, and the prose keeps only
-   the reasoning the table cannot hold — why the arrival-side status is
-   restricted, why the compound family is budget-split rather than multiplied,
-   and why the plug-in variant is permanently rather than temporarily empirical.
-   Printing both the table and its paraphrase would have been the worse paper.
-2. **The reward-against-compute frontier** is Fig. 3, included in
-   `sections/09_experiments.tex`.
-
-Two presentational decisions from that compression were improvements and are
-kept. The arm ladder and the main result table are **merged** into one
-full-width table, so each rung's objection sits on the same line as the number
-that answers it. Figure 1 dropped its ladder side panel once that table carried
-the same eleven rungs, and the space went to the running-episode panel instead.
-
----
-
-## 5. Reference verification
+## 4. Reference verification
 
 Every entry carried over into `citations.bib` was verified online on
 **2026-09-17**: a page showing the title, the authors and the venue or year was
@@ -221,10 +152,9 @@ fetched for each one. Nothing is present that could not be verified, and no
 field was guessed. Where a page range or a venue does not exist yet, the field is
 omitted rather than invented. A 2026-09-24 citation pass closed the draft's
 citation gaps with five new entries, each verified online the same day (URLs
-below), and wired every verified entry into the text: **40 entries are verified
-and 39 are cited**, leaving only `uv2026cfp` (the venue's call for papers,
-cited from this README rather than from the paper). `python3 check.py refs`
-lists the uncited ones. Only entries cited with `\cite{...}` reach the
+below). The 2026-09-29 rewrite around certify-then-hedge added 14 entries, each checked against
+arXiv, Crossref or PMLR, and now cites **26 of the 54 entries**; the rest are verified but
+belong to the submitted draft's sections. `python3 check.py refs` lists the uncited ones. Only entries cited with `\cite{...}` reach the
 References section.
 
 Entries added and verified on **2026-09-24**:
@@ -288,51 +218,30 @@ INFORMS volume subtitle.
 
 ---
 
-## 6. Source material, and where the numbers came from
+## 5. Where the numbers come from
 
-The draft was written against the repository, not against its prose. Every
-number in the paper traces to `CLAIMS.md`. Two notes on provenance:
+The submitted draft (Overleaf `68f996d`, imported at `0967e30`) was rewritten around the
+commitment study in `analysis/commitment/` (`PLAN.md` for the registered stages and their
+amendments, `REPORT.md` for the readout). The paper's numbers come from:
 
-**The `collect_res/` result schemas.** The task brief pointed at
-`~/Overleaf/ICLR_COLLIE/collect_res/`, described as 23 result-table CSVs plus a
-README. **That folder no longer exists**: `~/Overleaf/ICLR_COLLIE` was removed
-and replaced by a clone of the IEEE Overleaf project. The generator that built it
-survives verbatim in shell history, so all 23 schemas were recovered and used as
-the table skeletons here. The recovered index also settles the confirmatory
-contrast set as arm 10 against arms 8, 6 and 11, which is what this draft uses.
-The folder name says ICLR for historical reasons only; the venue is IEEE UV.
+- `analysis/commitment/out/confirm.json`: the registered stage C evaluation (Table I, Fig. 2);
+- `analysis/commitment/out/posthoc.json` and `sensitivity.json`: post-hoc readouts, labelled
+  post hoc wherever the paper uses them;
+- `analysis/commitment/out/mc_exposure.json`: the null exposure simulation;
+- `analysis/commitment/out/ladder.json`: the model ladder;
+- `analysis/real_content_pilot/out/evaluation.json`, `analysis/kill_trigger_forensics.md` and
+  `reports/`: the pilots and the benchmark audit.
 
-**Two whitelisted numbers were dropped after checking them.** The brief listed
-"~1063 tests" and "100% coverage on shipped modules" as statable. Live collection
-at `HEAD` returns exactly **1063** tests, so that figure is right, but the
-project configures **no coverage gate at all** and the only coverage artifact on
-disk measures one file of the 61 under `collie/`. No coverage percentage is
-substantiable, so neither the test count nor any coverage figure appears in the
-paper. `CLAIMS.md` records both decisions.
+Integers in the paper are rounded once from unrounded values; two independent checks of the
+draft (2026-09-29) are what `CLAIMS.md` reflects.
 
 ---
 
-## 7. Open questions whose answers would change the draft
+## 6. Open questions for the team
 
-1. **The running example's family number.** The brief says "family 5 transit
-   pause". In the frozen code, family 5 is `shipment_loss` and `transit_pause`
-   is the supply leg of family 6, `compound`
-   (`collie/data/families/base.py:173-180`). The draft uses family 5, a
-   lost-shipment burst, which keeps the brief's family number and its
-   supply-disruption character. Switching the running example to the compound
-   family would change Sections 4 through 7.
-2. **The third confirmatory contrast.** The recovered result index and the brief
-   both name arm 11. Design doc 03\_5 §6.3 names telemetry-only adaptive OR, arm
-   2, instead. This draft follows the index and the brief, presents arm 11 as C3,
-   marks C3 as a benchmark rather than a mechanism contrast, and keeps arm 2 as
-   the registered secondary comparator. Nothing is frozen yet, so this is
-   reversible in one paragraph.
-3. ~~**Whether the page-1 IEEE copyright footer is required.**~~ **Resolved:
-   follow the call.** The CFP asks for headers and footers to be removed, so the
-   `fancyhdr` block is commented out in `main.tex` and the submission carries no
-   header, footer or page number. The block is kept verbatim because the venue's
-   own sample installs the footer and the ISBN string is required at
-   camera-ready; re-enabling it is two uncomments plus the session designation.
+1. The author block, the acknowledgment and the session designation (section 3).
+2. Whether the abstract should be cut toward IEEE's usual 150-250 words; it is 294 words, inside
+   the call's 100-300.
 
 ---
 

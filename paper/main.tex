@@ -8,14 +8,12 @@
 %%   citations.bib the paper's bibliography (\bibliography below)
 %%   figures/      all included graphics and TikZ/pgfplots figure sources
 %%   illustrate/   scripts that generate the raster/PDF figures in figures/
-%% The venue's annotated sample is conference_paper_instructions.tex;
-%% IEEEexample.bib holds ready-made BibTeX entry patterns for every type.
 %%
-%% THIS IS AN INITIAL DRAFT. Experiments are still running. Every result cell,
-%% every arm score, and every contrast is marked with \pending{...} and is
-%% listed in the placeholder inventory in README.md. Every substantive claim is
-%% traced to its evidence in CLAIMS.md. Run `make check` for the structural
-%% checks; the placeholder total it prints must match the inventory table.
+%% Camera-ready draft. Every number comes from a committed output, and every
+%% substantive claim is traced to its evidence in CLAIMS.md. The only markers
+%% left are \pending{...} placeholders for the team (author block and
+%% acknowledgment), listed in README.md; `make check` counts them. Run
+%% `make figures` to re-render the two figures from the committed outputs.
 
 \documentclass[conference]{IEEEtran}
 \IEEEoverridecommandlockouts
@@ -79,6 +77,8 @@
 % [hidelinks] because the UV2026 call asks for no blue underlining on URLs and
 % email addresses.
 \usepackage[hidelinks]{hyperref}
+\hypersetup{pdftitle={Certify, Then Hedge: Graded Commitment to Language-Model Shock
+  Hypotheses in Inventory Control}}
 
 %%% --- IEEE customizations ----------------------------------------------------------
 \renewcommand\IEEEkeywordsname{Keywords}   % rename 'Index Terms' -> 'Keywords'

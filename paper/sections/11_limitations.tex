@@ -1,18 +1,18 @@
 \section{Limitations}
 \label{sec:limitations}
 
-\textbf{One simulator, one cost ratio, 48 units.} All evidence comes from our
-generator. Its lead times are deterministic, so a lead-time shift appears in the
-receipts without noise, and that is where the gain sits: lead-time shifts, a
+\textbf{One simulator, 48 units.} All evidence comes from our generator. Its
+lead times are deterministic, so a lead-time shift appears in the receipts
+without noise, and at $p/h = 4$ that is where the gain sits: lead-time shifts, a
 sixth of the shocked episodes, carry about 171 of the 178 per-episode net gain
 over arm~1 with Gemini and 157 of 163 with Grok, while the point estimates are
 $-83$ per demand-rise and $-40$ per compound episode (the registered readout
 gives no per-family intervals). The method has not been run on InventoryBench's
-own instances, a third of which have stochastic lead times with lost shipments,
-across three cost ratios; the fresh-seed test used one, $p/h = 4$ (the other two
-are replayed with the models' answers held fixed, Section~\ref{sec:results}), and 48 units
-rather than the registered 72, because the alert bank yields distinct texts for
-only eight units per family.
+own instances, a third of which have stochastic lead times with lost shipments;
+the fresh-seed test used one of the benchmark's three cost ratios (the others
+are replayed post hoc with the models' answers held fixed), and 48 units rather
+than the registered 72, because the alert bank yields distinct texts for only
+eight units per family.
 
 \textbf{What the theorems cover.} Theorems~\ref{thm:exposure}
 and~\ref{thm:regret} assume an exact null, and the arm as run lies outside it:
@@ -20,35 +20,32 @@ its demand null is estimated from the pre-proposal prefix, and its arrival null
 is a diffuse delay law while our delays are deterministic. A null Monte Carlo of
 the frozen arm (fixed false payload, scripted firings; released with our code)
 finds no cell more than two standard errors above a bound where the premise
-holds. With the plug-in null and a first firing at period 10 it measures
-$\Expect_0[\Pi_\sigma]$ at 2.0 to 2.7 times $A$ and
-$\Prob_0(\sup_t \Pi_t \ge 1/2)$ at 2.3 to 3.7 times its bound; later firings
-shrink the excess without removing it. The arrival mismatch alone keeps stopped
+holds. With the plug-in null and a first firing at period 10, in the cells
+matched to our null twins (demand spread 25\%, deterministic delays, a demand-up or
+content-free prior), it measures $\Expect_0[\Pi_\sigma]$ at 2.0 to 2.7 times $A$ and
+$\Prob_0(\sup_t \Pi_t \ge 1/2)$ at 2.3 to 3.7 times its bound, and up to 3.2 and
+4.7 times in other cells; later firings shrink the excess without removing it. The arrival mismatch alone keeps stopped
 and summed exposure below their bounds but lifts exposure at a fixed decision
 to at most 1.24 times its budget. The generator's exact demand law also
-scores integer demands on a rounding lattice, which certifies faster than
+scores integer demands on a rounding lattice, which may certify faster than
 unrounded data would. The regret theorem bounds a one-period newsvendor
 surrogate only.
 
-\textbf{What the content-free control measures.} The control with
-$\lambda = 1$ calls no model but is timed by the same alerts, so it removes the
-text, not the alert channel. On fresh seeds the method's net reward is not
-distinguishable from the control's: $+9$ $[-5, 24]$ per episode with Gemini and
-$-6$ $[-29, 11]$ with Grok, and with Llama~3.1~8B ($-43$ $[-78, -15]$) and
-GPT-3.5 Turbo ($-16$ $[-35, -0.4]$) the control earns more. The family label
-mainly lowers the summed shock mass on null episodes, from 0.83 to 0.52
-(Gemini) and 0.46 (Grok), mostly on false-alert nulls, by moving prior weight
-off the pulse hypothesis. That measure overstates action: a pulse hypothesis
-keeps its \eprocess{} after its window closes, so its mass can linger on a null
-episode after it stops moving the order.
+\textbf{What the content-free control measures.} The control calls no model but
+is timed by the same alerts, so it removes the text, not the alert channel. Its
+null commitment also overstates action: a pulse hypothesis keeps its \eprocess{}
+after its window closes, so its mass can linger on a null episode after it stops
+moving the order, and that pulse mass is most of what the model's label removes
+(post hoc, 0.69 of the control's 0.83).
 
 \textbf{Status of the evidence.} Relative to Gate~3 this study is exploratory,
 and Gate~3's registered decision on the pilot, \emph{kill-or-reframe}, stands.
-The method was developed on the 120 spent pilot episodes. Its fresh-seed
-confirmation was registered, with the code frozen by hash, before the
-confirmation runs; the plan discloses a structural test on six of the 48 units
-beforehand, an interim look at one primary endpoint, three departures from the
+The method was developed on the 120 spent pilot episodes; its fresh-seed
+confirmation was registered, with the code frozen by hash, before its live runs.
+The plan discloses a structural test on six of the 48 units beforehand, an
+interim look at both primary tests on one model's run, three departures from the
 original registration (net reward as the primary endpoint, action before any
 activation threshold, fresh units outside the frozen manifest) and three
 amendments, the last recording an independent audit that reproduced every
-registered number.
+registered number and listed further departures, none of which changed a run, a
+rule or a number.

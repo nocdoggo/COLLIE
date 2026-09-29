@@ -1,6 +1,6 @@
 \section{Introduction}
 
-Retailers are asking language models what to order. On InventoryBench, 1{,}320 multi-period
+Language models are being proposed for replenishment decisions. On InventoryBench, 1{,}320 multi-period
 lost-sales replenishment instances, the strongest published language-model strategy lets the
 model name an order quantity every period and applies it untested~\cite{inventorybench}.
 Whether that works cannot be read off the reported gain, because three decisions are welded
@@ -16,12 +16,15 @@ the proposal, decides whether the claim may touch an order. We preregistered the
 version of the last step, a \emph{gate} that lets a hypothesis act only once its \eprocess{}
 crosses the Ville threshold $1/\alpha_j$, and ran a pilot against a frozen decision rule.
 
-The gate failed its own decision rule, and the failure is informative. It was safe: it almost
-never acted on a false alarm. But it acted on fewer than half of the correct proposals, a
-median of ten periods after they were made, and when it acted it compiled the magnitude the
-model had stated, which was the least reliable field the models produced. The gross profit
-endpoint we had registered hid part of this, since it charges no holding and so rewards
-over-stocking (Section~\ref{sec:results}).
+The gate failed its own decision rule. With scripted model content the registered pilot read
+\emph{kill-or-reframe}: only two of six shock families left a clairvoyant enough headroom, and a
+detector compiled without language beat the gate on the registered gross-profit endpoint. An
+exploratory rerun with live Gemini and Grok answers showed why the gate could not use real
+content. It rarely acted on a false alarm (1 of 12 false-alert episodes with each model), but it
+acted on fewer than half of the right-family proposals (43\% and 39\%), a median of 10 and 11
+periods after they were made, and when it acted it compiled the magnitude the model had stated,
+which matched the truth in 8 and 7 of 96 shocked episodes. The gross-profit endpoint hid part of
+this, since it charges no holding and so rewards over-stocking (Section~\ref{sec:results}).
 
 This paper replaces the gate with \emph{certify-then-hedge}. The \eprocess{} no longer switches
 the controller on; it prices a fixed set of action-aligned hypotheses. The language model's
@@ -40,7 +43,8 @@ posterior-odds rule of the same form.
 \caption{One fresh-seed episode, a lead-time shift of one period with an accurate early
 alert (Gemini~3.8 as the proposer), chosen to show the mechanism: it is the gate's third-worst of
 the 32 lead-time episodes. \textbf{(a)}~The gate (dashed) commits fully ten periods after onset;
-certify-then-hedge (solid) commits in proportion to the posterior shock mass $\Pi_t$.
+certify-then-hedge (solid) shows its posterior shock mass $\Pi_t$, which weights the
+hypothesis in the order's mixture quantile.
 \textbf{(b)}~Cumulative net reward against the baseline. The model said the shift was
 ``medium'', which the gate compiles as two periods; certify-then-hedge estimated one from the
 receipts. Final: $+198$ against $-2{,}358$; over all 32 lead-time episodes, $+1{,}286$ and
@@ -62,9 +66,10 @@ $+414$ per episode.}
       (Section~\ref{sec:results}).
 \item \textbf{An account of where the gain comes from.} Against the baseline it comes almost
       entirely from lead-time shifts, and an alert-timed variant that ignores the model's
-      answer earns as much; the model's label lowers commitment on no-shock episodes without
-      changing reward. A 21-model ladder shows that acting on proposals at once loses in
-      proportion to how readily a model commits, not how often it is right.
+      answer earns about as much with the two primary models (and more with two weaker ones);
+      the model's label lowers commitment on no-shock episodes with no detectable change in
+      reward. A model ladder (20 of 21 models run) shows that acting on proposals at once
+      loses more the more readily a model commits, and that being right does not protect it.
 \item \textbf{The negative pilot and the audit trail}: the gate's registered failure, every
       deviation and disclosure, and the audited benchmark divergence that motivated the
       controlled design.
