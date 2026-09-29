@@ -1,0 +1,33 @@
+% sections/00_abstract.tex -- abstract and keywords.
+% IEEE UV 2026: the abstract submitted through EasyChair is 100-300 words, with no symbols,
+% special characters, footnotes or math; this one follows the same rule.
+
+\begin{abstract}
+Language models often read operational alerts correctly, but a wrong reading moves real
+orders. We study a replenishment controller that asks a language model only
+what changed, in a closed typed vocabulary, and tests the answer with an anytime-valid e-process
+on later data. A preregistered pilot of the natural design, which lets a
+hypothesis act once its e-process crosses a Ville threshold, was stopped at its own
+decision gate; with live models the gate acted late or not at all. We propose certify-then-hedge.
+The e-process no longer switches the controller on but prices a fixed set of action-aligned
+hypotheses, the model's answer only reweights them and dates the one it names, the size of the
+shock is estimated from the data, and the order is the critical fractile of the resulting
+posterior-predictive mixture. Under a known null and arrival law, the expected exposure to a false hypothesis
+stays within the frozen error budget, whatever the model says. In an exploratory test registered
+before its live runs, on 240 fresh episodes with Gemini and Grok as proposers, the method
+improved net reward per episode over the gate by 309 and 179 and over the base-stock
+baseline by 178 and 163, with losses on no-shock episodes within the registered margin. Nearly all of the gain over the baseline came from
+lead-time shifts, and an alert-timed variant that ignores the model's answer was not
+distinguishable from the method. A second registered, exploratory stage confirmed the gains over the gate at the
+benchmark's two other cost ratios and over the baseline at the higher one, where the model's
+answer added 82 per episode with Gemini, not detectably with Grok, and no-shock losses were
+not shown to stay within the margin; on noisy lead times the gain over the
+baseline was not confirmed.
+\end{abstract}
+
+\hfill
+
+\begin{IEEEkeywords}
+large language models, inventory control, anytime-valid inference, e-values, sequential
+decision making, preregistration
+\end{IEEEkeywords}

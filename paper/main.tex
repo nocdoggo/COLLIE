@@ -1,0 +1,210 @@
+%% main.tex — top-level file for the COLLIE paper (IEEE UV 2026).
+%% Format: IEEE two-column conference template, 8th IEEE International
+%% Conference on Universal Village (UV2026), October 17-20, 2026.
+%% Regular papers: 5-8 pages; short papers: 3-4 pages; US Letter.
+%%
+%% Structure:
+%%   sections/     one numbered .tex file per section, input below in order
+%%   citations.bib the paper's bibliography (\bibliography below)
+%%   figures/      all included graphics and TikZ/pgfplots figure sources
+%%   illustrate/   scripts that generate the raster/PDF figures in figures/
+%%
+%% Camera-ready draft. Every number comes from a committed output, and every
+%% substantive claim is traced to its evidence in CLAIMS.md. The only markers
+%% left are \pending{...} placeholders for the team (author block and
+%% acknowledgment), listed in README.md; `make check` counts them. Run
+%% `make figures` to re-render the two figures from the committed outputs.
+
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+
+%%% --- Required by IEEEtran ---------------------------------------------------
+\usepackage{cite}
+
+%%% --- Encoding ----------------------------------------------------------------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+%%% --- Math --------------------------------------------------------------------
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{bm}
+\usepackage{algorithmic}
+% IEEEtran already defines \proof / \endproof, so amsthm must be told to take
+% them over rather than error on a redefinition.
+\let\proof\relax
+\let\endproof\relax
+\usepackage{amsthm}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+
+%%% --- Graphics ----------------------------------------------------------------
+\usepackage{graphicx}
+\graphicspath{{figures/}}   % all figures live in figures/
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit,calc,backgrounds,decorations.pathreplacing}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+%%% --- Tables --------------------------------------------------------------------
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{siunitx}
+\newcolumntype{Y}{>{\centering\arraybackslash}X}   % centered tabularx column
+
+%%% --- Captions -----------------------------------------------------------------
+\usepackage{caption}
+\captionsetup[table]{font={footnotesize,sc},labelsep=period}
+\captionsetup[figure]{font={footnotesize},name={Fig.},labelsep=period}
+
+%%% --- Header / footer ------------------------------------------------------------
+% DISABLED to comply with the UV2026 call, which asks submissions to carry no
+% running headers or footers and no page numbering. IEEEtran's conference mode
+% already omits headers and page numbers on its own, so nothing replaces this.
+% Kept, with the copyright block further down, for camera-ready: re-enable both
+% together if the venue asks for the ISBN footer. See README.md, section 1.
+% \usepackage{fancyhdr}
+% \renewcommand{\headrulewidth}{0pt}
+% \renewcommand{\footrulewidth}{0pt}
+
+%%% --- Miscellaneous --------------------------------------------------------------
+\usepackage{textcomp}
+\usepackage{comment}
+\usepackage{url}          % line-breakable URLs via \url{}
+% [hidelinks] because the UV2026 call asks for no blue underlining on URLs and
+% email addresses.
+\usepackage[hidelinks]{hyperref}
+\hypersetup{pdftitle={Certify, Then Hedge: Graded Commitment to Language-Model Shock
+  Hypotheses in Inventory Control}}
+
+%%% --- IEEE customizations ----------------------------------------------------------
+\renewcommand\IEEEkeywordsname{Keywords}   % rename 'Index Terms' -> 'Keywords'
+
+%%% --- The placeholder convention ---------------------------------------------------
+% Every number, figure datapoint, and result sentence that the experiments have
+% not yet produced is wrapped in \pending. The convention is mandatory: a
+% half-filled draft must be impossible to mistake for a finished one. Grep
+% "pending" over the tree and the count must match the inventory table in
+% README.md exactly.
+%
+% \pending is a TEXT command. It must never appear inside a math environment.
+\newcommand{\pending}[1]{\textcolor{red}{\textbf{[PENDING: #1]}}}
+% Table cells that will receive a single scalar. Same convention, shorter.
+\newcommand{\pcell}{\textcolor{red}{\textbf{PENDING}}}
+
+%%% --- Notation shorthands ----------------------------------------------------------
+\newcommand{\Filt}{\mathcal{F}}
+\newcommand{\Ind}{\mathbb{1}}
+\newcommand{\Real}{\mathbb{R}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\Expect}{\mathbb{E}}
+\newcommand{\shockspec}{\textsc{ShockSpec}}
+\newcommand{\controlconfig}{\textsc{ControlConfig}}
+\newcommand{\alertspec}{\textsc{AlertSpec}}
+\newcommand{\eprocess}{e\nobreakdash-process}
+\newcommand{\evalue}{e\nobreakdash-value}
+\newcommand{\collie}{\textsc{Collie}}
+\newcommand{\evalpath}{\texttt{eval/}}
+\newcommand{\envpath}{\texttt{env.py}}
+
+%%% --- Author block commands --------------------------------------------------------
+\makeatletter
+
+% \linebreakand: ends the current author row and starts a new one
+% See https://tex.stackexchange.com/questions/509433/how-to-line-up-author-names-in-ieee-template
+\newcommand{\linebreakand}{%
+  \end{@IEEEauthorhalign}
+  \hfill\mbox{}\par
+  \mbox{}\hfill\begin{@IEEEauthorhalign}
+}
+
+% \AuthorCell[width]{name}{affiliation}
+% Fixed-width name+affiliation cell, centered. Optional width defaults to 0.33\textwidth (3-col rows).
+% Use \AuthorCell[0.45\textwidth]{...}{...} for 2-col rows.
+\newcommand{\AuthorCell}[3][0.33\textwidth]{%
+  \IEEEauthorblockN{\parbox[t]{#1}{\centering #2}}%
+  \IEEEauthorblockA{\parbox[t]{#1}{\centering #3}}%
+}
+
+% \CorrespondingMark[n]: footnote + superscript for corresponding author (default ref 1)
+\newcommand{\CorrespondingMark}[1][1]{%
+  \thanks{\IEEEauthorrefmark{#1}Corresponding author}\IEEEauthorrefmark{#1}%
+}
+
+\makeatother
+
+\begin{document}
+
+% No manual line breaks: IEEEtran centres and wraps a title better than a
+% hand-chosen break, which rewrapped badly at this length.
+\title{Certify, Then Hedge: Graded Commitment to Language-Model Shock Hypotheses in
+Inventory Control}
+
+% AUTHOR LINE, non-anonymous. Review is NOT blind: the IEEE UV 2026 call for
+% papers (verified 2026-09-17, URL and quote in README.md) contains no mention
+% of blind or anonymous review, the venue's own annotated sample ships a full
+% \author block with affiliations and emails, and the submission instructions
+% distribute no anonymous style file. The names themselves are \pending{}
+% because the author list is the submitting authors' to set.
+\author{
+\AuthorCell{\pending{author list}\CorrespondingMark}{%
+  \pending{affiliation} \\
+  \pending{email}}
+
+% Add co-authors as additional cells; \and separates cells within a row and
+% \linebreakand starts a new row. Delete \CorrespondingMark above if unneeded.
+% \and
+% \AuthorCell{Given Name Surname}{%
+%   \textit{dept. name of organization (of Aff.)} \\
+%   \textit{name of organization (of Aff.)}\\
+%   City, Country \\
+%   email address or ORCID}
+}
+
+\maketitle
+
+%%% --- Copyright and conference header / footer ----------------------------------
+% DISABLED for submission. The UV2026 call asks submissions to carry no running
+% headers or footers and no page numbering, and the call governs. The venue's
+% own annotated sample installs the page-1 copyright footer below, which is
+% required at camera-ready, so the block is kept verbatim rather than deleted.
+%
+% To re-enable at camera-ready: uncomment this block AND the fancyhdr lines in
+% the preamble, then set the session designation, which is a placeholder.
+% \thispagestyle{fancy}
+% \fancyhead{}
+% \fancyfoot{}
+% \lhead{IEEE 8th International Conference on Universal Village · UV2026 · Session XX-X}
+% \lfoot{\fontsize{8}{10} \selectfont 979-8-3195-2714-1/26/\$31.00 \copyright2026 IEEE}
+% \rhead{}
+% \cfoot{}
+% \rfoot{}
+
+%%% --- Sections (one file per section, in paper order) -----------------------------
+\input{sections/00_abstract}          % abstract and keywords
+\input{sections/01_introduction}
+\input{sections/02_background}
+\input{sections/03_setup}
+\input{sections/04_interface}
+\input{sections/06_method_verify}
+\input{sections/06_method_hedge}
+\input{sections/07_design}
+\input{sections/08_results}
+\input{sections/10_related_work}
+\input{sections/11_limitations}
+\input{sections/12_conclusion}
+% Sponsor acknowledgments belong in \thanks in the author block, not here.
+\input{sections/13_acknowledgment}
+
+%%% --- References -------------------------------------------------------------------
+% Only entries cited with \cite{...} appear in the References section.
+% IEEEabrv.bib provides standard journal-name abbreviation strings for use
+% inside entries in citations.bib; entry patterns for every type are in
+% IEEEexample.bib.
+\bibliographystyle{IEEEtran}
+\bibliography{IEEEabrv,citations}
+
+\end{document}

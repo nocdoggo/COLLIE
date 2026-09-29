@@ -1,0 +1,155 @@
+{
+  "alert_selection_rule": "bank-v1",
+  "alert_source": "bank",
+  "alert_sources": {
+    "bank:early_accurate": 40,
+    "bank:false_alert_null": 24,
+    "bank:late_accurate": 40,
+    "bank:unreliable": 40,
+    "none:bank_gap_demand_down": 32,
+    "none:no_alert": 40,
+    "none:silent_null": 24
+  },
+  "analysis_class": "exploratory",
+  "arm_set": "confirm",
+  "arms": [
+    "arm1_capped_base_stock",
+    "arm2_telemetry_hmm_or",
+    "arm8_spec_immediate",
+    "arm10_spec_eprocess",
+    "ctrl_cusum_to_compiler",
+    "ctrl_keyword_parser",
+    "ctrl_alertspec_upper_bound",
+    "oracle_shockspec_headroom",
+    "arm12_cth",
+    "arm12b_cth_llm",
+    "ctrl_cth_uniform"
+  ],
+  "decoding": "det-v1 (temperature 0.0, no seed), module 02 prompt, no system prompt",
+  "endpoint": {
+    "base_url": "https://api.x.ai/v1",
+    "bills_thinking_as_output": true,
+    "extra_body": null,
+    "model_id": "grok-4.20-0309-non-reasoning",
+    "name": "grok-hosted-confirmation",
+    "price_date": "2026-09-07",
+    "price_input_per_mtok": 1.25,
+    "price_output_per_mtok": 2.5,
+    "supports_seed": true
+  },
+  "episodes": 240,
+  "git": {
+    "branch": "method/graded-commitment",
+    "dirty_paths": [
+      "M .gitignore",
+      "?? analysis/commitment/out/d1-gemini-3.8-flash/",
+      "?? analysis/commitment/out/d1-grok-4.20/",
+      "?? analysis/commitment/out/d19-gemini-3.8-flash/",
+      "?? analysis/commitment/out/d19-grok-4.20/",
+      "?? analysis/commitment/out/dsl-gemini-3.8-flash/",
+      "?? analysis/commitment/out/dsl-grok-4.20/",
+      "?? analysis/commitment/out/ladder-step-5-preview/"
+    ],
+    "sha": "a38eb64e78328d712f694d87d886b2a92d369505"
+  },
+  "guard": {
+    "max_physical_calls": 1500,
+    "physical_calls_this_invocation": 437,
+    "physical_calls_total": 441,
+    "refusals_this_invocation": 0,
+    "retries_this_invocation": 0,
+    "spend_cap_usd": 2.0,
+    "usd_this_invocation": 1.0662062500000007,
+    "usd_total": 1.0748087500000008
+  },
+  "ladder_rung": {
+    "model_id": "grok-4.20-0309-non-reasoning",
+    "name": "grok-4.20",
+    "price_input_per_mtok": 1.25,
+    "price_output_per_mtok": 2.5,
+    "provider": "grok",
+    "released": "2026-03",
+    "served_as": [
+      "grok-4.20-0309-non-reasoning"
+    ],
+    "tier": "mid"
+  },
+  "layout": "fresh",
+  "ledger": {
+    "charged": 1096,
+    "charged_usd": 2.5148075,
+    "per_arm": [
+      {
+        "accepted": 274,
+        "accepted_after_repair": 0,
+        "arm_id": "arm10_spec_eprocess",
+        "attempted": 274,
+        "input_tokens": 465561,
+        "output_tokens": 18796,
+        "p50_latency_ms": 0.001652049832046032,
+        "p95_latency_ms": 1171.7146229930222,
+        "rejected": 0,
+        "usd_cost": 0.62894125
+      },
+      {
+        "accepted": 274,
+        "accepted_after_repair": 0,
+        "arm_id": "arm12_cth",
+        "attempted": 274,
+        "input_tokens": 465561,
+        "output_tokens": 18680,
+        "p50_latency_ms": 0.0018529826775193214,
+        "p95_latency_ms": 1225.2919999882579,
+        "rejected": 0,
+        "usd_cost": 0.62865125
+      },
+      {
+        "accepted": 274,
+        "accepted_after_repair": 0,
+        "arm_id": "arm12b_cth_llm",
+        "attempted": 274,
+        "input_tokens": 465561,
+        "output_tokens": 18657,
+        "p50_latency_ms": 0.001962995156645775,
+        "p95_latency_ms": 1067.6184359472245,
+        "rejected": 0,
+        "usd_cost": 0.62859375
+      },
+      {
+        "accepted": 274,
+        "accepted_after_repair": 0,
+        "arm_id": "arm8_spec_immediate",
+        "attempted": 274,
+        "input_tokens": 465561,
+        "output_tokens": 18668,
+        "p50_latency_ms": 988.6218609753996,
+        "p95_latency_ms": 1386.5023179678246,
+        "rejected": 0,
+        "usd_cost": 0.62862125
+      }
+    ],
+    "physical_this_invocation": 437
+  },
+  "n_per_family": 8,
+  "not_a_gate3_vote": true,
+  "outputs_sha256": {
+    "alerts.jsonl": "1e43ae94d515bb0f26c15dae43f7cf1371e4574328a5098cf57ac86a6aa62d20",
+    "ledger.csv": "ed9c2ea8c5ebf45eb3e9074f22b4ecc3d766ef4aebe2f20d93c8700e8c477efa",
+    "proposals.jsonl": "7b28c36fea50475e7d36750fd687a86cf8092fb8c8ff58949c3bf548f4ca9ba9",
+    "records.jsonl.gz": "99372642ca794b01bf3e548c59104309e8fa1e3870cd1c014df79d1dd444d684",
+    "truth.jsonl": "b8b3073b97850a84fff6244057dd169334a683af4837ae9cba76bc088d6b9f4d"
+  },
+  "partial": false,
+  "profit": 19.0,
+  "records": 2544,
+  "rule_u": {
+    "arm10_coerced_abstentions": 10,
+    "version": "U-v1"
+  },
+  "run_name": "d19-grok-4.20",
+  "truth_identical_to_reports_pilot_truth": null,
+  "versions": {
+    "openai": "1.109.1",
+    "python": "3.12.11"
+  }
+}

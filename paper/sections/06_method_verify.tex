@@ -1,0 +1,42 @@
+\section{Certification: The E-Process and the Gate}
+\label{sec:verify}
+\label{sec:notclaim}
+
+For a proposal $j$ with registered null $p_0$ and alternative region $\Theta_j$,
+\begin{equation}
+E_{j,t} \;=\; \int_{\Theta_j}
+\prod_{r=\tau_j+1}^{t}
+\frac{p_{h_j,\theta}\bigl(Y_r \mid \Filt_{r-1}, A_{r-1}\bigr)}
+     {p_0\bigl(Y_r \mid \Filt_{r-1}, A_{r-1}\bigr)}
+\; dW_j(\theta),
+\label{eq:eprocess}
+\end{equation}
+with $E_{j,\tau_j} = 1$. Each fixed-$\theta$ ratio has conditional mean one under the null whatever policy generated
+$A_{r-1}$, so the product is a test martingale even inside the closed loop, and a mixture over
+$\theta$ with a prior $W_j$ fixed at $\tau_j$ is again one~\cite{ramdas-savi, e-detectors,
+grunwald-safe-testing}. With $W_j$ discrete, the mixture sits outside the product. Demand
+hypotheses use the exact law of rounded normal demand under a registered grid of multipliers,
+starts and durations; arrival hypotheses use an exact forward recursion over the remaining
+transit times of outstanding orders, so the verifier never uses the controller's imputed
+shipment ledger; compound hypotheses split their budget over two separate
+\eprocess{}es.
+
+\textbf{The registered gate.} Arm~10 allocates $\alpha_j = \alpha 2^{-j}$ to proposal $j$ (at
+most two per episode, $\alpha = 0.05$) and lets proposal $j$ act, on its compiled configuration,
+from the decision after the first $t$ with $E_{j,t} \ge 1/\alpha_j$.
+
+\begin{theorem}
+\label{thm:activation}
+Under the registered global no-change null, $\Prob_0(\text{any false activation in an
+episode}) \le \sum_j \alpha_j \le \alpha$.
+\end{theorem}
+
+Ville's inequality~\cite{ville} bounds each crossing by $\alpha_j$ and a union bound gives the
+rest. The guarantee is \emph{model-conditional}: it presumes $p_0$ is the true law. Two
+implementation facts weaken it in ways we measured rather than assumed. The demand null's mean
+and variance are estimated from the pre-proposal prefix, which makes the test anti-conservative
+for short prefixes; and the registered arrival null is a diffuse lead-time law while our lead
+times are deterministic outside the noisy-lead stratum, which makes the gate's arrival test slow
+but, empirically, conservative (for the hedge's exposure it is not; Section~\ref{sec:limitations}). None of
+the theorems in this paper covers wrong-family activation, realized profit, or
+refutation and expiry rules, which are registered operational rules rather than certified ones.

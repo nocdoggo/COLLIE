@@ -1,0 +1,150 @@
+\section{Certify, Then Hedge}
+\label{sec:hedge}
+
+The registered gate of Section~\ref{sec:verify} answers one question, whether a
+hypothesis may act, and answers it late: it waits until $E_{j,t}$ crosses
+$1/\alpha_j$ and then acts on the magnitude the model stated. With live models
+(Section~\ref{sec:results}) both halves of that design failed in the same place: the
+gate refuted none of the right-family proposals (0 of 67 and 0 of 74), but it
+activated less than half of them, a median of 10 to 11 periods after the proposal,
+and when it did act it compiled whatever magnitude the model had stated, though no
+alert states a size.
+Certify-then-hedge keeps the \eprocess{} and changes what it is used for. The
+\eprocess{} no longer switches a controller on; it prices the hypothesis, and the
+controller hedges between the baseline and the hypothesis according to that
+price.
+
+\subsection{Hypotheses and the language prior}
+
+At each trigger firing $j$ (a stopping time $\tau_j$, at most two per episode) we
+register a fixed, action-aligned hypothesis set $\mathcal{H}$: demand up, demand
+down, lead-time shift and an upward demand pulse. The other families (\texttt{shipment\_loss},
+\texttt{transit\_pause}, \texttt{compound}) carry no hypothesis by design: an order
+placed at onset cannot land before a loss burst or a pause ends, and in the pilot's
+forensic replay even a clairvoyant acting at onset gained under 1\% on loss bursts or
+compound shocks once its foresight of demand noise was removed. Hypothesis $k \in \mathcal{H}$ of firing
+$j$ receives prior mass $a_j w_{jk}$ with
+\begin{equation}
+a_j = \alpha\,2^{-j}, \qquad
+w_{jk} = \frac{\lambda}{|\mathcal{H}|} + (1-\lambda)\,\Ind\{k = \hat k_j\},
+\label{eq:prior}
+\end{equation}
+where $\hat k_j$ is the hypothesis the language model's \shockspec{} names (none if
+it abstains, fails to parse after one repair, or names a family and direction
+outside $\mathcal{H}$) and $\lambda\in[0,1]$ is a registered hedge. The model
+therefore sets the prior weights and, for the hypothesis it names, the onset window
+of its \eprocess{}; nothing else. With $\lambda = 1$ the arm never calls the model
+(it is still timed by the shared trigger, alerts included), and $\lambda = 0$
+trusts the model's family alone. The allocation $a_j$ is the frozen budget of
+Theorem~\ref{thm:activation}, spent on masses rather than thresholds; over both
+firings it totals $A = \sum_j a_j \le 3\alpha/4$.
+
+\subsection{Certification, posterior and sizing}
+
+Each $(j,k)$ carries its own \eprocess{} $E_{jk,t}$ of the form
+\eqref{eq:eprocess}, started strictly after $\tau_j$ and built from a canonical
+specification of $k$ (with the model's onset window when $k = \hat k_j$). Every
+hypothesis keeps receiving evidence after a later firing, so nothing is lost to
+supersession. With $A_t = \sum_{j:\tau_j < t}\sum_k a_j w_{jk}$ and
+$N_t = \sum_{j,k} a_j w_{jk} E_{jk,t}$, the predictable posterior mass of $(j,k)$
+at decision $t$ is
+\begin{equation}
+\pi_{jk,t} = \frac{a_j w_{jk}\, E_{jk,t-1}}{1 - A_t + N_{t-1}},
+\qquad
+\Pi_t = \sum_{j,k} \pi_{jk,t}.
+\label{eq:posterior}
+\end{equation}
+Validity of what follows needs nothing from the \emph{size} of a shock, so the
+size comes from the data rather than the model's magnitude bin. Within a demand
+hypothesis a working likelihood of the visible demand path weighs the registered
+multipliers over a grid of starts and durations, and the post-change level is
+learned conjugately (five pseudo-observations at the hypothesized multiple of the
+pre-onset mean); within the lead-time hypothesis a Gaussian working likelihood of
+visible receipts and the in-transit total weighs offsets $\Delta \in \{1,2,3\}$
+and starts. Each $(j,k)$ thus contributes a predictive law $G_{jk,t}$ for demand
+over the protection interval, and the null contributes arm~1's own
+$F_{0,t} = \mathcal{N}\bigl((1+L)\bar d_t,\,(1+L)s_{d,t}^2\bigr)$.
+
+\subsection{The hedge}
+
+The order-up-to requirement is the critical fractile $\beta = p/(p+h)$ of the
+posterior-predictive mixture of the requirement $Y - P_t$, where $P_t$ is the
+in-transit total,
+\begin{multline}
+x_t = \inf\Bigl\{x : (1-\Pi_t)\,F_{0,t}(x + P_t) \\
++ \sum_{j,k}\pi_{jk,t}\,G_{jk,t}(x + P_t) \ge \beta\Bigr\},
+\label{eq:hedge}
+\end{multline}
+and the order is $q_t = \min(\max(0,\lceil x_t - I_t\rceil), C_t, \hat C_t)$ with
+the published smoother $\hat C_t$ unchanged. When no hypothesis is live,
+$\Pi_t = 0$ and $q_t$ is arm~1's order bit for bit.
+
+\subsection{Guarantees}
+
+Write $\Prob_0$ for the global no-change null under which every $E_{jk}$ is a
+nonnegative supermartingale with unit start (the model-conditional premise of
+Theorem~\ref{thm:activation}); this needs the null's demand baseline to be known
+and the delays to follow the registered arrival law. A hypothesis whose
+\eprocess{} cannot be built, or which meets an observation impossible under its
+law, is dropped from both $N$ and $A_t$, which only lowers $\Pi_t$; one whose
+window has closed is kept.
+
+\begin{theorem}[Exposure]
+\label{thm:exposure}
+For every stopping time $\sigma$ of the decision filtration $(\Filt_{t-1})$ and
+every language-model output, including abstention, a wrong family or adversarial
+content, $\Expect_0[\Pi_\sigma] \le A$ and, for $c\in(0,1)$,
+$\Prob_0(\sup_t \Pi_t \ge c) \le A(1-c)/\bigl(c(1-A)\bigr)$.
+\end{theorem}
+
+\emph{Proof sketch.} Add the budget of firings yet to come,
+$\tilde N_t = N_t + \sum_{j:\tau_j > t} a_j$. Because the weights are fixed at
+each $\tau_j$ and sum to at most one, $\tilde N$ is a nonnegative supermartingale
+with $\tilde N_0 \le A$. Since $A_t \le A$ and $N \le \tilde N$,
+$\Pi_t \le \tilde N_{t-1}/(1-A+\tilde N_{t-1})$, which is concave and increasing, so
+optional stopping at $\sigma-1$ and Jensen's inequality give the first bound, and
+Ville's inequality applied to $\tilde N/A$ gives the second. \hfill$\square$
+
+\begin{theorem}[Odds regret]
+\label{thm:regret}
+Let $c_F(x)$ be the one-period newsvendor cost of target $x$ under law $F$, $x^0_t$
+arm~1's target, $G_t = \Pi_t^{-1}\sum_{j,k}\pi_{jk,t}G_{jk,t}$ the hypotheses'
+mixture and $V_t = c_{G_t}(x^0_t) - \min_x c_{G_t}(x) \le \bar V$ the value of acting
+on them if they were true. Then
+$c_{F_0}(x_t) - c_{F_0}(x^0_t) \le \frac{\Pi_t}{1-\Pi_t}\,V_t$, so under
+$\Prob_0$ the expected cumulative surrogate regret is at most
+$T A \bar V/(1-A)$.
+\end{theorem}
+
+\emph{Proof sketch.} $x_t$ minimizes $(1-\Pi_t)c_{F_0} + \Pi_t c_{G_t}$, so
+$(1-\Pi_t)\bigl(c_{F_0}(x_t)-c_{F_0}(x^0_t)\bigr) \le
+\Pi_t\bigl(c_{G_t}(x^0_t)-c_{G_t}(x_t)\bigr) \le \Pi_t V_t$; and
+$\Pi_t/(1-\Pi_t) = N_{t-1}/(1-A_t) \le \tilde N_{t-1}/(1-A)$ with
+$\Expect_0[\tilde N_{t-1}] \le A$. \hfill$\square$
+
+The premise is fragile as run: the demand \eprocess{}es estimate the null's mean and spread
+from the periods before $\tau_j$, and outside the noisy-lead stratum the simulator's delays are
+deterministic, not the registered arrival law; a null simulation puts
+$\Expect_0[\Pi_\sigma]$ at up to 2.7 times $A$ in the cells matched to our null episodes
+(Section~\ref{sec:limitations}).
+
+Two further properties follow from \eqref{eq:prior} and \eqref{eq:posterior}.
+First, with one hypothesis and $\lambda = 0$ the posterior odds are
+$a_j E_{j,t}/(1-a_j)$, so thresholding $E_{j,t}$ at $1/\alpha_j$, as the gate
+does, is up to one unit of threshold acting when that hypothesis is the more
+probable. This is an analogy, not an identity. The evidence is largely shared: for a
+named demand or pulse hypothesis the gate's \eprocess{} mixes over the registered
+multipliers whatever magnitude the model states, and for a lead-time shift the
+magnitude only selects the delay tilt. What differs is its use: the gate switches all
+at once to the configuration compiled from the stated magnitude, while the hedge sizes
+the shock from the data and weights it by its posterior mass. Second, the language model can move evidence but not
+validity. A hypothesis the model does not name enters with $\lambda$ times its
+content-free weight, so a wrong or missing family costs exactly
+$\log(1/\lambda)$ nats of evidence against the arm with $\lambda = 1$ ($\log 4$
+at $\lambda = 1/4$); the named hypothesis enters with
+$\lambda + (1-\lambda)|\mathcal{H}|$ times it, a saving of
+$\log(\lambda + (1-\lambda)|\mathcal{H}|)$ ($\log 3.25$). Neither changes the
+bounds above. Theorem~\ref{thm:regret} is stated for the one-period surrogate that
+the controller optimizes; lost sales, rounding, the caps and the zero floor make
+realized multi-period cost an empirical matter, which Section~\ref{sec:results}
+measures.

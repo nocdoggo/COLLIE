@@ -1,0 +1,137 @@
+{
+  "alert_selection_rule": "bank-v1",
+  "alert_source": "bank",
+  "alert_sources": {
+    "bank:early_accurate": 20,
+    "bank:false_alert_null": 12,
+    "bank:late_accurate": 20,
+    "bank:unreliable": 20,
+    "none:bank_gap_demand_down": 16,
+    "none:no_alert": 20,
+    "none:silent_null": 12
+  },
+  "analysis_class": "exploratory",
+  "arm_set": "nine",
+  "arms": [
+    "arm1_capped_base_stock",
+    "arm2_telemetry_hmm_or",
+    "arm8_spec_immediate",
+    "arm9_spec_heuristic_rollback",
+    "arm10_spec_eprocess",
+    "ctrl_cusum_to_compiler",
+    "ctrl_keyword_parser",
+    "ctrl_alertspec_upper_bound",
+    "oracle_shockspec_headroom"
+  ],
+  "decoding": "det-v1 (temperature 0.0, no seed), module 02 prompt, no system prompt",
+  "endpoint": {
+    "base_url": "https://api.stepfun.ai/step_plan/v1",
+    "bills_thinking_as_output": true,
+    "extra_body": null,
+    "model_id": "step-3.7-flash",
+    "name": "stepfun:step-3.7-flash",
+    "price_date": "2026-09-28",
+    "price_input_per_mtok": 0.2,
+    "price_output_per_mtok": 1.15,
+    "supports_seed": false
+  },
+  "episodes": 120,
+  "git": {
+    "branch": "method/graded-commitment",
+    "dirty_paths": [
+      "M .gitignore",
+      "?? analysis/commitment/out/ladder-gpt-oss-20b/",
+      "?? analysis/commitment/out/ladder-step-3.7-flash/",
+      "?? analysis/commitment/out/ladder-step-5-preview/"
+    ],
+    "sha": "18d657c140c24371f1bbcd4c823587026700c5e5"
+  },
+  "guard": {
+    "max_physical_calls": 1500,
+    "physical_calls_this_invocation": 165,
+    "physical_calls_total": 171,
+    "refusals_this_invocation": 0,
+    "retries_this_invocation": 0,
+    "spend_cap_usd": 4.0,
+    "usd_this_invocation": 1.6271527,
+    "usd_total": 1.7160455499999998
+  },
+  "ladder_rung": {
+    "model_id": "step-3.7-flash",
+    "name": "step-3.7-flash",
+    "price_input_per_mtok": 0.2,
+    "price_output_per_mtok": 1.15,
+    "provider": "stepfun",
+    "released": "2026-05",
+    "served_as": [
+      "step-3.7-flash"
+    ],
+    "tier": "mid"
+  },
+  "layout": "pilot",
+  "ledger": {
+    "charged": 432,
+    "charged_usd": 4.1778387,
+    "per_arm": [
+      {
+        "accepted": 142,
+        "accepted_after_repair": 1,
+        "arm_id": "arm10_spec_eprocess",
+        "attempted": 144,
+        "input_tokens": 241487,
+        "output_tokens": 1187437,
+        "p50_latency_ms": 0.002925051376223564,
+        "p95_latency_ms": 45302.4018839933,
+        "rejected": 1,
+        "usd_cost": 1.41384995
+      },
+      {
+        "accepted": 142,
+        "accepted_after_repair": 1,
+        "arm_id": "arm8_spec_immediate",
+        "attempted": 144,
+        "input_tokens": 241487,
+        "output_tokens": 1163562,
+        "p50_latency_ms": 31409.07944191713,
+        "p95_latency_ms": 79291.36735398788,
+        "rejected": 1,
+        "usd_cost": 1.3863937
+      },
+      {
+        "accepted": 142,
+        "accepted_after_repair": 1,
+        "arm_id": "arm9_spec_heuristic_rollback",
+        "attempted": 144,
+        "input_tokens": 241487,
+        "output_tokens": 1155911,
+        "p50_latency_ms": 0.003114924766123295,
+        "p95_latency_ms": 0.004507019184529781,
+        "rejected": 1,
+        "usd_cost": 1.3775950499999998
+      }
+    ],
+    "physical_this_invocation": 165
+  },
+  "n_per_family": null,
+  "not_a_gate3_vote": true,
+  "outputs_sha256": {
+    "alerts.jsonl": "58afda2dc82906ae90309dff6601d4d0d3778422e626556c15a01fa661fb428f",
+    "ledger.csv": "a4f1aa7b66a9fc307bbfec89e844cf4289cf8d16d9829c03e7ecc3fb2e30ec7b",
+    "proposals.jsonl": "b56d5369742cbb24cbe5d100a94430f969dc9df8f25e7dc620610bce26f468eb",
+    "records.jsonl.gz": "2bdc9598e0ca4a0c502b5cd776bd78372873ceb55a7870cf77c93b0479664878",
+    "truth.jsonl": "0d30aa2c366d1c0995de049b3e20fb5c8a1e8f31fbc926f17cd7d62f2a4f0221"
+  },
+  "partial": false,
+  "profit": 4.0,
+  "records": 1032,
+  "rule_u": {
+    "arm10_coerced_abstentions": 4,
+    "version": "U-v1"
+  },
+  "run_name": "ladder-step-3.7-flash",
+  "truth_identical_to_reports_pilot_truth": true,
+  "versions": {
+    "openai": "1.109.1",
+    "python": "3.12.11"
+  }
+}

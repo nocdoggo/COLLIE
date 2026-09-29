@@ -290,6 +290,88 @@ Not yet frozen. Task 19 establishes `prereg/freeze_manifest.json` at the end of 
 
 ## Gate 3 — pilot decision
 
+### 2026-09-29 — commitment study stage D recorded (cost ratios and noisy lead times); Gate 3 decision unchanged
+
+- **Artefacts:** `analysis/commitment/PLAN.md` (stage D, registered at `fae3714`; pre-run
+  amendments DA1 to DA12 at `33f77b4`), `stage_d.py`, `confirm_d.py`, `readout_d.py`, the six
+  runs under `analysis/commitment/out/d19-*`, `d1-*`, `dsl-*`, and `out/confirm_d.json`,
+  `out/readout_d.json`; the stage D section of `REPORT.md`. No frozen file changed
+  (`tools.freeze.drift()` is `[]`), nothing in `reports/` was written, and `test.yaml` was never
+  opened. Exploratory with respect to Gate 3.
+- **What ran:** the stage C method, arms and evaluator rules on a new pool of 48 units (base
+  200000) at InventoryBench's other two cost ratios, p/h = 19 and 1, and on the reserved
+  stochastic-lead stratum (8 family-4 units) at p/h = 4, with Gemini 3.8 and Grok 4.20; all six
+  runs completed at `a38eb64`, which differs from `33f77b4` in no stage C or D code file (the
+  registered hashes match), and nothing was evaluated before the last one finished.
+- **Pre-run amendments:** an independent audit of the registration and a fact-check of the study
+  notes led to DA1 to DA12 before any stage D call. The evaluator now refuses any run but the
+  registered one and decides the 8-cluster test by exact enumeration; the stratum's leads are
+  clipped at 4 (a lead of 5 is outside the registered arrival null and made arm 10's e-process
+  raise); the two registered secondaries were defined, with across-ratio changes read per unit of
+  price and the -25 margin kept in currency (DA4); D5 is read by the sign consistency of its eight
+  units, with descriptive per-unit and per-shift readouts (DA11); the lead-time shift sizes in the
+  study notes were corrected (two periods from a baseline lead of 1, one from 2). None changed a
+  hypothesis, a family or a cap.
+- **Outcome (Holm within each family):** at p/h = 19, hedge minus gate and hedge minus arm 1
+  reject with both models, and hedge minus the content-free control (the text's value) rejects
+  with Gemini (+81.5) but not Grok (-1.9); null safety at the registered -25 margin is not
+  established there (-22.0 and -21.6). At p/h = 1, hedge minus gate rejects with both; the
+  registered non-inferiority of hedge minus arm 1 over all episodes holds only just with Gemini
+  (lower bound -24.5) and fails with Grok (-27.6), and the method loses a little on null episodes
+  (-3.5 and -3.3, within the margin). On noisy
+  lead times, hedge minus arm 1 does not reject with either model (+253.7 and +187.2, exact p
+  0.137 and 0.148).
+- **Cost:** $12.49.
+- **Blast radius:** none. No registered number, threshold, criterion or endpoint moved.
+
+### 2026-09-29 — commitment study recorded: certify-then-hedge confirmed on fresh seeds; Gate 3 decision unchanged
+
+- **Artefacts:** `analysis/commitment/` (plan `PLAN.md`, report `REPORT.md`, method `cth.py`,
+  evaluation `out/confirm.json`, ladder `out/ladder.json`). No frozen file changed
+  (`tools.freeze.drift()` is `[]`), nothing in `reports/` was written, and `test.yaml` was never
+  opened. Relative to Gate 3 the study is exploratory: it does not re-vote the 2026-09-23 decision.
+- **What it is:** a new, declared arm (certify-then-hedge) that replaces arm 10's binary
+  activation with a posterior over a fixed hypothesis set priced by module 05's e-processes, the
+  shock's size estimated from the data, and orders at the critical fractile of the
+  posterior-predictive mixture. It departs from the frozen contract's wording that a hypothesis
+  influences orders only while ACTIVE (`collie/contracts.py` docstring), and it uses net reward,
+  not Gate 3's gross profit, as its primary endpoint; both departures were declared in the stage C
+  registration.
+- **Registration:** stage C (method code frozen by hash, hypotheses, tests, evaluator) was
+  committed and pushed at `9d8e97f` before its live runs. Amendments: C1 (48 units instead of 72,
+  forced by the dev/cal alert bank's template capacity, before any call), C2 (an empty model echo
+  is re-requested; one secondary run re-run from cache) and C3 (disclosures, below).
+- **Disclosures (C3, after an independent audit that reproduced every registered number):** a
+  pre-registration structural test computed, but nobody read, outcomes on 6 of the 48 clusters
+  (without them all four primary tests still reject, largest p = 0.0024); the registered
+  evaluator was run on the Grok primary run while the Gemini one was in progress; the C1 layout
+  was materialised (no arms) before registration; the Gemini run's manifest records the
+  end-of-run SHA; Rule U applies to arm 10 only; the exposure guarantee needs a known null, which
+  the plug-in demand null only approximates (a null Monte Carlo puts stopped exposure at 2.0 to
+  2.7 times the budget at early firings in the cells matched to the null episodes, up to 3.2 in
+  others), and the stated prior constants are corrected.
+- **Outcome:** on 240 fresh episodes (48 seed clusters from a reserved pool), all four primary
+  tests reject under Holm: certify-then-hedge minus arm 10, net per episode, +309.1 (Gemini 3.8)
+  and +178.8 (Grok 4.20); minus arm 1, +178.5 and +162.9; seed-cluster bootstrap intervals exclude
+  zero. It is non-inferior to arm 1 on the 48 null episodes with every model (with Gemini the
+  small loss, -3.2, is distinguishable from zero). Four secondary models give the same direction.
+  Post hoc, 96% of the gain over arm 1 comes from lead-time shifts; the alert-timed content-free
+  variant (no model call) is not distinguishable from the method on net; the model's family
+  label cuts commitment on null episodes by 37% and 45% without a detectable change in null
+  reward. On the fresh seeds arm 10 is -131 and -16 against arm 1 and acting at once -2,046 and
+  -2,284 (both reverse sign on gross profit).
+- **Cost-ratio replay (exploratory, post hoc):** the same episodes re-run at p/h = 1, 2, 9 and 19
+  with each model's answers held fixed (exact at p/h = 4): the method beats the gate at every
+  ratio; its gain over arm 1 vanishes at p/h = 1 and grows to about +1,000 per episode at 19,
+  where the text's share over the content-free variant becomes distinguishable from zero with
+  Gemini (+84) but not Grok.
+- **Model ladder:** 20 of 21 language models ran on the registered 120 pilot episodes
+  (`step-5-preview`, a slow reasoning model, was still running); perception ranged from 0/96 to
+  59/96 and acting at once from 0 to -3,656 net per episode against arm 1.
+- **Cost:** stage C $6.51 (the unrounded sum of its six runs; an earlier version said $6.50);
+  stage A as recorded in `analysis/commitment/out/*/spend_log.jsonl`.
+- **Blast radius:** none. No registered number, threshold, criterion or endpoint moved.
+
 ### 2026-09-28 — exploratory real-content pilot recorded; Gate 3 decision unchanged
 
 - **Artefacts:** `analysis/real_content_pilot/`. The plan (`PLAN.md`) was committed and pushed at

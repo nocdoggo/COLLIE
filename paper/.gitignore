@@ -1,0 +1,29 @@
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.lof
+*.lot
+*.nav
+*.snm
+*.vrb
+*.xdv
+main.pdf
+conference_paper_instructions.pdf
+
+# figures/*.pdf and figures/*.png are rendered by illustrate/figures.py and are
+# tracked on purpose: building the paper must not require matplotlib.
+
+# Python
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store

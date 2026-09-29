@@ -1,0 +1,163 @@
+{
+  "alert_selection_rule": "bank-v1",
+  "alert_source": "bank",
+  "alert_sources": {
+    "bank:early_accurate": 20,
+    "bank:false_alert_null": 12,
+    "bank:late_accurate": 20,
+    "bank:unreliable": 20,
+    "none:bank_gap_demand_down": 16,
+    "none:no_alert": 20,
+    "none:silent_null": 12
+  },
+  "analysis_class": "exploratory",
+  "arm_set": "nine",
+  "arms": [
+    "arm1_capped_base_stock",
+    "arm2_telemetry_hmm_or",
+    "arm8_spec_immediate",
+    "arm9_spec_heuristic_rollback",
+    "arm10_spec_eprocess",
+    "ctrl_cusum_to_compiler",
+    "ctrl_keyword_parser",
+    "ctrl_alertspec_upper_bound",
+    "oracle_shockspec_headroom"
+  ],
+  "decoding": "det-v1 (temperature 0.0, no seed), module 02 prompt, no system prompt",
+  "endpoint": {
+    "base_url": "https://api.stepfun.ai/step_plan/v1",
+    "bills_thinking_as_output": true,
+    "extra_body": null,
+    "model_id": "step-3.5-flash-2603",
+    "name": "stepfun:step-3.5-flash-2603",
+    "price_date": "2026-09-28",
+    "price_input_per_mtok": 0.1,
+    "price_output_per_mtok": 0.3,
+    "supports_seed": false
+  },
+  "episodes": 120,
+  "git": {
+    "branch": "method/graded-commitment",
+    "dirty_paths": [
+      "M .gitignore",
+      " M paper/main.tex",
+      " M paper/sections/00_abstract.tex",
+      " M paper/sections/01_introduction.tex",
+      " M paper/sections/02_background.tex",
+      "D  paper/sections/04_method_spec.tex",
+      "D  paper/sections/05_method_compile.tex",
+      " M paper/sections/06_method_verify.tex",
+      "D  paper/sections/07_triggers_alerts.tex",
+      "D  paper/sections/08_ladder_accounting.tex",
+      "D  paper/sections/09_experiments.tex",
+      " M paper/sections/12_conclusion.tex",
+      "?? analysis/commitment/out/ladder-deepseek-v3/",
+      "?? analysis/commitment/out/ladder-gemma-3-27b/",
+      "?? analysis/commitment/out/ladder-gpt-3.5-turbo/",
+      "?? analysis/commitment/out/ladder-gpt-4o-mini/",
+      "?? analysis/commitment/out/ladder-gpt-oss-20b/",
+      "?? analysis/commitment/out/ladder-llama-3.1-8b/",
+      "?? analysis/commitment/out/ladder-llama-3.2-1b/",
+      "?? analysis/commitment/out/ladder-llama-3.2-3b/",
+      "?? analysis/commitment/out/ladder-llama-3.3-70b/",
+      "?? analysis/commitment/out/ladder-qwen-2.5-72b/",
+      "?? analysis/commitment/out/ladder-qwen-2.5-7b/",
+      "?? analysis/commitment/out/ladder-step-3.5-flash-2603/",
+      "?? analysis/commitment/out/ladder-step-3.5-flash/",
+      "?? analysis/commitment/out/ladder-step-3.7-flash/",
+      "?? analysis/commitment/out/ladder-step-5-preview/",
+      "?? paper/sections/04_interface.tex",
+      "?? paper/sections/07_design.tex",
+      "?? paper/sections/08_results.tex"
+    ],
+    "sha": "eef8fd30fe04c12697d224c02378929f56321781"
+  },
+  "guard": {
+    "max_physical_calls": 1500,
+    "physical_calls_this_invocation": 166,
+    "physical_calls_total": 173,
+    "refusals_this_invocation": 0,
+    "retries_this_invocation": 0,
+    "spend_cap_usd": 2.0,
+    "usd_this_invocation": 0.34533929999999985,
+    "usd_total": 0.37139419999999984
+  },
+  "ladder_rung": {
+    "model_id": "step-3.5-flash-2603",
+    "name": "step-3.5-flash-2603",
+    "price_input_per_mtok": 0.1,
+    "price_output_per_mtok": 0.3,
+    "provider": "stepfun",
+    "released": "2026-03",
+    "served_as": [
+      "step-3.5-flash-2603"
+    ],
+    "tier": "mid"
+  },
+  "layout": "pilot",
+  "ledger": {
+    "charged": 435,
+    "charged_usd": 0.9352406999999999,
+    "per_arm": [
+      {
+        "accepted": 141,
+        "accepted_after_repair": 2,
+        "arm_id": "arm10_spec_eprocess",
+        "attempted": 145,
+        "input_tokens": 243187,
+        "output_tokens": 945822,
+        "p50_latency_ms": 0.0027940841391682625,
+        "p95_latency_ms": 38720.01397097483,
+        "rejected": 2,
+        "usd_cost": 0.3080653
+      },
+      {
+        "accepted": 141,
+        "accepted_after_repair": 2,
+        "arm_id": "arm8_spec_immediate",
+        "attempted": 145,
+        "input_tokens": 243187,
+        "output_tokens": 964816,
+        "p50_latency_ms": 23435.866613988765,
+        "p95_latency_ms": 84872.5679460913,
+        "rejected": 2,
+        "usd_cost": 0.3137635
+      },
+      {
+        "accepted": 141,
+        "accepted_after_repair": 2,
+        "arm_id": "arm9_spec_heuristic_rollback",
+        "attempted": 145,
+        "input_tokens": 243187,
+        "output_tokens": 963644,
+        "p50_latency_ms": 0.003195018507540226,
+        "p95_latency_ms": 0.0038159778341650963,
+        "rejected": 2,
+        "usd_cost": 0.31341189999999997
+      }
+    ],
+    "physical_this_invocation": 166
+  },
+  "n_per_family": null,
+  "not_a_gate3_vote": true,
+  "outputs_sha256": {
+    "alerts.jsonl": "58afda2dc82906ae90309dff6601d4d0d3778422e626556c15a01fa661fb428f",
+    "ledger.csv": "786e260e4b2c3014b7c92e9835b69044ebe55bf6f45a242198be3234b0b86792",
+    "proposals.jsonl": "90514119efa838dbc4e3701030b9962b0cf6ce735a483d3c884face4b6a17fcb",
+    "records.jsonl.gz": "f7785aa6b7e9bfe66607573f6630822d222165ab9a4c4871e2963b6d31c4cbcc",
+    "truth.jsonl": "0d30aa2c366d1c0995de049b3e20fb5c8a1e8f31fbc926f17cd7d62f2a4f0221"
+  },
+  "partial": false,
+  "profit": 4.0,
+  "records": 1032,
+  "rule_u": {
+    "arm10_coerced_abstentions": 4,
+    "version": "U-v1"
+  },
+  "run_name": "ladder-step-3.5-flash-2603",
+  "truth_identical_to_reports_pilot_truth": true,
+  "versions": {
+    "openai": "1.109.1",
+    "python": "3.12.11"
+  }
+}

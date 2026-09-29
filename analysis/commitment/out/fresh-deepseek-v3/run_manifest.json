@@ -1,0 +1,188 @@
+{
+  "alert_selection_rule": "bank-v1",
+  "alert_source": "bank",
+  "alert_sources": {
+    "bank:early_accurate": 40,
+    "bank:false_alert_null": 24,
+    "bank:late_accurate": 40,
+    "bank:unreliable": 40,
+    "none:bank_gap_demand_down": 32,
+    "none:no_alert": 40,
+    "none:silent_null": 24
+  },
+  "analysis_class": "exploratory",
+  "arm_set": "confirm",
+  "arms": [
+    "arm1_capped_base_stock",
+    "arm2_telemetry_hmm_or",
+    "arm8_spec_immediate",
+    "arm10_spec_eprocess",
+    "ctrl_cusum_to_compiler",
+    "ctrl_keyword_parser",
+    "ctrl_alertspec_upper_bound",
+    "oracle_shockspec_headroom",
+    "arm12_cth",
+    "arm12b_cth_llm",
+    "ctrl_cth_uniform"
+  ],
+  "decoding": "det-v1 (temperature 0.0, no seed), module 02 prompt, no system prompt",
+  "endpoint": {
+    "base_url": "https://openrouter.ai/api/v1",
+    "bills_thinking_as_output": true,
+    "extra_body": null,
+    "model_id": "deepseek/deepseek-chat",
+    "name": "openrouter:deepseek/deepseek-chat",
+    "price_date": "2026-09-28",
+    "price_input_per_mtok": 0.257,
+    "price_output_per_mtok": 1.029,
+    "supports_seed": false
+  },
+  "episodes": 240,
+  "git": {
+    "branch": "method/graded-commitment",
+    "dirty_paths": [
+      "M .gitignore",
+      " M paper/.gitignore",
+      "?? analysis/commitment/cth_arms.py",
+      "?? analysis/commitment/cth_core.py",
+      "?? analysis/commitment/cth_runner.py",
+      "?? analysis/commitment/evaluate.py",
+      "?? analysis/commitment/evidence.py",
+      "?? analysis/commitment/hypotheses.py",
+      "?? analysis/commitment/mc.py",
+      "?? analysis/commitment/out/fresh-deepseek-v3/",
+      "?? analysis/commitment/out/fresh-gemini-2.5-flash-lite/",
+      "?? analysis/commitment/out/fresh-gemini-3.8-flash/",
+      "?? analysis/commitment/out/fresh-gpt-3.5-turbo/",
+      "?? analysis/commitment/out/fresh-grok-4.20/",
+      "?? analysis/commitment/out/fresh-llama-3.1-8b/",
+      "?? analysis/commitment/out/ladder-deepseek-v3/",
+      "?? analysis/commitment/out/ladder-gemma-3-27b/",
+      "?? analysis/commitment/out/ladder-gpt-3.5-turbo/",
+      "?? analysis/commitment/out/ladder-gpt-4o-mini/",
+      "?? analysis/commitment/out/ladder-gpt-oss-20b/",
+      "?? analysis/commitment/out/ladder-llama-3.1-8b/",
+      "?? analysis/commitment/out/ladder-llama-3.2-1b/",
+      "?? analysis/commitment/out/ladder-llama-3.2-3b/",
+      "?? analysis/commitment/out/ladder-llama-3.3-70b/",
+      "?? analysis/commitment/out/ladder-qwen-2.5-72b/",
+      "?? analysis/commitment/out/ladder-qwen-2.5-7b/",
+      "?? analysis/commitment/out/ladder-step-3.5-flash-2603/",
+      "?? analysis/commitment/out/ladder-step-3.5-flash/",
+      "?? analysis/commitment/out/ladder-step-3.7-flash/",
+      "?? analysis/commitment/out/ladder-step-5-preview/",
+      "?? analysis/commitment/out/stage_a.json",
+      "?? analysis/commitment/out/stage_a.md",
+      "?? analysis/commitment/replay.py",
+      "?? paper/.kilo/",
+      "?? paper/.zcode/",
+      "?? paper/sections/06_method_hedge.tex",
+      "?? tests/test_commitment_arms.py",
+      "?? tests/test_commitment_cth.py",
+      "?? tests/test_commitment_episodes.py",
+      "?? tests/test_commitment_evaluate.py",
+      "?? tests/test_commitment_mc.py"
+    ],
+    "sha": "4eb361b9346db4982d7ac1fee10b251b0037812a"
+  },
+  "guard": {
+    "max_physical_calls": 1500,
+    "physical_calls_this_invocation": 189,
+    "physical_calls_total": 402,
+    "refusals_this_invocation": 0,
+    "retries_this_invocation": 5,
+    "spend_cap_usd": 1.0,
+    "usd_this_invocation": 0.09593610999999988,
+    "usd_total": 0.22226267399999988
+  },
+  "ladder_rung": {
+    "model_id": "deepseek/deepseek-chat",
+    "name": "deepseek-v3",
+    "price_input_per_mtok": 0.257,
+    "price_output_per_mtok": 1.029,
+    "provider": "openrouter",
+    "released": "2024-12",
+    "served_as": [
+      "deepseek/deepseek-chat"
+    ],
+    "tier": "671B-MoE"
+  },
+  "layout": "fresh",
+  "ledger": {
+    "charged": 1111,
+    "charged_usd": 0.57873958,
+    "per_arm": [
+      {
+        "accepted": 275,
+        "accepted_after_repair": 1,
+        "arm_id": "arm10_spec_eprocess",
+        "attempted": 279,
+        "input_tokens": 471617,
+        "output_tokens": 23728,
+        "p50_latency_ms": 0.0016620615497231483,
+        "p95_latency_ms": 0.0039960723370313644,
+        "rejected": 3,
+        "usd_cost": 0.145621681
+      },
+      {
+        "accepted": 277,
+        "accepted_after_repair": 0,
+        "arm_id": "arm12_cth",
+        "attempted": 277,
+        "input_tokens": 467553,
+        "output_tokens": 23560,
+        "p50_latency_ms": 0.0016620615497231483,
+        "p95_latency_ms": 5353.274854947813,
+        "rejected": 0,
+        "usd_cost": 0.144404361
+      },
+      {
+        "accepted": 277,
+        "accepted_after_repair": 0,
+        "arm_id": "arm12b_cth_llm",
+        "attempted": 277,
+        "input_tokens": 467550,
+        "output_tokens": 23185,
+        "p50_latency_ms": 0.0017320271581411362,
+        "p95_latency_ms": 0.0034850090742111206,
+        "rejected": 0,
+        "usd_cost": 0.144017715
+      },
+      {
+        "accepted": 276,
+        "accepted_after_repair": 1,
+        "arm_id": "arm8_spec_immediate",
+        "attempted": 278,
+        "input_tokens": 469620,
+        "output_tokens": 23327,
+        "p50_latency_ms": 2800.233162008226,
+        "p95_latency_ms": 8468.234368017875,
+        "rejected": 1,
+        "usd_cost": 0.144695823
+      }
+    ],
+    "physical_this_invocation": 189
+  },
+  "n_per_family": 8,
+  "not_a_gate3_vote": true,
+  "outputs_sha256": {
+    "alerts.jsonl": "4185a9d86b9c65dc50567a641cd6c026057eafc327572eb35f8ab18059305cf7",
+    "ledger.csv": "c46acc05d73d90a415dc025ac4310b28e0e67c6caa7d44c9c9fae9fa4becbb83",
+    "proposals.jsonl": "f35135ee74204f29e54a40f118274bb7193108c7cfa549bda16fc766533d1684",
+    "records.jsonl.gz": "30f308017cdd3719781771c117ef9ddf4948704816981b3427ab4f25fd343a6b",
+    "truth.jsonl": "4152333ca7db8385b559ef4461b7d8e2e83b85733e4f1afda561d41a24859555"
+  },
+  "partial": false,
+  "profit": 4.0,
+  "records": 2544,
+  "rule_u": {
+    "arm10_coerced_abstentions": 12,
+    "version": "U-v1"
+  },
+  "run_name": "fresh-deepseek-v3",
+  "truth_identical_to_reports_pilot_truth": null,
+  "versions": {
+    "openai": "1.109.1",
+    "python": "3.12.11"
+  }
+}

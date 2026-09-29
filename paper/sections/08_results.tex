@@ -1,0 +1,149 @@
+\section{Results}
+\label{sec:results}
+\label{sec:experiments}
+
+\subsection{Why the gate was stopped}
+
+The registered Gate~3 pilot read \emph{kill-or-reframe} on two triggers. The first was
+headroom: on the registered gross-profit endpoint, even a clairvoyant that knows the shock at
+onset clears the 5\% bar
+on only two of six families (a demand rise and a lead-time shift), because pulses, loss bursts
+and the compound family's transit pauses are over before an order placed at onset can land, and
+a demand fall offers little to recover. The second compared the gate with a detector compiled
+without language and found it behind by 566 per episode in gross profit; forensic replays traced
+that gap to the endpoint, since on net reward the same contrast is $+2{,}306$. The exploratory
+pilot then gave the gate real model content. Gemini and Grok named the right family and
+direction in 59 and 53 of 96 shocked episodes, yet the gate
+activated only 43\% and 39\% of the right-family proposals, a median of 10 and 11 periods after
+the proposal, and ended at $-234$ and $-172$ net per episode against arm~1 with intervals
+including zero. The magnitude field matched the truth's bin in 8 and 7 of 96 episodes, but
+that measures a label mismatch rather than calibration: a provisional binning puts 80 of the 96
+shocks in \emph{low}, while the hidden label of every non-distractor template says
+\emph{medium}. Acting at once was
+far worse: arm~8 lost 2{,}549 and 2{,}624 per episode.
+
+\subsection{The fresh-seed confirmation}
+
+Table~\ref{tab:confirm} gives the primary contrasts on the 240 fresh episodes: all four
+one-sided tests reject after Holm correction (largest $p = 0.0031$), and post hoc, without the six
+clusters a structural test had touched before registration, the contrasts are $+329$, $+188$,
+$+163$ and $+145$ (largest $p = 0.0024$). On the 48 null episodes the method is non-inferior to
+arm~1 at the registered margin of $-25$ (Gemini $-3.2$ $[-8.2, -0.1]$, Grok $+1.9$
+$[-1.7, 8.2]$); post hoc, Gemini's small loss comes from the false-alert twins. The gate is no
+better than arm~1 on fresh seeds, and with four further proposer models
+(Fig.~\ref{fig:models}) every interval for the method against the gate and arm~1 excludes zero.
+
+\begin{table}[!tb]
+\caption{Fresh-seed confirmation (registered; exploratory with respect to the project's
+preregistration), 240 episodes, 48 seed clusters, $p/h = 4$. Mean paired difference per
+episode, net reward, with the 95\% seed-cluster bootstrap interval; gross profit in the last
+column. $^\ast$Primary tests, all rejected after Holm correction.}
+\label{tab:confirm}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}llrr@{}}
+\toprule
+Contrast & Model & Net $[95\%]$ & Gross \\
+\midrule
+hedge $-$ gate$^\ast$ & Gemini & $+309\ [173, 472]$ & $+85$ \\
+                      & Grok   & $+179\ [87, 281]$  & $+139$ \\
+hedge $-$ arm 1$^\ast$ & Gemini & $+178\ [55, 326]$ & $+280$ \\
+                       & Grok   & $+163\ [48, 300]$ & $+262$ \\
+gate $-$ arm 1         & Gemini & $-131\ [-316, 28]$ & $+195$ \\
+                       & Grok   & $-16\ [-104, 75]$  & $+123$ \\
+at once $-$ arm 1      & Gemini & $-2{,}046\ [-2{,}612, -1{,}478]$ & $+501$ \\
+                       & Grok   & $-2{,}284\ [-2{,}849, -1{,}710]$ & $+501$ \\
+content-free $-$ arm 1 & either & $+169\ [48, 312]$ & $+270$ \\
+hedge $-$ content-free & Gemini & $+9\ [-5, 24]$ & $+10$ \\
+                       & Grok   & $-6\ [-29, 11]$ & $-8$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Gross profit charges no holding, so in Table~\ref{tab:confirm} it ranks acting at once \emph{best} ($+501$) though
+it is the worst on net: the endpoint trap of our first registration. Every claim here is on net.
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=\textwidth]{fig2_models.pdf}
+\caption{The fresh-seed confirmation with six proposer models (240 episodes each).
+\textbf{(a)}~First proposals naming the right family and direction, among the 170 shocked
+episodes where the trigger fired. \textbf{(b)}~Acting on proposals at once (arm~8) against
+arm~1, net per episode. \textbf{(c)}~The gate (arm~10) and certify-then-hedge against arm~1,
+with 95\% seed-cluster intervals; the band and dashed line are the content-free control
+($\lambda = 1$, no model call, the same for every model). Perception and the harm of acting at
+once vary widely with the model; the hedge's gain does not, and it stays within the band.}
+\label{fig:models}
+\end{figure*}
+
+\subsection{Where the gain comes from}
+
+By the registered per-family readout, the 32 shocked lead-time episodes supply 96\% of the gain
+over arm~1 ($+1{,}286$ and $+1{,}177$ per episode, against $+80$ to $+95$ per demand fall and
+pulse, and about $-40$ and $-3$ per compound and loss episode). The rest is post hoc: every shocked family's
+interval excludes zero except the demand rise ($-83$; $[-200, 21]$ and $[-204, 26]$). Without the
+lead-time units the method is $+9$ $[-24, 43]$ and $+7$ $[-25, 36]$ against arm~1; against the
+gate it still leads by $+227$ $[82, 408]$ with Gemini, whose gate loses $1{,}057$ per demand-rise
+episode by compiling the stated magnitude, while with Grok $+58$ $[-1, 134]$ is not
+distinguishable from zero. Where the model named the shift (17 of the 32 lead-time episodes with
+Gemini, 11 with Grok; in the rest the gate never acted), two mechanisms separate hedge from gate:
+timing, as the hedge
+commits partially as evidence accumulates while the gate commits all at once a median of 11
+periods after the proposal; and sizing, as the gate compiles the stated size, wrong in 7 and 6
+of those proposals (true shifts were one or two periods), while
+the hedge estimates the offset from receipts (Fig.~\ref{fig:episode}).
+
+\subsection{What the language contributes}
+
+The content-free variant calls no model but is timed by the same alerts; it earns $+169$
+$[48, 312]$ against arm~1, and at $p/h = 4$ the method is not distinguishable from it ($+9$
+$[-5, 24]$ with Gemini, $-6$ $[-29, 11]$ with Grok; $-43$ to $0$ with the four further models,
+below zero for Llama~3.1~8B and GPT-3.5 Turbo). What the model's label changes is commitment on
+null episodes: the summed shock mass falls from $0.83$ to $0.52$ and $0.46$ (post hoc, on
+false-alert twins, with no detectable change in null reward), since naming any family moves
+prior weight off the others. Trusting the family alone
+($\lambda = 0$) cuts it to $0.18$ and $0.06$ but costs net reward against the content-free arm
+with four of the six models, from $-83$ $[-169, -13]$ (Grok) to $-192$ (Llama~3.1~8B); hence
+the hedged prior. Post hoc,
+with each model's answers held fixed, the weight matters less than the rule: $\lambda = 0.5$ or
+$0.75$ is not distinguishable from $0.25$, while committing once the shock mass reaches $1/2$
+changes net reward by $-56$ $[-97, -19]$ and $-62$ $[-108, -21]$ ($-370$ and $-368$ at
+$p/h = 19$).
+
+\subsection{Cost ratios and noisy lead times}
+\label{sec:stage-d}
+
+A second registered stage, exploratory with respect to Gate~3, ran the frozen method on a new
+pool of 48 units at the benchmark's other ratios, $p/h = 19$ and $1$, and at $p/h = 4$ on eight
+lead-time units whose lead times carry the registered arrival law's noise (clipped at four
+periods), with Holm's correction within each family of tests. At $p/h = 19$ the method beat the
+gate by $+597$ $[323, 917]$ (Gemini) and $+631$ $[265, 1{,}085]$ (Grok) and arm~1 by $+979$
+$[364, 1{,}703]$ and $+896$ $[322, 1{,}569]$, and against the content-free variant the text
+earned $+82$ $[35, 138]$ with Gemini ($+84$ $[18, 166]$ in a post-hoc replay of the first
+stage's episodes) but $-2$ $[-75, 59]$ with Grok; five of the six tests reject. On null episodes
+the difference from arm~1 is $-22$ $[-65, 5]$ with each model, so non-inferiority at $-25$ is not
+established. At $p/h = 1$ the method beat the gate by $+189$ $[103, 288]$ and $+45$ $[10, 86]$
+(both reject; the gate itself loses to arm~1 there), is not distinguishable from arm~1 ($+10$
+$[-24.5, 51.8]$, just non-inferior at $-25$; $+4$ $[-27.6, 43.3]$, not non-inferior) or,
+two-sided, from the content-free variant, and loses a little on null episodes ($-3.5$
+$[-7.0, -0.8]$, $-3.3$ $[-6.7, -0.7]$). Per unit of price the gain over arm~1 rises from
+$p/h = 1$ to $19$ with Grok ($+43$ $[2, 80]$; Gemini $+41$ $[-1, 79]$). On noisy lead times the
+gain over arm~1, $+254$ and $+187$, was not confirmed (exact $p = 0.14$ and $0.15$; six of eight
+unit gains positive with each model; descriptive intervals $[-141, 629]$ and $[-149, 469]$); it
+came from the four units whose lead rose by two periods, while the one-period units lost on
+average (shift size is confounded with the baseline lead).
+
+\subsection{Model scale}
+
+The ladder ran 20 of the 21 models on the 120 pilot episodes (StepFun's slowest reasoning model
+had not finished at the time of writing). First proposals named the right family and direction
+in 0 to 59 of 96 shocked episodes. Acting at once lost between nothing (Llama~3.2 1B, which never
+produced a usable \shockspec{}) and $3{,}656$ per episode (Gemini~2.5 Flash-Lite). Contrary to the stage's
+registered expectation that this loss would grow as perception falls, it grows with how readily
+a model commits, and commitment and accuracy move together (post hoc, $r = 0.86$). The gate
+stayed between $-300$ and $+3$ against arm~1 and acted in at most one of the 12 false-alert twin
+episodes; contrary to the same expectation, its interval lay below zero on two models
+(Gemini~2.5 Flash $-294$ $[-567, -45]$, GPT-3.5 Turbo $-60$ $[-151, -1]$). The hedge's
+development replays (no claim) had point estimates between $+107$ and $+158$ on every model,
+against $+136$ for its content-free variant.

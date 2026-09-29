@@ -1,0 +1,27 @@
+# Reward-against-compute frontier, Fig. 3.
+#
+# One row per arm and control. `calls` is the registered realized charged-call
+# budget per episode and is known in advance. `profit` is the primary reward
+# endpoint, stratum-weighted cumulative profit per episode, with ci_low and
+# ci_high from the seed-level cluster bootstrap; those three columns are EMPTY
+# until the sweep lands. Fill them and Fig. 3 completes with no code change.
+#
+# Arms 8, 9 and 10 share one physical proposal call set, so they carry the same
+# `calls` value by construction and the vertical spread among them is exactly
+# the effect of the activation stage.
+arm,calls,profit,ci_low,ci_high
+arm1_capped_base_stock,0,,,
+arm2_telemetry_hmm_or,0,,,
+arm3_llm_direct,50,,,
+arm4_triggered_llm_direct,2,,,
+arm5_llm_to_or_every_period,50,,,
+arm6_llm_to_or_sparse,2,,,
+arm7_llm_to_or_persistent,2,,,
+arm8_spec_immediate,2,,,
+arm9_spec_heuristic_rollback,2,,,
+arm10_spec_eprocess,2,,,
+arm11_or_to_llm,50,,,
+ctrl_cusum_to_compiler,0,,,
+ctrl_keyword_parser,0,,,
+ctrl_alertspec_upper_bound,2,,,
+oracle_shockspec_headroom,0,,,

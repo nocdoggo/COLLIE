@@ -1,0 +1,42 @@
+\section{Limitations}
+\label{sec:limitations}
+
+\textbf{One simulator, small pools.} All evidence comes from our generator. Outside the
+noisy-lead stratum its lead times are deterministic, so a lead-time shift appears in the receipts
+without noise, and that is where the gain sits: at $p/h = 4$ lead-time shifts, a sixth of the shocked episodes, carry
+about 171 of the 178 per-episode gain over arm~1 with Gemini and 157 of 163 with Grok. With
+noisy lead times the gain over arm~1 was not confirmed on eight units, and the one-period
+shifts lost on average (descriptive). The method has not been run on InventoryBench's own instances, a third of
+which have stochastic lead times with lost shipments; the fresh pools have 48 units (the confirmation
+registered 72) because the alert bank yields distinct texts for only eight units per family.
+
+\textbf{What the theorems cover.} Theorems~\ref{thm:exposure}
+and~\ref{thm:regret} assume an exact null, and the arm as run lies outside it: its
+demand null is estimated from the pre-proposal prefix, and its arrival null is a
+diffuse delay law while our delays are deterministic outside the noisy-lead stratum.
+A null Monte Carlo of the frozen arm (released with our code) finds no cell more
+than two standard errors above a bound where the premise holds. With the plug-in
+null and a first firing at period 10, in the cells matched to our null twins, it
+measures $\Expect_0[\Pi_\sigma]$ at 2.0 to 2.7 times $A$ and
+$\Prob_0(\sup_t \Pi_t \ge 1/2)$ at 2.3 to 3.7 times its bound (up to 3.2 and 4.7
+in other cells); the arrival mismatch alone lifts exposure at a fixed decision to
+at most 1.24 times its budget. The regret theorem bounds a one-period newsvendor
+surrogate only.
+
+\textbf{What the content-free control measures.} The control calls no model but
+is timed by the same alerts, so it removes the text, not the alert channel. Its
+null commitment also overstates action: a pulse hypothesis keeps its \eprocess{}
+after its window closes, so its mass can linger on a null episode after it stops
+moving the order. Post hoc, crediting each period's mass to its leading hypothesis,
+pulse-led periods carry 0.69 of the control's 0.83 and 0.32 and 0.38 of the hedge's 0.52
+and 0.46, so most of what the model's label removes is that mass.
+
+\textbf{Status of the evidence.} Relative to Gate~3 this study is exploratory, and
+Gate~3's decision, \emph{kill-or-reframe}, stands. The method was developed on the spent
+pilot episodes; both later stages were registered, code frozen by hash, before their live
+runs. The plan discloses a structural test on six first-stage units, an interim look at one
+run, three departures from the original registration (net reward as endpoint, action before
+any activation threshold, fresh units outside the frozen manifest), an audit that reproduced
+every registered first-stage number, and the second stage's pre-run amendments, which changed
+no hypothesis or cap (one clipped the noisy stratum's lead times). The second stage did not
+establish null safety at $p/h = 19$, nor non-inferiority against arm~1 at $p/h = 1$ with Grok.

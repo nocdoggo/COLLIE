@@ -1,0 +1,8 @@
+{
+  "base": 100000,
+  "lead_rule": "min(4, max(0, L_t + xi_t)); twin min(4, max(0, L_base + xi_t)); inf kept",
+  "note": "run_manifest.json says layout 'fresh'; this file names the pool",
+  "pool": "stochastic",
+  "stage": "D",
+  "units": "family 4, i = 12..19"
+}
