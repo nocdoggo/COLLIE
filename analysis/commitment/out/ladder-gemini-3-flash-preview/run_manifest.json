@@ -1,0 +1,130 @@
+{
+  "alert_selection_rule": "bank-v1",
+  "alert_source": "bank",
+  "alert_sources": {
+    "bank:early_accurate": 1,
+    "bank:false_alert_null": 1,
+    "bank:unreliable": 1
+  },
+  "analysis_class": "exploratory",
+  "arm_set": "nine",
+  "arms": [
+    "arm1_capped_base_stock",
+    "arm2_telemetry_hmm_or",
+    "arm8_spec_immediate",
+    "arm9_spec_heuristic_rollback",
+    "arm10_spec_eprocess",
+    "ctrl_cusum_to_compiler",
+    "ctrl_keyword_parser",
+    "ctrl_alertspec_upper_bound",
+    "oracle_shockspec_headroom"
+  ],
+  "decoding": "det-v1 (temperature 0.0, no seed), module 02 prompt, no system prompt",
+  "endpoint": {
+    "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/",
+    "bills_thinking_as_output": true,
+    "extra_body": null,
+    "model_id": "gemini-3-flash-preview",
+    "name": "gemini-primary:gemini-3-flash-preview",
+    "price_date": "2026-09-28",
+    "price_input_per_mtok": 0.5,
+    "price_output_per_mtok": 3.0,
+    "supports_seed": false
+  },
+  "episodes": 3,
+  "git": {
+    "branch": "method/graded-commitment",
+    "dirty_paths": [
+      "M .gitignore",
+      "?? analysis/commitment/out/"
+    ],
+    "sha": "a8985996278f00439a0bbea1382413813575b6ba"
+  },
+  "guard": {
+    "max_physical_calls": 1500,
+    "physical_calls_this_invocation": 7,
+    "physical_calls_total": 7,
+    "refusals_this_invocation": 0,
+    "retries_this_invocation": 2,
+    "spend_cap_usd": 2.0,
+    "usd_this_invocation": 0.09304899999999999,
+    "usd_total": 0.09304899999999999
+  },
+  "ladder_rung": {
+    "model_id": "gemini-3-flash-preview",
+    "name": "gemini-3-flash-preview",
+    "price_input_per_mtok": 0.5,
+    "price_output_per_mtok": 3.0,
+    "provider": "gemini",
+    "released": "2025-12",
+    "served_as": [
+      "gemini-3-flash-preview"
+    ],
+    "tier": "mid"
+  },
+  "layout": "pilot",
+  "ledger": {
+    "charged": 15,
+    "charged_usd": 0.1545395,
+    "per_arm": [
+      {
+        "accepted": 5,
+        "accepted_after_repair": 0,
+        "arm_id": "arm10_spec_eprocess",
+        "attempted": 5,
+        "input_tokens": 7887,
+        "output_tokens": 21441,
+        "p50_latency_ms": 0.002312939614057541,
+        "p95_latency_ms": 53627.6388480328,
+        "rejected": 0,
+        "usd_cost": 0.0682665
+      },
+      {
+        "accepted": 5,
+        "accepted_after_repair": 0,
+        "arm_id": "arm8_spec_immediate",
+        "attempted": 5,
+        "input_tokens": 7901,
+        "output_tokens": 13062,
+        "p50_latency_ms": 10185.271223075688,
+        "p95_latency_ms": 395730.23566498887,
+        "rejected": 0,
+        "usd_cost": 0.0431365
+      },
+      {
+        "accepted": 5,
+        "accepted_after_repair": 0,
+        "arm_id": "arm9_spec_heuristic_rollback",
+        "attempted": 5,
+        "input_tokens": 7901,
+        "output_tokens": 13062,
+        "p50_latency_ms": 0.0024529872462153435,
+        "p95_latency_ms": 0.0027240021154284477,
+        "rejected": 0,
+        "usd_cost": 0.0431365
+      }
+    ],
+    "physical_this_invocation": 7
+  },
+  "n_per_family": null,
+  "not_a_gate3_vote": true,
+  "outputs_sha256": {
+    "alerts.jsonl": "f54a49896556e0d52bca0a53f6a9b799d3058c3df8cc3ecb88e5fa7d8e616696",
+    "ledger.csv": "a45521dcbf9ecabbdc203378ee7e2e73e0a1ee8f84875dc222542c5d13b74e7b",
+    "proposals.jsonl": "a0289f0865eac7c85c28db71a10513e177bb83015d64185e7e57897df02f50ee",
+    "records.jsonl.gz": "d23a3a5fdfcb07fa423173dd1f84cd009f52b99465ad9bbaa8bcaec78056974d",
+    "truth.jsonl": "0d30aa2c366d1c0995de049b3e20fb5c8a1e8f31fbc926f17cd7d62f2a4f0221"
+  },
+  "partial": true,
+  "profit": 4.0,
+  "records": 25,
+  "rule_u": {
+    "arm10_coerced_abstentions": 0,
+    "version": "U-v1"
+  },
+  "run_name": "ladder-gemini-3-flash-preview",
+  "versions": {
+    "openai": "1.109.1",
+    "python": "3.12.11"
+  }
+}
