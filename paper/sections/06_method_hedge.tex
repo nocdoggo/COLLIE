@@ -29,9 +29,10 @@ w_{jh} = \frac{\lambda}{|\mathcal{H}|} + (1-\lambda)\,\Ind\{h = \hat h_j\},
 \end{equation}
 where $\hat h_j$ is the family the language model names in its \shockspec{} (none
 if it abstains or names a family outside $\mathcal{H}$) and $\lambda\in[0,1]$ is
-a registered hedge. The model therefore sets \emph{prior weights} and nothing
-else: $\lambda = 1$ is a content-free arm that never calls the model, and
-$\lambda = 0$ trusts the model's family alone. The allocation $a_j$ is the
+a registered hedge. The model therefore sets the prior weights and, for the
+hypothesis it names, the onset window of its \eprocess{}; nothing else. With
+$\lambda = 1$ the arm never calls the model (it is still timed by the shared
+trigger, alerts included), and $\lambda = 0$ trusts the model's family alone. The allocation $a_j$ is the
 frozen budget of Theorem~\ref{thm:activation}; it is spent on masses rather than
 thresholds.
 
@@ -63,10 +64,11 @@ arm~1's own $F_{0,t} = \mathcal{N}\bigl((1+L)\bar d_t,\,(1+L)s_{d,t}^2\bigr)$.
 \subsection{The hedge}
 
 The order-up-to requirement is the critical fractile $\beta = p/(p+h)$ of the
-posterior-predictive mixture of requirement $Y - \gamma P_t$,
+posterior-predictive mixture of the requirement $Y - P_t$, where $P_t$ is the
+in-transit total,
 \begin{multline}
 x_t = \inf\Bigl\{x : (1-\Pi_t)\,F_{0,t}(x + P_t) \\
-+ \sum_{j,h}\pi_{jh,t}\,G_{jh,t}(x + \gamma_{h} P_t) \ge \beta\Bigr\},
++ \sum_{j,h}\pi_{jh,t}\,G_{jh,t}(x + P_t) \ge \beta\Bigr\},
 \label{eq:hedge}
 \end{multline}
 and the order is $q_t = \min(\max(0,\lceil x_t - I_t\rceil), C_t, \hat C_t)$ with
@@ -77,7 +79,9 @@ $\Pi_t = 0$ and $q_t$ is arm~1's order bit for bit.
 
 Write $\Prob_0$ for the global no-change null under which every $E_{jh}$ is a
 nonnegative supermartingale with unit start (the model-conditional premise of
-Theorem~\ref{thm:activation}).
+Theorem~\ref{thm:activation}); this needs the null's baseline to be known.
+Hypotheses that can no longer act are dropped from both $N$ and $A$, which
+only lowers $\Pi_t$.
 
 \begin{theorem}[Exposure]
 \label{thm:exposure}
@@ -103,20 +107,30 @@ $\Prob_0$ the expected cumulative surrogate regret is at most
 $T A \bar V/(1-A)$.
 \end{theorem}
 
-\emph{Proof sketch.} $x_t$ minimises $(1-\Pi_t)c_{F_0} + \Pi_t c_{G_t}$, so
+\emph{Proof sketch.} $x_t$ minimizes $(1-\Pi_t)c_{F_0} + \Pi_t c_{G_t}$, so
 $(1-\Pi_t)\bigl(c_{F_0}(x_t)-c_{F_0}(x^0_t)\bigr) \le
 \Pi_t\bigl(c_{G_t}(x^0_t)-c_{G_t}(x_t)\bigr) \le \Pi_t V_t$; apply
 Theorem~\ref{thm:exposure}. \hfill$\square$
 
-Two consequences follow directly. First, with a single hypothesis and
-$\lambda = 0$, the posterior odds are $a_j E_{j,t}/(1-a_j)$, so the registered
-gate $E_{j,t} \ge 1/\alpha_j$ is, up to one unit of threshold, the MAP decision of
-this posterior: certify-then-hedge replaces the gate's step with the Bayes action.
-Second, the language model can move evidence but not validity. By
-\eqref{eq:prior} every hypothesis keeps prior weight at least $\lambda/|\mathcal{H}|$,
-so a wrong family costs at most $\log(|\mathcal{H}|/\lambda)$ nats of evidence
-against the content-free arm, a right one saves up to
-$\log\bigl(1 + (1-\lambda)|\mathcal{H}|/\lambda\bigr)$, and neither changes the
-bounds above. The theorems are stated for the one-period surrogate that the
-controller optimises; lost sales, the smoother and the zero floor make realised
+The premise is where the guarantee is fragile. Our demand \eprocess{}es, as
+registered, estimate the null's mean and spread from the periods before
+$\tau_j$. A null simulation of the frozen arm (Section~\ref{sec:limitations})
+finds no cell clearly above a bound when that baseline is known, but with the
+plug-in estimate and a first firing at period 10, $\Expect_0[\Pi_\sigma]$ reaches
+2.0 to 2.7 times $A$; later firings shrink the excess.
+
+Two further properties follow from \eqref{eq:prior} and \eqref{eq:posterior}.
+First, with one hypothesis and $\lambda = 0$ the posterior odds are
+$a_j E_{j,t}/(1-a_j)$, so thresholding $E_{j,t}$ at $1/\alpha_j$, as the gate
+does, is up to one unit of threshold acting when that hypothesis is the more
+probable. The correspondence is structural rather than numerical: the gate
+certifies the model's full \shockspec{}, magnitude included, while the hedge
+certifies a canonical one. Second, the language model can move evidence but not
+validity. A hypothesis the model does not name enters with $\lambda$ times its
+content-free weight, so a wrong or missing family costs exactly
+$\log(1/\lambda)$ nats of evidence against the arm with $\lambda = 1$ ($\log 4$
+at $\lambda = 1/4$); the named hypothesis enters with $\lambda + (1-\lambda)|\mathcal{H}|$
+times it, a saving of $\log(\lambda + (1-\lambda)|\mathcal{H}|)$ ($\log 3.25$). Neither changes the bounds above. The
+theorems are stated for the one-period surrogate that the controller
+optimizes; lost sales, the smoother and the zero floor make realized
 multi-period cost an empirical matter, which Section~\ref{sec:results} measures.

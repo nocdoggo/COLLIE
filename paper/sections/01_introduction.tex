@@ -25,23 +25,26 @@ over-stocking (Section~\ref{sec:results}).
 
 This paper replaces the gate with \emph{certify-then-hedge}. The \eprocess{} no longer switches
 the controller on; it prices a fixed set of action-aligned hypotheses. The language model's
-answer only sets prior weights over that set, mixed with a uniform prior so that a wrong answer
-has bounded cost. The size of a shock is estimated from the data rather than taken from the
-model, and the order is the critical fractile of the posterior-predictive mixture, so the
-controller moves toward a hypothesis exactly as fast as the evidence for it grows
-(Fig.~\ref{fig:episode}). The construction keeps the error budget of the gate as a bound on
-expected exposure to a false hypothesis at every stopping time, whatever the model says, and
-it contains the gate as its most-probable-hypothesis special case.
+answer only reweights that set (and fixes the onset window of the hypothesis it names), mixed
+with a uniform prior so that a wrong answer has bounded cost. The size of a shock is estimated
+from the data rather than taken from the model, and the order is the critical fractile of the
+posterior-predictive mixture, so the controller moves toward a hypothesis as fast as the
+evidence for it grows (Fig.~\ref{fig:episode}). Under a known null, the construction keeps the
+gate's error budget as a bound on expected exposure to a false hypothesis at every stopping
+time, whatever the model says, and in the single-hypothesis case the gate's threshold is a
+posterior-odds rule of the same form.
 
 \begin{figure}[!t]
 \centering
 \includegraphics[width=\columnwidth]{fig1_episode.pdf}
 \caption{One fresh-seed episode, a lead-time shift of one period with an accurate early
-alert (Gemini~3.8 as the proposer). \textbf{(a)}~The gate (dashed) commits fully ten periods
-after onset; certify-then-hedge (solid) commits in proportion to the posterior shock mass
-$\Pi_t$. \textbf{(b)}~Cumulative net reward against the baseline. The model said the shift was
+alert (Gemini~3.8 as the proposer), chosen to show the mechanism: it is the gate's third-worst of
+the 32 lead-time episodes. \textbf{(a)}~The gate (dashed) commits fully ten periods after onset;
+certify-then-hedge (solid) commits in proportion to the posterior shock mass $\Pi_t$.
+\textbf{(b)}~Cumulative net reward against the baseline. The model said the shift was
 ``medium'', which the gate compiles as two periods; certify-then-hedge estimated one from the
-receipts. Final: $+198$ against $-2{,}358$.}
+receipts. Final: $+198$ against $-2{,}358$; over all 32 lead-time episodes, $+1{,}286$ and
+$+414$ per episode.}
 \label{fig:episode}
 \end{figure}
 
@@ -49,18 +52,20 @@ receipts. Final: $+198$ against $-2{,}358$.}
 
 \begin{itemize}\itemsep0pt
 \item \textbf{Certify-then-hedge}, a graded commitment rule for typed language-model
-      hypotheses in a closed control loop, with an anytime-valid exposure bound that holds for
-      any model output and an odds-regret bound in cost units (Section~\ref{sec:hedge}).
-\item \textbf{A registered test on fresh seeds.} Against the gate and against the operations
-      research baseline, with two proposer models, all four primary tests survive Holm
-      correction, and the method is non-inferior on no-shock episodes
+      hypotheses in a closed control loop, with an exposure bound that holds for any model
+      output under a known null and an odds-regret bound in cost units, and a simulation of how
+      far the bound slips under the plug-in null we ran (Section~\ref{sec:hedge}).
+\item \textbf{A registered test on fresh seeds}, exploratory with respect to the project's
+      preregistration. Against the gate and against the operations research baseline, with two
+      proposer models, all four primary tests survive Holm correction, and losses on no-shock
+      episodes stay within the registered margin; four further models point the same way
       (Section~\ref{sec:results}).
-\item \textbf{A model-scale study} over 21 language models from seven developers, from
-      one-billion-parameter open models to current frontier models: acting on proposals at once
-      loses more with some models than others, while the certified hedge's gain does not
-      depend on the model (Section~\ref{sec:results}).
-\item \textbf{An honest account of the language's value.} On this simulator a content-free
-      version of the hedge earns as much; the model's family label mainly reduces commitment on
-      no-shock episodes. We report the negative pilot, every deviation, and the audited
-      benchmark divergence that motivated the controlled design.
+\item \textbf{An account of where the gain comes from.} Against the baseline it comes almost
+      entirely from lead-time shifts, and an alert-timed variant that ignores the model's
+      answer earns as much; the model's label lowers commitment on no-shock episodes without
+      changing reward. A 21-model ladder shows that acting on proposals at once loses in
+      proportion to how readily a model commits, not how often it is right.
+\item \textbf{The negative pilot and the audit trail}: the gate's registered failure, every
+      deviation and disclosure, and the audited benchmark divergence that motivated the
+      controlled design.
 \end{itemize}

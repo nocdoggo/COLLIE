@@ -27,6 +27,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.patches import Patch
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 FIGURES_DIR = SCRIPT_DIR.parent / "figures"
@@ -231,6 +232,10 @@ def data_fig2_models() -> Path:
                 *(round(v, 1) for v in (c["arm8-arm1|net"]["mean"], *c["arm8-arm1|net"]["b"])),
                 *(round(v, 1) for v in (c["arm10-arm1|net"]["mean"], *c["arm10-arm1|net"]["b"])),
                 *(round(v, 1) for v in (c["cth-arm1|net"]["mean"], *c["cth-arm1|net"]["b"])),
+                *(
+                    round(v, 1)
+                    for v in (c["uniform-arm1|net"]["mean"], *c["uniform-arm1|net"]["b"])
+                ),
             ]
         )
     return _write_csv(
@@ -251,6 +256,9 @@ def data_fig2_models() -> Path:
             "cth_mean",
             "cth_lo",
             "cth_hi",
+            "uniform_mean",
+            "uniform_lo",
+            "uniform_hi",
         ],
         rows,
     )
@@ -291,6 +299,10 @@ def fig2_models() -> None:
     ax_i.set_xlabel("net vs arm 1, per episode")
     ax_i.set_title("(b) acting at once (arm 8)", loc="left", pad=20)
 
+    # The content-free control calls no model, so it is one value for every row: a band.
+    u_mean, u_lo, u_hi = (float(rows[0][f"uniform_{k}"]) for k in ("mean", "lo", "hi"))
+    ax_c.axvspan(u_lo, u_hi, color=GRID, alpha=0.9, lw=0, zorder=0)
+    ax_c.axvline(u_mean, color=MUTED, lw=0.8, ls=(0, (3, 2)), zorder=1)
     off = 0.14
     for key, color, marker, dy, name in (
         ("gate", CONTROL, "D", -off, "gate (arm 10)"),
@@ -305,14 +317,20 @@ def fig2_models() -> None:
     ax_c.axvline(0, color=RULE, lw=0.6)
     ax_c.set_xlabel("net vs arm 1, per episode")
     ax_c.set_title("(c) verified commitment", loc="left", pad=20)
+    handles, names = ax_c.get_legend_handles_labels()
+    handles.append(Patch(facecolor=GRID, edgecolor=MUTED, linestyle=(0, (3, 2)), lw=0.8))
+    names.append("content-free")
     ax_c.legend(
+        handles,
+        names,
         loc="lower left",
         bbox_to_anchor=(0.0, 1.0),
-        ncol=2,
+        ncol=3,
         frameon=False,
         fontsize=6.5,
-        handletextpad=0.3,
-        columnspacing=1.2,
+        handletextpad=0.4,
+        handlelength=1.4,
+        columnspacing=1.0,
         borderaxespad=0.0,
     )
     _save(fig, "fig2_models")

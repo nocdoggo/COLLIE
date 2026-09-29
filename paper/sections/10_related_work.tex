@@ -13,8 +13,8 @@ Certify-then-hedge hedges instead: the model only reweights a fixed,
 action-aligned hypothesis set (and sets its hypothesis's onset window), the
 prior-weighted \eprocess{}es become posterior odds, and the order is a
 Bayes-mixture base-stock quantile. With one hypothesis and $\lambda = 0$ the
-posterior's MAP decision is the gate's activation rule, up to one unit of
-threshold; the exposure bound holds for any model output
+gate's threshold is a posterior-odds rule of the same form, and under a known
+null the exposure bound holds for any model output
 (Theorem~\ref{thm:exposure}).
 
 \textbf{Anytime-valid inference.} We take e-values and Ville's inequality as
@@ -28,9 +28,8 @@ loosen, not fail, when its e-collection, the analogue of a prior, is chosen
 badly~\cite{grunwald-eposterior}, and e-values keep Type-I risk control when the
 loss is chosen after the data~\cite{grunwald-beyond-np}. Certify-then-hedge
 multiplies prior weights by \eprocess{}es where a Bayes posterior uses
-likelihood ratios, so a wrong language prior costs at most
-$\log(|\mathcal{H}|/\lambda)$ nats of evidence relative to trusting the true
-family outright, and no validity.
+likelihood ratios, so a wrong or missing family costs $\log(1/\lambda)$ nats
+of evidence against the content-free prior, and no validity.
 
 \textbf{Inventory under uncertain information.} In inventory theory, advance
 demand information is a reliable signal that offsets lead

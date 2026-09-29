@@ -12,8 +12,9 @@ the same first prompt.
 \textbf{Arms.} Arm~1 is the published capped base-stock policy. Arm~8 acts on a proposal at once
 (the compiled configuration of the latest \shockspec{}, forever); arm~10 is the gate of
 Section~\ref{sec:verify}. Certify-then-hedge runs with $\lambda = 0.25$ (the method), with
-$\lambda = 0$ (the model's family only), and with $\lambda = 1$ (content-free: the same trigger
-and machinery, no model call). Controls complete the ladder: a telemetry-only hidden-Markov
+$\lambda = 0$ (the model's family only), and with $\lambda = 1$ (content-free: the same trigger,
+alerts included, and machinery, with no model call). Arm~10 alone keeps the pilot's rule that
+turns a proposal with no duration into an abstention. Controls complete the ladder: a telemetry-only hidden-Markov
 policy (arm~2), the detector compiled without language, a keyword parser of the alert text, the
 alert's hidden specification compiled at onset minus one (a perfect-reading upper bound), and a
 hidden-truth oracle.
@@ -33,8 +34,11 @@ episodes (24 seeds) with scripted model content; it read \emph{kill-or-reframe}.
 exploratory pilot replayed the same 120 episodes with live Gemini and Grok answers and the real
 alert bank. (iii) The model ladder ran the same episodes with the remaining models. (iv)
 Certify-then-hedge was developed on those spent episodes only, where its numbers carry no
-claim. (v) The confirmation froze the method's code by hash and registered its hypotheses,
-tests and evaluator before any fresh episode was run.
+claim. (v) The confirmation, exploratory with respect to the project's preregistration, froze
+the method's code by hash and registered its hypotheses, tests and evaluator in the study plan
+before its live runs. The plan also discloses that a scripted structural test had computed
+outcomes on six of the 48 units beforehand, and that the registered evaluator was run on one
+primary model while the other was still running; nothing changed after either.
 
 \textbf{Fresh seeds.} The confirmation draws 48 units (eight per family) from a seed pool
 disjoint from every registered pool, each replayed under the four information conditions plus

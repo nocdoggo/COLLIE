@@ -3,27 +3,25 @@
 % special characters, footnotes or math; this one follows the same rule.
 
 \begin{abstract}
-Language models can read the operational messages that precede supply and demand shocks,
-but acting on what they say is risky: a wrong reading moves real orders. We study a
-replenishment controller that asks a language model only what changed, in a closed typed
-vocabulary, and tests the answer with an anytime-valid e-process on data that arrive after
-the proposal. A preregistered pilot of the natural design, which lets a hypothesis act only
-once its e-process crosses a Ville threshold, was stopped at its own decision gate: the
-gate was safe but acted late, rarely, and on magnitudes the model got wrong. We therefore
-propose certify-then-hedge. The e-process no longer switches the controller on; it prices
-a fixed set of action-aligned hypotheses, the model's answer only sets prior weights over
-them, the size of the shock is estimated from the data, and the order is the critical
-fractile of the resulting posterior-predictive mixture. The expected exposure to a false
-hypothesis stays below the frozen error budget at every stopping time, whatever the model
-says, and the old gate is the special case of acting on the most probable hypothesis. On
-240 fresh episodes registered before any outcome was seen, certify-then-hedge improved net
-reward over the gate by 309 and 179 per episode and over the operations research baseline
-by 179 and 163, with Gemini and Grok as the proposers, all four tests surviving Holm
-correction, and it was non-inferior on no-shock episodes. Four further models, from an
-eight-billion-parameter open model to a legacy chat model, gave the same picture, while
-acting on proposals at once lost 1,478 to 3,181 per episode. On this simulator the gain comes
-from the statistics rather than the language: a content-free variant earns as much, and the
-model's contribution is to cut commitment on no-shock episodes by about 45 percent.
+Language models can name the shock behind an operational message, but acting on what they
+say is risky: a wrong reading moves real orders. We study a replenishment controller that asks a
+language model only what changed, in a closed typed vocabulary, and tests the answer with an
+anytime-valid e-process on data that arrive after the proposal. A preregistered pilot of the
+natural design, which lets a hypothesis act only once its e-process crosses a Ville threshold,
+was stopped at its own decision gate: the gate was safe but acted late, rarely, and on
+magnitudes that did not match the truth. We propose certify-then-hedge. The e-process no longer
+switches the controller on; it prices a fixed set of action-aligned hypotheses, the model's
+answer only reweights them, the size of the shock is estimated from the data, and the order is
+the critical fractile of the resulting posterior-predictive mixture. Under a known null, the
+expected exposure to a false hypothesis stays within the frozen error budget at every stopping
+time, whatever the model says. In an exploratory test registered before its live runs, on 240
+fresh episodes with Gemini and Grok as proposers, certify-then-hedge improved net reward per
+episode over the gate by 309 and 179 and over the operations research baseline by 179 and 163;
+all four tests survived Holm correction, and losses on no-shock episodes stayed within the
+registered margin. Nearly all of the gain over the baseline came from lead-time shifts. A
+variant that ignores the model's answer, timed by the same alerts, earned as much; the model's
+label cut commitment on no-shock episodes by 37 and 45 percent without changing reward. Acting
+on proposals at once lost 1,478 to 3,181 in net reward per episode across six models.
 \end{abstract}
 
 \hfill
