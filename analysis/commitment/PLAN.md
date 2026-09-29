@@ -121,6 +121,13 @@ within-family size comparisons). Small models are expected to fail the module 02
 often; parse failures, repairs and fallbacks are reported per rung as part of the result.
 Stage A's cap becomes $5.25 plus $17.00 for these rungs.
 
+**A3 (2026-09-29, after the StepFun smoke runs, before their full runs).** Projected shadow cost
+of the full 120-episode runs: `step-3.5-flash` $0.39, `step-3.5-flash-2603` $0.85,
+`step-3.7-flash` $2.82, `step-5-preview` $1.74. The Step Plan is flat-rate, so these are shadow
+prices with no cash consequence; the StepFun caps are raised from $2.00 to $4.00 (shadow) so that
+`step-3.7-flash` runs. Its smoke parses are disclosed as seen (15/15 valid, 3 abstentions). No
+other rule changes. The OpenRouter projections were all below their caps ($0.03 to $0.21).
+
 ## Stage B. Method development: certify-then-hedge
 
 Written 2026-09-28. Stage B is development: it supports no claim, tuning is allowed, and its
