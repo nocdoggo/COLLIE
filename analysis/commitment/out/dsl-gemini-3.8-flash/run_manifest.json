@@ -1,0 +1,154 @@
+{
+  "alert_selection_rule": "bank-v1",
+  "alert_source": "bank",
+  "alert_sources": {
+    "bank:early_accurate": 8,
+    "bank:false_alert_null": 4,
+    "bank:late_accurate": 8,
+    "bank:unreliable": 8,
+    "none:no_alert": 8,
+    "none:silent_null": 4
+  },
+  "analysis_class": "exploratory",
+  "arm_set": "confirm",
+  "arms": [
+    "arm1_capped_base_stock",
+    "arm2_telemetry_hmm_or",
+    "arm8_spec_immediate",
+    "arm10_spec_eprocess",
+    "ctrl_cusum_to_compiler",
+    "ctrl_keyword_parser",
+    "ctrl_alertspec_upper_bound",
+    "oracle_shockspec_headroom",
+    "arm12_cth",
+    "arm12b_cth_llm",
+    "ctrl_cth_uniform"
+  ],
+  "decoding": "det-v1 (temperature 0.0, no seed), module 02 prompt, no system prompt",
+  "endpoint": {
+    "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/",
+    "bills_thinking_as_output": true,
+    "extra_body": null,
+    "model_id": "gemini-3.8-flash",
+    "name": "gemini-primary",
+    "price_date": "2026-09-06",
+    "price_input_per_mtok": 0.75,
+    "price_output_per_mtok": 3.75,
+    "supports_seed": false
+  },
+  "episodes": 40,
+  "git": {
+    "branch": "method/graded-commitment",
+    "dirty_paths": [
+      "M .gitignore",
+      "?? analysis/commitment/out/d1-gemini-3.8-flash/",
+      "?? analysis/commitment/out/d1-grok-4.20/",
+      "?? analysis/commitment/out/d19-gemini-3.8-flash/",
+      "?? analysis/commitment/out/d19-grok-4.20/",
+      "?? analysis/commitment/out/dsl-gemini-3.8-flash/",
+      "?? analysis/commitment/out/dsl-grok-4.20/",
+      "?? analysis/commitment/out/ladder-step-5-preview/"
+    ],
+    "sha": "a38eb64e78328d712f694d87d886b2a92d369505"
+  },
+  "guard": {
+    "max_physical_calls": 1500,
+    "physical_calls_this_invocation": 36,
+    "physical_calls_total": 38,
+    "refusals_this_invocation": 0,
+    "retries_this_invocation": 0,
+    "spend_cap_usd": 2.0,
+    "usd_this_invocation": 0.47889449999999995,
+    "usd_total": 0.4897484999999999
+  },
+  "ladder_rung": {
+    "model_id": "gemini-3.8-flash",
+    "name": "gemini-3.8-flash",
+    "price_input_per_mtok": 0.75,
+    "price_output_per_mtok": 3.75,
+    "provider": "gemini",
+    "released": "2026-09",
+    "served_as": [
+      "gemini-3.8-flash"
+    ],
+    "tier": "mid"
+  },
+  "layout": "fresh",
+  "ledger": {
+    "charged": 128,
+    "charged_usd": 1.39982625,
+    "per_arm": [
+      {
+        "accepted": 32,
+        "accepted_after_repair": 0,
+        "arm_id": "arm10_spec_eprocess",
+        "attempted": 32,
+        "input_tokens": 50694,
+        "output_tokens": 82229,
+        "p50_latency_ms": 0.0017320271581411362,
+        "p95_latency_ms": 19591.061635059305,
+        "rejected": 0,
+        "usd_cost": 0.34637925
+      },
+      {
+        "accepted": 32,
+        "accepted_after_repair": 0,
+        "arm_id": "arm12_cth",
+        "attempted": 32,
+        "input_tokens": 50694,
+        "output_tokens": 82263,
+        "p50_latency_ms": 0.0019329600036144257,
+        "p95_latency_ms": 21858.696665032767,
+        "rejected": 0,
+        "usd_cost": 0.34650675000000003
+      },
+      {
+        "accepted": 32,
+        "accepted_after_repair": 0,
+        "arm_id": "arm12b_cth_llm",
+        "attempted": 32,
+        "input_tokens": 50694,
+        "output_tokens": 83573,
+        "p50_latency_ms": 0.002503977157175541,
+        "p95_latency_ms": 11913.237967994064,
+        "rejected": 0,
+        "usd_cost": 0.35141925
+      },
+      {
+        "accepted": 32,
+        "accepted_after_repair": 0,
+        "arm_id": "arm8_spec_immediate",
+        "attempted": 32,
+        "input_tokens": 50698,
+        "output_tokens": 84666,
+        "p50_latency_ms": 6959.313089959323,
+        "p95_latency_ms": 39668.89640002046,
+        "rejected": 0,
+        "usd_cost": 0.35552100000000003
+      }
+    ],
+    "physical_this_invocation": 36
+  },
+  "n_per_family": 8,
+  "not_a_gate3_vote": true,
+  "outputs_sha256": {
+    "alerts.jsonl": "cf530c2c06b603444edea0cec9861b45d431e764ecd2d7a7825b9cbe5a261059",
+    "ledger.csv": "97711746a525d437d269a329e7d6857cef9303aee67c4520dd912534953e578c",
+    "proposals.jsonl": "736b7f77fd58a7067b86810efd6a90cf5e8162537195dc429fe79743a06e08c1",
+    "records.jsonl.gz": "d73e4592c2f4a1fbc57ebad8b389b046eacdf4d7a26f9a9aae2dbc91c9519beb",
+    "truth.jsonl": "eaf0c614b3ba3d01cb91a09288293202ee18057f0d7002c2bb3f3fd1c9f63eae"
+  },
+  "partial": false,
+  "profit": 4.0,
+  "records": 424,
+  "rule_u": {
+    "arm10_coerced_abstentions": 0,
+    "version": "U-v1"
+  },
+  "run_name": "dsl-gemini-3.8-flash",
+  "truth_identical_to_reports_pilot_truth": null,
+  "versions": {
+    "openai": "1.109.1",
+    "python": "3.12.11"
+  }
+}
