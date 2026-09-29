@@ -74,7 +74,7 @@ including the two existing ones, against the committed `scripted-bank` reference
 Reading rules are the real-content pilot's: a contrast is called different from zero only when
 its seed-cluster bootstrap interval excludes zero.
 
-### Stage A amendments (logged before the full runs)
+### Stage A amendments
 
 **A1 (2026-09-28, after the smoke runs, before any full run).** Smoke projections of the full
 120-episode cost (the real-content pilot's `smoke_summary`): `gemini-2.5-flash-lite` $0.05,
@@ -136,6 +136,35 @@ provider timeout (`openai.APITimeoutError`) after 61 calls, with no outputs beyo
 It was restarted at 07:26 UTC under the same name and cap, from its answer cache (the 61 answers
 replay at no cost), following the stage C precedent (C2). No rule changes; its shadow spend stays
 within the $4.00 cap.
+
+**A4, continued (2026-09-29, after the run): a deviation from the transport timeout.** The
+restarted run stopped again on exhausted timeouts at 09:19 and 10:54 UTC and was resumed from its
+cache each time, under the same name and cap. The last two stops came on the same prompt text,
+which four episodes share: it had timed out twenty times across them, ten in a row on the request
+still pending, at the 180 s request timeout that the real-content pilot's transport rules set and
+stage A adopts ("Retries, refusals and caps follow the real-content pilot's transport rules").
+Every earlier exhausted request had been answered after a resume under that rule, so the rule did
+not make finishing impossible; at about 11:03 UTC the operator chose to raise the timeout to 900 s
+instead of resuming again. This is a deviation from that rule. It changes no prompt, decoding or
+cached answer, but it changes which new answers are accepted: 13 of the run's 179 answers took
+184 to 372 s on their first attempt and were accepted only because of the longer timeout; under
+the rule each would have been re-requested, and with no seed a re-request can return a different
+answer. Nothing was re-run; the 13 were kept. The timeout is set by a new `runner.py --timeout-s`
+flag, committed as `0eb0ffe` at 11:08 UTC while that attempt was running. `runner.py` is frozen
+by hash in stages C and D, so this is also a logged deviation from both: its sha256 prefix moves
+from `c753ef5e9e348aa2` to `79c8edfab27f1e0a`. The flag defaults to the old constant (180 s) and
+its value is written to `invocations.jsonl`, so no stage C or D run and no other ladder run is
+affected (test `test_the_runner_timeout_defaults_to_the_registered_180_s`). Two resumed attempts
+were stopped by the operator, at about 11:03 UTC to raise the timeout and at 11:39 UTC to move
+the loop into a terminal multiplexer; neither left a line in `invocations.jsonl`. The first made
+no answer. The second, about 11:03 to 11:39 UTC, made the 10 answers that fall between logged
+invocations (in the cache and `spend_log.jsonl`), six of them among the 13 slow ones; it started
+before `0eb0ffe` was committed, so its timeout and code version are inferred from its answers,
+not recorded. The final invocation, 11:39 to 13:41 UTC, records `timeout_s` 900 and made 72
+answers. The run completed at 13:41 UTC: 120 episodes, 179 answers including the smoke run's (89
+retries, 3 exhausted), $1.71 shadow cost, within the $4.00 cap. The rung is descriptive like
+every ladder rung; of the paper's ladder statements, only the top of the perception range
+(65/96) comes from it.
 
 ## Stage B. Method development: certify-then-hedge
 

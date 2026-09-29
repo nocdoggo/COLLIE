@@ -19,9 +19,9 @@
    }
   ],
   "pearson": {
-   "committed_vs_family_right": 0.858945730438041,
-   "loss_vs_committed": -0.9053155890495084,
-   "loss_vs_family_right": -0.9007979958219192
+   "committed_vs_family_right": 0.8617847077313645,
+   "loss_vs_committed": -0.908584064309313,
+   "loss_vs_family_right": -0.9060486150181953
   },
   "per_rung": [
    {
@@ -122,6 +122,17 @@
     "episodes_committed_arm8": 75,
     "family_right": 53,
     "rung": "step-3.7-flash"
+   },
+   {
+    "arm10_arm1_b": [
+     -445.338768,
+     87.598909
+    ],
+    "arm10_arm1_net": -167.016667,
+    "arm8_arm1_net": -3349.583333,
+    "episodes_committed_arm8": 87,
+    "family_right": 65,
+    "rung": "step-5-preview"
    },
    {
     "arm10_arm1_b": [
@@ -245,10 +256,10 @@
     "rung": "gpt-4o-mini"
    }
   ],
-  "rungs": 20,
+  "rungs": 21,
   "spearman": {
-   "loss_vs_committed": -0.7175630443516366,
-   "loss_vs_family_right": -0.7612960440744254
+   "loss_vs_committed": -0.7417993246057428,
+   "loss_vs_family_right": -0.7899876640393922
   }
  },
  "rounding": "values are unrounded; round once, for display",

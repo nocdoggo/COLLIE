@@ -8,8 +8,7 @@
   "mean": 136.00833333333333
  },
  "missing_or_partial": [
-  "gemini-3-flash-preview",
-  "step-5-preview"
+  "gemini-3-flash-preview"
  ],
  "registered_in": "analysis/commitment/PLAN.md, stage A (with A1-A3)",
  "rungs": [
@@ -444,6 +443,54 @@
    "shocked": 96,
    "tier": "mid",
    "usd": 1.716046
+  },
+  {
+   "abstain_first": 17,
+   "arm10_arm1_net": {
+    "cluster_bootstrap": [
+     -445.338768,
+     87.598909
+    ],
+    "clusters": 24,
+    "mean": -167.016667,
+    "n": 120,
+    "normal": [
+     -382.913179,
+     48.879846
+    ]
+   },
+   "arm8_arm1_net": {
+    "cluster_bootstrap": [
+     -4795.295,
+     -2128.415154
+    ],
+    "clusters": 24,
+    "mean": -3349.583333,
+    "n": 120,
+    "normal": [
+     -4121.145181,
+     -2578.021486
+    ]
+   },
+   "cth_arm1_net_dev": {
+    "b": [
+     10.256008064516132,
+     372.0928874813711
+    ],
+    "mean": 158.41666666666666
+   },
+   "developer": "StepFun",
+   "false_alert_active_arm10": 1,
+   "false_alert_active_arm8": 12,
+   "family_right": 65,
+   "latency_p50_ms": 127058.159,
+   "parse_attempts": 429,
+   "parse_valid": 429,
+   "released": "2026-09",
+   "rung": "step-5-preview",
+   "shocked": 96,
+   "tier": "large",
+   "usd": 1.711022
   },
   {
    "abstain_first": 5,

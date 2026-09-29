@@ -290,6 +290,50 @@ Not yet frozen. Task 19 establishes `prereg/freeze_manifest.json` at the end of 
 
 ## Gate 3 — pilot decision
 
+### 2026-09-29 — commitment study stage A complete: the 21st ladder model finished under a longer request timeout; Gate 3 decision unchanged
+
+- **Artefacts:** `analysis/commitment/out/ladder-step-5-preview/` and the recomputed
+  `out/ladder.json`, `out/ladder.md`, `out/dev/ladder_dev.json` and `out/posthoc.json` (only their
+  ladder parts changed); amendment A4 in `analysis/commitment/PLAN.md`;
+  `analysis/commitment/runner.py`; `analysis/commitment/ladder.py` (display rounding only); the
+  test `test_the_runner_timeout_defaults_to_the_registered_180_s` in `tests/test_commitment.py`.
+- **New sha256:** `runner.py` `79c8edfab27f1e0a` (first 16 hex; `c753ef5e9e348aa2` in the stage C
+  and D registrations, which freeze it by hash). No file in the freeze manifest changed
+  (`tools.freeze.drift()` is `[]`), nothing in `reports/` was written, and `test.yaml` was never
+  opened.
+- **What changed:** `runner.py` gained a `--timeout-s` flag (`0eb0ffe`) that sets the request
+  timeout of live calls; it defaults to the old constant, 180 s, and is written to
+  `invocations.jsonl`. `step-5-preview` stopped three times on exhausted retries (07:25, 09:19
+  and 10:54 UTC) and was stopped twice by the operator (about 11:03 and 11:39 UTC); it was resumed
+  from its cache each time and ran with a 900 s timeout from about 11:03 UTC, departing from the
+  180 s request timeout of the real-content pilot's transport rules, which stage A adopts. No
+  prompt, decoding or cached answer changed, but 13 of its 179 answers took 184 to 372 s on their
+  first attempt and were accepted only because of the longer timeout (under the rule each would
+  have been re-requested). Six of the 13 came from the resumed attempt of about 11:03 to 11:39 UTC,
+  which, like the brief attempt before it, left no line in `invocations.jsonl` and started before
+  `0eb0ffe` was committed (11:08 UTC), so its timeout and code version are inferred from its
+  answers, not recorded; the final invocation (11:39 to 13:41 UTC) records `timeout_s` 900.
+  `ladder.py` now rounds its table half away from zero, as the study does elsewhere, which moves
+  one displayed cell (step-3.5-flash's gate, -156.5, from -156 to -157). It finished at 13:41 UTC.
+- **Why:** the run's last two stops came on one prompt text that four episodes share; it had timed
+  out twenty times across them, ten in a row on the request still pending. Every earlier exhausted
+  request had been answered after a resume under the 180 s rule, so the rule did not make
+  finishing impossible; the operator chose to raise the timeout instead of resuming again.
+- **Outcome:** all 21 ladder models have now run. `step-5-preview` named the right family in 65 of
+  96 shocked episodes (the highest on the ladder) and acting at once lost 3,350 per episode
+  against arm 1; the gate was -167 b[-445, 88]. Every other rung's values are unchanged; the
+  ladder's ranges now read perception 0/96 to 65/96, acting at once 0 to -3,656, the gate -300 to
+  +3 with an interval below zero on the same two rungs; post hoc, commitment and accuracy
+  correlate at r = 0.86 and the loss with either at r = -0.91.
+- **Cost:** $1.71 (shadow price on StepFun's flat-rate plan); the ladder's rungs sum to $10.05.
+- **Blast radius:** the `step-5-preview` rung only, which is descriptive (exploratory with respect
+  to Gate 3). Two registered values moved: the 180 s request timeout, for this rung only, and
+  `runner.py`'s stage C and D hash, whose flag defaults to 180 s so no stage C or D run is
+  affected. No registered result, threshold, criterion or endpoint moved, and nothing was re-run:
+  the 13 answers accepted under 900 s were kept. Of the paper's ladder statements only the top of
+  the perception range (65/96) comes from this rung; without it the range is 0/96 to 59/96 and
+  every other statement holds.
+
 ### 2026-09-29 — commitment study stage D recorded (cost ratios and noisy lead times); Gate 3 decision unchanged
 
 - **Artefacts:** `analysis/commitment/PLAN.md` (stage D, registered at `fae3714`; pre-run

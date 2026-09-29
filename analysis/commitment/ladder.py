@@ -15,10 +15,22 @@ from __future__ import annotations
 
 import argparse
 import json
+from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 
 from analysis.commitment.endpoints import LADDER
 from analysis.real_content_pilot.evaluate import evaluate
+
+
+def whole(x: float) -> str:
+    """Signed whole number with thousands separators, rounded half away from zero."""
+    return format(Decimal(repr(x)).quantize(Decimal(1), rounding=ROUND_HALF_UP), "+,f")
+
+
+def cents(x: float) -> str:
+    """Amount to the cent, rounded half away from zero."""
+    return format(Decimal(repr(x)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP), "f")
+
 
 REPO = Path(__file__).resolve().parents[2]
 OUT = REPO / "analysis" / "commitment" / "out"
@@ -113,10 +125,10 @@ def main(argv=None) -> int:
         md.append(
             f"| {x['rung']} | {x['developer']} | {x['released']} | {x['tier']} | "
             f"{x['family_right']}/{x['shocked']} | {x['abstain_first']} | "
-            f"{x['arm8_arm1_net']['mean']:+,.0f} | {x['arm10_arm1_net']['mean']:+,.0f} | "
-            f"{'n/a' if hedge is None else format(hedge['mean'], '+,.0f')} | "
+            f"{whole(x['arm8_arm1_net']['mean'])} | {whole(x['arm10_arm1_net']['mean'])} | "
+            f"{'n/a' if hedge is None else whole(hedge['mean'])} | "
             f"{x['false_alert_active_arm8']}/12, {x['false_alert_active_arm10']}/12 | "
-            f"${x['usd'] or 0:.2f} |"
+            f"${cents(x['usd'] or 0)} |"
         )
     args.out.with_suffix(".md").write_text("\n".join(md) + "\n")
     print("\n".join(md))
