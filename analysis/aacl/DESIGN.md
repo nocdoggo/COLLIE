@@ -85,6 +85,16 @@ The method is the UV paper's contribution; here it is the instrument.
   stated onset window, and let its prior act on orders placed before onset (the pipeline needs
   lead-time periods of notice). The certificate still prices the hypothesis on post-onset data
   only.
+- *The price of certification for early warnings.* As registered, a hypothesis carries only its
+  prior mass (`a_j w_jk`, at most 0.025) until its e-process gathers post-onset evidence, and the
+  exposure theorem caps expected commitment under the null at the whole budget (`A <= 0.0375`).
+  So certify-then-hedge cannot pre-position on a long-horizon warning, by construction: exactly
+  the case where text is most valuable is the one the certificate forbids. The follow-up should
+  measure that price (value of acting on a correct warning before onset, against the exposure a
+  false warning then costs) and study budgets that scale with measured reading reliability, for
+  example a text-supported budget `A_text` set from a model's calibrated accuracy on development
+  alerts, with its own exposure bound. This is a genuine research question for the NLP paper
+  (when is a reader trustworthy enough to act before the data), not a tuning detail.
 - *Trust as a parameter.* `lam` (the uniform share of the prior) set per model from its measured
   reading accuracy or elicited confidence, so that calibration sets exposure; fixed against
   confidence-set weights as a registered secondary. The exposure bound holds for any `lam`.

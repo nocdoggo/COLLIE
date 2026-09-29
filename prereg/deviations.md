@@ -334,7 +334,8 @@ Not yet frozen. Task 19 establishes `prereg/freeze_manifest.json` at the end of 
 - **Model ladder:** 20 of 21 language models ran on the registered 120 pilot episodes
   (`step-5-preview`, a slow reasoning model, was still running); perception ranged from 0/96 to
   59/96 and acting at once from 0 to -3,656 net per episode against arm 1.
-- **Cost:** stage C $6.50; stage A as recorded in `analysis/commitment/out/*/spend_log.jsonl`.
+- **Cost:** stage C $6.51 (the unrounded sum of its six runs; an earlier version said $6.50);
+  stage A as recorded in `analysis/commitment/out/*/spend_log.jsonl`.
 - **Blast radius:** none. No registered number, threshold, criterion or endpoint moved.
 
 ### 2026-09-28 — exploratory real-content pilot recorded; Gate 3 decision unchanged
