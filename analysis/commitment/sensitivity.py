@@ -3,10 +3,16 @@
 Exploratory and post hoc. Stage C registered one ratio (p/h = 4, critical fractile 0.8); this
 re-runs its full arm set on the same 240 fresh episodes at other ratios, with no API call. Each
 arm that consulted a model is served the answer that model gave in the registered run at the
-same (arm, episode, period). The prompt shows the price, the holding cost and the inventory
-position, so at another ratio the model saw a slightly different prompt than it would have; the
-answer is held fixed at what it said under p/h = 4. Arms that call no model (arm 1, the
-content-free control, the oracle) are exact at every ratio.
+same (arm, episode, period). The prompt shows the margin (``profit_per_unit``), the inventory
+position and the order and arrival history, all of which change with the ratio because the arms
+order differently; the model-calling arms are therefore a counterfactual with the answer held at
+what the model said under p/h = 4. Arms that call no model (arm 1, the content-free control, the
+oracle) are exact at every ratio.
+
+Values in the summary are stored unrounded; round them once, for display. Rewards are in
+currency and every reward grows with p, so each ratio also reports the hedge's gain as a share of
+arm 1's net reward. "Without the lead-time units" drops family 4's shocked episodes and their
+twins (whole clusters), as ``posthoc.py`` does.
 
 Replaying at p/h = 4 must reproduce the registered records exactly; the run checks that before
 it reports anything else. A model call at a period the registered run never called at would
@@ -209,44 +215,34 @@ def check_reproduction(frame: pd.DataFrame, run: str) -> dict:
 def summarise(frame: pd.DataFrame) -> dict:
     meta = confirm.episode_frame(RUNS[0]).drop_duplicates("episode_id")
     meta = meta.set_index("episode_id")[["cluster", "fam", "is_null"]]
+    unit_fam = meta["cluster"].str.extract(r"/f(\d)/")[0].astype(int)
     out = {}
     for (run, ratio), part in frame.groupby(["run", "ratio"]):
         part = part.join(meta, on="episode_id")
-        entry = {"critical_fractile": round(ratio / (ratio + 1.0), 4)}
+        entry = {"critical_fractile": ratio / (ratio + 1.0)}
         for name, treat, control in CONTRASTS:
             for endpoint in ("net", "gross"):
                 c = confirm.contrast(part, treat, control, endpoint)
-                entry[f"{name}|{endpoint}"] = {
-                    "mean": round(c["mean"], 3),
-                    "b": [round(c["b"][0], 3), round(c["b"][1], 3)],
-                    "p_one_sided": round(c["p_one_sided"], 5),
-                }
+                entry[f"{name}|{endpoint}"] = {k: c[k] for k in ("mean", "b", "p_one_sided")}
         nulls = part[part.is_null]
         piv = nulls.pivot(index="episode_id", columns="arm", values="net")
-        entry["null_cth_minus_arm1"] = round(
-            float((piv[confirm.CTH] - piv[confirm.ARM1]).mean()), 1
-        )
+        entry["null_cth_minus_arm1"] = float((piv[confirm.CTH] - piv[confirm.ARM1]).mean())
         exp = nulls.pivot(index="episode_id", columns="arm", values="exposure")
         entry["null_exposure"] = {
-            arm: round(float(exp[arm].mean()), 3)
-            for arm in (confirm.CTH, confirm.CTH_LLM, confirm.UNIFORM)
+            arm: float(exp[arm].mean()) for arm in (confirm.CTH, confirm.CTH_LLM, confirm.UNIFORM)
         }
-        arm1 = part[part.arm == confirm.ARM1].net.mean()
-        entry["arm1_net_mean"] = round(float(arm1), 1)
+        arm1 = float(part[part.arm == confirm.ARM1].net.mean())
+        entry["arm1_net_mean"] = arm1
+        entry["cth-arm1|net|share_of_arm1_net"] = entry["cth-arm1|net"]["mean"] / arm1
         piv = part.pivot(index="episode_id", columns="arm", values="net")
         fam = meta["fam"].reindex(piv.index)
         for name, treat in (("cth", confirm.CTH), ("uniform", confirm.UNIFORM)):
             diff = piv[treat] - piv[confirm.ARM1]
             entry[f"by_family_{name}_minus_arm1"] = {
-                str(int(f)): round(float(diff[fam == f].mean()), 1) for f in sorted(fam.unique())
+                str(int(f)): float(diff[fam == f].mean()) for f in sorted(fam.unique())
             }
-        entry["cth-arm1|net|without_family_4"] = {
-            k: round(v, 3) if isinstance(v, float) else [round(x, 3) for x in v]
-            for k, v in confirm.contrast(
-                part, confirm.CTH, confirm.ARM1, "net", mask=meta["fam"].ne(4)
-            ).items()
-            if k in ("mean", "b")
-        }
+        c = confirm.contrast(part, confirm.CTH, confirm.ARM1, "net", mask=unit_fam.ne(4))
+        entry["cth-arm1|net|without_lead_time_units"] = {k: c[k] for k in ("mean", "b", "n")}
         out.setdefault(run, {})[f"{ratio:g}"] = entry
     return out
 

@@ -60,9 +60,9 @@ four tests at 0.05): all four reject.
 
 | model | right family, first proposal | at once (arm 8) | gate (arm 10) | hedge | hedge - content-free | null safety (hedge - arm 1 on 48 nulls) |
 |---|---|---|---|---|---|---|
-| Gemini 3.8 Flash | 93/170 | -2,046 | -131 | +179 | +9 | -3.2 b[-8.2, -0.1] |
+| Gemini 3.8 Flash | 93/170 | -2,046 | -131 | +178 | +9 | -3.2 b[-8.2, -0.1] |
 | Grok 4.20 | 84/170 | -2,284 | -16 | +163 | -6 | +1.9 b[-1.7, 8.2] |
-| DeepSeek-V3 | 78/170 | -1,478 | -39 | +170 | +1 | +1.4 b[-1.6, 6.5] |
+| DeepSeek-V3 | 78/170 | -1,478 | -39 | +170 | +0 | +1.4 b[-1.6, 6.5] |
 | Gemini 2.5 Flash-Lite | 102/170 | -3,181 | -81 | +154 | -16 | +0.9 b[-2.2, 5.9] |
 | GPT-3.5 Turbo | 46/170 (28 parse failures) | -1,493 | -2 | +153 | -16 | +1.4 b[-2.3, 7.7] |
 | Llama 3.1 8B | 29/170 (53 parse failures) | -1,838 | -109 | +126 | -43 | +1.5 b[-2.2, 7.7] |
@@ -78,7 +78,7 @@ demand down +90 / +88, pulse +95 / +80, demand up -83 / -83, compound -40 / -40,
 -3 / -3, null -3 / +2. The gain is where the oracle headroom is.
 
 **Language.** The hedge is not distinguishable from the content-free control on net with the
-primary models (+9.3 b[-4.9, 23.6], -6.2 b[-28.7, 10.7]) and runs from -43 to +1 against it with
+primary models (+9.3 b[-4.9, 23.6], -6.2 b[-28.7, 10.7]) and runs from -43 to 0 against it with
 the others (below zero for Llama 3.1 8B and GPT-3.5 Turbo). The model's family label mainly lowers commitment on
 null episodes: mean summed shock mass on the 48 nulls is 0.83 for the content-free control,
 0.45 to 0.52 for the hedge, and 0.04 to 0.18 when the model's family is trusted alone (`lam =
@@ -88,40 +88,50 @@ text, carries the gain.
 
 **Post hoc** (`out/posthoc.json`, written after the results were seen; decides nothing):
 
-- *Where the gain comes from.* The lead-time family supplies 96% of hedge - arm 1 (Gemini 96.0%,
-  Grok 96.3%). Without the 8 lead-time units (40 clusters) hedge - arm 1 is +9.0 b[-23.9, 42.5]
-  and +6.6 b[-24.6, 36.1]; hedge - gate stays +226.8 b[82.3, 408.1] with Gemini (+58.1
+- *Where the gain comes from.* The 32 shocked lead-time episodes supply 96% of hedge - arm 1
+  (Gemini 96.0%, Grok 96.3%; with their twins, 95.8% and 96.7%). Without the 8 lead-time units
+  (40 clusters) hedge - arm 1 is +9.0 b[-23.9, 42.5] and +6.6 b[-24.6, 36.1]; hedge - gate stays +226.8 b[82.3, 408.1] with Gemini (+58.1
   b[-0.8, 133.6] with Grok), because the gate loses 1,057 per demand-rise episode with Gemini.
 - *Without the six structural-test clusters* (units `i = 0`, 42 clusters): H1 +328.6 and +187.7,
-  H2 +162.8 and +145.3, every one-sided p at most 0.0024.
+  H2 +162.8 and +145.3; the largest one-sided p is 0.0024.
 - *Null episodes.* The Gemini null loss is on the 24 false-alert twins (-6.4 b[-16.1, -0.3],
-  worst -105); the 24 silent twins are -0.0 b[-0.4, 0.2] (21 never trigger). Hedge - content-free
+  worst -105); the 24 silent twins are -0.04 b[-0.38, 0.25] (21 never trigger). Hedge - content-free
   on the 48 nulls: -2.0 b[-8.1, 1.7] (Gemini), +3.1 b[-0.04, 8.4] (Grok).
 - *Exposure.* Hedge over content-free null exposure: 0.631 b[0.429, 0.668] (Gemini) and 0.553
-  b[0.392, 0.581] (Grok), cuts of 37% and 45%, almost all on false-alert twins. Naming any family,
-  right or wrong, moves prior weight off the others.
-- *Endpoint sign.* Gross and net disagree in sign for gate - arm 1, at once - arm 1 and hedge - at
-  once on both primary models; every claim here is on net.
+  b[0.392, 0.581] (Grok), cuts of 37% and 45%, almost all on false-alert twins (the silent-twin
+  ratio is not estimable: only 3 clusters carry content-free exposure). Naming any family, right
+  or wrong, moves prior weight off the others; the content-free control's null mass sits mostly on
+  the pulse hypothesis (0.69 of 0.83).
+- *Lead-time proposals.* Gemini named a lead-time shift in 17 of the 32 lead-time episodes
+  (medium 8, high 3, low 6) and Grok in 11 (medium 10, high 1); every true shift was one period.
+  The gate activated a median of 11 periods after the proposal with both.
+- *Endpoint sign.* Gross and net disagree in sign for at once - arm 1 and hedge - at once (both
+  endpoints' intervals exclude zero) and for the gate - arm 1 point estimate (its net interval
+  includes zero), on both primary models; every claim here is on net.
 
 **Cost ratio** (`sensitivity.py`, `out/sensitivity.json`; exploratory replay). The 240 fresh
 episodes and all eleven arms re-run at p/h = 1, 2, 9 and 19 (InventoryBench uses 1, 4 and 19),
 each model-calling arm served the answer its model gave at the same (arm, episode, period) under
-p/h = 4. The prompt shows the price and inventory, so this approximates those arms; the others
-are exact. At p/h = 4 the replay reproduces all 2,544 registered records of each primary run
+p/h = 4. The prompt shows the margin, the inventory position and the order and arrival history,
+all of which change with the ratio, so those arms are a counterfactual with the answer held
+fixed; the others are exact. At p/h = 4 the replay reproduces all 2,544 registered records of each primary run
 exactly, and no call at any ratio lacked a recorded answer.
 
 | p/h | hedge - gate (Gemini / Grok) | hedge - arm 1 | hedge - content-free |
 |---|---|---|---|
-| 1 | +228 b[109, 376] / +86 b[30, 151] | +16 b[-14, 47] / +10 b[-18, 40] | +1 / -5 |
+| 1 | +228 b[109, 376] / +85 b[30, 151] | +16 b[-14, 47] / +10 b[-18, 40] | +1 / -5 b[-10, -0.02] |
 | 2 | +259 / +114 | +67 b[8, 135] / +55 b[2, 118] | +9 / -3 |
 | 4 | +309 / +179 | +178 / +163 | +9 / -6 |
 | 9 | +454 / +357 | +485 b[182, 853] / +447 b[168, 785] | +47 b[6, 97] / +10 b[-34, 59] |
 | 19 | +722 b[400, 1,095] / +694 b[324, 1,138] | +1,056 b[398, 1,850] / +991 b[376, 1,739] | +84 b[18, 166] / +19 b[-38, 87] |
 
 The hedge beats the gate at every ratio. Its gain over arm 1 vanishes at p/h = 1 and grows with
-the ratio; at p/h = 19 it no longer rests on lead-time shifts alone (+120 b[40, 219] and +117
-b[38, 218] without family 4). The text's share over the content-free control becomes visible at
-p/h = 9 and 19 with Gemini only. Post hoc, on the confirmation's own episodes, ten comparisons.
+the ratio; at p/h = 19 it no longer rests on lead-time shifts alone (+125 b[43, 227] and +121
+b[38, 224] without the lead-time units). Every reward grows with p: as a share of arm 1's net
+reward the gain is 0.5% / 0.3% at p/h = 1, 1.1% / 1.0% at 4 and 1.2% / 1.2% at 19. The text's
+share over the content-free control is distinguishable from zero with Gemini at p/h = 9 and 19,
+and with Grok at p/h = 1, where it is negative. All post hoc, on the confirmation's own
+episodes; `sensitivity.json` holds 6 contrasts x 2 endpoints x 5 ratios x 2 models.
 
 **Cost.** Stage C provider cost $6.50: Gemini 3.8 $4.55, Grok 4.20 $1.09, GPT-3.5 $0.45,
 DeepSeek-V3 $0.22, Gemini 2.5 Flash-Lite $0.13, Llama 3.1 8B $0.06.
@@ -163,12 +173,17 @@ stage B development replay (arm 10's cached answers, no calls), so it carries no
 | grok-build-0.1 | xAI | 2025-08 | small | 28/96 | 53 | -2,002 | +3 | +144 | 3/12, 0/12 | $1.28 |
 | grok-4.20 | xAI | 2026-03 | mid | 53/96 | 20 | -2,624 | -172 | +154 | 9/12, 1/12 | $0.44 |
 
-Readings. Perception ranges from 0/96 (Llama 3.2 1B and 3B never produce a valid `ShockSpec`,
-so every proposal falls back to arm 1) to 59/96. The loss from acting at once ranges from zero
-to -3,656 and tracks how readily a model commits rather than how often it is right: Qwen 2.5 7B
-(2/96 right, 63 first-proposal abstentions) loses 61, while Gemini 2.5 Flash-Lite (55/96 right,
-5 abstentions) loses 3,656. The gate stays between -300 and +3. The hedge's development replay
-gains +107 to +158 on every rung; the content-free variant gains +136 on the same episodes.
+Readings. Perception ranges from 0/96 to 59/96: Llama 3.2 1B never produces a non-abstaining
+`ShockSpec`, so every proposal falls back to arm 1, and 3B produces seven (all demand up), on
+which acting at once loses 28 b[-54, -6]. The loss from acting at once ranges from zero to
+-3,656 and grows with how readily a model commits; across the rungs commitment and accuracy move
+together (post hoc, `posthoc.json` `ladder`: r = 0.86; loss against either, r = -0.90), so
+being right does not protect a model: Qwen 2.5 7B (2/96 right, 63 first-proposal abstentions)
+loses 61, while Gemini 2.5 Flash-Lite (55/96 right, 5 abstentions) loses 3,656. The gate stays
+between -300 and +3; contrary to stage A's registered expectation (item 6), its interval lies
+below zero on two rungs, Gemini 2.5 Flash -294 b[-567, -45] and GPT-3.5 Turbo -60 b[-151, -1].
+The hedge's development replay has point estimates of +107 to +158 on every rung (the interval
+includes zero for Llama 3.1 8B); the content-free variant gains +136 on the same episodes.
 Rung costs in `out/ladder.json` sum to $8.34 over the 20 finished rungs, of which $2.34 is the
 real-content pilot's two banks, reused here.
 
@@ -195,6 +210,7 @@ The simulator's lead times are deterministic, which makes a lead-time shift easy
 receipts; at p/h = 4 the gain rests on that family. One cost ratio (p/h = 4) was confirmed; the
 others are replayed with the models' answers held fixed. The exposure bound needs a known null;
 the demand e-processes estimate theirs from the pre-proposal prefix, and the Monte Carlo puts
-the stopped exposure at 2 to 3 times the budget at early firings. The regret bound covers the one-period surrogate, not realised multi-period
+the stopped exposure at 2.0 to 2.7 times the budget at early firings in the cells matched to the
+null episodes (up to 3.2 in others). The regret bound covers the one-period surrogate, not realised multi-period
 cost. No claim is made about language understanding; at the registered cost ratio the text adds
 no net value over the alert-timed content-free control.

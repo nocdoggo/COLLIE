@@ -270,7 +270,7 @@ say. None changes a run, a rule, a cap or a number; post-hoc checks are in `out/
    eleven arms on the 30 episodes of units `i = 0` (6 of the 48 clusters), contrary to
    `episodes.py`'s "sealed" docstring and to "no run has touched" at the top of this plan; the
    outcomes were not read. Without those six clusters, H1 is +328.6 (Gemini 3.8) and +187.7 (Grok
-   4.20) and H2 +162.8 and +145.3, every one-sided sign-flip p at most 0.0024.
+   4.20) and H2 +162.8 and +145.3; the largest one-sided sign-flip p is 0.0024.
 3. *Layout materialised early.* At 23:53Z on 2026-09-28, before stages A and C were registered,
    a smoke check of an earlier `episodes.py` wrote the data and truth files of units `i = 0..7`
    (the later C1 layout) to a scratch directory and counted them; no arm ran on them.

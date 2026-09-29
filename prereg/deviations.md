@@ -313,8 +313,9 @@ Not yet frozen. Task 19 establishes `prereg/freeze_manifest.json` at the end of 
   evaluator was run on the Grok primary run while the Gemini one was in progress; the C1 layout
   was materialised (no arms) before registration; the Gemini run's manifest records the
   end-of-run SHA; Rule U applies to arm 10 only; the exposure guarantee needs a known null, which
-  the plug-in demand null only approximates (a null Monte Carlo puts stopped exposure at 2 to 3
-  times the budget at early firings), and the stated prior constants are corrected.
+  the plug-in demand null only approximates (a null Monte Carlo puts stopped exposure at 2.0 to
+  2.7 times the budget at early firings in the cells matched to the null episodes, up to 3.2 in
+  others), and the stated prior constants are corrected.
 - **Outcome:** on 240 fresh episodes (48 seed clusters from a reserved pool), all four primary
   tests reject under Holm: certify-then-hedge minus arm 10, net per episode, +309.1 (Gemini 3.8)
   and +178.8 (Grok 4.20); minus arm 1, +178.5 and +162.9; seed-cluster bootstrap intervals exclude
