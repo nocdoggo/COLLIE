@@ -290,6 +290,36 @@ Not yet frozen. Task 19 establishes `prereg/freeze_manifest.json` at the end of 
 
 ## Gate 3 — pilot decision
 
+### 2026-09-29 — commitment study recorded: certify-then-hedge confirmed on fresh seeds; Gate 3 decision unchanged
+
+- **Artefacts:** `analysis/commitment/` (plan `PLAN.md`, report `REPORT.md`, method `cth.py`,
+  evaluation `out/confirm.json`, ladder `out/ladder.json`). No frozen file changed
+  (`tools.freeze.drift()` is `[]`), nothing in `reports/` was written, and `test.yaml` was never
+  opened. Relative to Gate 3 the study is exploratory: it does not re-vote the 2026-09-23 decision.
+- **What it is:** a new, declared arm (certify-then-hedge) that replaces arm 10's binary
+  activation with a posterior over a fixed hypothesis set priced by module 05's e-processes, the
+  shock's size estimated from the data, and orders at the critical fractile of the
+  posterior-predictive mixture. It departs from the frozen contract's wording that a hypothesis
+  influences orders only while ACTIVE (`collie/contracts.py` docstring), and it uses net reward,
+  not Gate 3's gross profit, as its primary endpoint; both departures were declared in the stage C
+  registration.
+- **Registration:** stage C (method code frozen by hash, hypotheses, tests, evaluator) was
+  committed and pushed at `9d8e97f` before any fresh-seed outcome existed. Amendments: C1 (48
+  units instead of 72, forced by the dev/cal alert bank's template capacity, before any call) and
+  C2 (an empty model echo is re-requested; one secondary run re-run from cache).
+- **Outcome:** on 240 fresh episodes (48 seed clusters from a reserved pool), all four primary
+  tests reject under Holm: certify-then-hedge minus arm 10, net per episode, +309.1 (Gemini 3.8)
+  and +178.8 (Grok 4.20); minus arm 1, +178.5 and +162.9; seed-cluster bootstrap intervals exclude
+  zero. It is non-inferior to arm 1 on the 48 null episodes with every model. Four secondary
+  models give the same direction. A content-free variant of the method earns as much on net;
+  the model's family label mainly lowers commitment on null episodes. On the fresh seeds arm 10
+  is -131 and -16 against arm 1 and acting at once -2,046 and -2,284.
+- **Model ladder:** 18 of 21 language models ran on the registered 120 pilot episodes (three slow
+  reasoning models were still running); perception ranged from 0/96 to 59/96 and acting at once
+  from 0 to -3,656 net per episode against arm 1.
+- **Cost:** stage C $6.50; stage A as recorded in `analysis/commitment/out/*/spend_log.jsonl`.
+- **Blast radius:** none. No registered number, threshold, criterion or endpoint moved.
+
 ### 2026-09-28 — exploratory real-content pilot recorded; Gate 3 decision unchanged
 
 - **Artefacts:** `analysis/real_content_pilot/`. The plan (`PLAN.md`) was committed and pushed at
