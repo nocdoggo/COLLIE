@@ -1,0 +1,180 @@
+{
+  "alert_selection_rule": "bank-v1",
+  "alert_source": "bank",
+  "alert_sources": {
+    "bank:early_accurate": 40,
+    "bank:false_alert_null": 24,
+    "bank:late_accurate": 40,
+    "bank:unreliable": 40,
+    "none:bank_gap_demand_down": 32,
+    "none:no_alert": 40,
+    "none:silent_null": 24
+  },
+  "analysis_class": "exploratory",
+  "arm_set": "confirm",
+  "arms": [
+    "arm1_capped_base_stock",
+    "arm2_telemetry_hmm_or",
+    "arm8_spec_immediate",
+    "arm10_spec_eprocess",
+    "ctrl_cusum_to_compiler",
+    "ctrl_keyword_parser",
+    "ctrl_alertspec_upper_bound",
+    "oracle_shockspec_headroom",
+    "arm12_cth",
+    "arm12b_cth_llm",
+    "ctrl_cth_uniform"
+  ],
+  "decoding": "det-v1 (temperature 0.0, no seed), module 02 prompt, no system prompt",
+  "endpoint": {
+    "base_url": "https://api.x.ai/v1",
+    "bills_thinking_as_output": true,
+    "extra_body": null,
+    "model_id": "grok-4.20-0309-non-reasoning",
+    "name": "grok-hosted-confirmation",
+    "price_date": "2026-09-07",
+    "price_input_per_mtok": 1.25,
+    "price_output_per_mtok": 2.5,
+    "supports_seed": true
+  },
+  "episodes": 240,
+  "git": {
+    "branch": "method/graded-commitment",
+    "dirty_paths": [
+      "M .gitignore",
+      " M paper/.gitignore",
+      "?? analysis/commitment/cth_core.py",
+      "?? analysis/commitment/evaluate.py",
+      "?? analysis/commitment/evidence.py",
+      "?? analysis/commitment/hypotheses.py",
+      "?? analysis/commitment/out/fresh-deepseek-v3/",
+      "?? analysis/commitment/out/fresh-gemini-2.5-flash-lite/",
+      "?? analysis/commitment/out/fresh-gemini-3.8-flash/",
+      "?? analysis/commitment/out/fresh-gpt-3.5-turbo/",
+      "?? analysis/commitment/out/fresh-grok-4.20/",
+      "?? analysis/commitment/out/fresh-llama-3.1-8b/",
+      "?? analysis/commitment/out/ladder-deepseek-v3/",
+      "?? analysis/commitment/out/ladder-gemma-3-27b/",
+      "?? analysis/commitment/out/ladder-gpt-oss-20b/",
+      "?? analysis/commitment/out/ladder-llama-3.1-8b/",
+      "?? analysis/commitment/out/ladder-llama-3.2-1b/",
+      "?? analysis/commitment/out/ladder-llama-3.2-3b/",
+      "?? analysis/commitment/out/ladder-llama-3.3-70b/",
+      "?? analysis/commitment/out/ladder-qwen-2.5-72b/",
+      "?? analysis/commitment/out/ladder-qwen-2.5-7b/",
+      "?? analysis/commitment/out/ladder-step-3.5-flash-2603/",
+      "?? analysis/commitment/out/ladder-step-3.5-flash/",
+      "?? analysis/commitment/out/ladder-step-3.7-flash/",
+      "?? analysis/commitment/out/ladder-step-5-preview/",
+      "?? analysis/commitment/out/stage_a.json",
+      "?? analysis/commitment/out/stage_a.md",
+      "?? analysis/commitment/replay.py",
+      "?? paper/.kilo/",
+      "?? paper/.zcode/",
+      "?? paper/sections/06_method_hedge.tex",
+      "?? tests/test_commitment_episodes.py",
+      "?? tests/test_commitment_evaluate.py"
+    ],
+    "sha": "f1a289a20e98f9a3f0188e6fdd65d5bf40808f9c"
+  },
+  "guard": {
+    "max_physical_calls": 1500,
+    "physical_calls_this_invocation": 425,
+    "physical_calls_total": 429,
+    "refusals_this_invocation": 0,
+    "retries_this_invocation": 0,
+    "spend_cap_usd": 2.0,
+    "usd_this_invocation": 1.0837537499999998,
+    "usd_total": 1.0936099999999997
+  },
+  "ladder_rung": {
+    "model_id": "grok-4.20-0309-non-reasoning",
+    "name": "grok-4.20",
+    "price_input_per_mtok": 1.25,
+    "price_output_per_mtok": 2.5,
+    "provider": "grok",
+    "released": "2026-03",
+    "served_as": [
+      "grok-4.20-0309-non-reasoning"
+    ],
+    "tier": "mid"
+  },
+  "layout": "fresh",
+  "ledger": {
+    "charged": 1108,
+    "charged_usd": 2.6468075,
+    "per_arm": [
+      {
+        "accepted": 277,
+        "accepted_after_repair": 0,
+        "arm_id": "arm10_spec_eprocess",
+        "attempted": 277,
+        "input_tokens": 492585,
+        "output_tokens": 18412,
+        "p50_latency_ms": 0.0015819678083062172,
+        "p95_latency_ms": 1058.6486519314349,
+        "rejected": 0,
+        "usd_cost": 0.66176125
+      },
+      {
+        "accepted": 277,
+        "accepted_after_repair": 0,
+        "arm_id": "arm12_cth",
+        "attempted": 277,
+        "input_tokens": 492585,
+        "output_tokens": 18278,
+        "p50_latency_ms": 0.0016529811546206474,
+        "p95_latency_ms": 1135.4714670451358,
+        "rejected": 0,
+        "usd_cost": 0.66142625
+      },
+      {
+        "accepted": 277,
+        "accepted_after_repair": 0,
+        "arm_id": "arm12b_cth_llm",
+        "attempted": 277,
+        "input_tokens": 492585,
+        "output_tokens": 18417,
+        "p50_latency_ms": 0.0017830170691013336,
+        "p95_latency_ms": 1062.98273592256,
+        "rejected": 0,
+        "usd_cost": 0.66177375
+      },
+      {
+        "accepted": 277,
+        "accepted_after_repair": 0,
+        "arm_id": "arm8_spec_immediate",
+        "attempted": 277,
+        "input_tokens": 492585,
+        "output_tokens": 18446,
+        "p50_latency_ms": 962.9428620683029,
+        "p95_latency_ms": 1263.0698839202523,
+        "rejected": 0,
+        "usd_cost": 0.66184625
+      }
+    ],
+    "physical_this_invocation": 425
+  },
+  "n_per_family": 8,
+  "not_a_gate3_vote": true,
+  "outputs_sha256": {
+    "alerts.jsonl": "4185a9d86b9c65dc50567a641cd6c026057eafc327572eb35f8ab18059305cf7",
+    "ledger.csv": "c3a0f6438714eda2869ef90e5356293fde797463c0e1b444718a5dbd68bfab55",
+    "proposals.jsonl": "0741b1c9dad81095275a34c802b6775eab5c72362a879b8d522915b750d9efd3",
+    "records.jsonl.gz": "9cd3be62d6ee1ac205223272e15433cd1319526ca313c6c5773e3b129d989d04",
+    "truth.jsonl": "4152333ca7db8385b559ef4461b7d8e2e83b85733e4f1afda561d41a24859555"
+  },
+  "partial": false,
+  "profit": 4.0,
+  "records": 2544,
+  "rule_u": {
+    "arm10_coerced_abstentions": 7,
+    "version": "U-v1"
+  },
+  "run_name": "fresh-grok-4.20",
+  "truth_identical_to_reports_pilot_truth": null,
+  "versions": {
+    "openai": "1.109.1",
+    "python": "3.12.11"
+  }
+}

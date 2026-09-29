@@ -1,0 +1,185 @@
+{
+  "alert_selection_rule": "bank-v1",
+  "alert_source": "bank",
+  "alert_sources": {
+    "bank:early_accurate": 40,
+    "bank:false_alert_null": 24,
+    "bank:late_accurate": 40,
+    "bank:unreliable": 40,
+    "none:bank_gap_demand_down": 32,
+    "none:no_alert": 40,
+    "none:silent_null": 24
+  },
+  "analysis_class": "exploratory",
+  "arm_set": "confirm",
+  "arms": [
+    "arm1_capped_base_stock",
+    "arm2_telemetry_hmm_or",
+    "arm8_spec_immediate",
+    "arm10_spec_eprocess",
+    "ctrl_cusum_to_compiler",
+    "ctrl_keyword_parser",
+    "ctrl_alertspec_upper_bound",
+    "oracle_shockspec_headroom",
+    "arm12_cth",
+    "arm12b_cth_llm",
+    "ctrl_cth_uniform"
+  ],
+  "decoding": "det-v1 (temperature 0.0, no seed), module 02 prompt, no system prompt",
+  "endpoint": {
+    "base_url": "https://openrouter.ai/api/v1",
+    "bills_thinking_as_output": true,
+    "extra_body": null,
+    "model_id": "openai/gpt-3.5-turbo",
+    "name": "openrouter:openai/gpt-3.5-turbo",
+    "price_date": "2026-09-28",
+    "price_input_per_mtok": 0.5,
+    "price_output_per_mtok": 1.5,
+    "supports_seed": false
+  },
+  "episodes": 240,
+  "git": {
+    "branch": "method/graded-commitment",
+    "dirty_paths": [
+      "M .gitignore",
+      " M paper/.gitignore",
+      "?? analysis/commitment/cth_arms.py",
+      "?? analysis/commitment/cth_core.py",
+      "?? analysis/commitment/evaluate.py",
+      "?? analysis/commitment/evidence.py",
+      "?? analysis/commitment/hypotheses.py",
+      "?? analysis/commitment/mc.py",
+      "?? analysis/commitment/out/fresh-deepseek-v3/",
+      "?? analysis/commitment/out/fresh-gemini-2.5-flash-lite/",
+      "?? analysis/commitment/out/fresh-gemini-3.8-flash/",
+      "?? analysis/commitment/out/fresh-gpt-3.5-turbo/",
+      "?? analysis/commitment/out/fresh-grok-4.20/",
+      "?? analysis/commitment/out/fresh-llama-3.1-8b/",
+      "?? analysis/commitment/out/ladder-deepseek-v3/",
+      "?? analysis/commitment/out/ladder-gemma-3-27b/",
+      "?? analysis/commitment/out/ladder-gpt-3.5-turbo/",
+      "?? analysis/commitment/out/ladder-gpt-4o-mini/",
+      "?? analysis/commitment/out/ladder-gpt-oss-20b/",
+      "?? analysis/commitment/out/ladder-llama-3.1-8b/",
+      "?? analysis/commitment/out/ladder-llama-3.2-1b/",
+      "?? analysis/commitment/out/ladder-llama-3.2-3b/",
+      "?? analysis/commitment/out/ladder-llama-3.3-70b/",
+      "?? analysis/commitment/out/ladder-qwen-2.5-72b/",
+      "?? analysis/commitment/out/ladder-qwen-2.5-7b/",
+      "?? analysis/commitment/out/ladder-step-3.5-flash-2603/",
+      "?? analysis/commitment/out/ladder-step-3.5-flash/",
+      "?? analysis/commitment/out/ladder-step-3.7-flash/",
+      "?? analysis/commitment/out/ladder-step-5-preview/",
+      "?? analysis/commitment/out/stage_a.json",
+      "?? analysis/commitment/out/stage_a.md",
+      "?? analysis/commitment/replay.py",
+      "?? paper/.kilo/",
+      "?? paper/.zcode/",
+      "?? paper/sections/06_method_hedge.tex",
+      "?? tests/test_commitment_cth.py",
+      "?? tests/test_commitment_episodes.py",
+      "?? tests/test_commitment_evaluate.py"
+    ],
+    "sha": "5deb165e5b2ec1fb401b56e6ab477b442824c0e7"
+  },
+  "guard": {
+    "max_physical_calls": 1500,
+    "physical_calls_this_invocation": 464,
+    "physical_calls_total": 468,
+    "refusals_this_invocation": 0,
+    "retries_this_invocation": 0,
+    "spend_cap_usd": 1.0,
+    "usd_this_invocation": 0.44561350000000005,
+    "usd_total": 0.4493035000000001
+  },
+  "ladder_rung": {
+    "model_id": "openai/gpt-3.5-turbo",
+    "name": "gpt-3.5-turbo",
+    "price_input_per_mtok": 0.5,
+    "price_output_per_mtok": 1.5,
+    "provider": "openrouter",
+    "released": "2023-05",
+    "served_as": [
+      "openai/gpt-3.5-turbo"
+    ],
+    "tier": "legacy"
+  },
+  "layout": "fresh",
+  "ledger": {
+    "charged": 1237,
+    "charged_usd": 1.1065905,
+    "per_arm": [
+      {
+        "accepted": 245,
+        "accepted_after_repair": 3,
+        "arm_id": "arm10_spec_eprocess",
+        "attempted": 309,
+        "input_tokens": 483851,
+        "output_tokens": 23074,
+        "p50_latency_ms": 0.001842970959842205,
+        "p95_latency_ms": 1197.2523359581828,
+        "rejected": 61,
+        "usd_cost": 0.2765365
+      },
+      {
+        "accepted": 245,
+        "accepted_after_repair": 2,
+        "arm_id": "arm12_cth",
+        "attempted": 309,
+        "input_tokens": 483842,
+        "output_tokens": 22876,
+        "p50_latency_ms": 0.0016919802874326706,
+        "p95_latency_ms": 1302.8699960559607,
+        "rejected": 62,
+        "usd_cost": 0.276235
+      },
+      {
+        "accepted": 245,
+        "accepted_after_repair": 3,
+        "arm_id": "arm12b_cth_llm",
+        "attempted": 309,
+        "input_tokens": 483851,
+        "output_tokens": 22992,
+        "p50_latency_ms": 0.00179302878677845,
+        "p95_latency_ms": 1175.3037450835109,
+        "rejected": 61,
+        "usd_cost": 0.2764135
+      },
+      {
+        "accepted": 244,
+        "accepted_after_repair": 4,
+        "arm_id": "arm8_spec_immediate",
+        "attempted": 310,
+        "input_tokens": 485619,
+        "output_tokens": 23064,
+        "p50_latency_ms": 1234.5304570626467,
+        "p95_latency_ms": 1551.7277449835092,
+        "rejected": 62,
+        "usd_cost": 0.2774055
+      }
+    ],
+    "physical_this_invocation": 464
+  },
+  "n_per_family": 8,
+  "not_a_gate3_vote": true,
+  "outputs_sha256": {
+    "alerts.jsonl": "4185a9d86b9c65dc50567a641cd6c026057eafc327572eb35f8ab18059305cf7",
+    "ledger.csv": "9f26ab73e96e07c32ea1800d7b66df7f646f8b6e5db71da380d9121626eccd63",
+    "proposals.jsonl": "9209259f0e8c55c447757432a0226d469801788d5f7e4b25a629f618d6433283",
+    "records.jsonl.gz": "13b9dec1eac8da15cc1d3f701764a2620ba73ad9995a2a62834a9a593d42fe37",
+    "truth.jsonl": "4152333ca7db8385b559ef4461b7d8e2e83b85733e4f1afda561d41a24859555"
+  },
+  "partial": false,
+  "profit": 4.0,
+  "records": 2544,
+  "rule_u": {
+    "arm10_coerced_abstentions": 2,
+    "version": "U-v1"
+  },
+  "run_name": "fresh-gpt-3.5-turbo",
+  "truth_identical_to_reports_pilot_truth": null,
+  "versions": {
+    "openai": "1.109.1",
+    "python": "3.12.11"
+  }
+}
