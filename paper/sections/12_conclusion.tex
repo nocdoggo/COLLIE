@@ -1,0 +1,22 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+Should a language model be asked what to order? The question is badly posed,
+because it silently bundles three separable decisions, and separating them is what
+makes any resulting gain attributable. \collie{} consults the model rarely,
+restricts it to a typed claim about what changed, compiles that claim into one
+point of a registered grid over a controller the operations research literature
+already trusts, and lets the claim touch an order only after an anytime-valid
+\eprocess{} started strictly after the claim was frozen has paid for it. The
+model says what changed, once. Statistics decides whether to trust it. Operations
+research decides what to do.
+
+Two things we built are useful whether or not the method wins. One is an audited
+testbed whose baseline reproduces every published order sequence bit for bit,
+which is what let us establish that the published baseline score belongs to one
+of the benchmark's two simulators and is unreachable from the other, so any future
+comparison here has to name its harness. The other is a ledger that keeps
+physical requests separate from charged copies, which makes a shared proposal
+call across three activation policies a controlled ablation rather than a cost
+accident. \pending{final result paragraph: which contrasts survived Holm
+correction, what the frontier showed, and which kill triggers fired}

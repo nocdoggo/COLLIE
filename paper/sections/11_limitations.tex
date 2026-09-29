@@ -1,0 +1,49 @@
+\section{Limitations}
+\label{sec:limitations}
+
+What could make this paper wrong? Section~\ref{sec:notclaim} bounds the theorem.
+Several of the real risks lie outside it.
+
+\textbf{The headroom band is not yet interpretable.} The oracle-to-baseline
+headroom band we have measured so far was produced with a stand-in compiler and a
+scripted transport. It is narrow, and it is uninterpretable until the real
+pipeline lands end to end. That is the honest statement and we will not sharpen
+it. If the band stays narrow once the real compiler and a real model are both in
+the loop, no arm between the baseline and the oracle can be distinguished and the
+study needs reframing. \pending{headroom band under the integrated pipeline}
+
+\textbf{Two families receive almost no proposals without an alert.} Families 4
+and 5 do not touch the demand stream, so the detector fires at its null rate by
+construction, every triggered arm degenerates to the baseline controller in those
+cells, and pooling them dilutes any effect the alert channel produces elsewhere.
+An arrival-side detector on expected against realized arrivals would be legal,
+and it is an open scope decision rather than something we have quietly done.
+
+\textbf{Reproducibility, open weights, and the oracle.} The primary hosted
+endpoint rejects the decoding seed parameter and a second accepts it without
+honoring it, so reproducibility comes from a cache of stored bytes and a reader
+who re-derives our numbers from the provider will not get identical text. The
+project is cloud-only by a registered, dated operator decision, so the paper
+cannot make an open-weight claim. The oracle is an upper bound rather than a
+method: it reads the true family and onset, is never tuned on test data, and
+refuses the compound family, so compound rows are excluded and we state that
+wherever such a row appears. Verification is also late by design, which is why
+proposal-to-activation delay is a primary outcome. And the scope is controlled
+policy evaluation rather than deployment, since the real trajectories are genuine
+sales histories but their disruptions are simulated and true demand stays visible
+during a stockout. Redistribution is governed by upstream competition terms, so
+an artifact release carries code, generators, prompts, splits, manifests and
+hashes and directs users upstream for the data.
+
+\textbf{The registration is not yet frozen, and it gates the confirmatory
+claims.} The preregistration file that must carry the endpoints, the stratum
+weights, the three contrasts, the Holm family, the budget allocation, the
+compiler mapping and the numeric go and kill thresholds does not yet exist. Until
+it does the contrast set of Section~\ref{sec:experiments} is provisional, no
+analysis can legitimately be labeled confirmatory, and the per-method freeze
+manifest is likewise unimplemented. The verifier and the schema parser are
+implemented on feature branches and are not yet integrated on the main line, and
+no pilot has been run, so no go or kill verdict exists. We say this plainly
+because the alternative is a paper whose method section describes a system its
+own evidence base does not yet contain. \pending{integration status, pilot
+verdict, frozen registration hash}
