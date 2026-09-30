@@ -234,3 +234,12 @@ __marimo__/
 #   Raw key material anywhere in the tree, not only under cloud_endpoint/ — a stray
 #   provider key must never be committable regardless of where it is dropped.
 *.key
+manuscript/main.aux
+manuscript/main.bbl
+manuscript/main.fls
+manuscript/main.blg
+manuscript/main.fdb_latexmk
+manuscript/main.out
+
+# Downloaded third-party data for the COLING follow-up (re-creatable; see external_data/README.md)
+/external_data
