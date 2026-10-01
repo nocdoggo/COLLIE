@@ -1722,8 +1722,12 @@ claim.
   (ignored by git).
 - Annotation: the sample lists, the blank sheets and the manifest of the literal task, the
   pilot and the check sets in `analysis/coling/out/audit/`, where the sampler writes them; the
-  train-half outcome-audit sheets and traces in `analysis/coling/out/audit_outcomes/`; sheets
-  in progress and the planted-error keys under `external_data/annotation/` (ignored by git).
+  train-half outcome-audit sheets and traces in `analysis/coling/out/audit_outcomes/`; the
+  minimal pairs and the blank sheets of their audit in `analysis/coling/out/e5/`; sheets in
+  progress, the planted-error keys and the gold of the minimal pairs under
+  `external_data/annotation/` (ignored by git). An annotator may fill a sheet as an Excel
+  workbook in which every cell is text; `sheet_xlsx.py` writes it from the blank sheet and
+  turns the filled workbook back into the sheet's own layout before it is validated.
 - E6: derived tables and link-check sheets in `analysis/coling/out/faa/`.
 - Downloads: `external_data/` (ignored by git).
 - Sealed outcomes, and the test-half audit sheets, traces and key: `external_data/sealed/`,
