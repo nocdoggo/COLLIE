@@ -94,3 +94,19 @@ carry the registered text.
     no anonymity period, and the submission does not link to it. The registration is evidenced
     by an anonymised copy of the registered plan and guide in the supplement, with their sha256
     and push time.
+19. **Vague row [owner, 1 Oct].** The literal-task table's row "vague or undated" is split into
+    a `vague` row and a `no_date` row, so the pilot carries a vague item (open point D1). A
+    shortfall in the vague row goes to the undated row first. The four sample lists are redrawn
+    before anything is handed out.
+20. **Distractor rows [owner, 1 Oct].** The row "distractor date" is split into "distractor
+    only" (class `distractor`, and a non-dated class that carries a distractor date) and "dated
+    target beside a distractor date" (a dated class with a distractor date), half of the old
+    quota each. The plan's E2 line on distractor items is reported on both rows.
+21. **Guide phrases [owner, 1 Oct].** A statement that shares a wording with a phrase quoted in
+    the guide may be drawn. A statement whose whole normalised text equals a quoted phrase of
+    three or more words is excluded from every sample, whatever the drug or company. The number
+    of drawn items that contain a quoted phrase is reported.
+22. **Relative-form seeds [owner, 1 Oct].** The minimal-pair seeds of the relative form are
+    taken from statements dated 2023-01-01 or later, text only, because the labelling samples
+    use every train statement of that form. Calls on those seeds wait for F1. The other forms'
+    seeds stay in the train period.
