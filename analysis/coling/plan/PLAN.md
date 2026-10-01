@@ -549,6 +549,10 @@ Late).
     (section 4).
   - Slices are taken inside the test split. The Late split is not read for outcomes in October,
     so a model whose cutoff month is December 2025 or later has no slice. [owner to confirm]
+  - With the cutoffs of section 4, six slices start after these days: 2023-10-31
+    (gpt-4o-mini), 2023-12-31 (llama-3.3-70b), 2024-06-30 (gpt-oss-20b), 2024-08-31
+    (gemma-3-27b), 2024-09-30 (qwen-2.5-7b) and 2024-12-31 (deepseek-v3). gemini-3.8-flash and
+    grok-4.20, both of March 2026, have no slice.
   - A slice is analysed only if it holds at least 50 scoreable statements. The size of every
     slice is **TBD-at-gate** (cutoffs from section 4; counts from the counts-only code).
 - **Samples and their order.** Every sample is drawn by the seeded rule, in this order, so that
@@ -578,14 +582,14 @@ recorded in F1. Reasoning and thinking tokens are billed as output.
 
 | Model | Role | Route and id | Released | Training cutoff | Pinned endpoint, precision | $/1M in | $/1M out |
 |---|---|---|---|---|---|---|---|
-| llama-3.3-70b | **primary** | OpenRouter `meta-llama/llama-3.3-70b-instruct` | **TBD-at-registration** | **TBD-at-registration** | **TBD-at-registration** | 0.10 | 0.32 |
-| deepseek-v3 | **primary** | OpenRouter `deepseek/deepseek-chat` | **TBD-at-registration** | **TBD-at-registration** | **TBD-at-registration** | 0.257 | 1.029 |
-| qwen-2.5-7b | secondary | OpenRouter `qwen/qwen-2.5-7b-instruct` | **TBD-at-registration** | **TBD-at-registration** | **TBD-at-registration** | 0.10 | 0.20 |
-| gemma-3-27b | secondary | OpenRouter `google/gemma-3-27b-it` | **TBD-at-registration** | **TBD-at-registration** | **TBD-at-registration** | 0.08 | 0.45 |
-| gpt-oss-20b | secondary | OpenRouter `openai/gpt-oss-20b` | **TBD-at-registration** | **TBD-at-registration** | **TBD-at-registration** | 0.018 | 0.09 |
-| gpt-4o-mini | secondary | OpenRouter `openai/gpt-4o-mini` | **TBD-at-registration** | **TBD-at-registration** | **TBD-at-registration** | 0.15 | 0.60 |
-| gemini-3.8-flash | secondary | Google `gemini-3.8-flash` | **TBD-at-registration** | **TBD-at-registration** | direct | 0.75 | 3.75 |
-| grok-4.20 | secondary | xAI `grok-4.20-0309-non-reasoning` | **TBD-at-registration** | **TBD-at-registration** | direct | 1.25 | 2.50 |
+| llama-3.3-70b | **primary** | OpenRouter `meta-llama/llama-3.3-70b-instruct` | 2024-12 | documented: December 2023 (model card) | `deepinfra/turbo`, fp8 | 0.10 | 0.32 |
+| deepseek-v3 | **primary** | OpenRouter `deepseek/deepseek-chat` | 2024-12 | bounded: December 2024 | `deepinfra/fp4`, fp4 | 0.32 | 0.89 |
+| qwen-2.5-7b | secondary | OpenRouter `qwen/qwen-2.5-7b-instruct` | 2024-09 | bounded: September 2024 | `phala`, precision not stated | 0.10 | 0.20 |
+| gemma-3-27b | secondary | OpenRouter `google/gemma-3-27b-it` | 2025-03 | documented: August 2024 (model card) | `deepinfra/fp8`, fp8 | 0.08 | 0.16 |
+| gpt-oss-20b | secondary | OpenRouter `openai/gpt-oss-20b` | 2025-08 | documented: June 2024 (model card) | `deepinfra/bf16`, bf16 | 0.03 | 0.14 |
+| gpt-4o-mini | secondary | OpenRouter `openai/gpt-4o-mini` (alias of the only snapshot, `gpt-4o-mini-2024-07-18`) | 2024-07 | documented: October 2023 (provider model page) | `openai`, not applicable | 0.15 | 0.60 |
+| gemini-3.8-flash | secondary | Google `gemini-3.8-flash` | 2026-09 | documented: March 2026 (model card; January 2025 in some domains) | direct | 0.75 | 3.75 |
+| grok-4.20 | secondary | xAI `grok-4.20-0309-non-reasoning` | 2026-03 | bounded: March 2026 | direct | 1.25 | 2.50 |
 
 - **How the table is filled.** Release dates, cutoffs, routes and endpoints are collected at
   source, each with its URL and retrieval date, and kept in `MODELS.md` in this folder, whose
@@ -594,26 +598,37 @@ recorded in F1. Reasoning and thinking tokens are billed as output.
   primaries before they enter the table.
 - **Cutoff rule.** A cell reads "documented: month (source)" when the model's maker states a
   cutoff, and "bounded: release month" otherwise (section 3).
-- **Prices.** The prices shown are the list prices per 1M tokens in the repository's ladder
-  file, as in the 29 September draft: retrieved 2026-09-28 for the six OpenRouter models,
-  2026-09-06 for gemini-3.8-flash and 2026-09-07 for grok-4.20. On OpenRouter a price belongs to
-  one provider endpoint, so once an endpoint is pinned its price is the registered one. The
-  prices of the pinned endpoints replace these at registration (**TBD-at-registration**). The
-  harness carries its own table of the eight readers (route, endpoint, precision and price) and
-  refuses a live run for any other model, or while a route is not yet set.
+- **Prices.** The prices shown are the list prices per 1M tokens of the pinned endpoints (of
+  the makers' own routes for gemini-3.8-flash and grok-4.20), read at source on 2026-10-01.
+  On OpenRouter a price belongs to one provider endpoint, so the registered price is the pinned
+  endpoint's. The 29 September draft took its prices from the repository's ladder file, which
+  holds one price per model id; for three models that was the price of another endpoint, and
+  the pin changes it: deepseek-v3 (was 0.257 / 1.029), gemma-3-27b (was 0.08 / 0.45) and
+  gpt-oss-20b (was 0.018 / 0.09). The gemini-3.8-flash price holds through 2026-12-31, and the
+  grok-4.20 price holds for prompts under 200,000 tokens, which every prompt of this study is.
+  The harness carries its own table of the eight readers (route, endpoint, precision and price)
+  and refuses a live run for any other model, or while a route is not yet set.
 - **Provider pin.** The harness of the 29 September draft sent no provider preference:
   OpenRouter chose the provider and could fall back to another, and only the echoed model id
   was checked, which is the same for every provider of a model. Now each OpenRouter request
   names one provider endpoint with fallbacks off. The echoed model id and the provider that
   served the call are stored with every call, and a response from another model or another
-  provider stops the run. The endpoint chosen for each model, with its precision, is
-  **TBD-at-registration**. No test-period call is made before F1.
-- **Why these primaries.** Both are open-weight models with early cutoffs, documented or
-  bounded by the release month, which the memorisation controls need. Each is to be served by
-  one named endpoint at a stated precision. The primaries alone enter the confirmatory family.
-- **If deepseek-v3 cannot be tied to a dated checkpoint, or its maker documents no cutoff,** it
-  stays a primary, its cutoff is bounded by its release month, and every statement about it says
-  "bounded". [owner to confirm]
+  provider stops the run. The endpoint chosen for each model, with its precision, is in the
+  table. With fallbacks off, an outage of the pinned endpoint is a failed attempt to retry
+  later, never a reason to change the route. No test-period call is made before F1.
+- **Why these primaries.** Both are open-weight models with early cutoffs, which the
+  memorisation controls need. Each is served by one named endpoint at a stated precision. The
+  primaries alone enter the confirmatory family. Three facts qualify this:
+  - Only llama-3.3-70b has a cutoff documented by its maker (December 2023). The maker of
+    deepseek-v3 documents none, so its cutoff is bounded by its release month (December 2024).
+  - Neither pin serves the precision of the released weights: llama-3.3-70b is released in BF16
+    and pinned at fp8, and DeepSeek-V3 is released in FP8 and pinned at fp4. No endpoint serves
+    the December 2024 DeepSeek-V3 at FP8. The paper's model table prints the precision.
+  - `deepseek/deepseek-chat` has no dated id. OpenRouter's record and the host's own page tie
+    the route to the December 2024 weights (`MODELS.md` section 5), which is as far as a check
+    without a call can go. The maker no longer serves that model itself.
+- **deepseek-v3 stays a primary** under these conditions, its cutoff is bounded by its release
+  month, and every statement about it says "bounded". [owner to confirm]
 - **The secondaries.** They span size, openness and recency; they are reported descriptively
   along those axes.
 - **Parse failures.**
@@ -1176,7 +1191,9 @@ and perfect information (section 5, E6).
 ## 9. Budget
 
 The study-wide hard cap is **$200**. It covers every run, including dev runs and cost trials.
-The rules, which the harness (`read.py`, frozen at F1) enforces:
+The cap is on spend at list prices, as the harness records it. OpenRouter's fee on buying
+credits (5.5% on its standard plan on 1 October) is outside the price of a call and outside the
+cap. The rules, which the harness (`read.py`, frozen at F1) enforces:
 
 - *One ledger.* Every paid run uses one output root, and declares its cap in the study ledger
   there before its first call.
@@ -2007,11 +2024,33 @@ quoted here are from the build of 29 September.
     2026) as far as they were collected on 1 October; no later month was parsed or linked.
     *Why:* the collector, parser and linker were written on 1 October, and the draft did not
     say what a term with fewer than 30 links needs or how a doubly checked link counts.
+34. **Model facts and prices.** The table of section 4 is filled from `MODELS.md`. Against the
+    draft: qwen-2.5-7b was released in September 2024, not October; each OpenRouter model is
+    pinned to one endpoint at a stated precision where the endpoint states one; and the prices
+    of deepseek-v3, gemma-3-27b and gpt-oss-20b change to those of the pinned endpoints.
+    deepseek-v3 has no cutoff documented by its maker and is bounded by its release month. The
+    $200 cap is stated as a cap on list-price spend. *Seen:* the makers' model cards and
+    pages and OpenRouter's public endpoint listing, read on 1 October; no model was called.
+    *Why:* the draft's prices were per model id, and a pinned endpoint has its own price.
+35. **Literal-task samples.** Four rules settled by the owner on 1 October, before any sheet
+    was handed out. (a) The row "vague or undated" of the guide's sample table is split into a
+    vague row and an undated row, with a vague shortfall going to the undated row. (b) The row
+    "distractor date" is split into "distractor only" and "dated target beside a distractor
+    date". (c) A statement that shares a wording with a phrase quoted in the guide may be
+    drawn; a statement whose whole text equals a quoted phrase of three or more words is
+    excluded from every sample. (d) The minimal-pair seeds of the relative form are taken from
+    statements dated 2023-01-01 or later, text only, and calls on them wait for F1. *Seen:*
+    the counts of statements by form and period, the texts of a first draw of the four sample
+    lists, and the guide; no outcome field. *Why:* the first draw had no vague item in the
+    pilot, 10 of its 12 distractor items had no target beside the distractor, 4 literal items
+    were word for word a phrase quoted in the guide, and the labelling samples had used every
+    train statement of the relative form.
 
 **Status of these changes.** The owner confirmed on 1 October the scope (item 1), the deadlines
 and their one relaxation (item 2), the availability rule, the capture freeze and the result of
-the availability check (items 9 and 26), the roles (item 24), and the public repository with
-an anonymised copy of the plan and guide in the supplement (item 17). The other items are
+the availability check (items 9 and 26), the roles (item 24), the public repository with
+an anonymised copy of the plan and guide in the supplement (item 17), and the four sample
+rules of item 35. The other items are
 provisional rules of 1 October: each stands as written unless the owner changes it, and each
 is confirmed or changed before this file is registered. [owner to confirm]
 
