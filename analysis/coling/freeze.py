@@ -207,11 +207,13 @@ CODE = (
     "predictors.py",
     "gbm.py",
     "power.py",
+    "track_record.py",
 )
 """The code PLAN.md section 17 hashes at registration, in its order: builder, rule reader, form
 classifier, capture manifest, dataset builder, samplers and sheet generators, agreement code,
 counts-only code, this script, calibrator (``predictors.py``), both gradient-boosted models
-(``gbm.py``) and the power code. ``plan_check.py`` wants each of these hashes in section 17."""
+(``gbm.py``), the power code and the track-record builder. ``plan_check.py`` wants each of these
+hashes in section 17."""
 CODE_OTHER = ("read.py",)
 """Hashed for the record and not listed in section 17: ``read.py`` is hashed at F1."""
 BUILD_CODE = ("corpus.py", "manifest.py")

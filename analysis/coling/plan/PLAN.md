@@ -516,6 +516,15 @@ Late).
 - **Fit outcomes run past the dev boundary.** A fit statement is followed to 2022-10-06, through
   the dev period. A component fitted on the fit split for the dev runs therefore uses recoveries
   dated inside the dev period, and the H3 selection on dev is not a clean forecast evaluation.
+  The same holds for condition (b) in the dev runs. Its table rests on the same fit outcomes,
+  and its examples can show a recovery or follow-up date later than the dev item's own date.
+  A fit statement can also be an earlier statement of a dev item's thread: its bracket is then
+  the dev item's own outcome, which the table counts and an example can show (no example shows
+  the drug, the company or the presentation). No statement is left out for this. The numbers
+  are **TBD-at-gate**, from the manifest of the track-record builder: fit statements with a
+  bracket date on or after 2021-01-01; examples that show such a date; scoreable dev
+  statements whose thread the table follows past their date; and those whose thread an
+  example follows past their date.
   The test evaluation is clean: no train outcome is followed past the train horizon.
 - **Final fits.** After the H3 selection, every model-free predictor is refitted on fit and dev
   together, before any test prediction.
@@ -784,12 +793,19 @@ the readers give:
     statements the row rests on, the share recovered by the stated end, the share recovered by
     90 days after it, and the median days from update to recovery. The shares are Turnbull
     estimates, and the prompt says so. A form with no stated end (TBD, silent) has no shares,
-    and its rows show them as not applicable. The entry's own form and revision bucket are
+    and its rows show them as not applicable; its median is that of the cell when the cell
+    holds at least 100 statements, else that of the form. The median is that of the time to
+    recovery capped at 365 days: a median above 365 is shown as 365, and as not applicable
+    when the follow-up of the row's statements stops before day 365. The table names the first
+    and the last statement date behind it. The entry's own form and revision bucket are
     named under the table.
   - For the dev runs of the H3 selection the table comes from the fit split alone; for test
     runs, from the whole train period (fit and dev).
   - The examples are drawn by the seeded rule, stratified by form, from fit statements outside
-    the earlier samples (section 3). An example shown as "not recovered within 365 days" must
+    the earlier samples (section 3): a ranked pool of 50, of which the first ten resolved
+    statements in rank order are shown, the same ten in the dev and the test runs. A statement
+    is resolved when its displayed presentation recovered or was discontinued, or when it is
+    censored 365 days or more after its date. An example shown as "not recovered within 365 days" must
     have a lower bound at least 365 days after its date.
 - **(c) Literal reading plus calibrator.** The model's literal reading (`literal-v1`, run on
   the E3 items) is passed through the fixed empirical slip calibrator (section 8).
@@ -1861,6 +1877,12 @@ moved out of the study folder before registration.
   not been opened. On the owner's decision it was moved, unopened, under the sealed folder on
   1 October, where the rule of the sealed files applies to it.
 
+- **Thread counts in a code review.** On 1 October a review of the track-record builder
+  counted, by thread and from first-sight fields, the test-period statements on the threads of
+  the ten in-context examples (13, of which 4 eligible) and on the threads of train statements
+  censored at their first capture in 2023 (none). No outcome field of a test-period statement
+  was read, and no code or table depends on the counts.
+
 To our knowledge, no test-period outcome has been derived, printed or tabulated outside the
 sealed folder, apart from the counts of events with an observable outcome and the one deduction
 recorded above.
@@ -1910,6 +1932,8 @@ depend on the pandas version, so the environment is part of the record.
 - The calibrator (`predictors.py`), both GBMs (`gbm.py`) and the power code (`power.py`):
   **TBD-at-gate**. If the text-trained GBM is not ready, its code hash moves to F1 by an edit
   of this line before the push.
+- The track-record builder (`track_record.py`): **TBD-at-gate**. Its two record files and
+  their manifest are hashed in F1, before any call that shows them.
 
 **Tables.**
 
