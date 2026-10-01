@@ -1727,7 +1727,11 @@ moved out of the study folder before registration.
 - **FAA advisories of 2026 (from 1 October).** The advisories are collected from 1 October.
   The parser, the statement builder and the linker are developed on the 2024 pilot sample and
   on the development months (April and May 2026); the code refuses any later month until E6's
-  amendment is registered.
+  amendment is registered. Two contacts with later months are disclosed. The first version of
+  the parser, run on 1 October, opened the list pages of three June days to count the
+  advisories they list; it read their numbers only and parsed no advisory. The collector's
+  log, which a review of 1 October read, gives the number of advisories listed on each day.
+  Since that review a locked month yields a count of files and nothing else.
 - **An archive of results and downloaded data** made on 29 September lies untracked in another
   checkout of the repository. It may hold a copy of the sealed folder as built that day. It has
   not been opened. It is deleted, or moved under the sealed folder, before registration.
