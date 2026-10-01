@@ -571,7 +571,9 @@ Late).
      in that order, from the events table and the form classifier only, with no outcome field;
   2. the train-half outcome-audit sample;
   3. the in-context examples, the dev prompt items and the minimal-pair seeds, in that order,
-     which exclude everything drawn in steps 1 and 2 and one another;
+     which exclude everything drawn in steps 1 and 2 and one another. The seeds of the
+     relative form are statements dated 2023-01-01 or later, text only, and no model is called
+     on their pairs before F1;
   4. from the eligible list: the probe sample, the 20-sample subset, the paraphrase subset, the
      2×2 subset (section 5) and the 100 statements of the reference-reading check. Each is a
      draw of its own, so the subsets may overlap. The reference-reading check leaves out the
@@ -581,7 +583,10 @@ Late).
      confirmatory run has finished (section 10).
 
   The statements used as examples in the guide and the fixed test item of the harness are
-  excluded from every sample. The hash of every sample list drawn before registration (steps
+  excluded from every sample. A statement whose whole text is a phrase of three or more words
+  quoted in section 3 or 7 of the guide, or whose two text fields are each such a phrase, is
+  excluded from every sample of statements that are read (guide, appendix A.4); the
+  outcome-audit samples do not apply this rule. The hash of every sample list drawn before registration (steps
   1 and 2 at least) is in section 17; a list of steps 3 and 4 drawn after it is hashed in F1,
   before any call that uses it.
 
@@ -696,7 +701,8 @@ both context for E3, and neither is a failure.
 - They are drawn before every other sample except the pilot and the check sets (section 3).
 - *Strata.* The form classes of section 2.6, grouped as in the guide's allocation table. A
   statement that carries a distractor date beside its target (any class but discontinuation)
-  belongs to the distractor stratum, not to the stratum of its form. The *month-and-year
+  leaves the stratum of its form: for the stratum of dated targets beside a distractor date
+  when its class is dated, and for the distractor-only stratum otherwise. The *month-and-year
   stratum* is therefore the month-and-year statements with no distractor date.
 - The allocation per stratum is **TBD-at-gate**: the quotas are fixed in the guide's
   allocation table before the draw, and a stratum with fewer statements than its quota gives
@@ -729,7 +735,8 @@ template.
 
 - For each primary model, one exact McNemar test compares the model (`literal-v1`) with the
   rule reader, pooled over the items outside the month-and-year stratum. A month-and-year
-  statement that carries a distractor date is in the distractor stratum, so it is in the test.
+  statement that carries a distractor date is in the stratum of dated targets beside a
+  distractor date, so it is in the test.
 - A reading is correct when its statement type is the gold one and either the reading and the
   gold both abstain or the IoU of their intervals is at least 0.5.
 - Holm's correction runs over the two tests at 0.05.
@@ -871,7 +878,8 @@ That is reportable.
 
 - About 800 items from about 100 real seeds. The seeds are stratified by form and drawn in the
   order of section 3: after the samples of section 10, the in-context examples and the dev
-  prompt items, and excluding them.
+  prompt items, and excluding them. The seeds are train-period statements, except those of
+  the relative form, which are dated 2023-01-01 or later (section 3); their pairs wait for F1.
 - Names are fictitious, and gold labels follow by construction.
 
 **Factors, varied one at a time from the seed.**
@@ -1300,8 +1308,9 @@ projection fits:
 4. the cut order of section 12.
 
 **Resuming a run.** A run stopped by its cap or by a provider error is resumed from its cache,
-under the same name. Its cap may be raised within the reserve, and each resumption is logged as
-an amendment. A run that cannot finish is reported as incomplete.
+under the same name, and each resumption is recorded in the study ledger. A cap may be raised
+within the reserve; every raise is logged as an amendment with its reason, and holds for the
+model's later runs. A run that cannot finish is reported as incomplete.
 
 ## 10. Annotation: author audit
 
@@ -2071,14 +2080,16 @@ quoted here are from the build of 29 September.
     vague row and an undated row, with a vague shortfall going to the undated row. (b) The row
     "distractor date" is split into "distractor only" and "dated target beside a distractor
     date". (c) A statement that shares a wording with a phrase quoted in the guide may be
-    drawn; a statement whose whole text equals a quoted phrase of three or more words is
-    excluded from every sample. (d) The minimal-pair seeds of the relative form are taken from
+    drawn; a statement whose whole text equals a quoted phrase of three or more words, or
+    whose two text fields are each such a phrase, is excluded from every sample of statements
+    that are read. (d) The minimal-pair seeds of the relative form are taken from
     statements dated 2023-01-01 or later, text only, and calls on them wait for F1. *Seen:*
     the counts of statements by form and period, the texts of a first draw of the four sample
     lists, and the guide; no outcome field. *Why:* the first draw had no vague item in the
     pilot, 10 of its 12 distractor items had no target beside the distractor, 4 literal items
-    were word for word a phrase quoted in the guide, and the labelling samples had used every
-    train statement of the relative form.
+    were word for word a phrase quoted in the guide, and five of the six train statements of
+    the relative form were in a labelling sample or in the guide's appendix A, with the sixth
+    barred by the cap per episode.
 
 **Status of these changes.** The owner confirmed on 1 October the scope (item 1), the deadlines
 and their one relaxation (item 2), the availability rule, the capture freeze and the result of
