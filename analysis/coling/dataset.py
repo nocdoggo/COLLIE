@@ -71,7 +71,7 @@ can call the same function and ``scoreable_counts`` (scoreable and undetermined,
 breakdown by outcome). ``train_outcome_counts`` adds the mix of the two horizon events and
 refuses any row that is not of the train period.
 
-Outputs (all three are rewritten by the one command below).
+Outputs (all are rewritten by the one command below).
 
 * ``out/statements.csv.gz``: the table, sorted by ``statement_group_id``.
 * ``out/eligible_e3.csv``: the E3 eligible list, sorted by ``statement_group_id``, with the
@@ -90,30 +90,37 @@ Outputs (all three are rewritten by the one command below).
   statement table.
 * ``out/dataset_counts.json``: every count PLAN.md sections 2 and 3 take from this builder, the
   seeds and hashes of the lists (the eligible list, the three secondary lists, the subsets, the
-  late list and the scoreable dev statements), and the hashes of the inputs and outputs. For the
-  test and late splits it holds counts of statements only; train-period outcomes are counted by
-  fit and dev.
-
-Item files for the reading harness are written only when ``--items`` names a folder
-(``write_items``): JSON Lines in the schema of ``read.ReadItem``, with ``item_id`` the
-``statement_group_id``. Probe items carry the fields of ``PROBE_KEYS`` and nothing else: no
-stated end, form, revision bucket or notice text.
+  late list and the scoreable dev statements), and the hashes of the inputs and outputs, with
+  the hash of every item file. For the test and late splits it holds counts of statements only;
+  train-period outcomes are counted by fit and dev.
+* ``out/items/<stem>.jsonl`` (``--items`` names another folder): the item files of the reading
+  harness, one per list of ``item_lists``. JSON Lines in the schema of ``read.ReadItem``, with
+  ``item_id`` the ``statement_group_id``, sorted by id. Probe items carry the fields of
+  ``PROBE_KEYS`` and nothing else: no stated end, form, revision bucket or notice text.
+* ``out/items/dev_prompt.jsonl``: the items of the cost trial, the first ``TRIAL_SIZE``
+  statements by ``draw_rank`` of the dev prompt list (``sample_dev_prompt.csv`` under
+  ``--samples-later``, written by ``audit_sample.py``), kept in that order. They are dev-split
+  statements, so train-period items; anything else stops the build. When the list is not on
+  disk, or names a statement the table does not hold, no trial file is written, one left by an
+  earlier run is removed, and the counts file says so (``cost_trial``).
 
 Usage (from the repository root)::
 
-    PYTHONPATH=. python -m analysis.coling.dataset              # write the three outputs
+    PYTHONPATH=. python -m analysis.coling.dataset              # write the outputs
     PYTHONPATH=. python -m analysis.coling.dataset --check      # recompute and compare
-    PYTHONPATH=. python -m analysis.coling.dataset --items analysis/coling/out/items
+    PYTHONPATH=. python -m analysis.coling.dataset --items another/folder
     PYTHONPATH=. python -m analysis.coling.dataset --captures external_data/fda_wayback_csv
 
 The default inputs are ``analysis/coling/out/events.csv.gz``, ``outcomes_train.csv.gz`` and
-``capture_manifest.csv``, the guide (its Appendix A) and the first-draw lists under
-``analysis/coling/out/audit/samples`` when they exist. ``--captures`` builds the corpus in memory
-from the capture files instead (after the manifest check), keeps the events and the train-period
-outcome rows, and writes nothing but this module's outputs. The counts file records which of the
-two it was built from, so ``--check`` takes the same flags as the run that wrote it. After the
-first draw is written (``audit_sample draw``), or after any change to ``forms.py``, ``rules.py``
-or this file, run the command again: ``--check`` and the tests report stale outputs until then.
+``capture_manifest.csv``, the guide (its Appendix A), the first-draw lists under
+``analysis/coling/out/audit/samples`` and the dev prompt list under
+``analysis/coling/out/audit/samples_later`` when they exist. ``--captures`` builds the corpus in
+memory from the capture files instead (after the manifest check), keeps the events and the
+train-period outcome rows, and writes nothing but this module's outputs. The counts file records
+which of the two it was built from, so ``--check`` takes the same flags as the run that wrote it.
+After the first draw or the dev prompt list is written (``audit_sample draw``, ``draw-later``),
+or after any change to ``forms.py``, ``rules.py`` or this file, run the command again:
+``--check`` and the tests report stale outputs until then.
 """
 
 from __future__ import annotations
@@ -154,9 +161,16 @@ GUIDE = Path("analysis/coling/plan/AUDIT_GUIDE.md")
 SAMPLES = OUT / "audit" / "samples"
 FIRST_DRAW = ("pilot", "check", "reserve", "literal")
 """The samples people label, drawn before every other (``<SAMPLES>/sample_<name>.csv``)."""
+SAMPLES_LATER = OUT / "audit" / "samples_later"
+TRIAL = "dev_prompt"
+"""The dev prompt list (``<SAMPLES_LATER>/sample_dev_prompt.csv``, with a ``draw_rank`` column)
+and the stem of the cost-trial item file made from it."""
+TRIAL_SIZE = 20
+"""The cost trial reads the first 20 statements of the dev prompt list, by ``draw_rank``."""
 STATEMENTS = OUT / "statements.csv.gz"
 ELIGIBLE = OUT / "eligible_e3.csv"
 COUNTS = OUT / "dataset_counts.json"
+ITEMS = OUT / "items"
 COMMAND = "PYTHONPATH=. python -m analysis.coling.dataset"
 
 EVENT_FIELDS = (
@@ -883,6 +897,45 @@ def first_draw_lists(folder: Path | None) -> dict[str, tuple[str, ...]]:
     return found
 
 
+def dev_prompt_list(folder: Path | None) -> tuple[str, ...] | None:
+    """The statement ids of the dev prompt list under ``folder`` (``sample_dev_prompt.csv``), in
+    ``draw_rank`` order; None when the list is not there. A rank that is not a whole number, a
+    repeated rank and a repeated statement are errors."""
+    path = None if folder is None else folder / f"sample_{TRIAL}.csv"
+    if path is None or not path.is_file():
+        return None
+    frame = read_table(path)
+    for column in ("statement_group_id", "draw_rank"):
+        if column not in frame.columns:
+            raise ValueError(f"{path} has no {column} column")
+    ids = list(frame["statement_group_id"])
+    try:
+        ranks = [int(rank) for rank in frame["draw_rank"]]
+    except ValueError:
+        raise ValueError(f"{path}: every draw_rank must be a whole number") from None
+    if len(set(ranks)) != len(ranks) or len(set(ids)) != len(ids):
+        raise ValueError(f"{path} repeats a draw_rank or a statement")
+    return tuple(i for _, i in sorted(zip(ranks, ids, strict=True)))
+
+
+def trial_ids(table: pd.DataFrame, listed: Sequence[str]) -> list[str]:
+    """The statements of the cost trial: the first ``TRIAL_SIZE`` of the dev prompt list, in its
+    order. They must be dev-split statements, so train-period items; any other is an error."""
+    chosen = list(listed[:TRIAL_SIZE])
+    rows = table.set_index("statement_group_id")
+    other = [
+        i
+        for i in chosen
+        if rows.at[i, "split"] != "dev" or rows.at[i, "event_date"] >= TEST_START.isoformat()
+    ]
+    if other:
+        raise ValueError(
+            f"the cost trial reads dev-split statements only, dated before {TEST_START}; "
+            f"sample_{TRIAL}.csv gives {other[:5]}"
+        )
+    return chosen
+
+
 def true(column: pd.Series) -> pd.Series:
     """A text column of True and False as booleans."""
     return column == "True"
@@ -941,10 +994,13 @@ def item(row: Mapping[str, str], probe: bool = False) -> dict[str, Any]:
     return {k: full[k] for k in (PROBE_KEYS if probe else ENTRY_KEYS)}
 
 
-def items(table: pd.DataFrame, ids: Iterable[str], probe: bool = False) -> list[dict[str, Any]]:
-    """The items of the named statements, sorted by id. An unknown id is an error."""
+def items(
+    table: pd.DataFrame, ids: Iterable[str], probe: bool = False, in_order: bool = False
+) -> list[dict[str, Any]]:
+    """The items of the named statements, sorted by id (``in_order``: in the order given). An
+    unknown id is an error."""
     rows = table.set_index("statement_group_id", drop=False)
-    wanted = sorted(set(ids))
+    wanted = list(dict.fromkeys(ids)) if in_order else sorted(set(ids))
     unknown = [i for i in wanted if i not in rows.index]
     if unknown:
         raise ValueError(f"not in the statement table: {unknown[:5]}")
@@ -972,20 +1028,57 @@ def item_lists(table: pd.DataFrame, eligible: pd.DataFrame) -> dict[str, tuple[l
     return lists
 
 
-def write_items(table: pd.DataFrame, eligible: pd.DataFrame, folder: Path) -> dict[str, dict]:
-    """Write every item list as ``<folder>/<stem>.jsonl``; returns rows and hashes by file."""
+def item_files(
+    table: pd.DataFrame, eligible: pd.DataFrame, trial: Sequence[str] = ()
+) -> dict[str, tuple[str, dict[str, Any]]]:
+    """Every item file by name, as its text with its rows and hashes: one file per list of
+    ``item_lists``, sorted by id, and the cost-trial file (``<TRIAL>.jsonl``), in the order of
+    ``trial``, when ``trial`` names a statement."""
+    lists = {stem: (*pair, False) for stem, pair in item_lists(table, eligible).items()}
+    if trial:
+        lists[TRIAL] = (list(trial), False, True)
+    files = {}
+    for stem, (ids, probe, in_order) in lists.items():
+        text = jsonl(items(table, ids, probe, in_order))
+        files[f"{stem}.jsonl"] = (
+            text,
+            {
+                "rows": len(ids),
+                "probe": probe,
+                "sha256": sha16(text.encode("utf-8")),
+                "item_ids_sha256": ids_sha256(ids),
+            },
+        )
+    return files
+
+
+def write_items(
+    table: pd.DataFrame, eligible: pd.DataFrame, folder: Path, trial: Sequence[str] = ()
+) -> dict[str, dict]:
+    """Write every item file as ``<folder>/<stem>.jsonl``; returns rows and hashes by file."""
     folder.mkdir(parents=True, exist_ok=True)
     written = {}
-    for stem, (ids, probe) in item_lists(table, eligible).items():
-        text = jsonl(items(table, ids, probe))
-        (folder / f"{stem}.jsonl").write_text(text, encoding="utf-8")
-        written[f"{stem}.jsonl"] = {
-            "rows": len(ids),
-            "probe": probe,
-            "sha256": sha16(text.encode("utf-8")),
-            "item_ids_sha256": ids_sha256(ids),
-        }
+    for name, (text, record) in item_files(table, eligible, trial).items():
+        (folder / name).write_text(text, encoding="utf-8")
+        written[name] = record
     return written
+
+
+def trial_record(listed: Sequence[str] | None, chosen: Sequence[str], unmatched: int) -> dict:
+    """What the counts file says of the cost-trial items: whether the dev prompt list was read,
+    how many of its ids the statement table does not hold, and whether the file is written."""
+    return {
+        "use": f"cost trial: the first {TRIAL_SIZE} of the dev prompt list, in draw_rank order",
+        "list": f"sample_{TRIAL}.csv",
+        "list_read": listed is not None,
+        "statements_on_the_list": len(listed or ()),
+        "ids_not_in_the_statement_table": unmatched,
+        "requested": TRIAL_SIZE,
+        "file": f"{TRIAL}.jsonl",
+        "written": bool(chosen),
+        "statements": len(chosen),
+        "ids_sha256": ids_sha256(chosen) if chosen else None,
+    }
 
 
 # --------------------------------------------------------------------------------------------
@@ -1312,8 +1405,9 @@ def counts(
 @dataclass(frozen=True)
 class Inputs:
     """What one build reads: the events of every period, train-period outcomes, the capture
-    days, the guide's excluded examples, a record of where they came from, and the first-draw
-    lists that were on disk (statement ids by list name)."""
+    days, the guide's excluded examples, a record of where they came from, the first-draw
+    lists that were on disk (statement ids by list name), and the dev prompt list in
+    ``draw_rank`` order (None when it was not on disk)."""
 
     events: pd.DataFrame
     outcomes: pd.DataFrame
@@ -1321,17 +1415,19 @@ class Inputs:
     examples: tuple[tuple[str, str, str], ...]
     source: dict[str, str]
     first_draw: dict[str, tuple[str, ...]] = field(default_factory=dict)
+    dev_prompt: tuple[str, ...] | None = None
 
 
 @dataclass(frozen=True)
 class Built:
-    """The three outputs as bytes or text, with the tables behind them."""
+    """The outputs as bytes or text (the item files by name), with the tables behind them."""
 
     table: pd.DataFrame
     eligible: pd.DataFrame
     report: dict[str, Any]
     statements_gz: bytes
     eligible_csv: str
+    item_text: dict[str, str] = field(default_factory=dict)
 
     @property
     def report_text(self) -> str:
@@ -1362,10 +1458,15 @@ def not_sealed(path: Path) -> Path:
 
 
 def files_input(
-    events: Path, outcomes: Path, manifest: Path, guide: Path, samples: Path | None = None
+    events: Path,
+    outcomes: Path,
+    manifest: Path,
+    guide: Path,
+    samples: Path | None = None,
+    later: Path | None = None,
 ) -> Inputs:
     """The inputs as the files on disk give them."""
-    for path in (events, outcomes, manifest, guide, *([samples] if samples else [])):
+    for path in (events, outcomes, manifest, guide, *(p for p in (samples, later) if p)):
         not_sealed(path)
     return Inputs(
         events=read_table(events),
@@ -1381,6 +1482,7 @@ def files_input(
             "capture_manifest_sha256": sha16(manifest.read_bytes()),
         },
         first_draw=first_draw_lists(samples),
+        dev_prompt=dev_prompt_list(later),
     )
 
 
@@ -1390,7 +1492,11 @@ def as_text(frame: pd.DataFrame) -> pd.DataFrame:
 
 
 def corpus_input(
-    corpus: Any, source: Mapping[str, str], guide: Path, samples: Path | None = None
+    corpus: Any,
+    source: Mapping[str, str],
+    guide: Path,
+    samples: Path | None = None,
+    later: Path | None = None,
 ) -> Inputs:
     """The inputs from a corpus built in memory. Only its events, its capture days and the
     train-period rows of its outcome table are taken; no other outcome row is touched."""
@@ -1403,11 +1509,13 @@ def corpus_input(
         examples=tuple(guide_examples(guide.read_text(encoding="utf-8"))),
         source=dict(source),
         first_draw=first_draw_lists(samples),
+        dev_prompt=dev_prompt_list(later),
     )
 
 
 def build(inputs: Inputs) -> Built:
-    """The statement table, the eligible list and the counts report for one set of inputs."""
+    """The statement table, the eligible list, the item files and the counts report for one
+    set of inputs."""
     days = inputs.days
     first_seen = set(inputs.events["first_seen_date"].astype(str))
     unknown = sorted(first_seen - {d.isoformat() for d in days})
@@ -1423,6 +1531,10 @@ def build(inputs: Inputs) -> Built:
     first_draw = inputs.first_draw
     labelled = labelled_statements(inputs.events, (i for ids in first_draw.values() for i in ids))
     eligible = eligible_frame(table, excluded, labelled)
+    listed = inputs.dev_prompt
+    strangers = set(listed or ()) - set(table["statement_group_id"])
+    trial = [] if strangers else trial_ids(table, listed or ())
+    files = item_files(table, eligible, trial)
     statements_gz = forms.gz_bytes(table)
     eligible_csv = csv_text(eligible)
     merged = dict(zip(table["form"], table["merged_form"], strict=True))
@@ -1445,6 +1557,7 @@ def build(inputs: Inputs) -> Built:
             "merged_forms_in_use": {k: merged[k] for k in forms.FORM_NAMES if k in merged},
         },
         **counts(inputs.events, table, eligible, days, excluded, labelled, first_draw),
+        "cost_trial": trial_record(listed, trial, len(strangers)),
         "outputs": {
             STATEMENTS.name: {
                 "rows": len(table),
@@ -1457,9 +1570,11 @@ def build(inputs: Inputs) -> Built:
                 "sha256": sha16(eligible_csv.encode("utf-8")),
                 "ids_sha256": ids_sha256(eligible["statement_group_id"]),
             },
+            ITEMS.name: {name: record for name, (_, record) in files.items()},
         },
     }
-    return Built(table, eligible, report, statements_gz, eligible_csv)
+    item_text = {name: text for name, (text, _) in files.items()}
+    return Built(table, eligible, report, statements_gz, eligible_csv, item_text)
 
 
 def print_summary(report: Mapping[str, Any]) -> None:
@@ -1515,6 +1630,22 @@ def print_summary(report: Mapping[str, Any]) -> None:
             f"warning: {first['ids_not_in_the_statement_table']} ids of the first-draw lists are "
             "not in the statement table; the lists were drawn from another build"
         )
+    trial = report["cost_trial"]
+    if trial["written"]:
+        print(
+            f"cost trial: {trial['statements']} items, the first of the "
+            f"{trial['statements_on_the_list']} of {trial['list']} in draw_rank order"
+        )
+    elif not trial["list_read"]:
+        print(f"cost trial: no item file written, {trial['list']} is missing")
+    elif trial["ids_not_in_the_statement_table"]:
+        print(
+            f"warning: cost trial: no item file written, {trial['ids_not_in_the_statement_table']} "
+            f"ids of {trial['list']} are not in the statement table; the list was drawn from "
+            "another build"
+        )
+    else:
+        print(f"cost trial: no item file written, {trial['list']} names no statement")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -1527,11 +1658,15 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--captures", type=Path, help="build the corpus in memory from this folder")
     ap.add_argument("--guide", type=Path, default=GUIDE, help="the guide (its Appendix A)")
     ap.add_argument("--samples", type=Path, default=SAMPLES, help="folder of the first-draw lists")
-    ap.add_argument("--out", type=Path, default=OUT, help="folder of the three outputs")
-    ap.add_argument("--items", type=Path, help="also write the item files to this folder")
+    ap.add_argument(
+        "--samples-later", type=Path, default=SAMPLES_LATER, help="folder of the dev prompt list"
+    )
+    ap.add_argument("--out", type=Path, default=OUT, help="folder of the outputs")
+    ap.add_argument("--items", type=Path, help="folder of the item files (default: <out>/items)")
     ap.add_argument("--check", action="store_true", help="recompute and compare; write nothing")
     args = ap.parse_args(argv)
-    for path in (args.out, args.items, args.samples):
+    later = args.samples_later
+    for path in (args.out, args.items, args.samples, later):
         if path is not None:
             not_sealed(path)
     if sha16(Path(rules.__file__).read_bytes()) != forms.RULES_SHA256:
@@ -1546,32 +1681,45 @@ def main(argv: list[str] | None = None) -> int:
             "capture_manifest": "verified" if checked else "not checked",
         }
         built_corpus = corpus.build_corpus(args.captures)
-        inputs = corpus_input(built_corpus, source, not_sealed(args.guide), args.samples)
+        inputs = corpus_input(built_corpus, source, not_sealed(args.guide), args.samples, later)
     else:
-        inputs = files_input(args.events, args.outcomes, args.manifest, args.guide, args.samples)
+        inputs = files_input(
+            args.events, args.outcomes, args.manifest, args.guide, args.samples, later
+        )
     built = build(inputs)
-    paths = {name: args.out / name for name in (STATEMENTS.name, ELIGIBLE.name, COUNTS.name)}
+    folder = args.items or args.out / ITEMS.name
+    tables = {name: args.out / name for name in (STATEMENTS.name, ELIGIBLE.name, COUNTS.name)}
+    paths = tables | {name: folder / name for name in built.item_text}
     content = {
         STATEMENTS.name: built.statements_gz,
         ELIGIBLE.name: built.eligible_csv.encode("utf-8"),
         COUNTS.name: built.report_text.encode("utf-8"),
+        **{name: text.encode("utf-8") for name, text in built.item_text.items()},
     }
+    # a trial file that this build does not write is one an earlier run left behind
+    left = folder / f"{TRIAL}.jsonl"
+    left_behind = left.name not in built.item_text and left.exists()
     if args.check:
         stale = [
             paths[name].as_posix()
             for name in content
             if not paths[name].exists() or paths[name].read_bytes() != content[name]
         ]
+        stale += [left.as_posix()] if left_behind else []
         print("up to date" if not stale else "differs from a fresh run: " + ", ".join(stale))
         return 1 if stale else 0
     args.out.mkdir(parents=True, exist_ok=True)
+    folder.mkdir(parents=True, exist_ok=True)
     for name, data in content.items():
         paths[name].write_bytes(data)
+    if left_behind:
+        left.unlink()
     print_summary(built.report)
-    print("wrote " + ", ".join(p.as_posix() for p in paths.values()))
-    if args.items:
-        for name, record in write_items(built.table, built.eligible, args.items).items():
-            print(f"wrote {args.items / name}: {record['rows']} items, sha256 {record['sha256']}")
+    print("wrote " + ", ".join(p.as_posix() for p in tables.values()))
+    for name, record in built.report["outputs"][ITEMS.name].items():
+        print(f"wrote {folder / name}: {record['rows']} items, sha256 {record['sha256']}")
+    if left_behind:
+        print(f"removed {left}: the item file of an earlier run")
     return 0
 
 

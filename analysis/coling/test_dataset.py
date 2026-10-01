@@ -12,14 +12,18 @@ train rows only, no outcome cell or value of a test-period statement reaches any
 mix of horizon events is tabulated for train rows only); the eligible list, its subsets, the
 guide's examples, the harness's fixed test item and the first-draw lists that the reference check
 leaves out; the item files (schema of the reading harness, the same fields as the annotation
-sheets, probe items without a stated end, form, revision bucket or text); the lists (display-row
+sheets, probe items without a stated end, form, revision bucket or text, every key the one the
+harness loads, the folder and the names the launcher looks for, their hashes in the counts file);
+the cost-trial items (the first 20 of the dev prompt list by ``draw_rank``, in that order, dev
+statements only, no file when the list is missing or of another build, the same from a corpus
+in memory); the lists (display-row
 outcome, no late statement); the counts report; and the command line (reproducible bytes,
 ``--check``, refusal of the sealed folder).
 
-The last four tests read the files in the repository and are skipped when they are absent.
+The last five tests read the files in the repository and are skipped when they are absent.
 ``test_outputs_are_up_to_date`` fails until the dataset command is rerun after any change to
-``dataset.py``, ``forms.py``, ``rules.py``, the open tables, the guide's Appendix A or the
-first-draw lists.
+``dataset.py``, ``forms.py``, ``rules.py``, the open tables, the guide's Appendix A, the
+first-draw lists or the dev prompt list.
 
 Run::
 
@@ -276,6 +280,63 @@ def inputs(
         source={"events": "synthetic"},
         first_draw=first_draw or {},
     )
+
+
+RANKS = {f"V{k:02d}": k * 7 % 25 for k in range(1, 25)}
+"""The dev prompt list of the tests: 24 dev statements, with the ranks 1 to 24 in an order that
+is not the order of their ids."""
+BY_RANK = sorted(RANKS, key=lambda gid: RANKS[gid])
+
+
+def dev_events() -> list[dict[str, str]]:
+    """One dev-split statement at risk for every id of ``RANKS``; the first and the second are
+    dated on the first and on the last day of the dev split."""
+    days = {"V01": ("2021-01-01", "2021-02-01"), "V02": ("2022-12-31", "2023-01-13")}
+    return [
+        event(
+            "E9" + gid[1:],
+            gid,
+            days.get(gid, ("2021-02-10", "2021-03-15"))[0],
+            "Estimated Recovery: TBD",
+            days.get(gid, ("2021-02-10", "2021-03-15"))[1],
+        )
+        for gid in sorted(RANKS)
+    ]
+
+
+def trial_events() -> pd.DataFrame:
+    return pd.concat([synthetic_events(), pd.DataFrame(dev_events())], ignore_index=True)
+
+
+def trial_outcomes() -> pd.DataFrame:
+    rows = [
+        outcome_of(row, "censored", "2023-01-13", reason="end_of_train") for row in dev_events()
+    ]
+    return outcome_table(TRAIN_OUTCOMES + rows)
+
+
+def trial_inputs(dev_prompt: tuple[str, ...] | None) -> D.Inputs:
+    """The inputs of a build on the synthetic events with the dev statements of ``RANKS``."""
+    given = {**inputs().__dict__, "events": trial_events(), "outcomes": trial_outcomes()}
+    return D.Inputs(**{**given, "dev_prompt": dev_prompt})
+
+
+def write_dev_prompt(folder: Path, ranks: dict[str, int | str]) -> Path:
+    """The dev prompt list as the sampler writes it: sorted by statement, with the draw rank."""
+    rows = [
+        {
+            "event_id": "E9" + gid[1:],
+            "statement_group_id": gid,
+            "thread_id": "T9" + gid[1:],
+            "draw_rank": rank,
+            "period": "train",
+        }
+        for gid, rank in sorted(ranks.items())
+    ]
+    folder.mkdir(parents=True, exist_ok=True)
+    path = folder / f"sample_{D.TRIAL}.csv"
+    pd.DataFrame(rows).to_csv(path, index=False)
+    return path
 
 
 # --------------------------------------------------------------------------------------------
@@ -771,16 +832,22 @@ def test_no_test_period_outcome_reaches_any_output(tmp_path: Path) -> None:
     train = table[(table["period"] == "train") & (table["listing"] == "shortage")]
     assert (train["outcome"] != "").all()
     written = [gzip.decompress(built.statements_gz).decode(), built.eligible_csv, built.report_text]
-    assert all(MARKER not in text for text in written)
-    assert "no_followup" not in written[0]
+    written += list(built.item_text.values())
+    assert len(written) == 13 and all(MARKER not in text for text in written)
+    assert all("no_followup" not in text for text in written)
     # the same outputs as a build that was never given the test-period rows
     same = D.build(D.Inputs(**{**inputs(guide="").__dict__, "source": {"events": "in memory"}}))
     assert built.statements_gz == same.statements_gz and built.eligible_csv == same.eligible_csv
-    assert built.report_text == same.report_text
+    assert built.report_text == same.report_text and built.item_text == same.item_text
     # outcomes are counted for fit and dev only
     assert list(built.report["train"]) == list(D.TRAIN_SPLITS)
     assert set(D.OUTCOME_COLUMNS).isdisjoint(D.FIRST_SIGHT_COLUMNS)
     assert set(D.OUTCOME_COLUMNS).isdisjoint(D.ELIGIBLE_COLUMNS)
+    # an item holds no outcome field, of any period
+    assert set(D.OUTCOME_COLUMNS).isdisjoint(D.ENTRY_KEYS)
+    for text in built.item_text.values():
+        for line in text.splitlines():
+            assert set(json.loads(line)) <= set(D.ENTRY_KEYS)
 
 
 def test_eligibility_and_display_rows_do_not_depend_on_outcomes() -> None:
@@ -797,6 +864,25 @@ def test_eligibility_and_display_rows_do_not_depend_on_outcomes() -> None:
     assert not a.table["outcome"].equals(b.table["outcome"])
     for key in ("e3", "eligible", "secondary_lists_test", "subsets", "statements", "events"):
         assert a.report[key] == b.report[key]
+    # nor do the item files; only the list of the scoreable dev statements may
+    assert list(a.item_text) == list(b.item_text) and len(a.item_text) == 10
+    for name in a.item_text:
+        assert name == "dev_scoreable.jsonl" or a.item_text[name] == b.item_text[name]
+    # the cost-trial items are dev statements: their outcomes are open, and none is read
+    c = D.build(trial_inputs(tuple(BY_RANK)))
+    other = [
+        outcome_of(row, "censored", "2023-01-13", reason="end_of_train")
+        if row["statement_group_id"] == "V02"
+        else outcome_of(row, "recovered", row["first_seen_date"], "2023-01-13")
+        for row in dev_events()
+    ]
+    given = trial_inputs(tuple(BY_RANK)).__dict__ | {
+        "outcomes": outcome_table(TRAIN_OUTCOMES + other)
+    }
+    d = D.build(D.Inputs(**given))
+    assert not c.table["outcome"].equals(d.table["outcome"])
+    assert c.item_text["dev_prompt.jsonl"] == d.item_text["dev_prompt.jsonl"]
+    assert c.report["cost_trial"] == d.report["cost_trial"]
 
 
 def test_the_sealed_folder_is_refused(tmp_path: Path) -> None:
@@ -810,6 +896,11 @@ def test_the_sealed_folder_is_refused(tmp_path: Path) -> None:
         D.main(["--out", str(sealed)])
     with pytest.raises(SystemExit, match="sealed"):
         D.main(["--samples", str(sealed), "--out", str(tmp_path)])
+    with pytest.raises(SystemExit, match="sealed"):
+        D.main(["--items", str(sealed / "items"), "--out", str(tmp_path)])
+    with pytest.raises(SystemExit, match="sealed"):
+        D.main(["--samples-later", str(sealed), "--out", str(tmp_path)])
+    assert sorted(p.name for p in tmp_path.iterdir()) == ["sealed"] and not list(sealed.iterdir())
     assert D.not_sealed(tmp_path / "out") == tmp_path / "out"
 
 
@@ -1098,6 +1189,212 @@ def test_write_items_writes_every_list(tmp_path: Path) -> None:
     )
 
 
+def test_items_keep_the_order_given_when_asked() -> None:
+    table = full_table()
+    ids = ["T03", "S01", "S02", "S01"]
+    assert [r["item_id"] for r in D.items(table, ids)] == ["S01", "S02", "T03"]
+    assert [r["item_id"] for r in D.items(table, ids, in_order=True)] == ["T03", "S01", "S02"]
+    with pytest.raises(ValueError, match="not in the statement table"):
+        D.items(table, ["S01", "nowhere"], in_order=True)
+
+
+def test_dev_prompt_list_is_read_in_rank_order(tmp_path: Path) -> None:
+    assert D.dev_prompt_list(None) is None and D.dev_prompt_list(tmp_path) is None
+    path = write_dev_prompt(tmp_path, RANKS)
+    assert path.name == "sample_dev_prompt.csv"
+    listed = D.dev_prompt_list(tmp_path)
+    assert listed == tuple(BY_RANK) and listed != tuple(sorted(RANKS))
+    # ranks are numbers: 9 comes before 10
+    assert [RANKS[gid] for gid in listed] == list(range(1, 25))
+    assert listed[8:10] == ("V12", "V05")
+    # whatever the order of the rows
+    frame = D.read_table(path)
+    frame.iloc[::-1].to_csv(path, index=False)
+    assert D.dev_prompt_list(tmp_path) == listed
+    # an empty list is a list that was read
+    path.write_text("statement_group_id,draw_rank\n", encoding="utf-8")
+    assert D.dev_prompt_list(tmp_path) == ()
+    for ranks, message in (
+        ({"V01": 1, "V02": 1}, "repeats a draw_rank"),
+        ({"V01": 1, "V02": ""}, "whole number"),
+        ({"V01": 1, "V02": "2.5"}, "whole number"),
+    ):
+        write_dev_prompt(tmp_path, ranks)
+        with pytest.raises(ValueError, match=message):
+            D.dev_prompt_list(tmp_path)
+    path.write_text("statement_group_id,draw_rank\nV01,1\nV01,2\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="repeats a draw_rank or a statement"):
+        D.dev_prompt_list(tmp_path)
+    path.write_text("statement_group_id\nV01\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="no draw_rank column"):
+        D.dev_prompt_list(tmp_path)
+
+
+def test_trial_items_are_the_first_twenty_by_rank(tmp_path: Path) -> None:
+    from analysis.coling import read as R
+
+    built = D.build(trial_inputs(tuple(BY_RANK)))
+    assert D.TRIAL == "dev_prompt" and D.TRIAL_SIZE == 20
+    first = BY_RANK[:20]
+    assert first != sorted(first) and set(BY_RANK[20:]) == {"V03", "V07", "V14", "V21"}
+    rows = [json.loads(line) for line in built.item_text["dev_prompt.jsonl"].splitlines()]
+    assert [r["item_id"] for r in rows] == first
+    assert all(tuple(sorted(r)) == tuple(sorted(D.ENTRY_KEYS)) for r in rows)
+    assert {r["split"] for r in rows} == {"dev"}
+    # every other list stays sorted by id
+    for name, text in built.item_text.items():
+        ids = [json.loads(line)["item_id"] for line in text.splitlines()]
+        assert name == "dev_prompt.jsonl" or ids == sorted(ids)
+    written = D.write_items(built.table, built.eligible, tmp_path, first)
+    assert written == built.report["outputs"]["items"]
+    assert (tmp_path / "dev_prompt.jsonl").read_text() == built.item_text["dev_prompt.jsonl"]
+    loaded = R.load_items(tmp_path / "dev_prompt.jsonl")
+    assert [i.item_id for i in loaded] == first
+    # dev statements, so train-period items: none dated in the test period, the two boundary
+    # days of the dev split included
+    assert {i.period for i in loaded} == {"train"}
+    days = sorted(i.date_of_update for i in loaded)
+    assert days[0] == "2021-01-01" and days[-1] == "2022-12-31" < R.TEST_START.isoformat()
+    assert built.report["cost_trial"] == {
+        "use": "cost trial: the first 20 of the dev prompt list, in draw_rank order",
+        "list": "sample_dev_prompt.csv",
+        "list_read": True,
+        "statements_on_the_list": 24,
+        "ids_not_in_the_statement_table": 0,
+        "requested": 20,
+        "file": "dev_prompt.jsonl",
+        "written": True,
+        "statements": 20,
+        "ids_sha256": D.ids_sha256(first),
+    }
+    record = built.report["outputs"]["items"]["dev_prompt.jsonl"]
+    assert record == {
+        "rows": 20,
+        "probe": False,
+        "sha256": D.sha16((tmp_path / "dev_prompt.jsonl").read_bytes()),
+        "item_ids_sha256": R._ids_sha256(first),
+    }
+    # the list changes nothing else: the same tables and the same other item files without it
+    without = D.build(trial_inputs(None))
+    assert without.statements_gz == built.statements_gz
+    assert without.eligible_csv == built.eligible_csv
+    assert without.item_text == {
+        k: v for k, v in built.item_text.items() if k != "dev_prompt.jsonl"
+    }
+    # a list shorter than the trial is taken whole, in its order
+    short = D.build(trial_inputs(tuple(BY_RANK[:5])))
+    assert [
+        json.loads(line)["item_id"] for line in short.item_text["dev_prompt.jsonl"].splitlines()
+    ] == BY_RANK[:5]
+    assert short.report["cost_trial"]["statements"] == 5
+
+
+def test_no_trial_file_without_the_list_or_with_a_list_of_another_build() -> None:
+    built = D.build(trial_inputs(None))
+    assert "dev_prompt.jsonl" not in built.item_text
+    assert "dev_prompt.jsonl" not in built.report["outputs"]["items"]
+    assert len(built.item_text) == 10 == len(built.report["outputs"]["items"])
+    trial = built.report["cost_trial"]
+    assert trial["list_read"] is False and trial["written"] is False
+    assert trial["statements"] == 0 == trial["statements_on_the_list"]
+    assert trial["ids_sha256"] is None and trial["file"] == "dev_prompt.jsonl"
+    # a list that names a statement the table does not hold was drawn from another build
+    stranger = D.build(trial_inputs((*BY_RANK[:19], "V99", *BY_RANK[19:])))
+    assert "dev_prompt.jsonl" not in stranger.item_text
+    trial = stranger.report["cost_trial"]
+    assert trial["list_read"] is True and trial["written"] is False
+    assert trial["ids_not_in_the_statement_table"] == 1 and trial["statements_on_the_list"] == 25
+    # also when the stranger is past the first twenty
+    assert "dev_prompt.jsonl" not in D.build(trial_inputs((*BY_RANK, "V99"))).item_text
+    empty = D.build(trial_inputs(()))
+    assert "dev_prompt.jsonl" not in empty.item_text
+    assert empty.report["cost_trial"]["list_read"] is True
+    assert empty.report["cost_trial"]["written"] is False
+
+
+def test_trial_items_are_dev_statements_only() -> None:
+    table = D.build(trial_inputs(None)).table
+    assert D.trial_ids(table, BY_RANK) == BY_RANK[:20]
+    # S07 and S10 are dev statements; S01 is a fit statement, T01 a test one, L01 a late one
+    assert D.trial_ids(table, ["S10", "S07"]) == ["S10", "S07"]
+    for other in ("T01", "L01", "S01"):
+        listed = (*BY_RANK[:4], other, *BY_RANK[4:])
+        with pytest.raises(ValueError, match=rf"dev-split statements only.*\['{other}'\]"):
+            D.trial_ids(table, listed)
+        with pytest.raises(ValueError, match="dev-split statements only"):
+            D.build(trial_inputs(listed))
+    # a dev split that a wrong table calls otherwise is still held to the date
+    wrong = table.copy()
+    wrong.loc[wrong["statement_group_id"] == "T01", "split"] = "dev"
+    with pytest.raises(ValueError, match="dev-split statements only"):
+        D.trial_ids(wrong, ["T01"])
+    # the first day of the test period is refused, the day before it is not
+    first_day = wrong["statement_group_id"] == "V01"
+    wrong.loc[first_day, "event_date"] = "2023-01-01"
+    with pytest.raises(ValueError, match="dev-split statements only"):
+        D.trial_ids(wrong, ["V01"])
+    wrong.loc[first_day, "event_date"] = "2022-12-31"
+    assert D.trial_ids(wrong, ["V01"]) == ["V01"]
+    # only the statements that are written are held to it: the list is cut at twenty first
+    tail = D.build(trial_inputs((*BY_RANK[:20], "T01")))
+    assert "T01" not in tail.item_text["dev_prompt.jsonl"]
+    assert tail.report["cost_trial"]["statements"] == 20
+
+
+def test_item_files_hold_the_keys_the_harness_loads(tmp_path: Path) -> None:
+    from dataclasses import fields
+
+    from analysis.coling import read as R
+
+    built = D.build(trial_inputs(tuple(BY_RANK)))
+    written = D.write_items(built.table, built.eligible, tmp_path, BY_RANK[:20])
+    assert sorted(written) == sorted(p.name for p in tmp_path.iterdir()) and len(written) == 11
+    loaded_fields = {f.name for f in fields(R.ReadItem)}
+    # what the builder writes and the harness does not load, and the reverse
+    assert set(D.ENTRY_KEYS) - loaded_fields == {"display_event_id", "split"}
+    assert loaded_fields - set(D.ENTRY_KEYS) == {"mask_terms"}
+    assert set(D.PROBE_KEYS) < set(D.ENTRY_KEYS) and not set(D.PROBE_KEYS) - loaded_fields
+    for name, record in written.items():
+        path = tmp_path / name
+        rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
+        loaded = R.load_items(path)
+        assert len(rows) == len(loaded) == record["rows"]
+        keys = D.PROBE_KEYS if record["probe"] else D.ENTRY_KEYS
+        for row, item in zip(rows, loaded, strict=True):
+            assert sorted(row) == sorted(keys) and not set(row) & set(R._ALIASES)
+            # every key the harness loads comes back as it was written
+            assert {k: getattr(item, k) for k in row if k in loaded_fields} == {
+                k: v for k, v in row.items() if k in loaded_fields
+            }
+            assert item.mask_terms == ()
+        assert record["item_ids_sha256"] == R._ids_sha256(i.item_id for i in loaded)
+        assert record["sha256"] == D.sha16(path.read_bytes())
+    assert sum(record["probe"] for record in written.values()) == 1
+
+
+def test_the_launcher_finds_the_item_files(tmp_path: Path) -> None:
+    launch = pytest.importorskip("analysis.coling.launch")
+    built = D.build(trial_inputs(tuple(BY_RANK)))
+    records = D.write_items(built.table, built.eligible, tmp_path, BY_RANK[:20])
+    assert launch.ITEMS_DIR == D.ITEMS
+    trial = launch.LIST_BY_KEY["trial"]
+    assert trial.stem == D.TRIAL and trial.limit == D.TRIAL_SIZE == trial.planned
+    wanted = {s.key: s for s in launch.LISTS if s.source.startswith("dataset.py")} | {
+        "trial": trial
+    }
+    assert len(wanted) == 10
+    options = launch.default_options(tmp_path)
+    for spec in wanted.values():
+        record, ids = launch.list_record(spec, options)
+        mine = records[f"{spec.stem}.jsonl"]
+        assert record["on_disk"] and record["limit"] is None
+        assert record["items"] == record["items_in_file"] == mine["rows"] == len(ids)
+        assert record["sha256"][:16] == mine["sha256"]
+        assert record["item_ids_sha256"] == mine["item_ids_sha256"]
+    record, ids = launch.list_record(trial, options)
+    assert ids == BY_RANK[:20] and record["sealed_items"] == 0
+
+
 # --------------------------------------------------------------------------------------------
 # Counts
 # --------------------------------------------------------------------------------------------
@@ -1249,20 +1546,25 @@ def test_build_checks_the_capture_days() -> None:
 # --------------------------------------------------------------------------------------------
 
 
-def write_inputs(folder: Path) -> list[str]:
+def write_inputs(folder: Path, trial: bool = False) -> list[str]:
+    """The input files of a run and its flags; ``trial`` adds the dev statements of ``RANKS``.
+    The dev prompt list is looked for under ``<folder>/later``, which starts empty."""
     folder.mkdir(parents=True, exist_ok=True)
-    synthetic_events().to_csv(folder / "events.csv.gz", index=False, compression=F.GZIP)
-    outcome_table(TRAIN_OUTCOMES).to_csv(
-        folder / "outcomes_train.csv.gz", index=False, compression=F.GZIP
-    )
+    events = trial_events() if trial else synthetic_events()
+    outcomes = trial_outcomes() if trial else outcome_table(TRAIN_OUTCOMES)
+    events.to_csv(folder / "events.csv.gz", index=False, compression=F.GZIP)
+    outcomes.to_csv(folder / "outcomes_train.csv.gz", index=False, compression=F.GZIP)
     stamps = [d.replace("-", "") + "120000" for d in DAYS]
     manifest = pd.DataFrame({"file": [s + ".csv" for s in stamps], "timestamp": stamps})
     manifest.assign(bytes=1, sha256="0").to_csv(folder / "capture_manifest.csv", index=False)
     (folder / "guide.md").write_text(GUIDE, encoding="utf-8")
     (folder / "samples").mkdir(exist_ok=True)
+    (folder / "later").mkdir(exist_ok=True)
     return [
         "--samples",
         str(folder / "samples"),
+        "--samples-later",
+        str(folder / "later"),
         "--events",
         str(folder / "events.csv.gz"),
         "--outcomes",
@@ -1286,9 +1588,20 @@ def test_main_writes_the_outputs_reproducibly(
     names = (D.STATEMENTS.name, D.ELIGIBLE.name, D.COUNTS.name)
     for name in names:
         assert (out_a / name).read_bytes() == (out_b / name).read_bytes()
-    assert sorted(p.name for p in out_a.iterdir()) == sorted(names)
+    # the item files go to <out>/items, or to the folder --items names and then nowhere else
+    assert sorted(p.name for p in out_a.iterdir()) == sorted((*names, "items"))
+    assert sorted(p.name for p in out_b.iterdir()) == sorted(names)
     assert (tmp_path / "items" / "subset_probe.jsonl").exists()
+    files = sorted(p.name for p in (out_a / "items").iterdir())
+    assert files == sorted(p.name for p in (tmp_path / "items").iterdir()) and len(files) == 10
+    for name in files:
+        assert (out_a / "items" / name).read_bytes() == (tmp_path / "items" / name).read_bytes()
+        assert f"wrote {out_a / 'items' / name}: " in printed
+    assert "cost trial: no item file written, sample_dev_prompt.csv is missing" in printed
     report = json.loads((out_a / D.COUNTS.name).read_text())
+    assert sorted(report["outputs"]["items"]) == files
+    for name, record in report["outputs"]["items"].items():
+        assert record["sha256"] == D.sha16((out_a / "items" / name).read_bytes())
     table = D.load_statements(out_a / D.STATEMENTS.name)
     assert list(table.columns) == list(D.COLUMNS) and len(table) == 23
     assert table["statement_group_id"].tolist() == sorted(table["statement_group_id"])
@@ -1338,6 +1651,145 @@ def test_check_detects_a_stale_output(tmp_path: Path, capsys: pytest.CaptureFixt
     assert D.main([*args, "--check"]) == 0
     listed = D.read_table(path).set_index("statement_group_id")
     assert listed.loc["T09", ["probe", "reference_check"]].tolist() == ["1", "0"]
+
+
+def test_main_writes_the_trial_file_and_check_covers_the_item_files(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    from analysis.coling import read as R
+
+    out = tmp_path / "out"
+    args = [*write_inputs(tmp_path / "in", trial=True), "--out", str(out)]
+    write_dev_prompt(tmp_path / "in" / "later", RANKS)
+    assert D.main(args) == 0
+    printed = capsys.readouterr().out
+    assert "cost trial: 20 items, the first of the 24 of sample_dev_prompt.csv" in printed
+    assert f"wrote {out / 'items' / 'dev_prompt.jsonl'}: 20 items" in printed
+    loaded = R.load_items(out / "items" / "dev_prompt.jsonl")
+    assert [i.item_id for i in loaded] == BY_RANK[:20]
+    assert all(i.period == "train" and i.date_of_update >= "2021-01-01" for i in loaded)
+    report = json.loads((out / D.COUNTS.name).read_text())
+    assert report["cost_trial"]["written"] is True and report["cost_trial"]["statements"] == 20
+    files = sorted(p.name for p in (out / "items").iterdir())
+    assert files == sorted(report["outputs"]["items"]) and len(files) == 11
+    for name, record in report["outputs"]["items"].items():
+        assert record["sha256"] == D.sha16((out / "items" / name).read_bytes())
+    assert D.main([*args, "--check"]) == 0
+    # an item file that is changed, or gone, is stale
+    for name in ("dev_prompt.jsonl", "e3_eligible.jsonl"):
+        path = out / "items" / name
+        kept = path.read_bytes()
+        path.write_bytes(kept + b"\n")
+        assert D.main([*args, "--check"]) == 1
+        assert f"differs from a fresh run: {path.as_posix()}\n" in capsys.readouterr().out
+        path.unlink()
+        assert D.main([*args, "--check"]) == 1
+        path.write_bytes(kept)
+        assert D.main([*args, "--check"]) == 0
+    # --check wrote nothing and the same run with --items names the other folder
+    assert D.main([*args, "--items", str(tmp_path / "elsewhere"), "--check"]) == 1
+    assert not (tmp_path / "elsewhere").exists()
+    # a list with another order of the same statements is another trial file
+    swapped = RANKS | {BY_RANK[0]: 2, BY_RANK[1]: 1}
+    write_dev_prompt(tmp_path / "in" / "later", swapped)
+    assert D.main([*args, "--check"]) == 1
+    assert D.main(args) == 0
+    again = [i.item_id for i in R.load_items(out / "items" / "dev_prompt.jsonl")]
+    assert again == [BY_RANK[1], BY_RANK[0], *BY_RANK[2:20]]
+
+
+def test_main_without_the_dev_prompt_list_writes_no_trial_file(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    out = tmp_path / "out"
+    args = [*write_inputs(tmp_path / "in", trial=True), "--out", str(out)]
+    assert D.main(args) == 0  # the list is missing: the build goes through
+    printed = capsys.readouterr().out
+    assert "cost trial: no item file written, sample_dev_prompt.csv is missing" in printed
+    trial_file = out / "items" / "dev_prompt.jsonl"
+    assert not trial_file.exists() and len(list((out / "items").iterdir())) == 10
+    report = json.loads((out / D.COUNTS.name).read_text())
+    assert report["cost_trial"]["list_read"] is False
+    assert report["cost_trial"]["written"] is False and report["cost_trial"]["statements"] == 0
+    assert "dev_prompt.jsonl" not in report["outputs"]["items"]
+    assert D.main([*args, "--check"]) == 0
+    # the list appears: stale until the command is run again
+    listed = write_dev_prompt(tmp_path / "in" / "later", RANKS)
+    assert D.main([*args, "--check"]) == 1 and not trial_file.exists()
+    assert D.main(args) == 0 and trial_file.exists()
+    assert D.main([*args, "--check"]) == 0
+    # the list goes: the trial file of the earlier run is stale, and the next run removes it
+    listed.unlink()
+    capsys.readouterr()
+    assert D.main([*args, "--check"]) == 1 and trial_file.exists()
+    assert (
+        f"differs from a fresh run: {out / D.COUNTS.name}, {trial_file}\n"
+        in capsys.readouterr().out
+    )
+    assert D.main(args) == 0 and not trial_file.exists()
+    assert f"removed {trial_file}: the item file of an earlier run" in capsys.readouterr().out
+    assert len(list((out / "items").iterdir())) == 10
+    assert D.main([*args, "--check"]) == 0
+    # a list of another build: a warning, no trial file, and the build goes through
+    write_dev_prompt(tmp_path / "in" / "later", RANKS | {"V99": 25})
+    assert D.main(args) == 0 and not trial_file.exists()
+    printed = capsys.readouterr().out
+    assert "warning: cost trial: no item file written, 1 ids of sample_dev_prompt.csv" in printed
+    report = json.loads((out / D.COUNTS.name).read_text())
+    assert report["cost_trial"]["ids_not_in_the_statement_table"] == 1
+    # a list with no row was read and names nothing
+    listed.write_text("statement_group_id,draw_rank\n", encoding="utf-8")
+    assert D.main(args) == 0 and not trial_file.exists()
+    printed = capsys.readouterr().out
+    assert "cost trial: no item file written, sample_dev_prompt.csv names no statement" in printed
+    assert json.loads((out / D.COUNTS.name).read_text())["cost_trial"]["list_read"] is True
+    # a list with a test-period statement among its first twenty stops the build
+    write_dev_prompt(tmp_path / "in" / "later", RANKS | {"T01": 0})
+    with pytest.raises(ValueError, match="dev-split statements only"):
+        D.main(args)
+    assert not trial_file.exists()
+    # the sealed folder is refused for the list as for every other path
+    with pytest.raises(SystemExit, match="never reads the sealed folder"):
+        D.main([*args, "--samples-later", str(tmp_path / "sealed" / "later")])
+
+
+def test_a_corpus_in_memory_gives_the_same_trial_file(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    dev = [outcome_of(row, "censored", "2023-01-13", reason="end_of_train") for row in dev_events()]
+    corpus = SimpleNamespace(
+        events=trial_events(),
+        outcomes=C.add_group_outcomes(pd.DataFrame(TRAIN_OUTCOMES + dev + TEST_OUTCOMES)),
+        captures=SimpleNamespace(dates=[pd.Timestamp(d) for d in DAYS]),
+    )
+    write_inputs(tmp_path / "in", trial=True)
+    later, guide = tmp_path / "in" / "later", tmp_path / "in" / "guide.md"
+    source = {"events": "in memory"}
+    assert D.corpus_input(corpus, source, guide).dev_prompt is None
+    assert D.corpus_input(corpus, source, guide, None, later).dev_prompt is None
+    write_dev_prompt(later, RANKS)
+    given = D.corpus_input(corpus, source, guide, None, later)
+    assert given.dev_prompt == tuple(BY_RANK)
+    files = D.build(given).item_text
+    assert files == D.build(trial_inputs(tuple(BY_RANK))).item_text and len(files) == 11
+    # the command line: with --captures the list comes from --samples-later all the same
+    monkeypatch.setattr(C, "verify_manifest", lambda folder: True)
+    monkeypatch.setattr(C, "build_corpus", lambda folder: corpus)
+    out, captures = tmp_path / "out", tmp_path / "captures"
+    flags = ["--captures", str(captures), "--guide", str(guide), "--out", str(out)]
+    flags += ["--samples", str(tmp_path / "in" / "samples"), "--samples-later", str(later)]
+    assert D.main(flags) == 0
+    assert "cost trial: 20 items, the first of the 24" in capsys.readouterr().out
+    assert sorted(p.name for p in (out / "items").iterdir()) == sorted(files)
+    for name, text in files.items():
+        assert (out / "items" / name).read_text(encoding="utf-8") == text
+        assert MARKER not in text
+    report = json.loads((out / D.COUNTS.name).read_text())
+    assert report["inputs"]["events"] == f"built in memory from {captures.as_posix()}"
+    assert report["cost_trial"]["written"] is True and report["cost_trial"]["statements"] == 20
+    assert D.main([*flags, "--check"]) == 0
+    with pytest.raises(SystemExit, match="never reads the sealed folder"):
+        D.main([*flags, "--samples-later", str(tmp_path / "sealed")])
 
 
 # --------------------------------------------------------------------------------------------
@@ -1397,6 +1849,38 @@ def test_written_eligible_list_matches_the_table(
     assert report["outputs"][D.STATEMENTS.name]["sha256"] == D.sha16(D.STATEMENTS.read_bytes())
     for subset in D.SUBSETS:
         assert int(listed[subset.name].astype(int).sum()) == min(subset.size, len(ids))
+
+
+def test_written_trial_items_are_the_first_of_the_dev_prompt_list(
+    real_outputs: tuple[pd.DataFrame, pd.DataFrame, dict],
+) -> None:
+    from analysis.coling import read as R
+
+    table, _, report = real_outputs
+    path = D.ITEMS / f"{D.TRIAL}.jsonl"
+    listed = D.dev_prompt_list(D.SAMPLES_LATER)
+    if listed is None or not path.exists():
+        pytest.skip("no dev prompt list or no cost-trial item file on disk")
+    loaded = R.load_items(path)
+    ids = [i.item_id for i in loaded]
+    assert ids == list(listed[: D.TRIAL_SIZE]) and len(listed) >= D.TRIAL_SIZE
+    assert {i.period for i in loaded} == {"train"}
+    # dev statements at risk, shown by the row the sampler listed: the list is of this build
+    rows = table.set_index("statement_group_id").loc[ids]
+    drawn = D.read_table(D.SAMPLES_LATER / f"sample_{D.TRIAL}.csv").set_index("statement_group_id")
+    other_build = "the dev prompt list was drawn on another build of the events table"
+    assert set(rows["split"]) == {"dev"}, other_build
+    assert D.true(rows["at_risk_B"]).all(), other_build
+    assert drawn.loc[ids, "event_id"].tolist() == rows["event_id"].tolist(), other_build
+    # none is a statement that people label: the first draw and the train-half outcome audit
+    labelled = {i for members in D.first_draw_lists(D.SAMPLES).values() for i in members}
+    audited = D.OUT / "audit_outcomes" / "outcome_train_sample.csv"
+    if audited.exists():
+        labelled |= set(pd.read_csv(audited, dtype=str, usecols=["statement_group_id"]).iloc[:, 0])
+    assert not labelled & set(ids)
+    record = report["outputs"]["items"][path.name]
+    assert record["rows"] == len(ids) and record["sha256"] == D.sha16(path.read_bytes())
+    assert report["cost_trial"]["ids_sha256"] == D.ids_sha256(ids) == record["item_ids_sha256"]
 
 
 def test_outputs_are_up_to_date(real_outputs: tuple[pd.DataFrame, pd.DataFrame, dict]) -> None:
