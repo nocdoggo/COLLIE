@@ -87,9 +87,10 @@ carry the registered text.
 16. **Hashed at registration:** the form classifier, the calibrator and both gradient-boosted
     baselines (code). Fitted artefacts are hashed at F1. If the text model is not ready, its code
     hash moves to F1 by an edit before the push.
-17. **If `deepseek-v3` cannot be pinned** to a dated checkpoint or has no documented cutoff: it
-    stays a primary with its cutoff bounded by its release month, and the plan says "bounded",
-    not "documented". *Owner to confirm.*
+17. **`deepseek-v3` [owner, 1 Oct].** Its maker documents no cutoff and the route has no dated
+    id: it stays a primary with its cutoff bounded by its release month, and the plan says
+    "bounded", not "documented". Its endpoint is `deepinfra/fp4` (not `streamlake`). The cutoff
+    table is fixed in the counts-only code at the freeze and does not change after it.
 18. **Anonymity [owner, 1 Oct].** The repository stays public under the owner's handle; ARR has
     no anonymity period, and the submission does not link to it. The registration is evidenced
     by an anonymised copy of the registered plan and guide in the supplement, with their sha256
@@ -110,3 +111,13 @@ carry the registered text.
     taken from statements dated 2023-01-01 or later, text only, because the labelling samples
     use every train statement of that form. Calls on those seeds wait for F1. The other forms'
     seeds stay in the train period.
+23. **Old archive [owner, 1 Oct].** The untracked archive of 29 September, which may hold a
+    copy of the sealed outcomes, was moved unopened under the sealed folder.
+24. **E6 route extension [owner, 1 Oct].** A route carried on at its stated end under a new TMI
+    ID counts as extended; the same-TMI-ID reading is a registered sensitivity analysis. The
+    plan discloses that the wider reading was drafted after the rate under the stricter one
+    was seen.
+25. **E6 gate rule [owner, 1 Oct].** At least 150 links checked, 30 per term or all of a term's
+    links when it has fewer, and at least 90% of all checked links correct, with no minimum
+    per term. A link on both sheets is correct only when both checkers say so, and "unclear"
+    is not correct.

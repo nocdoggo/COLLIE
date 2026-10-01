@@ -28,7 +28,7 @@ again, compare, and change the retrieval date. Endpoint lists, uptimes and price
 move from day to day; cutoffs, release dates and ids should not.
 
 **Owner review.** DECISIONS 14 asks the owner to review the two primaries. The lines to re-open
-are marked **(primary)**; the open choice for `deepseek-v3` is in section 5.
+are marked **(primary)**; the owner's choice for `deepseek-v3` is in section 5.
 
 ## 1. Summary
 
@@ -415,7 +415,8 @@ What remains **UNVERIFIED**:
 | Price per 1M | 0.32 / 0.89 | 0.2574 / 1.0287 (the plan's price; it includes a 10% discount with no stated end) |
 | One-day uptime on 2026-10-01 | 94.3 | 98.4 |
 
-Recommended: `deepinfra/fp4`, because the checkpoint and the precision can both be stated and
+**Chosen by the owner on 1 October: `deepinfra/fp4`.** It was the recommended endpoint,
+because the checkpoint and the precision can both be stated and
 checked, which is what the memorisation controls and the paper's model table need. Its uptime
 has to be tried in the cost trial; with fallbacks off, a failed request is an error to retry,
 not a silent switch. If the owner prefers `streamlake`, the plan must say that the precision is
@@ -573,7 +574,7 @@ Values for the table of the eight readers (price date 2026-10-01 for every row):
 | Model | Model id sent | Endpoint (`provider.order`) | `quantizations` | $/1M in | $/1M out |
 |---|---|---|---|---|---|
 | llama-3.3-70b | `meta-llama/llama-3.3-70b-instruct` | `deepinfra/turbo` | `fp8` | 0.10 | 0.32 |
-| deepseek-v3 | `deepseek/deepseek-chat` | `deepinfra/fp4` (owner to confirm) | `fp4` | 0.32 | 0.89 |
+| deepseek-v3 | `deepseek/deepseek-chat` | `deepinfra/fp4` (owner's choice, 1 October) | `fp4` | 0.32 | 0.89 |
 | qwen-2.5-7b | `qwen/qwen-2.5-7b-instruct` | `phala` | left out | 0.10 | 0.20 |
 | gemma-3-27b | `google/gemma-3-27b-it` | `deepinfra/fp8` | `fp8` | 0.08 | 0.16 |
 | gpt-oss-20b | `openai/gpt-oss-20b` | `deepinfra/bf16` | `bf16` | 0.03 | 0.14 |

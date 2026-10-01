@@ -478,7 +478,9 @@ The review of 1 October sorts them by who has to decide, and when:
    no cancellation in between and no gap (grace 0). Alternatives: a grace of 15 or 30 minutes
    (3 or 9 outcomes); or count any new stop that starts within 30 minutes of the stated end
    (flag `new_stop_30`, 26 outcomes), which also covers a stop cancelled and issued again.
-3. **What "extended" means for a route.** Draft: the same TMI ID and name, or the same name
+3. **What "extended" means for a route.** Settled by the owner on 1 October, before the gate
+   sheets went out: the draft stands, and the alternative is registered as a sensitivity
+   analysis. Draft: the same TMI ID and name, or the same name
    carried on under a new TMI ID without a break (5.1). Alternative: the same TMI ID only,
    which is what the issuer calls an extension (`REPLACES/EXTENDS ADVZY n` keeps the TMI ID).
    16 outcomes differ, 14 of them among the 24 route:HIGH statements (section 7), so this
@@ -508,10 +510,10 @@ The review of 1 October sorts them by who has to decide, and when:
 12. **Minimum size for a per-term result.** The rare terms (gs:HIGH, plan:EXPECTED, route:HIGH)
     may stay small in the test months. Draft: report a term on its own only with at least 30
     scored statements on at least 10 days in the test months; pool the others by family.
-13. **Gate threshold and scoring.** 90% is a draft value (PLAN E6, owner to confirm). Also
-    draft: a link checked by both is correct only when both say `ok`; `unclear` is not correct;
-    the pass rule is on the overall share, not per term; the ten excluded statements are
-    reported apart.
+13. **Gate threshold and scoring.** Settled by the owner on 1 October, before any verdict: 90%
+    of all checked links; a link checked by both is correct only when both say `ok`; `unclear`
+    is not correct; the pass rule is on the overall share, not per term; the ten excluded
+    statements are reported apart.
 14. **Boundary of the test months.** Draft: statements whose outcome needs 1 October are
     excluded. Alternative: download 1 October (possible from 2 October 0000Z) as a look-ahead
     day that gives no statement.

@@ -638,7 +638,9 @@ recorded in F1. Reasoning and thinking tokens are billed as output.
     the route to the December 2024 weights (`MODELS.md` section 5), which is as far as a check
     without a call can go. The maker no longer serves that model itself.
 - **deepseek-v3 stays a primary** under these conditions, its cutoff is bounded by its release
-  month, and every statement about it says "bounded". [owner to confirm]
+  month, and every statement about it says "bounded". The owner chose the endpoint
+  `deepinfra/fp4` over `streamlake` on 1 October, because its host names the checkpoint and
+  states the precision (`MODELS.md` section 5).
 - **The secondaries.** They span size, openness and recency; they are reported descriptively
   along those axes.
 - **Parse failures.**
@@ -941,8 +943,17 @@ parsed or linked. The amendment fixes:
 **Linker gate.** On the development months: at least 150 links checked by hand, the required
 number for every term (30, or all of a term's links when it has fewer), and at least 90% of the
 checked links correct. A1 and A2 check the links on sheets drawn with seed 20261001; a link
-checked by both is correct only when both say so, and "unclear" is not correct. The 90%
-threshold is a draft value. [owner to confirm]
+checked by both is correct only when both say so, and "unclear" is not correct. The rule is on
+the share of all checked links, with no further minimum per term. The owner fixed this rule on
+1 October, before any verdict was given.
+
+**What "extended" means for a route** (owner decision, 1 October, before the gate sheets went
+out). A route is extended when an advisory of the same TMI ID and name moves its end, or when
+an advisory of the same name carries it on at its stated end under another TMI ID. The stricter
+reading, the same TMI ID only, is reported as a sensitivity analysis. The wider reading was
+drafted after the development months had been linked under the stricter one, where 2 of the 24
+statements with the highest term were extended against 16 under the wider reading; this is
+disclosed in the paper.
 
 **Readers.** Seven models (all but gemini-3.8-flash; section 9) give a probability for each
 term, in isolation and in context, under two framings: what the writer conveys, and whether it
@@ -1746,8 +1757,8 @@ moved out of the study folder before registration.
   Since that review a locked month yields a count of files and nothing else.
 - **An archive of results and downloaded data** made on 29 September lies untracked in another
   checkout of the repository. It may hold a copy of the sealed folder as built that day. It has
-  not been opened. It is deleted, or moved under the sealed folder, before registration.
-  [owner to confirm]
+  not been opened. On the owner's decision it was moved, unopened, under the sealed folder on
+  1 October, where the rule of the sealed files applies to it.
 
 To our knowledge, no test-period outcome has been derived, printed or tabulated outside the
 sealed folder, apart from the counts of events with an observable outcome and the one deduction
@@ -1948,8 +1959,9 @@ quoted here are from the build of 29 September.
 15. **What is hashed when.** Code of the form classifier, calibrator and GBMs at registration;
     fitted artefacts at F1. *Seen:* nothing from the data. *Why:* every component is refitted
     after the H3 selection, so no fitted artefact is final at registration.
-16. **deepseek-v3.** It stays a primary with a cutoff bounded by its release month if no cutoff
-    is documented. *Seen:* nothing from the data. *Why:* the draft assumed a documented cutoff.
+16. **deepseek-v3.** It stays a primary with a cutoff bounded by its release month, since its
+    maker documents none, and is served by the endpoint `deepinfra/fp4` (owner decision,
+    1 October). *Seen:* nothing from the data. *Why:* the draft assumed a documented cutoff.
 17. **Evidence of registration.** Identity by commit and tag; an anonymised copy of the plan and
     guide in the supplement. *Seen:* nothing from the data. *Why:* the draft did not say how a
     file is identified without its own hash, or how the record is shown under anonymity.
@@ -2071,8 +2083,9 @@ quoted here are from the build of 29 September.
 **Status of these changes.** The owner confirmed on 1 October the scope (item 1), the deadlines
 and their one relaxation (item 2), the availability rule, the capture freeze and the result of
 the availability check (items 9 and 26), the roles (item 24), the public repository with
-an anonymised copy of the plan and guide in the supplement (item 17), and the four sample
-rules of item 35. The other items are
+an anonymised copy of the plan and guide in the supplement (item 17), deepseek-v3 and its
+endpoint (item 16), the E6 gate rule and the reading of a route extension (item 33), and the
+four sample rules of item 35. The other items are
 provisional rules of 1 October: each stands as written unless the owner changes it, and each
 is confirmed or changed before this file is registered. [owner to confirm]
 
