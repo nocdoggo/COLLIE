@@ -351,6 +351,20 @@ def test_guide_examples_are_read_from_appendix_a_only() -> None:
     assert AO.guide_version("**Version v0, 29 September 2026. Draft.**") == "v0"
 
 
+def test_guide_version_keeps_the_part_after_a_full_stop() -> None:
+    """A guide revised after a failed gate is v1.1: the sheets must not name it v1."""
+    for line, version in (
+        ("**Version v1 draft, 1 October 2026.** The pilot", "v1 draft"),
+        ("**Version v1, 2 October 2026.** Frozen", "v1"),
+        ("**Version v1.1, 3 October 2026.** Revised once more", "v1.1"),
+        ("**Version v1.1 draft, 3 October 2026.**", "v1.1 draft"),
+        ("**Version v1.** Frozen", "v1"),
+        ("**Version v1.10.2.** Frozen", "v1.10.2"),
+    ):
+        assert AO.guide_version(f"# Guide\n\n{line}\n") == version, line
+    assert AO.guide_version("no version line") == "unknown"
+
+
 def test_exclusion_covers_the_statement_its_presentations_and_their_threads(
     train: AO.Built,
 ) -> None:
@@ -380,6 +394,30 @@ def test_exclusion_covers_the_statement_its_presentations_and_their_threads(
     ids = {"event_id": {d1["event_id"]}, "statement_group_id": {d1["statement_group_id"]}}
     assert AO.audited_threads(table, ids) == {d1["thread_id"]}
     assert AO.audited_threads(table, {"thread_id": {d3["thread_id"], "Tgone"}}) == {d3["thread_id"]}
+
+
+def test_a_named_thread_names_every_statement_it_carried(train: AO.Built) -> None:
+    """The sample lists name the thread of the row shown for a statement. The second statement
+    of D2 is its own, the first is shared with D1: naming the second statement leaves D1 in the
+    pool, naming D2's thread takes D1 out with it."""
+    table = train.table
+    d1 = table[table["presentation"] == D1].iloc[0]
+    d2 = table[table["presentation"] == D2]
+    late = d2[d2["statement_text"].str.contains("August")].iloc[0]
+    assert late["statement_group_id"] != d1["statement_group_id"]
+    by_statement, _ = AO.excluded_threads(
+        table, {"statement_group_id": {late["statement_group_id"]}}, []
+    )
+    assert by_statement == {late["thread_id"]}
+    listed = {
+        "event_id": {late["event_id"]},
+        "statement_group_id": {late["statement_group_id"]},
+        "thread_id": {late["thread_id"]},
+    }
+    by_thread, _ = AO.excluded_threads(table, listed, [])
+    assert by_thread == {late["thread_id"], d1["thread_id"]}
+    # a thread that is named and holds no event of the build is still returned
+    assert AO.excluded_threads(table, {"thread_id": {"Tgone"}}, [])[0] == {"Tgone"}
 
 
 def test_sample_lists_are_read_from_csv_and_json_lines(tmp_path: Path) -> None:
@@ -1348,6 +1386,39 @@ def test_validator_compares_ids_and_shown_cells_with_the_blank() -> None:
     assert "Q9: not an item of this sheet" in problems
     assert warnings == ["Q2: shown cells changed: generic"]
     assert AO.validate([{"audit_id": "Q1"}])[0][0].startswith("missing columns")
+    assert AO.NOT_COMMAS not in AO.validate([{"audit_id": "Q1"}])[0][0]
+
+
+def test_a_sheet_saved_in_another_format_is_one_clear_problem(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """A spreadsheet can save a sheet with semicolons between the cells, or in another encoding
+    than UTF-8: the validator and the scorer say what to do, and nothing is scored."""
+    row = filled("Q1", generic="Alpha \u2014 Injection")
+    text = AO.csv_text(AO.SHEET_COLUMNS, [row], {"auditor": "A1", "session_start": "09:00"})
+    good = tmp_path / "good.csv"
+    good.write_text(text, encoding="utf-8")
+    assert AO.main(["validate", str(good), "--blank", str(good)]) == 0
+    capsys.readouterr()
+    semicolons = tmp_path / "semicolons.csv"
+    table = text.split("\n", 2)[2].replace('","', '";"')
+    semicolons.write_text("# auditor: A1;;;\n" + table, encoding="utf-8")
+    assert AO.main(["validate", str(semicolons)]) == 1
+    printed = capsys.readouterr().out
+    assert "problem: missing columns: audit_id, generic" in printed and AO.NOT_COMMAS in printed
+    other = tmp_path / "cp1252.csv"
+    other.write_bytes(text.encode("cp1252"))
+    assert AO.main(["validate", str(other), "--blank", str(good)]) == 1
+    printed = capsys.readouterr().out
+    assert f"problem: {AO.NOT_UTF8}" in printed and "0 rows, 1 problems" in printed
+    names = AO.file_names("train")
+    for auditor in AO.AUDITORS:
+        (tmp_path / names[auditor]).write_text(text, encoding="utf-8")
+    args = ["score", "--half", "train", "--dir", str(tmp_path), "--key", str(tmp_path / "k.csv")]
+    assert AO.main([*args, "--a1", str(good), "--a2", str(other)]) == 2
+    printed = capsys.readouterr().out
+    assert f"problem (A2): {AO.NOT_UTF8}" in printed and "nothing was scored" in printed
+    assert not (tmp_path / names["score"]).exists()
 
 
 def test_sheet_parser_survives_a_spreadsheet_round_trip() -> None:

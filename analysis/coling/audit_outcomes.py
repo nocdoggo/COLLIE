@@ -20,14 +20,21 @@ per generic. Draws are deterministic: ids are ordered by the sha256 of seed, pur
 Exclusions (by statement and thread). The pool leaves out every thread that carries a statement
 of the pilot, the check sets, the literal-task sample or the guide's Appendix A, every
 presentation that shares such a statement, and every other event on those threads. Both auditors
-label every literal item, so a thread either of them labelled is skipped for both.
+label every literal item, so a thread either of them labelled is skipped for both. A list that
+names a thread leaves out more: every statement that thread carried at any date, with all its
+presentations. The lists of ``audit_sample.py`` name the thread of the row shown for each
+statement, so no statement in the pool covers a presentation that an annotator is shown, and the
+statement-group bracket beside an item never includes one.
 
 * The samples are read from the lists passed with ``--exclude`` (by default the folder where
   ``audit_sample.py`` writes them): any CSV or JSON-lines file with an ``event_id``,
   ``statement_group_id`` or ``thread_id`` column. A directory is searched. The lists are applied
   to both halves: the literal sample holds test-period statements too.
 * Appendix A is read from the guide (generic, company, statement date; the same text at another
-  date counts too).
+  date counts too). Its rule on quoted phrases (A.4: a statement whose whole text equals a
+  phrase the guide quotes) belongs to the samples of statements that are read, which
+  ``audit_sample.py`` draws; it is not applied here, where nothing is asked about the wording.
+  The threads of those samples are left out through their lists, whatever rule drew them.
 * The command stops when no sample list is found, when the guide has no Appendix A row or one
   that matches no event, and when a listed id names no event of the corpus as built (the lists
   then come from another build): in each case the exclusion would be incomplete.
@@ -74,7 +81,8 @@ sheets are returned and validate.
 Sheets. ``verdict_B`` and ``verdict_A`` take ``ok``, ``error`` or ``cannot_tell``; ``codes_B``
 and ``codes_A`` take O1 to O9; ``note_codes`` takes the flags N1 to N6, which are never errors.
 Sheets, traces and the adjudication sheet are written for people: every cell is quoted, and a
-cell that a spreadsheet would read as a formula starts with an apostrophe. The header lines
+cell that a spreadsheet would read as a formula starts with an apostrophe. A returned sheet that
+is not UTF-8 text is reported as one problem, with what to do. The header lines
 ``# session_start:`` and ``# session_end:`` are filled by the auditor (``HH:MM``, one time per
 sitting, separated by semicolons); ``score`` reports the minutes per item from them.
 
@@ -256,6 +264,11 @@ ENTERED = (
     "note",
 )
 SHEET_COLUMNS = (*SHOWN, *ENTERED)
+NOT_UTF8 = (
+    "the file is not UTF-8 text; save it again as CSV UTF-8 (comma-separated), with every "
+    "column as text"
+)
+NOT_COMMAS = " (the file looks semicolon-separated; save it comma-separated)"
 TRACE_COLUMNS = (
     "audit_id",
     "capture_date",
@@ -639,7 +652,8 @@ def excluded_threads(
 
     A thread is skipped when it carries a named event or statement, a guide example (or the
     same generic, company and normalised text at another date, as the guide's Appendix A says),
-    or any presentation of such a statement.
+    or any presentation of such a statement. Every event on a named thread counts as named: the
+    statements that thread carried at other dates are skipped too, with all their presentations.
     """
     wanted = set(examples)
     generic = table["generic_name"].map(C.norm_text)
@@ -1437,7 +1451,9 @@ def builder_hashes() -> dict[str, str]:
 
 
 def guide_version(text: str) -> str:
-    match = re.search(r"\*\*Version (v[^,.*]+)", text)
+    """The version named in the guide's ``**Version ...`` line: ``v1 draft``, ``v1``, ``v1.1``
+    (as ``audit_sample.guide_version`` reads it)."""
+    match = re.search(r"\*\*Version (v\d+(?:\.\d+)*(?: [^,.*]+)?)", text)
     return match.group(1).strip() if match else "unknown"
 
 
@@ -1754,7 +1770,8 @@ def validate(
 
     With the blank sheet, the item ids must be the same set; a shown cell that differs from the
     blank is a warning, since scoring takes the shown values from the key. A sheet without rows
-    is in order only when its blank has none (a re-audit list that names one auditor only).
+    is in order only when its blank has none (a re-audit list that names one auditor only). A
+    sheet saved with semicolons between the cells lacks every column, and is told so.
     """
     problems: list[str] = []
     warnings: list[str] = []
@@ -1762,7 +1779,8 @@ def validate(
         return ([] if blank == [] else ["the sheet has no rows"]), warnings
     missing = [c for c in SHEET_COLUMNS if c not in rows[0]]
     if missing:
-        return [f"missing columns: {', '.join(missing)}"], warnings
+        hint = NOT_COMMAS if any(";" in name for name in rows[0]) else ""
+        return [f"missing columns: {', '.join(missing)}{hint}"], warnings
     ids = [r.get("audit_id", "") for r in rows]
     problems += [f"{i}: listed more than once" for i, n in Counter(ids).items() if n > 1]
     if blank is not None:
@@ -1780,7 +1798,12 @@ def validate(
 
 
 def run_validate(args: argparse.Namespace) -> int:
-    meta, rows = read_sheet(args.sheet)
+    try:
+        meta, rows = read_sheet(args.sheet)
+    except UnicodeDecodeError:
+        print(f"problem: {NOT_UTF8}")
+        print(f"{args.sheet}: 0 rows, 1 problems, 0 warnings")
+        return 1
     blank = read_sheet(args.blank)[1] if args.blank else None
     problems, warnings = validate(rows, blank)
     if session_minutes(meta) is None:
@@ -2047,7 +2070,12 @@ def run_score(args: argparse.Namespace) -> int:
     minutes: dict[str, Any] = {}
     failed = False
     for auditor, path in returned.items():
-        meta, rows = read_sheet(path)
+        try:
+            meta, rows = read_sheet(path)
+        except UnicodeDecodeError:
+            print(f"problem ({auditor}): {NOT_UTF8}")
+            failed = True
+            continue
         problems, warnings = validate(rows, read_sheet(directory / names[auditor])[1])
         for line in warnings:
             print(f"warning ({auditor}): {line}")

@@ -124,8 +124,10 @@ and the first ones are taken, so a draw does not depend on the order of its inpu
 2. The train-half outcome sample, which excludes the statements and presentation threads of
    step 1 and of appendix A (section 6.2).
 3. In-context examples, dev prompt items and minimal-pair seeds, which exclude everything drawn
-   in steps 1 and 2. (They are not part of this guide; the rule is stated here because the
-   blinding rules depend on it.)
+   in steps 1 and 2, and every statement that reads like an item of step 1. (They are not part
+   of this guide; the rule is stated here because the blinding rules depend on it. Section 10
+   gives their lists and says what reads like an item, and section 7.1 gives the one case in
+   which a seed is not a train-period statement.)
 4. The task E sample, from the registered list of E3-eligible statements, leaving out the
    statements of step 1 (section 12.2).
 5. The test-half outcome sample, drawn in sealed mode after every confirmatory run has finished.
@@ -194,7 +196,8 @@ These rules hold until the gold of the task in question is hashed and committed.
    (section 8.2).
 7. **Guide examples are excluded.** The statements listed in appendix A (the worked examples, the
    sources of quoted phrases and the prompt harness's fixed test item) are excluded from every
-   sample.
+   sample. A statement of any drug whose whole text is a phrase quoted in section 3 or 7 is
+   excluded from every sample of statements that are read (appendix A.4).
 
 A breach is recorded in the changelog with the items affected. Those items are reported
 separately.
@@ -240,19 +243,32 @@ reason, the distractors and the `hard` flag are extra gold fields.
   | relative | `relative` | 1 | 1 | 1 | 10 |
   | exact day | `exact_day` | 2 | 3 | 3 | 10 |
   | TBD or unknown | `tbd` | 2 | | | 12 |
-  | vague or undated | `vague`, `no_date` | 2 | | | 8 |
+  | vague | `vague` | 1 | | | 3 |
+  | undated | `no_date` | 1 | | | 5 |
   | silent | `silent` | 1 | | | 10 |
-  | distractor date | `distractor`, and any class above with a distractor date | 2 | | | 12 |
+  | distractor only | `distractor`; `tbd`, `vague`, `no_date`, `silent` with a distractor date | 1 | | | 6 |
+  | dated target beside a distractor date | `month_year`, `month_no_year`, `part_of_month`, `quarter`, `half_year`, `year`, `range`, `relative`, `exact_day` with a distractor date | 1 | | | 6 |
   | discontinuation | `discontinuation` | 1 | | | 6 |
   | **Total** | | **20** | **20** | **20** | **120** |
 
-  A statement of any class except `discontinuation` that also carries a distractor date (the
-  classifier's `distractor_dates` is above zero) belongs to the distractor stratum, not to its
-  form's stratum. The check sets come from the seven dated strata only, since the gate is
-  computed on intervals.
-- **Shortfall.** A stratum that cannot fill a quota gives all it has. In the literal sample the
-  shortfall goes to the TBD, distractor and silent strata in turn; in the pilot and the check
-  sets it goes to the month-and-year stratum.
+  A row owns the classes its cell names plainly. The part of a cell that ends in *with a
+  distractor date* names classes the row takes only when the statement also carries a
+  distractor date (the classifier's `distractor_dates` is above zero). So a statement that
+  carries one leaves the row of its form:
+  - for the *distractor only* row when its class has no dated target (`tbd`, `vague`,
+    `no_date`, `silent`): the entry then holds a distractor date and no date to read;
+  - for the row *dated target beside a distractor date* when its class is one of the nine
+    dated classes of the first seven rows.
+
+  A `distractor` statement is in the distractor-only row whatever it carries, and a
+  `discontinuation` statement stays in its own row. The check sets come from the seven dated
+  strata only (the first seven rows), since the gate is computed on intervals. In the files
+  a stratum is called by the first class its row owns (`quarter`, `vague`, `no_date`,
+  `distractor`); the row that owns none is `dated_distractor`.
+- **Shortfall.** A stratum that cannot fill a quota gives all it has. What the vague stratum
+  lacks goes to the undated stratum first. After that, in the literal sample the shortfall goes
+  to the TBD, distractor-only and silent strata in turn; in the pilot and the check sets it
+  goes to the month-and-year stratum.
 - **Periods.** The pilot and both check sets come from the train period only. In the literal
   sample each stratum takes one third of its quota (rounded) from statements dated 2023-01-01 or
   later, more where the train period cannot fill the rest, and more from the train period where
@@ -260,22 +276,35 @@ reason, the distractors and the `hard` flag are extra gold fields.
   text may be labelled.
 - **Caps.** At most 2 items per masked template (months and numbers masked) and 3 per shortage
   episode, over the pilot, the check sets and the literal sample together.
-- **Exclusions.** The statements of appendix A. Nothing else: the literal sample is drawn before
-  the in-context examples, the dev prompt items and the minimal-pair seeds, which exclude it
-  (section 1). A statement of another drug that uses the wording of a worked example can be
-  drawn; the cap on masked templates limits how many.
+- **Exclusions.** The statements of appendix A, and every statement whose whole text is a
+  phrase this guide quotes: its statement text is, word for word and punctuation aside, a
+  phrase of three or more words quoted in section 3 or in section 7, the worked-example
+  tables included, whatever the drug or the company (appendix A.4). A statement that has both
+  text fields is excluded when each of the two is such a phrase. A statement that only shares
+  a wording with a quoted phrase, or contains one, can be drawn; the cap on masked templates
+  limits how many. Nothing else is excluded: the literal sample is drawn before the
+  in-context examples, the dev prompt items and the minimal-pair seeds, which exclude it
+  (section 1).
 - **Order.** Each annotator gets the items in a different seeded order.
 
 `forms.py` writes the number of statements per class and period to
 `analysis/coling/out/form_counts.json`, and the sampler (`audit_sample.py`, which reads the
 table above from this file) prints what each stratum has left, and how much of that the caps
-allow, before it draws each sample. Two strata are thin in the train period (relative and
-discontinuation: ten statements or fewer each in the 1 October build). The pilot and the check
-sets take their relative items first, so the literal sample finds too few train-period relative
-statements for its share and takes most of its relative items from 2023 on. The pooled test of
-`PLAN.md` E2 runs over the items outside the month-and-year stratum, 108 when every quota is
-filled (a month-and-year statement that carries a distractor date is in the distractor stratum,
-so it is in the test); per-form results are descriptive.
+allow, before it draws each sample. Three strata are thin in the train period (vague, relative
+and discontinuation: ten statements or fewer each in the 1 October build).
+
+- The vague class has eight statements in the frame, six of the train period and two later.
+  Appendix A excludes two of them (worked examples 13 and 14) and the rule on quoted phrases a
+  third, so three train-period statements and two later ones can be drawn. The pilot takes one
+  and the literal sample three; no quota fell short in the draw of 1 October.
+- The pilot and the check sets take their relative items first, so the literal sample finds
+  too few train-period relative statements for its share and takes most of its relative items
+  from 2023 on (one train-period item and nine later ones in the draw of 1 October).
+
+The pooled test of `PLAN.md` E2 runs over the items outside the month-and-year stratum: 108
+when every quota is filled, as in the draw of 1 October. A month-and-year statement that
+carries a distractor date is in the row of dated targets beside a distractor date, so it is in
+the test. Per-form results are descriptive.
 
 ### 3.3 What you see
 
@@ -590,6 +619,12 @@ end time for each sitting. It warns, without rejecting, when a quote is not foun
 in the entry and when a date lies more than 60 months from the Date of update: check those rows
 for typing errors.
 
+The sheet is filled in a copy (section 9). The validator compares the copy with the blank
+sheet, which stays where the sheet builder wrote it. When it finds no blank, because the sheet
+was filled in place or the blank was moved, it warns that the list of items and the shown cells
+were not checked. Such a sheet cannot be submitted: the agreement script refuses a sheet that
+is the blank's own file, and one whose blank is missing or changed.
+
 ## 4. Pilot, revision and check set
 
 1. **Pilot (this draft).** 20 train-period items, allocated as in section 3.2. A1 and A2 label
@@ -607,7 +642,8 @@ for typing errors.
    The meeting then settles the open points:
    - D1: the certainty of an abstaining target that has no unknown marker (section 3.8);
    - D3: "until X" and "through X" (C11);
-   - D13: seasons (C17);
+   - D13: seasons (C17). No pilot item carries a season word, since no train-period statement
+     does; the meeting settles the point on the two forms that C17 names;
    - D14: what is done about the conventions marked [R] or [G] that the prompt does not state;
    - the hours: the measured seconds per item against section 0, and any reduction from its list;
    - whether the `YYYY-MM` shorthand and the sheet format worked.
@@ -623,8 +659,12 @@ for typing errors.
    - If fewer than 10 check items have an interval from both annotators, or the offsets do not
      vary enough for alpha to be defined, the pilot items are pooled with the check items. A
      gate that is still undefined after pooling counts as not passed.
-   - If either alpha is below 0.6, the guide is revised once more (v1.1) and the 20 reserve items
-     are labelled under it. If that fails too, the hold trigger of `PLAN.md` section 12 fires.
+   - If either alpha is below 0.6, the guide is revised once more and the 20 reserve items are
+     labelled under the revision. A guide revised after a failed gate is v1.1: its version line
+     reads `v1.1`, and the reserve sheets are written again so that they name it.
+   - The reserve gate is computed like the check gate, on the reserve items. In the two cases
+     of the first point it pools with the pilot items, as the check set does, and not with the
+     check items. If it fails too, the hold trigger of `PLAN.md` section 12 fires.
    - The agreement script prints the gate (`agree --task check`, or `--task reserve`) and
      exits with status 0 when it passes.
 6. **Freeze.** v1 (or v1.1) is committed and its hash goes into the registration record. Pilot,
@@ -741,8 +781,17 @@ If `PLAN.md` and `corpus.py` still differ at registration, the audit follows the
 - **Exclusions, by statement and thread.** Left out are: every presentation thread that carries
   a statement of the pilot, the check sets, the literal sample or appendix A; every
   presentation that shares such a statement; and every other event on those threads. Both
-  annotators label every literal item, so a thread is left out for both. The builder refuses to
-  draw the train half without the sample lists, and applies the same lists to the test half.
+  annotators label every literal item, so a thread is left out for both. The sample lists
+  name, for each statement, the thread of the row shown to the annotators. For that thread
+  the builder goes one step further: every statement the thread carried at any date is left
+  out as well, with all its presentations. So no statement in the pool covers a presentation
+  that an annotator is shown, and the statement-level bracket beside an item never includes
+  one. The builder refuses to draw either half without the sample lists, which hold
+  statements of both periods. It also stops when a row of appendix A matches no event, and
+  when a list names an id that is no event of the corpus as built (the lists then come from
+  another build): in each case the exclusion would be incomplete. Only a draft, which is
+  never handed out, is drawn without them. The rule on quoted phrases (appendix A.4) is not
+  applied to this sample: the audit asks nothing about the wording of a statement.
   A trace shows the rows of the audited thread, so a statement an annotator will label does not
   appear in them. Where the audited thread is absent, the trace also lists a row of another
   thread with the same NDC (section 6.3); when that thread is an excluded one, the trace gives
@@ -751,7 +800,8 @@ If `PLAN.md` and `corpus.py` still differ at registration, the audit follows the
 - **Stratification.** Within each half, by definition-B outcome type (recovered, discontinued,
   censored, not at risk), by bracket width (31 days or less, 32 to 90, more than 90) where the
   bracket is closed, and by whether the event was re-confirmed. Every stratum that is not empty
-  gets 2 items; the other items follow the pool in proportion, so rare strata are oversampled.
+  gets 2 items, or the one event its pool has; the other items follow the pool in proportion,
+  so rare strata are oversampled.
   A stratum that cannot fill its quota passes the shortfall to the largest ones. The error rate
   is reported raw and reweighted to the pool.
 - **Caps.** At most one item per thread and per statement, and at most 2 per generic.
@@ -984,6 +1034,23 @@ field that is cut). Say why in `note`. It goes to ADJ (section 5).
   twice with the same cause, the rule in `corpus.py` is fixed, never single items. The outcomes
   are then re-derived, the affected items and 20 fresh ones are re-audited, and the corpus is
   frozen and sealed only after that.
+- **Re-audit commands.** Both write a set of their own (another `--out` and `--keys` than the
+  first round), and each set is validated, scored and adjudicated like the first:
+  - the fresh items:
+    `audit_outcomes sheets --half train --round 2 --own <n> --shared <n> --planted <n>
+    --exclude analysis/coling/out/audit/samples <the first round's outcome_train_sample.csv>`,
+    with sizes that give 20 real items. The first round's items and their threads stay out
+    of the draw;
+  - the affected items:
+    `audit_outcomes sheets --half train --items <the first round's key> --changed`, run once
+    the first round is scored. It draws nothing: the items are those of the first round whose
+    bracket, derived again, differs from the one the key records, and each goes to the
+    auditor who had it. Planted items are added only with `--planted`.
+- **Pass rule of a re-audit (provisional, for the owner to confirm).** The scorer allows
+  confirmed errors up to 5% of the real items of the set, rounded down, for B and separately
+  for A. That is 1 error among 20 fresh items, and none in an affected set of fewer than 20
+  items. `PLAN.md` gives no rule for these two sets; this one is what the scorer applies, and
+  it is confirmed or changed by the owner before a re-audit is scored.
 - **Test half.** A failure after registration is handled the same way, logged as a dated
   amendment with the new sealed hash, before the evaluator runs.
 - **Flags** (N1 to N6) are counted and reported. A flag does not change the rule after
@@ -999,6 +1066,14 @@ minimal pairs are not collected in October.
 
 - **Sample.** 100 E5 items, stratified by factor: certainty marker, surface form, granularity,
   stale against fresh, distractor date, and silent. At most 2 per seed.
+- **Seeds.** The pairs are made from the seed statements of `sample_pair_seeds.csv` (section
+  10): statements of the seven dated strata, from the train period. One form is the
+  exception: the seeds of the relative form are statements dated 2023-01-01 or later, because
+  the labelling samples leave almost none of the train period (in the draw of 1 October, five
+  of its six statements are in a labelling sample or in appendix A). Only the text of such a
+  seed is used, and no outcome of it is read. The list marks these seeds (`period` reads
+  `test`), and no model is called on a pair made from one of them until amendment F1 of
+  `PLAN.md` is tagged, as for every test-period item.
 - **Assignment.** 45 to A1, 45 to A2, and 10 audited by both. Each auditor also gets 5 planted
   items, where the generator's gold was corrupted in one field by a seeded rule. The key is
   kept apart from the sheets (section 10); nobody opens it, and the scoring script reads it
@@ -1072,8 +1147,11 @@ Every table gives n. (Agreement statistics resample items. The episode-level res
 
   Each kappa is shown with the raw agreement and both annotators' marginal shares, since kappa
   moves with prevalence.
-- **By stratum and by period.** n, raw agreement, the kappas, and alpha when a stratum has at
-  least 10 pairs of intervals. Below that, raw agreement only.
+- **By stratum and by period.** n, raw agreement and the kappas for every cell, and alpha when a
+  stratum has at least 10 pairs of intervals. Below that no alpha is given. The kappas of a
+  cell with few items stay in the output and are read with the raw agreement and n beside
+  them; a kappa is undefined, and written as null, when both annotators gave one and the
+  same value on every item of the cell.
 - **Adjudication.** Counts of `slip` and `gap` decisions, by field.
 - **Time.** The mean seconds per item, from the start and end times of each sitting, written in
   the sheet's header.
@@ -1120,8 +1198,10 @@ a secondary, and the kappas on abstention, certainty class and statement type. T
 
 One CSV file (UTF-8, comma-separated, every cell quoted, a header row) per annotator per task.
 
-- **Editing.** Spreadsheet software may be used. Import every column as text, so that dates and
-  the `YYYY-MM` shorthand are not converted, and save back as CSV.
+- **Editing.** Fill a copy of the sheet, kept under `external_data/annotation/<task>/`
+  (section 10), and leave the blank where the sheet builder wrote it: the checks compare the
+  two. Spreadsheet software may be used. Import every column as text, so that dates and the
+  `YYYY-MM` shorthand are not converted, and save back as CSV.
 - **Header lines.** The rows above the header row begin with `#` and read `# key: value`. They
   give the task or half, the seed, the guide version and hash, the values each coded column
   takes (task A), and, for task B, the `corpus.py` hash and the horizon. Keep them. The scripts
@@ -1138,10 +1218,17 @@ One CSV file (UTF-8, comma-separated, every cell quoted, a header row) per annot
   apostrophe so that it is not taken for a formula. The apostrophe is not part of the entry.
 - **Computed columns and checks** are not in the sheet. Run the validator on your file before
   you submit it; it lists the rows to fix. From the repository root, with `PYTHONPATH=.`:
-  - task A: `python -m analysis.coling.audit_sample validate <sheet>`;
+  - task A: `python -m analysis.coling.audit_sample validate <sheet>`. It finds the blank by
+    the header lines of the sheet (`--blank` names another) and warns when it finds none:
+    the list of items and the shown cells are then unchecked;
   - task B: `python -m analysis.coling.audit_outcomes validate <sheet> --blank <blank sheet>`.
 
   The scripts of tasks C and E give theirs in their docstrings when they are written.
+- **Submission checks.** For task A, `agree` validates both sheets against the blanks again
+  and refuses a sheet that was filled in place (it is then the blank's own file) and one
+  whose blank is missing or is not the file the manifest records. For task B, `score`
+  validates both sheets against the blanks, reads the key only when both pass, and refuses a
+  set whose blanks or key are not the files its manifest lists.
 
 **Task A: `literal_<A1|A2>.csv`** (the pilot and check sheets, `pilot_`, `check_` and
 `reserve_`, have the same layout; all are written by `audit_sample.py`)
@@ -1269,6 +1356,49 @@ The folders below are the scripts' defaults on 1 October, as `PLAN.md` section 1
   for them (`--exclude`). The train-half outcome sample is `outcome_train_sample.csv` beside
   its sheets, with the same three columns. The task E sample is the column `reference_check`
   of the eligible list (`analysis/coling/out/eligible_e3.csv`).
+- **Later lists.** Once the train-half outcome sample is final, `audit_sample.py draw-later`
+  writes three more lists to `analysis/coling/out/audit/samples_later/`. Each has the three
+  id columns, `draw_rank` (the place of the statement in the seeded draw: whoever uses a list
+  walks it in that order) and `period` (`train`, or `test` for a statement dated 2023-01-01
+  or later). Each leaves out the first draw, the outcome sample, appendix A with its rule on
+  quoted phrases (A.4), and the lists before it, by statement and by text (the same generic,
+  company and normalised text at another date). Each also leaves out the statements that read
+  like an item of the first draw, which A1 and A2 label:
+  - a statement whose whole text is that of an item, word for word and punctuation aside,
+    whatever the drug or the company (a text with no word is not compared);
+  - a statement of the same generic and company, dated the same day as an item, for which
+    the rule reader finds the same statement type and the same period: the item's notice on
+    another presentation, as when two presentations differ by a typing error.
+
+  A statement that only shares a wording with an item (another month or number) can be on a
+  list. The three lists:
+  - `sample_incontext_pool.csv`: the in-context pool, 50 fit-split statements at risk under
+    B, with a dated form and not stale at issue, taken in turn over the dated forms; one per
+    masked template and one per episode;
+  - `sample_dev_prompt.csv`: 60 dev prompt items, dev-split statements at risk under B, taken
+    in turn over the strata of section 3.2, under the two caps of that section;
+  - `sample_pair_seeds.csv`: 100 pair seeds for the minimal-pair generator, statements of the
+    seven dated strata that are not stale at issue, one per masked template and at most 3 per
+    episode: 22 of month and year and 13 of each other stratum, a shortfall going to month
+    and year. They are train-period statements, except those of the relative stratum
+    (section 7.1), which carry `test` in `period`.
+- **Lists that are fixed.** A draw repeated on the same inputs writes the same bytes. When the
+  guide or the events table has changed so that a list on disk would hold other statements,
+  `draw` stops and writes nothing until the sample is named under one of two flags:
+  `--fixed <sample>` keeps the list on disk and draws the others around it; `--replace
+  <sample>` takes the new list (with `--sheets <sample>` when its sheets are on disk). From
+  the moment a sheet of a list is handed out, or a later draw has left the list out, the
+  list is kept with `--fixed`. The outcome-audit builder has the matching rule: it does not
+  write over a final set without `--replace`. So has `draw-later`: when one of its three
+  lists on disk would hold other statements, or another order, it stops and writes nothing
+  until `--replace` is given.
+- **Sheets and a revised guide.** A sheet names, in its header, the guide it was written
+  under (version and hash). The task A sheets of a set that is labelled under a revised guide
+  are written again from the list on disk (`sheets --task check` after the pilot meeting):
+  the items stay, the guide line changes. The train-half task B sheets are not written again:
+  the set drawn under the draft is validated and scored as it stands after the guide becomes
+  v1, since no check compares its guide line with the guide on disk, and section 6 is not
+  among the parts the pilot meeting revises.
 - **Item keys of task A.** `analysis/coling/out/audit/keys/<task>_key.csv` links each
   `item_id` to its statement, stratum, form and period, for the agreement script. The form is
   a rule reading, so A1 and A2 do not open this folder (section 2, rule 1).
@@ -1287,9 +1417,13 @@ The bracketed parts are for the authors to confirm.
 > who adjudicated. No crowdworkers or other participants were recruited, and no one was paid for
 > annotation beyond their normal [salary or studentship]. The annotators labelled public notices
 > from the US FDA drug-shortage list, a US federal government work that contains no personal
-> information; the list's company contact column was removed before annotation and release. The
-> full guideline, including the time conventions, blinding rules, pilot and adjudication
-> procedure, is released with the data (Appendix [X]). Because the annotators are authors
+> information; the list's company contact column was removed before annotation and release. A
+> few notices name a company e-mail address or telephone number in their text. E-mail addresses
+> are masked in the outcome-audit files; the literal-task sheets show each notice as the models
+> read it, and company telephone numbers remain as the FDA published them [confirm what the
+> released files mask]. The full guideline, including the time conventions, blinding rules,
+> pilot and adjudication procedure, is released with the data (Appendix [X]). Because the
+> annotators are authors
 > labelling public, non-personal text, and no data about people were collected, we did not seek
 > ethics-board review [confirm that this matches institutional policy]. Both annotators are
 > fluent readers of English with a background in [NLP research]. Because they knew the study's
@@ -1353,9 +1487,12 @@ It changes no item: the eligible list and every `stated_end` are registered befo
   pilot and the check sets, which are train-period, cannot be among them. No statement of the
   literal sample may be on a task E sheet, so that no rule reading of an item you labelled is
   shown before the task A gold is hashed (section 2, rule 1). The draw leaves such statements
-  out. On 1 October `dataset.py` did not yet do so (appendix B); if the registered subset is
-  drawn without that rule, a statement that is in both samples is left off the task E sheets,
-  the check then has fewer than 100 items, and the number left off is reported.
+  out: `dataset.py` reads the four lists of the first draw (and leaves out the same text at
+  another date), and its counts file marks the subset as final only when all four lists were
+  read and every id on them is a statement of the build. The eligible list is therefore built
+  again after the first draw. If the registered subset is not final, a statement that is in
+  both samples is left off the task E sheets, the check then has fewer than 100 items, and
+  the number left off is reported.
 - **Assignment.** 45 to A1, 45 to A2, 10 checked by both.
 - **When.** After both task A sheets are submitted, since the sheet shows rule readings. The
   sheets are returned and hashed before A1 or A2 see any E3 output and before the registered
@@ -1393,9 +1530,12 @@ It changes no item: the eligible list and every `stated_end` are registered befo
 A row below names a generic, a company and a statement date. It excludes every statement of
 that generic and company dated that day, and every statement of that generic and company with
 the same normalised text at another date. The samplers read the rows from this file
-(`audit_outcomes.guide_examples`): the first three cells of every table row under this
-heading, with the dates found in the third cell. A table with fewer than three columns is not
-read.
+(`audit_sample.guide_exclusions` and `audit_outcomes.guide_examples`): the three cells of
+every row of a three-column table under this heading, with the dates found in the third cell.
+The lists of rows are kept in three-column tables: the first reader skips a table of another
+width, and the second takes the first three cells of any row with three cells or more, so no
+other table of this appendix has a date in its third column. Section A.4 adds a rule that
+needs no row.
 
 ### A.1 Worked examples
 
@@ -1449,7 +1589,8 @@ Train-period statements on the shortage listing from which a phrase of several w
 the phrase follows the date. Bare date forms ("Mar 21", "Nov-22", "1st quarter 2020", "the June
 timeframe") and phrases that several statements share ("Product will be made available as it
 is released", "Next Delivery: May 2021; Estimated Recovery: July 2021", "available for order")
-are not tracked; the cap on masked templates limits them. Four quoted phrases come from the To
+have no row here. A statement whose whole text is such a phrase is excluded by A.4; the cap on
+masked templates limits the statements that only contain one. Four quoted phrases come from the To
 Be Discontinued listing, which is outside the sampling frame, and need no entry (the final date
 of availability in section 3.6, and three of the distractor examples of section 3.10).
 
@@ -1488,6 +1629,68 @@ recovery April 2020").
 | Generic | Company | Statement date |
 |---|---|---|
 | Anagrelide Hydrochloride Capsules | Teva Pharmaceuticals | 2020-03-17 |
+
+### A.4 Statements whose whole text is a quoted phrase
+
+A statement is also excluded, with no row above, when its whole text is a phrase that this
+guide quotes, whatever the drug, the company and the date (owner's decision of 1 October).
+
+- **Phrase.** The words between two double quotation marks in section 3 or in section 7, the
+  worked-example tables included, when they are three words or more; a word is a part between
+  spaces that holds a letter or a digit.
+- **Whole text.** The statement text that `corpus.py` builds from the two fields (the Related
+  information, after an Availability information that is more than a bare label), normalised
+  as there (lower case, single spaces) and compared with the phrase word for word. Punctuation
+  is not compared: a colon, a hyphen or a full stop inside the text does not tell a statement
+  from a phrase, so "Estimated recovery: TBD" is the phrase "Estimated recovery TBD" of
+  section 3.8. The statement is excluded when its words are those of the phrase, in the same
+  order. A statement that has both fields is excluded when each field is a quoted phrase:
+  this guide quotes the two fields of an entry apart, and in some worked examples it leaves
+  the Related information out of the table and quotes it once in the text above. A statement
+  that contains a quoted phrase among other words, has its wording with another month or
+  number, or has one field that is not quoted, is not excluded.
+- **Where it applies.** To the samples of statements that are read: the pilot, the check set,
+  the reserve, the literal sample, the in-context pool, the dev prompt items and the pair
+  seeds. `audit_sample.py` reads the phrases from this file at every draw
+  (`guide_phrases`), so a phrase quoted in a later revision is covered by the draws that
+  follow it and does not change a list that is kept. The rule is not applied to the outcome
+  audit, whose unit is the bracket of a presentation (section 6.2), and the draws of
+  `dataset.py` do not apply it (appendix B).
+- **What it removes (1 October build).** Sections 3 and 7 quote 114 phrases of three words or
+  more. 729 statements of the task A frame are wholly quoted; 44 of these are excluded by the
+  rows of A.1 to A.3 already, and the rule removes the other 685, of which 27 have two
+  quoted fields. The strata not listed hold no such statement.
+
+  | Stratum | Period | Frame | Excluded by A.1 to A.3 | Wholly quoted | Removed by this rule |
+  |---|---|---|---|---|---|
+  | month and year | train | 2,101 | 45 | 36 | 27 |
+  | part of a month | train | 203 | 18 | 3 | 0 |
+  | quarter, half or year | train | 109 | 6 | 4 | 1 |
+  | range | train | 101 | 9 | 3 | 0 |
+  | relative | train | 6 | 1 | 1 | 0 |
+  | TBD or unknown | train | 243 | 14 | 30 | 24 |
+  | TBD or unknown | 2023 on | 582 | 0 | 134 | 134 |
+  | vague | train | 6 | 2 | 2 | 1 |
+  | undated | train | 97 | 0 | 6 | 6 |
+  | undated | 2023 on | 115 | 0 | 6 | 6 |
+  | silent | train | 1,386 | 35 | 174 | 159 |
+  | silent | 2023 on | 2,385 | 3 | 329 | 327 |
+  | distractor only | train | 63 | 7 | 1 | 0 |
+
+  The largest number is in the silent stratum: 486 of its 3,771 frame statements (13%), of
+  which 474 have the one text "Check wholesalers for inventory". The largest share is in the
+  TBD stratum: 158 of its 825 frame statements (19%), of which 126 have the one text
+  "Estimated recovery: TBD", all of them dated 2023 or later. In the vague stratum the rule
+  removes one statement of eight.
+- **What it leaves in.** A statement that contains a quoted phrase among other words stays in
+  the frame. In the draw of 1 October such statements are 7 of the 20 pilot items, 8 of the
+  20 check items, 7 of the 20 reserve items and 30 of the 120 literal items; the sampler
+  prints these numbers and writes them to the manifest.
+- **What the silent and TBD items then stand for.** No silent item of a sample has the bare
+  wholesaler sentence as its whole text, and no TBD item the bare "Estimated recovery: TBD".
+  The cap on masked templates would have let in two items of each wording at most, over the
+  four samples together. Results on these two strata are therefore results on the statements
+  with other wordings.
 
 ## Appendix B. Decision points and alignment with the code (1 October)
 
@@ -1535,7 +1738,7 @@ more: none occurs only in texts dated 2023 or later, after one cue of section 3.
 | D18 | Forms the rule reader misses | covers "N to M" and a half without a year; says nothing on the others | "Estimated recovery 4-6 weeks" and "Next release 4 to 6 weeks" (no "in", no colon) read as `none`; "Will remain on backorder for 3 months" reads as `none`; "early to mid 2021" reads as May to August; a half with no year ("Estimated recovery: 1H") reads as `none`; a numeric day with no year and no word before it ("Next release 10/5") reads as `none`, though "on 10/5", "by 10/5" and "week of 10/5" are read; "cannot be estimated" is not taken as an unknown marker; "fifth week of May" and "5th week of May" read as the whole month, though "week 5 of May" is read | C12 and C9: 4 to 6 weeks later; 3 months later; January to August. C8: the first occurrence of the half that ends on or after the Date of update, and of the day on or after it. 3.7: an unknown marker, so abstain with `tbd`. C4: days 29 to the last | known mismatch, found by probes on 1 October (not corpus texts); disclosed, not patched |
 | D19 | Sample of the alpha gate | | | the 20-item check set, with the share of identical intervals beside it (section 4) | closed (decision 10) |
 | D20 | Who adjudicates, and who may read model outputs | | | ADJ adjudicates and does not label; A1 and A2 do not read reader outputs on their items before the gold is hashed (section 2, rule 1) | closed (decision 10). The limit on ADJ's looks at items still to be adjudicated is this guide's addition, for the owner to confirm |
-| D21 | Exclusion unit of the train-half outcome sample | | | statement and presentation thread (section 6.2), as `audit_outcomes.py` implements it, not the whole shortage episode of v0 | closed in this draft, for the owner to confirm: the episode rule would leave about a quarter of the train events, this one about five in six |
+| D21 | Exclusion unit of the train-half outcome sample | | | statement and presentation thread (section 6.2), as `audit_outcomes.py` implements it, not the whole shortage episode of v0 | closed in this draft, for the owner to confirm: the episode rule would leave about a quarter of the train events; this one leaves 5,011 of the 8,020 (62%) in the draw of 1 October, with all four sample lists read. Of the 3,009 left out, 1,826 are on a thread that carries a sampled or appendix A statement; the other 1,183 come from the further step for the thread of the shown row (6.2) |
 | D22 | Choice of the target among several statements | the type order (recovery, next delivery, discontinuation, depletion); nothing on two statements of one type | `_score`: the type order, except that a dated discontinuation outranks a next delivery stated with no time and ties with one under an unknown marker, and a discontinuation under an unknown marker ties with a next delivery stated with no time (the first mentioned then wins); within recovery the kind of cue first, then dated over unknown marker, a vague statement last, except for two ties that go to the first mentioned: a shortage state under an unknown marker against a dated statement with a bare cue, and a bare cue under an unknown marker against a vague statement; a cue written after the date ("October 2021 supply") ranks with the resupply cues | rule 1 of 3.6 is the prompt's order, with no exception; rules 2 to 4 are the ranking of `rules.py`, without the two ties | known mismatch in these corners, disclosed. They decide no target in the sampling frame: on 1 October the ranking of 3.6, coded with the reader's own cue table, was compared with `_score` on every statement of the frame that makes two or more statements (texts only, with and without the bare availability label), and the two chose the same statement every time. v0 and the first draft of 1 October put "dated over unknown marker" before the kind of cue, which differed from `rules.py` on a handful of statements |
 
 **Differences from `PLAN.md` and from the code, known on 1 October.** The plan was being amended
@@ -1544,15 +1747,20 @@ drafts: the roles, the draft the pilot is labelled under, the gate with its pool
 reserve items, the timing of the reference-reading check and the statements its draw leaves out,
 the E2 test over the items outside the month-and-year stratum, the display row of a statement
 that is not at risk, the availability-string check and its result, the error rule of the
-minimal-pair audit, the output folder of the literal task and the E6 link checks. What remains,
-compared with `PLAN.md` at sha256 prefix `8a461df0dc2f3031`, is below. This list is emptied
-before v1 is hashed.
+minimal-pair audit, the output folder of the literal task, the E6 link checks, the two
+distractor rows of E2, the rule on quoted phrases and the seeds of the relative form. What
+remains, compared with `PLAN.md` at sha256 prefix `f24a449d57dbaf03`, is below. This list is
+emptied before v1 is hashed.
 
 | Where | Says or does | This guide |
 |---|---|---|
 | `PLAN.md` 3, calendar overlap | a train-period statement first archived in 2023 is "first seen in the capture of 2023-01-13" | nearly all are (6.1); in the open events table, 7 of the 377 train events first captured in 2023 are first seen in a later capture of that year |
 | `PLAN.md` 10, tasks 4 to 6 | gives no order between the test-half outcome audit and tasks C and E | the test-half audit starts only after A1 and A2 have submitted their sheets of tasks A, C and E (section 1) |
-| `dataset.py`, subset `reference_check` | the draw leaves out the statements of appendix A only | no statement of the literal sample is on a task E sheet (12.2, and `PLAN.md` section 3, step 4): either the draw takes the literal sample list as well, or the overlap is left off the sheets and reported |
+| `PLAN.md` 3, samples and their order, step 3 | the in-context examples, the dev prompt items and the seeds "exclude everything drawn in steps 1 and 2 and one another" | they also leave out every statement that reads like an item of step 1: the same whole text whatever the drug or the company, and the item's notice on another presentation (section 10) |
+| `PLAN.md` 7.1 and 5, E2 | every literal metric is reported per form, "weighted by event and by template" | no sample holds a statement whose whole text is a quoted phrase (A.4), 486 silent statements among them; the plan does not say that the per-form figures and their event weights describe the frame without those statements |
+| `PLAN.md` 10, blinding and task 5 | the train-half sample "leaves out every thread that carries a statement they label" | it does, and it also leaves out every statement that the thread of a shown row carried at any date, with all its presentations (6.2, D21); the pool is 5,011 events, where the plan's wording alone would give 6,194 |
+| `PLAN.md` 10, task 5 | the affected items and 20 fresh ones are audited again; no pass rule for these two sets | 6.7: the scorer allows confirmed errors up to 5% of the real items of a set, rounded down (1 in 20, none below 20); provisional, for the owner to confirm |
+| `dataset.py`, the subsets of the eligible list | leave out appendix A and the fixed test item, and `reference_check` the first draw as well; the rule on quoted phrases (A.4) is not applied | A.4 names the samples it covers. No eligible statement has a quoted phrase as its whole text in the 1 October build: the 469 such frame statements dated 2023 or later are TBD, undated or silent, and the eligible list holds dated forms only. The eligible list is built again after the first draw (12.2) |
 | `audit_sample.py` and `audit_outcomes.py`, header lines | the task A sheets take the times as `sitting_start` and `sitting_end`, one pair of lines per sitting; the task B sheets as `session_start` and `session_end`, with semicolons | section 9 describes both; one form for all sheets would be easier on the annotators |
 
 Two lines of `PLAN.md` section 10 wait on this guide and on the owner: the load figure, which
@@ -1594,3 +1802,69 @@ measure, and the owner's confirmation of the limit on what ADJ looks at (D20).
   files that hold rule readings named in blinding rule 1; a train event first captured later
   in 2023 than 2023-01-13 (6.1); "March end" and the fifth week of a month (C3, C4, D18); two
   ties of the rule reader's ranking (D22); the thin strata (3.2).
+- **v1 draft, 1 October 2026, after the owner's four decisions on the samples.** Made before
+  any sheet was handed out; the four sample lists and the pilot and check sheets were drawn
+  again under this text.
+  - *Vague row (3.2).* The row "vague or undated" is split into a vague row (pilot 1, literal
+    3) and an undated row (pilot 1, literal 5). What the vague stratum lacks goes to the
+    undated stratum first.
+  - *Distractor rows (3.2).* The row "distractor date" is split into "distractor only" (pilot
+    1, literal 6) and "dated target beside a distractor date" (pilot 1, literal 6). The table
+    now says which classes a row takes only with a distractor date, and the sampler reads
+    that from it. In the literal sample the general shortfall goes to the TBD,
+    distractor-only and silent strata. The E2 test still covers the 108 items outside the
+    month-and-year row.
+  - *Quoted phrases (2, 3.2, A.2, A.4).* A statement whose whole text is a phrase of three or
+    more words quoted in section 3 or 7 is excluded from the samples of statements that are
+    read, whatever the drug or the company, and so is a statement whose two text fields are
+    each such a phrase; a statement that only shares or contains a wording can still be
+    drawn. A.4 gives the rule and what it removes. It is not applied to the outcome audit
+    (6.2).
+  - *Pair seeds (1, 7.1, 10).* The seeds of the relative form are statements dated 2023-01-01
+    or later, text only, marked in the list; no model is called on their pairs before
+    amendment F1.
+  - *Thin strata (3.2).* Vague is named with relative and discontinuation; the numbers of the
+    draw are given.
+- **v1 draft, 1 October 2026, corrections of the text to the tooling, the same day.**
+  - 3.12 and 9: sheets are filled in a copy; `validate` warns when it finds no blank sheet;
+    `agree` refuses a sheet filled in place; the submission checks of `agree` and `score`.
+  - 4, step 5: the reserve gate pools with the pilot items, as the check gate does; a guide
+    revised after a failed gate carries `v1.1` in its version line.
+  - 6.2: the outcome-audit builder refuses either half without the sample lists, and stops on
+    a row of appendix A that matches no event and on a listed id unknown to the build; a
+    stratum whose pool has one event gets that one.
+  - 6.7: the two re-audit commands, and the pass rule the scorer applies to a re-audit set
+    (provisional, for the owner to confirm).
+  - 8.1: a small stratum gets no alpha; its kappas stay in the output.
+  - 10: the later lists (`samples_later/`, `draw_rank`, `period`, their three rules), the
+    flags `--fixed` and `--replace`, and what a revised guide does to sheets already written.
+  - 11: e-mail addresses are masked in the outcome-audit files and not in the literal-task
+    sheets; company telephone numbers in the FDA text remain.
+  - 12.2: `dataset.py` now leaves the first draw out of the task E subset; the eligible list
+    is built again after the first draw.
+  - Appendix A: both samplers that read the rows are named. Appendix B: the pool of the
+    train-half outcome audit (D21); the list of differences from `PLAN.md` and the code,
+    redone against the plan as it stood that evening.
+- **v1 draft, 1 October 2026, after an independent check of the samples and sheets, the same
+  day.** Made before any sheet was handed out. The pilot, check and reserve lists did not
+  change. One literal item changed, and with it the pool of the train-half outcome audit
+  (5,011 events); the 56 items of that audit stayed the same. The three later lists were
+  drawn again, and every sheet was written again so that it names this text.
+  - *Quoted phrases (3.2, A.4).* A statement and a quoted phrase are compared word for word,
+    punctuation aside. That leaves out 129 more statements of the TBD stratum, 126 of them
+    with the text "Estimated recovery: TBD"; one was a literal item. A.4 also gives the
+    numbers of drawn items that contain a quoted phrase, and what the silent and TBD items of
+    a sample stand for.
+  - *Later lists (1, 10).* The in-context pool, the dev prompt items and the pair seeds also
+    leave out the statements that read like an item A1 and A2 label: the same whole text
+    whatever the drug or the company, and the same notice on another presentation. The first
+    draw of these lists held 12 statements with the whole text of an item of another drug,
+    and 6 that were an item's notice on another presentation; one of the 6, in the in-context
+    pool, differed from a literal item by a typing error. `draw-later` no longer writes over
+    a list on disk that would change, unless `--replace` is given.
+  - *Outcome audit (6.2, D21).* The text now says all that the builder leaves out: for the
+    thread of a shown row, every statement it carried at any date, with all its
+    presentations. The builder did not change.
+  - *Pilot (4).* D13 has no pilot item; the meeting settles it on the forms C17 names.
+  - Appendix B: the list of differences from `PLAN.md`, redone against the plan of that
+    night.
