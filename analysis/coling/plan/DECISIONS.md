@@ -42,8 +42,10 @@ carry the registered text.
    and freeze by 7 October.
 3. **Dev boundary: 2021-01-01, as a fixed date.** The rule in the draft gives 2021-10-01 with 178
    scoreable statements, 167 of them no/no, because train outcomes are censored at the split and
-   captures stop for 308 days after 2021-11-30. The fixed date gives 661 scoreable dev statements
-   in 73 episodes and leaves 799 for fit. The dev outcome mix is printed in the registration, and
+   captures stop for 308 days after 2021-11-30. The fixed date gives 643 scoreable dev statements
+   in 73 episodes and leaves 787 for fit, on the displayed presentation (decision 5) and on the
+   tables of 1 October; the corpus freeze prints the registered counts. (An earlier version of
+   this note gave 661 and 799, which counted every covered presentation.) The dev outcome mix is printed in the registration, and
    the plan discloses that fit outcomes are followed past the dev boundary.
 4. **Reference reading.** Eligibility for E3 and the `stated_end` shown in prompts come from the
    frozen rule reading (`rules.py`) for every form. The authors check 100 eligible statements and

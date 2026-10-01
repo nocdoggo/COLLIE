@@ -1078,8 +1078,10 @@ bounds of section 7.2 are reported beside every confirmatory estimate.
 - Each hypothesis has a language model on one side, and no paid call precedes registration. The
   estimate therefore uses one pair of model-free predictors per hypothesis as a proxy: the
   paired loss variance of the pair on the scoreable dev statements, with its inflation from
-  clustering, scaled to the registered numbers of scoreable test statements and episodes.
-  Where a registered number is a lower bound, the bound is used.
+  clustering, scaled to the registered number of scoreable test statements and to the
+  size-weighted number of statements per episode of the eligible list, scaled by the
+  scoreable share. The number of episodes enters only a second figure, "from episodes alone",
+  printed beside it. Where a registered number is a lower bound, the bound is used.
 - The three pairs are fixed in the power code before it reads a dev outcome, and are listed here
   at registration (**TBD-at-gate**). The draft pairs: face value against rules plus slip (H1);
   rules plus slip against the base-rate predictor (H2); the structured-only GBM against the
@@ -1172,8 +1174,9 @@ fit statements for the dev runs and from fit and dev statements for the test run
   revision bucket (first, second, third or later statement of its thread; revision index 0, 1,
   2 or more). The cell is that of the statement and is the same for every reader.
 - *Backoff.* The estimate of form by revision bucket is used when that cell holds at least 100
-  dated statements in the fitting set; otherwise the estimate of the form; otherwise the
-  estimate over all dated forms. Which cells meet the minimum is **TBD-at-gate**.
+  dated statements in the fitting set; otherwise the estimate of the form, when the form holds
+  at least 100; otherwise the estimate over all dated forms. Statements that are stale at
+  issue are neither counted nor fitted. Which cells meet the minimum is **TBD-at-gate**.
 - Given a literal reading with period end `ŝ`: `P(E_end) = F_slip(t_end − ŝ)` and
   `P(E_end90) = F_slip(t_end + 90 − ŝ)`. The quantiles are `ŝ − s` plus the slip quantiles,
   kept within 0 to 365 days.
@@ -1184,11 +1187,19 @@ fit statements for the dev runs and from fit and dev statements for the test run
 
 - Features: reason for shortage, therapeutic category, time since initial posting, company and
   calendar month. No free text. Status is not a feature: it is constant on at-risk statements.
-- It gives quantiles at 0.05 to 0.95. The resulting CDF is read at each horizon.
+- It gives the 19 quantiles at 0.05 to 0.95. The CDF is read at each horizon by straight
+  lines through (0, 0) and the 19 quantiles, and is never above 0.95 below the cap of 365
+  days; at or beyond the cap it continues with the conditional tail of the pooled Turnbull
+  estimate.
 - Censoring in fitting: an interval-censored fit event is given the midpoint of its bracket. A
-  right-censored fit event is represented by the conditional tail of the pooled Turnbull
-  estimate beyond its censoring time. The exact wording of this rule is **TBD-at-gate**: it is
-  matched to the predictor code hashed in section 17.
+  right-censored fit event becomes 10 copies of weight 1/10, placed at the (k − 0.5)/10
+  quantiles (k = 1 to 10) of the conditional tail of the pooled Turnbull estimate beyond its
+  censoring time, capped at 365 days.
+- The settings of the boosting are fixed in the predictor code hashed in section 17 and are
+  not tuned on dev. The fit is identical across runs and thread counts on the registered
+  environment; pinball boosting is discontinuous at tied targets, so a fitted artefact may
+  not reproduce bit for bit on another platform, and F1 records the environment with the
+  artefact hashes.
 
 **Text-trained quantile GBM.** TF-IDF on the availability and related text, plus the structured
 features. This baseline is what makes H3 an NLP question.
@@ -1197,7 +1208,12 @@ features. This baseline is what makes H3 an NLP question.
 
 - **The stated date at face value** (the issuer as forecaster): `P(E_end) = P(E_end90) = 1`, with
   every quantile at `t_end − s`.
-- **Base-rate remaining duration** by listing age.
+- **Base-rate remaining duration** by listing age: a Turnbull curve of time to recovery for
+  each bin of the time since initial posting (under 90 days, 90 to 364, 365 to 729, 730 to
+  1,094, 1,095 to 1,824, 1,825 or more, and unknown), fitted on dated, TBD and silent
+  statements. A bin with fewer than 100 fitting statements uses the pooled curve. The
+  fallback of the calibrator for an ABSTAIN reading is the same construction fitted on TBD and
+  silent statements only.
 - **Rules plus slip:** the rule reading through the calibrator. Under section 2.5 this is also
   the reference reading plus slip.
 - **The LLM literal reading plus slip**, which is condition (c).
