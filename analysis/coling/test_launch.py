@@ -13,6 +13,7 @@ Usage (from the repository root)::
 
 from __future__ import annotations
 
+import contextlib
 import fcntl
 import json
 import os
@@ -441,7 +442,9 @@ def test_caps_of_a_models_runs_sum_to_its_cap(study, tmp_path: Path, monkeypatch
     with pytest.raises(ValueError):
         lp.split_units(5, [0, 0])
     plan = study.plan
-    sheet = rd.run_sheet(plan["counts"])
+    # the plan prices the track-record prompts with the record on disk
+    record = rd.load_track_record(study.items / "track_fit_dev.json")
+    sheet = rd.run_sheet(plan["counts"], track=record)
     for model in rd.STUDY_MODELS:
         runs = [run for run in plan["runs"] if run["model"] == model]
         held = [r for r in plan["reserved"] if r["model"] == model]
@@ -1589,3 +1592,26 @@ def test_blocked_names_every_missing_value(tmp_path: Path, monkeypatch, capsys) 
     assert sum("list 'e5' is not the file the plan was made with" in line for line in out) == 1
     with pytest.raises(SystemExit, match="no plan at"):
         lp.main(["status", "--out-root", str(tmp_path / "elsewhere")])
+
+
+def test_condition_b_is_priced_with_the_track_record_on_disk(
+    study, tmp_path: Path, monkeypatch
+) -> None:
+    """The sheet prices the track-record prompts with the fit-and-dev record when its file is
+    there, and with the harness's stand-in when it is not."""
+    seen: list = []
+    real = rd.run_sheet
+
+    def watched(counts, **kw):
+        seen.append(kw.get("track"))
+        return real(counts, **kw)
+
+    monkeypatch.setattr(rd, "run_sheet", watched)
+    options = options_for(tmp_path)
+    lp.make_plan(options)
+    assert isinstance(seen[-1], rd.TrackRecord)
+    assert seen[-1] == rd.load_track_record(Path(options["tracks"]["fit+dev"]))
+    gone = dict(options, tracks=dict(options["tracks"], **{"fit+dev": "no/such/track.json"}))
+    with contextlib.suppress(SystemExit, ValueError, FileNotFoundError):
+        lp.make_plan(gone)
+    assert seen[-1] is None

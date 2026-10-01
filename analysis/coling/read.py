@@ -490,8 +490,9 @@ def _row_errors(row: SlipRow, track: TrackRecord) -> list[str]:
 
 
 def track_precedes(track: TrackRecord, item: ReadItem) -> bool:
-    """Whether the track record ends before the item's date, so it holds nothing from its
-    future (always true for test-period items)."""
+    """Whether the last statement behind the track record is dated before the item (always true
+    for test-period items). A rule on statement dates: the outcomes of the fit record are
+    followed to the train horizon, through the dev period (PLAN section 3)."""
     return parse_date(track.through) < parse_date(item.date_of_update)
 
 
@@ -499,7 +500,8 @@ def track_refusals(track: TrackRecord, items: Sequence[ReadItem]) -> list[str]:
     """Why a live run may not show this track record with these items (empty when it may).
 
     * The record must end before every item: a table that covers an item's own period would
-      put outcomes of that period into its prompt. So a dev run needs the ``fit`` record.
+      put statements of that period into its prompt. So a dev run needs the ``fit`` record
+      (whose outcomes still run through the dev period: PLAN section 3).
     * Items of the test or late period are read with the record of the whole train period
       (``fit+dev``), as registered.
 

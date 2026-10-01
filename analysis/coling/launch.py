@@ -529,9 +529,11 @@ def make_plan(options: Mapping[str, Any]) -> dict[str, Any]:
     for spec in LISTS:
         counts[spec.count] += lists[spec.key]["items"]
     sheet_items = rd.load_items(Path(options["sheet_items"])) if options["sheet_items"] else None
+    priced_with = Path(options["tracks"]["fit+dev"])
     sheet = rd.run_sheet(
         counts,
         items=sheet_items,
+        track=rd.load_track_record(priced_with) if priced_with.is_file() else None,
         prices={m: (p[0], p[1]) for m, p in options["prices"].items()},
         per_call_usd=dict(options["per_call_usd"]),
         repair_rate=options["repair_rate"],
