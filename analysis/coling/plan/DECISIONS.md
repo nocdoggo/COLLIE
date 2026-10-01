@@ -123,3 +123,12 @@ carry the registered text.
     links when it has fewer, and at least 90% of all checked links correct, with no minimum
     per term. A link on both sheets is correct only when both checkers say so, and "unclear"
     is not correct.
+26. **H3 comparator (provisional until the owner confirms).** The comparator of H3 is the base
+    rate by listing age, fixed at registration. The draft's contrast against the
+    structured-only GBM is a registered secondary beside H3, and "value beyond the structured
+    fields" is written only when the model's best condition beats both. The family stays at
+    six; no predictor code changes; the H3 pair of the power code becomes the base rate
+    against the text-trained GBM. The plan discloses what had been seen (item 36). If the
+    freeze-run tables put the structured-only GBM below the base rate on dev, or leave the
+    95% interval of their difference including zero, the choice goes back to the owner before
+    registration.

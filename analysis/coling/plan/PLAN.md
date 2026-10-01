@@ -815,7 +815,8 @@ Subsets are drawn from the eligible list by the seeded rule, stratified by state
 **Descriptive decomposition.** For each model, on the scoreable events, with the loss taken as
 the primary Brier (section 7.2):
 
-- the text's content value: loss(structured-only) − loss(rule reading + calibrator);
+- the text's content value: loss(base rate by listing age) − loss(rule reading + calibrator),
+  with the same difference from the structured-only GBM beside it;
 - the reading loss: loss(model reading + calibrator) − loss(rule reading + calibrator);
 - the trust loss: loss(condition a) − loss(model reading + calibrator).
 
@@ -825,7 +826,9 @@ both the reference of this decomposition and the "rules plus slip" baseline of s
 **Secondaries (no multiplicity claim).**
 
 - Every metric for all eight models and all conditions.
-- The H1 to H3 contrasts for the six secondary models.
+- The H1 and H2 contrasts for the six secondary models, and the H3 contrast for each of their
+  three conditions (they have no dev runs, so no `m-best`).
+- For each primary: `Δ_GBM`, and the H3 contrast for each of the three conditions (section 6).
 - Post-cutoff slices.
 - The recovery definition A (FDA resolved).
 - The outcome over all covered presentations, and over any covered presentation.
@@ -1051,15 +1054,50 @@ sides share the same frozen calibrator, so only the literal reading differs.
   check (section 10) is reported beside H2, and H2 is also reported on the month-and-year form
   alone, where the rule reading is least in doubt.
 
-**H3: value of the text** (two-sided). `Δ = loss(structured-only GBM) − loss(m-best) ≠ 0`.
+**H3: value of the text** (two-sided). `Δ = loss(base rate by listing age) − loss(m-best) ≠ 0`.
 
+- *Comparator.* The base-rate predictor of section 8, refitted on fit and dev. It uses the
+  Initial Posting Date and nothing of the statement text. It is fixed here, at registration,
+  and is not selected again in F1. The draft's comparator was the structured-only GBM
+  ("Changes from the 29 September draft", item 36).
+- *Why this one.* Of the study's two predictors that read no text, the base rate has the lower
+  primary loss on the scoreable dev statements, which is the rule that selects `m-best`:
+  **TBD-at-gate** (the dev loss of both, their difference with its 95% interval, and both
+  bounds of section 7.2, from the power code on the freeze-run tables). It also had the lower
+  loss in every check made inside the fit split (item 36).
+- *What the comparator is given.* Like every predictor, it is read at the two horizons, and
+  the stated end comes from the rule reading of the text (section 2.5). H3 therefore measures
+  what a reading of the notice adds once the length of the stated period is known. It does not
+  measure the value of the stated date itself.
+- *Failed answers.* Under conditions (a) and (b) an answer that fails to parse is replaced by
+  the base-rate output (section 4), so it adds zero to `Δ`. The number of such answers is
+  reported with H3, beside the sensitivity analysis on the events that both sides parsed.
 - `m-best` is the one of `m`'s three conditions (a, b, c) with the lowest primary loss on the
   scoreable dev statements.
 - The selection is recorded in F1, before any test call, with the dev loss of all three
   conditions, their bounds (section 7.2) and the dev outcome mix. The dev split is dominated by
   "no" answers (section 3), which favours the condition that gives the lowest probabilities.
-- The text-trained GBM, and rules plus slip, are each compared with the structured-only GBM in
-  the same way, as registered secondaries.
+  The H3 contrast is also reported with each of the three conditions in place of `m-best`, as
+  secondaries.
+- *The structured-only GBM.* `Δ_GBM = loss(structured-only GBM) − loss(m-best)`, the H3 of the
+  draft, is a registered secondary outside the family. It is computed on the same statements
+  and the same bootstrap draws as `Δ`, and is reported beside H3, with its 95% interval, in
+  every table that shows H3.
+- *Reading.*
+  - H3 holds in favour of the text for `m` when its Holm-adjusted p is below 0.05 and `Δ > 0`.
+    The models are shown structured fields that the base rate does not use (section 2.3), so
+    the paper then writes that the text carries value beyond the structured fields only if
+    the 95% interval of `Δ_GBM` also lies above zero. This second condition is not a test of
+    the family: it can only withhold a claim. When it fails, the paper says that `m-best` beat
+    the base rate by listing age and did not beat the structured-only GBM, and makes no claim
+    about the structured fields.
+  - H3 holds in favour of the base rate when its Holm-adjusted p is below 0.05 and `Δ < 0`.
+    This needs no second condition.
+  - Otherwise H3 is null for `m`. A null is reported with its 95% interval and the minimum
+    detectable `Δ` below, and is not read as equivalence.
+- *Other registered secondaries* (no multiplicity claim), each computed in the same way: the
+  text-trained GBM, and rules plus slip, each against the base rate and against the
+  structured-only GBM; and the structured-only GBM against the base rate.
 
 **Resampling.** A paired cluster bootstrap by shortage episode: 10,000 draws, seed 20261001. Each
 draw resamples episodes with replacement and computes both predictors' mean losses on the same
@@ -1086,10 +1124,13 @@ bounds of section 7.2 are reported beside every confirmatory estimate.
   size-weighted number of statements per episode of the eligible list, scaled by the
   scoreable share. The number of episodes enters only a second figure, "from episodes alone",
   printed beside it. Where a registered number is a lower bound, the bound is used.
-- The three pairs are fixed in the power code before it reads a dev outcome, and are listed here
-  at registration (**TBD-at-gate**). The draft pairs: face value against rules plus slip (H1);
-  rules plus slip against the base-rate predictor (H2); the structured-only GBM against the
-  text-trained GBM (H3).
+- The pairs are listed here at registration (**TBD-at-gate**). The pairs of H1 and H2 were
+  fixed in the power code before it read a dev outcome: face value against rules plus slip
+  (H1); rules plus slip against the base-rate predictor (H2). The pair of H3 changed with its
+  comparator, after the dev losses had been seen ("Changes from the 29 September draft",
+  item 36): the base-rate predictor against the text-trained GBM. Rules plus slip could also
+  stand for `m-best`; that is the pair of H2, so the value of H2 is the value of H3 under that
+  stand-in. The text-trained GBM is taken because it gives the larger minimum detectable `Δ`.
 - The values are indicative, and the dev outcome mix is stated beside them. Low power does not
   stop the study. It is written into the paper.
 
@@ -1166,8 +1207,9 @@ describe the frame without those statements.
 ## 8. Baselines and conditions
 
 **Freezing.** The code of every model-free component is hashed at registration. Every component
-is fitted on the fit split and selected on dev, then refitted on fit and dev together; the
-fitted artefacts are hashed in F1, before any test call.
+is fitted on the fit split for the dev runs and refitted on fit and dev together for the test
+runs; none is selected or tuned on dev. The fitted artefacts are hashed in F1, before any test
+call.
 
 **Rule reader.** The regex reader `rules.py`, frozen (standing rules), with the conventions of
 section 2.5. It is the rule baseline of E2 and H2 and the source of the stated period. Its
@@ -1190,8 +1232,12 @@ fit statements for the dev runs and from fit and dev statements for the test run
 - When the reading is ABSTAIN, the calibrator falls back to the no-date time-to-recovery
   distribution by listing age.
 
-**Structured-only quantile GBM (the content-free control).**
+**Structured-only quantile GBM (a registered secondary of H3).**
 
+- It was the comparator of H3 in the draft. On the train period it lost to the base rate by
+  listing age, which uses one of its five features ("Changes from the 29 September draft",
+  item 36). It is kept as it was, untuned, and its contrast with `m-best` is reported beside
+  H3 (section 6).
 - Features: reason for shortage, therapeutic category, time since initial posting, company and
   calendar month. No free text. Status is not a feature: it is constant on at-risk statements.
 - It gives the 19 quantiles at 0.05 to 0.95. The CDF is read at each horizon by straight
@@ -1209,18 +1255,21 @@ fit statements for the dev runs and from fit and dev statements for the test run
   artefact hashes.
 
 **Text-trained quantile GBM.** TF-IDF on the availability and related text, plus the structured
-features. This baseline is what makes H3 an NLP question.
+features. It reads the text without a language model. Its contrasts with the base rate and with
+the structured-only GBM (the same learner without the text) are registered secondaries of H3
+(section 6).
 
 **Other predictors.**
 
 - **The stated date at face value** (the issuer as forecaster): `P(E_end) = P(E_end90) = 1`, with
   every quantile at `t_end − s`.
-- **Base-rate remaining duration** by listing age: a Turnbull curve of time to recovery for
+- **Base-rate remaining duration** by listing age (the comparator of H3, section 6): a Turnbull curve of time to recovery for
   each bin of the time since initial posting (under 90 days, 90 to 364, 365 to 729, 730 to
   1,094, 1,095 to 1,824, 1,825 or more, and unknown), fitted on dated, TBD and silent
   statements. A bin with fewer than 100 fitting statements uses the pooled curve. The
   fallback of the calibrator for an ABSTAIN reading is the same construction fitted on TBD and
-  silent statements only.
+  silent statements only. The base rate uses the Initial Posting Date and nothing of the
+  statement text, and nothing in it is tuned.
 - **Rules plus slip:** the rule reading through the calibrator. Under section 2.5 this is also
   the reference reading plus slip.
 - **The LLM literal reading plus slip**, which is condition (c).
@@ -1465,8 +1514,10 @@ and the main labelling on 3 to 5 October; the figure must fit the hours they can
   the certainty class of a statement that gives no date and has no unknown marker (both
   literal templates). After registration, development uses dev items only, with at most 3
   variants per prompt, all disclosed. Prompts are selected by parse rate and format compliance,
-  and never by an outcome loss. The one outcome-based choice is the H3 selection on dev,
-  recorded in F1. From F1 on, a changed prompt takes a new template id.
+  and never by an outcome loss. The one outcome-based choice after registration is the selection of
+  `m-best` on dev, recorded in F1. The H3 comparator was fixed before registration, after
+  train-period losses of the model-free predictors had been seen ("Changes from the
+  29 September draft", item 36). From F1 on, a changed prompt takes a new template id.
 - **Test items wait for F1.** No test-period or late-period item is sent to a model before F1
   is pushed. The harness refuses such items unless the F1 tag is in place and a flag is passed
   (section 9).
@@ -1598,15 +1649,20 @@ plus:
   quantity for `E_end90` and the coverage of the 80% interval are reported beside it. The claim
   is conditional on survival to first sight (section 2.5).
 - The models use the list's track record when it is given (H1 holds).
-- The free text carries value beyond the structured fields (H3 holds in favour of the text).
+- The free text carries value beyond the structured fields: H3 holds in favour of the text
+  against the base rate by listing age, and the 95% interval of `Δ_GBM` lies above zero
+  (section 6). If only the first holds, the paper says which predictor `m-best` did not beat
+  and makes no claim about the structured fields.
 - On H2, an LLM reading beats the rules (a reading effect), or equivalence holds (reading is not
   the bottleneck). Both are informative.
 
 **Negative, publishable because registered.**
 
 - The models do not use the track record even when shown it (H1 fails).
-- The text adds nothing beyond the structured fields, or loses to them (H3 null or in favour of
-  the structured model).
+- A model's reading of the notice loses to the base rate by listing age (H3 holds in favour
+  of the base rate), or no difference is detected (H3 null). A null is reported with its 95%
+  interval and the minimum detectable `Δ` of section 6, and is not read as "the text adds
+  nothing".
 - Literal reading is solved for this register (E2).
 - Invariance holds on the minimal pairs (E5).
 - Memorisation confines the outcome claims to post-cutoff slices (E4).
@@ -1619,7 +1675,11 @@ claim.
 - From Chicoine and Griffin (2025): a face-value reader will be overconfident on `E_end`, and
   condition (b) should reduce the primary Brier.
 - H2 is expected to be small, because month-and-year forms dominate.
-- H3 is open.
+- H3 is open. On the train period, rules plus slip (a reading with no language model) was
+  behind the base rate on the scoreable dev statements and ahead of it in the check on 2020
+  ("Changes from the 29 September draft", item 36).
+- `Δ_GBM` is expected to be positive for any reading passed through the calibrator: rules plus
+  slip had the lower loss than the structured-only GBM in every train-period check.
 
 **Not claimed.**
 
@@ -1628,6 +1688,8 @@ claim.
 - "First" (the paper writes "to our knowledge").
 - That models "understand" anything.
 - The term "commitment" (the label layer is "certainty class").
+- That the base rate is the best predictor that could be built from the structured fields: it
+  is the better of the two registered ones.
 
 ## 14. Outputs and release
 
@@ -2023,7 +2085,7 @@ quoted here are from the build of 29 September.
     a form with fewer than 15 events in all periods into "other". *Seen:* counts of statements
     by form in every split (texts only); the merge uses train counts. *Why:* the draft's 11
     forms overlapped and had no order.
-23. **New definitions.** The power proxies; the criterion for "overconfident"; distractor
+23. **New definitions.** The power proxies (the H3 proxy changed again with item 36); the criterion for "overconfident"; distractor
     uptake; selective prediction limited to condition (c) and the rules; the E5 error and the
     contrast of each E5 test; the evaluator's three refusals in terms of what the harness
     stores; bounds beside every confirmatory estimate; the pinball loss of a target that is
@@ -2121,6 +2183,69 @@ quoted here are from the build of 29 September.
     were word for word a phrase quoted in the guide, and five of the six train statements of
     the relative form were in a labelling sample or in the guide's appendix A, with the sixth
     barred by the cap per episode.
+
+36. **H3 comparator.** Draft: `Δ = loss(structured-only GBM) − loss(m-best)`, with that GBM
+    called the content-free control. Now: the comparator is the base rate by listing age,
+    fixed at registration; the draft's contrast is a registered secondary reported beside H3;
+    the paper writes "value beyond the structured fields" only when `m-best` beats both
+    (section 6). With it change the content value of the decomposition (E3), the H3 pair of
+    the power estimate (now the base rate against the text-trained GBM), and the H3 line of
+    the six secondary models, which is reported per condition because they have no dev runs.
+    No predictor code changed. *Seen:* train outcomes, on the build of 1 October; no model
+    output (no model had been called) and no test-period outcome. In detail:
+    - *Dev.* The primary loss on the 643 scoreable dev statements (73 episodes; 485 no/no, 82
+      no/yes, 76 yes/yes): base rate 0.197, rules plus slip 0.214, text-trained GBM 0.215,
+      structured-only GBM 0.243, face value 0.818; a constant 0 scores 0.182. Every pairwise
+      contrast with its interval, and the bounds of section 7.2.
+    - *The two predictors that read no text.* The structured-only GBM is worse than the base
+      rate by 0.046 on dev (95% interval 0.025 to 0.071), and under both bounds over the 1,332
+      dated dev statements (0.254 against 0.206; 0.287 against 0.262). On the 259 scoreable
+      dev statements whose two horizons fall on or before 2021-11-30 the difference is 0.013
+      (−0.007 to 0.038). Four checks were made inside the fit split, each fitted on the
+      statements before a date and scored on the scoreable dated statements after it. The GBM
+      is worse by 0.029 (0.020 to 0.040; fitted before 2020, the 569 statements of 2020),
+      0.037 (0.025 to 0.051; the 240 of January to June 2020), 0.041 (0.024 to 0.059; fitted
+      before April 2020, the 340 of April to September) and 0.022 (0.007 to 0.039; fitted
+      before July 2020, the 329 of July to December). The four checks overlap. In each of
+      them the GBM gives the lower probabilities, so its loss does not come from a subset
+      that favours low probabilities.
+    - *The text-reading predictors against the base rate* (the base rate's loss minus
+      theirs; dev, then the four checks in the same order). Rules plus slip: −0.017 (−0.030
+      to −0.003), +0.020 (0.000 to 0.040), +0.022 (−0.003 to 0.048), +0.025 (0.002 to 0.047),
+      −0.007 (−0.034 to 0.021). Under both bounds on dev, rules plus slip has the lower loss
+      (0.196 against 0.206; 0.255 against 0.262). Text-trained GBM: −0.018, −0.033, −0.038,
+      −0.027, −0.014.
+    - *The same against the structured-only GBM.* Rules plus slip: +0.029 (0.004 to 0.061; p
+      0.017), +0.050, +0.059, +0.067, +0.015 (−0.022 to 0.053). Text-trained GBM: +0.028,
+      −0.004, −0.001, +0.015, +0.007.
+    - *Other predictors that read no text*, tried for this change and not registered. One
+      curve for all listing ages scores within 0.002 of the base rate in every comparison.
+      On dev and three of the checks: the GBM on listing age alone is worse than the base
+      rate by 0.005 to 0.017; on listing age and month, by 0.006 to 0.040; without the
+      company, by 0.022 to 0.041. A logistic model on all structured fields and the horizon
+      is worse on three and within 0.003 on one. A logistic model on listing age and horizon
+      length, fitted on scoreable statements only, beats the base rate on dev (0.171 against
+      0.197) and loses to it on 2020 (0.282 against 0.236).
+    - *Selection of the scoreable statements.* The Turnbull share recovered by the stated end
+      plus 90 days is 0.447 over all dated dev statements against 0.246 among the scoreable
+      ones (0.545 against 0.440 on the fit split).
+    - *Power.* The minimum detectable `Δ` of H3 is 0.017 under the draft's pair and 0.029
+      under the new one. With rules plus slip standing for the model it is 0.036 under the
+      draft's comparator and 0.015 under the new one.
+    - *The refit.* The GBM fitted for the dev runs had 7 right-censored targets of 1,421; the
+      refit for the test runs will have 642 of 3,033.
+
+    *Why:* H3 asks whether a reading of the notice forecasts better than a predictor that
+    reads none of it. The structured-only GBM lost to a table that uses one of its five
+    features, so a positive `Δ` against it would have shown that the comparator is weak. A
+    failed answer under conditions (a) and (b) is replaced by the base-rate output (section
+    4): against the draft's comparator, a model whose answers all failed would have been
+    credited with the base rate's margin over the GBM. The comparator is fixed and not left
+    to a dev rule because the rule's result was known, and because a rule run on the
+    scoreable dev statements rewards low probabilities. The GBM was not tuned or replaced: a
+    new structured model would have been one more choice made after dev outcomes were seen.
+    The change makes H3 harder to hold in favour of the text on dev; on 2020 it does not
+    decide the sign. The draft's contrast is reported beside H3 so that both can be read.
 
 **Status of these changes.** The owner confirmed on 1 October the scope (item 1), the deadlines
 and their one relaxation (item 2), the availability rule, the capture freeze and the result of
