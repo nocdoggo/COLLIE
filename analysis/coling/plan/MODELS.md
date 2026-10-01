@@ -591,10 +591,10 @@ What the harness has to do with them:
   endpoint), and refuse a response from any other provider. In the routing metadata the
   provider that served the call is the one of the entry flagged `selected`; the other entries
   were considered and not used.
-- As it stood on 1 October, `read.py` does these three: its table `ROUTES` holds the six
-  OpenRouter rows as unset, with the endpoints above in its comments. The values above are
-  what is entered when the routes are set; a price left out there keeps the ladder's price,
-  which is wrong for deepseek-v3, gemma-3-27b and gpt-oss-20b.
+- As entered on 1 October, `read.py` does these three: its table `ROUTES` holds all eight
+  rows with the values above (model id, endpoint, precision, price) under the price date
+  2026-10-01. The two direct rows carry the makers' own prices as read again that day, which
+  equal the ladder's.
 - The exact strings to compare are not documented and are to be fixed in the cost trial: the
   routing metadata and the generation record name the provider ("DeepInfra", "Phala",
   "OpenAI" in the endpoint listing's `provider_name`), which is not the tag sent in `order`.

@@ -571,7 +571,10 @@ Late).
      in that order, from the events table and the form classifier only, with no outcome field;
   2. the train-half outcome-audit sample;
   3. the in-context examples, the dev prompt items and the minimal-pair seeds, in that order,
-     which exclude everything drawn in steps 1 and 2 and one another. The seeds of the
+     which exclude everything drawn in steps 1 and 2 and one another, and every statement that
+     reads like an item of step 1: one whose whole text is that of an item, whatever the drug
+     or company, and one of the same drug and company, dated the same day, for which the rule
+     reader finds the same statement type and period (guide, section 10). The seeds of the
      relative form are statements dated 2023-01-01 or later, text only, and no model is called
      on their pairs before F1;
   4. from the eligible list: the probe sample, the 20-sample subset, the paraphrase subset, the
@@ -583,7 +586,8 @@ Late).
      confirmatory run has finished (section 10).
 
   The statements used as examples in the guide and the fixed test item of the harness are
-  excluded from every sample. A statement whose whole text is a phrase of three or more words
+  excluded from every sample. A statement whose whole text is, word for word and punctuation aside, a phrase of three or
+  more words
   quoted in section 3 or 7 of the guide, or whose two text fields are each such a phrase, is
   excluded from every sample of statements that are read (guide, appendix A.4); the
   outcome-audit samples do not apply this rule. The hash of every sample list drawn before registration (steps
@@ -1127,7 +1131,10 @@ several parts and refuses:
   words read by the conventions of section 2.5. The answer schema has no distractor field.
 - **Certainty-class** accuracy and Cohen's kappa against gold, over the four classes.
 
-Each is reported per form, weighted by event and by template.
+Each is reported per form, weighted by event and by template. No sample holds a statement
+whose whole text is a phrase the guide quotes (685 statements of the frame in the draw of
+1 October, 486 of them silent and 158 TBD), so the per-form figures and their event weights
+describe the frame without those statements.
 
 ### 7.2 Against outcomes (E3, E4, and E7 if it runs)
 
@@ -1245,12 +1252,16 @@ cap. The rules, which the harness (`read.py`, frozen at F1) enforces:
   there before its first call.
 - *Caps.* A cap belongs to a run: one model, one template and one condition under one run name
   (a run may be one part of an item list). A run is refused when the caps and recorded spend of
-  its model's runs would pass the model's cap in the table below, or those of all runs would
+  its model's runs would pass the model's cap in the table below (or the cap a logged amendment has put in
+  its place), or those of all runs would
   pass $200. Caps of runs in flight count, not only recorded spend.
 - *Before every paid call,* the call is refused if its projected cost would take the run past
   its cap.
 - *Registration first.* A paid call is refused unless the registration tag is an ancestor of the
   checkout; a call on a test-period or late-period item also needs the F1 tag (section 17).
+- *Completeness.* Whether an item list was read in full is checked on the runs of that line
+  alone, named to the harness, because trial, dev and secondary runs share the output root and
+  may share a model and condition with a confirmatory run.
 - *The run sheet* lists every run with its model, template, item list and cap; the caps of a
   model's runs sum to that model's cap. It is **TBD-at-gate**.
 
@@ -1325,8 +1336,9 @@ projection fits:
 
 **Resuming a run.** A run stopped by its cap or by a provider error is resumed from its cache,
 under the same name, and each resumption is recorded in the study ledger. A cap may be raised
-within the reserve; every raise is logged as an amendment with its reason, and holds for the
-model's later runs. A run that cannot finish is reported as incomplete.
+within the reserve, or lowered again; every change is logged as an amendment with its reason,
+and holds for the model's later runs until another amendment replaces it. An amendment that a
+later one replaced is not applied a second time. A run that cannot finish is reported as incomplete.
 
 ## 10. Annotation: author audit
 
@@ -1357,7 +1369,8 @@ version of the notice, nor any reader's output on it. In the literal task they s
 display row as defined in section 2.3; in the reference-reading check, that row and the rule
 reading. In the outcome audit they see the capture rows of the audited thread, which for the
 train half stop at the train horizon; the train-half sample leaves out every thread that
-carries a statement they label.
+carries a statement they label and, for the thread of the row they are shown, every statement
+that thread carried at any date, with all its presentations.
 
 **Tasks.**
 
@@ -1671,7 +1684,8 @@ n-gram script against the UV text, with a target of near zero and a limit of 10%
 **Shared plumbing.** `read.py` imports some of the repository's shared infrastructure, unchanged.
 None of it is a method of either paper.
 
-- From `analysis/commitment/endpoints.py`: the model ladder, with its dated prices, and the
+- From `analysis/commitment/endpoints.py`: the model ladder (endpoints, model ids and billing
+  rules; the prices and their date are those of the harness's own table, section 4), and the
   served-model echo check.
 - From `analysis/real_content_pilot/transport.py`: the guarded transport, which handles
   retries, the spend cap and the spend log.
@@ -2096,7 +2110,8 @@ quoted here are from the build of 29 September.
     vague row and an undated row, with a vague shortfall going to the undated row. (b) The row
     "distractor date" is split into "distractor only" and "dated target beside a distractor
     date". (c) A statement that shares a wording with a phrase quoted in the guide may be
-    drawn; a statement whose whole text equals a quoted phrase of three or more words, or
+    drawn; a statement whose whole text is, word for word and punctuation aside, a quoted phrase of
+    three or more words, or
     whose two text fields are each such a phrase, is excluded from every sample of statements
     that are read. (d) The minimal-pair seeds of the relative form are taken from
     statements dated 2023-01-01 or later, text only, and calls on them wait for F1. *Seen:*
