@@ -903,13 +903,17 @@ That is reportable.
   order of section 3: after the samples of section 10, the in-context examples and the dev
   prompt items, and excluding them. The seeds are train-period statements, except those of
   the relative form, which are dated 2023-01-01 or later (section 3); their pairs wait for F1.
-- Names are fictitious, and gold labels follow by construction.
+- Names are fictitious. The gold of an unedited seed is the frozen rule reading of its
+  statement; the gold of an edit follows from it by construction, and the rule reader is run
+  on every item as a cross-check. No edit has the whole text of a statement of the labelling
+  samples, the in-context pool, the dev prompt items or the guide's Appendix A.
 
 **Factors, varied one at a time from the seed.**
 
 - Certainty marker, attested only: estimated, expected, anticipated, TBD, "no estimated release
   date", "as it is released".
-- Surface form.
+- Surface form: the same period in another writing that a train-period notice uses for the
+  time of a delivery or a recovery.
 - Granularity: early, mid or late, month ranges, "timeframe", quarters.
 - Stale against fresh.
 - Distractor date: depletion, "available until", expiry.
