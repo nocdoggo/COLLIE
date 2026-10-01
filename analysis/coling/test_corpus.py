@@ -1,18 +1,19 @@
 """Tests for the OpEst-FDA corpus builder on small synthetic captures.
 
 Each test writes a few fake capture CSVs (FDA header, leading blank line, CRLF endings) to a
-temporary directory and builds the corpus from them. Covered: parsing drift (blank lines, BOM,
+temporary directory and builds the corpus from them; one test reads the committed check list of
+availability strings instead. Covered: parsing drift (blank lines, BOM,
 latin-1, header whitespace, typos in Type of Update, status spellings, a row broken by an
 unescaped quote, a file with a header and no rows), re-verification, revision, recovery under
 definitions A and B, exit while the generic is resolved, right-censoring, discontinuation as a
 competing event, NDC linking across a re-formatted presentation, relisting after resolution, the
 train/test split with sealing, and timing-phrase extraction; the availability rule (negated,
 future and estimated mentions, the rejection list and the stop on an entry that is in no capture,
-the check list of strings); the Gate 1 counts with their gate set and cutoff month; the
-per-capture count of realigned rows; the guard on re-confirmation dates; the manifest hook; the
-build of the open tables alone; and edge cases of censoring (a train event first seen in the test
-period, an event first seen at the last capture, a thread that leaves while its generic is
-unlisted), of dating and of mixed statement groups.
+the check list of strings, and the committed check list against the rule); the Gate 1 counts
+with their gate set and cutoff month; the per-capture count of realigned rows; the guard on
+re-confirmation dates; the manifest hook; the build of the open tables alone; and edge cases of
+censoring (a train event first seen in the test period, an event first seen at the last capture,
+a thread that leaves while its generic is unlisted), of dating and of mixed statement groups.
 
 Run::
 
@@ -409,6 +410,9 @@ def test_outputs_and_sealing(tmp_path: Path, capsys: pytest.CaptureFixture[str])
     assert digest in printed
     with gzip.open(sealed / "outcomes_test.csv.gz") as fh:
         assert fh.read(8) == b"event_id"
+    # The gzip header carries no write time, so the same rows give the same bytes on any day.
+    for path in (*sorted(out.glob("*.gz")), *sorted(sealed.glob("*.gz"))):
+        assert path.read_bytes()[4:8] == bytes(4), path.name
     assert "statement events 1;" in printed
     assert "capture manifest: NOT checked" in printed
     assert not (out / "availability_strings.csv").exists()
@@ -557,6 +561,8 @@ ON_HAND = (
     "Available may be delayed",
     "We have product available",
     "Product will continue to have supply available",
+    "Available 6 months dating",
+    "Available 30 days coverage",
 )
 NOT_ON_HAND = (
     "Available by 4/5/19",
@@ -596,6 +602,15 @@ NOT_ON_HAND = (
     "Available within 2 weeks",
     "Available in approximately 2 weeks",
     "Available on or about June 1",
+    "Available next week",
+    "Available this month",
+    "Product will become available",
+    "Tentatively available",
+    "Available for shipment in June",
+    "Available again in June 2021",
+    "Available to order 6/1/21",
+    "None available",
+    "Product isn't available",
 )
 
 
@@ -686,6 +701,32 @@ def test_check_list_and_rejection_list_hold_no_email_address(
     assert C.availability_class(raw) == "other"
     table = C.availability_strings(C.load_captures(tmp_path).obs)
     assert [tuple(r) for r in table.itertuples(index=False)] == [(key, "other", "limited", 1)]
+
+
+def test_committed_check_list_is_what_the_rule_gives() -> None:
+    """The list the author checked (``out/availability_strings.csv``) against the rule in the
+    builder: every listed string gets the classes the list shows, a class changed only by leaving
+    available (or by rejection), and no string holds an address. A change of the rule that moves
+    a listed string fails here until the list is written again and checked again."""
+    path = Path(C.__file__).parent / "out" / C.STRINGS_PATH.name
+    if not path.exists():
+        pytest.skip(f"{path} is not on disk")
+    table = pd.read_csv(path, dtype=str, keep_default_na=False)
+    assert tuple(table.columns[: len(C.STRING_COLUMNS)]) == C.STRING_COLUMNS
+    assert len(table) and table["string"].is_unique
+    assert (table["n_rows"].astype(int) > 0).all()
+    assert not table["string"].str.contains("@").any()
+    rejected = set(C.REJECTED_AVAILABLE)
+    assert rejected <= set(table["string"])
+    rows = zip(table["string"], table["class_after_fix"], table["class_before_fix"], strict=True)
+    for text, after, before in rows:
+        assert C.availability_key(text) == text, text
+        assert C.availability_class(text) == after, text
+        assert C.availability_class_before_fix(text) == before, text
+        assert before in C.SUPPLY_CLASSES, text
+        assert after == before or after == "other", text
+        if after != before:
+            assert before == "available" or text in rejected, text
 
 
 def test_a_future_available_is_no_recovery_and_leaves_the_event_at_risk(tmp_path: Path) -> None:
@@ -830,6 +871,14 @@ def test_gate_counts_and_the_cutoff_argument(
     assert "dated after 2024-01-31, observable outcome, definition B: presentation-level" in printed
     assert "events 0, distinct statements 0 (need >= 150)" in printed
     assert "with follow-up 0, distinct with follow-up 0 (no threshold)" in printed
+    # The thresholds on observable outcomes are on definition B; A is printed without one.
+    lines = printed.splitlines()
+    for need in ("(need >= 250)", "(need >= 150)"):
+        assert [line for line in lines if need in line and "definition B" not in line] == []
+        assert sum(need in line for line in lines) == 1
+    secondary = [line for line in lines if "definition A" in line]
+    assert len(secondary) == 2
+    assert all(line.endswith("(secondary, no threshold)") for line in secondary)
 
 
 def test_gate_set_and_the_day_after_the_cutoff(tmp_path: Path) -> None:
@@ -908,6 +957,31 @@ def test_gate_set_and_the_day_after_the_cutoff(tmp_path: Path) -> None:
     assert earlier["after_cutoff_observable31_B_distinct"] == 3
     later = C.gate_counts(corpus, "2024-01-01")  # January 2024: nothing is dated after it
     assert later["after_cutoff_events"] == 0 and later["after_cutoff_observable31_B_events"] == 0
+
+
+def test_fourth_gate_count_is_on_observable_events_not_on_followed_ones(tmp_path: Path) -> None:
+    text = "Estimated recovery: March 2024"
+    corpus = build(
+        tmp_path,
+        {
+            "20240105000000": [
+                row(P10, "Revised", "01/03/2024", "Unavailable", text),
+                row(P20, "Revised", "01/03/2024", "Unavailable", text),
+            ],
+            "20240201000000": [row(P20, "Revised", "01/03/2024", "Unavailable", text, "Resolved")],
+        },
+    )
+    # P10 leaves the list while its generic is Resolved: recovered within 31 days, although no
+    # later capture lists its thread. The older check ("with follow-up") does not count it.
+    gone = outcome(corpus, events_of(corpus, P10).iloc[0]["event_id"])
+    assert gone["observable31_B"] and gone["event_via_B"] == "exit_generic_resolved"
+    assert gone["n_followup_listed"] == 0
+    counts = C.gate_counts(corpus)
+    assert counts["after_cutoff_observable31_B_events"] == 2
+    assert counts["after_cutoff_observable31_B_distinct"] == 1
+    assert counts["after_cutoff_with_followup"] == 1
+    assert counts["after_cutoff_distinct_with_followup"] == 1
+    assert counts["after_cutoff_events"] == 2 and counts["after_cutoff_distinct"] == 1
 
 
 def test_report_counts_realigned_rows_per_capture(

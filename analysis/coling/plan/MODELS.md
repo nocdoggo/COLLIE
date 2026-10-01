@@ -4,8 +4,9 @@ This note fills the **TBD-at-registration** items of `PLAN.md` sections 3, 4 and
 and 17) for the eight readers. Every fact below was read on **2026-10-01 (UTC)** from the page
 named next to it: a model card, the provider's own documentation, or OpenRouter's public
 per-model endpoint listing. No model was called and no key was used. Every primary source was
-then read a second time, independently, on the same day; the corrections from that reading are
-folded in.
+then read again on the same day, twice, each time without relying on the earlier reading; the
+corrections are folded in. Where a value that moves from hour to hour (an endpoint's status or
+uptime) differed between readings, section 3 says so.
 
 The requests carried nothing personal. They went through a general page-fetching tool that sets
 its own User-Agent, so they did not carry the project string of process rule 8 (`DECISIONS.md`).
@@ -49,7 +50,7 @@ are marked **(primary)**; the open choice for `deepseek-v3` is in section 5.
 | qwen-2.5-7b | OpenRouter `qwen/qwen-2.5-7b-instruct` | `phala` (the only endpoint) | not stated | 0.10 | 0.20 | 0.10 / 0.20 | none |
 | gemma-3-27b | OpenRouter `google/gemma-3-27b-it` | `deepinfra/fp8` | fp8 | 0.08 | 0.16 | 0.08 / 0.45 | output price; the plan's price is the `parasail/fp8` endpoint's |
 | gpt-oss-20b | OpenRouter `openai/gpt-oss-20b` | `deepinfra/bf16` | bf16 | 0.03 | 0.14 | 0.018 / 0.09 | both prices; the plan's price is the `darkbloom/fp8` endpoint's |
-| gpt-4o-mini | OpenRouter `openai/gpt-4o-mini-2024-07-18` (dated; or the alias `openai/gpt-4o-mini`) | `openai` | not applicable | 0.15 | 0.60 | 0.15 / 0.60 | id only, if the dated slug is taken |
+| gpt-4o-mini | OpenRouter `openai/gpt-4o-mini` (alias of the only snapshot, `gpt-4o-mini-2024-07-18`; a dated route `openai/gpt-4o-mini-2024-07-18` also exists) | `openai` | not applicable | 0.15 | 0.60 | 0.15 / 0.60 | none (section 8 on the dated route) |
 | gemini-3.8-flash | Google `gemini-3.8-flash` (the only id; no dated snapshot is listed) | direct | not applicable | 0.75 | 3.75 | 0.75 / 3.75 | none until 2026-12-31 |
 | grok-4.20 | xAI `grok-4.20-0309-non-reasoning` (dated id) | direct | not applicable | 1.25 | 2.50 | 1.25 / 2.50 | none (prompts under 200k tokens) |
 
@@ -79,10 +80,17 @@ All retrieved 2026-10-01.
   log.
 - Repository history, `https://huggingface.co/deepseek-ai/DeepSeek-V3/commits/main`: created
   2024-12-25 (UTC); the weight uploads and the commit "Release DeepSeek-V3" are all dated
-  2024-12-26. The eight later commits (to 2025-03-27, head `e815299`) are, by their messages,
-  changes to the README files, the repository metadata, the citation and helper scripts. The
-  repository therefore holds one set of weights, those of December 2024; V3-0324 has a
-  repository of its own (`deepseek-ai/DeepSeek-V3-0324`, created 2025-03-24).
+  2024-12-26. Eight commits follow (to 2025-03-27, head
+  `e815299b0bcbac849fa540c768ef21845365c9eb`).
+  - By their messages, six of them change the README files, the citation, the library metadata
+    and a helper script. The other two were opened: the head commit ("Small fix") changes
+    `config.json`, `configuration_deepseek.py` and `modeling_deepseek.py`, and `108e1e0`
+    changes `README_WEIGHTS.md`.
+  - None of the eight is described as, or was seen to be, a change of a weight file; six were
+    judged by their messages only.
+  - The repository therefore holds one set of weights, those of December 2024 (163
+    `model-*.safetensors` files in `https://huggingface.co/api/models/deepseek-ai/DeepSeek-V3`).
+    V3-0324 has a repository of its own (`deepseek-ai/DeepSeek-V3-0324`, created 2025-03-24).
 - Release date used: 2024-12-26 (the change-log entry and the weight release; OpenRouter lists
   the model as created on the same day).
 
@@ -147,9 +155,11 @@ All retrieved 2026-10-01.
 - Models overview, `https://docs.x.ai/docs/models`: the only cutoff sentence is "The knowledge
   cut-off date of Grok 4.7 is May 2026." Nothing is said about Grok 4.20.
 - Release notes, `https://docs.x.ai/docs/release-notes`: "Grok 4.20 and Grok 4.20 Multi-agent
-  are live" under the heading "March", the seventh heading from the top after "September". The
-  recent headings carry no year; the year 2026 follows from their order, from the dated id
-  (0309) and from OpenRouter's endpoint name `x-ai/grok-4.20-20260309`.
+  are live" under the heading "March". From the top the headings run September, August, July,
+  June, May, April, March, January, then December 2025 and back to November 2024. Those of this
+  year carry no year; that this "March" is March 2026 follows from their order, from the dated
+  id (0309) and from OpenRouter's endpoint name `x-ai/grok-4.20-20260309` (its record there was
+  created on 2026-03-31).
 - A second host of the same model, `https://docs.oracle.com/en-us/iaas/Content/generative-ai/xai-grok-4-20.htm`,
   prints "Knowledge Cutoff: Not available".
 - Cutoff figures on third-party pages (September 2025 on one, November 2024 on another) disagree
@@ -160,10 +170,21 @@ All retrieved 2026-10-01.
 Source for every row: `https://openrouter.ai/api/v1/models/<author>/<slug>/endpoints` (public;
 it answered without a key although the API reference describes a bearer token). The `tag` column
 is the slug to send in a provider preference. Prices are converted from per-token to per 1M
-tokens. Uptime is the listing's one-day figure (`uptime_last_1d`: "successful requests /
-(successful + error requests) * 100") and is a snapshot. The API reference lists the status
-codes (0, -1, -2, -3, -5, -10) without describing them; 0 is the value of every endpoint here
-except the two shown with another code.
+tokens. The API reference for the listing is
+`https://openrouter.ai/docs/api/api-reference/endpoints/list-endpoints`.
+
+- **Uptime** is the listing's one-day figure (`uptime_last_1d`: "successful requests /
+  (successful + error requests) * 100", rate-limited requests excluded), as first read. At a
+  later reading the same day no figure differed by more than 0.3 points.
+- **Status.** The API reference lists the codes (0, -1, -2, -3, -5, -10) without describing
+  them, and they moved within the day. Every endpoint below showed 0, except `nebius/fp8` (-5,
+  gemma-3-27b) and `groq` (-2, gpt-oss-20b) at the first reading, and `novita/bf16` (-2,
+  gemma-3-27b) and `siliconflow/fp8` (-2, gpt-oss-20b) at the later one. None of the four is a
+  recommended endpoint; the six recommended endpoints showed 0 each time.
+- **Discount.** The API reference describes `pricing.discount` as "Fractional discount applied
+  to this endpoint's pricing; the price is multiplied by (1 - discount) (0 = no discount, 1 =
+  free)". Two endpoints below carry one (`sambanova-turbo` and `streamlake`); every other
+  endpoint shows 0.
 
 **`meta-llama/llama-3.3-70b-instruct` (primary)** (created 2024-12-06; 11 endpoints; read twice)
 
@@ -181,8 +202,7 @@ except the two shown with another code.
 | `google-vertex` | unknown | 128,000 | 0.72 | 0.72 | not given |
 | `together` | unknown | 131,072 | 1.04 | 1.04 | 99.2 |
 
-The `sambanova-turbo` row carries a discount field of 0.25 in the listing; the other ten carry
-none.
+The `sambanova-turbo` row carries a discount of 0.25 in the listing; the other ten show 0.
 
 DeepInfra's own page, `https://deepinfra.com/meta-llama/Llama-3.3-70B-Instruct-Turbo`, confirms
 FP8, $0.10 / $0.32, a 65,536-token context and the Hugging Face repository
@@ -193,18 +213,21 @@ endpoints; read twice)
 
 | tag | quantization | context | $/1M in | $/1M out | uptime 1d | note |
 |---|---|---|---|---|---|---|
-| `streamlake` | unknown | 128,000 | 0.2574 | 1.0287 | 98.4 | the listing carries a discount field of 0.1 |
+| `streamlake` | unknown | 128,000 | 0.2574 | 1.0287 | 98.4 | the listing carries a discount of 0.1 |
 | `deepinfra/fp4` | fp4 | 163,840 | 0.32 | 0.89 | 94.3 | |
 
-The `streamlake` prices equal 0.286 and 1.143 less 10%, so they read as prices after the
-discount; the listing does not say so and does not say when the discount ends (**UNVERIFIED**).
-If it ends, the price of this endpoint rises to about 0.286 / 1.143.
+The listed `streamlake` prices are the prices after the discount: they equal 0.286 and 1.143
+less 10%, and OpenRouter's model page (`https://openrouter.ai/deepseek/deepseek-chat/providers`)
+prints "$0.2574 / $1.029 per 1M" beside a mark of 10% off. The same arithmetic holds for the
+`sambanova-turbo` row above (0.45 and 0.90 are 0.60 and 1.20 less 25%). When the discount ends
+is not stated on any page read (**UNVERIFIED**). If it ends, the price of this endpoint rises to
+about 0.286 / 1.143.
 
 DeepInfra's own page, `https://deepinfra.com/deepseek-ai/DeepSeek-V3`, confirms the model id
 `deepseek-ai/DeepSeek-V3`, fp4 and $0.32 / $0.89, and points to the Hugging Face repository
 `deepseek-ai/DeepSeek-V3`. OpenRouter's page for the other host,
-`https://openrouter.ai/provider/streamlake`, lists `deepseek/deepseek-chat` among the 22 routes
-it serves and says nothing about weights or precision.
+`https://openrouter.ai/provider/streamlake`, lists `deepseek/deepseek-chat` among the routes it
+serves and says nothing about weights or precision.
 
 **`qwen/qwen-2.5-7b-instruct`** (created 2024-10-16; 1 endpoint)
 
@@ -214,36 +237,37 @@ it serves and says nothing about weights or precision.
 
 **`google/gemma-3-27b-it`** (created 2025-03-12; 4 endpoints)
 
-| tag | quantization | context | $/1M in | $/1M out | uptime 1d | status |
-|---|---|---|---|---|---|---|
-| `deepinfra/fp8` | fp8 | 131,072 | 0.08 | 0.16 | 99.7 | 0 |
-| `parasail/fp8` | fp8 | 131,072 | 0.08 | 0.45 | 99.8 | 0 |
-| `nebius/fp8` | fp8 | 110,000 | 0.10 | 0.30 | 87.1 | -5 |
-| `novita/bf16` | bf16 | 98,304 | 0.119 | 0.20 | 81.5 | 0 |
+| tag | quantization | context | $/1M in | $/1M out | uptime 1d |
+|---|---|---|---|---|---|
+| `deepinfra/fp8` | fp8 | 131,072 | 0.08 | 0.16 | 99.7 |
+| `parasail/fp8` | fp8 | 131,072 | 0.08 | 0.45 | 99.8 |
+| `nebius/fp8` | fp8 | 110,000 | 0.10 | 0.30 | 87.1 |
+| `novita/bf16` | bf16 | 98,304 | 0.119 | 0.20 | 81.5 |
 
 DeepInfra's own page, `https://deepinfra.com/google/gemma-3-27b-it`, confirms fp8 and
 $0.08 / $0.16.
 
 **`openai/gpt-oss-20b`** (created 2025-08-05; 12 endpoints)
 
-| tag | quantization | $/1M in | $/1M out | uptime 1d | status |
-|---|---|---|---|---|---|
-| `darkbloom/fp8` | fp8 | 0.018 | 0.09 | 99.8 | 0 |
-| `akashml/fp4` | fp4 | 0.02 | 0.10 | 99.4 | 0 |
-| `dekallm/bf16` | bf16 | 0.029 | 0.14 | 98.7 | 0 |
-| `coreweave/fp4` | fp4 | 0.03 | 0.13 | 100.0 | 0 |
-| `deepinfra/bf16` | bf16 | 0.03 | 0.14 | 100.0 | 0 |
-| `parasail/fp4` | fp4 | 0.03 | 0.15 | 99.9 | 0 |
-| `novita/fp4` | fp4 | 0.04 | 0.15 | 98.5 | 0 |
-| `siliconflow/fp8` | fp8 | 0.04 | 0.18 | 92.1 | 0 |
-| `amazon-bedrock/eu-west-1` | unknown | 0.07 | 0.15 | 99.7 | 0 |
-| `amazon-bedrock` | unknown | 0.07 | 0.15 | 100.0 | 0 |
-| `google-vertex/us-central1` | unknown | 0.07 | 0.25 | 98.1 | 0 |
-| `groq` | unknown | 0.075 | 0.30 | 95.8 | -2 |
+| tag | quantization | $/1M in | $/1M out | uptime 1d |
+|---|---|---|---|---|
+| `darkbloom/fp8` | fp8 | 0.018 | 0.09 | 99.8 |
+| `akashml/fp4` | fp4 | 0.02 | 0.10 | 99.4 |
+| `dekallm/bf16` | bf16 | 0.029 | 0.14 | 98.7 |
+| `coreweave/fp4` | fp4 | 0.03 | 0.13 | 100.0 |
+| `deepinfra/bf16` | bf16 | 0.03 | 0.14 | 100.0 |
+| `parasail/fp4` | fp4 | 0.03 | 0.15 | 99.9 |
+| `novita/fp4` | fp4 | 0.04 | 0.15 | 98.5 |
+| `siliconflow/fp8` | fp8 | 0.04 | 0.18 | 92.1 |
+| `amazon-bedrock/eu-west-1` | unknown | 0.07 | 0.15 | 99.7 |
+| `amazon-bedrock` | unknown | 0.07 | 0.15 | 100.0 |
+| `google-vertex/us-central1` | unknown | 0.07 | 0.25 | 98.1 |
+| `groq` | unknown | 0.075 | 0.30 | 95.8 |
 
 All twelve list a 131,072-token context. DeepInfra's own page,
-`https://deepinfra.com/openai/gpt-oss-20b`, describes its serving as "bfloat16 with native MXFP4
-quantization for the MoE layer", which is the format of the released files, at $0.03 / $0.14.
+`https://deepinfra.com/openai/gpt-oss-20b`, gives the precision as "bfloat16", the price as
+$0.03 / $0.14, and repeats the maker's note "Native MXFP4 quantization: The models are trained
+with native MXFP4 precision for the MoE layer". That is the format of the released files.
 
 **`openai/gpt-4o-mini`** (created 2024-07-18; 3 endpoints, all 128,000-token context)
 
@@ -293,8 +317,10 @@ The request body takes a `provider` object. The fields that matter here:
   request fails; it is not sent elsewhere. The API reference: "false: use only the
   primary/custom provider, and return the upstream error if it's unavailable."
 
-The pin to send, shown for the first primary (the documentation's example for a single endpoint,
-with the quantization filter added as a guard against a relabelled endpoint):
+The pin to send, shown for the first primary. It is the documented form for disabling fallbacks
+(`order` together with `allow_fallbacks: false`; the documentation's own example names two
+providers), here with one full endpoint slug in the list and with the quantization filter added
+as a guard against a relabelled endpoint:
 
 ```json
 {
@@ -312,13 +338,18 @@ with the quantization filter added as a guard against a relabelled endpoint):
 With the OpenAI-compatible client the object goes in `extra_body={"provider": {...}}`. For
 `phala` and `openai`, which state no quantization, the `quantizations` field is left out.
 
+What the router answers when the one listed endpoint does not pass the `quantizations` filter is
+not documented (**UNVERIFIED**). An error is expected, since fallbacks are off; the cost trial
+will show it.
+
 **Checking which provider served a call.** The documented response schema has `model` ("Model
 used for completion") and no top-level `provider` field. Two documented ways to read the
 provider:
 
 - the request header `X-OpenRouter-Metadata: enabled` (default `disabled`) adds an
   `openrouter_metadata` object to the response; its `endpoints.available` list gives a
-  `provider` and a `selected` flag for each endpoint considered;
+  `model`, a `provider` and a `selected` flag for each endpoint considered, so the provider
+  that served the call is the one of the entry whose flag is true;
 - `GET /api/v1/generation?id=<response id>` returns `provider_name` ("Name of the provider that
   served the request") and `model`
   (`https://openrouter.ai/docs/api/api-reference/generations/get-request-&-usage-metadata-for-a-generation`).
@@ -338,7 +369,11 @@ is the pin, together with a provider pin.
 Evidence at source:
 
 - The record is named "DeepSeek: DeepSeek V3", created 2024-12-26, and both endpoints are named
-  `deepseek/deepseek-chat-v3`. Asking for `deepseek/deepseek-chat-v3` returns the same record.
+  `deepseek/deepseek-chat-v3`. Asking the endpoint listing for `deepseek/deepseek-chat-v3`
+  returns the same record.
+- OpenRouter's model page, `https://openrouter.ai/deepseek/deepseek-chat/providers`, links
+  "Model weights" to `https://huggingface.co/deepseek-ai/DeepSeek-V3`, gives the date
+  "Dec 26, 2024" and prints no notice of removal.
 - Later checkpoints have their own records and their own hosts:
   `deepseek/deepseek-chat-v3-0324` ("DeepSeek V3 0324", created 2025-03-24; `siliconflow/fp8`
   $0.25 / $1.00, `gmicloud/fp8` $0.29 / $1.14) and `deepseek/deepseek-chat-v3.1` ("DeepSeek
@@ -359,9 +394,14 @@ What remains **UNVERIFIED**:
 - that the `streamlake` endpoint serves the December 2024 weights, and at what precision. Its
   listing says quantization "unknown", and no StreamLake documentation of the model was found;
 - the revision hash of the weights at either host (neither states one);
-- OpenRouter's `canonical_slug`, `hugging_face_id` and any `expiration_date` for the record: the
-  all-models listing (`/api/v1/models`) did not return these fields to this check. Nothing read
-  today announces a removal of the route, but the field that would announce it was not seen;
+- OpenRouter's `canonical_slug`, `hugging_face_id`, `knowledge_cutoff` and any
+  `expiration_date` for the record. The API reference
+  (`https://openrouter.ai/docs/api/api-reference/models/get-models`) documents these fields of
+  the all-models listing (`/api/v1/models`), but at every attempt that listing answered this
+  check with a short list in another format that has none of them. Nothing read today announces
+  a removal of the route, but the field that would announce it ("The date after which the
+  model may be removed") was not seen. A `knowledge_cutoff` there would be OpenRouter's figure,
+  not the maker's, and would not change the word "bounded";
 - whether a request may name `deepseek/deepseek-chat-v3` instead of `deepseek/deepseek-chat`,
   and which of the two the response echoes. No call was made; the earlier ladder runs passed the
   echo check with `deepseek/deepseek-chat`, so that id stays until the cost trial shows more.
@@ -372,7 +412,7 @@ What remains **UNVERIFIED**:
 |---|---|---|
 | Checkpoint named at the host's own page | yes (`deepseek-ai/DeepSeek-V3`) | no page found |
 | Precision | fp4, below the FP8 of the released weights | not stated |
-| Price per 1M | 0.32 / 0.89 | 0.2574 / 1.0287 (the plan's price; it appears to include a 10% discount) |
+| Price per 1M | 0.32 / 0.89 | 0.2574 / 1.0287 (the plan's price; it includes a 10% discount with no stated end) |
 | One-day uptime on 2026-10-01 | 94.3 | 98.4 |
 
 Recommended: `deepinfra/fp4`, because the checkpoint and the precision can both be stated and
@@ -445,9 +485,12 @@ These refer to `PLAN.md` as it stood on disk on 1 October, after its section 4 g
 - **deepseek-v3, if the owner takes `streamlake` instead:** the cell reads "`streamlake`,
   precision not stated" and the prices are 0.2574 / 1.0287 (the draft's 0.257 / 1.029 to four
   decimals). They may rise if the discount ends (section 3).
-- **gpt-4o-mini route.** Either `openai/gpt-4o-mini-2024-07-18` (dated) or the alias
-  `openai/gpt-4o-mini`; both lead to the same and only snapshot. The dated id is recommended if
-  the cost trial shows what its responses echo; otherwise the alias stays.
+- **gpt-4o-mini route.** Keep `openai/gpt-4o-mini`, pinned to `openai`. The alias leads to the
+  only snapshot (`gpt-4o-mini-2024-07-18`), neither id is deprecated, and the earlier ladder
+  run finished under the echo check with this id. The cell can name the snapshot beside the
+  alias. The dated route `openai/gpt-4o-mini-2024-07-18` is an equivalent whose echo has not
+  been seen. The route id is a registered fact, so taking the dated route is a choice to make
+  before registration, not after the cost trial.
 - **gemini-3.8-flash.** The price holds through 2026-12-31. The id has no dated snapshot.
 - **grok-4.20.** The price holds for prompts under 200k tokens; a prompt of the study is one
   entry and at most ten examples.
@@ -478,12 +521,16 @@ These refer to `PLAN.md` as it stood on disk on 1 October, after its section 4 g
 - deepseek-v3 has no documented cutoff, and DECISIONS 17 keeps it as a primary with the word
   "bounded". Its route does serve the December 2024 model as far as OpenRouter's and DeepInfra's
   own pages show.
-- The remaining risk is supply (two endpoints, one of them at 94.3% one-day uptime). If the
-  cost trial shows that neither can be used, a replacement would be an amendment to the
-  confirmatory family. The candidate among the eight is gemma-3-27b: open weights, a documented
-  cutoff (August 2024), four endpoints with a stated precision. Naming it as the standby in the
-  registration, before any call, would keep a later switch from being a choice made after
-  seeing outputs. This is the owner's decision.
+- The remaining risk is supply (two endpoints, one of them at 94.3% one-day uptime). The plan
+  already has the rule for it, in section 6: if a primary's confirmatory runs cannot be
+  completed on its registered route, "its three tests are reported as not evaluable and stay in
+  the family. No other model takes its place without an amendment made before any evaluation."
+  Under that rule nothing has to be named now.
+- If the owner would rather keep six evaluable tests, the candidate among the eight is
+  gemma-3-27b: open weights, a documented cutoff (August 2024), four endpoints with a stated
+  precision. It would have to be named in the registration, or in an amendment made before any
+  evaluation, as the rule requires. This is the owner's decision; the rule itself still carries
+  the owner-to-confirm tag.
 
 **Section 3, post-cutoff slices.**
 
@@ -499,15 +546,22 @@ These refer to `PLAN.md` as it stood on disk on 1 October, after its section 4 g
 **Section 9.**
 
 - The registered prices are those of the table above.
+- The estimates and the check of the caps were made at the draft's prices and have to be
+  recomputed at the pinned ones (the harness's dry run prices the run sheet):
+  - deepseek-v3: input +24%, output −13% (0.32 / 0.89 against 0.2574 / 1.0287);
+  - gpt-oss-20b: input +67%, output +56% (0.03 / 0.14 against 0.018 / 0.09). It is a
+    reasoning model with a $3 cap, so it is the row to look at;
+  - gemma-3-27b: output −64% (0.16 against 0.45).
 - The gemini-3.8-flash price doubles on 2027-01-01 (1.50 / 7.50), which matters for anything
   moved to January.
 - OpenRouter's fee on buying credits (5.5% on the standard plan) is outside the price of a call
   and outside the spend the harness records. The plan should say whether the $200 cap is on
   list-price spend or on money paid.
 
-**Sections 11 and 17.** The "Checkpoints" bullet of section 11 takes the same wording as the
-provider-pin bullet of section 4. Section 17 records the hash of this note; it is to be taken
-after the owner's choice for deepseek-v3 is written into section 5 and the table above.
+**Sections 11 and 17.** The "Checkpoints" bullet of section 11 already has the wording of the
+provider-pin bullet of section 4; nothing changes there. Section 17 records the hash of this
+note; it is to be taken after the owner's choice for deepseek-v3 is written into section 5 and
+the table above.
 
 **Section 12 (Gate 1).** The fourth threshold's cutoff for llama-3.3-70b is confirmed as
 December 2023; the constant in `corpus.py` needs no change.
@@ -523,26 +577,31 @@ Values for the table of the eight readers (price date 2026-10-01 for every row):
 | qwen-2.5-7b | `qwen/qwen-2.5-7b-instruct` | `phala` | left out | 0.10 | 0.20 |
 | gemma-3-27b | `google/gemma-3-27b-it` | `deepinfra/fp8` | `fp8` | 0.08 | 0.16 |
 | gpt-oss-20b | `openai/gpt-oss-20b` | `deepinfra/bf16` | `bf16` | 0.03 | 0.14 |
-| gpt-4o-mini | `openai/gpt-4o-mini` (or the dated id) | `openai` | left out | 0.15 | 0.60 |
+| gpt-4o-mini | `openai/gpt-4o-mini` | `openai` | left out | 0.15 | 0.60 |
 | gemini-3.8-flash | `gemini-3.8-flash` | direct, no provider object | not applicable | 0.75 | 3.75 |
 | grok-4.20 | `grok-4.20-0309-non-reasoning` | direct, no provider object | not applicable | 1.25 | 2.50 |
 
-- Send the `provider` object per OpenRouter model (section 4) with `allow_fallbacks: false`, by
-  replacing the endpoint's `extra_body`; nothing under `analysis/commitment/` changes.
-- Refuse a live run for any model outside the table.
+What the harness has to do with them:
+
+- Send the `provider` object per OpenRouter model (section 4) with `allow_fallbacks: false`, in
+  the endpoint's `extra_body`; nothing under `analysis/commitment/` changes.
+- Refuse a live run for any model outside the table, and while a route is not set.
 - Store the serving provider with every call (routing-metadata header, or the generation
-  endpoint), and refuse a response from any other provider. `EchoCheckedClient` returns only
-  the text and the token counts, and the endpoint configuration carries a request body
-  extension but no request headers, so this needs a small client class inside `read.py` that
-  sends the header (or keeps the response id for the generation endpoint) and returns the
-  provider with the text.
+  endpoint), and refuse a response from any other provider. In the routing metadata the
+  provider that served the call is the one of the entry flagged `selected`; the other entries
+  were considered and not used.
+- As it stood on 1 October, `read.py` does these three: its table `ROUTES` holds the six
+  OpenRouter rows as unset, with the endpoints above in its comments. The values above are
+  what is entered when the routes are set; a price left out there keeps the ladder's price,
+  which is wrong for deepseek-v3, gemma-3-27b and gpt-oss-20b.
 - The exact strings to compare are not documented and are to be fixed in the cost trial: the
   routing metadata and the generation record name the provider ("DeepInfra", "Phala",
   "OpenAI" in the endpoint listing's `provider_name`), which is not the tag sent in `order`.
 - The ladder's endpoints carry price dates of 2026-09-28 for the OpenRouter routes and
   2026-09-06 and 2026-09-07 for the two direct routes; the direct prices were read again today
   and are unchanged, so one date serves all eight.
-- If the dated slug `openai/gpt-4o-mini-2024-07-18` is taken, the accepted echo must be that id.
-  What OpenRouter echoes for it is to be confirmed in the cost trial.
+- If the owner takes the dated slug `openai/gpt-4o-mini-2024-07-18` before registration
+  (section 8), the accepted echo must be that id. What OpenRouter echoes for it has not been
+  seen.
 - With fallbacks off, an outage of the pinned endpoint returns an error. The harness should
   treat it as a failed attempt to retry later, never as a reason to change the route.

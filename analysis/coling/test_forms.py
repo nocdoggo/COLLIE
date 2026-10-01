@@ -1,17 +1,20 @@
 """Tests for the form classifier (``forms.py``).
 
-The cases are statement texts written the way the FDA shortage CSV writes them (verbatim or
-lightly shortened training-period texts from 2018-2022), each with its Date of Update, the form
-class and the no-year flag. Covered: every class of the inventory, the precedence conflicts
-(relative against range, day and part of a month; half-year against quarter; part of a month
-against a month with no year; a two-digit year against a day; a recovery "TBD" beside a dated
-delivery; an undated discontinuation beside a dated depletion; a dated target beside expiry
-dating), what ``silent`` and the dated forms mean in terms of the rule reading (an undated
-depletion is not silent), the year a list lends to a yearless month, the fields passed on from
-the rule reading, the merge rule, the splits, the statement table and its counts on a small
-synthetic events table (also with no train statement and with no row), the golden file (built,
-tampered with, compared after a change of the events table, and recomputed on a sample of the
-real one), and determinism of both outputs.
+The cases are statement texts written the way the FDA shortage CSV writes them, each with its Date
+of Update, the form class and the no-year flag. Most are verbatim or lightly shortened
+training-period texts from 2018-2022; the others change the date of such a text or are
+constructed for a corner, and none is taken from a text dated 2023 or later. Covered: every class
+of the inventory, the precedence conflicts (relative against range, day and part of a month;
+half-year against quarter; part of a month against a month with no year; a two-digit year
+against a day, and two digits that cannot be a year; a recovery "TBD" beside a dated delivery;
+an undated discontinuation beside a dated depletion; a dated target beside expiry dating; the
+three corners of the rule reader's ranking), what ``silent`` and the dated forms mean in terms
+of the rule reading (an undated depletion is not silent), the year a list lends to a yearless
+month, the fields passed on from the rule reading, the merge rule, the tables of the module
+docstring against the code, the splits, the statement table and its counts on a small synthetic
+events table (also with no train statement and with no row; at risk through a later member),
+the golden file (built, tampered with, compared after a change of the events table, and
+recomputed on a sample of the real one), and determinism of both outputs.
 
 Run::
 
@@ -22,6 +25,7 @@ from __future__ import annotations
 
 import json
 import random
+import re
 from pathlib import Path
 
 import pandas as pd
@@ -272,6 +276,16 @@ def test_two_digit_year_or_day() -> None:
     assert (as_day.form, as_day.no_year, as_day.end) == ("exact_day", True, "2015-05-21")
 
 
+def test_two_digits_that_cannot_be_a_year_leave_the_year_unwritten() -> None:
+    # "15" is neither a year near 2021 nor, after a hyphen or a part word, a day
+    month = F.classify("Backordered. Estimated availability Dec-15", "2021-01-10")
+    assert (month.form, month.no_year, month.end) == ("month_no_year", True, "2021-12-31")
+    part = F.classify("Currently on backorder - next shipment anticipated mid Feb 15", "2021-01-10")
+    assert (part.form, part.no_year, part.end) == ("part_of_month", True, "2021-02-20")
+    near = F.classify("Backordered. Estimated availability Dec-21", "2021-01-10")
+    assert (near.form, near.no_year, near.end) == ("month_year", False, "2021-12-31")
+
+
 def test_recovery_tbd_beats_a_dated_delivery() -> None:
     got = F.classify("Next Delivery: May 2021; Estimated Recovery: TBD", "2021-03-05")
     assert (got.form, got.statement_type, got.end) == ("tbd", "recovery", None)
@@ -317,6 +331,38 @@ def test_a_target_beside_expiry_dating_keeps_its_form() -> None:
     assert (unknown.form, unknown.distractor_dates) == ("tbd", 1)
     alone = F.classify("5 month expiry (1/2022 expiry) dating available by request.", "2021-08-25")
     assert (alone.form, alone.distractor_dates, alone.end) == ("distractor", 1, None)
+
+
+def test_distractor_dates_are_counted() -> None:
+    got = F.classify(
+        "6 & 9 month expiry (4/2022 & 7/2022 expiry) dating available by request. Next release "
+        "December 2021.",
+        "2021-10-08",
+    )
+    assert (got.form, got.end, got.distractor_dates) == ("month_year", "2021-12-31", 2)
+
+
+def test_ranking_corners_of_the_rule_reader() -> None:
+    """The three corners named in the module docstring, as the frozen rule reader ranks them."""
+    anchor = "2021-01-10"
+    dated = "To be discontinued in March 2021."
+    undated = "Product will be made available as it is released."
+    # a dated discontinuation outranks a delivery with no time, in either order
+    assert F.form_class(f"{dated} {undated}", anchor) == "discontinuation"
+    assert F.form_class(f"{undated} {dated}", anchor) == "discontinuation"
+    # and ties with a delivery under an unknown marker: the first mentioned wins
+    unknown = "Next release date TBD."
+    assert F.form_class(f"{dated} {unknown}", anchor) == "discontinuation"
+    assert F.form_class(f"{unknown} {dated}", anchor) == "tbd"
+    # a discontinuation under an unknown marker ties with a delivery with no time
+    assert F.form_class(f"Discontinuation date TBD. {undated}", anchor) == "discontinuation"
+    assert F.form_class(f"{undated} Discontinuation date TBD.", anchor) == "no_date"
+    # a bare "TBD" ties with a vague recovery; one with a recovery cue beats it
+    assert F.form_class("Long-term backorder. TBD", anchor) == "vague"
+    assert F.form_class("TBD. Long-term backorder", anchor) == "tbd"
+    assert F.form_class("Long-term backorder. Estimated recovery TBD.", anchor) == "tbd"
+    # across types the order holds: a vague recovery beats a dated delivery
+    assert F.form_class("Long-term backorder. Next release June 2021.", anchor) == "vague"
 
 
 def test_end_of_supply_dates_are_distractors_with_their_period() -> None:
@@ -401,6 +447,14 @@ def test_year_lent_by_a_list() -> None:
         "Lots are anticipated in April; additional inventory in May 2022.", "2022-04-11"
     )
     assert (apart.form, apart.no_year) == ("month_no_year", True)
+    # a day, a part of a month or a month followed by two digits that cannot be a year takes its
+    # year from the Date of Update and passes that on, so the written year at the end of the
+    # list does not reach the first month
+    for middle in ("June 5", "late June", "Dec-15"):
+        cut = F.classify(f"Next deliveries expected in May, {middle} and July 2022", "2021-01-10")
+        assert (cut.form, cut.no_year, cut.end) == ("month_no_year", True, "2021-05-31"), middle
+    whole = F.classify("Next deliveries expected in May, June and July 2022", "2021-01-10")
+    assert (whole.form, whole.no_year, whole.end) == ("month_year", False, "2022-05-31")
 
 
 # --------------------------------------------------------------------------------------------
@@ -490,6 +544,30 @@ def test_inventory() -> None:
             seen.append(at)
         assert at == ("month_year" if name in dated else "silent")
         assert all((n in dated) == (name in dated) for n in seen)
+
+
+def test_statement_types_and_certainty_classes_are_those_of_the_literal_schema() -> None:
+    assert len(F.STATEMENT_TYPES) == 5 and len(F.CERTAINTIES) == 4
+    assert set(F.STATEMENT_TYPES) == set(R.STATEMENT_TYPES) - {"availability_until"}
+    assert set(F.CERTAINTIES) == set(R.LITERAL_V1_CERTAINTY.values()) | {
+        "undetermined",
+        "no_statement",
+    }
+    assert set(R.LITERAL_V1_CERTAINTY) == set(R.CERTAINTIES) - {"unknown"}
+    for text, anchor in [(t, a) for t, a, _, _ in CASES] + PROBES:
+        got = F.classify(text, anchor)
+        assert got.statement_type in F.STATEMENT_TYPES and got.certainty in F.CERTAINTIES
+        assert got.rule_statement_type in R.STATEMENT_TYPES and got.rule_certainty in R.CERTAINTIES
+
+
+def test_module_docstring_tables_match_the_code() -> None:
+    doc = F.__doc__ or ""
+    numbered = re.findall(r"^\s*(\d+)  (\w+) ", doc, flags=re.MULTILINE)
+    assert [int(n) for n, _ in numbered] == list(range(1, 16))
+    assert tuple(name for _, name in numbered) == F.FORM_NAMES
+    arrows = re.findall(r"(\w+) -> (\w+)", doc)
+    assert len(arrows) == len(F.MERGE_INTO) and dict(arrows) == F.MERGE_INTO
+    assert f"``MIN_TRAIN`` ({F.MIN_TRAIN})" in doc
 
 
 def test_merge_map_keeps_large_classes() -> None:
@@ -639,6 +717,34 @@ def test_statement_forms() -> None:
     assert (st["member_forms"].drop("S7") == 1).all()
 
 
+def test_at_risk_needs_the_shortage_listing_and_any_member() -> None:
+    text = "Backordered. Next release October 2020."
+    rows = [
+        # T1: the member with the smallest id is Resolved; the second is Current and available;
+        # the third is Current and unavailable
+        event("E01", "T1", "2020-08-13", text, status="resolved"),
+        event("E02", "T1", "2020-08-13", text, availability="available"),
+        event("E03", "T1", "2020-08-13", text),
+        # T2: only Current and available members: at risk under A, not under B
+        event("E04", "T2", "2020-08-14", text, availability="available"),
+        event("E05", "T2", "2020-08-14", text, availability="available"),
+        # T3: a discontinuation-listing row is never at risk, whatever its status says
+        event("E06", "T3", "2020-08-15", text, listing="discontinuation"),
+        # T4 to T6: a limited, blank or other availability class is not "available"
+        event("E07", "T4", "2020-08-16", text, availability="limited"),
+        event("E08", "T5", "2020-08-17", text, availability="blank"),
+        event("E09", "T6", "2020-08-18", text, availability="other"),
+    ]
+    st = F.statement_forms(pd.DataFrame(rows)).set_index("statement_group_id")
+    assert st["event_id"].tolist() == ["E01", "E04", "E06", "E07", "E08", "E09"]
+    assert st["at_risk_A"].tolist() == [True, True, False, True, True, True]
+    assert st["at_risk_B"].tolist() == [True, False, False, True, True, True]
+    report = F.tabulate(st.reset_index())
+    assert report["statements"]["shortage"]["all"] == 5
+    assert report["statements"]["at_risk_A"]["all"] == 5
+    assert report["statements"]["at_risk_B"]["all"] == 4
+
+
 def test_statement_forms_needs_its_columns() -> None:
     with pytest.raises(ValueError, match="statement_text"):
         F.statement_forms(synthetic_events().drop(columns="statement_text"))
@@ -667,6 +773,24 @@ def test_an_events_table_with_no_train_statement() -> None:
     assert set(report["merge"]["merged_form"].values()) == {"month_year", "silent"}
     empty = F.tabulate(F.statement_forms(events.iloc[:0]))
     assert empty["statements"]["all"]["all"] == 0 and empty["form"]["all"]["silent"]["all"] == 0
+    # a class with no statement still has its row of zeros, in every table and population
+    zero = {"fit": 0, "dev": 0, "test": 0, "late": 0, "train": 0, "all": 0}
+    for made in (report, empty):
+        for population in F.POPULATIONS:
+            assert tuple(made["form"][population]) == F.FORM_NAMES
+            assert tuple(made["no_year"][population]) == F.DATED_FORMS
+            assert tuple(made["statement_type"][population]) == F.STATEMENT_TYPES
+            assert tuple(made["certainty"][population]) == F.CERTAINTIES
+        assert made["statement_type"]["all"]["depletion"] == zero
+
+
+def test_tabulate_rejects_a_value_outside_its_list() -> None:
+    statements = F.statement_forms(synthetic_events())
+    for column in ("form", "statement_type", "certainty"):
+        wrong = statements.copy()
+        wrong.loc[0, column] = "other"
+        with pytest.raises(ValueError, match=column):
+            F.tabulate(wrong)
 
 
 def test_tabulate_counts_statements_by_form_split_and_population() -> None:
@@ -811,7 +935,8 @@ def real_files() -> tuple[pd.DataFrame, pd.DataFrame]:
 
 
 def test_golden_file_sample_is_reproduced(real_files: tuple[pd.DataFrame, pd.DataFrame]) -> None:
-    """A seeded sample of the golden file, recomputed from the texts of the events table."""
+    """A seeded sample of the golden file, with every form in it, recomputed from the texts of
+    the events table."""
     events, golden = real_files
     train = events[events["event_date"] < F.TEST_START.isoformat()]
     texts = {
@@ -825,7 +950,13 @@ def test_golden_file_sample_is_reproduced(real_files: tuple[pd.DataFrame, pd.Dat
     shared = [key for key in keys if key in texts]
     assert shared, "no pair of the golden file is in the events table"
     rows = golden.set_index(["text_sha256", "anchor"])
-    for key in random.Random(SEED).sample(shared, min(400, len(shared))):
+    # 400 pairs over all forms, and up to 25 more of each form so that no class goes unchecked
+    rng = random.Random(SEED)
+    sample = set(rng.sample(shared, min(400, len(shared))))
+    for form in F.FORM_NAMES:
+        of_form = [key for key in shared if rows.at[key, "form"] == form]
+        sample.update(rng.sample(of_form, min(25, len(of_form))))
+    for key in sorted(sample):
         now = {k: str(v) for k, v in F.classify(texts[key], key[1]).as_row().items()}
         assert now == rows.loc[key].to_dict(), key
     assert set(golden["form"]) <= set(F.FORM_NAMES)
@@ -842,7 +973,12 @@ def test_outputs_are_up_to_date(real_files: tuple[pd.DataFrame, pd.DataFrame]) -
     assert F.main(["--check"]) == 0, "stale outputs: python -m analysis.coling.forms"
     report = json.loads(F.COUNTS.read_text())
     assert report["inputs"]["rules_sha256"] == F.RULES_SHA256
+    assert report["command"] == F.COMMAND
     assert report["golden"]["rows"] == len(real_files[1])
+    for population, totals in report["statements"].items():
+        for table in ("form", "merged_form", "statement_type", "certainty"):
+            rows = report[table][population].values()
+            assert {s: sum(row[s] for row in rows) for s in totals} == totals, (table, population)
     merged = F.load_merge()
     assert merged == F.merge_map(report["merge"]["train_counts"])
     assert report["merge"]["train_counts"] == {
@@ -876,6 +1012,7 @@ def test_main_writes_both_outputs_reproducibly(
     assert F.load_merge(out_a / F.COUNTS.name) == report["merge"]["merged_form"]
     assert report["inputs"]["events"] == events.as_posix()
     assert report["inputs"]["events_sha256"] == F.sha16(events.read_bytes())
+    assert report["command"] == f"{F.COMMAND} --events {events.as_posix()}"
     assert report["inputs"]["forms_sha256"] == F.sha16(Path(F.__file__).read_bytes())
     assert report["golden"] == {
         "file": F.GOLDEN.name,
@@ -899,6 +1036,17 @@ def test_check_detects_a_stale_output(tmp_path: Path, capsys: pytest.CaptureFixt
     printed = capsys.readouterr().out
     assert "differs from a fresh run" in printed and "'2099-12-31' ->" in printed
     assert "readings changed on shared pairs: 1; pairs on one side only: 0" in printed
+    assert F.GOLDEN.name in printed and F.COUNTS.name not in printed
+    # a counts file that no longer matches is reported as well, on its own
+    assert F.main(args) == 0
+    counts = tmp_path / F.COUNTS.name
+    report = json.loads(counts.read_text())
+    report["form"]["all"]["month_year"]["fit"] += 1
+    counts.write_text(F.report_text(report))
+    capsys.readouterr()
+    assert F.main([*args, "--check"]) == 1
+    printed = capsys.readouterr().out
+    assert F.COUNTS.name in printed and F.GOLDEN.name not in printed
 
 
 def test_load_merge_rejects_another_inventory(tmp_path: Path) -> None:

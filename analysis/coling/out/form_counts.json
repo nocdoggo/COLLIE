@@ -5,7 +5,7 @@
   "events": "analysis/coling/out/events.csv.gz",
   "events_sha256": "e8929d516aae5e1c",
   "rules_sha256": "6a810bcb1ae277b9",
-  "forms_sha256": "3b2e97a59246d9cf"
+  "forms_sha256": "b99502d348ea82be"
  },
  "splits": {
   "fit": "before 2021-01-01",
@@ -1454,6 +1454,22 @@
  },
  "statement_type": {
   "all": {
+   "recovery": {
+    "fit": 938,
+    "dev": 1077,
+    "test": 2293,
+    "late": 882,
+    "train": 2015,
+    "all": 5190
+   },
+   "next_delivery": {
+    "fit": 462,
+    "dev": 549,
+    "test": 943,
+    "late": 247,
+    "train": 1011,
+    "all": 2201
+   },
    "depletion": {
     "fit": 12,
     "dev": 15,
@@ -1470,14 +1486,6 @@
     "train": 384,
     "all": 897
    },
-   "next_delivery": {
-    "fit": 462,
-    "dev": 549,
-    "test": 943,
-    "late": 247,
-    "train": 1011,
-    "all": 2201
-   },
    "none": {
     "fit": 1147,
     "dev": 941,
@@ -1485,32 +1493,16 @@
     "late": 480,
     "train": 2088,
     "all": 4978
-   },
-   "recovery": {
-    "fit": 938,
-    "dev": 1077,
-    "test": 2293,
-    "late": 882,
-    "train": 2015,
-    "all": 5190
    }
   },
   "shortage": {
-   "depletion": {
-    "fit": 1,
-    "dev": 2,
-    "test": 7,
-    "late": 0,
-    "train": 3,
-    "all": 10
-   },
-   "discontinuation": {
-    "fit": 9,
-    "dev": 1,
-    "test": 47,
-    "late": 29,
-    "train": 10,
-    "all": 86
+   "recovery": {
+    "fit": 935,
+    "dev": 1043,
+    "test": 2284,
+    "late": 882,
+    "train": 1978,
+    "all": 5144
    },
    "next_delivery": {
     "fit": 462,
@@ -1520,24 +1512,6 @@
     "train": 1011,
     "all": 2199
    },
-   "none": {
-    "fit": 926,
-    "dev": 756,
-    "test": 2181,
-    "late": 472,
-    "train": 1682,
-    "all": 4335
-   },
-   "recovery": {
-    "fit": 935,
-    "dev": 1043,
-    "test": 2284,
-    "late": 882,
-    "train": 1978,
-    "all": 5144
-   }
-  },
-  "at_risk_A": {
    "depletion": {
     "fit": 1,
     "dev": 2,
@@ -1554,6 +1528,24 @@
     "train": 10,
     "all": 86
    },
+   "none": {
+    "fit": 926,
+    "dev": 756,
+    "test": 2181,
+    "late": 472,
+    "train": 1682,
+    "all": 4335
+   }
+  },
+  "at_risk_A": {
+   "recovery": {
+    "fit": 935,
+    "dev": 1042,
+    "test": 2284,
+    "late": 882,
+    "train": 1977,
+    "all": 5143
+   },
    "next_delivery": {
     "fit": 462,
     "dev": 547,
@@ -1562,6 +1554,22 @@
     "train": 1009,
     "all": 2197
    },
+   "depletion": {
+    "fit": 1,
+    "dev": 2,
+    "test": 7,
+    "late": 0,
+    "train": 3,
+    "all": 10
+   },
+   "discontinuation": {
+    "fit": 9,
+    "dev": 1,
+    "test": 47,
+    "late": 29,
+    "train": 10,
+    "all": 86
+   },
    "none": {
     "fit": 786,
     "dev": 650,
@@ -1569,17 +1577,25 @@
     "late": 467,
     "train": 1436,
     "all": 3971
-   },
-   "recovery": {
-    "fit": 935,
-    "dev": 1042,
-    "test": 2284,
-    "late": 882,
-    "train": 1977,
-    "all": 5143
    }
   },
   "at_risk_B": {
+   "recovery": {
+    "fit": 920,
+    "dev": 1027,
+    "test": 2215,
+    "late": 871,
+    "train": 1947,
+    "all": 5033
+   },
+   "next_delivery": {
+    "fit": 371,
+    "dev": 456,
+    "test": 847,
+    "late": 203,
+    "train": 827,
+    "all": 1877
+   },
    "depletion": {
     "fit": 0,
     "dev": 1,
@@ -1596,14 +1612,6 @@
     "train": 10,
     "all": 83
    },
-   "next_delivery": {
-    "fit": 371,
-    "dev": 456,
-    "test": 847,
-    "late": 203,
-    "train": 827,
-    "all": 1877
-   },
    "none": {
     "fit": 164,
     "dev": 151,
@@ -1611,14 +1619,6 @@
     "late": 124,
     "train": 315,
     "all": 1085
-   },
-   "recovery": {
-    "fit": 920,
-    "dev": 1027,
-    "test": 2215,
-    "late": 871,
-    "train": 1947,
-    "all": 5033
    }
   }
  },
@@ -1640,14 +1640,6 @@
     "train": 1903,
     "all": 4349
    },
-   "no_statement": {
-    "fit": 1147,
-    "dev": 941,
-    "test": 2410,
-    "late": 480,
-    "train": 2088,
-    "all": 4978
-   },
    "undetermined": {
     "fit": 392,
     "dev": 272,
@@ -1655,6 +1647,14 @@
     "late": 384,
     "train": 664,
     "all": 1811
+   },
+   "no_statement": {
+    "fit": 1147,
+    "dev": 941,
+    "test": 2410,
+    "late": 480,
+    "train": 2088,
+    "all": 4978
    }
   },
   "shortage": {
@@ -1674,14 +1674,6 @@
     "train": 1800,
     "all": 4193
    },
-   "no_statement": {
-    "fit": 926,
-    "dev": 756,
-    "test": 2181,
-    "late": 472,
-    "train": 1682,
-    "all": 4335
-   },
    "undetermined": {
     "fit": 181,
     "dev": 182,
@@ -1689,6 +1681,14 @@
     "late": 265,
     "train": 363,
     "all": 1131
+   },
+   "no_statement": {
+    "fit": 926,
+    "dev": 756,
+    "test": 2181,
+    "late": 472,
+    "train": 1682,
+    "all": 4335
    }
   },
   "at_risk_A": {
@@ -1708,14 +1708,6 @@
     "train": 1800,
     "all": 4193
    },
-   "no_statement": {
-    "fit": 786,
-    "dev": 650,
-    "test": 2068,
-    "late": 467,
-    "train": 1436,
-    "all": 3971
-   },
    "undetermined": {
     "fit": 181,
     "dev": 180,
@@ -1723,6 +1715,14 @@
     "late": 265,
     "train": 361,
     "all": 1129
+   },
+   "no_statement": {
+    "fit": 786,
+    "dev": 650,
+    "test": 2068,
+    "late": 467,
+    "train": 1436,
+    "all": 3971
    }
   },
   "at_risk_B": {
@@ -1742,14 +1742,6 @@
     "train": 1764,
     "all": 4110
    },
-   "no_statement": {
-    "fit": 164,
-    "dev": 151,
-    "test": 646,
-    "late": 124,
-    "train": 315,
-    "all": 1085
-   },
    "undetermined": {
     "fit": 139,
     "dev": 137,
@@ -1757,6 +1749,14 @@
     "late": 234,
     "train": 276,
     "all": 936
+   },
+   "no_statement": {
+    "fit": 164,
+    "dev": 151,
+    "test": 646,
+    "late": 124,
+    "train": 315,
+    "all": 1085
    }
   }
  },

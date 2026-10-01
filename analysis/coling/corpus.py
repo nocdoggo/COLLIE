@@ -38,10 +38,10 @@ text changes, when the thread returns from Resolved to Current, or when it reapp
 least one capture's absence with a different Date of Update. Otherwise a later row with the same
 text is a re-confirmation (a "Reverified" re-stamp, or a "Revised" stamp with unchanged text),
 not a new statement. An event is dated by the Date of Update of the row where it is first seen
-(the capture date when that is missing or later than the capture). ``revision_index`` counts the
-earlier events of the thread. The events table holds only what is known when the event is first
-seen: the number of re-confirmations, the next revision and every other fact from later captures
-are outcome information and go to the outcome files.
+(the capture date when that is missing or later than the capture by more than one day).
+``revision_index`` counts the earlier events of the thread. The events table holds only what is
+known when the event is first seen: the number of re-confirmations, the next revision and every
+other fact from later captures are outcome information and go to the outcome files.
 
 Timing phrases. ``timing_candidates`` lists, as JSON ``[[tag, text], ...]``, the spans of the
 statement text that look like timing phrases (month and year, ranges, numeric dates, quarters,
@@ -172,6 +172,7 @@ GATE_END = pd.Timestamp("2025-12-31")
 CUTOFF = pd.Timestamp("2023-12-31")
 OBSERVABLE_WIDTH_DAYS = 31
 GATE_THRESHOLDS = {"statements": 600, "observable": 250, "episodes": 100, "post_cutoff": 150}
+GATE_PRIMARY = "B"  # the thresholds on observable outcomes are on this definition
 GZIP = {"method": "gzip", "mtime": 0}
 CAPTURES_DIR = Path("external_data/fda_wayback_csv")
 OUT_DIR = Path("analysis/coling/out")
@@ -385,6 +386,7 @@ SUPPLY_CLASSES = ("available", "limited")
 # Strings the author rejected in the check of ``availability_strings.csv``, as that file prints
 # them (``availability_key``): text that the rule below would class available or limited and
 # that reports neither. A string listed here is classed other. The tuple is frozen with this file.
+# The author read the check list on 1 October 2026 and rejected no string, so it is empty.
 REJECTED_AVAILABLE: tuple[str, ...] = ()
 _EMAIL = re.compile(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)+")
 
@@ -1537,7 +1539,9 @@ def print_report(
     corpus: Corpus, gate: dict[str, int], gaps: dict[str, Any], cutoff: Any = CUTOFF
 ) -> None:
     """Counts only: captures, rows, threads, events, capture gaps and Gate 1. ``cutoff`` is the
-    one given to ``gate_counts`` for ``gate``."""
+    one given to ``gate_counts`` for ``gate``. The two thresholds on observable outcomes are read
+    on the distinct statements under definition B; the counts under A are printed beside them
+    and have no threshold."""
     caps, ev = corpus.captures, corpus.events
     cutoff = cutoff_day(cutoff)
     print(f"captures read: {len(caps.stamps)}; skipped: {len(caps.skipped)}")
@@ -1568,6 +1572,11 @@ def print_report(
     for key, value in gaps.items():
         print(f"  {key}: {value}")
     t = GATE_THRESHOLDS
+    need = {
+        (d, key): f"need >= {t[key]}" if d == GATE_PRIMARY else "secondary, no threshold"
+        for d in GATE_DEFINITIONS
+        for key in ("observable", "post_cutoff")
+    }
     print(
         f"Gate 1: shortage events dated {iso(TEST_START)}..{iso(GATE_END)}, Current at statement, "
         "with a date-like phrase"
@@ -1580,14 +1589,14 @@ def print_report(
         print(
             f"  observable outcome (bracket <= {OBSERVABLE_WIDTH_DAYS} d), definition {d}: "
             f"presentation-level events {gate[f'observable31_{d}_events']}, distinct statements "
-            f"{gate[f'observable31_{d}_distinct']} (need >= {t['observable']})"
+            f"{gate[f'observable31_{d}_distinct']} ({need[d, 'observable']})"
         )
     print(f"  shortage episodes {gate['episodes']} (need >= {t['episodes']})")
     for d in GATE_DEFINITIONS:
         print(
             f"  dated after {iso(cutoff)}, observable outcome, definition {d}: presentation-level "
             f"events {gate[f'after_cutoff_observable31_{d}_events']}, distinct statements "
-            f"{gate[f'after_cutoff_observable31_{d}_distinct']} (need >= {t['post_cutoff']})"
+            f"{gate[f'after_cutoff_observable31_{d}_distinct']} ({need[d, 'post_cutoff']})"
         )
     print(
         f"  dated after {iso(cutoff)}: events {gate['after_cutoff_events']}, distinct statements "

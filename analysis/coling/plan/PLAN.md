@@ -72,7 +72,12 @@ All deadlines in this file are in Anywhere on Earth time (AoE, UTC−12): 23:59 
 - *The rule reader is frozen.* `rules.py` is frozen at sha256 prefix `6a810bcb1ae277b9` (its
   state since 29 September). The pilot (section 10) may change the guide and the prompt text; a
   difference from `rules.py` that remains is disclosed, not patched.
-- *Seeds.* Every random draw uses seed 20261001, with the items sorted by id before the draw.
+- *Seeds.* Every random choice uses seed 20261001. A sample of section 3 is drawn by ordering
+  the candidate ids by the sha256 of the seed, a tag that names the draw, and the id, and
+  taking them from the top (within each stratum, and under the caps, where a sample has them).
+  The result does not depend on the order of the input, and an id keeps its place when other
+  ids come or go. Resampling (bootstrap draws, sign flips) uses the same seed in a
+  random-number generator.
 - *Web requests.* The study's collectors carry the project User-Agent
   `collie-research-fetch/0.1 (academic research; polite, cached)` and nothing personal in any
   header, URL or payload. They keep what they download and wait between requests: 6 seconds
@@ -199,13 +204,19 @@ are **TBD-at-gate**, from the freeze run.
   - *Required:* every string that the rule classes as available, and every string that the
     rule change of 1 October moved out of available.
   - *Optional:* the strings classed limited. They matter for the BL sensitivity analysis
-    (section 2.5), and for B only where a string in fact reports full supply. If they are not
-    checked, the paper says so.
+    (section 2.5), and for B only where a string in fact reports full supply.
   - A string the checker rejects goes into a list frozen with `corpus.py` and is then classed
     other. A string that the rule moved out of available and the checker would keep is settled
     before the freeze run: the rule is changed, or the difference is recorded here.
-- The check is done before the freeze run. Its date, the number of strings checked (required
-  and optional) and the number rejected are **TBD-at-gate**.
+- *The check was done on 1 October 2026.* The adjudicator read the whole list as `corpus.py`
+  wrote it that day: 910 distinct strings, of which the rule classes 233 as available and 647
+  as limited, and 30 that the rule change moved out of available. The strings classed limited
+  were read too, so the optional part is done. No string was rejected and no change to the
+  rule was asked for, so the frozen list of rejected strings is empty. The record of the check
+  is this paragraph and the sha256 of the list as read (`da0bde1baac48473`).
+- At the freeze the list is written again by its own command (it reads the captures only) and
+  its hash is compared with the one above. If it differs, the strings that differ are checked
+  before the outcomes are sealed, and what was checked is recorded here.
 
 ### 2.3 Unit: the statement event
 
@@ -256,7 +267,8 @@ and enters no outcome analysis set. The count of such statements is **TBD-at-gat
 
 **The display row.** Readers and annotators see one row per statement event. When the statement
 covers several presentations, one of its presentations at risk under B is drawn by the seeded
-rule (seed 20261001, members sorted by event id; no outcome field is used) and shown. A
+rule of the standing rules (the tag is made from the statement's id; no outcome field is used)
+and shown. A
 statement with no presentation at risk under B, which can enter only the literal task, shows
 its member with the smallest event id. The same draw is used everywhere: in every prompt, on
 every annotation sheet and for the primary outcome (section 2.5).
@@ -371,9 +383,12 @@ sensitivity analysis.
   the rule's accuracy is reported (section 10).
 - The conventions are those of `rules.py`, which the literal prompt and the guide share:
   - a month is the whole month, and a year alone is the whole year;
-  - a month, quarter or half with no year is its first occurrence that ends on or after the
-    Date of Update;
-  - early, mid and late are days 1 to 10, 11 to 20, and 21 to the month's end;
+  - a month or a quarter with no year is its first occurrence that ends on or after the Date
+    of Update; a half of a year written with no year is not read, and such a text has no
+    stated period;
+  - early, mid and late in a month are days 1 to 10, 11 to 20, and 21 to the month's end; in a
+    quarter they are its first, second and third month; in a year, its first, second and last
+    four months;
   - a quarter is the whole quarter, and a half is January to June or July to December;
   - a range runs from the start of its first element to the end of its last;
   - "by X" and "before X" run from the Date of Update to the end of X (or are X itself when X
@@ -455,9 +470,10 @@ distractor dates beside the target (a text can carry one whatever its form).
 
 A class with fewer than 15 train-period statements at risk under B is merged into a named
 neighbour class, for per-form reporting and for every table or cell fitted by form (the
-calibrator, the track-record table). The literal-task sample is stratified on the unmerged
-classes. Templates are the normalised texts with months and numbers masked; results are also
-reported weighted by template.
+calibrator, the track-record table). A class that is still too small after it has received
+another is merged on in turn; month and year, and silent, are never merged away. The
+literal-task sample is stratified on the unmerged classes. Templates are the normalised texts
+with months and numbers masked; results are also reported weighted by template.
 
 The final inventory and order, the merge map as applied, and the count per form and split are
 **TBD-at-gate**, from the classifier on the frozen build (its hash is in section 17).
@@ -543,7 +559,10 @@ Late).
   3. the in-context examples, the dev prompt items and the minimal-pair seeds, in that order,
      which exclude everything drawn in steps 1 and 2 and one another;
   4. from the eligible list: the probe sample, the 20-sample subset, the paraphrase subset, the
-     2×2 subset (section 5) and the 100 statements of the reference-reading check;
+     2×2 subset (section 5) and the 100 statements of the reference-reading check. Each is a
+     draw of its own, so the subsets may overlap. The reference-reading check leaves out the
+     statements of step 1, so that no annotator is shown the rule reading of a statement they
+     labelled (section 10);
   5. the test-half outcome-audit sample, drawn under the sealed folder after every
      confirmatory run has finished (section 10).
 
@@ -654,7 +673,8 @@ both context for E3, and neither is a failure.
   stratum* is therefore the month-and-year statements with no distractor date.
 - The allocation per stratum is **TBD-at-gate**: the quotas are fixed in the guide's
   allocation table before the draw, and a stratum with fewer statements than its quota gives
-  all it has.
+  all it has. The guide also fixes where a shortfall goes, the share of each quota taken from
+  statements dated 2023 or later (one third), and the caps per text template and per episode.
 
 **Gold.** The adjudicated labels of the two annotators (section 10).
 
@@ -683,8 +703,8 @@ template.
 - For each primary model, one exact McNemar test compares the model (`literal-v1`) with the
   rule reader, pooled over the items outside the month-and-year stratum. A month-and-year
   statement that carries a distractor date is in the distractor stratum, so it is in the test.
-- A reading is correct when the statement type is right and either both readings abstain or the
-  interval IoU is at least 0.5.
+- A reading is correct when its statement type is the gold one and either the reading and the
+  gold both abstain or the IoU of their intervals is at least 0.5.
 - Holm's correction runs over the two tests at 0.05.
 - Per-form results are descriptive.
 
@@ -725,8 +745,9 @@ the readers give:
     each form and revision bucket, with the calibrator's backoff (section 8): the number of
     statements the row rests on, the share recovered by the stated end, the share recovered by
     90 days after it, and the median days from update to recovery. The shares are Turnbull
-    estimates, and the prompt says so. The entry's own form and revision bucket are named
-    under the table.
+    estimates, and the prompt says so. A form with no stated end (TBD, silent) has no shares,
+    and its rows show them as not applicable. The entry's own form and revision bucket are
+    named under the table.
   - For the dev runs of the H3 selection the table comes from the fit split alone; for test
     runs, from the whole train period (fit and dev).
   - The examples are drawn by the seeded rule, stratified by form, from fit statements outside
@@ -821,8 +842,9 @@ That is reportable.
 
 **Items.**
 
-- About 800 items from about 100 real seeds. The seeds are stratified by form and drawn after
-  the samples of section 10 and the in-context examples, excluding them.
+- About 800 items from about 100 real seeds. The seeds are stratified by form and drawn in the
+  order of section 3: after the samples of section 10, the in-context examples and the dev
+  prompt items, and excluding them.
 - Names are fictitious, and gold labels follow by construction.
 
 **Factors, varied one at a time from the seed.**
@@ -893,7 +915,7 @@ parsed or linked. The amendment fixes:
 
 **Linker gate.** On the development months: at least 150 links checked by hand, the required
 number for every term (30, or all of a term's links when it has fewer), and at least 90% of the
-checked links correct. A1 and A2 check the links on sheets drawn by the seeded rule; a link
+checked links correct. A1 and A2 check the links on sheets drawn with seed 20261001; a link
 checked by both is correct only when both say so, and "unclear" is not correct. The 90%
 threshold is a draft value. [owner to confirm]
 
@@ -1077,6 +1099,10 @@ Each is reported per form, weighted by event and by template.
   - An interval-censored target is scored with the midpoint of its bracket. The loss bounds (the
     minimum and maximum over the bracket) are reported too.
   - A right-censored target beyond the cap is scored at the cap.
+  - A target that is right-censored before the cap (follow-up ends before recovery and before
+    day 365) has no midpoint. It is left out of the pinball loss, and the number left out is
+    reported. The loss bounds include it, with the target at its lower bound and at the cap.
+    The draft gave no rule for this case. [owner to confirm]
 - **Coverage** of the 80% interval `[q0.1, q0.9]`, counted on events whose bracket lies wholly
   inside or wholly outside the interval.
 - **Probe and 2×2 metrics** (E4): as defined in E4.
@@ -1271,7 +1297,8 @@ carries a statement they label.
 
 **Tasks.**
 
-1. **Availability-string check** (the adjudicator, before the freeze run): section 2.2.
+1. **Availability-string check** (the adjudicator, before the freeze run): done on 1 October
+   (section 2.2).
 2. **Pilot and check set** (before registration; Friday 2 October).
    - 20 train-period items are labelled by A1 and A2 independently under the guide's draft of
      1 October. A meeting of A1, A2 and the adjudicator settles every disagreement, and the
@@ -1321,12 +1348,17 @@ carries a statement they label.
    - Pass, for each half: at most 2 confirmed errors among its 50 items, that is, at least 95%
      of the audited brackets agree with the auditor's reading of the captures, for B and
      separately for A.
-   - A failure fixes the rule, never single items. For the train half that happens before the
-     freeze run: the outcomes are derived again, and the affected items and 20 fresh ones are
-     audited again. For the test half the outcomes are derived and sealed again, and the new
-     hash is logged as an amendment before the evaluator runs.
-6. **Minimal-pair audit.** 100 E5 items. At least 95% of labels must match the text. Otherwise
-   the generator is fixed and a fresh 100 are audited, with the fix logged.
+   - A failure fixes the rule, never single items. In the train half the rule is also fixed
+     when the same kind of error is confirmed twice with the same cause. For the train half
+     that happens before the freeze run: the outcomes are derived again, and the affected items
+     and 20 fresh ones are audited again. For the test half the outcomes are derived and sealed
+     again, and the new hash is logged as an amendment before the evaluator runs.
+6. **Minimal-pair audit.** 100 E5 items: 45 to each annotator and 10 to both, with planted
+   errors scored as in the outcome audit. An item has an error when a gold label does not
+   follow from the edited text, when the edit changes more than its factor, or when the
+   inserted form is not attested in a real notice. Pass: at least 95 of the 100 items are free
+   of confirmed errors. Otherwise the generator is fixed and a fresh 100 are audited, with the
+   fix logged.
 7. **E6 link checks**, if E6 is still in the study on 4 October: the hand check of at least
    150 links that is the linker gate (section 5, E6), by A1 and A2. Its sheets and its
    procedure come with the linker code and E6's amendment, not with the guide.
@@ -1387,8 +1419,8 @@ numbers.
 
 | Day | Work |
 |---|---|
-| **Thu 1 Oct** | Decisions on scope and rules. Capture manifest. Availability-rule fix. Harness changes (fields shown, provider pin, study ledger). Form classifier, dataset builder, model-free predictors, samplers and audit sheets started. Model cutoffs and routes collected at source. FAA collector, parser and linker written; FAA collection started. Plan and guide revised. OpenReview profiles started for every author. |
-| Fri 2 Oct | Availability-string check. Pilot, meeting, guide v1, check set, alpha gate. Train-half outcome audit. Freeze run of the corpus builder (the one sealed write). Counts-only code. Every gate value filled in. Power check. Independent check of every filled number against the code. |
+| **Thu 1 Oct** | Done when this revision was written: decisions on scope and rules; capture manifest; availability-rule fix and the availability-string check; harness changes (fields shown, provider pin, study ledger, paid-call guards); form classifier; dataset builder; samplers, sheet generators and agreement code, with draft sheets for the train-half outcome audit; model cutoffs and routes collected at source; FAA collector, parser and linker; FAA collection started; plan and guide revised. Still to do that day: model-free predictors, power code, counts-only code, an independent check of each new module, and OpenReview profiles started for every author. |
+| Fri 2 Oct | Pilot, meeting, guide v1, check set, alpha gate. Train-half outcome audit. Freeze run of the corpus builder (the one sealed write). Counts-only code run. Every gate value filled in. Power check. Independent check of every filled number against the code. |
 | **Sat 3 Oct** | **Registration pushed and tagged, by 23:59 AoE.** Then: dev prompt development (format only), 20-item cost trials, dev runs. Literal task starts. |
 | Sun 4 Oct | H3 selection. Refit on fit and dev. **F1 pushed** (one day later than the draft had it). Confirmatory runs: E3 conditions a, b, c and the probe, both primaries. Then E2, E5, the 2×2 and the secondaries, in cost order. **E6 linker gate**; if it passes, E6's amendment. |
 | Mon 5 Oct | Runs finish. Literal task, reference-reading check and minimal-pair audit done; agreement computed; gold hashed. E6 runs, if it passed its gate. Test-half outcome audit, after the last confirmatory run. |
@@ -1421,7 +1453,8 @@ to 2025 that were Current at first sight and carried a date-like phrase, which i
 and other distractor dates; it is wider than E3 eligibility. The first three thresholds were
 met on that set (section 16 gives the counts). The fourth was tested on a weaker count, events
 with any later capture of their thread, against a cutoff of 2023-12-31 that had not been
-confirmed at source. No scoreable count was printed.
+confirmed at source. No scoreable count was printed. On 1 October the builder printed the
+fourth threshold as worded, at the same cutoff, and it was met on the gate set (section 16).
 
 *The registered gate record* is **TBD-at-gate**, in two parts.
 
@@ -1528,10 +1561,10 @@ claim.
   `analysis/coling/out/read/<run>/`, with the study ledger beside them (tracked); raw responses
   in `results/coling/read/<run>/` and the one call cache in `results/coling/read/cache/`
   (ignored by git).
-- Annotation: blank sheets and the manifest of submitted sheets in
-  `analysis/coling/out/annotation/`; the train-half outcome-audit sheets and traces in
-  `analysis/coling/out/audit_outcomes/`; sheets in progress and the planted-error keys under
-  `external_data/annotation/` (ignored by git).
+- Annotation: the sample lists, the blank sheets and the manifest of the literal task, the
+  pilot and the check sets in `analysis/coling/out/audit/`, where the sampler writes them; the
+  train-half outcome-audit sheets and traces in `analysis/coling/out/audit_outcomes/`; sheets
+  in progress and the planted-error keys under `external_data/annotation/` (ignored by git).
 - E6: derived tables and link-check sheets in `analysis/coling/out/faa/`.
 - Downloads: `external_data/` (ignored by git).
 - Sealed outcomes, and the test-half audit sheets, traces and key: `external_data/sealed/`,
@@ -1622,8 +1655,8 @@ moved out of the study folder before registration.
   - dated after 2023-12-31: 2,679 events, 2,677 of them with a later capture of their thread
     (1,947 distinct statements).
 - **The same report printed again on 1 October**, from rebuilds in memory that wrote nothing,
-  with the availability rule as changed that day and no string rejected yet. The counts of
-  rows, events, statements, episodes and of the gate set are unchanged. Changed or new:
+  with the availability rule as changed that day and no string rejected. The counts of rows,
+  events, statements, episodes and of the gate set are unchanged. Changed or new:
   - events with an observable outcome in the gate set under B: 2,011 events and 1,422 distinct
     statements (under A, 590 and 405 as before);
   - the fourth threshold as worded, which the builder now prints: of the gate set dated after
@@ -1655,18 +1688,25 @@ moved out of the study folder before registration.
 - **One deduction about test outcomes was written down (1 October).** A statement first captured
   after its stated period had ended was, by the at-risk rule, not recovered at that capture. Its
   first horizon event is therefore answered "no" by first-sight data alone. The review stated
-  this for a counted set of eligible test statements (190 of the 2,585). This is the value of
-  one horizon outcome for a subset of test statements, deduced without reading an outcome
-  field. It is the only test-period outcome value known to have been stated. No tabulation of
-  that set by year, form or company was made, and none is made before the evaluator runs. The
-  rule that followed is in "Changes", item 11.
+  this for a counted set of eligible test statements (the set counted in the list above). This
+  is the value of one horizon outcome for a subset of test statements, deduced without reading
+  an outcome field. It is the only test-period outcome value known to have been stated. No
+  tabulation of that set by year, form or company was made, and none is made before the
+  evaluator runs. The rule that followed is in "Changes", item 11.
+- **The form classifier, the dataset builder and the outcome-audit sampler were run on 1
+  October** on the events of every period and on the open train outcomes. They wrote counts of
+  statements by form, split, year, revision bucket and analysis set, a draft of the eligible
+  list with its subsets, and, for the train period only, counts of outcomes and draft sheets
+  for the train-half outcome audit. The classifier reads no outcome, the dataset builder
+  refuses an outcome table that holds a test-period row, and the train half of the audit
+  reads train-period outcomes only. None of these runs printed or wrote a test-period outcome.
 - **Availability strings of all periods were read** as bare strings, to design the rule fix of
   1 October ("Changes", item 9). No outcome was involved. The effect of the fix on the test
   period is reported only as the count of events whose at-risk flag changes. In the rebuild of
-  1 October, before the author check, 55 presentation-level events in 33 statements became at
-  risk under B (30 events dated before 2023 and 25 from 2023), and none left the at-risk set.
-  The count after the author check is **TBD-at-gate**, from the freeze run, against the events
-  table of 29 September.
+  1 October, 55 presentation-level events in 33 statements became at risk under B (30 events
+  dated before 2023 and 25 from 2023), and none left the at-risk set. The author check of the
+  same day rejected no string (section 2.2), so it changes none of these. The registered count
+  is **TBD-at-gate**, from the freeze run, against the events table of 29 September.
 - **FAA advisories of 2026 (from 1 October).** The advisories are collected from 1 October.
   The parser, the statement builder and the linker are developed on the 2024 pilot sample and
   on the development months (April and May 2026); the code refuses any later month until E6's
@@ -1716,8 +1756,9 @@ depend on the pandas version, so the environment is part of the record.
   strings): **TBD-at-gate**.
 - `rules.py` (the rule reader): `6a810bcb1ae277b9`.
 - `forms.py` (the form classifier) and `manifest.py` (the capture manifest): **TBD-at-gate**.
-- The dataset builder, the counts-only code, the samplers, the sheet generators and the
-  agreement code: file names and hashes, **TBD-at-gate**.
+- The dataset builder (`dataset.py`), the samplers and sheet generators (`audit_sample.py`,
+  `audit_outcomes.py`), the agreement code (`audit_agreement.py`) and the counts-only code
+  (not yet written on 1 October): hashes, and the last file name, **TBD-at-gate**.
 - The calibrator and both GBMs (code): **TBD-at-gate**. If the text-trained GBM is not ready,
   its code hash moves to F1 by an edit of this line before the push.
 
@@ -1737,7 +1778,8 @@ depend on the pandas version, so the environment is part of the record.
 - The pilot and check-set result (both alphas, the share of identical intervals) and the
   train-half outcome-audit result (confirmed errors for B and for A), with the hashes of the
   submitted sheets. **TBD-at-gate.**
-- The availability-string check: its date and counts (section 2.2). **TBD-at-gate.**
+- The availability-string check (section 2.2): done on 1 October 2026; 910 strings read, none
+  rejected; the list as read has hash `da0bde1baac48473`, re-read at the freeze run.
 
 **Counts.** Every gate value above, with the Gate 1 record (section 12).
 
@@ -1768,7 +1810,7 @@ gate result and what section 5 lists.
 
 ## Changes from the 29 September draft (1 October 2026)
 
-The draft of 29 September is the previous committed version of this file. Between it and this
+The draft of 29 September is this file at commit `69b1588`. Between it and this
 revision, train-period outcomes were examined freely (they are open); test-period texts and
 first-sight fields were read and counted; and no test-period outcome field was read (section
 16, which also records one deduction). Each changed rule is listed with what had been seen when
@@ -1787,18 +1829,23 @@ quoted here are from the build of 29 September.
    scoreable dated dev events. Now: 2021-01-01, fixed. *Seen:* train outcomes. The draft's rule
    gives 2021-10-01, with 178 scoreable dev statements of which 167 are "no" at both horizons.
    The fixed date gives 661 scoreable dev statements in 73 episodes (508 no/no, 81 no/yes, 72
-   yes/yes) and leaves 799 for fit. *Why:* train outcomes stop at 2022-10-06 and no capture
-   exists for the 308 days before 2022-10-04, so a late boundary scores almost only statements
-   that had not recovered; the H3 selection and the power check would rest on that.
+   yes/yes) and leaves 799 for fit. These counts use the bracket over all covered
+   presentations, which was the primary unit when the boundary was set; on the displayed
+   presentation (item 5) they differ a little, and the registered counts are those of section
+   3. *Why:* train outcomes stop at 2022-10-06 and no capture exists for the 308 days before
+   2022-10-04, so a late boundary scores almost only statements that had not recovered; the H3
+   selection and the power check would rest on that.
 4. **Reference reading and eligibility.** Draft: the stated period came from the rule output
    for forms where it matched author labels on 95% of audited train items, and from author
    labels for every other test event. Now: the frozen rule reading for every form; the authors
    check 100 eligible statements and the accuracy is reported; no author labels on the other
-   forms in October. *Seen:* test-period event counts (the eligible count, and its split by the
-   rule reading's granularity: 418 of 2,585 eligible statements are not plain month and year).
-   No test-period outcome. *Why:* the eligible list and the stated end printed in every
-   predictive prompt must exist at registration, and the labels would have come after it; the
-   labelling load did not fit the annotators' hours.
+   forms in October. With the labels gone, the H2 secondary on author-labelled events becomes
+   H2 on the month-and-year form alone, and E7 takes the rule reading as its reference.
+   *Seen:* test-period event counts (the eligible count, and its split by the rule reading:
+   418 of 2,585 eligible statements have another granularity than a month, or a distractor
+   date beside the target). No test-period outcome. *Why:* the eligible list and the stated
+   end printed in every predictive prompt must exist at registration, and the labels would
+   have come after it; the labelling load did not fit the annotators' hours.
 5. **Primary outcome unit.** Draft: the maximum over all presentations a statement covers. Now:
    the bracket of one displayed presentation, drawn by the seeded rule; the maximum is a
    secondary. *Seen:* test-period event counts (579 of 2,585 eligible statements cover more
@@ -1812,19 +1859,23 @@ quoted here are from the build of 29 September.
    a 30-item pilot; a McNemar test per form with at least 15 items, with Holm over forms × 2.
    Now: 120 statements labelled by both; a 20-item pilot and a 20-item check set; one pooled
    exact McNemar test per primary over the items outside the month-and-year stratum; per-form
-   results descriptive. *Seen:* event counts by form in all periods (texts only). *Why:*
-   annotator hours; under the guide's quotas only one form reached 15 items, so the per-form
-   family had no power.
+   results descriptive; the draft's descriptive mixed model is dropped. In the positive
+   result, "vague" forms (on which the gold abstains, so no IoU exists) are replaced by
+   part-of-month forms. *Seen:* event counts by form in all periods (texts only). *Why:*
+   annotator hours; under the quotas of the guide's first draft only one form reached 15
+   items, so the per-form family had no power.
 8. **Budget scope.** gemini-3.8-flash reads E2 and the E3 conditions only (no probe, no E5, no
    E6); the TBD, silent and stale secondaries are read by the two primaries only; the Late
    split is not read for outcomes, where the draft kept it for descriptive post-cutoff slices
-   of the newest models; the table is rebuilt from itemised counts. *Seen:* test-period event
-   counts (2,585 eligible statements against the 1,000 the draft assumed). *Why:* the draft's
-   scope passed the gemini-3.8-flash cap at the real counts.
+   of the newest models; the table is rebuilt from itemised counts; the cost trial runs 20 dev
+   items per template, not per task type; the order of the budget fallbacks changes with the
+   scope. *Seen:* test-period event counts (2,585 eligible statements against the 1,000 the
+   draft assumed). *Why:* the draft's scope passed the gemini-3.8-flash cap at the real counts.
 9. **Availability rule and capture set.** Negated, future and estimated uses of "available",
    and a mention directly followed by a time, no longer class a row as available; strings the
-   author rejects go in a frozen list; the capture set is frozen at the 110 files, with a
-   manifest the builder checks. *Seen:* the availability strings of all periods, as bare text;
+   author rejects go in a frozen list (none was rejected, item 26); the capture set is frozen
+   at the 110 files, with a manifest the builder checks, and a capture whose content repeats
+   the one before it is not used. *Seen:* the availability strings of all periods, as bare text;
    train outcomes had been examined; no test-period outcome. *Why:* the old rule classed texts
    such as "available by 4/5/19" and "no release date available at this time" as available,
    which removes a statement from the at-risk set or records a false recovery under B.
@@ -1839,16 +1890,20 @@ quoted here are from the build of 29 September.
     section 16. *Why:* the draft did not say how such statements are treated.
 12. **Calibrator.** Now: form by revision bucket when the cell holds at least 100 statements,
     else form, else all dated forms; buckets first, second, third or later; the prompt's
-    track-record table has the same cells and carries Turnbull shares. *Seen:* train outcomes
+    track-record table has the same cells and carries Turnbull shares. The table is described
+    as the track record of the whole list, where the draft said "the issuer's"; an example
+    shown as not recovered needs 365 days of follow-up. *Seen:* train outcomes
     (cell sizes and Turnbull fits), and the test-period count of statements per revision
     bucket. *Why:* most form-by-revision cells are too small, and the draft's "1, 2, 3 or more"
     did not match an index that starts at 0.
 13. **Small rules.** The date shift is plus 4 years. The 20 samples use condition (a) and are
     scored as empirical quantiles of the sampled medians. The probe sample comes from the
-    eligible list, stratified by year, and its items carry no stated period. The H2 margin of
+    eligible list, stratified by year; its items carry no stated period, and the probe asks
+    for the two probabilities at 90 and 180 days as well as the quantiles. The H2 margin of
     0.02 is confirmed. Parsing is strict: the draft's sentence that sorted quantiles and
-    clipped probabilities is deleted. *Seen:* nothing from the data. *Why:* the draft left
-    these open, or contradicted the harness.
+    clipped probabilities is deleted; an empty response is not repaired; an answer with
+    `P(E_end90)` below `P(E_end)` is kept and counted. *Seen:* nothing from the data. *Why:*
+    the draft left these open, or contradicted the harness.
 14. **E5.** The authors' predictive readings are cut. The registered test is a GEE clustered by
     seed, with 12 tests under Holm; the draft's mixed model with Firth's correction is dropped.
     *Seen:* nothing from the data. *Why:* no library in the environment fits the mixed model,
@@ -1883,8 +1938,9 @@ quoted here are from the build of 29 September.
 23. **New definitions.** The power proxies; the criterion for "overconfident"; distractor
     uptake; selective prediction limited to condition (c) and the rules; the E5 error and the
     contrast of each E5 test; the evaluator's three refusals in terms of what the harness
-    stores; bounds beside every confirmatory estimate. *Seen:* nothing from the data beyond the
-    items above. *Why:* the draft named these without defining them.
+    stores; bounds beside every confirmatory estimate; the pinball loss of a target that is
+    right-censored before the cap. *Seen:* nothing from the data beyond the items above. *Why:*
+    the draft named these without defining them, or gave no rule.
 24. **Roles.** Draft: the annotators are the authors, and adjudication is by an author who does
     not write prompts. Now: A1 and A2 do all the labelling and both outcome audits; the owner
     adjudicates, does not label, and may write prompts and read model outputs, within a stated
@@ -1898,19 +1954,64 @@ quoted here are from the build of 29 September.
     September tested a wider set than the analysis set, and a weaker fourth count.
 26. **Availability check.** Draft: an author checks every string the rule classes as
     available. Now: the adjudicator checks those strings and the ones the rule change moved out
-    of available; the strings classed limited are added as an optional part. *Seen:* the
+    of available; the strings classed limited are added as an optional part. The check was
+    done on 1 October on the whole list, and nothing was rejected (section 2.2). *Seen:* the
     availability strings, as bare text. *Why:* the rule change needs a check in both
-    directions; the strings classed limited (about 650) bear mainly on a sensitivity analysis.
+    directions; the strings classed limited (647) bear mainly on a sensitivity analysis.
 27. **Sealing rule.** Now explicit: before registration the sealed files are read once, by the
     counts-only code at the freeze, which prints the numbers of scoreable and undetermined
     statements and no outcome value; the files are written by the freeze run and its one
     checking rerun only. The draft allowed counts of events with an observable outcome and had
     Gate 1 print a scoreable count, without saying what code reads the sealed file. *Seen:*
     nothing from the data. *Why:* several builds share one sealed folder.
+28. **Other standing rules.** Draft: every collector sends at most one request per second and
+    caches. Now: the pause each collector keeps is stated, with two exceptions disclosed (the
+    openFDA page requests; the model pages read through a page reader). New: nothing is
+    tabulated from the later rows of a thread in the open events table; no API key is in a
+    build environment before registration; no personal name is written to any file; the
+    seeded draw is defined. *Seen:* nothing from the data. *Why:* the draft's request rule did
+    not describe two of the collectors, and the others were unwritten practice.
+29. **Outcome audit.** Draft: 100 outcomes stratified by era, passing at 95% agreement. Now:
+    presentation-level brackets under B and under A, with the statement-level bracket beside
+    them; in each half 20 items for each annotator and 10 for both, with planted errors scored
+    by code; a half passes with at most 2 confirmed errors, for B and for A separately; the
+    train-half sample leaves out every thread that carries a labelled statement, and its
+    traces stop at the train horizon. *Seen:* train outcomes (the train-half sheets are built
+    from them, and draft sheets were made on 1 October). No test-period outcome. *Why:* the
+    draft did not say what unit is audited, by whom, or how a 95% rule applies to 50 items.
+30. **Minimal-pair audit.** Draft: at least 95% of labels match the text. Now: an item also
+    fails when its edit changes more than its factor or its inserted form is not attested; 45
+    items for each annotator and 10 for both; pass at 95 of 100. *Seen:* nothing from the
+    data. *Why:* the plan and the guide have to state one rule.
+31. **Prompt text before registration.** Draft: prompts are developed on dev items and frozen
+    at F1. Now: the text changes of 1 October (the two added fields, the wording of the
+    track-record table) and the two sentences settled at the pilot meeting are entered before
+    registration, with no model call, and the five templates are pinned again under the same
+    ids; from F1 on a changed prompt takes a new id. *Seen:* nothing from the data, and no
+    model output. *Why:* the annotation sheets show the entry block that the models see, and
+    the guide quotes the prompt's conventions, so both must be fixed before the pilot gate.
+32. **Paid-call controls.** Draft: a run starts only if recorded spend plus its cap fits in
+    $200, and routing "is pinned". Now the harness keeps one ledger for all runs, with a cap
+    per model as well as the study cap, and counts the caps of runs in flight; refuses a paid
+    call unless the registration tag is an ancestor of the checkout, and a test-period or
+    late-period item unless the F1 tag is too; and names one provider endpoint per OpenRouter
+    model, storing who served each call. *Seen:* nothing from the data. *Why:* two runs
+    started together each saw the other's spend as zero, and only process kept a paid call
+    from coming before registration.
+33. **E6.** The data are described as three kinds of statement, each taken at its first
+    issuance. In the linker gate a term needs 30 checked links, or all of its links when it
+    has fewer; A1 and A2 do the checks, and a link checked by both counts only when both
+    accept it. Seven models read E6, and nothing in it enters the confirmatory family. The
+    amendment also fixes the prompts, the item sets and who gives the author readings.
+    *Seen:* the 2024 pilot sample and the advisories of the development months (April and May
+    2026) as far as they were collected on 1 October; no later month was parsed or linked.
+    *Why:* the collector, parser and linker were written on 1 October, and the draft did not
+    say what a term with fewer than 30 links needs or how a doubly checked link counts.
 
 **Status of these changes.** The owner confirmed on 1 October the scope (item 1), the deadlines
-and their one relaxation (item 2), the roles (item 24), and the public repository with an
-anonymised copy of the plan and guide in the supplement (item 17). The other items are
+and their one relaxation (item 2), the availability rule, the capture freeze and the result of
+the availability check (items 9 and 26), the roles (item 24), and the public repository with
+an anonymised copy of the plan and guide in the supplement (item 17). The other items are
 provisional rules of 1 October: each stands as written unless the owner changes it, and each
 is confirmed or changed before this file is registered. [owner to confirm]
 
@@ -1926,8 +2027,14 @@ on the train period.
 - The Date Discontinued cell on a shortage row is not a discontinuation.
 - The event date falls back to the capture date only when the Date of Update is later by more
   than one day.
-- "By X" runs from the Date of Update to the end of X.
-- Observable brackets include brackets to discontinuation.
+- "By X" runs from the Date of Update to the end of X. The conventions for a year alone, a
+  half, the parts of a quarter and of a year, relative times and vague times are written out;
+  a half with no year is not read.
+- A statement event is keyed by the listing as well as by generic, company, text and date.
+- The upper bound of a bracket is the first capture that shows recovery or discontinuation,
+  and observable brackets include brackets to discontinuation.
+- The literal answer carries the quoted words it rests on. Masking in the 2×2 replaces names
+  and NDC digits and rescales strengths; the draft said it removes them.
 - The third at-risk condition is applied by the dataset builder, and a statement is at risk
   when any covered presentation is.
 - Five statement types and four certainty classes, as in the answer schema and the guide.

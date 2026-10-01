@@ -42,7 +42,7 @@ The classes are tested in this order and the first that fits is the form (``FORM
 Classes 1 to 12 need a *target* that is a recovery or a next-delivery statement; the rule reader
 chooses the target in the order of the literal prompt (recovery, next delivery, discontinuation,
 depletion), and within a type a dated statement beats an unknown marker, which beats a vague or
-undated one (one corner differs; see the known limits). So "Next Delivery: May 2021; Estimated
+undated one (three corners differ; see the known limits). So "Next Delivery: May 2021; Estimated
 Recovery: TBD" is ``tbd``, and an undated discontinuation beside a dated depletion is
 ``discontinuation``.
 
@@ -67,8 +67,9 @@ Flags and other fields (``FormReading``)
   one whatever its form; ``distractor`` is the class of texts whose only timing is of that kind.
 * ``statement_type`` and ``certainty``: the five types and four classes of the literal prompt and
   of ``AUDIT_GUIDE.md`` (availability-until counts as depletion; asserted, estimated,
-  undetermined, no_statement), as ``rules.as_literal_v1`` maps them. ``rule_statement_type`` and
-  ``rule_certainty`` are the rule reader's own six and five.
+  undetermined, no_statement), as ``rules.as_literal_v1`` maps them (``STATEMENT_TYPES`` and
+  ``CERTAINTIES``). ``rule_statement_type`` and ``rule_certainty`` are the rule reader's own six
+  and five.
 * ``start``, ``end``, ``granularity``, ``bound``, ``stale``, ``abstain_reason``: the target's
   period as the rule reader read it. ``pattern`` is the entry of ``rules.PATTERNS`` that matched
   the target's time.
@@ -111,9 +112,12 @@ Known limits (left as they are, because the rule reader is frozen)
 * In "April/May 21" the rule reader takes the year of the range from the Date of Update, not
   from the two digits, so ``no_year`` is set.
 * "late this week or early next week" is read as this week (``relative``).
-* The rule reader's ranking of targets (``rules._score``) departs from the strict order of types
-  in one corner: a dated discontinuation outranks a delivery stated with no time ("as it is
-  released"), and ties with a delivery under an unknown marker, where the first mentioned wins.
+* The rule reader's ranking of targets (``rules._score``) departs from the order above in three
+  corners. A dated discontinuation outranks a delivery stated with no time ("as it is
+  released") and ties with a delivery under an unknown marker. A discontinuation under an
+  unknown marker ties with a delivery stated with no time. A recovery under an unknown marker
+  that has no specific cue (a bare "TBD") ties with a vague recovery. In a tie the first
+  mentioned wins.
 
 Use from other modules
 ----------------------
@@ -144,8 +148,8 @@ Usage (from the repository root)::
 
 The default input is ``analysis/coling/out/events.csv.gz``. ``--captures`` builds the events
 table in memory from the capture files instead and writes nothing but the two outputs. The
-counts file records which of the two it was built from, so ``--check`` takes the same flags as
-the run that wrote it.
+counts file records which of the two it was built from and the command that wrote it, so
+``--check`` takes the same flags as the run that wrote it.
 """
 
 from __future__ import annotations
@@ -190,8 +194,13 @@ EVENT_FIELDS = (
     "availability_class",
     "statement_text",
 )
+COMMAND = "PYTHONPATH=. python -m analysis.coling.forms"
 ESTIMATE_TYPES = ("recovery", "next_delivery")
 RELATIVE_PATTERNS = ("relative", "relative_supply", "calendar_relative")
+STATEMENT_TYPES = ("recovery", "next_delivery", "depletion", "discontinuation", "none")
+"""The five statement types of the literal answer schema, in the schema's order."""
+CERTAINTIES = ("asserted", "estimated", "undetermined", "no_statement")
+"""The four certainty classes of the literal answer schema, in the schema's order."""
 
 
 @dataclass(frozen=True, slots=True)
@@ -533,7 +542,16 @@ def _split_totals(splits: pd.Series) -> dict[str, int]:
 
 
 def tabulate(statements: pd.DataFrame) -> dict[str, Any]:
-    """Counts of statements by form, split and population, with the merge table as applied."""
+    """Counts of statements by form, split and population, with the merge table as applied.
+
+    Every table has one row per class of its fixed list, with zeros where a class is absent, so
+    the rows of a table add up to the number of statements whatever the events table holds.
+    """
+    listed = (("form", FORM_NAMES), ("statement_type", STATEMENT_TYPES), ("certainty", CERTAINTIES))
+    for column, allowed in listed:
+        unknown = sorted(set(statements[column]) - set(allowed))
+        if unknown:
+            raise ValueError(f"{column} has values outside its list: {unknown}")
     train = statements["split"].isin(TRAIN_SPLITS)
     base = statements[_in_population(statements, MERGE_POPULATION) & train]
     train_counts = {n: int((base["form"] == n).sum()) for n in FORM_NAMES}
@@ -588,11 +606,9 @@ def tabulate(statements: pd.DataFrame) -> dict[str, Any]:
             splits[sub["distractor_dates"].astype(int) > 0]
         )
         report["statement_type"][population] = _by_split(
-            sub["statement_type"], splits, sorted(set(statements["statement_type"]))
+            sub["statement_type"], splits, STATEMENT_TYPES
         )
-        report["certainty"][population] = _by_split(
-            sub["certainty"], splits, sorted(set(statements["certainty"]))
-        )
+        report["certainty"][population] = _by_split(sub["certainty"], splits, CERTAINTIES)
     return report
 
 
@@ -685,13 +701,15 @@ def events_from_captures(captures: Path) -> pd.DataFrame:
     return pd.read_csv(io.StringIO(text), dtype=str, keep_default_na=False)
 
 
-def build(events: pd.DataFrame, source: Mapping[str, str]) -> tuple[dict[str, Any], bytes]:
+def build(
+    events: pd.DataFrame, source: Mapping[str, str], command: str = COMMAND
+) -> tuple[dict[str, Any], bytes]:
     """The counts report and the golden file's bytes for one events table."""
     frame = golden_frame(events)
     golden = gz_bytes(frame)
     report = {
         "about": "Counts of distinct statements by form class (PLAN.md section 2.6). No outcome.",
-        "command": "PYTHONPATH=. python -m analysis.coling.forms",
+        "command": command,
         "inputs": {
             **source,
             "rules_sha256": sha16(Path(rules.__file__).read_bytes()),
@@ -739,16 +757,20 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if sha16(Path(rules.__file__).read_bytes()) != RULES_SHA256:
         print(f"warning: rules.py is not the frozen file ({RULES_SHA256})")
+    command = COMMAND
     if args.captures:
         events = events_from_captures(args.captures)
         source = {"events": f"built in memory from {args.captures.as_posix()}"}
+        command += f" --captures {args.captures.as_posix()}"
     else:
         events = load_events(args.events)
         source = {
             "events": args.events.as_posix(),
             "events_sha256": sha16(args.events.read_bytes()),
         }
-    report, golden = build(events, source)
+        if args.events != EVENTS:
+            command += f" --events {args.events.as_posix()}"
+    report, golden = build(events, source, command)
     counts_path, golden_path = args.out / COUNTS.name, args.out / GOLDEN.name
     if args.check:
         stale = []
