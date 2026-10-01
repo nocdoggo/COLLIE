@@ -54,6 +54,10 @@ All deadlines in this file are in Anywhere on Earth time (AoE, UTC−12): 23:59 
   - What may be printed: counts of events, of events with an observable outcome, and of events
     whose horizon events are determined (section 2.5). No count is broken down by an outcome
     value.
+  - A count that would let a small number be worked out is masked. The counts-only code prints
+    a count below 5 as `<5`, and where an exact count together with an open total would give a
+    count below 5 by subtraction, it prints a lower bound (`>N`) or `withheld`. A masked count
+    is registered as printed.
   - After registration the sealed outcomes are read only by the sampler and the sheets of the
     test-period outcome audit (section 10), after every confirmatory run has finished, and by
     the registered evaluator.
@@ -538,8 +542,11 @@ Late).
   never an outcome. The primary analysis uses the scoreable ones.
   - The eligible list is written by the dataset builder and hashed (section 17).
   - **TBD-at-gate**: the numbers of eligible statements and of their episodes; of scoreable
-    statements; and of eligible statements with a horizon event left undetermined. The last two
-    come from registered code that reads the sealed file and prints these counts only.
+    statements and of their episodes; and of eligible statements with a horizon event left
+    undetermined. The scoreable and undetermined counts come from registered code
+    (`sealed_counts.py`) that reads the sealed file once and prints only these counts, the
+    scoreable count of each post-cutoff slice, and the two observable counts of the Gate 1
+    record (section 12), each masked by the rule of the standing rules.
   - TBD, silent and stale-at-issue test statements at risk under B form three further item
     lists, each hashed, for E3's secondary analyses. Their sizes are **TBD-at-gate**.
 - **Post-cutoff slices.** For each model, the slice is the eligible statements dated after the
@@ -554,7 +561,10 @@ Late).
     (gemma-3-27b), 2024-09-30 (qwen-2.5-7b) and 2024-12-31 (deepseek-v3). gemini-3.8-flash and
     grok-4.20, both of March 2026, have no slice.
   - A slice is analysed only if it holds at least 50 scoreable statements. The size of every
-    slice is **TBD-at-gate** (cutoffs from section 4; counts from the counts-only code).
+    slice is **TBD-at-gate** (cutoffs from section 4; counts from the counts-only code). A size
+    may be registered as a lower bound; a bound above 49 meets the rule. A slice whose size is
+    withheld is decided by the evaluator from the exact count after unsealing, by the same
+    rule, before any test of that slice is computed.
 - **Samples and their order.** Every sample is drawn by the seeded rule, in this order, so that
   no later sample can change an earlier one:
   1. the pilot, the check set, the reserve check set and the literal-task sample (section 10),
@@ -1050,6 +1060,7 @@ bounds of section 7.2 are reported beside every confirmatory estimate.
   estimate therefore uses one pair of model-free predictors per hypothesis as a proxy: the
   paired loss variance of the pair on the scoreable dev statements, with its inflation from
   clustering, scaled to the registered numbers of scoreable test statements and episodes.
+  Where a registered number is a lower bound, the bound is used.
 - The three pairs are fixed in the power code before it reads a dev outcome, and are listed here
   at registration (**TBD-at-gate**). The draft pairs: face value against rules plus slip (H1);
   rules plus slip against the base-rate predictor (H2); the structured-only GBM against the
@@ -1723,7 +1734,8 @@ moved out of the study folder before registration.
   1 October, 55 presentation-level events in 33 statements became at risk under B (30 events
   dated before 2023 and 25 from 2023), and none left the at-risk set. The author check of the
   same day rejected no string (section 2.2), so it changes none of these. The registered count
-  is **TBD-at-gate**, from the freeze run, against the events table of 29 September.
+  is **TBD-at-gate**: the freeze run's events table compared with the events table of
+  29 September as it stands in the repository's history.
 - **FAA advisories of 2026 (from 1 October).** The advisories are collected from 1 October.
   The parser, the statement builder and the linker are developed on the 2024 pilot sample and
   on the development months (April and May 2026); the code refuses any later month until E6's
@@ -1758,8 +1770,10 @@ Hashes are the first 16 hex characters of sha256.
 - F1 is identified in the same way, by its commit and the tag `coling-f1`. The harness checks
   both tags by these names (section 9).
 - Before the push, an independent check runs the study's test files, reruns the corpus builder
-  once and compares both sealed hashes with the freeze run's, and confirms every filled number
-  against the code.
+  once and compares both sealed hashes with the freeze run's (`freeze.py --verify-rerun`),
+  confirms every filled number against the code, and runs the checker of this file
+  (`plan_check.py`), which fails while a marker or an owner tag is left or a hash recorded
+  here differs from the file on disk.
 
 **Environment.** Python 3.12.11; the lock file `uv.lock`, hash `3308eeb43cb51580` on 1 October,
 re-read at registration. Nothing is installed for this study. The bytes of the gzip tables
@@ -1778,10 +1792,12 @@ depend on the pandas version, so the environment is part of the record.
 - `rules.py` (the rule reader): `6a810bcb1ae277b9`.
 - `forms.py` (the form classifier) and `manifest.py` (the capture manifest): **TBD-at-gate**.
 - The dataset builder (`dataset.py`), the samplers and sheet generators (`audit_sample.py`,
-  `audit_outcomes.py`), the agreement code (`audit_agreement.py`) and the counts-only code
-  (not yet written on 1 October): hashes, and the last file name, **TBD-at-gate**.
-- The calibrator and both GBMs (code): **TBD-at-gate**. If the text-trained GBM is not ready,
-  its code hash moves to F1 by an edit of this line before the push.
+  `audit_outcomes.py`), the agreement code (`audit_agreement.py`), the counts-only code
+  (`sealed_counts.py`) and the freeze script that runs them in order and writes the record
+  (`freeze.py`): hashes **TBD-at-gate**.
+- The calibrator (`predictors.py`), both GBMs (`gbm.py`) and the power code (`power.py`):
+  **TBD-at-gate**. If the text-trained GBM is not ready, its code hash moves to F1 by an edit
+  of this line before the push.
 
 **Tables.**
 
@@ -1981,7 +1997,9 @@ quoted here are from the build of 29 September.
     directions; the strings classed limited (647) bear mainly on a sensitivity analysis.
 27. **Sealing rule.** Now explicit: before registration the sealed files are read once, by the
     counts-only code at the freeze, which prints the numbers of scoreable and undetermined
-    statements and no outcome value; the files are written by the freeze run and its one
+    statements, of scoreable episodes, of scoreable statements in each post-cutoff slice and
+    the two observable counts of the Gate 1 record, masks any count that would give a number
+    below 5, and prints no outcome value; the files are written by the freeze run and its one
     checking rerun only. The draft allowed counts of events with an observable outcome and had
     Gate 1 print a scoreable count, without saying what code reads the sealed file. *Seen:*
     nothing from the data. *Why:* several builds share one sealed folder.
