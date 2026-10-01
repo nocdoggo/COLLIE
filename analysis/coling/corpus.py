@@ -6,6 +6,8 @@ a full listing, so a presentation's history is the sequence of its rows across c
 
 Parsing. Bytes are decoded as utf-8-sig, falling back to latin-1. Leading blank lines are
 skipped; headers are stripped and mapped to canonical names through aliases (``HEADER_ALIASES``).
+A file with no recognisable header, or with a header and no rows, is not a capture: it is skipped
+and named in the report.
 Rows with more cells than the header (unescaped quotes inside Presentation or Related
 Information) are realigned: cells up to the first cell that reads as a Type of Update followed by
 a date are merged into Presentation, and any remaining overflow into Related Information; short
@@ -56,7 +58,10 @@ seen, each capture gives the thread a state under each recovery definition:
 * B (supply is back): recovered when the row's Availability Information reads as available
   (``availability_class == "available"``: "Available", "Inventory is currently available", not
   "limited", "allocation", "backorder" or "unavailable"), or when A holds. B is never later
-  than A.
+  than A. A mention of "available" that is negated, future or estimated does not count ("no
+  release date available at this time", "will be available in June", "available by 4/5/19",
+  "available soon"), and neither does a string the author rejected (see Availability check
+  below).
 * BL (sensitivity for B): as B, with limited supply ("Limited Availability", "on allocation")
   counted as available.
 
@@ -73,7 +78,9 @@ The outcome is a bracket: ``lower`` is the last capture at which the thread was 
 (at least the capture where the event was first seen), ``upper`` the first capture showing the
 event. With neither event by the last capture the outcome is right-censored at ``lower``;
 ``censor_reason_X`` says whether the thread was still listed at the last capture
-(``end_of_archive``; ``end_of_train`` for a train event at its horizon, see Sealing) or left the list while its generic was Current or unlisted, and then
+(``end_of_archive``; ``end_of_train`` for a train event at its horizon, see Sealing; ``no_followup``
+for an event first seen at the archive's last capture) or left the list while its generic was
+Current or unlisted (``absent_generic_current``, ``absent_generic_unlisted``), and then
 ``exit_date_X`` is the first capture where it was missing (for the sensitivity analysis that
 counts leaving the list as recovery). An event is at risk under A when its row is Current at
 first sight, and under B (BL) when it is also not available (not even limited) then; other
@@ -87,22 +94,53 @@ when every member that is not discontinued has recovered, with ``lower = max low
 = max upper``; censored when any such member is censored (``lower = max lower``); discontinued
 when every member is.
 
+Availability check. ``write_availability_strings`` lists every distinct normalised Availability
+Information string that the rule classes available or limited, and every string that the fix of
+1 October 2026 moved out of available (``class_before_fix`` is the class when any mention of
+"available" counted), with the number of capture rows that carry it and nothing else. The author
+marks each string; the rejected ones are entered in ``REJECTED_AVAILABLE`` and are then classed
+other (also a rejected limited string; none is re-classed as limited). An entry that no capture
+row carries stops the build. The list is written by its own command (below) and never by
+``main``.
+
 Sealing. Events dated 2023-01-01 or later form the test period. Their outcomes are written only
 to ``--sealed`` (``outcomes_test.csv.gz``, a gzip with a fixed header time so the sha256 printed
 is reproducible for the same inputs); no value from them is printed. Train outcomes go to
 ``--out`` and are followed only to the last capture before 2023-01-01: a train event still open
 there is administratively censored (``censor_reason_X = end_of_train``), and every follow-up field
 (``next_event_id``, ``n_followup_listed``, ``followup_end_date``, ...) stops at that capture, so
-no train outcome says how a thread stood in the test period. The same train outcomes followed to
-the archive's end go to ``--sealed`` (``outcomes_train_uncensored.csv.gz``) for use after the
-test outcomes are unsealed. Printed are counts only: the Gate 1 counts and the capture-gap summary. The events table holds
-every statement, so the later rows of a thread show that it was still listed; nothing may be
-tabulated from that before registration either.
+no train outcome says how a thread stood in the test period. One exception is first-sight
+information, not an outcome: a train event whose first capture is itself in the test period (a
+Date of Update late in 2022, first archived in 2023) has that capture as its horizon. It has no
+follow-up and is censored ``end_of_train`` at its first-seen capture when at risk; the first-seen
+capture dates of the event and of the other members of its statement are the only test-period
+dates in its row. The same train outcomes followed to the archive's end go to ``--sealed``
+(``outcomes_train_uncensored.csv.gz``) for use after the test outcomes are unsealed. Printed are
+counts only: rows, realigned rows per capture, threads, events, the capture-gap summary and the
+Gate 1 counts (``gate_counts``; the fourth takes the primary model's cutoff month from
+``--cutoff``). The events table holds every statement, so the later rows of a thread show that it
+was still listed; nothing may be tabulated from that before registration either.
 
-Usage (from the repository root)::
+Capture manifest. ``main`` and ``open_build`` first call ``verify_manifest`` on the capture
+folder, which runs ``analysis.coling.manifest.verify`` when that module exists and stops the build
+on a mismatch; the report says whether the folder was verified.
+
+Usage (from the repository root). The full build writes the sealed files, so it is run only at
+the corpus freeze::
 
     PYTHONPATH=. python -m analysis.coling.corpus [--captures external_data/fda_wayback_csv]
-        [--out analysis/coling/out] [--sealed external_data/sealed]
+        [--out analysis/coling/out] [--sealed external_data/sealed] [--cutoff 2023-12-31]
+
+The availability check list (``analysis/coling/out/availability_strings.csv``) reads the captures
+only and seals nothing::
+
+    PYTHONPATH=. python -c "from analysis.coling import corpus; corpus.write_availability_strings()"
+
+The two open tables alone (``events.csv.gz`` and ``outcomes_train.csv.gz``, the same bytes as the
+full build writes) and the report, after the manifest check and with nothing sealed; ``cutoff=``
+takes the place of ``--cutoff``::
+
+    PYTHONPATH=. python -c "from analysis.coling import corpus; corpus.open_build()"
 """
 
 from __future__ import annotations
@@ -112,13 +150,14 @@ import bisect
 import csv
 import difflib
 import hashlib
+import importlib
 import io
 import json
 import re
 import sys
 import unicodedata
 from collections import defaultdict
-from collections.abc import Iterable, Sequence
+from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -128,10 +167,17 @@ import pandas as pd
 
 TEST_START = pd.Timestamp("2023-01-01")
 GATE_END = pd.Timestamp("2025-12-31")
-CUTOFF = pd.Timestamp("2023-12-31")  # Llama 3.3 70B's documented cutoff, per the design memo
+# Last day of the primary model's training-cutoff month (Llama 3.3 70B, per the design memo).
+# It is only the default of ``gate_counts`` and ``--cutoff``; pass the documented value there.
+CUTOFF = pd.Timestamp("2023-12-31")
 OBSERVABLE_WIDTH_DAYS = 31
 GATE_THRESHOLDS = {"statements": 600, "observable": 250, "episodes": 100, "post_cutoff": 150}
 GZIP = {"method": "gzip", "mtime": 0}
+CAPTURES_DIR = Path("external_data/fda_wayback_csv")
+OUT_DIR = Path("analysis/coling/out")
+STRINGS_PATH = OUT_DIR / "availability_strings.csv"
+STRING_COLUMNS = ("string", "class_after_fix", "class_before_fix", "n_rows")
+MANIFEST_MODULE = "analysis.coling.manifest"
 
 # ---------------------------------------------------------------------------
 # Parsing
@@ -173,7 +219,7 @@ _TRANS = str.maketrans(
 
 
 class CaptureFormatError(ValueError):
-    """A capture file that is not a shortage CSV (no recognisable header)."""
+    """A capture file that is not a shortage CSV (no recognisable header, or no rows)."""
 
 
 def decode(raw: bytes) -> str:
@@ -273,6 +319,8 @@ def read_capture(path: Path) -> pd.DataFrame:
         rec["row_repaired"] = repaired
         rec["row_in_file"] = i
         records.append(rec)
+    if not records:
+        raise CaptureFormatError(f"{path.name}: a header and no rows")
     frame = pd.DataFrame.from_records(records)
     for col in TEXT_COLUMNS:
         if col not in frame:
@@ -332,20 +380,147 @@ _UNAVAILABLE = re.compile(
 )
 _LIMITED = re.compile(r"limited|allocat|intermittent|constrain|reduced|short supply|contract")
 _AVAILABLE = re.compile(r"\bavailable\b|in stock")
+SUPPLY_CLASSES = ("available", "limited")
+
+# Strings the author rejected in the check of ``availability_strings.csv``, as that file prints
+# them (``availability_key``): text that the rule below would class available or limited and
+# that reports neither. A string listed here is classed other. The tuple is frozen with this file.
+REJECTED_AVAILABLE: tuple[str, ...] = ()
+_EMAIL = re.compile(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)+")
+
+# A mention of "available" or "in stock" reports supply on hand unless it is negated, future or
+# estimated. The cue stands before the mention in the same clause (at most a few words between,
+# no punctuation), or a time or a word of waiting follows the mention directly.
+_WORDS = r"(?:[\w/'-]+\s+)"
+_NEGATED_BEFORE = re.compile(
+    rf"\b(?:no|not|never|none|nothing|cannot|unable|\w+n't)\s+{_WORDS}{{0,4}}$"
+)
+_FUTURE_BEFORE = re.compile(
+    rf"\b(?:be|become|becomes|(?:will|shall|should|would)\s+have)\s+{_WORDS}{{0,2}}$"
+)
+_STILL_BEFORE = re.compile(
+    rf"\b(?:continu\w*\s+to\s+be|(?:has|have)\s+(?:\w+\s+)?become)\s+{_WORDS}{{0,2}}$"
+)
+_ESTIMATED_BEFORE = re.compile(
+    r"\b(?:estimat(?:e|es|ed)|expect(?:s|ed)?|anticipat(?:e|es|ed)|projected|tentative(?:ly)?"
+    rf"|scheduled|planned|targeted)\s+{_WORDS}{{0,3}}$"
+)
+_LEAD_IN_AFTER = re.compile(
+    r"\s*(?:(?:again|for (?:sale|order|ordering|shipment|shipping|purchase)|to (?:order|ship))\s+)?"
+)
+_WAITING_AFTER = re.compile(
+    r"(?:soon|shortly|later|tomorrow|date|pending|(?:up)?on (?:release|approval|arrival)"
+    r"|(?:when|once) released)\b"
+)
+_ABOUT = r"(?:about|around|approximately|approx\.?|roughly)"
+_FUTURE_PREP_AFTER = re.compile(
+    r"(?:(?:(?:starting|beginning|sometime)\s+)?(?:on or (?:about|after|before)|by|in|on|at|from"
+    rf"|within|after|eta|est\.?|{_ABOUT}|as early as|(?:not|no) (?:sooner|earlier) than"
+    rf"|not before)(?:\s+{_ABOUT})?|starting|beginning)\s+(?:the\s+)?"
+)
+_PART_AFTER = re.compile(r"(?:early|mid|late)(?:\s+to\s+(?:early|mid|late))?[\s-]+")
+_WEEK_AFTER = re.compile(
+    r"(?:the\s+)?(?:(?:first|second|third|fourth|1st|2nd|3rd|4th)\s+)?(?:week|wk)\b"
+)
+_NAMED_PERIOD = re.compile(r"(?:next|coming|following|this|(?:the\s+)?end)\b")
+_AMBIGUOUS_AFTER = {"may", "fall"}
 
 
-def availability_class(text: str) -> str:
-    """blank, unavailable, limited, available or other (checked in that order)."""
-    t = norm_text(text)
+def availability_key(text: str) -> str:
+    """An Availability Information string as the check list prints it and as the rejection list
+    matches it: normalised (``norm_text``), with any e-mail address replaced by ``[email]`` so
+    that none is copied into the check list or into this file."""
+    return _EMAIL.sub("[email]", norm_text(text))
+
+
+def _starts_with_time(text: str, after_preposition: bool) -> bool:
+    """Whether ``text`` opens with a timing phrase (the candidates' patterns, matched at 0, also
+    behind "early", "mid" or "late": "early next year", "mid to late June").
+
+    Without a preposition before it, a bare "may" or "fall" (which need not be a time) and a bare
+    duration ("6 months dating", "30 days coverage") do not count.
+    """
+    if _WEEK_AFTER.match(text):
+        return True
+    part = _PART_AFTER.match(text)
+    for start in (0, part.end()) if part else (0,):
+        for tag, pattern in _COMPILED:
+            hit = pattern.match(text, start)
+            if hit is None:
+                continue
+            span = hit.group(0)
+            if after_preposition:
+                return True
+            if tag == "RELATIVE" and not _NAMED_PERIOD.match(span):
+                continue
+            bare = re.sub(r"[^a-z]", "", span) in _AMBIGUOUS_AFTER and not re.search(r"\d", span)
+            if tag in {"MONTH", "SEASON"} and bare and start == 0:
+                continue
+            return True
+    return False
+
+
+def _timed_after(after: str) -> bool:
+    """Whether a time follows a mention directly: "available by 4/5/19", "available in February
+    2024", "available for sale wk of 12/9", "back in stock week 3 of May", "available TBD"; or a
+    word of waiting: "available soon", "available upon release", "available date".
+
+    "until", "through" and "as of" are not future ("available until mid-November" is on hand
+    now), and punctuation after the mention ends the reach ("Available, Q2 2024" is a label)."""
+    rest = after[_LEAD_IN_AFTER.match(after).end() :]
+    if _WAITING_AFTER.match(rest):
+        return True
+    prep = _FUTURE_PREP_AFTER.match(rest)
+    if prep is not None and _starts_with_time(rest[prep.end() :], True):
+        return True
+    return _starts_with_time(rest, False)
+
+
+def _on_hand(text: str, mention: re.Match[str]) -> bool:
+    """Whether one mention of "available" or "in stock" reports supply on hand now."""
+    before = text[: mention.start()]
+    if _NEGATED_BEFORE.search(before) or _ESTIMATED_BEFORE.search(before):
+        return False
+    if _FUTURE_BEFORE.search(before) and not _STILL_BEFORE.search(before):
+        return False
+    return not _timed_after(text[mention.end() :])
+
+
+def _availability_class(t: str, any_mention: bool) -> str:
     if not t:
         return "blank"
     if _UNAVAILABLE.search(t):
         return "unavailable"
     if _LIMITED.search(t):
         return "limited"
-    if _AVAILABLE.search(t):
+    mentions = list(_AVAILABLE.finditer(t))
+    if mentions and (any_mention or any(_on_hand(t, m) for m in mentions)):
         return "available"
     return "other"
+
+
+def availability_class(text: str) -> str:
+    """blank, unavailable, limited, available or other (checked in that order).
+
+    A string is available only when some mention of "available" or "in stock" reports supply on
+    hand now. A mention does not count when it is negated ("no release date available at this
+    time", "not yet available"), future or estimated ("will be available in June", "to be
+    available", "tentatively available", "estimated date available") or directly followed by a
+    time ("available by 4/5/19", "available in February 2024", "available March 2019") or by a
+    word of waiting ("available soon", "available upon release"). A string with no mention that
+    counts is other. A string in ``REJECTED_AVAILABLE`` is other as well.
+    """
+    t = norm_text(text)
+    found = _availability_class(t, any_mention=False)
+    rejected = found in SUPPLY_CLASSES and availability_key(t) in REJECTED_AVAILABLE
+    return "other" if rejected else found
+
+
+def availability_class_before_fix(text: str) -> str:
+    """The rule as it stood before 1 October 2026: any mention of "available" or "in stock"
+    counted, and no string was rejected. Kept only so that the check list can show what the
+    present rule moved out of available; no outcome uses it."""
+    return _availability_class(norm_text(text), any_mention=True)
 
 
 _MONTH_WORDS = (
@@ -486,11 +661,13 @@ class Captures:
     dates: list[pd.Timestamp]
     skipped: list[str] = field(default_factory=list)
     n_dropped: int = 0
+    realigned: dict[str, int] = field(default_factory=dict)  # stamp -> realigned rows as read
 
 
 def load_captures(directory: Path) -> Captures:
     """Read every capture, normalise fields, drop statusless rows and duplicate keys."""
     frames, stamps, skipped = [], [], []
+    realigned: dict[str, int] = {}
     for path in capture_files(directory):
         try:
             frame = read_capture(path)
@@ -499,6 +676,7 @@ def load_captures(directory: Path) -> Captures:
             continue
         frame["cap_idx"] = len(stamps)
         frame["cap_stamp"] = path.stem
+        realigned[path.stem] = int(frame["row_repaired"].sum())
         stamps.append(path.stem)
         frames.append(frame)
     if not frames:
@@ -511,7 +689,7 @@ def load_captures(directory: Path) -> Captures:
     obs = obs.sort_values(["cap_idx", "key", "dou", "row_in_file"], ascending=[1, 1, 0, 1])
     obs = obs.drop_duplicates(["cap_idx", "key"], keep="first")
     obs = obs.sort_values(["cap_idx", "row_in_file"]).reset_index(drop=True)
-    return Captures(obs, stamps, dates, skipped, n_rows - len(obs))
+    return Captures(obs, stamps, dates, skipped, n_rows - len(obs), realigned)
 
 
 def add_normalised_fields(obs: pd.DataFrame) -> pd.DataFrame:
@@ -528,6 +706,7 @@ def add_normalised_fields(obs: pd.DataFrame) -> pd.DataFrame:
     parts = zip(obs["listing"], obs["g_norm"], obs["c_norm"], obs["p_norm"], strict=True)
     obs["key"] = ["\x1f".join(p) for p in parts]
     obs["ndcs"] = obs["presentation"].map(extract_ndcs)
+    obs["avail_key"] = obs["availability"].map(availability_key)
     obs["avail_class"] = obs["availability"].map(availability_class)
     pairs = zip(obs["availability"], obs["related"], strict=True)
     obs["statement"] = [statement_text(a, r) for a, r in pairs]
@@ -688,6 +867,11 @@ def split_events(obs: pd.DataFrame) -> list[Event]:
     return events
 
 
+def plausible_stamp(dou: pd.Timestamp, cap_date: pd.Timestamp) -> bool:
+    """A Date of Update cannot be later than the capture that shows it (one day of slack)."""
+    return dou <= cap_date + np.timedelta64(1, "D")
+
+
 def date_events(events: list[Event], obs: pd.DataFrame) -> None:
     """Event date: the first row's Date of Update, or its capture date if missing or later."""
     for ev in events:
@@ -695,7 +879,7 @@ def date_events(events: list[Event], obs: pd.DataFrame) -> None:
         dou, cap = obs.at[i, "dou"], obs.at[i, "cap_date"]
         if pd.isna(dou):
             ev.date, ev.date_source = cap, "capture:missing"
-        elif dou > cap + np.timedelta64(1, "D"):
+        elif not plausible_stamp(dou, cap):
             ev.date, ev.date_source = cap, "capture:future"
         else:
             ev.date, ev.date_source = dou, "dou"
@@ -1049,16 +1233,28 @@ def date_discontinued_appears(ev: Event, ctx: Context, horizon: int) -> str:
 
 def followup_fields(ev: Event, ctx: Context, horizon: int) -> dict[str, Any]:
     """Facts about the event from later captures up to ``horizon`` (outcome information, so never
-    in events). ``followup_end_date`` is the date of the horizon capture."""
+    in events). ``followup_end_date`` is the date of the horizon capture.
+
+    A re-confirmation is a later row of the event whose Date of Update differs from the first
+    row's. ``n_reconfirmations`` counts the distinct such dates. ``last_reconfirmed_date`` is the
+    latest of them that is plausible (``plausible_stamp``); a date later than its own capture (a
+    typing error in the source, such as the year 2201) still counts as a re-confirmation but is
+    never used as a date, and ``n_reconfirm_dates_implausible`` says how many were set aside.
+    """
     c = ctx.col
     first_cap = c["cap_idx"][ev.rows[0]]
     first_dou = c["dou"][ev.rows[0]]
     seen = [r for r in ev.rows if c["cap_idx"][r] <= horizon]
-    later = [c["dou"][r] for r in seen[1:]]
-    stamps = {x for x in later if not pd.isna(x) and not same_date(x, first_dou)}
+    stamps, implausible = set(), set()
+    for r in seen[1:]:
+        dou = c["dou"][r]
+        if pd.isna(dou) or same_date(dou, first_dou):
+            continue
+        (stamps if plausible_stamp(dou, ctx.dates[c["cap_idx"][r]]) else implausible).add(dou)
     next_seen = ev.next_cap is not None and ev.next_cap <= horizon
     return {
-        "n_reconfirmations": len(stamps),
+        "n_reconfirmations": len(stamps) + len(implausible),
+        "n_reconfirm_dates_implausible": len(implausible),
         "last_reconfirmed_date": iso(max(stamps)) if stamps else "",
         "run_last_seen_date": iso(ctx.dates[c["cap_idx"][seen[-1]]]),
         "next_event_id": ev.next_id if next_seen else "",
@@ -1174,17 +1370,36 @@ def outcome_frame(rows: list[dict[str, Any]]) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 
 
-def gate_counts(corpus: Corpus) -> dict[str, int]:
-    """Gate 1 counts. Test outcomes enter only as counts of events with an observable outcome."""
+def cutoff_day(cutoff: Any) -> pd.Timestamp:
+    """The last day of the month that holds ``cutoff``: a model's cutoff is a month, and an event
+    is after it when it is dated after that month's last day."""
+    return pd.Timestamp(cutoff).normalize() + pd.offsets.MonthEnd(0)
+
+
+def gate_counts(corpus: Corpus, cutoff: Any = CUTOFF) -> dict[str, int]:
+    """Gate 1 counts. Test outcomes enter only as counts of events with an observable outcome.
+
+    The gate set is the shortage events dated TEST_START to GATE_END that are Current at
+    statement and carry a date-like phrase. ``after_cutoff_observable31_X_*`` is the fourth
+    threshold as the plan words it: the observable events (bracket of 31 days or less) of the gate
+    set dated after the last day of the primary model's documented cutoff month (``cutoff`` is
+    any day of that month, see ``cutoff_day``). ``_events`` counts presentation-level events
+    with an observable bracket of their own; ``_distinct`` counts distinct statements whose
+    statement-level bracket is observable. The ``after_cutoff_*with_followup`` counts are the
+    weaker check used before it (events with any later capture that lists the thread), kept
+    under their own names.
+    """
+    cutoff = cutoff_day(cutoff)
     ev = corpus.events
     date = pd.to_datetime(ev["event_date"])
-    gate = ev[
+    in_gate = (
         (ev["listing"] == "shortage")
         & (ev["status_at_statement"] == "current")
         & ev["has_date_like"].astype(bool)
         & (date >= TEST_START)
         & (date <= GATE_END)
-    ]
+    )
+    gate, late = ev[in_gate], ev[in_gate & (date > cutoff)]
     out = corpus.outcomes.set_index("event_id")
     counts = {
         "statement_events": len(gate),
@@ -1193,13 +1408,15 @@ def gate_counts(corpus: Corpus) -> dict[str, int]:
     }
     for d in GATE_DEFINITIONS:
         observable = out.index[out[f"observable31_{d}"].astype(bool)]
-        counts[f"observable31_{d}_events"] = int(gate["event_id"].isin(observable).sum())
         grouped = set(out.loc[out[f"group_observable31_{d}"].astype(bool), "statement_group_id"])
-        in_gate = gate.loc[gate["statement_group_id"].isin(grouped), "statement_group_id"]
-        counts[f"observable31_{d}_distinct"] = in_gate.nunique()
-    late = gate[pd.to_datetime(gate["event_date"]) > CUTOFF]
+        for prefix, frame in (("", gate), ("after_cutoff_", late)):
+            name = f"{prefix}observable31_{d}"
+            counts[f"{name}_events"] = int(frame["event_id"].isin(observable).sum())
+            in_frame = frame.loc[frame["statement_group_id"].isin(grouped), "statement_group_id"]
+            counts[f"{name}_distinct"] = in_frame.nunique()
     followed = late[late["event_id"].isin(out.index[out["n_followup_listed"] > 0])]
     counts["after_cutoff_events"] = len(late)
+    counts["after_cutoff_distinct"] = late["statement_group_id"].nunique()
     counts["after_cutoff_with_followup"] = len(followed)
     counts["after_cutoff_distinct_with_followup"] = followed["statement_group_id"].nunique()
     return counts
@@ -1222,6 +1439,80 @@ def gap_summary(dates: Sequence[pd.Timestamp]) -> dict[str, Any]:
     }
 
 
+def availability_strings(obs: pd.DataFrame) -> pd.DataFrame:
+    """The author's check list: every distinct normalised Availability Information string that
+    the rule classes available or limited, or classed so before the fix of 1 October 2026.
+
+    Strings are printed as ``availability_key`` gives them. ``n_rows`` counts the capture rows
+    that carry the string (rows kept by ``load_captures``, all captures, both listings). No
+    other column is shown, no drug, company, date or outcome, so the check reveals no
+    statement's outcome. Rows are sorted by class after the fix (available, limited, then
+    other: what the fix or the rejection list moved out), by ``n_rows`` descending, then by
+    string.
+    """
+    groups = obs.groupby("avail_key", sort=False)
+    frame = pd.DataFrame(
+        {
+            "class_after_fix": groups["avail_class"].first(),
+            "class_before_fix": groups["availability"].first().map(availability_class_before_fix),
+            "n_rows": groups.size(),
+        }
+    )
+    frame = frame.rename_axis("string").reset_index()[list(STRING_COLUMNS)]
+    supply = frame[["class_after_fix", "class_before_fix"]].isin(SUPPLY_CLASSES).any(axis=1)
+    frame = frame[supply]
+    rank = {name: k for k, name in enumerate(SUPPLY_CLASSES)}
+    keys = frame.assign(
+        rank=frame["class_after_fix"].map(rank).fillna(len(rank)), fewer=-frame["n_rows"]
+    )
+    order = keys.sort_values(["rank", "fewer", "string"]).index
+    return frame.loc[order].reset_index(drop=True)
+
+
+def write_availability_strings(captures: Path = CAPTURES_DIR, path: Path = STRINGS_PATH) -> int:
+    """Write the check list (``availability_strings``) as a plain CSV; returns its row count.
+
+    Only the captures are read: no thread, event or outcome is derived and nothing is sealed. A
+    file at ``path`` whose header is not exactly the four columns (the author's marks added in a
+    further column, say) is not overwritten.
+    """
+    header = ",".join(STRING_COLUMNS)
+    if path.exists() and path.read_text(encoding="utf-8").split("\n", 1)[0].strip() != header:
+        raise SystemExit(f"{path} has other columns than {header}; move it away first")
+    frame = availability_strings(load_captures(captures).obs)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    frame.to_csv(path, index=False, lineterminator="\n", encoding="utf-8")
+    return len(frame)
+
+
+def verify_manifest(directory: Path, module: str = MANIFEST_MODULE) -> bool:
+    """Check the capture folder against the frozen manifest, when the manifest module exists.
+
+    Calls ``verify(directory)`` of ``module`` (``analysis/coling/manifest.py``), which is imported
+    by name here so that this file runs without it. An error raised by ``verify`` stops the
+    build, and so does a result of False or a non-empty list of differences. Returns True when
+    the check ran and passed, and False when there is no such module (nothing was checked).
+    """
+    try:
+        manifest = importlib.import_module(module)
+    except ModuleNotFoundError as exc:
+        if exc.name is not None and (module == exc.name or module.startswith(exc.name + ".")):
+            return False
+        raise
+    found = manifest.verify(directory)
+    if found is False or (isinstance(found, list | tuple) and len(found) > 0):
+        raise SystemExit(f"{directory} does not match the capture manifest: {found}")
+    return True
+
+
+def unseen_rejections(obs: pd.DataFrame) -> list[str]:
+    """Entries of ``REJECTED_AVAILABLE`` that no capture row carries. Such an entry rejects
+    nothing (a mistyped copy of a check-list string, say), so ``main`` refuses to build with one.
+    """
+    seen = set(obs["avail_key"])
+    return [text for text in REJECTED_AVAILABLE if text not in seen]
+
+
 def write_gz(frame: pd.DataFrame, path: Path) -> str:
     """Write a gzip CSV with a fixed header time and return its sha256."""
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -1229,17 +1520,45 @@ def write_gz(frame: pd.DataFrame, path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def print_report(corpus: Corpus, gate: dict[str, int], gaps: dict[str, Any]) -> None:
-    """Counts only: captures, rows, threads, events, capture gaps and Gate 1."""
+def write_open_tables(corpus: Corpus, out: Path = OUT_DIR) -> dict[str, str]:
+    """Write the two open tables, the events of every period (first-sight fields only) and the
+    train outcomes followed to the train horizon, and return the sha256 of each file by name.
+
+    Nothing sealed is written and no test-period outcome leaves memory.
+    """
+    train = corpus.outcomes[corpus.outcomes["period"] == "train"]
+    return {
+        "events.csv.gz": write_gz(corpus.events, out / "events.csv.gz"),
+        "outcomes_train.csv.gz": write_gz(train, out / "outcomes_train.csv.gz"),
+    }
+
+
+def print_report(
+    corpus: Corpus, gate: dict[str, int], gaps: dict[str, Any], cutoff: Any = CUTOFF
+) -> None:
+    """Counts only: captures, rows, threads, events, capture gaps and Gate 1. ``cutoff`` is the
+    one given to ``gate_counts`` for ``gate``."""
     caps, ev = corpus.captures, corpus.events
+    cutoff = cutoff_day(cutoff)
     print(f"captures read: {len(caps.stamps)}; skipped: {len(caps.skipped)}")
     for msg in caps.skipped:
         print(f"  skipped {msg}")
     repaired = int(caps.obs["row_repaired"].sum())
     print(
-        f"rows kept: {len(caps.obs)}; dropped (duplicate or no status): {caps.n_dropped}; ", end=""
+        f"rows kept: {len(caps.obs)}; dropped (duplicate or no status): {caps.n_dropped}; "
+        f"realigned among those kept: {repaired}"
     )
-    print(f"realigned: {repaired}")
+    realigned = {stamp: n for stamp, n in caps.realigned.items() if n}
+    print(
+        f"realigned rows as read, per capture: {sum(realigned.values())} in {len(realigned)} of "
+        f"{len(caps.realigned)} captures (none in the others)"
+    )
+    for stamp, n in realigned.items():
+        print(f"  {stamp}: {n}")
+    print(
+        f"availability strings rejected by the author: {len(REJECTED_AVAILABLE)} "
+        f"({len(unseen_rejections(caps.obs))} of them in no capture)"
+    )
     print(
         f"threads: {caps.obs['thread'].nunique()}; generics: {caps.obs['generic_id'].nunique()}; "
         f"events: {len(ev)} (train {int((ev['period'] == 'train').sum())}, "
@@ -1264,27 +1583,66 @@ def print_report(corpus: Corpus, gate: dict[str, int], gaps: dict[str, Any]) -> 
             f"{gate[f'observable31_{d}_distinct']} (need >= {t['observable']})"
         )
     print(f"  shortage episodes {gate['episodes']} (need >= {t['episodes']})")
+    for d in GATE_DEFINITIONS:
+        print(
+            f"  dated after {iso(cutoff)}, observable outcome, definition {d}: presentation-level "
+            f"events {gate[f'after_cutoff_observable31_{d}_events']}, distinct statements "
+            f"{gate[f'after_cutoff_observable31_{d}_distinct']} (need >= {t['post_cutoff']})"
+        )
     print(
-        f"  dated after {iso(CUTOFF)}: events {gate['after_cutoff_events']}, with follow-up "
-        f"{gate['after_cutoff_with_followup']}, distinct with follow-up "
-        f"{gate['after_cutoff_distinct_with_followup']} (need >= {t['post_cutoff']})"
+        f"  dated after {iso(cutoff)}: events {gate['after_cutoff_events']}, distinct statements "
+        f"{gate['after_cutoff_distinct']}; with follow-up {gate['after_cutoff_with_followup']}, "
+        f"distinct with follow-up {gate['after_cutoff_distinct_with_followup']} (no threshold)"
     )
 
 
-def main(argv: Iterable[str] | None = None) -> int:
+def open_build(
+    captures: Path = CAPTURES_DIR,
+    out: Path = OUT_DIR,
+    cutoff: Any = CUTOFF,
+    check: Callable[[Path], object] | None = verify_manifest,
+) -> Corpus:
+    """Build the corpus, write the two open tables and print the report; nothing is sealed.
+
+    ``check`` is called on the capture folder before anything is read or written; it raises to
+    stop the build and returns False when it could not check. The default verifies the capture
+    manifest; ``None`` skips the check (synthetic captures in tests). The build also stops,
+    before anything is written, when an entry of ``REJECTED_AVAILABLE`` is in no capture.
+    """
+    checked = check is not None and check(captures) is not False
+    print(f"capture manifest: {'verified' if checked else 'NOT checked'}")
+    corpus = build_corpus(captures)
+    unseen = unseen_rejections(corpus.captures.obs)
+    if unseen:
+        raise SystemExit(f"REJECTED_AVAILABLE holds strings that are in no capture: {unseen}")
+    open_sha = write_open_tables(corpus, out)
+    print_report(corpus, gate_counts(corpus, cutoff), gap_summary(corpus.captures.dates), cutoff)
+    for name, sha in open_sha.items():
+        print(f"wrote {out / name} sha256 {sha}")
+    return corpus
+
+
+def main(
+    argv: Iterable[str] | None = None,
+    check: Callable[[Path], object] | None = verify_manifest,
+) -> int:
+    """Build the corpus and write every table, the sealed ones included: ``open_build``, then the
+    test outcomes and the train outcomes with full follow-up under ``--sealed``."""
     ap = argparse.ArgumentParser(prog="python -m analysis.coling.corpus")
-    ap.add_argument("--captures", type=Path, default=Path("external_data/fda_wayback_csv"))
-    ap.add_argument("--out", type=Path, default=Path("analysis/coling/out"))
+    ap.add_argument("--captures", type=Path, default=CAPTURES_DIR)
+    ap.add_argument("--out", type=Path, default=OUT_DIR)
     ap.add_argument("--sealed", type=Path, default=Path("external_data/sealed"))
+    ap.add_argument(
+        "--cutoff",
+        type=pd.Timestamp,
+        default=CUTOFF,
+        help="a day of the primary model's documented training-cutoff month (Gate 1)",
+    )
     args = ap.parse_args(None if argv is None else list(argv))
-    corpus = build_corpus(args.captures)
-    period = corpus.outcomes["period"]
-    write_gz(corpus.events, args.out / "events.csv.gz")
-    write_gz(corpus.outcomes[period == "train"], args.out / "outcomes_train.csv.gz")
-    sealed_sha = write_gz(corpus.outcomes[period == "test"], args.sealed / "outcomes_test.csv.gz")
+    corpus = open_build(args.captures, args.out, args.cutoff, check)
+    test = corpus.outcomes[corpus.outcomes["period"] == "test"]
+    sealed_sha = write_gz(test, args.sealed / "outcomes_test.csv.gz")
     full_sha = write_gz(corpus.train_uncensored, args.sealed / "outcomes_train_uncensored.csv.gz")
-    print_report(corpus, gate_counts(corpus), gap_summary(corpus.captures.dates))
-    print(f"wrote {args.out / 'events.csv.gz'} and {args.out / 'outcomes_train.csv.gz'}")
     print(f"sealed {args.sealed / 'outcomes_test.csv.gz'} sha256 {sealed_sha}")
     print(f"sealed {args.sealed / 'outcomes_train_uncensored.csv.gz'} sha256 {full_sha}")
     return 0

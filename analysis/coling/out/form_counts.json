@@ -1,0 +1,1769 @@
+{
+ "about": "Counts of distinct statements by form class (PLAN.md section 2.6). No outcome.",
+ "command": "PYTHONPATH=. python -m analysis.coling.forms",
+ "inputs": {
+  "events": "analysis/coling/out/events.csv.gz",
+  "events_sha256": "e8929d516aae5e1c",
+  "rules_sha256": "6a810bcb1ae277b9",
+  "forms_sha256": "3b2e97a59246d9cf"
+ },
+ "splits": {
+  "fit": "before 2021-01-01",
+  "dev": "2021-01-01 to before 2023-01-01",
+  "test": "2023-01-01 to before 2026-01-01",
+  "late": "2026-01-01 onward",
+  "train": "fit and dev"
+ },
+ "populations": {
+  "all": "every distinct statement, shortage and discontinuation listings",
+  "shortage": "statements on the shortage listing",
+  "at_risk_A": "shortage listing, status Current when first seen",
+  "at_risk_B": "shortage listing, status Current and not available when first seen (primary)"
+ },
+ "inventory": [
+  {
+   "name": "relative",
+   "label": "a relative time",
+   "dated": true,
+   "merge_into": "range"
+  },
+  {
+   "name": "range",
+   "label": "a range",
+   "dated": true,
+   "merge_into": "month_year"
+  },
+  {
+   "name": "exact_day",
+   "label": "an exact day",
+   "dated": true,
+   "merge_into": "part_of_month"
+  },
+  {
+   "name": "part_of_month",
+   "label": "part of a month",
+   "dated": true,
+   "merge_into": "month_year"
+  },
+  {
+   "name": "half_year",
+   "label": "a half-year",
+   "dated": true,
+   "merge_into": "quarter"
+  },
+  {
+   "name": "quarter",
+   "label": "a quarter",
+   "dated": true,
+   "merge_into": "month_year"
+  },
+  {
+   "name": "year",
+   "label": "a year",
+   "dated": true,
+   "merge_into": "quarter"
+  },
+  {
+   "name": "month_no_year",
+   "label": "a month with no year",
+   "dated": true,
+   "merge_into": "month_year"
+  },
+  {
+   "name": "month_year",
+   "label": "a month and year",
+   "dated": true,
+   "merge_into": null
+  },
+  {
+   "name": "tbd",
+   "label": "TBD or unknown",
+   "dated": false,
+   "merge_into": "silent"
+  },
+  {
+   "name": "vague",
+   "label": "a vague time",
+   "dated": false,
+   "merge_into": "no_date"
+  },
+  {
+   "name": "no_date",
+   "label": "no time given",
+   "dated": false,
+   "merge_into": "tbd"
+  },
+  {
+   "name": "discontinuation",
+   "label": "a discontinuation",
+   "dated": false,
+   "merge_into": "distractor"
+  },
+  {
+   "name": "distractor",
+   "label": "a time in another role",
+   "dated": false,
+   "merge_into": "silent"
+  },
+  {
+   "name": "silent",
+   "label": "no timing",
+   "dated": false,
+   "merge_into": null
+  }
+ ],
+ "merge": {
+  "rule": "a form with fewer than 15 train-period statements in the population at_risk_B is merged into its merge_into neighbour, in inventory order",
+  "minimum": 15,
+  "population": "at_risk_B",
+  "train_counts": {
+   "relative": 5,
+   "range": 83,
+   "exact_day": 42,
+   "part_of_month": 181,
+   "half_year": 3,
+   "quarter": 86,
+   "year": 15,
+   "month_no_year": 40,
+   "month_year": 2047,
+   "tbd": 247,
+   "vague": 6,
+   "no_date": 19,
+   "discontinuation": 10,
+   "distractor": 10,
+   "silent": 306
+  },
+  "merged_form": {
+   "relative": "range",
+   "range": "range",
+   "exact_day": "exact_day",
+   "part_of_month": "part_of_month",
+   "half_year": "quarter",
+   "quarter": "quarter",
+   "year": "year",
+   "month_no_year": "month_no_year",
+   "month_year": "month_year",
+   "tbd": "tbd",
+   "vague": "no_date",
+   "no_date": "no_date",
+   "discontinuation": "distractor",
+   "distractor": "distractor",
+   "silent": "silent"
+  },
+  "classes": [
+   {
+    "form": "range",
+    "members": [
+     "relative",
+     "range"
+    ],
+    "label": "a relative time or a range"
+   },
+   {
+    "form": "exact_day",
+    "members": [
+     "exact_day"
+    ],
+    "label": "an exact day"
+   },
+   {
+    "form": "part_of_month",
+    "members": [
+     "part_of_month"
+    ],
+    "label": "part of a month"
+   },
+   {
+    "form": "quarter",
+    "members": [
+     "half_year",
+     "quarter"
+    ],
+    "label": "a half-year or a quarter"
+   },
+   {
+    "form": "year",
+    "members": [
+     "year"
+    ],
+    "label": "a year"
+   },
+   {
+    "form": "month_no_year",
+    "members": [
+     "month_no_year"
+    ],
+    "label": "a month with no year"
+   },
+   {
+    "form": "month_year",
+    "members": [
+     "month_year"
+    ],
+    "label": "a month and year"
+   },
+   {
+    "form": "tbd",
+    "members": [
+     "tbd"
+    ],
+    "label": "TBD or unknown"
+   },
+   {
+    "form": "no_date",
+    "members": [
+     "vague",
+     "no_date"
+    ],
+    "label": "a vague time or no time given"
+   },
+   {
+    "form": "distractor",
+    "members": [
+     "discontinuation",
+     "distractor"
+    ],
+    "label": "a discontinuation or a time in another role"
+   },
+   {
+    "form": "silent",
+    "members": [
+     "silent"
+    ],
+    "label": "no timing"
+   }
+  ]
+ },
+ "statements": {
+  "all": {
+   "fit": 2838,
+   "dev": 2687,
+   "test": 6024,
+   "late": 1776,
+   "train": 5525,
+   "all": 13325
+  },
+  "shortage": {
+   "fit": 2333,
+   "dev": 2351,
+   "test": 5462,
+   "late": 1628,
+   "train": 4684,
+   "all": 11774
+  },
+  "at_risk_A": {
+   "fit": 2193,
+   "dev": 2242,
+   "test": 5349,
+   "late": 1623,
+   "train": 4435,
+   "all": 11407
+  },
+  "at_risk_B": {
+   "fit": 1464,
+   "dev": 1636,
+   "test": 3760,
+   "late": 1225,
+   "train": 3100,
+   "all": 8085
+  }
+ },
+ "form": {
+  "all": {
+   "relative": {
+    "fit": 5,
+    "dev": 1,
+    "test": 15,
+    "late": 12,
+    "train": 6,
+    "all": 33
+   },
+   "range": {
+    "fit": 55,
+    "dev": 47,
+    "test": 64,
+    "late": 6,
+    "train": 102,
+    "all": 172
+   },
+   "exact_day": {
+    "fit": 20,
+    "dev": 24,
+    "test": 30,
+    "late": 30,
+    "train": 44,
+    "all": 104
+   },
+   "part_of_month": {
+    "fit": 92,
+    "dev": 117,
+    "test": 140,
+    "late": 56,
+    "train": 209,
+    "all": 405
+   },
+   "half_year": {
+    "fit": 1,
+    "dev": 2,
+    "test": 0,
+    "late": 0,
+    "train": 3,
+    "all": 3
+   },
+   "quarter": {
+    "fit": 39,
+    "dev": 52,
+    "test": 170,
+    "late": 23,
+    "train": 91,
+    "all": 284
+   },
+   "year": {
+    "fit": 9,
+    "dev": 7,
+    "test": 20,
+    "late": 2,
+    "train": 16,
+    "all": 38
+   },
+   "month_no_year": {
+    "fit": 20,
+    "dev": 20,
+    "test": 65,
+    "late": 3,
+    "train": 40,
+    "all": 108
+   },
+   "month_year": {
+    "fit": 980,
+    "dev": 1142,
+    "test": 2268,
+    "late": 760,
+    "train": 2122,
+    "all": 5150
+   },
+   "tbd": {
+    "fit": 118,
+    "dev": 137,
+    "test": 378,
+    "late": 206,
+    "train": 255,
+    "all": 839
+   },
+   "vague": {
+    "fit": 7,
+    "dev": 33,
+    "test": 2,
+    "late": 0,
+    "train": 40,
+    "all": 42
+   },
+   "no_date": {
+    "fit": 54,
+    "dev": 44,
+    "test": 84,
+    "late": 31,
+    "train": 98,
+    "all": 213
+   },
+   "discontinuation": {
+    "fit": 279,
+    "dev": 105,
+    "test": 351,
+    "late": 162,
+    "train": 384,
+    "all": 897
+   },
+   "distractor": {
+    "fit": 28,
+    "dev": 53,
+    "test": 181,
+    "late": 17,
+    "train": 81,
+    "all": 279
+   },
+   "silent": {
+    "fit": 1131,
+    "dev": 903,
+    "test": 2256,
+    "late": 468,
+    "train": 2034,
+    "all": 4758
+   }
+  },
+  "shortage": {
+   "relative": {
+    "fit": 5,
+    "dev": 1,
+    "test": 15,
+    "late": 12,
+    "train": 6,
+    "all": 33
+   },
+   "range": {
+    "fit": 55,
+    "dev": 47,
+    "test": 64,
+    "late": 6,
+    "train": 102,
+    "all": 172
+   },
+   "exact_day": {
+    "fit": 20,
+    "dev": 24,
+    "test": 25,
+    "late": 30,
+    "train": 44,
+    "all": 99
+   },
+   "part_of_month": {
+    "fit": 92,
+    "dev": 117,
+    "test": 137,
+    "late": 56,
+    "train": 209,
+    "all": 402
+   },
+   "half_year": {
+    "fit": 1,
+    "dev": 2,
+    "test": 0,
+    "late": 0,
+    "train": 3,
+    "all": 3
+   },
+   "quarter": {
+    "fit": 39,
+    "dev": 52,
+    "test": 170,
+    "late": 23,
+    "train": 91,
+    "all": 284
+   },
+   "year": {
+    "fit": 9,
+    "dev": 7,
+    "test": 19,
+    "late": 2,
+    "train": 16,
+    "all": 37
+   },
+   "month_no_year": {
+    "fit": 20,
+    "dev": 20,
+    "test": 65,
+    "late": 3,
+    "train": 40,
+    "all": 108
+   },
+   "month_year": {
+    "fit": 979,
+    "dev": 1141,
+    "test": 2268,
+    "late": 758,
+    "train": 2120,
+    "all": 5146
+   },
+   "tbd": {
+    "fit": 118,
+    "dev": 136,
+    "test": 378,
+    "late": 206,
+    "train": 254,
+    "all": 838
+   },
+   "vague": {
+    "fit": 5,
+    "dev": 1,
+    "test": 2,
+    "late": 0,
+    "train": 6,
+    "all": 8
+   },
+   "no_date": {
+    "fit": 54,
+    "dev": 44,
+    "test": 84,
+    "late": 31,
+    "train": 98,
+    "all": 213
+   },
+   "discontinuation": {
+    "fit": 9,
+    "dev": 1,
+    "test": 47,
+    "late": 29,
+    "train": 10,
+    "all": 86
+   },
+   "distractor": {
+    "fit": 16,
+    "dev": 37,
+    "test": 149,
+    "late": 8,
+    "train": 53,
+    "all": 210
+   },
+   "silent": {
+    "fit": 911,
+    "dev": 721,
+    "test": 2039,
+    "late": 464,
+    "train": 1632,
+    "all": 4135
+   }
+  },
+  "at_risk_A": {
+   "relative": {
+    "fit": 5,
+    "dev": 1,
+    "test": 15,
+    "late": 12,
+    "train": 6,
+    "all": 33
+   },
+   "range": {
+    "fit": 55,
+    "dev": 47,
+    "test": 64,
+    "late": 6,
+    "train": 102,
+    "all": 172
+   },
+   "exact_day": {
+    "fit": 20,
+    "dev": 24,
+    "test": 25,
+    "late": 30,
+    "train": 44,
+    "all": 99
+   },
+   "part_of_month": {
+    "fit": 92,
+    "dev": 117,
+    "test": 137,
+    "late": 56,
+    "train": 209,
+    "all": 402
+   },
+   "half_year": {
+    "fit": 1,
+    "dev": 2,
+    "test": 0,
+    "late": 0,
+    "train": 3,
+    "all": 3
+   },
+   "quarter": {
+    "fit": 39,
+    "dev": 51,
+    "test": 170,
+    "late": 23,
+    "train": 90,
+    "all": 283
+   },
+   "year": {
+    "fit": 9,
+    "dev": 7,
+    "test": 19,
+    "late": 2,
+    "train": 16,
+    "all": 37
+   },
+   "month_no_year": {
+    "fit": 20,
+    "dev": 20,
+    "test": 65,
+    "late": 3,
+    "train": 40,
+    "all": 108
+   },
+   "month_year": {
+    "fit": 979,
+    "dev": 1141,
+    "test": 2268,
+    "late": 758,
+    "train": 2120,
+    "all": 5146
+   },
+   "tbd": {
+    "fit": 118,
+    "dev": 135,
+    "test": 378,
+    "late": 206,
+    "train": 253,
+    "all": 837
+   },
+   "vague": {
+    "fit": 5,
+    "dev": 1,
+    "test": 2,
+    "late": 0,
+    "train": 6,
+    "all": 8
+   },
+   "no_date": {
+    "fit": 54,
+    "dev": 43,
+    "test": 84,
+    "late": 31,
+    "train": 97,
+    "all": 212
+   },
+   "discontinuation": {
+    "fit": 9,
+    "dev": 1,
+    "test": 47,
+    "late": 29,
+    "train": 10,
+    "all": 86
+   },
+   "distractor": {
+    "fit": 16,
+    "dev": 37,
+    "test": 149,
+    "late": 8,
+    "train": 53,
+    "all": 210
+   },
+   "silent": {
+    "fit": 771,
+    "dev": 615,
+    "test": 1926,
+    "late": 459,
+    "train": 1386,
+    "all": 3771
+   }
+  },
+  "at_risk_B": {
+   "relative": {
+    "fit": 4,
+    "dev": 1,
+    "test": 13,
+    "late": 12,
+    "train": 5,
+    "all": 30
+   },
+   "range": {
+    "fit": 42,
+    "dev": 41,
+    "test": 62,
+    "late": 6,
+    "train": 83,
+    "all": 151
+   },
+   "exact_day": {
+    "fit": 18,
+    "dev": 24,
+    "test": 16,
+    "late": 28,
+    "train": 42,
+    "all": 86
+   },
+   "part_of_month": {
+    "fit": 84,
+    "dev": 97,
+    "test": 121,
+    "late": 44,
+    "train": 181,
+    "all": 346
+   },
+   "half_year": {
+    "fit": 1,
+    "dev": 2,
+    "test": 0,
+    "late": 0,
+    "train": 3,
+    "all": 3
+   },
+   "quarter": {
+    "fit": 38,
+    "dev": 48,
+    "test": 165,
+    "late": 23,
+    "train": 86,
+    "all": 274
+   },
+   "year": {
+    "fit": 8,
+    "dev": 7,
+    "test": 19,
+    "late": 2,
+    "train": 15,
+    "all": 36
+   },
+   "month_no_year": {
+    "fit": 20,
+    "dev": 20,
+    "test": 62,
+    "late": 3,
+    "train": 40,
+    "all": 105
+   },
+   "month_year": {
+    "fit": 941,
+    "dev": 1106,
+    "test": 2216,
+    "late": 748,
+    "train": 2047,
+    "all": 5011
+   },
+   "tbd": {
+    "fit": 114,
+    "dev": 133,
+    "test": 373,
+    "late": 206,
+    "train": 247,
+    "all": 826
+   },
+   "vague": {
+    "fit": 5,
+    "dev": 1,
+    "test": 2,
+    "late": 0,
+    "train": 6,
+    "all": 8
+   },
+   "no_date": {
+    "fit": 16,
+    "dev": 3,
+    "test": 13,
+    "late": 2,
+    "train": 19,
+    "all": 34
+   },
+   "discontinuation": {
+    "fit": 9,
+    "dev": 1,
+    "test": 46,
+    "late": 27,
+    "train": 10,
+    "all": 83
+   },
+   "distractor": {
+    "fit": 5,
+    "dev": 5,
+    "test": 102,
+    "late": 8,
+    "train": 10,
+    "all": 120
+   },
+   "silent": {
+    "fit": 159,
+    "dev": 147,
+    "test": 550,
+    "late": 116,
+    "train": 306,
+    "all": 972
+   }
+  }
+ },
+ "merged_form": {
+  "all": {
+   "range": {
+    "fit": 60,
+    "dev": 48,
+    "test": 79,
+    "late": 18,
+    "train": 108,
+    "all": 205
+   },
+   "exact_day": {
+    "fit": 20,
+    "dev": 24,
+    "test": 30,
+    "late": 30,
+    "train": 44,
+    "all": 104
+   },
+   "part_of_month": {
+    "fit": 92,
+    "dev": 117,
+    "test": 140,
+    "late": 56,
+    "train": 209,
+    "all": 405
+   },
+   "quarter": {
+    "fit": 40,
+    "dev": 54,
+    "test": 170,
+    "late": 23,
+    "train": 94,
+    "all": 287
+   },
+   "year": {
+    "fit": 9,
+    "dev": 7,
+    "test": 20,
+    "late": 2,
+    "train": 16,
+    "all": 38
+   },
+   "month_no_year": {
+    "fit": 20,
+    "dev": 20,
+    "test": 65,
+    "late": 3,
+    "train": 40,
+    "all": 108
+   },
+   "month_year": {
+    "fit": 980,
+    "dev": 1142,
+    "test": 2268,
+    "late": 760,
+    "train": 2122,
+    "all": 5150
+   },
+   "tbd": {
+    "fit": 118,
+    "dev": 137,
+    "test": 378,
+    "late": 206,
+    "train": 255,
+    "all": 839
+   },
+   "no_date": {
+    "fit": 61,
+    "dev": 77,
+    "test": 86,
+    "late": 31,
+    "train": 138,
+    "all": 255
+   },
+   "distractor": {
+    "fit": 307,
+    "dev": 158,
+    "test": 532,
+    "late": 179,
+    "train": 465,
+    "all": 1176
+   },
+   "silent": {
+    "fit": 1131,
+    "dev": 903,
+    "test": 2256,
+    "late": 468,
+    "train": 2034,
+    "all": 4758
+   }
+  },
+  "shortage": {
+   "range": {
+    "fit": 60,
+    "dev": 48,
+    "test": 79,
+    "late": 18,
+    "train": 108,
+    "all": 205
+   },
+   "exact_day": {
+    "fit": 20,
+    "dev": 24,
+    "test": 25,
+    "late": 30,
+    "train": 44,
+    "all": 99
+   },
+   "part_of_month": {
+    "fit": 92,
+    "dev": 117,
+    "test": 137,
+    "late": 56,
+    "train": 209,
+    "all": 402
+   },
+   "quarter": {
+    "fit": 40,
+    "dev": 54,
+    "test": 170,
+    "late": 23,
+    "train": 94,
+    "all": 287
+   },
+   "year": {
+    "fit": 9,
+    "dev": 7,
+    "test": 19,
+    "late": 2,
+    "train": 16,
+    "all": 37
+   },
+   "month_no_year": {
+    "fit": 20,
+    "dev": 20,
+    "test": 65,
+    "late": 3,
+    "train": 40,
+    "all": 108
+   },
+   "month_year": {
+    "fit": 979,
+    "dev": 1141,
+    "test": 2268,
+    "late": 758,
+    "train": 2120,
+    "all": 5146
+   },
+   "tbd": {
+    "fit": 118,
+    "dev": 136,
+    "test": 378,
+    "late": 206,
+    "train": 254,
+    "all": 838
+   },
+   "no_date": {
+    "fit": 59,
+    "dev": 45,
+    "test": 86,
+    "late": 31,
+    "train": 104,
+    "all": 221
+   },
+   "distractor": {
+    "fit": 25,
+    "dev": 38,
+    "test": 196,
+    "late": 37,
+    "train": 63,
+    "all": 296
+   },
+   "silent": {
+    "fit": 911,
+    "dev": 721,
+    "test": 2039,
+    "late": 464,
+    "train": 1632,
+    "all": 4135
+   }
+  },
+  "at_risk_A": {
+   "range": {
+    "fit": 60,
+    "dev": 48,
+    "test": 79,
+    "late": 18,
+    "train": 108,
+    "all": 205
+   },
+   "exact_day": {
+    "fit": 20,
+    "dev": 24,
+    "test": 25,
+    "late": 30,
+    "train": 44,
+    "all": 99
+   },
+   "part_of_month": {
+    "fit": 92,
+    "dev": 117,
+    "test": 137,
+    "late": 56,
+    "train": 209,
+    "all": 402
+   },
+   "quarter": {
+    "fit": 40,
+    "dev": 53,
+    "test": 170,
+    "late": 23,
+    "train": 93,
+    "all": 286
+   },
+   "year": {
+    "fit": 9,
+    "dev": 7,
+    "test": 19,
+    "late": 2,
+    "train": 16,
+    "all": 37
+   },
+   "month_no_year": {
+    "fit": 20,
+    "dev": 20,
+    "test": 65,
+    "late": 3,
+    "train": 40,
+    "all": 108
+   },
+   "month_year": {
+    "fit": 979,
+    "dev": 1141,
+    "test": 2268,
+    "late": 758,
+    "train": 2120,
+    "all": 5146
+   },
+   "tbd": {
+    "fit": 118,
+    "dev": 135,
+    "test": 378,
+    "late": 206,
+    "train": 253,
+    "all": 837
+   },
+   "no_date": {
+    "fit": 59,
+    "dev": 44,
+    "test": 86,
+    "late": 31,
+    "train": 103,
+    "all": 220
+   },
+   "distractor": {
+    "fit": 25,
+    "dev": 38,
+    "test": 196,
+    "late": 37,
+    "train": 63,
+    "all": 296
+   },
+   "silent": {
+    "fit": 771,
+    "dev": 615,
+    "test": 1926,
+    "late": 459,
+    "train": 1386,
+    "all": 3771
+   }
+  },
+  "at_risk_B": {
+   "range": {
+    "fit": 46,
+    "dev": 42,
+    "test": 75,
+    "late": 18,
+    "train": 88,
+    "all": 181
+   },
+   "exact_day": {
+    "fit": 18,
+    "dev": 24,
+    "test": 16,
+    "late": 28,
+    "train": 42,
+    "all": 86
+   },
+   "part_of_month": {
+    "fit": 84,
+    "dev": 97,
+    "test": 121,
+    "late": 44,
+    "train": 181,
+    "all": 346
+   },
+   "quarter": {
+    "fit": 39,
+    "dev": 50,
+    "test": 165,
+    "late": 23,
+    "train": 89,
+    "all": 277
+   },
+   "year": {
+    "fit": 8,
+    "dev": 7,
+    "test": 19,
+    "late": 2,
+    "train": 15,
+    "all": 36
+   },
+   "month_no_year": {
+    "fit": 20,
+    "dev": 20,
+    "test": 62,
+    "late": 3,
+    "train": 40,
+    "all": 105
+   },
+   "month_year": {
+    "fit": 941,
+    "dev": 1106,
+    "test": 2216,
+    "late": 748,
+    "train": 2047,
+    "all": 5011
+   },
+   "tbd": {
+    "fit": 114,
+    "dev": 133,
+    "test": 373,
+    "late": 206,
+    "train": 247,
+    "all": 826
+   },
+   "no_date": {
+    "fit": 21,
+    "dev": 4,
+    "test": 15,
+    "late": 2,
+    "train": 25,
+    "all": 42
+   },
+   "distractor": {
+    "fit": 14,
+    "dev": 6,
+    "test": 148,
+    "late": 35,
+    "train": 20,
+    "all": 203
+   },
+   "silent": {
+    "fit": 159,
+    "dev": 147,
+    "test": 550,
+    "late": 116,
+    "train": 306,
+    "all": 972
+   }
+  }
+ },
+ "no_year": {
+  "all": {
+   "relative": {
+    "fit": 0,
+    "dev": 0,
+    "test": 0,
+    "late": 0,
+    "train": 0,
+    "all": 0
+   },
+   "range": {
+    "fit": 4,
+    "dev": 8,
+    "test": 0,
+    "late": 0,
+    "train": 12,
+    "all": 12
+   },
+   "exact_day": {
+    "fit": 0,
+    "dev": 0,
+    "test": 2,
+    "late": 0,
+    "train": 0,
+    "all": 2
+   },
+   "part_of_month": {
+    "fit": 23,
+    "dev": 24,
+    "test": 23,
+    "late": 3,
+    "train": 47,
+    "all": 73
+   },
+   "half_year": {
+    "fit": 0,
+    "dev": 0,
+    "test": 0,
+    "late": 0,
+    "train": 0,
+    "all": 0
+   },
+   "quarter": {
+    "fit": 1,
+    "dev": 9,
+    "test": 22,
+    "late": 2,
+    "train": 10,
+    "all": 34
+   },
+   "year": {
+    "fit": 0,
+    "dev": 0,
+    "test": 0,
+    "late": 0,
+    "train": 0,
+    "all": 0
+   },
+   "month_no_year": {
+    "fit": 20,
+    "dev": 20,
+    "test": 65,
+    "late": 3,
+    "train": 40,
+    "all": 108
+   },
+   "month_year": {
+    "fit": 0,
+    "dev": 0,
+    "test": 0,
+    "late": 0,
+    "train": 0,
+    "all": 0
+   }
+  },
+  "shortage": {
+   "relative": {
+    "fit": 0,
+    "dev": 0,
+    "test": 0,
+    "late": 0,
+    "train": 0,
+    "all": 0
+   },
+   "range": {
+    "fit": 4,
+    "dev": 8,
+    "test": 0,
+    "late": 0,
+    "train": 12,
+    "all": 12
+   },
+   "exact_day": {
+    "fit": 0,
+    "dev": 0,
+    "test": 2,
+    "late": 0,
+    "train": 0,
+    "all": 2
+   },
+   "part_of_month": {
+    "fit": 23,
+    "dev": 24,
+    "test": 23,
+    "late": 3,
+    "train": 47,
+    "all": 73
+   },
+   "half_year": {
+    "fit": 0,
+    "dev": 0,
+    "test": 0,
+    "late": 0,
+    "train": 0,
+    "all": 0
+   },
+   "quarter": {
+    "fit": 1,
+    "dev": 9,
+    "test": 22,
+    "late": 2,
+    "train": 10,
+    "all": 34
+   },
+   "year": {
+    "fit": 0,
+    "dev": 0,
+    "test": 0,
+    "late": 0,
+    "train": 0,
+    "all": 0
+   },
+   "month_no_year": {
+    "fit": 20,
+    "dev": 20,
+    "test": 65,
+    "late": 3,
+    "train": 40,
+    "all": 108
+   },
+   "month_year": {
+    "fit": 0,
+    "dev": 0,
+    "test": 0,
+    "late": 0,
+    "train": 0,
+    "all": 0
+   }
+  },
+  "at_risk_A": {
+   "relative": {
+    "fit": 0,
+    "dev": 0,
+    "test": 0,
+    "late": 0,
+    "train": 0,
+    "all": 0
+   },
+   "range": {
+    "fit": 4,
+    "dev": 8,
+    "test": 0,
+    "late": 0,
+    "train": 12,
+    "all": 12
+   },
+   "exact_day": {
+    "fit": 0,
+    "dev": 0,
+    "test": 2,
+    "late": 0,
+    "train": 0,
+    "all": 2
+   },
+   "part_of_month": {
+    "fit": 23,
+    "dev": 24,
+    "test": 23,
+    "late": 3,
+    "train": 47,
+    "all": 73
+   },
+   "half_year": {
+    "fit": 0,
+    "dev": 0,
+    "test": 0,
+    "late": 0,
+    "train": 0,
+    "all": 0
+   },
+   "quarter": {
+    "fit": 1,
+    "dev": 8,
+    "test": 22,
+    "late": 2,
+    "train": 9,
+    "all": 33
+   },
+   "year": {
+    "fit": 0,
+    "dev": 0,
+    "test": 0,
+    "late": 0,
+    "train": 0,
+    "all": 0
+   },
+   "month_no_year": {
+    "fit": 20,
+    "dev": 20,
+    "test": 65,
+    "late": 3,
+    "train": 40,
+    "all": 108
+   },
+   "month_year": {
+    "fit": 0,
+    "dev": 0,
+    "test": 0,
+    "late": 0,
+    "train": 0,
+    "all": 0
+   }
+  },
+  "at_risk_B": {
+   "relative": {
+    "fit": 0,
+    "dev": 0,
+    "test": 0,
+    "late": 0,
+    "train": 0,
+    "all": 0
+   },
+   "range": {
+    "fit": 4,
+    "dev": 6,
+    "test": 0,
+    "late": 0,
+    "train": 10,
+    "all": 10
+   },
+   "exact_day": {
+    "fit": 0,
+    "dev": 0,
+    "test": 2,
+    "late": 0,
+    "train": 0,
+    "all": 2
+   },
+   "part_of_month": {
+    "fit": 19,
+    "dev": 22,
+    "test": 23,
+    "late": 3,
+    "train": 41,
+    "all": 67
+   },
+   "half_year": {
+    "fit": 0,
+    "dev": 0,
+    "test": 0,
+    "late": 0,
+    "train": 0,
+    "all": 0
+   },
+   "quarter": {
+    "fit": 1,
+    "dev": 8,
+    "test": 21,
+    "late": 2,
+    "train": 9,
+    "all": 32
+   },
+   "year": {
+    "fit": 0,
+    "dev": 0,
+    "test": 0,
+    "late": 0,
+    "train": 0,
+    "all": 0
+   },
+   "month_no_year": {
+    "fit": 20,
+    "dev": 20,
+    "test": 62,
+    "late": 3,
+    "train": 40,
+    "all": 105
+   },
+   "month_year": {
+    "fit": 0,
+    "dev": 0,
+    "test": 0,
+    "late": 0,
+    "train": 0,
+    "all": 0
+   }
+  }
+ },
+ "with_distractor_date": {
+  "all": {
+   "fit": 48,
+   "dev": 87,
+   "test": 259,
+   "late": 21,
+   "train": 135,
+   "all": 415
+  },
+  "shortage": {
+   "fit": 31,
+   "dev": 57,
+   "test": 205,
+   "late": 14,
+   "train": 88,
+   "all": 307
+  },
+  "at_risk_A": {
+   "fit": 31,
+   "dev": 57,
+   "test": 205,
+   "late": 14,
+   "train": 88,
+   "all": 307
+  },
+  "at_risk_B": {
+   "fit": 18,
+   "dev": 12,
+   "test": 150,
+   "late": 11,
+   "train": 30,
+   "all": 191
+  }
+ },
+ "statement_type": {
+  "all": {
+   "depletion": {
+    "fit": 12,
+    "dev": 15,
+    "test": 27,
+    "late": 5,
+    "train": 27,
+    "all": 59
+   },
+   "discontinuation": {
+    "fit": 279,
+    "dev": 105,
+    "test": 351,
+    "late": 162,
+    "train": 384,
+    "all": 897
+   },
+   "next_delivery": {
+    "fit": 462,
+    "dev": 549,
+    "test": 943,
+    "late": 247,
+    "train": 1011,
+    "all": 2201
+   },
+   "none": {
+    "fit": 1147,
+    "dev": 941,
+    "test": 2410,
+    "late": 480,
+    "train": 2088,
+    "all": 4978
+   },
+   "recovery": {
+    "fit": 938,
+    "dev": 1077,
+    "test": 2293,
+    "late": 882,
+    "train": 2015,
+    "all": 5190
+   }
+  },
+  "shortage": {
+   "depletion": {
+    "fit": 1,
+    "dev": 2,
+    "test": 7,
+    "late": 0,
+    "train": 3,
+    "all": 10
+   },
+   "discontinuation": {
+    "fit": 9,
+    "dev": 1,
+    "test": 47,
+    "late": 29,
+    "train": 10,
+    "all": 86
+   },
+   "next_delivery": {
+    "fit": 462,
+    "dev": 549,
+    "test": 943,
+    "late": 245,
+    "train": 1011,
+    "all": 2199
+   },
+   "none": {
+    "fit": 926,
+    "dev": 756,
+    "test": 2181,
+    "late": 472,
+    "train": 1682,
+    "all": 4335
+   },
+   "recovery": {
+    "fit": 935,
+    "dev": 1043,
+    "test": 2284,
+    "late": 882,
+    "train": 1978,
+    "all": 5144
+   }
+  },
+  "at_risk_A": {
+   "depletion": {
+    "fit": 1,
+    "dev": 2,
+    "test": 7,
+    "late": 0,
+    "train": 3,
+    "all": 10
+   },
+   "discontinuation": {
+    "fit": 9,
+    "dev": 1,
+    "test": 47,
+    "late": 29,
+    "train": 10,
+    "all": 86
+   },
+   "next_delivery": {
+    "fit": 462,
+    "dev": 547,
+    "test": 943,
+    "late": 245,
+    "train": 1009,
+    "all": 2197
+   },
+   "none": {
+    "fit": 786,
+    "dev": 650,
+    "test": 2068,
+    "late": 467,
+    "train": 1436,
+    "all": 3971
+   },
+   "recovery": {
+    "fit": 935,
+    "dev": 1042,
+    "test": 2284,
+    "late": 882,
+    "train": 1977,
+    "all": 5143
+   }
+  },
+  "at_risk_B": {
+   "depletion": {
+    "fit": 0,
+    "dev": 1,
+    "test": 6,
+    "late": 0,
+    "train": 1,
+    "all": 7
+   },
+   "discontinuation": {
+    "fit": 9,
+    "dev": 1,
+    "test": 46,
+    "late": 27,
+    "train": 10,
+    "all": 83
+   },
+   "next_delivery": {
+    "fit": 371,
+    "dev": 456,
+    "test": 847,
+    "late": 203,
+    "train": 827,
+    "all": 1877
+   },
+   "none": {
+    "fit": 164,
+    "dev": 151,
+    "test": 646,
+    "late": 124,
+    "train": 315,
+    "all": 1085
+   },
+   "recovery": {
+    "fit": 920,
+    "dev": 1027,
+    "test": 2215,
+    "late": 871,
+    "train": 1947,
+    "all": 5033
+   }
+  }
+ },
+ "certainty": {
+  "all": {
+   "asserted": {
+    "fit": 404,
+    "dev": 466,
+    "test": 1109,
+    "late": 208,
+    "train": 870,
+    "all": 2187
+   },
+   "estimated": {
+    "fit": 895,
+    "dev": 1008,
+    "test": 1742,
+    "late": 704,
+    "train": 1903,
+    "all": 4349
+   },
+   "no_statement": {
+    "fit": 1147,
+    "dev": 941,
+    "test": 2410,
+    "late": 480,
+    "train": 2088,
+    "all": 4978
+   },
+   "undetermined": {
+    "fit": 392,
+    "dev": 272,
+    "test": 763,
+    "late": 384,
+    "train": 664,
+    "all": 1811
+   }
+  },
+  "shortage": {
+   "asserted": {
+    "fit": 380,
+    "dev": 459,
+    "test": 1071,
+    "late": 205,
+    "train": 839,
+    "all": 2115
+   },
+   "estimated": {
+    "fit": 846,
+    "dev": 954,
+    "test": 1707,
+    "late": 686,
+    "train": 1800,
+    "all": 4193
+   },
+   "no_statement": {
+    "fit": 926,
+    "dev": 756,
+    "test": 2181,
+    "late": 472,
+    "train": 1682,
+    "all": 4335
+   },
+   "undetermined": {
+    "fit": 181,
+    "dev": 182,
+    "test": 503,
+    "late": 265,
+    "train": 363,
+    "all": 1131
+   }
+  },
+  "at_risk_A": {
+   "asserted": {
+    "fit": 380,
+    "dev": 458,
+    "test": 1071,
+    "late": 205,
+    "train": 838,
+    "all": 2114
+   },
+   "estimated": {
+    "fit": 846,
+    "dev": 954,
+    "test": 1707,
+    "late": 686,
+    "train": 1800,
+    "all": 4193
+   },
+   "no_statement": {
+    "fit": 786,
+    "dev": 650,
+    "test": 2068,
+    "late": 467,
+    "train": 1436,
+    "all": 3971
+   },
+   "undetermined": {
+    "fit": 181,
+    "dev": 180,
+    "test": 503,
+    "late": 265,
+    "train": 361,
+    "all": 1129
+   }
+  },
+  "at_risk_B": {
+   "asserted": {
+    "fit": 321,
+    "dev": 424,
+    "test": 1019,
+    "late": 190,
+    "train": 745,
+    "all": 1954
+   },
+   "estimated": {
+    "fit": 840,
+    "dev": 924,
+    "test": 1669,
+    "late": 677,
+    "train": 1764,
+    "all": 4110
+   },
+   "no_statement": {
+    "fit": 164,
+    "dev": 151,
+    "test": 646,
+    "late": 124,
+    "train": 315,
+    "all": 1085
+   },
+   "undetermined": {
+    "fit": 139,
+    "dev": 137,
+    "test": 426,
+    "late": 234,
+    "train": 276,
+    "all": 936
+   }
+  }
+ },
+ "statements_with_mixed_member_forms": 0,
+ "golden": {
+  "file": "rule_readings_train_golden.csv.gz",
+  "rows": 3721,
+  "sha256": "aa70c7b359b800f3"
+ }
+}
