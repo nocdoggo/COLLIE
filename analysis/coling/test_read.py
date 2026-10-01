@@ -147,6 +147,28 @@ PINNED = {
     ),
 }
 RealClient = rd.RouteCheckedClient
+PLAN_DIR = Path(rd.__file__).resolve().parent / "plan"
+ENTERED = {
+    "llama-3.3-70b": ("meta-llama/llama-3.3-70b-instruct", "deepinfra/turbo", "fp8", 0.10, 0.32),
+    "deepseek-v3": ("deepseek/deepseek-chat", "deepinfra/fp4", "fp4", 0.32, 0.89),
+    "qwen-2.5-7b": ("qwen/qwen-2.5-7b-instruct", "phala", None, 0.10, 0.20),
+    "gemma-3-27b": ("google/gemma-3-27b-it", "deepinfra/fp8", "fp8", 0.08, 0.16),
+    "gpt-oss-20b": ("openai/gpt-oss-20b", "deepinfra/bf16", "bf16", 0.03, 0.14),
+    "gpt-4o-mini": ("openai/gpt-4o-mini", "openai", None, 0.15, 0.60),
+}
+"""The six OpenRouter routes as entered on 2026-10-01: the model id sent, the endpoint slug, the
+precision the endpoint states and its price per 1M tokens in and out."""
+LISTED_AS = {"deepinfra": "DeepInfra", "phala": "Phala", "openai": "OpenAI"}
+"""The provider names that the endpoint listing prints for the pinned endpoints."""
+DIRECT_PRICES = {"gemini-3.8-flash": (0.75, 3.75), "grok-4.20": (1.25, 2.50)}
+"""The makers' own prices per 1M tokens of the two direct routes, read again on 2026-10-01."""
+
+
+def taken_back(model: str) -> dict[str, rd.Route]:
+    """The table of routes with one reader's row as it stood before its endpoint was entered:
+    the model id and no provider. The rows of the table itself are all entered, so the
+    ``UNSET`` rules are tried on this one."""
+    return rd.ROUTES | {model: rd.Route(rd.ROUTES[model].model_id, rd.UNSET)}
 
 
 def git(repo: Path, *args: str) -> None:
@@ -878,7 +900,7 @@ def test_reader_reads_caches_and_logs_spend(tmp_path: Path) -> None:
     assert prompt == rd.render_prompt(rd.TEMPLATES["literal-v1"], make_item())
     assert (decoding.decoding_hash, decoding.temperature, system) == ("det-v1", 0.0, None)
     [log] = spend_rows(tmp_path)
-    expected = (500 * 0.257 + 60 * 1.029) / 1e6
+    expected = (500 * 0.32 + 60 * 0.89) / 1e6  # the pinned endpoint's price, not the ladder's
     assert log["usd"] == pytest.approx(expected) == row["attempts"][0]["usd"]
     assert log["prompt_tokens"] == 500 and log["billable_output_tokens"] == 60
     # a second reader on the same cache: no new call, same reading, nothing billed
@@ -947,7 +969,7 @@ def test_projected_cap_stops_before_the_call(tmp_path: Path) -> None:
     # projections.)
     one = rd.projected_call_usd(reader.prompt_for(make_item()), "deepseek-v3", "literal",
                                 reader.endpoint)  # fmt: skip
-    billed = (500 * 0.257 + 60 * 1.029) / 1e6
+    billed = (500 * 0.32 + 60 * 0.89) / 1e6
     items = [make_item(item_id=f"i{n}") for n in range(5)]
     reader = make_reader(tmp_path / "b", FakeInner([LITERAL_OK] * 5), cap=one + 1.5 * billed)
     rows, status = rd.read_items(reader, items)
@@ -1013,18 +1035,114 @@ def test_track_record_is_masked_and_shifted_with_the_item(tmp_path: Path) -> Non
 # --- routes, the provider pin and the echo ------------------------------------------------------
 
 
-def test_routes_cover_the_eight_readers_and_wait_for_f1() -> None:
+def test_routes_cover_the_eight_readers_as_entered() -> None:
     assert tuple(rd.ROUTES) == rd.STUDY_MODELS and set(rd.MODEL_CAPS_USD) == set(rd.STUDY_MODELS)
     assert sum(rd.MODEL_CAPS_USD.values()) <= rd.STUDY_CAP_USD
+    on_openrouter = {m for m in rd.STUDY_MODELS if rd.LADDER[m].provider == "openrouter"}
+    assert on_openrouter == set(ENTERED) and set(DIRECT_PRICES) == set(rd.ROUTES) - set(ENTERED)
     for model, route in rd.ROUTES.items():
-        on_openrouter = rd.LADDER[model].provider == "openrouter"
-        assert route.provider == (rd.UNSET if on_openrouter else rd.DIRECT)
+        assert rd.route_errors(model) == []  # no row waits for its endpoint any more
         assert route.model_id == rd.LADDER[model].model_id
-        assert rd.provider_object(route) is None and rd.route_tag(route) == ""
-        assert bool(rd.route_errors(model)) is on_openrouter
-    assert "has no provider yet (UNSET)" in rd.route_errors("deepseek-v3")[0]
-    assert "not one of the eight" in rd.route_errors("qwen-2.5-72b")[0]
+        # the names a provider reports itself under are not known before the cost trial
+        assert route.also_served_as == () and route.also_served_by == ()
+        endpoint = rd.route_endpoint(model)
+        if model not in ENTERED:
+            # a direct route: no pin, and the ladder's endpoint with the price as read again
+            # on 2026-10-01 (the same price, under the date that serves all eight rows)
+            price = (*DIRECT_PRICES[model], "2026-10-01")
+            assert route == rd.Route(rd.LADDER[model].model_id, rd.DIRECT, None, price)
+            assert rd.provider_object(route) is None and rd.route_tag(route) == ""
+            ladder = rd.LADDER[model].endpoint()
+            assert endpoint == replace(ladder, price_date="2026-10-01") and ladder != endpoint
+            assert (endpoint.price_input_per_mtok, endpoint.price_output_per_mtok) == price[:2]
+            assert endpoint.extra_body is None
+            continue
+        model_id, slug, precision, price_in, price_out = ENTERED[model]
+        assert route == rd.Route(model_id, slug, precision, (price_in, price_out, "2026-10-01"))
+        pin = {"order": [slug], "allow_fallbacks": False}
+        pin |= {"quantizations": [precision]} if precision else {}
+        assert rd.provider_object(route) == pin and endpoint.extra_body == {"provider": pin}
+        assert (endpoint.model_id, endpoint.price_date) == (model_id, "2026-10-01")
+        assert (endpoint.price_input_per_mtok, endpoint.price_output_per_mtok) == (
+            price_in,
+            price_out,
+        )
+        # the name the listing prints for the endpoint's provider is accepted, another is not
+        assert rd.provider_problem(route, [LISTED_AS[slug.split("/")[0]]]) is None
+        assert rd.provider_problem(route, ["Together"]) is not None
+    assert len({rd.route_tag(rd.ROUTES[model]) for model in ENTERED}) == len(ENTERED)
     assert rd.PROVIDER_ECHO_REQUIRED is False
+    assert "not one of the eight" in rd.route_errors("qwen-2.5-72b")[0]
+
+
+def plan_table(document: str, heading: str) -> dict[str, list[str]]:
+    """The cells of each row of the first table under a heading of a plan document, by the
+    row's first cell."""
+    text = (PLAN_DIR / document).read_text(encoding="utf-8")
+    rows: dict[str, list[str]] = {}
+    for line in text[text.index(heading) :].splitlines()[1:]:
+        if line.startswith("## ") or (rows and not line.startswith("|")):
+            break
+        if line.startswith("|"):
+            cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+            rows[cells[0]] = cells
+    return rows
+
+
+def backticked(cell: str) -> str | None:
+    found = re.search(r"`([^`]+)`", cell)
+    return found.group(1) if found else None
+
+
+def test_routes_are_those_of_the_plan_documents() -> None:
+    # MODELS.md, section 9: id, endpoint, precision filter, price in, price out
+    models = plan_table("MODELS.md", "## 9. Consequences for `read.py`")
+    # PLAN.md, section 4: role, route and id, released, cutoff, pinned endpoint and precision,
+    # price in, price out
+    plan = plan_table("PLAN.md", "## 4. Models")
+    assert set(rd.STUDY_MODELS) <= set(models) and set(rd.STUDY_MODELS) <= set(plan)
+    text = (PLAN_DIR / "MODELS.md").read_text(encoding="utf-8")
+    assert "(price date 2026-10-01 for every row)" in text
+    registered = " ".join((PLAN_DIR / "PLAN.md").read_text(encoding="utf-8").split())
+    assert "gemini-3.8-flash and grok-4.20), read at source on 2026-10-01." in registered
+    for model in rd.STUDY_MODELS:
+        route, endpoint = rd.ROUTES[model], rd.route_endpoint(model)
+        prices = (endpoint.price_input_per_mtok, endpoint.price_output_per_mtok)
+        # one price date for all eight rows, in the table and in what a run records
+        assert route.price is not None and route.price[2] == "2026-10-01" == endpoint.price_date
+        assert route.price[:2] == prices
+        _, model_id, pinned, precision, price_in, price_out = models[model]
+        assert backticked(model_id) == route.model_id == backticked(plan[model][2])
+        assert (float(price_in), float(price_out)) == prices
+        assert (float(plan[model][6]), float(plan[model][7])) == prices
+        if route.provider == rd.DIRECT:
+            assert pinned.startswith("direct") and plan[model][5] == "direct"
+            continue
+        assert backticked(pinned) == route.provider == backticked(plan[model][5])
+        assert backticked(precision) == route.quantization
+        assert (precision == "left out") is (route.quantization is None)
+        stated = plan[model][5].split(",")[1].strip()
+        assert stated == (route.quantization or stated)
+        assert (route.quantization is None) is (
+            stated in ("precision not stated", "not applicable")
+        )
+
+
+def test_a_row_without_its_endpoint_is_refused(monkeypatch) -> None:
+    # no row of the table is unset now; the rule is tried on a row taken back
+    assert not any(route.provider == rd.UNSET for route in rd.ROUTES.values())
+    for model in ("deepseek-v3", "gemini-3.8-flash"):
+        with monkeypatch.context() as patch:
+            patch.setattr(rd, "ROUTES", taken_back(model))
+            route = rd.ROUTES[model]
+            assert rd.provider_object(route) is None and rd.route_tag(route) == ""
+            [error] = rd.route_errors(model)
+            assert f"ROUTES[{model!r}] has no provider yet (UNSET)" in error
+            # the ladder's endpoint, with no pin: priced in a dry run, never called
+            assert rd.route_endpoint(model) == rd.LADDER[model].endpoint()
+            [refusal, *_] = rd.live_refusals(model, rd.TEMPLATES["predictive-v1"], ["train"])
+            assert refusal == error
+        assert rd.route_errors(model) == []
 
 
 def test_provider_object_and_endpoint_of_a_filled_route(monkeypatch) -> None:
@@ -1048,8 +1166,13 @@ def test_provider_object_and_endpoint_of_a_filled_route(monkeypatch) -> None:
     monkeypatch.setattr(rd, "ROUTES", rd.ROUTES | {"gpt-4o-mini": dated})
     assert rd.route_endpoint("gpt-4o-mini").model_id == "openai/gpt-4o-mini-2024-07-18"
     assert rd.served_as("gpt-4o-mini") == ("openai/gpt-4o-mini-2024-07-18", "openai/gpt-4o-mini")
-    # a direct route and a model outside the table keep the ladder's endpoint
-    assert rd.route_endpoint("gemini-3.8-flash") == rd.LADDER["gemini-3.8-flash"].endpoint()
+    # a direct route with no price of its own and a model outside the table keep the ladder's
+    # endpoint
+    bare = rd.Route("gemini-3.8-flash", rd.DIRECT)
+    with monkeypatch.context() as patch:
+        patch.setattr(rd, "ROUTES", rd.ROUTES | {"gemini-3.8-flash": bare})
+        assert rd.route_errors("gemini-3.8-flash") == []
+        assert rd.route_endpoint("gemini-3.8-flash") == rd.LADDER["gemini-3.8-flash"].endpoint()
     assert rd.route_endpoint("qwen-2.5-72b") == rd.LADDER["qwen-2.5-72b"].endpoint()
     assert len(rd.route_tag(route)) == 8
     assert rd.route_tag(route) != rd.route_tag(rd.ROUTES["deepseek-v3"])
@@ -1387,6 +1510,41 @@ def test_registration_and_f1_tags_must_be_ancestors_of_head(tmp_path: Path, monk
     assert len(rd.paid_call_refusals(["test"])) == 2
 
 
+def test_only_a_tag_on_a_commit_that_head_descends_from_registers(
+    tmp_path: Path, monkeypatch
+) -> None:
+    repo = make_repo(tmp_path / "repo")
+    monkeypatch.setattr(rd, "REPO", repo)
+    both = [rd.REGISTRATION_TAG, rd.F1_TAG]
+    # a branch that carries the tag's name is not the tag
+    for name in both:
+        git(repo, "branch", name)
+    assert [rd.tag_is_ancestor(name) for name in both] == [False, False]
+    assert len(rd.paid_call_refusals(["train", "test"])) == 2
+    # nor is a tag of that name on something that is not a commit
+    git(repo, "tag", rd.F1_TAG, "HEAD^{tree}")
+    assert not rd.tag_is_ancestor(rd.F1_TAG)
+    git(repo, "tag", "-d", rd.F1_TAG)
+    # an annotated tag registers the commit it points to, for that commit and its descendants
+    git(repo, "commit", "-q", "--allow-empty", "-m", "two")
+    git(repo, "tag", "-a", "-m", "registered", rd.REGISTRATION_TAG, "main")
+    git(repo, "commit", "-q", "--allow-empty", "-m", "three")
+    assert rd.tag_is_ancestor(rd.REGISTRATION_TAG) and not rd.tag_is_ancestor(rd.F1_TAG)
+    # a checkout detached at a commit from before the registration is not registered
+    git(repo, "checkout", "-q", "--detach", "main~2")
+    assert not rd.tag_is_ancestor(rd.REGISTRATION_TAG)
+    assert rd.live_refusals("llama-3.3-70b", rd.TEMPLATES["predictive-v1"], ["train"])
+    # detached at the registered commit, or after it, it is
+    for commit in (f"refs/tags/{rd.REGISTRATION_TAG}", "main"):
+        git(repo, "checkout", "-q", "--detach", commit)
+        assert rd.tag_is_ancestor(rd.REGISTRATION_TAG)
+    # the directory the harness is started from plays no part: the checkout that holds it does
+    git(repo, "checkout", "-q", "--detach", "main~2")
+    elsewhere = make_repo(tmp_path / "elsewhere", *both)
+    monkeypatch.chdir(elsewhere)
+    assert len(rd.paid_call_refusals(["train", "test"])) == 2
+
+
 def test_git_variables_in_the_environment_cannot_point_the_guards_elsewhere(
     tmp_path: Path, monkeypatch
 ) -> None:
@@ -1400,6 +1558,21 @@ def test_git_variables_in_the_environment_cannot_point_the_guards_elsewhere(
     assert not rd.tag_is_ancestor(rd.REGISTRATION_TAG) and not rd.tag_is_ancestor(rd.F1_TAG)
     assert len(rd.paid_call_refusals(["train", "test"])) == 2
     assert rd.roots_anchor() == plain / ".git" / rd.ROOTS_ANCHOR_NAME
+    # no variable of git's reaches the command at all, whichever it is
+    monkeypatch.setenv("GIT_CEILING_DIRECTORIES", str(tmp_path))
+    monkeypatch.setenv("GIT_NAMESPACE", "elsewhere")
+    passed: list[dict] = []
+    run = subprocess.run
+
+    def watched(command, **kwargs):
+        passed.append(kwargs["env"])
+        return run(command, **kwargs)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(rd.subprocess, "run", watched)
+        assert len(rd.paid_call_refusals(["train", "test"])) == 2
+    assert passed and not any(name.startswith("GIT_") for env in passed for name in env)
+    assert all(env["PATH"] == os.environ["PATH"] for env in passed)
     monkeypatch.setattr(rd, "REPO", tagged)  # and the tagged repository is still read as itself
     assert rd.paid_call_refusals(["train", "test"]) == []
 
@@ -1431,9 +1604,11 @@ def test_a_paying_client_is_refused_wherever_it_is_asked_for(tmp_path: Path, mon
         assert built == [] and not out.exists()
 
     refused("needs the template", template=None)
+    entered = rd.ROUTES
+    monkeypatch.setattr(rd, "ROUTES", taken_back("llama-3.3-70b"))
     refused(r"UNSET.*no paid call before the registration")
-    monkeypatch.setattr(rd, "ROUTES", rd.ROUTES | PINNED)
-    refused("no paid call before the registration")
+    monkeypatch.setattr(rd, "ROUTES", entered)
+    refused("^no paid call before the registration")
     git(repo, "tag", rd.REGISTRATION_TAG)
     # a caller that does not say which periods its items are in is held to the F1 rule
     with pytest.raises(rd.LiveRunRefused, match="before F1"):
@@ -1478,6 +1653,74 @@ def test_a_paying_client_is_refused_wherever_it_is_asked_for(tmp_path: Path, mon
         inner=FakeInner([]),
     )
     assert built == [(LLAMA, "deepinfra/turbo")] and guard.inner.model_id == "fake"
+
+
+@pytest.mark.parametrize("model", rd.STUDY_MODELS)
+def test_an_entered_route_opens_no_paid_call_before_the_registration(
+    tmp_path: Path, monkeypatch, model: str
+) -> None:
+    # the table as it is entered: no route is patched here. Everything else a live run needs is
+    # put in place (the pilot sentences, the shared roots, the run in the ledger), so that the
+    # registration tag is the one thing missing.
+    built: list[str] = []
+
+    def scripted_client(endpoint, served_as, **kwargs):
+        built.append(endpoint.model_id)
+        return FakeInner([])
+
+    monkeypatch.setattr(rd, "RouteCheckedClient", scripted_client)
+    repo = make_repo(tmp_path / "repo")
+    monkeypatch.setattr(rd, "REPO", repo)
+    monkeypatch.setattr(rd, "PILOT_SENTENCES", {"D1": "", "D3": ""})
+    out, local = tmp_path / "out", tmp_path / "local"
+    rd.check_roots(out, local)
+    rd.declare_run(out, run="r1", model=model, cap_usd=1.0)
+    assert rd.route_errors(model) == []
+
+    def build(template: rd.PromptTemplate, periods: tuple[str, ...] = ("train",)):
+        log = out / "r1" / "spend_log.jsonl"
+        return rd.build_transport(
+            model,
+            spend_log=log,
+            spend_cap_usd=1.0,
+            max_physical_calls=10,
+            template=template,
+            periods=periods,
+        )
+
+    path = write_items(tmp_path, [make_item(date_of_update="2021-05-04")])
+    live = ["--items", str(path), "--model", model, "--template", "predictive-v1"]
+    live += ["--run-name", "r1", "--spend-cap-usd", "1", "--allow-live"]
+    live += ["--out-root", str(out), "--local-root", str(local)]
+
+    def refused_everywhere() -> None:
+        # the route and the pilot sentences add no refusal of their own: the tag is what is left
+        [missing] = rd.live_refusals(model, rd.TEMPLATES["literal-v1"], ["train"])
+        assert missing.startswith("no paid call before the registration")
+        for template in rd.TEMPLATES.values():
+            with pytest.raises(rd.LiveRunRefused, match=r"^no paid call before the registration"):
+                build(template)
+        with pytest.raises(rd.LiveRunRefused, match=r"^no paid call before the registration"):
+            build(rd.TEMPLATES["predictive-v1"], ("train", "test", "late"))
+        for more in ((), ("--allow-test-items",), ("--template", "probe-v1")):
+            with pytest.raises(SystemExit, match=r"^no paid call before the registration"):
+                rd.main([*live, *more])
+        assert built == [] and not (out / "r1").exists() and not local.exists()
+
+    refused_everywhere()
+    # a tag on a commit that HEAD does not descend from registers nothing
+    git(repo, "checkout", "-q", "-b", "side")
+    git(repo, "commit", "-q", "--allow-empty", "-m", "side")
+    git(repo, "tag", rd.REGISTRATION_TAG)
+    git(repo, "checkout", "-q", "main")
+    refused_everywhere()
+    # nor does the F1 tag stand in for the registration
+    git(repo, "tag", rd.F1_TAG)
+    refused_everywhere()
+    # the registration was the one thing missing: with it the same request reaches the client
+    git(repo, "tag", "-f", rd.REGISTRATION_TAG, "main")
+    endpoint, _ = build(rd.TEMPLATES["predictive-v1"])
+    assert built == [rd.ROUTES[model].model_id] == [endpoint.model_id]
 
 
 def test_all_paid_runs_share_one_out_root_and_one_local_root(tmp_path: Path, monkeypatch) -> None:
@@ -1650,9 +1893,9 @@ def test_a_model_cap_is_raised_within_the_reserve_only(tmp_path: Path) -> None:
         rd.declare_run(
             out, run="q", model="qwen-2.5-7b", cap_usd=1.0, model_cap_usd=3.5, amendment="A2"
         )
-    # a raised cap is not a standing one: the next run of the model must name it again
-    with pytest.raises(SystemExit, match=r"would pass its \$30\.00 cap"):
-        rd.declare_run(out, run="k2", model="grok-4.20", cap_usd=1.0)
+    # the raised cap is the model's from now on: its next run is judged against it unasked
+    with pytest.raises(SystemExit, match=r"hold \$40\.00.*would pass its \$61\.00 cap"):
+        rd.declare_run(out, run="k2", model="grok-4.20", cap_usd=21.5)
     # the amendment can be taken back in part, which frees reserve for another model
     rd.declare_run(
         out, run="k", model="grok-4.20", cap_usd=40.0, model_cap_usd=60.0, amendment="A3"
@@ -1678,6 +1921,189 @@ def test_a_model_cap_is_raised_within_the_reserve_only(tmp_path: Path) -> None:
         rd.declare_run(
             out, run="q2", model="qwen-2.5-7b", cap_usd=3.0, model_cap_usd=4.0, amendment="A4"
         )
+
+
+def test_a_raised_model_cap_holds_for_the_models_later_runs(tmp_path: Path) -> None:
+    out = tmp_path / "out"
+    model, note = "gpt-oss-20b", "A1: the trial's cost per call"
+    assert rd.MODEL_CAPS_USD[model] == 3.0 and rd.model_caps(out) == rd.MODEL_CAPS_USD
+    rd.declare_run(out, run="a", model=model, cap_usd=3.0)
+    with pytest.raises(SystemExit, match=r"would pass its \$3\.00 cap"):
+        rd.declare_run(out, run="b", model=model, cap_usd=1.0)
+    # the raise: given once, with its reason, and kept in the ledger
+    raised = rd.declare_run(
+        out, run="b", model=model, cap_usd=1.0, model_cap_usd=6.0, amendment=note
+    )
+    assert (raised["model_cap_usd"], raised["amendment"]) == (6.0, note)
+    assert rd.model_caps(out) == rd.MODEL_CAPS_USD | {model: 6.0}
+    # a later run of the model names no cap: it is judged against the raised one
+    later = rd.declare_run(out, run="c", model=model, cap_usd=2.0)
+    assert (later["model_cap_usd"], later["model_cap_amended_by"]) == (6.0, note)
+    assert "amendment" not in later and "model_cap_amended_by" not in raised
+    # ... up to the raised cap, and refused beyond it
+    with pytest.raises(SystemExit, match=r"hold \$6\.00.*would pass its \$6\.00 cap"):
+        rd.declare_run(out, run="d", model=model, cap_usd=0.01)
+    # a resumed run is judged the same way, and a later row without a note loses nothing
+    rd.declare_run(out, run="c", model=model, cap_usd=2.0)
+    with pytest.raises(SystemExit, match=r"hold \$4\.00.*would pass its \$6\.00 cap"):
+        rd.declare_run(out, run="c", model=model, cap_usd=2.01)
+    assert rd.amended_caps(out) == {model: 6.0} and rd.cap_amendments(out) == {model: (6.0, note)}
+    assert rd.ledger_summary(out)["models"][model] == {
+        "runs": 3,
+        "spent_usd": 0.0,
+        "held_usd": 6.0,
+        "cap_usd": 6.0,
+    }
+    # the other models keep their registered caps
+    with pytest.raises(SystemExit, match=r"would pass its \$3\.00 cap"):
+        rd.declare_run(out, run="q", model="qwen-2.5-7b", cap_usd=3.01)
+    # a cap changes only by an amendment, never by leaving the option out or by a bare note,
+    # and it is not lowered under what the model's runs already hold
+    with pytest.raises(SystemExit, match="give --model-cap-usd"):
+        rd.declare_run(out, run="c", model=model, cap_usd=2.0, amendment="A2: a note alone")
+    with pytest.raises(SystemExit, match=r"hold \$4\.00.*would pass its \$5\.00 cap"):
+        rd.declare_run(
+            out, run="c", model=model, cap_usd=2.0, model_cap_usd=5.0, amendment="A2: back"
+        )
+    assert rd.model_caps(out)[model] == 6.0
+    lowered = rd.declare_run(
+        out, run="c", model=model, cap_usd=1.0, model_cap_usd=5.0, amendment="A2: back"
+    )
+    assert lowered["model_cap_usd"] == 5.0 and rd.model_caps(out)[model] == 5.0
+    with pytest.raises(SystemExit, match=r"hold \$5\.00.*would pass its \$5\.00 cap"):
+        rd.declare_run(out, run="d", model=model, cap_usd=0.01)
+    rows = [json.loads(line) for line in (out / rd.LEDGER_NAME).read_text().splitlines()]
+    assert [r.get("amendment") for r in rows] == [None, note, None, None, "A2: back"]
+
+
+def test_a_raised_model_cap_never_takes_the_study_past_its_cap(tmp_path: Path) -> None:
+    out = tmp_path / "out"
+    for model, cap in rd.MODEL_CAPS_USD.items():
+        if model != "grok-4.20":
+            rd.declare_run(out, run=f"full-{model}", model=model, cap_usd=cap)
+    assert rd.ledger_summary(out)["held_usd"] == pytest.approx(139.0)
+    note = {"amendment": "A1: grok takes the reserve"}
+    rd.declare_run(out, run="k", model="grok-4.20", cap_usd=40.0, model_cap_usd=61.0, **note)
+    # dollars spent outside any declaration: the raised cap gives no right to them
+    spend(out, "stray", 1.0)
+    with pytest.raises(SystemExit, match=r"hold \$180\.00.*the study would pass its \$200\.00"):
+        rd.declare_run(out, run="k2", model="grok-4.20", cap_usd=21.0)  # within grok's $61
+    rd.declare_run(out, run="k2", model="grok-4.20", cap_usd=20.0)
+    assert rd.ledger_summary(out)["held_usd"] == pytest.approx(200.0)
+    with pytest.raises(SystemExit, match=r"hold \$60\.00.*would pass its \$61\.00 cap"):
+        rd.declare_run(out, run="k3", model="grok-4.20", cap_usd=1.5)
+    with pytest.raises(SystemExit, match=r"the study would pass its \$200\.00 cap"):
+        rd.declare_run(out, run="k3", model="grok-4.20", cap_usd=0.5)
+    # a lowered study cap binds a later run of the raised model too
+    with pytest.raises(SystemExit, match=r"the study would pass its \$150\.00 cap"):
+        rd.declare_run(out, run="k2", model="grok-4.20", cap_usd=20.0, study_cap_usd=150.0)
+    # caps in the ledger that sum past $200 (a row written by hand) are honoured for no run,
+    # of any model, until an amendment brings them back
+    by_hand = {"event": "declare", "run": "x", "model": "qwen-2.5-7b", "cap_usd": 0.0}
+    rd._append_ledger(out, by_hand | {"model_cap_usd": 50.0, "amendment": "by hand"})
+    assert sum(rd.model_caps(out).values()) == 247.0
+    for model in ("grok-4.20", "qwen-2.5-7b", "llama-3.3-70b"):
+        with pytest.raises(SystemExit, match=r"caps in force .* sum to \$247\.00"):
+            rd.declare_run(out, run=f"full-{model}", model=model, cap_usd=0.01)
+    rd.declare_run(
+        out, run="full-qwen-2.5-7b", model="qwen-2.5-7b", cap_usd=3.0, model_cap_usd=3.0,
+        amendment="A2: the registered cap again",
+    )  # fmt: skip
+    assert sum(rd.model_caps(out).values()) == 200.0
+    rd.declare_run(out, run="k2", model="grok-4.20", cap_usd=20.0)
+
+
+def test_an_amendment_that_a_later_one_replaced_is_not_applied_again(tmp_path: Path) -> None:
+    out = tmp_path / "out"
+    model = "gpt-oss-20b"
+    first = {"model_cap_usd": 5.0, "amendment": "A1: the cost per call in the trial"}
+    rd.declare_run(out, run="a", model=model, cap_usd=3.0, **first)
+    # the same command line again, and again (the run is resumed): its amendment is the one
+    # in force
+    for _ in range(2):
+        rd.declare_run(out, run="a", model=model, cap_usd=3.0, **first)
+    assert rd.amendment_log(out) == {model: [(5.0, first["amendment"])] * 3}
+    second = {"model_cap_usd": 6.0, "amendment": "A2: E6 is read too"}
+    rd.declare_run(out, run="b", model=model, cap_usd=2.0, **second)
+    # the first run is resumed with its old command line, which would fit under its old cap:
+    # the raise made since is not undone by it
+    ledger = (out / rd.LEDGER_NAME).read_bytes()
+    message = (
+        r"'A1: the cost per call in the trial' \(\$5\.00 for gpt-oss-20b\) is in the ledger "
+        r"already, and a later one \('A2: E6 is read too'\) put \$6\.00 in its place.*"
+        r"leave out --model-cap-usd and --amendment"
+    )
+    with pytest.raises(SystemExit, match=message):
+        rd.declare_run(out, run="a", model=model, cap_usd=3.0, **first)
+    assert rd.model_caps(out)[model] == 6.0 and (out / rd.LEDGER_NAME).read_bytes() == ledger
+    # resumed as every run is, with no cap option, it stands under the cap in force
+    resumed = rd.declare_run(out, run="a", model=model, cap_usd=4.0)
+    assert (resumed["model_cap_usd"], resumed["model_cap_amended_by"]) == (6.0, second["amendment"])
+    # the amendment in force may be repeated, and the cap changed again under a note of its own
+    rd.declare_run(out, run="b", model=model, cap_usd=2.0, **second)
+    again = {"model_cap_usd": 5.0, "amendment": "A3: back to the cap of A1"}
+    with pytest.raises(SystemExit, match=r"hold \$4\.00.*would pass its \$5\.00 cap"):
+        rd.declare_run(out, run="b", model=model, cap_usd=2.0, **again)
+    rd.declare_run(out, run="b", model=model, cap_usd=1.0, **again)
+    assert rd.cap_amendments(out) == {model: (5.0, again["amendment"])}
+    for stale in (first, second):
+        with pytest.raises(SystemExit, match="an amendment is not applied a second time"):
+            rd.declare_run(out, run="b", model=model, cap_usd=1.0, **stale)
+    # an old note with another cap is a new amendment, as the old cap under a new note was
+    old_note = {"model_cap_usd": 5.5, "amendment": first["amendment"]}
+    rd.declare_run(out, run="b", model=model, cap_usd=1.0, **old_note)
+    assert [cap for cap, _ in rd.amendment_log(out)[model]] == [5.0, 5.0, 5.0, 6.0, 6.0, 5.0, 5.5]
+    # a blank note is no note
+    for blank in ("", "   ", "\n"):
+        with pytest.raises(SystemExit, match="needs an --amendment note"):
+            rd.declare_run(
+                out, run="b", model=model, cap_usd=1.0, model_cap_usd=7.0, amendment=blank
+            )
+        row = rd.declare_run(out, run="b", model=model, cap_usd=1.0, amendment=blank)
+        assert "amendment" not in row and row["model_cap_amended_by"] == first["amendment"]
+    assert rd.model_caps(out)[model] == 5.5
+
+
+@pytest.mark.parametrize("bad", [float("nan"), float("inf"), -1.0])
+def test_an_amended_cap_in_the_ledger_that_is_not_an_amount_stops_every_declaration(
+    tmp_path: Path, bad: float
+) -> None:
+    # a cap that is not a number, written into the ledger by hand, would compare as false with
+    # every sum: the reserve check and the model's own cap would both be switched off
+    out = tmp_path / "out"
+    rd.declare_run(out, run="a", model="qwen-2.5-7b", cap_usd=3.0)
+    ledger = (out / rd.LEDGER_NAME).read_bytes()
+    by_hand = {"event": "declare", "run": "x", "model": "qwen-2.5-7b", "cap_usd": 0.0}
+    rd._append_ledger(out, by_hand | {"model_cap_usd": bad, "amendment": "by hand"})
+    for model in ("qwen-2.5-7b", "grok-4.20"):
+        with pytest.raises(SystemExit, match=r"amended cap for qwen-2\.5-7b that is not a finite"):
+            rd.declare_run(out, run="b", model=model, cap_usd=0.5)
+        with pytest.raises(SystemExit, match="not a finite amount, zero or more"):
+            rd.declare_run(
+                out, run="b", model=model, cap_usd=0.5, model_cap_usd=4.0, amendment="A1"
+            )
+    for read in (rd.model_caps, rd.amended_caps, rd.cap_amendments, rd.ledger_summary):
+        with pytest.raises(SystemExit, match="not a finite amount, zero or more"):
+            read(out)
+    assert list(rd.held_by_run(out)) == ["a", "x"]  # nothing was declared meanwhile
+    (out / rd.LEDGER_NAME).write_bytes(ledger)
+    with pytest.raises(SystemExit, match=r"hold \$3\.00.*would pass its \$3\.00 cap"):
+        rd.declare_run(out, run="b", model="qwen-2.5-7b", cap_usd=0.5)
+
+
+@pytest.mark.parametrize("bad", [float("nan"), float("inf"), -1.0])
+def test_a_cap_that_is_not_an_amount_is_refused(tmp_path: Path, bad: float) -> None:
+    # a cap that is not a number compares as false with everything, so it would pass every check
+    out = tmp_path / "out"
+    note = {"amendment": "A1"}
+    for caps in (
+        {"cap_usd": bad},
+        {"cap_usd": 1.0, "model_cap_usd": bad, **note},
+        {"cap_usd": 1.0, "study_cap_usd": bad},
+    ):
+        with pytest.raises(SystemExit, match="must be a finite amount, zero or more"):
+            rd.declare_run(out, run="a", model="llama-3.3-70b", **caps)
+    assert not out.exists()
 
 
 def test_runs_launched_together_cannot_take_the_same_dollars(tmp_path: Path) -> None:
@@ -1731,6 +2157,43 @@ def test_a_declaration_waits_for_the_ledger_lock(tmp_path: Path) -> None:
     errors = proc.communicate(timeout=60)[1]
     assert proc.returncode == 1 and "hold $4.00" in errors
     assert list(rd.held_by_run(out)) == ["first"]
+
+
+def test_a_raised_cap_waits_for_the_ledger_lock(tmp_path: Path) -> None:
+    # the caps in force are read under the lock too: a raise made by the holder of the lock is
+    # seen by the declaration that waits, whether that one raises a cap itself or relies on one
+    declare = (
+        "import sys; from pathlib import Path; import analysis.coling.read as rd; "
+        "print('ready', flush=True); "
+        "rd.declare_run(Path(sys.argv[1]), run='late', model='qwen-2.5-7b', cap_usd=1.0{more})"
+    )
+    root = str(Path(rd.__file__).resolve().parents[2])
+    env = os.environ | {"PYTHONPATH": root, "PYTHONDONTWRITEBYTECODE": "1"}
+    pipes = {"stdout": subprocess.PIPE, "stderr": subprocess.PIPE, "text": True}
+    raised = {"event": "declare", "run": "first", "model": "grok-4.20", "cap_usd": 1.0}
+    raised |= {"model_cap_usd": 50.0, "amendment": "A1: twenty dollars of the reserve"}
+    lowered = {"event": "declare", "run": "first", "model": "qwen-2.5-7b", "cap_usd": 0.0}
+    lowered |= {"model_cap_usd": 0.5, "amendment": "A1: qwen is cut"}
+    for name, more, row, said in (
+        ("raises", ", model_cap_usd=23.0, amendment='A2'", raised, "would sum to $209.00"),
+        ("relies", "", lowered, "would pass its $0.50 cap"),
+    ):
+        out = tmp_path / name / "out"
+        command = [sys.executable, "-c", declare.format(more=more), str(out)]
+        with rd._locked(out / f"{rd.LEDGER_NAME}.lock"):
+            proc = subprocess.Popen(command, env=env, **pipes)
+            try:
+                assert proc.stdout.readline().strip() == "ready"
+                with pytest.raises(subprocess.TimeoutExpired):
+                    proc.wait(timeout=1.0)
+                assert not (out / rd.LEDGER_NAME).exists()
+                rd._append_ledger(out, row)
+            except BaseException:
+                proc.kill()
+                raise
+        errors = proc.communicate(timeout=60)[1]
+        assert proc.returncode == 1 and said in errors
+        assert list(rd.held_by_run(out)) == ["first"]
 
 
 # --- the run sheet ------------------------------------------------------------------------------
@@ -1796,8 +2259,13 @@ def test_run_sheet_projects_calls_and_cost_per_model() -> None:
 def test_run_sheet_options_and_table(tmp_path: Path, capsys) -> None:
     counts = {"e2": 120, "e3": 1000}
     base = rd.run_sheet(counts)
-    priced = rd.run_sheet(counts, prices={"deepseek-v3": (0.32, 0.89)})
-    assert priced["models"]["deepseek-v3"]["usd_per_mtok"] == [0.32, 0.89]
+    # the sheet prices each model at its entered route; --price tries another endpoint's price
+    for model, (_, _, _, price_in, price_out) in ENTERED.items():
+        assert base["models"][model]["usd_per_mtok"] == [price_in, price_out]
+        assert base["models"][model]["price_date"] == "2026-10-01"
+    priced = rd.run_sheet(counts, prices={"deepseek-v3": (0.2574, 1.0287)})
+    assert priced["models"]["deepseek-v3"]["usd_per_mtok"] == [0.2574, 1.0287]
+    assert priced["models"]["deepseek-v3"]["price_date"] == "given on the command line"
     assert (
         priced["models"]["deepseek-v3"]["usd_typical"]
         != base["models"]["deepseek-v3"]["usd_typical"]
@@ -1861,18 +2329,30 @@ def test_dry_run_prices_without_calling(tmp_path: Path, monkeypatch, capsys) -> 
     assert summary["items_by_period"] == {"train": 1, "test": 1, "late": 0}
     gem, llama = summary["models"]["gemini-3.8-flash"], summary["models"]["llama-3.3-70b"]
     assert gem["calls"] == 2 and gem["usd_upper"] > gem["usd_typical"] > llama["usd_typical"] > 0
-    assert (gem["route_ready"], llama["route_ready"]) == (True, False)
+    assert (gem["route_ready"], llama["route_ready"]) == (True, True)
+    assert (llama["usd_per_mtok"], llama["price_date"]) == ([0.10, 0.32], "2026-10-01")
     assert summary["ledger"]["held_usd"] == 0 and summary["template_pending"] == []
     assert not (tmp_path / "out").exists() and not (tmp_path / "local").exists()
-    # a literal template can be dry-run while its pilot sentences are pending
     roots = ["--out-root", str(tmp_path / "out"), "--local-root", str(tmp_path / "local")]
+    # a model whose route has no endpoint is priced all the same, and shown as not ready
+    with monkeypatch.context() as patch:
+        patch.setattr(rd, "ROUTES", taken_back("deepseek-v3"))
+        dry = ["--items", str(path), "--template", "predictive-v1", "--dry-run", *roots]
+        assert rd.main([*dry, "--model", "deepseek-v3", "--model", "llama-3.3-70b"]) == 0
+        models = json.loads(capsys.readouterr().out)["models"]
+        assert (models["deepseek-v3"]["route_ready"], models["llama-3.3-70b"]["route_ready"]) == (
+            False,
+            True,
+        )
+        assert models["deepseek-v3"]["usd_per_mtok"] == [0.257, 1.029]  # the ladder's price
+    # a literal template can be dry-run while its pilot sentences are pending
     assert rd.main(["--items", str(path), "--model", "deepseek-v3", "--dry-run", *roots]) == 0
     pending = list(rd.TEMPLATES["literal-v1"].pending)
     assert json.loads(capsys.readouterr().out)["template_pending"] == pending
 
 
 def test_dry_run_counts_cached_calls(tmp_path: Path) -> None:
-    reader = make_reader(tmp_path, FakeInner([LITERAL_OK]))
+    reader = make_reader(tmp_path, FakeInner([LITERAL_OK]), route=rd.ROUTES["deepseek-v3"])
     reader.read(make_item())
     summary = rd.dry_run(
         [make_item(), make_item(item_id="i2")],
@@ -1886,6 +2366,22 @@ def test_dry_run_counts_cached_calls(tmp_path: Path) -> None:
         cache_dir=tmp_path / "cache",
     )
     assert summary["models"]["deepseek-v3"]["cached_calls"] == 1
+    # an answer read under another pin is not counted: the pin is part of the cache key
+    moved = replace(rd.ROUTES["deepseek-v3"], provider="streamlake", quantization=None)
+    other = make_reader(tmp_path / "b", FakeInner([LITERAL_OK]), route=moved)
+    other.read(make_item())
+    summary = rd.dry_run(
+        [make_item()],
+        models=["deepseek-v3"],
+        template=rd.TEMPLATES["literal-v1"],
+        track=None,
+        samples=1,
+        temperature=0.0,
+        mask_names=False,
+        shift_years=0,
+        cache_dir=tmp_path / "b" / "cache",
+    )
+    assert summary["models"]["deepseek-v3"]["cached_calls"] == 0
 
 
 def test_cli_guards(tmp_path: Path, monkeypatch, live_ready: Path) -> None:
@@ -1900,6 +2396,9 @@ def test_cli_guards(tmp_path: Path, monkeypatch, live_ready: Path) -> None:
         rd.main([*base, "--dry-run", "--samples", "3"])
     with pytest.raises(SystemExit, match="spend-cap"):
         rd.main([*base, "--run-name", "r1", "--allow-live"])
+    for bad in ("nan", "inf", "0", "-1"):
+        with pytest.raises(SystemExit, match="needs a positive --spend-cap-usd"):
+            rd.main([*live[:-1], bad, "--allow-live"])
     with pytest.raises(SystemExit, match="not one of the eight readers"):
         rd.main(["--items", str(train), "--model", "qwen-2.5-72b", *live[4:], "--allow-live"])
     (tmp_path / "t").mkdir()
@@ -1932,11 +2431,13 @@ def test_cli_refuses_a_live_run_that_is_not_ready(tmp_path: Path, monkeypatch) -
     monkeypatch.setattr(rd, "PILOT_SENTENCES", {"D1": None, "D3": None})
     with pytest.raises(SystemExit, match="waits for the pilot sentences \\['D1', 'D3'\\]"):
         run(train)
-    # 2. the route has no provider yet, and nothing is registered
+    # 2. a route with no provider, and nothing is registered
+    entered = rd.ROUTES
+    monkeypatch.setattr(rd, "ROUTES", taken_back("deepseek-v3"))
     with pytest.raises(SystemExit, match=r"UNSET.*no paid call before the registration"):
         run(train, "--template", "predictive-v1")
-    monkeypatch.setattr(rd, "ROUTES", rd.ROUTES | PINNED)
-    with pytest.raises(SystemExit, match="no paid call before the registration"):
+    monkeypatch.setattr(rd, "ROUTES", entered)
+    with pytest.raises(SystemExit, match=r"^no paid call before the registration"):
         run(train, "--template", "predictive-v1")
     # 3. registered: train-period items may be read, late-period items need F1 as well
     git(repo, "tag", rd.REGISTRATION_TAG)
@@ -2039,6 +2540,41 @@ def test_declare_only_writes_the_cap_and_makes_no_call(tmp_path, monkeypatch, ca
     assert not (tmp_path / "out" / "plan-llama").exists()
 
 
+def test_cli_a_raised_model_cap_is_given_once(tmp_path, monkeypatch, capsys) -> None:
+    monkeypatch.setattr(rd, "RouteCheckedClient", _no_live_client)
+    monkeypatch.setattr(rd, "REPO", make_repo(tmp_path / "repo"))
+    path = write_items(tmp_path, [make_item(date_of_update="2021-05-04")])
+
+    def declare(run: str, cap: str, *more: str) -> dict:
+        args = live_args(tmp_path, path, run, "--template", "predictive-v1", *more)
+        args[args.index("--allow-live")] = "--declare-only"
+        args[args.index("--spend-cap-usd") + 1] = cap
+        capsys.readouterr()
+        assert rd.main(args) == 0
+        return json.loads(capsys.readouterr().out)
+
+    assert declare("trial-a-llama", "5")["model_cap_usd"] == 5.0  # the registered cap, whole
+    with pytest.raises(SystemExit, match=r"would pass its \$5\.00 cap"):
+        declare("e3-a-llama", "1")
+    with pytest.raises(SystemExit, match="needs an --amendment note"):
+        declare("e3-a-llama", "1", "--model-cap-usd", "7")
+    with pytest.raises(SystemExit, match="give --model-cap-usd"):
+        declare("e3-a-llama", "1", "--amendment", "A1: the trial ran dearer")
+    raised = declare("e3-a-llama", "1", "--model-cap-usd", "7", "--amendment", "A1: dearer")
+    assert (raised["model_cap_usd"], raised["amendment"]) == (7.0, "A1: dearer")
+    # the next runs of the model are launched as every run is, with no cap option
+    later = declare("e3-b-llama", "1")
+    assert (later["model_cap_usd"], later["model_cap_amended_by"]) == (7.0, "A1: dearer")
+    with pytest.raises(SystemExit, match=r"hold \$7\.00.*would pass its \$7\.00 cap"):
+        declare("e3-c-llama", "0.5")
+    # the dry run's ledger summary shows the cap in force
+    dry = ["--items", str(path), "--model", "llama-3.3-70b", "--template", "predictive-v1"]
+    dry += ["--dry-run", "--out-root", str(tmp_path / "out"), "--local-root", str(tmp_path / "l")]
+    assert rd.main(dry) == 0
+    ledger = json.loads(capsys.readouterr().out)["ledger"]
+    assert ledger["models"]["llama-3.3-70b"]["cap_usd"] == 7.0 and ledger["held_usd"] == 7.0
+
+
 def test_shards_resume_and_completeness(tmp_path, monkeypatch, capsys, live_ready) -> None:
     sdk = FakeSDK(lambda prompt: PREDICTIVE_OK, model=LLAMA)
     use_sdk(monkeypatch, sdk)
@@ -2086,6 +2622,221 @@ def test_shards_resume_and_completeness(tmp_path, monkeypatch, capsys, live_read
     assert report[0]["missing"] == 1 and report[0]["missing_first"] == ["S999"]
     # no run of the template asked for: not ready
     assert rd.main(["--check-runs", "--out-root", str(out_root), "--items", str(path)]) == 3
+
+
+def test_check_runs_can_be_limited_to_named_runs(tmp_path, monkeypatch, capsys, live_ready) -> None:
+    sdk = FakeSDK(lambda prompt: PREDICTIVE_OK, model=LLAMA)
+    use_sdk(monkeypatch, sdk)
+    eligible = [make_item(item_id=f"S{n:03d}", date_of_update="2021-05-04") for n in range(8)]
+    listed = [make_item(item_id=f"T{n}", date_of_update="2021-05-04") for n in range(3)]
+    for name in ("trial", "secondary"):
+        (tmp_path / name).mkdir()
+    path = write_items(tmp_path, eligible)
+    trial = write_items(tmp_path / "trial", eligible[:2])
+    secondary = write_items(tmp_path / "secondary", listed)
+    predictive = ["--template", "predictive-v1"]
+    out_root = tmp_path / "out"
+    # one output root for every run: a trial, the two shards of the confirmatory run and a
+    # secondary list are read by one model under one condition
+    shards = ["e3-a-llama.s0", "e3-a-llama.s1"]
+    assert rd.main(live_args(tmp_path, trial, "trial-a-llama", *predictive)) == 0
+    for k, name in enumerate(shards):
+        assert rd.main(live_args(tmp_path, path, name, *predictive, "--shard", f"{k}/2")) == 0
+    assert rd.main(live_args(tmp_path, secondary, "e3-secondary-a-llama", *predictive)) == 0
+    capsys.readouterr()
+    everything = sorted([*shards, "e3-secondary-a-llama", "trial-a-llama"])
+    assert rd.runs_with_readings(out_root) == everything
+    ids = [item.item_id for item in eligible]
+    # pooled, the group can never be the eligible list
+    [pooled] = rd.check_runs(out_root, expected=ids, template="predictive-v1")
+    assert pooled["runs"] == everything
+    assert (pooled["duplicates"], pooled["unexpected"], pooled["ready"]) == (2, 3, False)
+    # limited to the runs named, it is
+    [named] = rd.check_runs(out_root, expected=ids, template="predictive-v1", runs=shards)
+    assert named["runs"] == shards and named["rows"] == 8 and named["ready"] is True
+    assert (named["duplicates"], named["missing"], named["unexpected"]) == (0, 0, 0)
+    assert named["item_ids_sha256"] == rd._ids_sha256(ids)
+    [one_shard] = rd.check_runs(out_root, expected=ids, template="predictive-v1", runs=shards[:1])
+    assert 0 < one_shard["missing"] < 8 and one_shard["ready"] is False
+    # a run of another item set among the runs named: every expected item is there, nothing
+    # is read twice, and the group is still not the eligible list
+    wider = [*shards, "e3-secondary-a-llama"]
+    [other_set] = rd.check_runs(out_root, expected=ids, template="predictive-v1", runs=wider)
+    assert (other_set["duplicates"], other_set["missing"]) == (0, 0)
+    assert (other_set["unexpected"], other_set["unexpected_first"]) == (3, ["T0", "T1", "T2"])
+    assert other_set["incomplete_runs"] == [] and other_set["ready"] is False
+    [group] = rd.collect_readings(out_root, runs=["trial-a-llama"]).values()
+    assert group["runs"] == ["trial-a-llama"] and group["item_ids"] == {"S000", "S001"}
+    assert rd.collect_readings(out_root, runs=[]) == {}
+    assert rd.collect_readings(out_root, runs=["no-such-run"]) == {}
+    # without the filter nothing changes: every run is pooled
+    assert rd.collect_readings(out_root) == rd.collect_readings(out_root, None)
+    [group] = rd.collect_readings(out_root).values()
+    assert group["runs"] == everything and len(group["duplicates"]) == 2
+    assert rd.check_runs(out_root, expected=ids, template="predictive-v1", runs=None) == [pooled]
+    # on the command line: --run, once per run
+    check = ["--check-runs", "--out-root", str(out_root), "--items", str(path), *predictive]
+    assert rd.main(check) == 3
+    assert json.loads(capsys.readouterr().out) == [pooled]
+    both = ["--run", shards[0], "--run", shards[1]]
+    assert rd.main([*check, *both]) == 0
+    captured = capsys.readouterr()
+    assert json.loads(captured.out) == [named] and captured.err == ""
+    assert rd.main([*check, "--run", shards[0]]) == 3
+    assert json.loads(capsys.readouterr().out) == [one_shard]
+    assert rd.main([*check, *both, "--run", "e3-secondary-a-llama"]) == 3
+    captured = capsys.readouterr()
+    assert json.loads(captured.out) == [other_set] and captured.err == ""
+    # a name that matches no run is said, and never passes for a run that is ready
+    assert rd.main([*check, *both, "--run", "e3-a-llama.s2"]) == 3
+    captured = capsys.readouterr()
+    assert json.loads(captured.out) == [named]
+    assert "--run: no readings under" in captured.err and "['e3-a-llama.s2']" in captured.err
+    assert rd.main(["--check-runs", "--out-root", str(out_root), "--run", "e3-a-llama.s2"]) == 3
+    assert json.loads(capsys.readouterr().out) == []
+    assert rd.main(["--check-runs", "--out-root", str(out_root), *both]) == 0
+    # the option names runs to check; a live run is named with --run-name
+    with pytest.raises(SystemExit, match="--run goes with --check-runs"):
+        rd.main([*live_args(tmp_path, path, "e3-a-llama.s2"), "--run", "e3-a-llama.s2"])
+    assert rd.runs_with_readings(out_root) == everything
+    # one name given as a string is one run, not its letters
+    assert rd.collect_readings(out_root, runs="trial-a-llama") == rd.collect_readings(
+        out_root, runs=["trial-a-llama"]
+    )
+    # a named run that counts for nothing is said too, and the check does not pass: a run of
+    # another template than the one asked for ...
+    assert rd.main(live_args(tmp_path, path, "e3-c-llama")) == 0  # literal-v1, the default
+    capsys.readouterr()
+    assert rd.main([*check, *both]) == 0
+    capsys.readouterr()
+    assert rd.main([*check, *both, "--run", "e3-c-llama"]) == 3
+    captured = capsys.readouterr()
+    assert json.loads(captured.out) == [named]
+    assert captured.err.strip() == "--run: the report holds nothing of ['e3-c-llama']"
+    # ... (without a template every group is reported, and the run is in one of them)
+    listed_all = ["--check-runs", "--out-root", str(out_root), *both, "--run", "e3-c-llama"]
+    rd.main(listed_all)
+    captured = capsys.readouterr()
+    assert captured.err == "" and len(json.loads(captured.out)) == 2
+    # ... and a run whose readings file is there and holds no row, with no manifest beside it
+    (out_root / "e3-a-llama.s9").mkdir()
+    (out_root / "e3-a-llama.s9" / "readings.jsonl").write_text("")
+    for names in (["--run", "e3-a-llama.s9"], [*both, "--run", "e3-a-llama.s9"]):
+        assert rd.main(["--check-runs", "--out-root", str(out_root), *names]) == 3
+        assert "the report holds nothing of ['e3-a-llama.s9']" in capsys.readouterr().err
+    assert rd.main(["--check-runs", "--out-root", str(out_root), *both]) == 0
+
+
+def test_a_run_name_keeps_its_item_set_and_its_sample_count(
+    tmp_path, monkeypatch, capsys, live_ready
+) -> None:
+    sdk = FakeSDK(lambda prompt: PREDICTIVE_OK, model=LLAMA)
+    use_sdk(monkeypatch, sdk)
+    items = [make_item(item_id=f"S{n:03d}", date_of_update="2021-05-04") for n in range(4)]
+    path = write_items(tmp_path, items)
+    (tmp_path / "other").mkdir()
+    replaced = [*items[:3], make_item(item_id="S999", date_of_update="2021-05-04")]
+    other = write_items(tmp_path / "other", replaced)
+
+    def args(items_file: Path = path, samples: str = "2", *more: str, run: str = "samples-llama"):
+        sampled = ["--template", "predictive-v1", "--samples", samples, "--temperature", "1"]
+        return live_args(tmp_path, items_file, run, *sampled, *more)
+
+    assert rd.main(args()) == 0 and len(sdk.calls) == 8
+    run = tmp_path / "out" / "samples-llama"
+    readings = (run / "readings.jsonl").read_bytes()
+    ledger = (tmp_path / "out" / rd.LEDGER_NAME).read_bytes()
+    [first] = [json.loads(line) for line in (run / "invocations.jsonl").read_text().splitlines()]
+    assert all(key in first for key in rd.IDENTITY_KEYS)
+    assert (first["items_sha256"], first["limit"], first["samples"]) == (
+        rd._sha256_file(path),
+        None,
+        2,
+    )
+    # another item set, another limit or another sample count under the same name: refused
+    # before anything is written, so the first readings stay as they are
+    for changed, key in (
+        (args(other), "items_sha256"),
+        (args(path, "2", "--limit", "3"), "limit"),
+        (args(path, "3"), "samples"),
+    ):
+        message = rf"'samples-llama' was started with other settings \(then, now\): \{{'{key}': \("
+        for mode in ("--allow-live", "--declare-only"):  # not even its cap is declared
+            changed[changed.index("--allow-live")] = mode
+            with pytest.raises(SystemExit, match=message + r".*needs another --run-name"):
+                rd.main(changed)
+            changed[changed.index(mode)] = "--allow-live"
+        assert (run / "readings.jsonl").read_bytes() == readings and len(sdk.calls) == 8
+        assert (tmp_path / "out" / rd.LEDGER_NAME).read_bytes() == ledger
+        assert len((run / "invocations.jsonl").read_text().splitlines()) == 1
+    # the same settings resume the run from the cache: no call, the same answers
+    capsys.readouterr()
+    assert rd.main(args()) == 0 and len(sdk.calls) == 8
+    assert len((run / "invocations.jsonl").read_text().splitlines()) == 2
+
+    def answers(text: str) -> list[tuple]:
+        rows = [json.loads(line) for line in text.splitlines()]
+        return [(row["item_id"], row["sample"], row["reading"], row["status"]) for row in rows]
+
+    resumed = (run / "readings.jsonl").read_text()
+    assert answers(resumed) == answers(readings.decode()) and len(answers(resumed)) == 8
+    assert all(
+        a["cache_hit"] for line in resumed.splitlines() for a in json.loads(line)["attempts"]
+    )
+    # the other item set is read under a name of its own; only its new item is called
+    assert rd.main(args(other, run="samples-llama-2")) == 0 and len(sdk.calls) == 10
+
+
+def test_a_stopped_shard_resumes_under_its_name(tmp_path, monkeypatch, capsys, live_ready) -> None:
+    items = [make_item(item_id=f"S{n:03d}", date_of_update="2021-05-04") for n in range(12)]
+    path = write_items(tmp_path, items)
+    mine = [item.item_id for item in items if rd.shard_of(item.item_id, 2) == 0]
+    assert 3 <= len(mine) < 12
+    predictive = ["--template", "predictive-v1"]
+    args = live_args(tmp_path, path, "e3-a-llama.s0", *predictive, "--shard", "0/2")
+    run = tmp_path / "out" / "e3-a-llama.s0"
+
+    def broken(prompt: str) -> str:
+        if len(sdk.calls) > 2:
+            raise RuntimeError("the provider fell over")
+        return PREDICTIVE_OK
+
+    sdk = FakeSDK(broken, model=LLAMA)
+    use_sdk(monkeypatch, sdk)
+    with pytest.raises(RuntimeError, match="fell over"):
+        rd.main(args)
+    manifest = json.loads((run / "run_manifest.json").read_text())
+    assert (manifest["readings"], manifest["complete"], manifest["shard"]) == (2, False, "0/2")
+    # named in a check, the stopped shard is a partial run: not ready, whatever it answered
+    name = ["e3-a-llama.s0"]
+    [partial] = rd.check_runs(tmp_path / "out", expected=mine[:2], runs=name)
+    assert (partial["incomplete_runs"], partial["missing"], partial["unexpected"]) == (name, 0, 0)
+    assert partial["ready"] is False
+    # resumed by the same command: the shard, the limit, the sample count and the items file
+    # are those of the first invocation, so only the items not yet answered are called
+    again = FakeSDK(lambda prompt: PREDICTIVE_OK, model=LLAMA)
+    use_sdk(monkeypatch, again)
+    capsys.readouterr()
+    assert rd.main(args) == 0 and len(again.calls) == len(mine) - 2
+    manifest = json.loads((run / "run_manifest.json").read_text())
+    assert manifest["complete"] is True and manifest["items"] == len(mine)
+    stopped, resumed = (
+        json.loads(line) for line in (run / "invocations.jsonl").read_text().splitlines()
+    )
+    assert [stopped[key] for key in rd.IDENTITY_KEYS] == [resumed[key] for key in rd.IDENTITY_KEYS]
+    assert stopped["items_sha256"] == rd._sha256_file(path) == manifest["items_sha256"]
+    # the other shard of the same file is a run of its own, and the two make the whole list
+    other = live_args(tmp_path, path, "e3-a-llama.s1", *predictive, "--shard", "1/2")
+    assert rd.main(other) == 0
+    shards = ["e3-a-llama.s0", "e3-a-llama.s1"]
+    [entry] = rd.check_runs(tmp_path / "out", expected=[i.item_id for i in items], runs=shards)
+    assert entry["ready"] is True and entry["items_answered"] == 12
+    # the items file written again with another item: neither shard goes on under its name
+    write_items(tmp_path, [*items, make_item(item_id="S999", date_of_update="2021-05-04")])
+    for rerun in (args, other):
+        with pytest.raises(SystemExit, match=r"other settings \(then, now\): \{'items_sha256'"):
+            rd.main(rerun)
+    assert len(again.calls) == 12 - 2
 
 
 def test_a_stopped_run_keeps_its_rows_and_resumes_free(

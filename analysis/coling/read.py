@@ -59,7 +59,8 @@ the endpoint says so). On top of that this module adds:
   spend plus a conservative estimate of this call would pass the run's cap;
 * a study ledger (``<out-root>/study_ledger.jsonl``): every live run declares its cap before its
   first call, and is refused when the caps and spend of the model's runs would pass the model's
-  cap (``MODEL_CAPS_USD``) or those of all runs would pass $200. All runs share one output root
+  cap (``MODEL_CAPS_USD``, or the cap a logged amendment put in its place: it then holds for
+  the model's later runs) or those of all runs would pass $200. All runs share one output root
   and one local root (:func:`check_roots`);
 * two paid-call guards (:func:`paid_call_refusals`): a live run needs the git tag
   ``coling-registration`` among the ancestors of HEAD, and a live run on items of the test or
@@ -92,7 +93,7 @@ the hashes of the items file, of the track-record file and of this file, the rou
 every expected item and sample was read); ``<local-root>/`` (git-ignored) holds the cache and,
 per run, ``responses.jsonl`` (raw text). Readings are model outputs, never outcomes, so nothing
 here is sealed. :func:`collect_readings` gives an evaluator the set of item ids answered per
-model and condition over every run and shard.
+model and condition over every run and shard, or over the runs it names.
 
 Usage (from the repository root)::
 
@@ -107,9 +108,10 @@ Usage (from the repository root)::
     # the same command with --declare-only in place of --allow-live writes the run's cap to the
     # ledger and calls nothing
     python -m analysis.coling.read --print-pins        # template ids and pins, for F1
-    python -m analysis.coling.read --run-sheet --count e2=120 --count e3=2585 ... \
+    python -m analysis.coling.read --run-sheet --count e2=120 --count e3=2585 ... \\
         [--sheet-format md] [--price MODEL=IN,OUT] [--per-call-usd MODEL=USD]
-    python -m analysis.coling.read --check-runs [--items expected.jsonl --template ID]
+    python -m analysis.coling.read --check-runs [--items expected.jsonl --template ID] \\
+        [--run NAME ...]                              # only the runs of these names
     python -m analysis.coling.read --print-schemas
 """
 
@@ -125,6 +127,7 @@ import platform
 import re
 import string
 import subprocess
+import sys
 import time
 from collections.abc import Iterable, Iterator, Sequence
 from contextlib import contextmanager
@@ -1845,8 +1848,8 @@ class Route:
     """The precision the endpoint states, sent as a filter; None when it states none."""
     price: tuple[float, float, str] | None = None
     """($ per 1M input tokens, $ per 1M output tokens, the day the price was read) of the pinned
-    endpoint; a pinned route must carry it. None, on a direct route, keeps the ladder's price
-    and date."""
+    endpoint, or of the maker's own route; a pinned route must carry it. A direct route without
+    one (None) keeps the ladder's price and date."""
     also_served_as: tuple[str, ...] = ()
     """Further model ids accepted in the echo (for a dated id that the route echoes otherwise)."""
     also_served_by: tuple[str, ...] = ()
@@ -1855,33 +1858,47 @@ class Route:
 
 
 # F1 TABLE -------------------------------------------------------------------------------------
-# One row per reader. The rows are filled once the endpoints of PLAN section 4 are chosen, and
-# before the cost trial, which is the first run that needs them; F1 records the table as it
-# then stands, with this file's hash. To register a route, replace ``UNSET`` with the endpoint
-# slug and add the precision and the endpoint's price, for example
-#     Route("meta-llama/llama-3.3-70b-instruct", "deepinfra/turbo", "fp8", (0.10, 0.32, "2026-10-01"))
-# The comment on each row gives the endpoint that analysis/coling/plan/MODELS.md recommends
-# (read at source on 2026-10-01); the owner confirms the two primaries. The price is entered for
-# every pinned endpoint, with the day it was read: on OpenRouter a price belongs to an endpoint,
-# the ladder's belongs to the model id, and a live run is refused for a pinned route without
-# one (the spend log would misstate the spend). For a precision the endpoint does not state
-# (``phala``, ``openai``) the third value is ``None``. If the dated id of gpt-4o-mini is taken,
-# change its model id here and, if the echo differs, ``also_served_as``.
+# One row per reader. The six OpenRouter routes were entered on 2026-10-01, once the owner had
+# confirmed the endpoints (analysis/coling/plan/DECISIONS.md; decision 17 for deepseek-v3). The
+# values are those of analysis/coling/plan/MODELS.md, section 9, read at source on 2026-10-01:
+# the model id sent, the endpoint slug, the precision the endpoint states, and the endpoint's
+# price with the day it was read. F1 records the table as it then stands, with this file's hash.
+# - The price is entered for every pinned endpoint: on OpenRouter a price belongs to an
+#   endpoint, the ladder's belongs to the model id, and a live run is refused for a pinned
+#   route without one (the spend log would misstate the spend). The two direct routes carry
+#   the makers' own prices, read again on 2026-10-01 and equal to the ladder's, so that one
+#   price date serves all eight rows, as PLAN section 4 registers it.
+# - ``phala`` and ``openai`` state no precision: their third value is ``None`` and no precision
+#   filter is sent.
+# - gpt-4o-mini keeps the alias id, pinned to ``openai``. If its dated id
+#   (openai/gpt-4o-mini-2024-07-18) is taken, change the model id here and, if the echo
+#   differs, ``also_served_as``.
+# - A row whose provider is ``UNSET`` (none today: a route taken back, or a reader added later)
+#   is refused for a live run until its endpoint is entered, for example
+#       Route("qwen/qwen-2.5-7b-instruct", "phala", None, (0.10, 0.20, "2026-10-01"))
+# - Still open until the cost trial: the name under which a provider reports itself in a
+#   response is not documented (the endpoint listing prints "DeepInfra", "Phala" and "OpenAI",
+#   not the slug that is sent). ``also_served_by`` is therefore left empty in every row and
+#   ``PROVIDER_ECHO_REQUIRED`` stays off; both are set from what the trial's responses show.
+# Entering a route clears nothing else: a live run still needs the registration tag
+# (:func:`paid_call_refusals`), the pilot sentences of its template and its entry in the ledger.
 ROUTES: dict[str, Route] = {
-    # deepinfra/turbo, fp8, 0.10 / 0.32
-    "llama-3.3-70b": Route("meta-llama/llama-3.3-70b-instruct", UNSET),
-    # deepinfra/fp4, fp4, 0.32 / 0.89 (or streamlake, precision not stated, 0.2574 / 1.0287)
-    "deepseek-v3": Route("deepseek/deepseek-chat", UNSET),
-    # phala (the only endpoint), precision not stated, 0.10 / 0.20
-    "qwen-2.5-7b": Route("qwen/qwen-2.5-7b-instruct", UNSET),
-    # deepinfra/fp8, fp8, 0.08 / 0.16
-    "gemma-3-27b": Route("google/gemma-3-27b-it", UNSET),
-    # deepinfra/bf16, bf16, 0.03 / 0.14
-    "gpt-oss-20b": Route("openai/gpt-oss-20b", UNSET),
-    # openai, no precision, 0.15 / 0.60; dated id openai/gpt-4o-mini-2024-07-18
-    "gpt-4o-mini": Route("openai/gpt-4o-mini", UNSET),
-    "gemini-3.8-flash": Route("gemini-3.8-flash", DIRECT),
-    "grok-4.20": Route("grok-4.20-0309-non-reasoning", DIRECT),
+    "llama-3.3-70b": Route(
+        "meta-llama/llama-3.3-70b-instruct", "deepinfra/turbo", "fp8", (0.10, 0.32, "2026-10-01")
+    ),
+    "deepseek-v3": Route(
+        "deepseek/deepseek-chat", "deepinfra/fp4", "fp4", (0.32, 0.89, "2026-10-01")
+    ),
+    "qwen-2.5-7b": Route("qwen/qwen-2.5-7b-instruct", "phala", None, (0.10, 0.20, "2026-10-01")),
+    "gemma-3-27b": Route(
+        "google/gemma-3-27b-it", "deepinfra/fp8", "fp8", (0.08, 0.16, "2026-10-01")
+    ),
+    "gpt-oss-20b": Route(
+        "openai/gpt-oss-20b", "deepinfra/bf16", "bf16", (0.03, 0.14, "2026-10-01")
+    ),
+    "gpt-4o-mini": Route("openai/gpt-4o-mini", "openai", None, (0.15, 0.60, "2026-10-01")),
+    "gemini-3.8-flash": Route("gemini-3.8-flash", DIRECT, None, (0.75, 3.75, "2026-10-01")),
+    "grok-4.20": Route("grok-4.20-0309-non-reasoning", DIRECT, None, (1.25, 2.50, "2026-10-01")),
 }
 PROVIDER_ECHO_REQUIRED = False
 """Whether a response on a pinned route must name its provider. OpenRouter documents the name
@@ -2753,8 +2770,20 @@ def write_run(
     return manifest
 
 
-def collect_readings(out_root: Path) -> dict[tuple[str, str], dict]:
+def runs_with_readings(out_root: Path) -> list[str]:
+    """The names of the runs under ``out_root`` that wrote a readings file, in name order."""
+    return [path.parent.name for path in sorted(out_root.glob("*/readings.jsonl"))]
+
+
+def collect_readings(
+    out_root: Path, runs: Iterable[str] | None = None
+) -> dict[tuple[str, str], dict]:
     """What the runs under ``out_root`` answered, pooled over run names and shards.
+
+    Every paid run shares one output root, so a cost trial, a dev run or a secondary list can
+    stand under the same model and condition as a confirmatory run. ``runs`` limits the pooling
+    to the runs of those names (the shards of one line of the run sheet, say); a run of any
+    other name is skipped as if it were not there. Without ``runs`` every run is pooled.
 
     The key is (model, condition), with the condition label of :func:`condition_id`. Each value
     holds ``runs`` (their names), ``incomplete_runs`` (those whose manifest is missing or does
@@ -2766,6 +2795,7 @@ def collect_readings(out_root: Path) -> dict[tuple[str, str], dict]:
     :func:`echo_acceptable` rejects.
     """
     groups: dict[tuple[str, str], dict] = {}
+    wanted = None if runs is None else {runs} if isinstance(runs, str) else set(runs)
 
     def enter(run: str, model: str, condition: str, complete: bool) -> dict:
         group = groups.setdefault(
@@ -2777,8 +2807,10 @@ def collect_readings(out_root: Path) -> dict[tuple[str, str], dict]:
                 group["incomplete_runs"].append(run)
         return group
 
-    for path in sorted(out_root.glob("*/readings.jsonl")):
-        run = path.parent.name
+    for run in runs_with_readings(out_root):
+        if wanted is not None and run not in wanted:
+            continue
+        path = out_root / run / "readings.jsonl"
         manifest_path = path.parent / "run_manifest.json"
         manifest = (
             json.loads(manifest_path.read_text(encoding="utf-8")) if manifest_path.is_file() else {}
@@ -2808,16 +2840,21 @@ def collect_readings(out_root: Path) -> dict[tuple[str, str], dict]:
 
 
 def check_runs(
-    out_root: Path, *, expected: Iterable[str] | None = None, template: str | None = None
+    out_root: Path,
+    *,
+    expected: Iterable[str] | None = None,
+    template: str | None = None,
+    runs: Iterable[str] | None = None,
 ) -> list[dict]:
     """A completeness report, one entry per model and condition (limited to one template if
-    given). With ``expected`` (item ids), each entry also says which of them are missing and
-    which answered ids were not expected. ``ready`` is true when nothing stands in the way of
-    scoring the group: complete runs only, no duplicate, every echo acceptable (see
+    given, and to the runs named in ``runs`` if given: see :func:`collect_readings`). With
+    ``expected`` (item ids), each entry also says which of them are missing and which answered
+    ids were not expected. ``ready`` is true when nothing stands in the way of scoring the
+    group: complete runs only, no duplicate, every echo acceptable (see
     :func:`echo_acceptable`), and, if ``expected`` was given, exactly the expected ids."""
     wanted = set(expected) if expected is not None else None
     report = []
-    for (model, condition), group in sorted(collect_readings(out_root).items()):
+    for (model, condition), group in sorted(collect_readings(out_root, runs).items()):
         if template is not None and condition.split("|")[0] != template:
             continue
         entry = {
@@ -3017,14 +3054,40 @@ def held_by_run(out_root: Path) -> dict[str, dict]:
     return held
 
 
-def amended_caps(out_root: Path) -> dict[str, float]:
-    """The model caps that declarations in the ledger replaced with an amendment note: for each
-    such model, the cap of its latest amended declaration."""
-    caps: dict[str, float] = {}
+def amendment_log(out_root: Path) -> dict[str, list[tuple[float, str]]]:
+    """Every amendment of a model cap in the ledger, by model and in the order they were
+    written: the cap each amended declaration set and its note. A cap there that is not a
+    finite amount, zero or more, stops everything that reads the caps: it would compare as
+    false with every sum, and so switch the checks off."""
+    log: dict[str, list[tuple[float, str]]] = {}
     for row in _read_jsonl(out_root / LEDGER_NAME):
         if row["event"] == "declare" and row.get("amendment"):
-            caps[row["model"]] = float(row["model_cap_usd"])
-    return caps
+            cap = float(row["model_cap_usd"])
+            if not (math.isfinite(cap) and cap >= 0):
+                raise SystemExit(
+                    f"the ledger holds an amended cap for {row['model']} that is not a finite "
+                    f"amount, zero or more ({cap}); no cap is read from it until it is repaired"
+                )
+            log.setdefault(row["model"], []).append((cap, str(row["amendment"])))
+    return log
+
+
+def cap_amendments(out_root: Path) -> dict[str, tuple[float, str]]:
+    """The model caps that declarations in the ledger replaced with an amendment note: for each
+    such model, the cap of its latest amended declaration and that declaration's note."""
+    return {model: entries[-1] for model, entries in amendment_log(out_root).items()}
+
+
+def amended_caps(out_root: Path) -> dict[str, float]:
+    """For each model whose cap an amendment in the ledger replaced, the cap now in its place."""
+    return {model: cap for model, (cap, _) in cap_amendments(out_root).items()}
+
+
+def model_caps(out_root: Path) -> dict[str, float]:
+    """The cap of every model as it stands under ``out_root``: the registered one
+    (``MODEL_CAPS_USD``), or the one that the latest amendment in the ledger put in its place.
+    An amended cap holds for every later run of the model until another amendment changes it."""
+    return MODEL_CAPS_USD | amended_caps(out_root)
 
 
 def _append_ledger(out_root: Path, row: dict) -> None:
@@ -3050,25 +3113,59 @@ def declare_run(
     the model's cap, or, added to what all other runs hold, would pass the study's cap. A run
     declared again (a resumed run, a raised cap) replaces its earlier declaration. The check and
     the write happen under one lock, so two runs launched together cannot both take the same
-    dollars. ``model_cap_usd`` replaces the registered cap of the model for this declaration; it
-    needs an ``amendment`` note, which is kept in the ledger, and it must stay within the
-    reserve: the caps of the eight models, with this one and with those already amended in the
-    ledger (:func:`amended_caps`), may not sum to more than the study's cap.
+    dollars.
+
+    The model's cap is the registered one (``MODEL_CAPS_USD``) until an amendment replaces it.
+    ``model_cap_usd`` is such an amendment: it needs an ``amendment`` note, which is kept in the
+    ledger with the new cap, and from then on that cap is the model's, for this run and for
+    every later run of the model, until another amendment changes it (:func:`model_caps`,
+    read from the ledger under the same lock). A cap therefore never falls back to the
+    registered one without a note. Nor does it fall back to an earlier amendment: a declaration
+    that repeats an amendment already in the ledger (the same cap under the same note, as when
+    the command line of an amended run is used again to resume it) is accepted while that
+    amendment is the one in force, and refused once a later one has replaced it. The caps in
+    force must stay within the reserve: those of the eight models, with the amended ones, may
+    not sum to more than the study's cap, whether this declaration changes one or only relies
+    on one. The study's cap binds beside them as before.
     """
+    for what, dollars in (("run", cap_usd), ("model", model_cap_usd), ("study", study_cap_usd)):
+        if dollars is not None and not (math.isfinite(dollars) and dollars >= 0):
+            raise SystemExit(f"the {what} cap must be a finite amount, zero or more: {dollars}")
     if study_cap_usd > STUDY_CAP_USD:
         raise SystemExit(f"the study cap is ${STUDY_CAP_USD:.2f}; it cannot be raised")
+    amendment = (amendment or "").strip() or None  # a blank note is no note
     if model_cap_usd is not None and not amendment:
         raise SystemExit("--model-cap-usd changes a registered cap and needs an --amendment note")
-    model_cap = MODEL_CAPS_USD[model] if model_cap_usd is None else model_cap_usd
+    if amendment and model_cap_usd is None:
+        raise SystemExit("--amendment is the note of a changed model cap; give --model-cap-usd")
     with _locked(out_root / f"{LEDGER_NAME}.lock"):
+        logged = amendment_log(out_root)
+        amended = {name: entries[-1] for name, entries in logged.items()}
+        caps = MODEL_CAPS_USD | {name: cap for name, (cap, _) in amended.items()}
         if model_cap_usd is not None:
-            caps = sum((MODEL_CAPS_USD | amended_caps(out_root) | {model: model_cap}).values())
-            if caps > STUDY_CAP_USD + 1e-9:
+            given, earlier = (model_cap_usd, amendment), logged.get(model, [])
+            if given in earlier[:-1] and given != earlier[-1]:
+                raise SystemExit(
+                    f"the amendment {amendment!r} (${model_cap_usd:.2f} for {model}) is in the "
+                    f"ledger already, and a later one ({earlier[-1][1]!r}) put "
+                    f"${earlier[-1][0]:.2f} in its place; an amendment is not applied a second "
+                    "time. To resume under the cap in force, leave out --model-cap-usd and "
+                    "--amendment; to change the cap again, give a new note"
+                )
+            caps[model] = model_cap_usd
+        model_cap = caps[model]
+        if sum(caps.values()) > STUDY_CAP_USD + 1e-9:
+            if model_cap_usd is not None:
                 raise SystemExit(
                     f"a model cap is raised within the reserve: with ${model_cap:.2f} for "
-                    f"{model} the caps of the models would sum to ${caps:.2f}, past the "
-                    f"study's ${STUDY_CAP_USD:.2f}"
+                    f"{model} the caps of the models would sum to ${sum(caps.values()):.2f}, "
+                    f"past the study's ${STUDY_CAP_USD:.2f}"
                 )
+            raise SystemExit(
+                f"the model caps in force (registered, or amended in the ledger) sum to "
+                f"${sum(caps.values()):.2f}, past the study's ${STUDY_CAP_USD:.2f}; no run is "
+                "declared until an amendment brings them back within it"
+            )
         others = {name: h for name, h in held_by_run(out_root).items() if name != run}
         same = sum(h["held_usd"] for h in others.values() if h["model"] == model)
         total = sum(h["held_usd"] for h in others.values())
@@ -3093,6 +3190,8 @@ def declare_run(
         }
         if amendment:
             row["amendment"] = amendment
+        elif model in amended:  # the cap is not the registered one: say which note set it
+            row["model_cap_amended_by"] = amended[model][1]
         _append_ledger(out_root, row)
     return row
 
@@ -3104,8 +3203,10 @@ def close_run(out_root: Path, *, run: str, model: str, spent_usd: float) -> None
 
 
 def ledger_summary(out_root: Path) -> dict:
-    """Dollars spent and held, by model and in all, against the caps."""
+    """Dollars spent and held, by model and in all, against the caps in force (the registered
+    ones, or those an amendment in the ledger put in their place)."""
     held = held_by_run(out_root)
+    caps = model_caps(out_root)
     models: dict[str, dict] = {}
     for entry in held.values():
         name = entry["model"] or "undeclared"
@@ -3114,7 +3215,7 @@ def ledger_summary(out_root: Path) -> dict:
         slot["spent_usd"] += entry["spent_usd"]
         slot["held_usd"] += entry["held_usd"]
     for name, slot in models.items():
-        slot["cap_usd"] = MODEL_CAPS_USD.get(name)
+        slot["cap_usd"] = caps.get(name)
     return {
         "models": models,
         "spent_usd": round(sum(e["spent_usd"] for e in held.values()), 6),
@@ -3231,7 +3332,7 @@ def run_sheet(
     input price plus output tokens times the output price. ``usd_typical`` uses the estimated
     prompt length and the typical output length (for a reasoning model, the median hidden
     reasoning); ``usd_upper`` uses the generous figures of the per-call cap check. ``prices``
-    replaces a model's prices (for an endpoint that is recommended but not yet in ``ROUTES``),
+    replaces a model's prices (to see what another endpoint than the one in ``ROUTES`` costs),
     ``per_call_usd`` replaces a model's typical cost per call by a measured mean (the cost
     trial's), and ``repair_rate`` adds that share of calls for repairs.
 
@@ -3406,7 +3507,15 @@ def _parser() -> argparse.ArgumentParser:
         help="item ids answered per model and condition under --out-root; with --items and "
         "--template, compared with the expected ids",
     )
-    ap.add_argument("--run-name", help="one model, template, condition and shard per run name")
+    ap.add_argument(
+        "--run",
+        action="append",
+        metavar="NAME",
+        help="check runs: only the runs of these names (repeatable); every run without it",
+    )
+    ap.add_argument(
+        "--run-name", help="one model, template, condition, shard and item set per run name"
+    )
     ap.add_argument(
         "--spend-cap-usd", type=float, help="cumulative for the run: earlier invocations count"
     )
@@ -3416,7 +3525,11 @@ def _parser() -> argparse.ArgumentParser:
         default=STUDY_CAP_USD,
         help="what all runs hold plus this run's cap must fit in it; it can only be lowered",
     )
-    ap.add_argument("--model-cap-usd", type=float, help="replaces the model's cap; needs a note")
+    ap.add_argument(
+        "--model-cap-usd",
+        type=float,
+        help="replaces the model's cap, for this run and the model's later runs; needs a note",
+    )
     ap.add_argument("--amendment", help="the note kept in the ledger with --model-cap-usd")
     ap.add_argument(
         "--declare-only", action="store_true", help="write the run's cap to the ledger; no call"
@@ -3454,7 +3567,8 @@ def _check_args(args: argparse.Namespace, items: Sequence[ReadItem]) -> None:
         raise SystemExit("this makes paid calls; pass --allow-live (or use --dry-run)")
     if not args.run_name or not _RUN_NAME.match(args.run_name):
         raise SystemExit("--run-name: lowercase letters, digits, '.', '-' or '_'")
-    if args.spend_cap_usd is None or args.spend_cap_usd <= 0:
+    cap = args.spend_cap_usd
+    if cap is None or not (math.isfinite(cap) and cap > 0):
         raise SystemExit("a live run needs a positive --spend-cap-usd")
     if args.model[0] not in ROUTES:
         raise SystemExit("; ".join(route_errors(args.model[0])))
@@ -3481,12 +3595,21 @@ IDENTITY_KEYS = (
     "shift_years",
     "track_record_sha256",
     "shard",
+    "limit",
+    "samples",
+    "items_sha256",
 )
+"""What a run name stands for. An invocation under a name that already has one must give the
+same value for every key (:func:`_check_run_identity`). The items file is identified by the hash
+of the whole file, which every shard and every resumption of a run shares; with the shard and
+the limit it fixes the item set, and with the sample count the rows the run is to write."""
 
 
 def _check_run_identity(out_dir: Path, invocation: dict) -> None:
-    """A run name keeps one model, route, template, condition and shard, so its cap, its spend
-    log and its readings stay meaningful."""
+    """A run name keeps one model, route, template, condition, shard and item set, so its cap,
+    its spend log and its readings stay meaningful: the readings file is written whole by every
+    invocation, and one under another item set would replace the rows of the first. The same
+    settings resume the run from the cache."""
     lines = _read_jsonl(out_dir / "invocations.jsonl")
     first = lines[0] if lines else {}
     clash = {
@@ -3495,7 +3618,10 @@ def _check_run_identity(out_dir: Path, invocation: dict) -> None:
         if lines and first.get(k) != invocation[k]
     }
     if clash:
-        raise SystemExit(f"run {out_dir.name!r} was started with other settings: {clash}")
+        raise SystemExit(
+            f"run {out_dir.name!r} was started with other settings (then, now): {clash}; its "
+            "readings would be overwritten, so this invocation needs another --run-name"
+        )
 
 
 def _live(
@@ -3517,6 +3643,9 @@ def _live(
         "shift_years": args.shift_years,
         "track_record_sha256": track.sha256 if track else None,
         "shard": args.shard,
+        "limit": args.limit,
+        "samples": args.samples,
+        "items_sha256": _sha256_file(args.items),
     }
     _check_run_identity(out_dir, identity)
     roots = check_roots(args.out_root, args.local_root)
@@ -3556,11 +3685,8 @@ def _live(
         **identity,
         "started_at": datetime.now(UTC).isoformat(timespec="seconds"),
         "items_file": str(args.items),
-        "items_sha256": _sha256_file(args.items),
         "items_in_file": items_in_file,
         "items": len(items),
-        "limit": args.limit,
-        "samples": args.samples,
         "spend_cap_usd": args.spend_cap_usd,
         "ledger": declared,
         "git_sha": _git("rev-parse", "HEAD"),
@@ -3646,6 +3772,8 @@ def _run_sheet_command(
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = _parser().parse_args(argv)
+    if args.run and not args.check_runs:
+        raise SystemExit("--run goes with --check-runs; a live run is named with --run-name")
     if args.print_schemas:
         print(json.dumps(SCHEMAS, indent=2))
         return 0
@@ -3661,9 +3789,18 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.check_runs:
         expected = [i.item_id for i in all_items] if all_items is not None else None
         template_id = args.template if expected is not None else None
-        report = check_runs(args.out_root, expected=expected, template=template_id)
+        report = check_runs(args.out_root, expected=expected, template=template_id, runs=args.run)
         print(json.dumps(report, indent=2, sort_keys=True))
-        found = bool(report) or expected is None
+        named = set(args.run or ())
+        absent = sorted(named - set(runs_with_readings(args.out_root)))
+        if absent:  # a name that matches no run must not pass for a run that is ready
+            print(f"--run: no readings under {args.out_root} for {absent}", file=sys.stderr)
+        # nor may a named run that counts for nothing: one of another template than the one
+        # asked for, or one that holds no row and no manifest, is in no entry of the report
+        idle = sorted(named - set(absent) - {run for entry in report for run in entry["runs"]})
+        if idle:
+            print(f"--run: the report holds nothing of {idle}", file=sys.stderr)
+        found = (bool(report) or expected is None) and not absent and not idle
         return 0 if found and all(entry["ready"] for entry in report) else 3
     if all_items is None or not args.model:
         raise SystemExit("--items and --model are required")
