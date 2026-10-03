@@ -564,7 +564,7 @@ Late).
     uses its release month, and the plan then calls the cutoff *bounded*, not documented
     (section 4).
   - Slices are taken inside the test split. The Late split is not read for outcomes in October,
-    so a model whose cutoff month is December 2025 or later has no slice. [owner to confirm]
+    so a model whose cutoff month is December 2025 or later has no slice.
   - With the cutoffs of section 4, six slices start after these days: 2023-10-31
     (gpt-4o-mini), 2023-12-31 (llama-3.3-70b), 2024-06-30 (gpt-oss-20b), 2024-08-31
     (gemma-3-27b), 2024-09-30 (qwen-2.5-7b) and 2024-12-31 (deepseek-v3). gemini-3.8-flash and
@@ -708,7 +708,7 @@ both context for E3, and neither is a failure.
 
 - 120 distinct statements, stratified by form, each labelled by both annotators. The owner
   was asked about this size on 1 October and did not object; it stands unless the owner says
-  otherwise before registration. [owner to confirm]
+  otherwise before registration.
 - The frame is the statements on the shortage listing that are Current at first sight, from
   all periods, since a literal reading involves no outcome.
 - They are drawn before every other sample except the pilot and the check sets (section 3).
@@ -877,7 +877,7 @@ Date, but no statement text. It gives the two probabilities and the time-to-reco
   is computed, and the family keeps six tests.
 - *A switched primary with a small slice.* If that slice holds fewer than 50 scoreable
   statements, the model's three tests are reported as not evaluable. They stay in the family of
-  six and count as not rejected. [owner to confirm]
+  six and count as not rejected.
 - *gemini-3.8-flash is not probed* (section 9). Its E3 results are reported as descriptive, with
   the statement that its memory of the test period was not tested.
 
@@ -1030,7 +1030,7 @@ Brier and in pinball loss is reported.
 - The draft took the reference from author labels on E3 test events. Those labels are not
   collected in October (section 10), so the reference is the frozen rule reading (section 2.5),
   on the scoreable E3 statements. E7 is also reported on the statements of the
-  reference-reading check whose rule reading the annotators confirmed. [owner to confirm]
+  reference-reading check whose rule reading the annotators confirmed.
 - The error classes are fixed in the evaluator at F1, before any test call.
 - **Positive result.** Named error classes carry most of the cost.
 - **Negative result.** Reading errors are cheap next to the trust loss, which supports the
@@ -1163,7 +1163,7 @@ bounds of section 7.2 are reported beside every confirmatory estimate.
 
 If a primary's confirmatory runs cannot be completed on its registered route, its three tests
 are reported as not evaluable and stay in the family. No other model takes its place without an
-amendment made before any evaluation. [owner to confirm]
+amendment made before any evaluation.
 
 **Evaluator.** The registered evaluator (**TBD-at-F1**: file and hash) accepts a run stored in
 several parts and refuses:
@@ -1217,7 +1217,7 @@ describe the frame without those statements.
   - A target that is right-censored before the cap (follow-up ends before recovery and before
     day 365) has no midpoint. It is left out of the pinball loss, and the number left out is
     reported. The loss bounds include it, with the target at its lower bound and at the cap.
-    The draft gave no rule for this case. [owner to confirm]
+    The draft gave no rule for this case.
 - **Coverage** of the 80% interval `[q0.1, q0.9]`, counted on events whose bracket lies wholly
   inside or wholly outside the interval.
 - **Probe and 2×2 metrics** (E4): as defined in E4.
@@ -1344,7 +1344,7 @@ reasoning or thinking) × the output price per 1M, at the registered prices of s
 - `gemini-3.8-flash` reads E2 and the E3 conditions on the eligible statements, and nothing
   else beyond its cost trial: no probe, no E5 and no E6.
 - The TBD, silent and stale-at-issue secondaries are read by the two primaries only.
-- The Late split is not read for outcomes. [owner to confirm]
+- The Late split is not read for outcomes.
 - E6, if it passes its gate, is read by the seven other models. Its calls go through the same
   harness, ledger and caps; its prompts and item sets are fixed by its amendment.
 
@@ -1427,7 +1427,7 @@ a difference found before then is settled in both before either is hashed.
 - The adjudicator may develop prompts and read model outputs. On the items of a task still to
   be adjudicated, the adjudicator looks only at aggregates (calls made and remaining,
   parse-failure and repair counts for the whole run, spend) until that task's gold is hashed.
-  This limit is the guide's addition. [owner to confirm]
+  This limit is the guide's addition.
 - If the adjudicator cannot do a task in time, A1 and A2 settle each item together by naming
   the deciding convention. An item they cannot settle that way is left out of the gold, and
   the number of such items is reported.
@@ -1515,9 +1515,9 @@ The draft's E5 predictive readings are cut.
 rates the pilot and the train-half audit measure; the same figure here and in the guide. The
 draft's figure (10 to 12 hours per author, plus reference labels) is withdrawn. The E6 link
 checks are not in the guide's table and are added to the figure if E6 runs. The owner
-confirmed on 1 October that A1 and A2 do the pilot and the train-half audit on Friday 2 October
-and the main labelling on 3 to 5 October; the figure must fit the hours they can give.
-[owner to confirm]
+planned on 1 October that A1 and A2 do the pilot and the train-half audit on Friday 2 October
+and the main labelling on 3 to 5 October. A1 and A2 started on Saturday 3 October, with the
+pilot and the train-half audit; the figure must fit the hours they can give.
 
 ## 11. Leakage controls
 
@@ -1614,7 +1614,7 @@ fourth threshold as worded, at the same cutoff, and it was met on the gate set (
   which have a stated date by the frozen rule reading, with the primary outcome (the displayed
   presentation, definition B); and the scoreable count.
 
-The gate passes only if the thresholds hold in both parts. [owner to confirm]
+The gate passes only if the thresholds hold in both parts.
 
 **Hold triggers.** Any one of these moves the paper to ARR January 2027, which loses COLING 2027
 (October is the last cycle it takes):
@@ -2284,9 +2284,9 @@ and their one relaxation (item 2), the availability rule, the capture freeze and
 the availability check (items 9 and 26), the roles (item 24), the public repository with
 an anonymised copy of the plan and guide in the supplement (item 17), deepseek-v3 and its
 endpoint (item 16), the E6 gate rule and the reading of a route extension (item 33), and the
-four sample rules of item 35. The other items are
-provisional rules of 1 October: each stands as written unless the owner changes it, and each
-is confirmed or changed before this file is registered. [owner to confirm]
+four sample rules of item 35. The other items, item 36
+included, were provisional rules of 1 October; the owner confirmed them as written on
+3 October.
 
 **Corrections of the text to the code as it stood on 29 September** (the builder did not change
 for these; the draft described it wrongly). *Seen:* train outcomes; the builder had been tested

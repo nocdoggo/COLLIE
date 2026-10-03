@@ -123,7 +123,7 @@ carry the registered text.
     links when it has fewer, and at least 90% of all checked links correct, with no minimum
     per term. A link on both sheets is correct only when both checkers say so, and "unclear"
     is not correct.
-26. **H3 comparator (provisional until the owner confirms).** The comparator of H3 is the base
+26. **H3 comparator [owner, 3 Oct].** The comparator of H3 is the base
     rate by listing age, fixed at registration. The draft's contrast against the
     structured-only GBM is a registered secondary beside H3, and "value beyond the structured
     fields" is written only when the model's best condition beats both. The family stays at
@@ -132,3 +132,10 @@ carry the registered text.
     freeze-run tables put the structured-only GBM below the base rate on dev, or leave the
     95% interval of their difference including zero, the choice goes back to the owner before
     registration.
+27. **Owner, 3 October.** A1 and A2 started on Saturday 3 October with the pilot and the
+    train-half outcome audit, to be returned by the end of that day. The registration deadline
+    stays as written, Saturday 3 October 23:59 AoE (the relaxation is for a repeated human gate
+    only). E6 is kept to its linker gate. The remaining provisional rules of the plan, and the
+    items of its change list, item 36 included, are confirmed as written. The worktree reaches
+    the API keys through links to the main checkout's key files (`cloud_endpoint/`, ignored by
+    git; the files themselves are never read).
