@@ -1,5 +1,5 @@
-"""Gradient-boosted quantile predictors of the time to recovery: the structured-only model (the
-content-free control of H3) and the text-trained model (PLAN.md section 8; DECISIONS.md 16).
+"""Gradient-boosted quantile predictors of the time to recovery: the structured-only model (a
+registered secondary of H3) and the text-trained model (PLAN.md section 8; DECISIONS.md 16).
 
 Both models predict the quantiles 0.05, 0.10, ..., 0.95 of the days from the statement date to
 recovery, capped at 365, with one scikit-learn ``HistGradientBoostingRegressor`` per quantile

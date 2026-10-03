@@ -166,7 +166,7 @@ def test_one_proxy_pair_per_hypothesis_from_the_model_free_predictors() -> None:
     assert [(p.comparator, p.tested) for p in W.PROXY_PAIRS] == [
         ("face_value", "rules_plus_slip"),
         ("rules_plus_slip", "base_rate"),
-        ("gbm_structured", "gbm_text"),
+        ("base_rate", "gbm_text"),
     ]
     for pair in W.PROXY_PAIRS:
         assert {pair.comparator, pair.tested} <= set(G.PREDICTORS)
@@ -174,11 +174,13 @@ def test_one_proxy_pair_per_hypothesis_from_the_model_free_predictors() -> None:
 
 def test_contrast_pairs_put_the_registered_ones_first() -> None:
     pairs = W.contrast_pairs(list(G.PREDICTORS))
-    assert pairs[:4] == [
+    assert pairs[:6] == [
         ("face_value", "rules_plus_slip"),
         ("rules_plus_slip", "base_rate"),
+        ("base_rate", "gbm_text"),
         ("gbm_structured", "gbm_text"),
         ("gbm_structured", "rules_plus_slip"),
+        ("gbm_structured", "base_rate"),
     ]
     assert len(pairs) == 10 and len({frozenset(pair) for pair in pairs}) == 10
     assert W.contrast_pairs(["base_rate", "face_value"]) == [("base_rate", "face_value")]
@@ -414,7 +416,7 @@ def test_power_report_by_hand() -> None:
     scoreable = frame([{"episode_id": e} for e in ("a", "a", "b", "b")])
     losses = pd.DataFrame(0.0, index=scoreable.index, columns=list(G.PREDICTORS))
     losses["face_value"] = [1.0, 1.0, 0.0, 0.0]  # H1: d = 1, 1, 0, 0, as in the test above
-    losses["gbm_structured"] = [1.0, 0.0, 1.0, 0.0]  # H3: no variance between episodes
+    losses["gbm_text"] = [1.0, 0.0, 1.0, 0.0]  # H3: no variance between episodes
     test = {"statements": 100, "episodes": 8, "weighted_statements_per_episode": 5.0}
     report = W.power_report(scoreable, losses, test, {"dev": 0.5})
     assert report["family"]["alpha_per_test"] == pytest.approx(0.05 / 6)

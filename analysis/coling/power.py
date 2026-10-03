@@ -15,15 +15,17 @@ What it does, on train-period data only.
 3. Estimates the minimum detectable difference of H1, H2 and H3 at 80% power, each test at
    0.05/6 (the Holm worst case), from one pair of model-free predictors per hypothesis.
 
-The proxy pairs (``PROXY_PAIRS``) are fixed here, before any dev outcome is read. Each
-hypothesis has a language model on one side, and no model call precedes registration:
+The proxy pairs (``PROXY_PAIRS``). Each hypothesis has a language model on one side, and no
+model call precedes registration. The pairs of H1 and H2 were fixed here before any dev outcome
+was read. The pair of H3 was changed with the comparator of H3, after the dev losses had been
+seen (PLAN.md, "Changes from the 29 September draft", item 36):
 
 * H1 (one-sided), ``loss(m-a) - loss(m-b)``: face value against rules plus slip. Taking the
   notice at its word against the same reading with the list's track record.
 * H2 (two-sided), ``loss(rules + calibrator) - loss(m-c)``: rules plus slip against the base
   rate by listing age.
-* H3 (two-sided), ``loss(structured-only GBM) - loss(m-best)``: the structured-only model
-  against the text-trained model.
+* H3 (two-sided), ``loss(base rate) - loss(m-best)``: the base rate by listing age against the
+  text-trained model.
 
 How the dev variance is scaled to the test set. For a pair, ``d`` is the paired difference of
 the primary loss on a scoreable dev statement.
@@ -125,12 +127,17 @@ class Pair:
 PROXY_PAIRS = (
     Pair("H1", "face_value", "rules_plus_slip", 1, "loss(m-a) - loss(m-b)"),
     Pair("H2", "rules_plus_slip", "base_rate", 2, "loss(rules + calibrator) - loss(m-c)"),
-    Pair("H3", "gbm_structured", "gbm_text", 2, "loss(structured-only GBM) - loss(m-best)"),
+    Pair("H3", "base_rate", "gbm_text", 2, "loss(base rate) - loss(m-best)"),
 )
-SECONDARY_PAIRS = (("gbm_structured", "rules_plus_slip"),)
-"""The registered secondary contrast of H3 that is not a proxy pair, as (comparator, tested):
-rules plus slip against the structured-only model. The text-trained model against the
-structured-only model is the H3 proxy pair."""
+SECONDARY_PAIRS = (
+    ("gbm_structured", "gbm_text"),
+    ("gbm_structured", "rules_plus_slip"),
+    ("gbm_structured", "base_rate"),
+)
+"""The registered secondary contrasts of H3 that are not proxy pairs, as (comparator, tested):
+the text-trained model, rules plus slip and the base rate, each against the structured-only
+model (the comparator of H3 in the draft of 29 September). Rules plus slip against the base rate
+is the H2 proxy pair with its sign reversed."""
 
 
 # --------------------------------------------------------------------------------------------
