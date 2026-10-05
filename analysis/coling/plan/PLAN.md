@@ -2196,10 +2196,10 @@ depend on the pandas version, so the environment is part of the record.
 
 **Annotation.**
 
-- `AUDIT_GUIDE.md` v1: its hash. **TBD-at-gate.**
-  <!-- from `analysis/coling/out/freeze_record.json`, `annotation.guide.sha256` (first 16
-  characters), once the guide's version line says v1 and `annotation.guide.version` is `v1`; the
-  file on disk is still the draft of 1 October. -->
+- `AUDIT_GUIDE.md` v1: `c7a73851be7246fa`. The check set was labelled under the v1 text of
+  5 October as it stood before its corrections of the same day (`449c8e049be6cab1`, named in the
+  check sheets); the guide's changelog lists the corrections, none of which touches a
+  convention of the literal task.
 - The pilot, on 20 items, both sheets valid: alpha 1.0 on the start and on the end month
   offsets; identical intervals on all 13 items where both annotators gave one; one item to
   adjudication (a statement type). Submitted sheets: `efea7ec22465b953` (A1) and

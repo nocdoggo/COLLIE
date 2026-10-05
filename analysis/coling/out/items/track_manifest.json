@@ -1,0 +1,111 @@
+{
+ "about": "The track record of condition (b) (PLAN.md section 5, E3): the table of Turnbull shares by form and revision bucket and the resolved examples, from train-period statements only. Outcomes are followed to the train horizon, also for the fit record (PLAN.md section 3).",
+ "command": "PYTHONPATH=. python -m analysis.coling.track_record",
+ "schema": "coling-track-record-v1",
+ "seed": 20261001,
+ "min_cell": 100,
+ "inputs": {
+  "statements": "analysis/coling/out/statements.csv.gz",
+  "statements_sha256": "bcadc718f4e4e6c05330483196fd63bb8696ecf600e50d1cee8de0b0dc79cdbb",
+  "incontext_pool": "analysis/coling/out/audit/samples_later/sample_incontext_pool.csv",
+  "incontext_pool_sha256": "ba42ebab7b3d1bb6c7ed46ed477e7028168693edc1a8be143bc2613a3c09e4ab"
+ },
+ "code": {
+  "builder_sha256": "53873bade0dd0e4bb232dd62c7fce9cd28f2a107675e3c68d832920766c3b99e",
+  "predictors_sha256": "452254cac0cb7817327ec82f9f555c81ba8c13e7c327dae8c5e55fe3245b3438",
+  "numpy": "2.5.2",
+  "pandas": "2.3.3"
+ },
+ "examples": {
+  "pool": 50,
+  "shown": [
+   "Sdb1e296a2757",
+   "S3415b2cc39b3",
+   "S64c31c5a0773",
+   "Sfc7ccc5f1b52",
+   "S9383da82f794",
+   "Sd40193457f01",
+   "S896007a1cdec",
+   "Sfa4cb7c43560",
+   "S2cbde42c626e",
+   "S3f696336f862"
+  ],
+  "passed_over_unresolved": []
+ },
+ "versions": {
+  "fit": {
+   "file": "track_fit.json",
+   "splits": [
+    "fit"
+   ],
+   "since": "2017-06-06",
+   "through": "2020-12-30",
+   "statements": {
+    "dated": 1163,
+    "tbd": 116,
+    "silent": 159
+   },
+   "table_rows": 27,
+   "rows_by_basis": {
+    "cell": 3,
+    "form": 6,
+    "all dated forms": 18
+   },
+   "follow_up": {
+    "last_bracket_date": "2022-10-06",
+    "cut": "2021-01-01",
+    "statements_with_a_bracket_date_on_or_after_the_cut": 741,
+    "of_them_censored_at_first_sight": 0
+   },
+   "examples_with_a_date_on_or_after_the_cut": 6,
+   "own_threads": {
+    "shown_to": [
+     "dev"
+    ],
+    "statements": 2687,
+    "followed_past_their_date_behind_the_table": 473,
+    "followed_past_their_date_by_an_example": 10,
+    "examples_that_follow_them": [
+     "Sfc7ccc5f1b52",
+     "S896007a1cdec",
+     "S3f696336f862"
+    ],
+    "scoreable": {
+     "statements": 644,
+     "followed_past_their_date_behind_the_table": 167,
+     "followed_past_their_date_by_an_example": 4
+    }
+   },
+   "sha256": "093edae80f73b71ec3603dc10fff4eac6650a55991d041971dcf979761aff52c"
+  },
+  "fit+dev": {
+   "file": "track_fit_dev.json",
+   "splits": [
+    "fit",
+    "dev"
+   ],
+   "since": "2017-06-06",
+   "through": "2022-12-28",
+   "statements": {
+    "dated": 2497,
+    "tbd": 250,
+    "silent": 306
+   },
+   "table_rows": 27,
+   "rows_by_basis": {
+    "cell": 5,
+    "form": 7,
+    "all dated forms": 15
+   },
+   "follow_up": {
+    "last_bracket_date": "2023-01-13",
+    "cut": "2023-01-01",
+    "statements_with_a_bracket_date_on_or_after_the_cut": 52,
+    "of_them_censored_at_first_sight": 52
+   },
+   "examples_with_a_date_on_or_after_the_cut": 0,
+   "own_threads": null,
+   "sha256": "41648e5a49e7d296a3ca2c49b61d7df3607eb8fe43f9f01daa136d9b0c3dc098"
+  }
+ }
+}

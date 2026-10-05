@@ -1,8 +1,10 @@
 # Freeze record
 
-Rendered from `analysis/coling/out/freeze_record.json`. Mode: freeze. Status: complete. Started 2026-10-05T21:07:28Z, finished 2026-10-05T21:09:30Z (UTC). Commit ba7de793353436519ea2663caef25394ceedf90b. Hashes are the first 16 hex characters of sha256; the template pins are given whole.
+Rendered from `analysis/coling/out/freeze_record.json`. Mode: freeze. Status: complete. Started 2026-10-05T21:25:39Z, finished 2026-10-05T21:26:48Z (UTC). Commit 26a43be48408ecc09c396213d3240e6fe5d74fe0. Hashes are the first 16 hex characters of sha256; the template pins are given whole.
 
 The one rerun that checks the sealed hashes: started 2026-10-05T21:09:53Z; both sealed hashes and both open tables as recorded.
+
+Written again by --continue-after-sealed. Earlier runs: started 2026-10-05T21:07:28Z, complete; started 2026-10-05T21:24:06Z, complete.
 
 **Environment.** Python 3.12.11; the lock file `uv.lock`, hash `3308eeb43cb51580`; pandas 2.3.3, numpy 2.5.2, scikit-learn 1.9.0, scipy 1.18.1.
 
@@ -45,7 +47,7 @@ The one rerun that checks the sealed hashes: started 2026-10-05T21:09:53Z; both 
 
 **Annotation.**
 
-- `analysis/coling/plan/AUDIT_GUIDE.md` (version line: v1): `449c8e049be6cab1`.
+- `analysis/coling/plan/AUDIT_GUIDE.md` (version line: v1): `c7a73851be7246fa`.
 - The availability-string list `analysis/coling/out/availability_strings.csv`: `da0bde1baac48473`.
 
 **Counts.** The Gate 1 record (section 12):

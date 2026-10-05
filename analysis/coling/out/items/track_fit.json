@@ -1,0 +1,421 @@
+{
+ "schema": "coling-track-record-v1",
+ "split": "fit",
+ "since": "2017-06-06",
+ "through": "2020-12-30",
+ "seed": 20261001,
+ "min_cell": 100,
+ "source": {
+  "statements_sha256": "bcadc718f4e4e6c05330483196fd63bb8696ecf600e50d1cee8de0b0dc79cdbb",
+  "incontext_pool_sha256": "ba42ebab7b3d1bb6c7ed46ed477e7028168693edc1a8be143bc2613a3c09e4ab",
+  "builder_sha256": "53873bade0dd0e4bb232dd62c7fce9cd28f2a107675e3c68d832920766c3b99e",
+  "predictors_sha256": "452254cac0cb7817327ec82f9f555c81ba8c13e7c327dae8c5e55fe3245b3438"
+ },
+ "slip_table": [
+  {
+   "form": "a relative time or a range",
+   "revision": "first",
+   "statements": 1163,
+   "basis": "all dated forms",
+   "share_by_stated_end": 0.220803,
+   "share_by_stated_end_90": 0.540945,
+   "median_days_to_recovery": 156.77973
+  },
+  {
+   "form": "a relative time or a range",
+   "revision": "second",
+   "statements": 1163,
+   "basis": "all dated forms",
+   "share_by_stated_end": 0.220803,
+   "share_by_stated_end_90": 0.540945,
+   "median_days_to_recovery": 156.77973
+  },
+  {
+   "form": "a relative time or a range",
+   "revision": "third or later",
+   "statements": 1163,
+   "basis": "all dated forms",
+   "share_by_stated_end": 0.220803,
+   "share_by_stated_end_90": 0.540945,
+   "median_days_to_recovery": 156.77973
+  },
+  {
+   "form": "an exact day",
+   "revision": "first",
+   "statements": 1163,
+   "basis": "all dated forms",
+   "share_by_stated_end": 0.220803,
+   "share_by_stated_end_90": 0.540945,
+   "median_days_to_recovery": 156.77973
+  },
+  {
+   "form": "an exact day",
+   "revision": "second",
+   "statements": 1163,
+   "basis": "all dated forms",
+   "share_by_stated_end": 0.220803,
+   "share_by_stated_end_90": 0.540945,
+   "median_days_to_recovery": 156.77973
+  },
+  {
+   "form": "an exact day",
+   "revision": "third or later",
+   "statements": 1163,
+   "basis": "all dated forms",
+   "share_by_stated_end": 0.220803,
+   "share_by_stated_end_90": 0.540945,
+   "median_days_to_recovery": 156.77973
+  },
+  {
+   "form": "part of a month",
+   "revision": "first",
+   "statements": 1163,
+   "basis": "all dated forms",
+   "share_by_stated_end": 0.220803,
+   "share_by_stated_end_90": 0.540945,
+   "median_days_to_recovery": 156.77973
+  },
+  {
+   "form": "part of a month",
+   "revision": "second",
+   "statements": 1163,
+   "basis": "all dated forms",
+   "share_by_stated_end": 0.220803,
+   "share_by_stated_end_90": 0.540945,
+   "median_days_to_recovery": 156.77973
+  },
+  {
+   "form": "part of a month",
+   "revision": "third or later",
+   "statements": 1163,
+   "basis": "all dated forms",
+   "share_by_stated_end": 0.220803,
+   "share_by_stated_end_90": 0.540945,
+   "median_days_to_recovery": 156.77973
+  },
+  {
+   "form": "a half-year or a quarter",
+   "revision": "first",
+   "statements": 1163,
+   "basis": "all dated forms",
+   "share_by_stated_end": 0.220803,
+   "share_by_stated_end_90": 0.540945,
+   "median_days_to_recovery": 156.77973
+  },
+  {
+   "form": "a half-year or a quarter",
+   "revision": "second",
+   "statements": 1163,
+   "basis": "all dated forms",
+   "share_by_stated_end": 0.220803,
+   "share_by_stated_end_90": 0.540945,
+   "median_days_to_recovery": 156.77973
+  },
+  {
+   "form": "a half-year or a quarter",
+   "revision": "third or later",
+   "statements": 1163,
+   "basis": "all dated forms",
+   "share_by_stated_end": 0.220803,
+   "share_by_stated_end_90": 0.540945,
+   "median_days_to_recovery": 156.77973
+  },
+  {
+   "form": "a year",
+   "revision": "first",
+   "statements": 1163,
+   "basis": "all dated forms",
+   "share_by_stated_end": 0.220803,
+   "share_by_stated_end_90": 0.540945,
+   "median_days_to_recovery": 156.77973
+  },
+  {
+   "form": "a year",
+   "revision": "second",
+   "statements": 1163,
+   "basis": "all dated forms",
+   "share_by_stated_end": 0.220803,
+   "share_by_stated_end_90": 0.540945,
+   "median_days_to_recovery": 156.77973
+  },
+  {
+   "form": "a year",
+   "revision": "third or later",
+   "statements": 1163,
+   "basis": "all dated forms",
+   "share_by_stated_end": 0.220803,
+   "share_by_stated_end_90": 0.540945,
+   "median_days_to_recovery": 156.77973
+  },
+  {
+   "form": "a month with no year",
+   "revision": "first",
+   "statements": 1163,
+   "basis": "all dated forms",
+   "share_by_stated_end": 0.220803,
+   "share_by_stated_end_90": 0.540945,
+   "median_days_to_recovery": 156.77973
+  },
+  {
+   "form": "a month with no year",
+   "revision": "second",
+   "statements": 1163,
+   "basis": "all dated forms",
+   "share_by_stated_end": 0.220803,
+   "share_by_stated_end_90": 0.540945,
+   "median_days_to_recovery": 156.77973
+  },
+  {
+   "form": "a month with no year",
+   "revision": "third or later",
+   "statements": 1163,
+   "basis": "all dated forms",
+   "share_by_stated_end": 0.220803,
+   "share_by_stated_end_90": 0.540945,
+   "median_days_to_recovery": 156.77973
+  },
+  {
+   "form": "a month and year",
+   "revision": "first",
+   "statements": 247,
+   "basis": "cell",
+   "share_by_stated_end": 0.210408,
+   "share_by_stated_end_90": 0.478672,
+   "median_days_to_recovery": 222.643744
+  },
+  {
+   "form": "a month and year",
+   "revision": "second",
+   "statements": 240,
+   "basis": "cell",
+   "share_by_stated_end": 0.177709,
+   "share_by_stated_end_90": 0.561333,
+   "median_days_to_recovery": 168.727008
+  },
+  {
+   "form": "a month and year",
+   "revision": "third or later",
+   "statements": 459,
+   "basis": "cell",
+   "share_by_stated_end": 0.264975,
+   "share_by_stated_end_90": 0.595221,
+   "median_days_to_recovery": 141.591308
+  },
+  {
+   "form": "TBD or unknown",
+   "revision": "first",
+   "statements": 116,
+   "basis": "form",
+   "share_by_stated_end": null,
+   "share_by_stated_end_90": null,
+   "median_days_to_recovery": 365.0
+  },
+  {
+   "form": "TBD or unknown",
+   "revision": "second",
+   "statements": 116,
+   "basis": "form",
+   "share_by_stated_end": null,
+   "share_by_stated_end_90": null,
+   "median_days_to_recovery": 365.0
+  },
+  {
+   "form": "TBD or unknown",
+   "revision": "third or later",
+   "statements": 116,
+   "basis": "form",
+   "share_by_stated_end": null,
+   "share_by_stated_end_90": null,
+   "median_days_to_recovery": 365.0
+  },
+  {
+   "form": "no timing",
+   "revision": "first",
+   "statements": 159,
+   "basis": "form",
+   "share_by_stated_end": null,
+   "share_by_stated_end_90": null,
+   "median_days_to_recovery": 321.12265
+  },
+  {
+   "form": "no timing",
+   "revision": "second",
+   "statements": 159,
+   "basis": "form",
+   "share_by_stated_end": null,
+   "share_by_stated_end_90": null,
+   "median_days_to_recovery": 321.12265
+  },
+  {
+   "form": "no timing",
+   "revision": "third or later",
+   "statements": 159,
+   "basis": "form",
+   "share_by_stated_end": null,
+   "share_by_stated_end_90": null,
+   "median_days_to_recovery": 321.12265
+  }
+ ],
+ "examples": [
+  {
+   "item_id": "Sdb1e296a2757",
+   "date_of_update": "2020-06-09",
+   "outcome": "recovered",
+   "type_of_update": "Reverified",
+   "availability_information": "Product not available",
+   "related_information": "Expecting new shipment July 15, 2020",
+   "stated_end": "2020-07-15",
+   "recovered_after": "2020-07-15",
+   "recovered_by": "2020-08-15",
+   "followed_until": null,
+   "generic_name": "Cefotetan Disodium Injection",
+   "company_name": "Teligent Pharma, Inc.",
+   "form": "an exact day",
+   "revision": "third or later"
+  },
+  {
+   "item_id": "S3415b2cc39b3",
+   "date_of_update": "2019-10-11",
+   "outcome": "recovered",
+   "type_of_update": "New",
+   "availability_information": "Limited Supply. Next Delivery: October 2019; Estimated Recovery: Late 2020",
+   "related_information": "Check with your wholesaler for available inventory. Shortage per manufacturer: Manufacturing Delay",
+   "stated_end": "2020-12-31",
+   "recovered_after": "2020-11-21",
+   "recovered_by": "2021-01-17",
+   "followed_until": null,
+   "generic_name": "Nalbuphine Hydrochloride Injection",
+   "company_name": "Hospira, Inc.",
+   "form": "a year",
+   "revision": "first"
+  },
+  {
+   "item_id": "S64c31c5a0773",
+   "date_of_update": "2019-12-20",
+   "outcome": "recovered",
+   "type_of_update": "Revised",
+   "availability_information": "Available. On allocation. Estimated availability January",
+   "related_information": "",
+   "stated_end": "2020-01-31",
+   "recovered_after": "2020-06-12",
+   "recovered_by": "2020-07-08",
+   "followed_until": null,
+   "generic_name": "Cefazolin Injection",
+   "company_name": "Sagent Pharmaceuticals",
+   "form": "a month with no year",
+   "revision": "second"
+  },
+  {
+   "item_id": "Sfc7ccc5f1b52",
+   "date_of_update": "2020-12-08",
+   "outcome": "not_recovered",
+   "type_of_update": "Revised",
+   "availability_information": "On backorder. Expected release - Q3 2021",
+   "related_information": "",
+   "stated_end": "2021-09-30",
+   "recovered_after": null,
+   "recovered_by": null,
+   "followed_until": "2022-10-06",
+   "generic_name": "Physostigmine Salicylate Injection, USP",
+   "company_name": "Akorn Pharmaceuticals",
+   "form": "a half-year or a quarter",
+   "revision": "third or later"
+  },
+  {
+   "item_id": "S9383da82f794",
+   "date_of_update": "2020-05-12",
+   "outcome": "recovered",
+   "type_of_update": "Revised",
+   "availability_information": "This presentation is temporarily on backorder.",
+   "related_information": "Additional lots are scheduled for manufacturing in the May - June 2020 timeframe. Product will be made available as it is released.",
+   "stated_end": "2020-06-30",
+   "recovered_after": "2020-11-21",
+   "recovered_by": "2021-01-17",
+   "followed_until": null,
+   "generic_name": "Ondansetron Hydrochloride Injection",
+   "company_name": "Hikma Pharmaceuticals USA, Inc. (formerly West-Ward)",
+   "form": "a relative time or a range",
+   "revision": "second"
+  },
+  {
+   "item_id": "Sd40193457f01",
+   "date_of_update": "2019-12-10",
+   "outcome": "recovered",
+   "type_of_update": "Reverified",
+   "availability_information": "On backorder. Expected release early January 2020",
+   "related_information": "",
+   "stated_end": "2020-01-10",
+   "recovered_after": "2020-04-02",
+   "recovered_by": "2020-06-12",
+   "followed_until": null,
+   "generic_name": "Bacitracin Ophthalmic Ointment",
+   "company_name": "Perrigo Pharmaceuticals",
+   "form": "part of a month",
+   "revision": "first"
+  },
+  {
+   "item_id": "S896007a1cdec",
+   "date_of_update": "2019-12-20",
+   "outcome": "recovered",
+   "type_of_update": "Reverified",
+   "availability_information": "Backordered. Estimated availability May-2020",
+   "related_information": "",
+   "stated_end": "2020-05-31",
+   "recovered_after": "2021-11-30",
+   "recovered_by": "2022-10-04",
+   "followed_until": null,
+   "generic_name": "Leucovorin Calcium Lyophilized Powder for Injection",
+   "company_name": "Sagent Pharmaceuticals",
+   "form": "a month and year",
+   "revision": "second"
+  },
+  {
+   "item_id": "Sfa4cb7c43560",
+   "date_of_update": "2020-08-12",
+   "outcome": "recovered",
+   "type_of_update": "New",
+   "availability_information": "Product availability is planned for 18-Sep-2020.",
+   "related_information": "Distributor-Salix Pharmaceuticals, Inc.: 1-800-321-4576",
+   "stated_end": "2020-09-18",
+   "recovered_after": "2020-11-21",
+   "recovered_by": "2021-01-17",
+   "followed_until": null,
+   "generic_name": "Chlorothiazide (Diuril) Oral Suspension",
+   "company_name": "Bausch Health",
+   "form": "an exact day",
+   "revision": "first"
+  },
+  {
+   "item_id": "S2cbde42c626e",
+   "date_of_update": "2020-02-07",
+   "outcome": "recovered",
+   "type_of_update": "Revised",
+   "availability_information": "This presentation is on backorder.",
+   "related_information": "Availability expected middle of 2020. Product will be made available as it is released.",
+   "stated_end": "2020-08-31",
+   "recovered_after": "2020-07-15",
+   "recovered_by": "2020-08-15",
+   "followed_until": null,
+   "generic_name": "Cefoxitin for Injection, USP",
+   "company_name": "Hikma Pharmaceuticals USA, Inc. (formerly West-Ward)",
+   "form": "a year",
+   "revision": "second"
+  },
+  {
+   "item_id": "S3f696336f862",
+   "date_of_update": "2020-05-20",
+   "outcome": "recovered",
+   "type_of_update": "Revised",
+   "availability_information": "Unavailable. Additional lots are scheduled for release in the June timeframe. Product will be made available as it is released (allocating inventory).",
+   "related_information": "Manufacturing capacity constraint",
+   "stated_end": "2020-06-30",
+   "recovered_after": "2021-05-21",
+   "recovered_by": "2021-08-02",
+   "followed_until": null,
+   "generic_name": "Loxapine Capsules",
+   "company_name": "Lannett Company, Inc.",
+   "form": "a month with no year",
+   "revision": "third or later"
+  }
+ ]
+}
