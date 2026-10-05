@@ -172,11 +172,12 @@ Parsing and harmonisation are implemented in `corpus.py`, frozen by hash at regi
 **Decoding.** Each capture is decoded as utf-8-sig, falling back to latin-1. Leading blank lines
 are skipped, and header names are stripped and mapped to canonical names.
 
-**Malformed rows.** Rows with more cells than their header (unescaped quotes inside
-Presentation or Related Information) are realigned by a fixed rule and flagged, and short rows
-are padded. The builder prints the number of realigned rows for every capture; the registered
-counts (rows kept, rows dropped as duplicate or without a status, rows realigned per capture)
-are **TBD-at-gate**, from the freeze run.
+**Malformed rows.** Rows with more cells than their header (unescaped quotes inside Presentation
+or Related Information) are realigned by a fixed rule and flagged, and short rows are padded.
+The builder prints the number of realigned rows for every capture. The registered counts, from
+the freeze run: 225,289 rows kept over the 110 captures; 634 rows dropped as duplicate or
+without a status; 7 rows realigned among those kept, in 3 captures (5 in `20191020223457`, 1 in
+`20221004081320` and 1 in `20221006172748`) and none in the other 107.
 
 **Field values.**
 
@@ -270,7 +271,8 @@ builder, from the form class of section 2.6:
 
 A statement at risk under B whose text is in none of these (a vague or undated statement, a
 discontinuation statement, or a text whose only date is a distractor) stays in the outcome file
-and enters no outcome analysis set. The count of such statements is **TBD-at-gate**.
+and enters no outcome analysis set. The count of such statements is 245: 35 in the fit split, 10
+in dev, 163 in test and 37 in late.
 
 **The display row.** Readers and annotators see one row per statement event. When the statement
 covers several presentations, one of its presentations at risk under B is drawn by the seeded
@@ -297,10 +299,29 @@ are made, so that the models see what the structured baseline uses (section 8).
 next revision and every other fact from later captures are outcome information, and are stored
 with the outcomes (sealed, for the test period).
 
-**Size.** The counts of presentation-level events and of distinct statement events, by period
-and split, are **TBD-at-gate**, from the freeze run and the dataset builder. The draft's
-expectation of 800 to 1,500 statement events was too low by about a factor of ten (section 16
-gives the counts printed so far).
+**Size.** The freeze run gives 22,727 presentation-level events (9,851 of the train period and
+12,876 of the test period, which includes Late) in 6,866 threads of 1,207 generics, and the
+dataset builder groups them into 13,325 distinct statement events. By split (Train is Fit and
+Dev together):
+
+| | Fit | Dev | Test | Late | Train | All |
+|---|---|---|---|---|---|---|
+| Presentation-level events | 5,516 | 4,335 | 10,165 | 2,711 | 9,851 | 22,727 |
+| on the shortage listing | 4,298 | 3,722 | 8,910 | 2,397 | 8,020 | 19,327 |
+| at risk under A | 3,860 | 3,379 | 8,637 | 2,386 | 7,239 | 18,262 |
+| at risk under B | 2,264 | 2,297 | 5,636 | 1,717 | 4,561 | 11,914 |
+| Statement events | 2,838 | 2,687 | 6,024 | 1,776 | 5,525 | 13,325 |
+| on the shortage listing | 2,333 | 2,351 | 5,462 | 1,628 | 4,684 | 11,774 |
+| at risk under A | 2,193 | 2,242 | 5,349 | 1,623 | 4,435 | 11,407 |
+| at risk under B | 1,482 | 1,639 | 3,772 | 1,225 | 3,121 | 8,118 |
+| at risk under B: dated, not stale at issue | 1,163 | 1,334 | 2,667 | 861 | 2,497 | 6,025 |
+| at risk under B: dated, stale at issue | 9 | 14 | 16 | 5 | 23 | 44 |
+| at risk under B: TBD or unknown | 116 | 134 | 376 | 206 | 250 | 832 |
+| at risk under B: silent | 159 | 147 | 550 | 116 | 306 | 972 |
+| at risk under B: in no analysis set | 35 | 10 | 163 | 37 | 45 | 245 |
+
+The draft's expectation of 800 to 1,500 statement events was too low by about a factor of ten
+(section 16 gives the counts printed before the freeze run).
 
 ### 2.4 Clusters: shortage episodes
 
@@ -324,8 +345,13 @@ Date is not used.
   statements. Train-fitted components and test items then share a cluster. Train censoring
   (section 3) removes the outcome overlap, not the shared cluster. The number of test episodes
   that also hold train statements is reported.
-- The number of episodes in each analysis set, and the number that cross the split, are
-  **TBD-at-gate**.
+- The freeze build holds 301 shortage episodes. 237 hold a train-period statement and 153 a
+  statement dated 2023 or later; 89 hold both, and so cross the split. The dated statements at
+  risk under B that are not stale at issue lie in 123 episodes in the fit split, 121 in dev, 116
+  in test and 53 in late. The E3-eligible statements lie in 115 episodes, 73 of which also hold
+  train statements; the three secondary lists lie in 76 (TBD), 96 (silent) and 13 (stale at
+  issue), of which 52, 59 and 9 also hold train statements. The scoreable statements lie in 106
+  episodes in fit and 74 in dev; the episodes of the scoreable test statements are in section 3.
 
 ### 2.5 Outcomes
 
@@ -432,8 +458,8 @@ held are under-represented.
 - A statement first captured after its stated period had ended stays eligible.
 - A registered sensitivity analysis repeats the E3 analyses on the statements first captured on
   or before `t_end`.
-- The count of eligible statements first captured after `t_end` is **TBD-at-gate**. No
-  tabulation of this set by year, form or company is made before the evaluator runs.
+- The count of eligible statements first captured after `t_end` is 194, of 2,593. No tabulation
+  of this set by year, form or company is made before the evaluator runs.
 
 **Time to recovery.**
 
@@ -482,8 +508,36 @@ another is merged on in turn; month and year, and silent, are never merged away.
 literal-task sample is stratified on the unmerged classes. Templates are the normalised texts
 with months and numbers masked; results are also reported weighted by template.
 
-The final inventory and order, the merge map as applied, and the count per form and split are
-**TBD-at-gate**, from the classifier on the frozen build (its hash is in section 17).
+The final inventory and order are the fifteen classes above, from the classifier on the frozen
+build (its hash is in section 17). Four classes hold fewer than 15 train-period statements at
+risk under B and are merged, each into its named neighbour: relative (5) into range; half of a
+year (3) into quarter; vague (6) into no date; discontinuation (10) into distractor, which holds
+10 itself and 20 with it. Year holds 15 and stays a class of its own. Per-form reports, the
+calibrator and the track-record table therefore use eleven classes, in this order: range
+(relative or range), exact day, part of a month, quarter (half of a year or quarter), year,
+month with no year, month and year, TBD or unknown, no date (vague or no date), distractor
+(discontinuation or distractor), silent. No statement has covered presentations of different
+forms. The count per form and split, as distinct statements at risk under B (Train is Fit and
+Dev together):
+
+| | Form | Fit | Dev | Test | Late | Train | All | Merged into |
+|---|---|---|---|---|---|---|---|---|
+| 1 | relative | 4 | 1 | 13 | 12 | 5 | 30 | range |
+| 2 | range | 43 | 41 | 63 | 6 | 84 | 153 |  |
+| 3 | exact day | 20 | 24 | 18 | 28 | 44 | 90 |  |
+| 4 | part of a month | 87 | 98 | 124 | 44 | 185 | 353 |  |
+| 5 | half of a year | 1 | 2 | 0 | 0 | 3 | 3 | quarter |
+| 6 | quarter | 38 | 49 | 165 | 23 | 87 | 275 |  |
+| 7 | year | 8 | 7 | 19 | 2 | 15 | 36 |  |
+| 8 | month with no year | 20 | 20 | 63 | 3 | 40 | 106 |  |
+| 9 | month and year | 951 | 1,106 | 2,218 | 748 | 2,057 | 5,023 |  |
+| 10 | TBD or unknown | 116 | 134 | 376 | 206 | 250 | 832 |  |
+| 11 | vague | 5 | 1 | 2 | 0 | 6 | 8 | no date |
+| 12 | no date | 16 | 3 | 13 | 2 | 19 | 34 |  |
+| 13 | discontinuation | 9 | 1 | 46 | 27 | 10 | 83 | distractor |
+| 14 | distractor | 5 | 5 | 102 | 8 | 10 | 120 |  |
+| 15 | silent | 159 | 147 | 550 | 116 | 306 | 972 |  |
+| | **All** | 1,482 | 1,639 | 3,772 | 1,225 | 3,121 | 8,118 | |
 
 Statement types are the five of the literal answer schema:
 
@@ -513,9 +567,12 @@ Late).
 - **Dev boundary: 2021-01-01, a fixed date.** The draft's rule (the latest month boundary
   leaving at least 150 scoreable dev events) gives a dev split that is almost all "no" at both
   horizons, because train outcomes stop at 2022-10-06 and no capture exists between 2021-11-30
-  and 2022-10-04 ("Changes from the 29 September draft", item 3). The numbers of scoreable dev
-  and fit statements, their episodes, and the dev outcome mix (the counts of no/no, no/yes and
-  yes/yes on the two horizon events) are **TBD-at-gate**, from the dataset builder.
+  and 2022-10-04 ("Changes from the 29 September draft", item 3). From the dataset builder,
+  on the displayed presentation: the dev split holds 1,334 dated statements in 121 episodes, of
+  which 644 are scoreable, in 74 episodes; 690 have a horizon event left undetermined. The dev
+  outcome mix on the two horizon events is 486 no/no, 82 no/yes and 76 yes/yes. The fit split
+  holds 1,163 dated statements in 123 episodes, of which 803 are scoreable, in 106 episodes (453
+  no/no, 180 no/yes, 170 yes/yes).
 - **Fit outcomes run past the dev boundary.** A fit statement is followed to 2022-10-06, through
   the dev period. A component fitted on the fit split for the dev runs therefore uses recoveries
   dated inside the dev period, and the H3 selection on dev is not a clean forecast evaluation.
@@ -523,11 +580,12 @@ Late).
   and its examples can show a recovery or follow-up date later than the dev item's own date.
   A fit statement can also be an earlier statement of a dev item's thread: its bracket is then
   the dev item's own outcome, which the table counts and an example can show (no example shows
-  the drug, the company or the presentation). No statement is left out for this. The numbers
-  are **TBD-at-gate**, from the manifest of the track-record builder: fit statements with a
-  bracket date on or after 2021-01-01; examples that show such a date; scoreable dev
-  statements whose thread the table follows past their date; and those whose thread an
-  example follows past their date.
+  the drug, the company or the presentation). No statement is left out for this. The numbers,
+  from the manifest of the track-record builder: 741 of the 1,438 fit statements behind the
+  table have a bracket date on or after 2021-01-01; 6 of the 10 examples show such a date; the
+  table follows the thread of 167 of the 644 scoreable dev statements past their date (473 of
+  all 2,687 dev statements); and an example follows the thread of 4 of the scoreable ones (10 of
+  all dev statements; 3 of the 10 examples do so).
   The test evaluation is clean: no train outcome is followed past the train horizon.
 - **Final fits.** After the H3 selection, every model-free predictor is refitted on fit and dev
   together, before any test prediction.
@@ -539,8 +597,14 @@ Late).
   - *One exception, which is first-sight information.* A train-period statement first archived
     in 2023 (dated late in 2022, first seen in the capture of 2023-01-13) has that capture as
     its only usable capture. It has no follow-up, is censored `end_of_train` there when at risk,
-    and that capture date is the only test-period date in its row. The number of such
-    statements is **TBD-at-gate**.
+    and that capture date is the only test-period date in its row. There are 119 such statements
+    on the shortage listing (295 presentation-level events), of which 52 are at risk under B (86
+    events); the track record of fit and dev holds those 52, each censored at its first capture.
+    <!-- the open events table also holds 38 such statements of the discontinuation listing,
+    which enter no outcome analysis: 35 first seen in the capture of 2023-01-13, one in that of
+    2023-05-14 and two in that of 2023-11-14 (computed from events.csv.gz, first-sight fields
+    only; not printed by the dataset builder). Every such statement of the shortage listing was
+    first seen on 2023-01-13. -->
   - Statements dated after 2021-11-30 have at most two days of follow-up in the train period
     (the captures of 2022-10-04 and 2022-10-06), so the dev split scores almost only statements
     dated in 2021.
@@ -553,14 +617,16 @@ Late).
   (2026-09-26). Eligibility uses the statement date, first-sight fields and the stated period,
   never an outcome. The primary analysis uses the scoreable ones.
   - The eligible list is written by the dataset builder and hashed (section 17).
-  - **TBD-at-gate**: the numbers of eligible statements and of their episodes; of scoreable
-    statements and of their episodes; and of eligible statements with a horizon event left
-    undetermined. The scoreable and undetermined counts come from registered code
-    (`sealed_counts.py`) that reads the sealed file once and prints only these counts, the
-    scoreable count of each post-cutoff slice, and the two observable counts of the Gate 1
-    record (section 12), each masked by the rule of the standing rules.
+  - The eligible list holds 2,593 statements in 115 shortage episodes (1,069, 933 and 591
+    statements dated 2023, 2024 and 2025). Of these, 1,903 statements are scoreable, in 106
+    episodes, and 690 have a horizon event left undetermined. These three counts come from
+    registered code (`sealed_counts.py`) that read the sealed file once, in the freeze run of
+    5 October, and printed only these counts, the scoreable count of each post-cutoff slice,
+    and the two observable counts of the Gate 1 record (section 12), each under the masking
+    rule of the standing rules. No count needed a mask.
   - TBD, silent and stale-at-issue test statements at risk under B form three further item
-    lists, each hashed, for E3's secondary analyses. Their sizes are **TBD-at-gate**.
+    lists, each hashed, for E3's secondary analyses. Their sizes are 376 (TBD), 550 (silent) and
+    16 (stale at issue), 942 together, in 76, 96 and 13 episodes.
 - **Post-cutoff slices.** For each model, the slice is the eligible statements dated after the
   last day of its training-cutoff month.
   - The cutoff is the one documented by the model's maker. A model with no documented cutoff
@@ -572,11 +638,13 @@ Late).
     (gpt-4o-mini), 2023-12-31 (llama-3.3-70b), 2024-06-30 (gpt-oss-20b), 2024-08-31
     (gemma-3-27b), 2024-09-30 (qwen-2.5-7b) and 2024-12-31 (deepseek-v3). gemini-3.8-flash and
     grok-4.20, both of March 2026, have no slice.
-  - A slice is analysed only if it holds at least 50 scoreable statements. The size of every
-    slice is **TBD-at-gate** (cutoffs from section 4; counts from the counts-only code). A size
-    may be registered as a lower bound; a bound above 49 meets the rule. A slice whose size is
-    withheld is decided by the evaluator from the exact count after unsealing, by the same
-    rule, before any test of that slice is computed.
+  - A slice is analysed only if it holds at least 50 scoreable statements. The six slices hold
+    1,670, 1,524, 943, 845, 761 and 591 eligible statements, in the order above, of which
+    1,253, 1,121, 679, 607, 549 and 411 are scoreable (cutoffs from section 4; counts from the
+    counts-only code, each an exact count). Every slice meets the rule. The masking rule would
+    have allowed a size to be registered as a lower bound, with a bound above 49 meeting the
+    rule, or to be withheld and decided by the evaluator from the exact count after unsealing;
+    neither was needed.
 - **Samples and their order.** Every sample is drawn by the seeded rule, in this order, so that
   no later sample can change an earlier one:
   1. the pilot, the check set, the reserve check set and the literal-task sample (section 10),
@@ -720,10 +788,17 @@ both context for E3, and neither is a failure.
   leaves the stratum of its form: for the stratum of dated targets beside a distractor date
   when its class is dated, and for the distractor-only stratum otherwise. The *month-and-year
   stratum* is therefore the month-and-year statements with no distractor date.
-- The allocation per stratum is **TBD-at-gate**: the quotas are fixed in the guide's
-  allocation table before the draw, and a stratum with fewer statements than its quota gives
-  all it has. The guide also fixes where a shortfall goes, the share of each quota taken from
-  statements dated 2023 or later (one third), and the caps per text template and per episode.
+- The allocation per stratum, as drawn (in brackets, the items dated 2023 or later): month and
+  year 12 (4); month with no year 10 (3); part of a month 10 (3); quarter, half or year 10 (3);
+  range 10 (3); relative 10 (9); exact day 10 (3); TBD or unknown 12 (4); vague 3 (1); undated
+  5 (2); silent 10 (3); distractor only 6 (2); dated target beside a distractor date 6 (2);
+  discontinuation 6 (2). Every stratum fills its quota: 120 items, 44 of them dated 2023 or
+  later and 108 outside the month-and-year stratum. One train-period relative statement was left
+  to draw under the caps, so that stratum takes nine of its ten items from 2023 on. The quotas
+  are fixed in the guide's allocation table before the draw, and a stratum with fewer statements
+  than its quota gives all it has. The guide also fixes where a shortfall goes, the share of
+  each quota taken from statements dated 2023 or later (one third), and the caps per text
+  template and per episode.
 
 **Gold.** The adjudicated labels of the two annotators (section 10).
 
@@ -1086,10 +1161,12 @@ sides share the same frozen calibrator, so only the literal reading differs.
   and is not selected again in F1. The draft's comparator was the structured-only GBM
   ("Changes from the 29 September draft", item 36).
 - *Why this one.* Of the study's two predictors that read no text, the base rate has the lower
-  primary loss on the scoreable dev statements, which is the rule that selects `m-best`:
-  **TBD-at-gate** (the dev loss of both, their difference with its 95% interval, and both
-  bounds of section 7.2, from the power code on the freeze-run tables). It also had the lower
-  loss in every check made inside the fit split (item 36).
+  primary loss on the scoreable dev statements, which is the rule that selects `m-best`: 0.195
+  against 0.240 for the structured-only GBM on the 644 scoreable dev statements, a difference of
+  0.045 (95% interval 0.025 to 0.070). Under the bounds of section 7.2, over the 1,334 dated dev
+  statements, it is 0.204 against 0.249 with every undetermined horizon event set to no, and
+  0.263 against 0.286 with every one set to yes (from the power code on the freeze-run tables).
+  It also had the lower loss in every check made inside the fit split (item 36).
 - *What the comparator is given.* Like every predictor, it is read at the two horizons, and
   the stated end comes from the rule reading of the text (section 2.5). H3 therefore measures
   what a reading of the notice adds once the length of the stated period is known. It does not
@@ -1140,8 +1217,11 @@ bounds of section 7.2 are reported beside every confirmatory estimate.
 
 **Power.**
 
-- The minimum detectable `Δ` for each hypothesis is **TBD-at-gate**, at 80% power under the Holm
-  worst case of 0.05/6.
+- The minimum detectable `Δ` for each hypothesis, at 80% power under the Holm worst case of
+  0.05/6, at the registered 1,903 scoreable statements in 106 episodes: 0.066 for H1, 0.016
+  for H2 and 0.028 for H3 (0.076, 0.020 and 0.031 from episodes alone). The dev outcome mix
+  behind them is 486 no/no, 82 no/yes and 76 yes/yes, on 644 scoreable dev statements in 74
+  episodes.
 - Each hypothesis has a language model on one side, and no paid call precedes registration. The
   estimate therefore uses one pair of model-free predictors per hypothesis as a proxy: the
   paired loss variance of the pair on the scoreable dev statements, with its inflation from
@@ -1149,7 +1229,10 @@ bounds of section 7.2 are reported beside every confirmatory estimate.
   size-weighted number of statements per episode of the eligible list, scaled by the
   scoreable share. The number of episodes enters only a second figure, "from episodes alone",
   printed beside it. Where a registered number is a lower bound, the bound is used.
-- The pairs are listed here at registration (**TBD-at-gate**). The pairs of H1 and H2 were
+- The pairs, as the power code holds them, each with the comparator first and with its contrast
+  on the scoreable dev statements: for H1, the stated date at face value against rules plus slip
+  (dev `Δ` 0.605); for H2, rules plus slip against the base-rate predictor (0.018); for H3, the
+  base-rate predictor against the text-trained GBM (−0.021). The pairs of H1 and H2 were
   fixed in the power code before it read a dev outcome: face value against rules plus slip
   (H1); rules plus slip against the base-rate predictor (H2). The pair of H3 changed with its
   comparator, after the dev losses had been seen ("Changes from the 29 September draft",
@@ -1250,7 +1333,13 @@ fit statements for the dev runs and from fit and dev statements for the test run
 - *Backoff.* The estimate of form by revision bucket is used when that cell holds at least 100
   dated statements in the fitting set; otherwise the estimate of the form, when the form holds
   at least 100; otherwise the estimate over all dated forms. Statements that are stale at
-  issue are neither counted nor fitted. Which cells meet the minimum is **TBD-at-gate**.
+  issue are neither counted nor fitted. In the fit split (the dev runs) the three cells of the
+  month-and-year form meet the minimum, with 247, 240 and 459 dated statements for the first,
+  the second and the third or later statement; no other form holds 100 (the largest, part of a
+  month, holds 85), so every other cell uses the estimate over all dated forms (1,163
+  statements). In fit and dev together (the test runs) the same three cells meet it, with 309,
+  365 and 1,371; part of a month holds 181, so its cells use the estimate of the form; every
+  other cell uses the estimate over all dated forms (2,497 statements).
 - Given a literal reading with period end `ŝ`: `P(E_end) = F_slip(t_end − ŝ)` and
   `P(E_end90) = F_slip(t_end + 90 − ŝ)`. The quantiles are `ŝ − s` plus the slip quantiles,
   kept within 0 to 365 days.
@@ -1337,7 +1426,8 @@ cap. The rules, which the harness (`read.py`, frozen at F1) enforces:
   alone, named to the harness, because trial, dev and secondary runs share the output root and
   may share a model and condition with a confirmatory run.
 - *The run sheet* lists every run with its model, template, item list and cap; the caps of a
-  model's runs sum to that model's cap. It is **TBD-at-gate**.
+  model's runs sum to that model's cap. It is given under "Run sheet" below, at the registered
+  counts.
 
 Every call is logged with its tokens and its price.
 
@@ -1354,8 +1444,8 @@ reasoning or thinking) × the output price per 1M, at the registered prices of s
   harness, ledger and caps; its prompts and item sets are fixed by its amendment.
 
 **Calls per model.** `N_E` is the number of eligible statements, `N_S` the number of statements
-in the three secondary lists together, and `N_D` the number of scoreable dev statements; all
-three are **TBD-at-gate**.
+in the three secondary lists together, and `N_D` the number of scoreable dev statements. At the
+freeze they are 2,593, 942 (376 TBD, 550 silent and 16 stale at issue) and 644.
 
 | Item set | Calls | Read by |
 |---|---|---|
@@ -1376,26 +1466,108 @@ Repair calls (at most one per failed answer) are not in these counts and count a
 The table below gives the calls without E6; E6 adds about 1,200 to every model but
 gemini-3.8-flash.
 
-| Model | Calls | Cost per call | Estimate | Cap |
-|---|---|---|---|---|
-| gemini-3.8-flash | 320 + 3 `N_E` | ~$0.011 (thinking billed) | **TBD-at-gate** | $110 |
-| grok-4.20 | 1,440 + 3 `N_E` | ~$0.0025 | **TBD-at-gate** | $30 |
-| deepseek-v3 | 8,940 + 3 (`N_E` + `N_S` + `N_D`) | ~$0.0004 | **TBD-at-gate** | $12 |
-| llama-3.3-70b | 8,940 + 3 (`N_E` + `N_S` + `N_D`) | ~$0.00015 | **TBD-at-gate** | $5 |
-| qwen-2.5-7b, gemma-3-27b, gpt-oss-20b, gpt-4o-mini | 1,440 + 3 `N_E` each | ~$0.0001 to $0.00025 | **TBD-at-gate** | $3 each |
-| **All** | | | **TBD-at-gate** | caps $169; reserve $31 |
+| Model | Calls | Cost per call | Estimate | Upper estimate | Cap |
+|---|---|---|---|---|---|
+| gemini-3.8-flash | 320 + 3 `N_E` = 8,099 | $0.00759 (thinking billed) | $61.45 | $156.88 | $110 |
+| grok-4.20 | 1,440 + 3 `N_E` = 9,219 | $0.00168 | $15.51 | $20.93 | $30 |
+| deepseek-v3 | 8,940 + 3 (`N_E` + `N_S` + `N_D`) = 21,477 | $0.00041 | $8.82 | $12.21 | $12 |
+| llama-3.3-70b | 8,940 + 3 (`N_E` + `N_S` + `N_D`) = 21,477 | $0.00013 | $2.82 | $3.95 | $5 |
+| qwen-2.5-7b | 1,440 + 3 `N_E` = 9,219 | $0.00014 | $1.24 | $1.67 | $3 |
+| gemma-3-27b | 1,440 + 3 `N_E` = 9,219 | $0.00011 | $0.99 | $1.34 | $3 |
+| gpt-oss-20b | 1,440 + 3 `N_E` = 9,219 | $0.00021 (reasoning billed) | $1.98 | $4.23 | $3 |
+| gpt-4o-mini | 1,440 + 3 `N_E` = 9,219 | $0.00022 | $2.08 | $2.94 | $3 |
+| **All** | 97,148 | | $94.90 | $204.16 | caps $169; reserve $31 |
 
-The costs per call are those of the 29 September draft: from logged calls of the same models
-where they exist, otherwise token counts times list prices. They are replaced by the cost trial.
+The calls, the costs per call and both estimates are those of the harness's run sheet at these
+counts (`python -m analysis.coling.read --run-sheet`), at the prices of section 4. A call is
+priced from the length of its prompt, rendered on the harness's fixed test item at four
+characters to a token (condition (b) with the track record of fit and dev), and from a typical
+answer of 70 tokens for a predictive template and 90 for a literal one; for gemini-3.8-flash and
+gpt-oss-20b the output also counts the median hidden reasoning of logged calls of the same
+model. The upper estimate is the figure the harness checks before a paid call: the prompt length
+times 1.25, an answer of twice the typical length, and the 90th percentile of hidden reasoning.
+The median understates the mean of a reasoning model: at the draft's cost of about $0.011 a
+call, the 8,099 calls of gemini-3.8-flash come to $89.09. The costs per call of the 29 September
+draft (about $0.011, $0.0025, $0.0004 and $0.00015 for the first four rows, and $0.0001 to
+$0.00025 for the four small models) are withdrawn. All of these are replaced by the cost trial.
+<!-- the table, the check of the caps and the run sheet below are those of `read.py`
+`c7bd46b5b7e3dd46`, which holds the two pilot sentences. They are printed again, with the
+command of this paragraph and the counts above, if that file changes before registration: a
+longer prompt moves every figure. -->
 
-**Check of the caps at the counts printed so far** (**TBD-at-gate**: this paragraph is replaced
-by the table's estimates). With the provisional counts of section 16 and of "Changes", item 3
-(`N_E` 2,585, `N_S` about 1,030, `N_D` 661), the formulas give about 8,100 calls and $89 for
-gemini-3.8-flash, 9,200 calls and $23 for grok-4.20, 22,000 calls each for the primaries ($9
-and $3), and 9,200 calls each for the four small models (under $3 each): about 98,000 calls and
-$130 in all. E6 would add about 8,400 calls and $5, of which $3 for grok-4.20, which then
-stands at about $26 of its $30. Every model is under its cap at these counts, with or without
-E6.
+**Check of the caps at the registered counts.** With `N_E` 2,593, `N_S` 942 and `N_D` 644 the
+formulas give 8,099 calls for gemini-3.8-flash, 9,219 for grok-4.20 and for each of the four
+small models, and 21,477 for each primary: 97,148 calls and an estimate of $94.90 in all,
+against caps of $169. The estimate of every model is under its cap. The upper estimate passes
+the cap for three models: gemini-3.8-flash ($156.88 against $110), gpt-oss-20b ($4.23 against
+$3) and deepseek-v3 ($12.21 against $12). The upper estimates sum to $204.16, above the study
+cap of $200. E6, which is cut, would have added 1,200 calls to every model but gemini-3.8-flash:
+8,400 calls and $3.37 in all (105,548 calls, $98.27), of which $1.90 for grok-4.20, which would
+then stand at $17.41 of its $30; every estimate would stay under its cap, and the upper estimate
+of gpt-4o-mini ($3.32 against $3) would pass its cap as well. The harness refuses a call that
+would take a run past its cap, so no cap is passed: a model whose spend follows its upper
+estimate stops before its runs are complete, and the rules below apply to the projection of the
+cost trial.
+
+**Run sheet.** The runs at the registered counts, without E6, as the harness prints them. A line
+read by one model is one run; a line over several item lists or cells (the three secondary
+lists, the three cells of the 2×2, the three paraphrases) is one run for each, and a run may be
+read in parts.
+
+| Run | Template | Item list | Items | Calls per model | Read by |
+|---|---|---|---|---|---|
+| e2-literal | `literal-v1` | the 120 literal items | 120 | 120 | all eight |
+| e2-literal-free | `literal-free-v1` | the 120 literal items | 120 | 120 | all eight |
+| e3-a | `predictive-v1` | the eligible list | 2,593 | 2,593 | all eight |
+| e3-b | `predictive-track-v1` | the eligible list | 2,593 | 2,593 | all eight |
+| e3-c | `literal-v1` | the eligible list | 2,593 | 2,593 | all eight |
+| e4-probe | `probe-v1` | the probe subset | 300 | 300 | seven (not gemini-3.8-flash) |
+| e5 | `literal-v1` | the minimal pairs | 800 | 800 | seven (not gemini-3.8-flash) |
+| trial-literal | `literal-v1` | the first 20 dev prompt items | 20 | 20 | all eight |
+| trial-literal-free | `literal-free-v1` | the first 20 dev prompt items | 20 | 20 | all eight |
+| trial-a | `predictive-v1` | the first 20 dev prompt items | 20 | 20 | all eight |
+| trial-b | `predictive-track-v1` | the first 20 dev prompt items | 20 | 20 | all eight |
+| trial-probe | `probe-v1` | the first 20 dev prompt items | 20 | 20 | seven (not gemini-3.8-flash) |
+| e3-secondary-a | `predictive-v1` | the three secondary lists | 942 | 942 | primaries |
+| e3-secondary-b | `predictive-track-v1` | the three secondary lists | 942 | 942 | primaries |
+| e3-secondary-c | `literal-v1` | the three secondary lists | 942 | 942 | primaries |
+| dev-a | `predictive-v1` | the scoreable dev statements | 644 | 644 | primaries |
+| dev-b | `predictive-track-v1` | the scoreable dev statements | 644 | 644 | primaries |
+| dev-c | `literal-v1` | the scoreable dev statements | 644 | 644 | primaries |
+| e4-2x2 | `predictive-track-v1` | the 2×2 subset | 300 | 900 | primaries |
+| e3-paraphrases | three paraphrases of `predictive-track-v1`, fixed at F1 | the paraphrase subset | 200 | 600 | primaries |
+| e3-samples | `predictive-v1` | the 20-sample subset | 300 | 6,000 | primaries |
+
+The cap of each run, in dollars. A model's cap is split over its runs in proportion to their
+upper estimates, each share rounded down to $0.0001; the remainder, under one cent, goes to the
+model's largest run, which is e3-b for every model, so that the caps of a model's runs sum to
+its cap. The cap of a line over several lists or cells is split among them in proportion to
+their calls.
+
+| Run | gemini-3.8-flash | grok-4.20 | deepseek-v3 | llama-3.3-70b | qwen-2.5-7b | gemma-3-27b | gpt-oss-20b | gpt-4o-mini |
+|---|---|---|---|---|---|---|---|---|
+| e2-literal | 1.6264 | 0.3728 | 0.0707 | 0.0296 | 0.0372 | 0.0372 | 0.0390 | 0.0384 |
+| e2-literal-free | 1.6030 | 0.2930 | 0.0567 | 0.0239 | 0.0293 | 0.0293 | 0.0380 | 0.0316 |
+| e3-a | 33.8762 | 4.2884 | 0.8415 | 0.3579 | 0.4288 | 0.4288 | 0.7921 | 0.4770 |
+| e3-b | 36.6666 | 13.7950 | 2.5105 | 1.0302 | 1.3799 | 1.3799 | 0.9055 | 1.2887 |
+| e3-c | 35.1457 | 8.0564 | 1.5281 | 0.6397 | 0.8056 | 0.8056 | 0.8428 | 0.8303 |
+| e4-probe |  | 0.4300 | 0.0857 | 0.0367 | 0.0430 | 0.0430 | 0.0908 | 0.0495 |
+| e5 |  | 2.4856 | 0.4714 | 0.1973 | 0.2485 | 0.2485 | 0.2600 | 0.2561 |
+| trial-literal | 0.2710 | 0.0621 | 0.0117 | 0.0049 | 0.0062 | 0.0062 | 0.0065 | 0.0064 |
+| trial-literal-free | 0.2671 | 0.0488 | 0.0094 | 0.0039 | 0.0048 | 0.0048 | 0.0063 | 0.0052 |
+| trial-a | 0.2612 | 0.0330 | 0.0064 | 0.0027 | 0.0033 | 0.0033 | 0.0061 | 0.0036 |
+| trial-b | 0.2828 | 0.1063 | 0.0193 | 0.0079 | 0.0106 | 0.0106 | 0.0069 | 0.0099 |
+| trial-probe |  | 0.0286 | 0.0057 | 0.0024 | 0.0028 | 0.0028 | 0.0060 | 0.0033 |
+| e3-secondary-a |  |  | 0.3057 | 0.1300 |  |  |  |  |
+| e3-secondary-b |  |  | 0.9116 | 0.3738 |  |  |  |  |
+| e3-secondary-c |  |  | 0.5551 | 0.2324 |  |  |  |  |
+| dev-a |  |  | 0.2090 | 0.0888 |  |  |  |  |
+| dev-b |  |  | 0.6232 | 0.2556 |  |  |  |  |
+| dev-c |  |  | 0.3795 | 0.1588 |  |  |  |  |
+| e4-2x2 |  |  | 0.8709 | 0.3572 |  |  |  |  |
+| e3-paraphrases |  |  | 0.5806 | 0.2381 |  |  |  |  |
+| e3-samples |  |  | 1.9473 | 0.8282 |  |  |  |  |
+| **Sum, the model's cap** | 110.0000 | 30.0000 | 12.0000 | 5.0000 | 3.0000 | 3.0000 | 3.0000 | 3.0000 |
 
 **Cost trial.** After registration and before F1, each model runs 20 dev items per template it
 uses. The trial's cost is scaled to the registered call counts and recorded in F1.
@@ -1523,6 +1695,12 @@ checks are not in the guide's table and are added to the figure if E6 runs. The 
 planned on 1 October that A1 and A2 do the pilot and the train-half audit on Friday 2 October
 and the main labelling on 3 to 5 October. A1 and A2 started on Saturday 3 October, with the
 pilot and the train-half audit; the figure must fit the hours they can give.
+<!-- the estimated load comes from the hours table of `AUDIT_GUIDE.md`, section 0, once v1
+carries the measured rates: the literal rate from the check set (`DECISIONS.md`, item 29: the
+sitting times on the pilot sheets include reading the guide) and the audit rate from the
+train-half outcome audit. At the planning rates of the draft the table gives 400 minutes for
+each annotator (175 before registration and 225 after) and 190 for the adjudicator (100 and 90),
+with a range of 250 to 550 minutes per annotator. -->
 
 ## 11. Leakage controls
 
@@ -1609,17 +1787,28 @@ with any later capture of their thread, against a cutoff of 2023-12-31 that had 
 confirmed at source. No scoreable count was printed. On 1 October the builder printed the
 fourth threshold as worded, at the same cutoff, and it was met on the gate set (section 16).
 
-*The registered gate record* is **TBD-at-gate**, in two parts.
+*The registered gate record* is in two parts.
 
-- From the freeze run of the builder, run with the cutoff confirmed in section 4: the four
-  counts on the builder's gate set, as distinct statements with the statement-level bracket
-  under B. Since 1 October the builder prints the fourth as worded, on observable events dated
-  after the cutoff, and keeps the weaker count beside it.
+- From the freeze run of the builder, run with the cutoff confirmed in section 4 (2023-12-31):
+  the four counts on the builder's gate set, as distinct statements with the statement-level
+  bracket under B. Since 1 October the builder prints the fourth as worded, on observable events
+  dated after the cutoff, and keeps the weaker count beside it. The gate set holds 4,328
+  presentation-level events. The four counts: 3,134 distinct statements (600 needed); 1,422 of
+  them observable under B (250 needed; 2,011 events); 123 shortage episodes (100 needed); and
+  834 observable statements dated after 2023-12-31 (150 needed; 1,205 events). The weaker count
+  beside the fourth is 1,947 statements dated after 2023-12-31 with a later capture of their
+  thread, of 1,948. Under A, with no threshold, 405 statements are observable (590 events), 214
+  of them dated after 2023-12-31 (334 events). All four thresholds are met on the gate set.
 - From the counts-only code: the same four counts on the E3-eligible statements (section 3),
   which have a stated date by the frozen rule reading, with the primary outcome (the displayed
-  presentation, definition B); and the scoreable count.
+  presentation, definition B); and the scoreable count. The first and the third are first-sight
+  counts and are met: 2,593 eligible statements (600 needed) in 115 episodes (100 needed). The
+  second and the fourth come from the counts-only code and are met: 1,275 statements have an
+  observable outcome (250 needed), 714 of them dated after 2023-12-31 (150 needed). 1,903
+  statements are scoreable (no threshold).
 
-The gate passes only if the thresholds hold in both parts.
+The gate passes only if the thresholds hold in both parts. They do: Gate 1 passed on the
+freeze run of 5 October.
 
 **Hold triggers.** Any one of these moves the paper to ARR January 2027, which loses COLING 2027
 (October is the last cycle it takes):
@@ -1907,9 +2096,13 @@ moved out of the study folder before registration.
   period is reported only as the count of events whose at-risk flag changes. In the rebuild of
   1 October, 55 presentation-level events in 33 statements became at risk under B (30 events
   dated before 2023 and 25 from 2023), and none left the at-risk set. The author check of the
-  same day rejected no string (section 2.2), so it changes none of these. The registered count
-  is **TBD-at-gate**: the freeze run's events table compared with the events table of
-  29 September as it stands in the repository's history.
+  same day rejected no string (section 2.2), so it changes none of these. The registered count,
+  from the freeze run's events table compared with the events table of 29 September as it stands
+  in the repository's history (commit `cab9b62`): 55 presentation-level events in 33 statements
+  are at risk under B in the freeze run's table and were not in that of 29 September, 30 events
+  in 21 statements dated before 2023 and 25 events in 12 statements from 2023; none left the
+  at-risk set. The two tables hold the same 22,727 events and differ only in the availability
+  class of these 55, which moved from available to other.
 - **FAA advisories of 2026 (from 1 October).** The advisories are collected from 1 October.
   The parser, the statement builder and the linker are developed on the 2024 pilot sample and
   on the development months (April and May 2026); the code refuses any later month until E6's
@@ -1968,47 +2161,91 @@ depend on the pandas version, so the environment is part of the record.
 **Code (hashed at registration).**
 
 - `corpus.py` (events, clusters, outcomes, with the frozen list of rejected availability
-  strings): **TBD-at-gate**.
+  strings): `a44cd27ccddad604`.
 - `rules.py` (the rule reader): `6a810bcb1ae277b9`.
-- `forms.py` (the form classifier) and `manifest.py` (the capture manifest): **TBD-at-gate**.
+- `forms.py` (the form classifier): `b99502d348ea82be`; `manifest.py` (the capture manifest):
+  `b08607c9b6623edf`.
 - The dataset builder (`dataset.py`), the samplers and sheet generators (`audit_sample.py`,
   `audit_outcomes.py`), the agreement code (`audit_agreement.py`), the counts-only code
   (`sealed_counts.py`) and the freeze script that runs them in order and writes the record
-  (`freeze.py`): hashes **TBD-at-gate**.
-- The calibrator (`predictors.py`), both GBMs (`gbm.py`) and the power code (`power.py`):
-  **TBD-at-gate**. If the text-trained GBM is not ready, its code hash moves to F1 by an edit
-  of this line before the push.
-- The track-record builder (`track_record.py`): **TBD-at-gate**. Its two record files and
+  (`freeze.py`): `dataset.py` `2fe95d355d3d5c77`; `audit_sample.py` `67ddfa330cf441d4`;
+  `audit_outcomes.py` `0cb4d4d93eddb8ea`; `audit_agreement.py` `0a040e036d2b7697`;
+  `sealed_counts.py` `22d592e0b65b339b`; `freeze.py` `0850418be7315cb0`.
+- The calibrator (`predictors.py`): `452254cac0cb7817`; both GBMs (`gbm.py`):
+  `1e5eb3791e90b587`; the power code (`power.py`): `6948ee5f2f27e111`. If the text-trained GBM
+  is not ready, its code hash moves to F1 by an edit of this line before the push.
+- The track-record builder (`track_record.py`): `53873bade0dd0e4b`. Its two record files and
   their manifest are hashed in F1, before any call that shows them.
 
 **Tables.**
 
 - Sealed: `external_data/sealed/outcomes_test.csv.gz` and
-  `external_data/sealed/outcomes_train_uncensored.csv.gz`, as printed by the freeze run.
-  **TBD-at-gate.**
+  `external_data/sealed/outcomes_train_uncensored.csv.gz`, as printed by the freeze run of
+  5 October: `67df1acccd9a7174` and `6f4d96d7e18d878a`. The one checking rerun, the same day,
+  gave both hashes and both open tables again.
 - Open: `analysis/coling/out/events.csv.gz` and `analysis/coling/out/outcomes_train.csv.gz`,
-  each as the gzip file and as its decompressed content. **TBD-at-gate.**
-- The E3 eligible list and the three secondary item lists. **TBD-at-gate.**
-- The sample lists of section 3 that are drawn before registration. **TBD-at-gate.**
+  each as the gzip file and as its decompressed content. `events.csv.gz`: gzip file
+  `d8d970a91691e702`, decompressed content `41f723e3debea466`. `outcomes_train.csv.gz`: gzip
+  file `8772acd6b63afa36`, decompressed content `d114076e052819d6`.
+- The E3 eligible list and the three secondary item lists. The eligible list
+  `analysis/coling/out/eligible_e3.csv` (2,593 statements): file `8c12fc3e940f250e`, ids
+  `a65983839e361c6e`. The secondary lists, by their ids: TBD (376 statements)
+  `49466e77d6649d73`; silent (550) `e2e69a03c89c1d2c`; stale at issue (16) `be48aa1e4b00e9f9`.
+- The sample lists of section 3 that are drawn before registration, each as its file under
+  `analysis/coling/out/`. Step 1: the pilot `audit/samples/sample_pilot.csv` (20 rows)
+  `edd0c9c477b83f79`; the check set `audit/samples/sample_check.csv` (20) `eb80b0fc1ceb2485`;
+  the reserve check set `audit/samples/sample_reserve.csv` (20) `6be05e4f1a000cbd`; the
+  literal-task sample `audit/samples/sample_literal.csv` (120) `05fcaf84b77406d7`. Step 2: the
+  train-half outcome-audit sample `audit_outcomes/outcome_train_sample.csv` (56 rows: 50 items
+  and 6 planted) `53a1c2449c26a233`. Step 3: the in-context pool
+  `audit/samples_later/sample_incontext_pool.csv` (50) `ba42ebab7b3d1bb6`; the dev prompt items
+  `audit/samples_later/sample_dev_prompt.csv` (60) `b404466c9a22a1b6`; the minimal-pair seeds
+  `audit/samples_later/sample_pair_seeds.csv` (100) `17caf511bf2bf3e1`. Step 4, drawn by the
+  dataset builder from the eligible list and given by their ids: the probe sample (300)
+  `efbeb16e16ce86ff`; the 20-sample subset (300) `682f734bea32ce6c`; the paraphrase subset (200)
+  `80ba3cf00b14b4d7`; the 2×2 subset (300) `7ed79fa3c0db7e72`; the reference-reading check (100)
+  `d8227bd74cef2485`.
 
 **Annotation.**
 
 - `AUDIT_GUIDE.md` v1: its hash. **TBD-at-gate.**
+  <!-- from `analysis/coling/out/freeze_record.json`, `annotation.guide.sha256` (first 16
+  characters), once the guide's version line says v1 and `annotation.guide.version` is `v1`; the
+  file on disk is still the draft of 1 October. -->
 - The pilot and check-set result (both alphas, the share of identical intervals) and the
   train-half outcome-audit result (confirmed errors for B and for A), with the hashes of the
   submitted sheets. **TBD-at-gate.**
+  <!-- from the agreement code on the two pilot sheets and the two check-set sheets (alpha on
+  the start and on the end month offsets, share of identical intervals), from the scorer of the
+  train-half outcome audit on its two sheets (confirmed errors under B and under A), and the
+  sha256 of each submitted sheet. `DECISIONS.md`, item 29, records the pilot and the train-half
+  audit as returned on 5 October; the check set, which is the gate, is labelled under v1 and is
+  still to come. -->
 - The availability-string check (section 2.2): done on 1 October 2026; 910 strings read, none
   rejected; the list as read has hash `da0bde1baac48473`, re-read at the freeze run.
 
 **Counts.** Every gate value above, with the Gate 1 record (section 12).
 
 **Models.** `MODELS.md` (cutoffs, release dates, routes, endpoints and prices, each with its
-source and retrieval date): its hash, and the table of section 4. **TBD-at-registration.**
+source and retrieval date): its hash, and the table of section 4. As the file stands, its hash
+is `747035397da93c93`, and the table of section 4 is the one it gives. **TBD-at-registration.**
+<!-- the hash is `models.sha256` of `analysis/coling/out/freeze_record.json`. The facts were
+read at their sources on 1 October; `MODELS.md` says under "To repeat the check" that they are
+read again if registration slips, which it has. An edit of `MODELS.md` changes the hash, and a
+changed cutoff is also an edit of `sealed_counts.py`. -->
 
 **Prompts.** The SHA-256 pins of the five templates (`literal-v1`, `literal-free-v1`,
 `predictive-v1`, `predictive-track-v1`, `probe-v1`) as they stand at registration, after the
-text changes of 1 October and the two pilot sentences: **TBD-at-gate**. No call has been made
-under any of these ids, so the pins of 29 September are replaced under the same ids.
+text changes of 1 October and the two pilot sentences. Two pins have not moved since 1 October:
+`predictive-v1` `c0732a5b2d109c60a94e56cd0820a4aa5851786bd01fd31acd3b12c9d47534ed`; `probe-v1`
+`02e8d4338c3532a22615a43c47c54423250bf13474ef3f556925f5c878e8d08e`. Three moved with the edit of
+5 October (the two pilot sentences, and one sentence on the median in the track-record prompt),
+and the harness prints them as: `literal-v1`
+`855244013a7614501ebdd6fbb45c8998f102a877e1299a6d86f81e1359934b27`; `literal-free-v1`
+`ab87cd7525a49965763f78f55d6f8c47f4ca1476f49216a525635f97d6ef2555`; `predictive-track-v1`
+`d0384c1f860d734bd26fa197de0a99e1bcdf520392941b399ef9d0f7b3213483`. The freeze record holds
+all five, each matching its pin, with no sentence pending. No call has been made under any of
+these ids, so the pins of 29 September are replaced under the same ids.
 
 **E6.** Not part of this record. If E6 passes its gate, its own amendment records the hashes
 of `faa_fetch.py`, `faa.py` and `faa_links.py`, the manifest of the collected advisories, the
