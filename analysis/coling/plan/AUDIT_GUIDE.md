@@ -1,9 +1,9 @@
 # Author audit guide
 
-**Version v1 draft, 1 October 2026.** The pilot is labelled under this draft. The pilot meeting
-(section 4) turns it into v1, which is frozen by hash at registration (`PLAN.md`, section 17).
-After that, changes are made only through the adjudication log (section 5) and are listed in the
-changelog at the end.
+**Version v1, 5 October 2026.** The pilot was labelled under the draft of 1 October. The outcome
+of the pilot (section 4) turned that draft into this v1, which is frozen by hash at registration
+(`PLAN.md`, section 17). After that, changes are made only through the adjudication log
+(section 5) and are listed in the changelog at the end.
 
 This guide covers the human labels of the COLING 2027 study "Estimated Recovery: TBD". Two
 annotators (called A1 and A2 in every file; never by name) and one adjudicator (ADJ) do the work.
@@ -24,7 +24,7 @@ statement, appendix A.2 names the statement; the others are bare date forms, wor
 statements share, or made up for the purpose, as are the edited entries of section 7.3. No
 statement dated 2023 or later is quoted anywhere.
 
-This draft follows the decisions of 1 October, recorded in the working note `DECISIONS.md`. A
+This guide follows the decisions of 1 to 5 October, recorded in the working note `DECISIONS.md`. A
 decision that the owner changes is edited here before v1 is hashed. `PLAN.md` and this guide must
 agree at registration: a difference found before then is settled in both before either is
 hashed. Appendix B lists the differences known on 1 October.
@@ -77,8 +77,8 @@ Not in the table:
   cover them.
 - The sheet builder's work is engineering time.
 
-**If the hours do not fit.** Sizes are fixed at the pilot meeting and written into v1 before it
-is hashed; nothing is resized after registration. The reductions that touch no registered test,
+**If the hours do not fit.** Sizes are fixed before v1 is hashed; nothing is resized after
+registration. The reductions that touch no registered test,
 with the minutes each saves per annotator at the planning rates (each one also changes the
 matching line of `PLAN.md` section 10, before registration):
 
@@ -90,7 +90,7 @@ matching line of `PLAN.md` section 10, before registration):
 
 The large blocks (120 literal items, 50 outcomes per half) are fixed in `PLAN.md` and are changed
 only there, by the owner. `PLAN.md` section 10 requires that the total fit the hours A1 and A2
-can give; the owner confirms that at the pilot meeting, with the measured rates.
+can give; the owner confirms that with the rate measured on the check set (section 4).
 
 **Who reads what.** A1 and A2 read sections 1 to 3 and the opening of section 9 (how to edit a
 sheet and its header lines) before the pilot, section 6 before the train-half audit, and
@@ -135,7 +135,7 @@ and the first ones are taken, so a draw does not depend on the order of its inpu
 **Order of work.**
 
 1. ADJ checks the availability strings (12.1), before the corpus is frozen. Done on 1 October.
-2. Pilot under this draft, meeting, revision to v1, check set under v1, gate (section 4).
+2. Pilot under the draft, its outcome, revision to v1, check set under v1, gate (section 4).
 3. Outcome audit, train half, then its adjudication. When it passes, the corpus is frozen.
 4. Registration, with the hash of v1 and of every sample list drawn so far.
 5. Task A, then its agreement statistics, then adjudication, then the gold file is hashed and
@@ -213,8 +213,8 @@ company or the FDA's habits, and do not correct text that looks wrong.
 The statement type, the interval or abstention, the certainty and the quote, with the stale flag
 derived from the interval, are exactly the fields that the models return under the literal
 prompt of `read.py` (`literal-v1`), so the gold can be scored against them field by field. Two
-sentences of that prompt wait for the pilot (D1 and D3 in appendix B; `PILOT_SENTENCES` in
-`read.py`), and the template cannot be run until they are settled and pinned. The abstention
+sentences of that prompt waited for the pilot (D1 and D3 in appendix B; `PILOT_SENTENCES` in
+`read.py`); they were settled on 5 October and are pinned with the template. The abstention
 reason, the distractors and the `hard` flag are extra gold fields.
 
 ### 3.2 Sample
@@ -427,13 +427,17 @@ ranking of `rules.py` (appendix B, D22, lists the corners where `rules.py` leave
 6. A list of times for one type ("Next Delivery: May 2020, July 2020, August 2020 and November
    2020", "Month and Month") is read as separate statements; the first listed is the target. A
    month without a year in such a list takes the year of the next month that has one.
+7. Shipments, releases or deliveries that are made in a stated period are `next_delivery`, also
+   when the entry speaks of allocation: the period says when product arrives, not when the
+   shortage ends. An allocation, a backorder or a limited supply that is said to last through or
+   until a time is `recovery` (C11; worked example 8). [G; settled after the pilot]
 
 ### 3.7 Time conventions
 
 The conventions marked **[P]** are the literal prompt's own words. Those marked **[R]** come
 from the frozen conventions of `rules.py` and fill gaps the prompt leaves open. Those marked **[G]**
-are this guide's own; the pilot checks them. The pilot meeting decides which [R] and [G]
-conventions are written into the prompt (appendix B, D3 and D14), and v1 updates the marks.
+are this guide's own; the pilot checked them. After the pilot the prompt states C11 (appendix B,
+D3); the other [R] and [G] conventions are not written into it (D14).
 Appendix B records the check of these conventions against `rules.py`.
 
 - **C1. Anchor.** Read every time relative to the Date of update shown. [P]
@@ -474,7 +478,8 @@ Appendix B records the check of these conventions against `rules.py`.
 - **C11. "Until", "through", "thru", "till" and "not ... until".** The period named, and nothing
   more: "Estimated shortage until March 2020" is March 2020; "on allocation through February 2021"
   is February 2021; "no plans to manufacture until sometime in 2023" is 2023. "After X", "not
-  sooner than X" and "no earlier than X" are also the period X. [R, G; open point D3]
+  sooner than X" and "no earlier than X" are also the period X. [P for "until" and "through",
+  since the pilot; R, G for the others; D3]
 - **C12. Relative times.** Counted from the Date of update, with a week of 7 days and a month of
   30 days. "Within N", "up to N" or "over the next N": the Date of update to N later. "N to M"
   ("3-18 months", "4-6 weeks"): N later to M later. A single N ("in 6 weeks", "for 3 months"): N
@@ -485,7 +490,10 @@ Appendix B records the check of these conventions against `rules.py`.
   C10), "June 1st, 2022". Numeric dates are month first. [P, R]
 - **C14. Vague times.** A time with no number and no calendar name ("few months", "a couple of
   months", "several weeks", "soon", "shortly", "the near future", "coming weeks", "an extended
-  period", "long-term"): abstain, reason `vague`. [P]
+  period", "long-term"): abstain, reason `vague`. [P] The adverb *temporarily* and the adjective
+  *temporary* are not times, and a remark that availability will be sporadic or intermittent
+  describes the state of supply: neither is a statement about timing, and the rest of the entry
+  is read as if it were not there. [G; settled after the pilot]
 - **C15. Words that do not change the interval.** Approximately, about, around, on or near,
   sometime, timeframe, target, ETA and every certainty marker: "approximately April 2019" is April
   2019; "the June timeframe" is June. [R]
@@ -493,8 +501,8 @@ Appendix B records the check of these conventions against `rules.py`.
   update. Never correct a date that looks like a typing error ("Next release November 2019" dated
   2021-09-23 is November 2019); say so in `note`. [G]
 - **C17. Seasons.** Spring, summer, fall, autumn and winter are not read as calendar names: "winter
-  2021" is the year 2021, and a season with no year abstains as `vague`. Set `hard`. [R, G; open
-  point D13]
+  2021" is the year 2021, and a season with no year abstains as `vague`. Set `hard`. [R, G; D13,
+  kept as it is after the pilot]
 
 **Abstain** (blank `start` and `end`) when the target statement gives no date or period:
 
@@ -530,8 +538,8 @@ be depleted immediately." the target is `asserted`.
 So the certainty of an abstaining target follows from its reason: `tbd` and `no_date` give
 `undetermined`, `vague` gives `estimated`, `no_statement` gives `no_statement`. "Will remain on
 backorder for few months" is `estimated`; "Product will be made available as it is released" is
-`undetermined`. This is how `rules.py` maps its readings to the prompt's classes. It is open point
-D1 (appendix B): the pilot confirms the mapping or changes it.
+`undetermined`. This is how `rules.py` maps its readings to the prompt's classes. It was open
+point D1 (appendix B): both annotators applied this mapping on every pilot item, and it stands.
 
 ### 3.9 Stale
 
@@ -554,7 +562,8 @@ could return as the delivery or recovery time. Record each with its role:
 | `other` | any other time expression that is not a delivery or recovery statement ("will provide an update in X") |
 
 Other delivery or recovery statements (the later items of a list, a next delivery beside the
-target recovery) are not distractors.
+target recovery) are not distractors. A length of expiry dating with no date (so many months of
+dating available by request) is not a distractor either.
 
 ### 3.11 Worked examples
 
@@ -597,9 +606,10 @@ table in examples 2, 4, 5, 14, 15, 17 and 20. Your sheet always shows both field
 
 ### 3.12 Consistency checks run on every sheet
 
-Before submitting, run the validator on your sheet
-(`python -m analysis.coling.audit_sample validate <sheet>`; section 9). It rejects a row, and
-you fix it, when:
+Before a sheet is submitted, the validator is run on it
+(`python -m analysis.coling.audit_sample validate <sheet>`; section 9), by you or, for a sheet
+filled as a workbook (section 9), by the sheet builder, who sends you the rows to fix. It
+rejects a row when:
 
 - `abstain` is 1 and a date is given, or 0 and a date is missing;
 - `start` is after `end`, or a date does not exist;
@@ -627,8 +637,8 @@ is the blank's own file, and one whose blank is missing or changed.
 
 ## 4. Pilot, revision and check set
 
-1. **Pilot (this draft).** 20 train-period items, allocated as in section 3.2. A1 and A2 label
-   them independently under this draft and write the start and end time of the sitting in the
+1. **Pilot (the draft of 1 October).** 20 train-period items, allocated as in section 3.2. A1 and
+   A2 label them independently under the draft and write the start and end time of the sitting in the
    sheet header (`# sitting_start:` and `# sitting_end:`, section 9).
 2. **Agreement.** The agreement script (`audit_agreement.py agree --task pilot`) computes the
    statistics of section 8.1 on the pilot, lists every disagreement, and gives the mean seconds
@@ -650,6 +660,31 @@ is the blank's own file, and one whose blank is missing or changed.
 
    Every change is written into this file as v1 and logged in the changelog. For D1 and D3 the
    meeting also fixes the sentence that goes into the literal prompt.
+
+   **Outcome of the pilot (5 October).** Both sheets were valid. On the 20 items the two
+   annotators gave an interval for the same 13 and the same interval on each of them (alpha 1.0
+   on the start and on the end month offsets); they agreed on abstention and on certainty on all
+   20, and on the statement type on 19. The pilot left no convention in dispute, so no meeting
+   was held: ADJ settled the points from the two sheets, and A1 and A2 received the outcome in
+   writing with this version, before the check set.
+   - The one disagreement: "No current supply" with the Related information "Partial shipments
+     on allocation April-July 2021" was read as `next_delivery` by one annotator and as
+     `recovery` by the other, with the same interval. It is `next_delivery` (section 3.6,
+     rule 7, added for it).
+   - D1: the mapping of section 3.8 stands; both annotators applied it on every item.
+   - D3: C11 stands. "Intermittent supply until the middle of June 2020" was read by both as
+     11 to 20 June 2020.
+   - D13: C17 stands. No pilot item bears on it.
+   - "This presentation is temporarily on backorder" and "Sporadic availability expected" were
+     read by both as saying nothing about timing; C14 now says so.
+   - D14: the prompt is not extended. ADJ marks the gold items whose reading rests on a
+     convention the prompt does not state, and E2 is also reported without those items.
+   - The hours: the sitting times on the pilot sheets include reading the guide, so they give
+     no labelling rate. The rate is measured on the check set, whose instructions ask for the
+     labelling time alone.
+   - The `YYYY-MM` shorthand worked: one annotator used it and one wrote full dates, with the
+     same readings. Both sheets were filled as workbooks (section 9) and converted without a
+     change to any label.
 4. **Check set (v1).** 20 fresh train-period items from the seven dated strata (section 3.2),
    labelled independently under v1.
 5. **Gate.** Krippendorff's alpha (section 8.1) is computed twice over the check set, on the
@@ -1078,9 +1113,12 @@ minimal pairs are not collected in October.
   items, where the generator's gold was corrupted in one field by a seeded rule. The key is
   kept apart from the sheets (section 10); nobody opens it, and the scoring script reads it
   (section 5).
-- **What you see.** The seed entry and its gold; the edited entry (fictitious names); the factor
-  and level; the gold of the edited entry in the fields of section 3.4; and `attested_text`, a real
-  notice that uses the inserted form.
+- **What you see.** The seed entry as every reader gets it (the unedited seed item, with
+  fictitious names) and its gold; the edited entry; the factor and level; the gold of the edited
+  entry in the fields of section 3.4; and `attested_text`, a real train-period notice that uses
+  the inserted form: the sentence or the phrase the edit changes or, for a new time expression,
+  the same writing as the time of a delivery or a recovery. It reads `(nothing inserted)` for
+  the stale and silent factors.
 
 ### 7.2 What you check
 
@@ -1103,7 +1141,7 @@ The seed is Cefoxitin, Fresenius Kabi, dated 2020-08-13, "Backordered. Next rele
 
 | Factor, level | Edited entry | Generator gold | Verdict |
 |---|---|---|---|
-| certainty, estimated | "Backordered. Next release expected October 2020." | next_delivery, 2020-10-01 to 2020-10-31, estimated, not stale | ok ("Next release expected <MON> <YYYY>" is attested) |
+| certainty, expected | "Backordered. Next release expected October 2020." | next_delivery, 2020-10-01 to 2020-10-31, estimated, not stale | ok ("Next release expected <MON> <YYYY>" is attested) |
 | certainty, TBD | "Backordered. Next release date not available at this time." | next_delivery, abstain, undetermined, not stale | ok |
 | granularity, mid | "Backordered. Next release mid-October 2020." | next_delivery, 2020-10-01 to 2020-10-31, asserted | **error**: the interval must be 2020-10-11 to 2020-10-20 (C3) |
 | stale | the same text; Type of update Reverified, dated 2020-11-16 | next_delivery, 2020-10-01 to 2020-10-31, asserted, stale | ok |
@@ -1202,6 +1240,13 @@ One CSV file (UTF-8, comma-separated, every cell quoted, a header row) per annot
   (section 10), and leave the blank where the sheet builder wrote it: the checks compare the
   two. Spreadsheet software may be used. Import every column as text, so that dates and the
   `YYYY-MM` shorthand are not converted, and save back as CSV.
+- **Workbooks.** A sheet may instead be filled as an Excel workbook that the sheet builder
+  makes from the blank sheet (`analysis/coling/sheet_xlsx.py`): the same rows and cells, every
+  cell stored as text, so that nothing is imported or converted. The filled workbook is turned
+  back into the sheet's own layout by the same script, which never guesses a label: it stops on
+  anything it cannot read surely and names every cell it writes otherwise than stored. The
+  validator then runs on the result. The pilot and the train-half outcome audit were filled
+  this way.
 - **Header lines.** The rows above the header row begin with `#` and read `# key: value`. They
   give the task or half, the seed, the guide version and hash, the values each coded column
   takes (task A), and, for task B, the `corpus.py` hash and the horizon. Keep them. The scripts
@@ -1223,7 +1268,9 @@ One CSV file (UTF-8, comma-separated, every cell quoted, a header row) per annot
     the list of items and the shown cells are then unchecked;
   - task B: `python -m analysis.coling.audit_outcomes validate <sheet> --blank <blank sheet>`.
 
-  The scripts of tasks C and E give theirs in their docstrings when they are written.
+  Task C: `python -m analysis.coling.minimal_pairs validate <sheet>`, with `# sitting_start:`
+  and `# sitting_end:` as in task A. The script of task E gives its own in its docstring when
+  it is written.
 - **Submission checks.** For task A, `agree` validates both sheets against the blanks again
   and refuses a sheet that was filled in place (it is then the blank's own file) and one
   whose blank is missing or is not the file the manifest records. For task B, `score`
@@ -1300,7 +1347,8 @@ it, filled, on its second.
 | `ok_type`, `ok_interval`, `ok_certainty`, `ok_stale`, `ok_distractors`, `minimal`, `attested`, `natural` | entered | 1 or 0 |
 | `correct_value`, `note` | entered | when a field is 0 |
 
-The agreement script derives the verdict: `error` if any of the checks before `natural` is 0.
+The scorer (`python -m analysis.coling.minimal_pairs score --a1 <sheet> --a2 <sheet>`) derives
+the verdict: `error` if any of the checks before `natural` is 0.
 
 **Task D: `availability_strings.csv`**, written by `corpus.py`
 
@@ -1333,8 +1381,9 @@ The folders below are the scripts' defaults on 1 October, as `PLAN.md` section 1
 
 - **Blank sheets.** The task A sheets (pilot, check, reserve, literal) go to
   `analysis/coling/out/audit/`, with the matching item file for the reading harness
-  (`<task>_items.jsonl`); the task C and E blanks are to go there too, once their scripts are
-  written. They contain only public notice text, rule readings (task E) and fictitious pairs
+  (`<task>_items.jsonl`); the task C blanks are in `analysis/coling/out/e5/`
+  (`pairs_<A1|A2>.csv`, each with `pairs_<A1|A2>_items.txt`); the task E blanks are to go
+  beside the task A ones, once its script is written. They contain only public notice text, rule readings (task E) and fictitious pairs
   (task C). The task D list is `analysis/coling/out/availability_strings.csv`, where
   `corpus.py` writes it. Train-half task B sheets and traces go to the folder the builder is
   given (`analysis/coling/out/audit_outcomes/` unless another is named); they hold
@@ -1394,11 +1443,11 @@ The folders below are the scripts' defaults on 1 October, as `PLAN.md` section 1
   until `--replace` is given.
 - **Sheets and a revised guide.** A sheet names, in its header, the guide it was written
   under (version and hash). The task A sheets of a set that is labelled under a revised guide
-  are written again from the list on disk (`sheets --task check` after the pilot meeting):
+  are written again from the list on disk (`sheets --task check` once the guide is v1):
   the items stay, the guide line changes. The train-half task B sheets are not written again:
   the set drawn under the draft is validated and scored as it stands after the guide becomes
   v1, since no check compares its guide line with the guide on disk, and section 6 is not
-  among the parts the pilot meeting revises.
+  among the parts the pilot revised.
 - **Item keys of task A.** `analysis/coling/out/audit/keys/<task>_key.csv` links each
   `item_id` to its statement, stratum, form and period, for the agreement script. The form is
   a rule reading, so A1 and A2 do not open this folder (section 2, rule 1).
@@ -1406,7 +1455,10 @@ The folders below are the scripts' defaults on 1 October, as `PLAN.md` section 1
   task B builder writes there unless `--keys` names another folder), and for the test half
   under the sealed folder. Nobody opens them; the scoring script reads them after both sheets
   are returned. The train-half and task C keys are committed with the scores; the test-half
-  key leaves the sealed folder only after the registered evaluator has run.
+  key leaves the sealed folder only after the registered evaluator has run. The gold of the
+  minimal pairs (`e5_gold.csv`) and its rule cross-check are kept in the same folder, since the
+  gold of an item on a task C sheet would show whether it is planted; `e5_manifest.json`
+  records their hashes.
 
 ## 11. ARR Responsible NLP checklist statement
 
@@ -1696,7 +1748,7 @@ guide quotes, whatever the drug, the company and the date (owner's decision of 1
 
 This guide follows the literal prompt of `read.py` wherever the prompt speaks, and `rules.py`
 where the prompt is silent. The rows below record where the documents differed and how each
-point stands. Points marked **open for the pilot** are settled at the pilot meeting (section 4).
+point stands. The points that were open for the pilot were settled on 5 October (section 4).
 `rules.py` is frozen, so a point settled differently from it becomes a known mismatch, listed
 here and disclosed in the paper.
 
@@ -1718,9 +1770,9 @@ more: none occurs only in texts dated 2023 or later, after one cue of section 3.
 
 | # | Point | `read.py` prompt | `rules.py` | This guide | Status |
 |---|---|---|---|---|---|
-| D1 | Certainty of an abstaining target that has no unknown marker | "undetermined" is defined as "the entry says the timing is not known"; a sentence is reserved for this point (`PILOT_SENTENCES`, the last line of the certainty question) | `as_literal_v1`: `vague` gives estimated; `no_date` and `tbd` give undetermined | as `rules.py` (3.8) | **open for the pilot.** The meeting confirms or changes the mapping and fixes the prompt sentence |
+| D1 | Certainty of an abstaining target that has no unknown marker | "undetermined" is defined as "the entry says the timing is not known"; a sentence is reserved for this point (`PILOT_SENTENCES`, the last line of the certainty question) | `as_literal_v1`: `vague` gives estimated; `no_date` and `tbd` give undetermined | as `rules.py` (3.8) | **closed on 5 October.** Both annotators applied the mapping on every pilot item; it stands. The prompt sentence: an entry that gives no date and does not say the timing is unknown is "estimated" when it gives a vague time and "undetermined" when it gives none |
 | D2 | An undated discontinuation against a dated depletion | the order is recovery, next delivery, discontinuation, depletion | the same order; within a type, dated beats TBD beats undated | as both (3.6) | agreed |
-| D3 | "Until X", "through X" | not covered; a sentence is reserved (`PILOT_SENTENCES`, after the convention on "by") | the period X | the period X (C11) | **open for the pilot.** As D1: the meeting confirms C11 and fixes the prompt sentence |
+| D3 | "Until X", "through X" | not covered; a sentence is reserved (`PILOT_SENTENCES`, after the convention on "by") | the period X | the period X (C11) | **closed on 5 October.** C11 stands; both annotators read the one pilot item that bears on it as the period named. The prompt sentence: "until" or "through" a time is that time itself |
 | D4 | "By X" | the Date of update to the end of X | the same, or X itself when X ends before the anchor | as both (C10) | agreed |
 | D5 | "Final date of availability" | the depletion definition includes "until when product remains available" | discontinuation ("final date") | discontinuation (3.6) | agreed with `rules.py`; the prompt's wording overlaps |
 | D6 | "No plans to manufacture until X" | not covered | recovery (a shortage state ending) | recovery, `hard` (H2) | agreed |
@@ -1730,12 +1782,12 @@ more: none occurs only in texts dated 2023 or later, after one cue of section 3.
 | D10 | Fields shown to readers | `ENTRY_BLOCK` shows Therapeutic category and Initial posting date (added on 1 October) and no Status | | 3.3, the same block | closed (decision 6) |
 | D11 | Outcome definitions and audit unit | | `corpus.py`: A, B and BL; one bracket per presentation thread, and a statement-level bracket | section 6: the audit follows the frozen `corpus.py`; the unit is the thread's bracket under B and A; the statement-level bracket is shown, not audited | closed (decision 5 makes the shown presentation's bracket the primary outcome) |
 | D12 | Size of the literal task | | | 120 items double-labelled, a 20-item pilot, a 20-item check set with 20 in reserve | closed (decisions 7 and 10) |
-| D13 | Seasons ("winter 2021", "in the summer") | not covered | with a year, the year (the season word is ignored); with no year, `none` | the year; with no year, `vague` (C17); `hard` | **open for the pilot.** No train-period statement contains a season word. If C17 stays, the yearless case is a known mismatch with `rules.py` |
-| D14 | Conventions the prompt does not state (weeks, parts of a year, "over the next N", calendar units such as "next month", a month followed by a two-digit number, "from X to Y", no clipping, the choice between two statements of one type) | not covered; no sentence is reserved for them | covered (frozen conventions) | C4, C7, C8, C9, C12, C16 and rules 2 to 4 of 3.6, marked [R] or [G] | **open for the pilot.** The gold follows conventions the models are not given. Either a sentence for them is added to the prompt before it is pinned, or ADJ marks the gold items whose reading rests on them and E2 is also reported without those items |
+| D13 | Seasons ("winter 2021", "in the summer") | not covered | with a year, the year (the season word is ignored); with no year, `none` | the year; with no year, `vague` (C17); `hard` | **closed on 5 October.** No train-period statement contains a season word, and no pilot item bears on it. C17 stays; the yearless case is a known mismatch with `rules.py` |
+| D14 | Conventions the prompt does not state (weeks, parts of a year, "over the next N", calendar units such as "next month", a month followed by a two-digit number, "from X to Y", no clipping, the choice between two statements of one type) | not covered; no sentence is reserved for them | covered (frozen conventions) | C4, C7, C8, C9, C12, C16 and rules 2 to 4 of 3.6, marked [R] or [G] | **closed on 5 October.** The gold follows conventions the models are not given. The prompt is not extended: ADJ marks the gold items whose reading rests on them, and E2 is also reported without those items |
 | D15 | Reference reading for E3 | `stated_end` is supplied to the prompt | the frozen rule reading | task E checks 100 eligible statements (12.2); no further author labels in October | closed (decision 4) |
 | D16 | Authors' predictive readings of minimal pairs | | | not collected (section 7) | closed (decision 15) |
 | D17 | Distractor roles | the answer has no distractor field | seven roles, with `availability_until`; in example 17 "May and July delivery" is listed as `other` | six roles; "available until" is `depletion`; delivery mentions are not distractors | closed: the scorer maps `availability_until` to `depletion`; example 17 is a known mismatch |
-| D18 | Forms the rule reader misses | covers "N to M" and a half without a year; says nothing on the others | "Estimated recovery 4-6 weeks" and "Next release 4 to 6 weeks" (no "in", no colon) read as `none`; "Will remain on backorder for 3 months" reads as `none`; "early to mid 2021" reads as May to August; a half with no year ("Estimated recovery: 1H") reads as `none`; a numeric day with no year and no word before it ("Next release 10/5") reads as `none`, though "on 10/5", "by 10/5" and "week of 10/5" are read; "cannot be estimated" is not taken as an unknown marker; "fifth week of May" and "5th week of May" read as the whole month, though "week 5 of May" is read | C12 and C9: 4 to 6 weeks later; 3 months later; January to August. C8: the first occurrence of the half that ends on or after the Date of update, and of the day on or after it. 3.7: an unknown marker, so abstain with `tbd`. C4: days 29 to the last | known mismatch, found by probes on 1 October (not corpus texts); disclosed, not patched |
+| D18 | Forms the rule reader misses | covers "N to M" and a half without a year; says nothing on the others | "Estimated recovery 4-6 weeks" and "Next release 4 to 6 weeks" (no "in", no colon) read as `none`; "Will remain on backorder for 3 months" reads as `none`; "early to mid 2021" reads as May to August; a half with no year ("Estimated recovery: 1H") reads as `none`; a numeric day with no year and no word before it ("Next release 10/5") reads as `none`, though "on 10/5", "by 10/5" and "week of 10/5" are read; "cannot be estimated" is not taken as an unknown marker; "fifth week of May" and "5th week of May" read as the whole month, though "week 5 of May" is read; "middle of Q3 2021", "start of Q3 2021" and "mid of Q3 2021" read as the whole quarter; "mid-2021" reads as `none`; "Shortage is estimated for 18 months" is a recovery only while the text holds nothing else | C12 and C9: 4 to 6 weeks later; 3 months later; January to August. C8: the first occurrence of the half that ends on or after the Date of update, and of the day on or after it. 3.7: an unknown marker, so abstain with `tbd`. C4: days 29 to the last | known mismatch, found by probes on 1 October (not corpus texts); disclosed, not patched |
 | D19 | Sample of the alpha gate | | | the 20-item check set, with the share of identical intervals beside it (section 4) | closed (decision 10) |
 | D20 | Who adjudicates, and who may read model outputs | | | ADJ adjudicates and does not label; A1 and A2 do not read reader outputs on their items before the gold is hashed (section 2, rule 1) | closed (decision 10). The limit on ADJ's looks at items still to be adjudicated is this guide's addition, for the owner to confirm |
 | D21 | Exclusion unit of the train-half outcome sample | | | statement and presentation thread (section 6.2), as `audit_outcomes.py` implements it, not the whole shortage episode of v0 | closed in this draft, for the owner to confirm: the episode rule would leave about a quarter of the train events; this one leaves 5,011 of the 8,020 (62%) in the draw of 1 October, with all four sample lists read. Of the 3,009 left out, 1,826 are on a thread that carries a sampled or appendix A statement; the other 1,183 come from the further step for the thread of the shown row (6.2) |
@@ -1868,3 +1920,18 @@ measure, and the owner's confirmation of the limit on what ADJ looks at (D20).
   - *Pilot (4).* D13 has no pilot item; the meeting settles it on the forms C17 names.
   - Appendix B: the list of differences from `PLAN.md`, redone against the plan of that
     night.
+- **v1, 5 October 2026.** After the pilot (section 4, "Outcome of the pilot"). Both pilot sheets
+  were valid and differed on one statement type in 20 items, so the open points were settled by
+  ADJ from the sheets, without a meeting. D1, D3 and D13 are closed as the draft had them
+  (sections 3.8, C11, C17); the literal prompt now carries the two sentences for D1 and D3. D14
+  is closed without a change to the prompt: ADJ marks the gold items that rest on a convention
+  the prompt does not state. New in section 3: rule 7 of 3.6 (deliveries made in a stated period
+  are a next delivery; a shortage state that lasts through or until a time is a recovery), and
+  in C14 that *temporarily*, *temporary* and a remark on sporadic or intermittent availability
+  say nothing about timing. Section 3.10: a length of expiry dating with no date is not a
+  distractor. Sections 3.12 and 9: a sheet may be filled as a workbook made by `sheet_xlsx.py`
+  and converted back before validation. Section 7 and section 9, after a check of the
+  minimal-pair generator: what an auditor sees, the level name of the first worked example
+  (`expected`), the validator and scorer commands of task C, where its blanks and its gold
+  are kept. Appendix B, D18: three more readings of the rule reader. The labelling rate is
+  measured on the check set, since the pilot's sitting times include reading the guide.
