@@ -2327,6 +2327,12 @@ generator, so these hashes are not in the freeze record; the generator's own man
 (`e5_manifest.json`) carries them. A fix that the minimal-pair audit requires
 (`AUDIT_GUIDE.md` section 7.4) is a dated amendment with new hashes.
 
+**Size simulation (section 6, "Why this test").** `size_check.py`: `b9b01f14e73a980b`. Its output,
+`analysis/coling/out/size_check.json`: `1ce93baffa45a549`, made on the frozen statement table, the
+eligible list and `power.json`, with seed 20261001. The file records its runtime and the
+number of worker processes, so a rerun gives the same figures under another hash. The
+simulation reads no sealed file.
+
 **Annotation.**
 
 - `AUDIT_GUIDE.md` v1: `c7a73851be7246fa`. The check set was labelled under the v1 text of
