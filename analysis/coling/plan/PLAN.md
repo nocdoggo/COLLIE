@@ -1172,9 +1172,9 @@ condition (a).
 **H2: reading in isolation** (two-sided). `Δ = loss(rules + calibrator) − loss(m-c) ≠ 0`. Both
 sides share the same frozen calibrator, so only the literal reading differs.
 
-- *Equivalence.* It is declared when the 90% interval of the registered test ("Intervals",
-  below) lies strictly inside ±0.02 Brier: its lower end above −0.02 and its upper end below
-  0.02. This is part of the H2 reading, but not a separate test in the family.
+- *Equivalence.* It is declared when the registered test rejects, each at 0.05 one-sided, a
+  difference of +0.02 Brier and a difference of −0.02 (the rule is under "Intervals", below).
+  This is part of the H2 reading, but not a separate test in the family.
 - *Caveat.* The stated period that defines the horizon events is the rule reading itself
   (section 2.5), which favours the rules: a model reading that is right where the rule is wrong
   is scored against the rule's horizon. The accuracy of the rule reading on the 100-statement
@@ -1303,13 +1303,28 @@ differences are zero, and the sign-flip test in up to 2.5% under that skew (2.8%
 heavy-tailed episode effects).
 
 **Intervals.** Every confirmatory contrast, and `Δ_GBM`, carries the interval of the values
-`Δ0` that the registered test does not reject: at level `1 − a`, from the smallest `Δ0` whose
-`p_up` is not below `a/2` to the largest `Δ0` whose `p_low` is not below `a/2`. Each end is
-found by bisection between `Δ` and the value 50 standard errors away, in 60 halvings, and is
-the last value not rejected; an end that the test cannot reach is reported as unbounded. The
-level is 95%. H2 also carries its 90% interval. Equivalence is declared when `p_low` at
-`Δ0 = 0.02` and `p_up` at `Δ0 = −0.02` are both below 0.05; that is the rule, and it is what
-the 90% interval lying strictly inside ±0.02 means. In the simulation, at the eligible sizes,
+`Δ0` that the registered test does not reject, at level `1 − a`. The lower end is searched
+with `p_up` and the upper end with `p_low`, each against `a/2`: a bisection between `Δ` and
+the value 50 standard errors away, in 60 halvings, whose result is the last value not
+rejected. An end is unbounded when the value 50 standard errors away is not rejected. When
+the standard error is zero, an end is `Δ` itself if a value one unit away (or `|Δ|` away, if
+that is more) is rejected, and unbounded otherwise. The level is 95%. H2 also carries its 90%
+interval.
+
+*Equivalence* is declared when `p_low` at `Δ0 = 0.02` and `p_up` at `Δ0 = −0.02` are both
+below 0.05. That is the rule. As a rule of thumb it says that the 90% interval lies strictly
+inside ±0.02, but the two can part, because the sign-flip part of the p-value need not fall
+steadily as `Δ0` moves away from `Δ`. In a search over synthetic data they parted only when
+one episode held most of the statements (64% or more), and never at episode sizes like those
+of the eligible list. The paper reports the interval and reads the rule.
+
+Two properties of these intervals follow from the test and not from the data. When the losses
+of the two sides differ in very few episodes, the bootstrap draws that take none of those
+episodes cannot reject, and the interval is unbounded on one side: about three differing
+episodes are needed for an end at 90% and four at 95%. With five or fewer episodes in all,
+every 95% interval is unbounded on both sides.
+
+In the simulation, at the eligible sizes,
 the 95% interval covers the true value in 94.1% to 99.1% of data sets (the percentile interval
 of the draft: 91.1% to 98.7%), and the one-sided error at 0.05 that governs the equivalence
 reading is 3.5% to 6.1% on the H2 proxy (percentile: 4.0% to 8.4%). At the dev sizes these are
@@ -1334,7 +1349,10 @@ every confirmatory estimate.
 
 For H2, where the two sides have the same loss wherever the model's reading is the rule's, the
 paper also reports the number of statements and of episodes on which the two losses differ,
-and how many of those episodes have a positive and a negative sum. When the losses differ in
+and how many of those episodes have a positive and a negative sum. A statement differs, and
+an episode sum has a sign, when it is further from zero than 1e-12 times the largest absolute
+episode sum (at least 1e-12); an episode whose differing statements cancel is counted apart.
+When the losses differ in
 few episodes and mostly in one direction, the registered test does not hold its level either.
 In a further run that is not in the committed output (two generators of a second simulation,
 at the eligible sizes) it rejected a true null at 0.83% in 2.4% of data sets, and in 13% when
