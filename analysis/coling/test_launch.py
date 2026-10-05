@@ -1547,6 +1547,8 @@ def test_blocked_names_every_missing_value(tmp_path: Path, monkeypatch, capsys) 
     # the harness's table has every route entered: the rows are taken back here, to see them named
     unset = {model: rd.Route(rd.ROUTES[model].model_id, rd.UNSET) for model in OPENROUTER}
     monkeypatch.setattr(rd, "ROUTES", rd.ROUTES | unset)
+    # the pilot sentences are settled in the harness: they are taken back too
+    monkeypatch.setattr(rd, "PILOT_SENTENCES", {"D1": None, "D3": None})
     assert lp.main(["plan", *args, "--local-root", str(tmp_path / "local")]) == 0
     plan = lp.load_plan(tmp_path / "out")
     out = capsys.readouterr().out

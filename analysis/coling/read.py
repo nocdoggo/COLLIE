@@ -689,8 +689,8 @@ at-risk entry. Therapeutic category and Initial posting date are shown because t
 baseline uses them."""
 
 # PILOT PLACEHOLDERS ---------------------------------------------------------------------------
-# Two sentences of the literal prompts are settled by the annotation pilot (AUDIT_GUIDE.md,
-# appendix B, decisions D1 and D3). To fill one, replace its ``None`` below with the sentence
+# Two sentences of the literal prompts were settled by the annotation pilot on 5 October 2026
+# (AUDIT_GUIDE.md, appendix B, decisions D1 and D3). To fill one, replace its ``None`` below with the sentence
 # (one line, no "$"), or with "" if the pilot decides that the prompt says nothing; then run
 # ``python -m analysis.coling.read --print-pins`` and copy the new pins of ``literal-v1`` and
 # ``literal-free-v1`` into ``FROZEN_SHA256``. Nothing else needs to change. While a sentence is
@@ -698,10 +698,17 @@ baseline uses them."""
 PILOT_SENTENCES: dict[str, str | None] = {
     # D1: the certainty class of a statement that gives no date and has no unknown marker.
     # Added as the last line of question 3 (certainty), in both literal templates.
-    "D1": None,
+    "D1": (
+        "When the entry gives no date for the statement and does not say that the timing is "
+        'unknown: answer "estimated" if it gives a vague time, such as "a few months", and '
+        '"undetermined" if it gives no time at all, such as "as it is released".'
+    ),
     # D3: how "until X" and "through X" are read. Added as a convention after the one on "by"
     # and "before", in literal-v1 only (literal-free-v1 states no conventions).
-    "D3": None,
+    "D3": (
+        '"Until" or "through" a time: that time itself, read as above, for example "through '
+        'February 2021" is the whole of February 2021.'
+    ),
 }
 # ----------------------------------------------------------------------------------------------
 
@@ -827,7 +834,8 @@ recovered by the end of the stated time, and by 90 days after it. A Turnbull est
 recovery dates that are known only to lie between two captures of the list. Basis says which \
 statements a row's figures rest on: "cell" is the row's own form and revision bucket; where that \
 had fewer than $min_cell statements, the figures are those of every revision of the form \
-("form") or of every form with a stated time ("all dated forms").
+("form") or of every form with a stated time ("all dated forms"). In the last column, a median \
+of 365 means 365 days or more, including never.
 
 $slip_table
 
@@ -1073,17 +1081,18 @@ TEMPLATES: dict[str, PromptTemplate] = {
 }
 
 FROZEN_SHA256 = {
-    "literal-v1": "c710aea4025e0d199e9a36870a9fee864f203e3c7dc6bafe0611e737f10ddf39",
-    "literal-free-v1": "b3e6357207485a8a3353829f4f93e77b9be31fe7ecc0b926e6739bb9ccea9e79",
+    "literal-v1": "855244013a7614501ebdd6fbb45c8998f102a877e1299a6d86f81e1359934b27",
+    "literal-free-v1": "ab87cd7525a49965763f78f55d6f8c47f4ca1476f49216a525635f97d6ef2555",
     "predictive-v1": "c0732a5b2d109c60a94e56cd0820a4aa5851786bd01fd31acd3b12c9d47534ed",
-    "predictive-track-v1": "4dcdd15176a2b93e6c9d87a4f49236ee127ff5b0ad8ddbce12714e9c174447dd",
+    "predictive-track-v1": "d0384c1f860d734bd26fa197de0a99e1bcdf520392941b399ef9d0f7b3213483",
     "probe-v1": "02e8d4338c3532a22615a43c47c54423250bf13474ef3f556925f5c878e8d08e",
 }
 """Pinned template digests, as ``--print-pins`` lists them. Until the freeze amendment F1 a
-prompt edit moves its pin here (no call has been made under any of these ids; the last edit was
-on 1 October 2026: entry fields, probe fields, the track-record sentence). The two literal pins
-move once more, when the pilot sentences are filled. From F1 on, changing a prompt means a new
-template id, not an edit."""
+prompt edit moves its pin here (no call has been made under any of these ids). The edit of
+1 October 2026 changed the entry fields, the probe fields and the track-record sentence. The edit
+of 5 October 2026, after the pilot, filled the two pilot sentences of the literal prompts (D1 and
+D3) and added to the track-record prompt that a median of 365 means 365 days or more. From F1
+on, changing a prompt means a new template id, not an edit."""
 
 
 def check_frozen() -> None:
