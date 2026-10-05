@@ -63,8 +63,9 @@ from itertools import zip_longest
 from pathlib import Path
 from typing import Any
 
-FIRST_ENTERED = ("statement_type", "verdict_B")
-"""The first column an annotator fills, on a literal-reading sheet and on an outcome sheet."""
+FIRST_ENTERED = ("statement_type", "verdict_B", "ok_type")
+"""The first column an annotator fills, on a literal-reading sheet, on an outcome sheet and on
+a minimal-pair sheet (task C)."""
 OUTCOME_LISTS = {
     "verdict_B": ("ok", "error", "cannot_tell"),
     "verdict_A": ("ok", "error", "cannot_tell"),
@@ -73,6 +74,21 @@ OUTCOME_LISTS = {
 }
 """Closed value sets of the outcome sheet (``VERDICTS`` and ``TYPES`` of ``audit_outcomes.py``).
 The literal-reading sheet names its own in its ``# values of ...`` lines."""
+PAIR_LISTS = {
+    name: ("1", "0")
+    for name in (
+        "ok_type",
+        "ok_interval",
+        "ok_certainty",
+        "ok_stale",
+        "ok_distractors",
+        "minimal",
+        "attested",
+        "natural",
+    )
+}
+"""Closed value sets of the minimal-pair sheet: its eight marks (``ERROR_CHECKS`` and
+``natural`` of ``minimal_pairs.py``), which its ``# values of ...`` lines describe in words."""
 SINGLE_VALUED = ("statement_type", "abstain", "abstain_reason", "certainty", "hard")
 """Columns of the literal-reading sheet that hold one value of a closed set."""
 WIDE = 45
@@ -173,7 +189,7 @@ def value_lists(sheet: Sheet) -> dict[str, tuple[str, ...]]:
             text = match.group(2).split("(")[0]
             parts = [p.strip() for p in re.split(r"\||\bor\b", text) if p.strip()]
             found[match.group(1)] = tuple(parts)
-    found |= {k: v for k, v in OUTCOME_LISTS.items() if k in sheet.header}
+    found |= {k: v for k, v in (OUTCOME_LISTS | PAIR_LISTS).items() if k in sheet.header}
     return {k: v for k, v in found.items() if k in sheet.header}
 
 

@@ -862,7 +862,8 @@ def test_the_workbook_names_nobody(literal: Path) -> None:
         "xl/worksheets/sheet1.xml",
     }
     people = dict(re.findall(r"<(?:dc|cp):(creator|lastModifiedBy)[^>]*>([^<]*)</", core))
-    assert people == {"creator": "", "lastModifiedBy": ""}
+    # an element written empty or left out names nobody (the library does either)
+    assert set(people) <= {"creator", "lastModifiedBy"} and set(people.values()) <= {""}
 
 
 # --------------------------------------------------------------------------------------------
@@ -2014,5 +2015,62 @@ def test_a_handed_out_workbook(name: str, blank: Path) -> None:
     with zipfile.ZipFile(path) as archive:
         core = archive.read("docProps/core.xml").decode("utf-8")
     people = dict(re.findall(r"<(?:dc|cp):(creator|lastModifiedBy)[^>]*>([^<]*)</", core))
-    assert people == {"creator": "", "lastModifiedBy": ""}
+    # an element written empty or left out names nobody (the library does either)
+    assert set(people) <= {"creator", "lastModifiedBy"} and set(people.values()) <= {""}
     assert path.read_bytes() == before
+
+
+# --- the sheet of the minimal-pair audit (task C) ---
+
+PAIR_MARKS = (
+    "ok_type",
+    "ok_interval",
+    "ok_certainty",
+    "ok_stale",
+    "ok_distractors",
+    "minimal",
+    "attested",
+    "natural",
+)
+PAIR_ENTERED = (*PAIR_MARKS, "correct_value", "note")
+
+
+def pairs_text() -> str:
+    """A blank sheet of the minimal-pair audit: entries of several lines, ten columns to fill."""
+    shown = study_constants("minimal_pairs.py", {"SHOWN"})["SHOWN"]
+    out = io.StringIO(newline="")
+    writer = csv.writer(out, lineterminator="\n", quoting=csv.QUOTE_ALL)
+    for line in (
+        "# task: C minimal-pair audit (AUDIT_GUIDE.md section 7)",
+        "# sheet: pairs",
+        "# annotator: A1",
+        "# values of minimal: 1 when the edit changes only the named factor, else 0",
+        "# values of note: free text; required when minimal or attested is 0",
+        "# sitting_start:",
+        "# sitting_end:",
+    ):
+        writer.writerow([line])
+    writer.writerow([*shown, *PAIR_ENTERED])
+    for n in ("1", "2"):
+        entry = f'Entry\n- Drug: Name{n} Injection\n- Related information: "Next release TBD"'
+        cells = dict.fromkeys(shown, "")
+        cells |= {"pair_id": f"P{n}", "seed_id": f"S{n}", "factor": "certainty", "level": "tbd"}
+        cells |= {"seed_entry": entry, "edited_entry": entry, "attested_text": "Next release TBD"}
+        writer.writerow([*cells.values(), *[""] * len(PAIR_ENTERED)])
+    return out.getvalue()
+
+
+def test_a_minimal_pair_sheet_has_its_columns_to_fill_and_its_lists(tmp_path: Path) -> None:
+    checks = study_constants("minimal_pairs.py", {"SHOWN", "CHECKS"})
+    assert (*checks["CHECKS"], "minimal", "attested", "natural") == PAIR_MARKS
+    blank = written(tmp_path, "pairs_A1.csv", pairs_text())
+    sheet = X.read_csv_sheet(blank)
+    assert X.first_entered(sheet.header) == len(checks["SHOWN"])
+    assert X.value_lists(sheet) == dict.fromkeys(PAIR_MARKS, ("1", "0"))
+    book = blank.with_suffix(".xlsx")
+    X.to_xlsx(blank, book)
+    letters = [X.column_letter(sheet.header.index(name) + 1) for name in PAIR_MARKS]
+    assert sorted(lists_of(book)) == sorted(letters)
+    assert len(cells_to_fill(blank)) == 2 * len(PAIR_ENTERED) + 2
+    back, problems, notes = X.to_csv(book, blank)
+    assert back.encode("utf-8") == blank.read_bytes() and not problems and not notes
