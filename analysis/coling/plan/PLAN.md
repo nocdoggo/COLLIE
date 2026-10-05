@@ -2749,7 +2749,7 @@ quoted here are from the build of 29 September.
     contrasts and of `Δ_GBM` are those of that test, and H2's equivalence is read from it;
     the draft's p-values, its interval and its sign-flip test are sensitivity analyses
     outside Holm's rule; the power paragraph says what the test costs; the E4 probe rule uses
-    the same test (sections 5 and 6). **[owner to confirm]** *Seen:* train outcomes and the
+    the same test (sections 5 and 6). *Seen:* train outcomes and the
     dev losses of the model-free predictors, from which the simulation builds its paired
     differences; the episode sizes of the eligible list and the registered number of
     scoreable test statements (test-period event counts); no model output (no model had been
@@ -2776,7 +2776,7 @@ quoted here are from the build of 29 September.
     model-free test predictions, the secondary scorers); where E7's error classes are
     fixed. The standing rule on sealing is wider than the draft's: scripts other than the
     evaluator read the sealed files, each only after the evaluator has run, and one may be
-    hashed after F1, by an amendment pushed before its first read. **[owner to confirm]**
+    hashed after F1, by an amendment pushed before its first read.
     *Seen:* as item 38. *Why:* the registered text and the code that will run must agree
     before either is frozen, and the evaluator does not compute every registered secondary.
     No hypothesis, sample or metric changes.
@@ -2789,8 +2789,10 @@ endpoint (item 16), the E6 gate rule and the reading of a route extension (item 
 four sample rules of item 35. The other items, item 36
 included, were provisional rules of 1 October; the owner confirmed them as written on
 3 October. Item 37 is the owner's decision of 5 October. Items 38 and 39 follow the simulation
-and the review of the evaluator of 5 October; each waits for the owner's confirmation (its
-tag).
+and the review of the evaluator of 5 October. The owner decided both that evening. Three
+tests were put to the owner: the one of section 6; the same with H1 two-sided; and the draft's
+percentile p-values with their size disclosed. The owner chose the one of section 6, and
+confirmed the sealing rule of item 39 as written.
 
 **Corrections of the text to the code as it stood on 29 September** (the builder did not change
 for these; the draft described it wrongly). *Seen:* train outcomes; the builder had been tested
