@@ -1,0 +1,826 @@
+{
+ "about": "Record of the corpus freeze (PLAN.md section 17): hashes and counts only. The sealed hashes are those the builder printed; nothing under the sealed folder was opened.",
+ "mode": "freeze",
+ "status": "complete",
+ "seed": 20261001,
+ "inputs": {
+  "cutoff": "2023-12-31",
+  "captures": "external_data/fda_wayback_csv",
+  "plan_states": {
+   "rules.py": "6a810bcb1ae277b9",
+   "capture_manifest.csv": "8104e4f23dd0c7b5",
+   "availability_strings.csv": "da0bde1baac48473",
+   "uv.lock": "3308eeb43cb51580"
+  },
+  "commit": "ba7de793353436519ea2663caef25394ceedf90b",
+  "started": "2026-10-05T21:07:28Z",
+  "finished": "2026-10-05T21:09:30Z"
+ },
+ "environment": {
+  "python": "3.12.11",
+  "lock_file": {
+   "file": "uv.lock",
+   "sha256": "3308eeb43cb51580eb8f6cf20151fd34475279b5aa14da72c078dbe2d4ce6fd8"
+  },
+  "packages": {
+   "pandas": "2.3.3",
+   "numpy": "2.5.2",
+   "scikit-learn": "1.9.0",
+   "scipy": "1.18.1"
+  }
+ },
+ "tables": {
+  "open": {
+   "events.csv.gz": {
+    "gzip_sha256": "d8d970a91691e702bacc27ae4d0605122a4170d275f7786bf066212a8d8aa145",
+    "content_sha256": "41f723e3debea466ca3e1cba5a676eff6526077eb65e8bab9a99449fe3e662a0"
+   },
+   "outcomes_train.csv.gz": {
+    "gzip_sha256": "8772acd6b63afa36ccf311a8495a5b3d593be74ba8847654561cbcb840aa91d5",
+    "content_sha256": "d114076e052819d64861d3d24eaaf5a07648940a35503a417c9db74ca08f8a63"
+   }
+  },
+  "eligible_list": {
+   "file": "analysis/coling/out/eligible_e3.csv",
+   "sha256": "8c12fc3e940f250e0a3426ef74355177431273db02736357a946dabb97ef7482",
+   "ids_sha256": "a65983839e361c6e309709930b16d80f4ad0c0cd6a3fc4ce2d841879b25988cf",
+   "statements": 2593
+  },
+  "secondary_lists": {
+   "tbd": {
+    "ids_sha256": "49466e77d6649d735117f42e8e65755c3c59ddba06c4978c74bbbc8bf5ed58b6",
+    "statements": 376
+   },
+   "silent": {
+    "ids_sha256": "e2e69a03c89c1d2c58abef63b67a910f4ec6a5848d6613d4a4e7fd1958e8e54d",
+    "statements": 550
+   },
+   "stale": {
+    "ids_sha256": "be48aa1e4b00e9f9c748650941f1c52195f3b8187f83395205a13bbbd962e04b",
+    "statements": 16
+   }
+  },
+  "sealed": {
+   "outcomes_test.csv.gz": "67df1acccd9a7174f5a7ab22f91cc98e2811db7b3d4808ad9c795113ffa57cdf",
+   "outcomes_train_uncensored.csv.gz": "6f4d96d7e18d878a541c5d6b467db553c0cf02a8973dd3aa46a3bb422ae915a8"
+  }
+ },
+ "steps": [
+  {
+   "name": "capture manifest",
+   "command": "PYTHONPATH=. python -m analysis.coling.manifest --check --pin 8104e4f23dd0c7b5",
+   "sealed": false,
+   "writes": [],
+   "status": "ok",
+   "exit_status": 0,
+   "started": "2026-10-05T21:07:28Z",
+   "finished": "2026-10-05T21:07:29Z",
+   "lines": [
+    "manifest analysis/coling/out/capture_manifest.csv sha256 8104e4f23dd0c7b560df4bfb91d141111f7d1f696fb7adbeaddd094efc9db137",
+    "external_data/fda_wayback_csv: as in the manifest"
+   ]
+  },
+  {
+   "name": "availability strings",
+   "command": "PYTHONPATH=. python -c 'from analysis.coling import corpus; corpus.write_availability_strings()'",
+   "sealed": false,
+   "writes": [
+    "analysis/coling/out/availability_strings.csv"
+   ],
+   "status": "ok",
+   "exit_status": 0,
+   "started": "2026-10-05T21:07:29Z",
+   "finished": "2026-10-05T21:07:39Z",
+   "lines": []
+  },
+  {
+   "name": "template pins",
+   "command": "PYTHONPATH=. python -m analysis.coling.read --print-pins",
+   "sealed": false,
+   "writes": [],
+   "status": "ok",
+   "exit_status": 0,
+   "started": "2026-10-05T21:07:39Z",
+   "finished": "2026-10-05T21:07:39Z",
+   "lines": [
+    "{",
+    "  \"read_py_sha256\": \"c7bd46b5b7e3dd4628c095cdf3816a4d810d83cc4d4576fc7709ff2f028bbeb0\",",
+    "  \"schemas_sha256\": \"04705846e804d9a24541fdc16619c2e31e12539386829558da7edc4118294bb8\",",
+    "  \"templates\": {",
+    "    \"literal-free-v1\": {",
+    "      \"kind\": \"literal\",",
+    "      \"matches_pin\": true,",
+    "      \"pending\": [],",
+    "      \"pinned\": \"ab87cd7525a49965763f78f55d6f8c47f4ca1476f49216a525635f97d6ef2555\",",
+    "      \"sha256\": \"ab87cd7525a49965763f78f55d6f8c47f4ca1476f49216a525635f97d6ef2555\"",
+    "    },",
+    "    \"literal-v1\": {",
+    "      \"kind\": \"literal\",",
+    "      \"matches_pin\": true,",
+    "      \"pending\": [],",
+    "      \"pinned\": \"855244013a7614501ebdd6fbb45c8998f102a877e1299a6d86f81e1359934b27\",",
+    "      \"sha256\": \"855244013a7614501ebdd6fbb45c8998f102a877e1299a6d86f81e1359934b27\"",
+    "    },",
+    "    \"predictive-track-v1\": {",
+    "      \"kind\": \"predictive\",",
+    "      \"matches_pin\": true,",
+    "      \"pending\": [],",
+    "      \"pinned\": \"d0384c1f860d734bd26fa197de0a99e1bcdf520392941b399ef9d0f7b3213483\",",
+    "      \"sha256\": \"d0384c1f860d734bd26fa197de0a99e1bcdf520392941b399ef9d0f7b3213483\"",
+    "    },",
+    "    \"predictive-v1\": {",
+    "      \"kind\": \"predictive\",",
+    "      \"matches_pin\": true,",
+    "      \"pending\": [],",
+    "      \"pinned\": \"c0732a5b2d109c60a94e56cd0820a4aa5851786bd01fd31acd3b12c9d47534ed\",",
+    "      \"sha256\": \"c0732a5b2d109c60a94e56cd0820a4aa5851786bd01fd31acd3b12c9d47534ed\"",
+    "    },",
+    "    \"probe-v1\": {",
+    "      \"kind\": \"predictive\",",
+    "      \"matches_pin\": true,",
+    "      \"pending\": [],",
+    "      \"pinned\": \"02e8d4338c3532a22615a43c47c54423250bf13474ef3f556925f5c878e8d08e\",",
+    "      \"sha256\": \"02e8d4338c3532a22615a43c47c54423250bf13474ef3f556925f5c878e8d08e\"",
+    "    }",
+    "  }",
+    "}"
+   ]
+  },
+  {
+   "name": "open tables",
+   "command": "PYTHONPATH=. python -c 'from analysis.coling import corpus; corpus.open_build(cutoff=\"2023-12-31\")'",
+   "sealed": false,
+   "writes": [
+    "analysis/coling/out/events.csv.gz",
+    "analysis/coling/out/outcomes_train.csv.gz"
+   ],
+   "status": "ok",
+   "exit_status": 0,
+   "started": "2026-10-05T21:07:39Z",
+   "finished": "2026-10-05T21:08:05Z",
+   "lines": [
+    "capture manifest: verified",
+    "captures read: 110; skipped: 0",
+    "rows kept: 225289; dropped (duplicate or no status): 634; realigned among those kept: 7",
+    "realigned rows as read, per capture: 7 in 3 of 110 captures (none in the others)",
+    "  20191020223457: 5",
+    "  20221004081320: 1",
+    "  20221006172748: 1",
+    "availability strings rejected by the author: 0 (0 of them in no capture)",
+    "threads: 6866; generics: 1207; events: 22727 (train 9851, test 12876)",
+    "capture gaps:",
+    "  captures: 110",
+    "  capture_days: 109",
+    "  first: 2019-10-20",
+    "  last: 2026-09-26",
+    "  per_year: {2019: 2, 2020: 16, 2021: 10, 2022: 2, 2023: 9, 2024: 20, 2025: 16, 2026: 34}",
+    "  median_gap_days: 9.0",
+    "  share_gaps_le_31: 0.815",
+    "  gaps_over_60_days: ['2019-10-20..2019-12-29 (70 d)', '2019-12-29..2020-04-02 (95 d)', '2020-04-02..2020-06-12 (71 d)', '2021-05-21..2021-08-02 (73 d)', '2021-11-30..2022-10-04 (308 d)', '2022-10-06..2023-01-13 (99 d)', '2023-05-14..2023-11-14 (184 d)', '2024-07-18..2024-09-29 (73 d)', '2025-03-18..2025-06-08 (82 d)', '2025-08-03..2025-12-09 (128 d)']",
+    "Gate 1: shortage events dated 2023-01-01..2025-12-31, Current at statement, with a date-like phrase",
+    "  statement events 4328; distinct statements 3134 (need >= 600)",
+    "  observable outcome (bracket <= 31 d), definition B: presentation-level events 2011, distinct statements 1422 (need >= 250)",
+    "  observable outcome (bracket <= 31 d), definition A: presentation-level events 590, distinct statements 405 (secondary, no threshold)",
+    "  shortage episodes 123 (need >= 100)",
+    "  dated after 2023-12-31, observable outcome, definition B: presentation-level events 1205, distinct statements 834 (need >= 150)",
+    "  dated after 2023-12-31, observable outcome, definition A: presentation-level events 334, distinct statements 214 (secondary, no threshold)",
+    "  dated after 2023-12-31: events 2679, distinct statements 1948; with follow-up 2677, distinct with follow-up 1947 (no threshold)",
+    "wrote analysis/coling/out/events.csv.gz sha256 d8d970a91691e702bacc27ae4d0605122a4170d275f7786bf066212a8d8aa145",
+    "wrote analysis/coling/out/outcomes_train.csv.gz sha256 8772acd6b63afa36ccf311a8495a5b3d593be74ba8847654561cbcb840aa91d5"
+   ]
+  },
+  {
+   "name": "form readings",
+   "command": "PYTHONPATH=. python -m analysis.coling.forms --check",
+   "sealed": false,
+   "writes": [],
+   "status": "ok",
+   "exit_status": 1,
+   "started": "2026-10-05T21:08:05Z",
+   "finished": "2026-10-05T21:08:08Z",
+   "lines": [
+    "differs from a fresh run: analysis/coling/out/form_counts.json"
+   ]
+  },
+  {
+   "name": "form counts",
+   "command": "PYTHONPATH=. python -m analysis.coling.forms",
+   "sealed": false,
+   "writes": [
+    "analysis/coling/out/form_counts.json",
+    "analysis/coling/out/rule_readings_train_golden.csv.gz"
+   ],
+   "status": "ok",
+   "exit_status": 0,
+   "started": "2026-10-05T21:08:08Z",
+   "finished": "2026-10-05T21:08:11Z",
+   "lines": [
+    "statements by form and split, population at_risk_B:",
+    "  form                fit    dev   test   late  train    all",
+    "  relative              4      1     13     12      5     30",
+    "  range                43     41     63      6     84    153",
+    "  exact_day            20     24     18     28     44     90",
+    "  part_of_month        87     98    124     44    185    353",
+    "  half_year             1      2      0      0      3      3",
+    "  quarter              38     49    165     23     87    275",
+    "  year                  8      7     19      2     15     36",
+    "  month_no_year        20     20     63      3     40    106",
+    "  month_year          951   1106   2218    748   2057   5023",
+    "  tbd                 116    134    376    206    250    832",
+    "  vague                 5      1      2      0      6      8",
+    "  no_date              16      3     13      2     19     34",
+    "  discontinuation       9      1     46     27     10     83",
+    "  distractor            5      5    102      8     10    120",
+    "  silent              159    147    550    116    306    972",
+    "merged class range: relative, range",
+    "merged class quarter: half_year, quarter",
+    "merged class no_date: vague, no_date",
+    "merged class distractor: discontinuation, distractor",
+    "statements with mixed member forms: 0",
+    "golden rows: 3721 sha256 aa70c7b359b800f3",
+    "wrote analysis/coling/out/form_counts.json and analysis/coling/out/rule_readings_train_golden.csv.gz"
+   ]
+  },
+  {
+   "name": "sample lists",
+   "command": "PYTHONPATH=. python -m analysis.coling.audit_sample draw --fixed pilot check reserve literal",
+   "sealed": false,
+   "writes": [
+    "analysis/coling/out/audit/samples/sample_pilot.csv",
+    "analysis/coling/out/audit/samples/sample_check.csv",
+    "analysis/coling/out/audit/samples/sample_reserve.csv",
+    "analysis/coling/out/audit/samples/sample_literal.csv",
+    "analysis/coling/out/audit/samples/strata.csv",
+    "analysis/coling/out/audit/manifest.json"
+   ],
+   "status": "ok",
+   "exit_status": 0,
+   "started": "2026-10-05T21:08:11Z",
+   "finished": "2026-10-05T21:08:16Z",
+   "lines": [
+    "appendix_a_rows: 58",
+    "appendix_a_rows_matching_no_event: 0",
+    "fixed_test_item_statements: 1",
+    "fixed_test_item_in_appendix_a: True",
+    "excluded_statements: 156",
+    "guide_phrases: 114",
+    "statements_equal_to_a_guide_phrase: 733",
+    "excluded_statements_with_guide_phrases: 844",
+    "guide phrases: frame statements whose whole text equals one (13 cells)",
+    "  stratum          period               frame        appendix_a equal_to_a_phrase           removed",
+    "  distractor       train                   63                 7                 1                 0",
+    "  month_year       train                 2101                45                36                27",
+    "  no_date          test                   115                 0                 6                 6",
+    "  no_date          train                   97                 0                 6                 6",
+    "  part_of_month    train                  203                18                 3                 0",
+    "  quarter          train                  109                 6                 4                 1",
+    "  range            train                  101                 9                 3                 0",
+    "  relative         train                    6                 1                 1                 0",
+    "  silent           test                  2385                 3               329               327",
+    "  silent           train                 1386                35               174               159",
+    "  tbd              test                   582                 0               134               134",
+    "  tbd              train                  243                14                30                24",
+    "  vague            train                    6                 2                 2                 1",
+    "  sample          stratum          period        pool available     quota     drawn",
+    "  pilot           month_year       train         2029       254         1         1",
+    "  pilot           month_no_year    train           34        26         2         2",
+    "  pilot           part_of_month    train          185       112         2         2",
+    "  pilot           quarter          train          102        83         2         2",
+    "  pilot           range            train           92        35         2         2",
+    "  pilot           relative         train            5         5         1         1",
+    "  pilot           exact_day        train           40        18         2         2",
+    "  pilot           tbd              train          205       112         2         2",
+    "  pilot           vague            train            3         3         1         1",
+    "  pilot           no_date          train           91        23         1         1",
+    "  pilot           silent           train         1192       190         1         1",
+    "  pilot           distractor       train           56        39         1         1",
+    "  pilot           dated_distractor train           23        19         1         1",
+    "  pilot           discontinuation  train           10         7         1         1",
+    "  check           month_year       train         2028       240         4         4",
+    "  check           month_no_year    train           32        24         3         3",
+    "  check           part_of_month    train          183       103         3         3",
+    "  check           quarter          train          100        81         3         3",
+    "  check           range            train           90        30         3         3",
+    "  check           relative         train            4         3         1         1",
+    "  check           exact_day        train           38        16         3         3",
+    "  check           tbd              train          202       106         0         0",
+    "  check           vague            train            2         2         0         0",
+    "  check           no_date          train           90        21         0         0",
+    "  check           silent           train         1191       175         0         0",
+    "  check           distractor       train           55        38         0         0",
+    "  check           dated_distractor train           22        18         0         0",
+    "  check           discontinuation  train            9         6         0         0",
+    "  reserve         month_year       train         2024       233         4         4",
+    "  reserve         month_no_year    train           29        20         3         3",
+    "  reserve         part_of_month    train          180        98         3         3",
+    "  reserve         quarter          train           97        77         3         3",
+    "  reserve         range            train           87        27         3         3",
+    "  reserve         relative         train            3         2         1         1",
+    "  reserve         exact_day        train           35        13         3         3",
+    "  reserve         tbd              train          202        98         0         0",
+    "  reserve         vague            train            2         2         0         0",
+    "  reserve         no_date          train           90        21         0         0",
+    "  reserve         silent           train         1191       169         0         0",
+    "  reserve         distractor       train           55        36         0         0",
+    "  reserve         dated_distractor train           22        19         0         0",
+    "  reserve         discontinuation  train            9         5         0         0",
+    "  literal         month_year       train         2019       221         8         8",
+    "  literal         month_year       test          3010       195         4         4",
+    "  literal         month_no_year    train           26        15         7         7",
+    "  literal         month_no_year    test            43        26         3         3",
+    "  literal         part_of_month    train          177        88         7         7",
+    "  literal         part_of_month    test           176        73         3         3",
+    "  literal         quarter          train           94        73         7         7",
+    "  literal         quarter          test           209        95         3         3",
+    "  literal         range            train           84        21         7         7",
+    "  literal         range            test            70        23         3         3",
+    "  literal         relative         train            2         1         7         1",
+    "  literal         relative         test            27        18         3         9",
+    "  literal         exact_day        train           32        10         7         7",
+    "  literal         exact_day        test            53        25         3         3",
+    "  literal         tbd              train          202        93         8         8",
+    "  literal         tbd              test           446       124         4         4",
+    "  literal         vague            train            2         2         2         2",
+    "  literal         vague            test             2         2         1         1",
+    "  literal         no_date          train           90        18         3         3",
+    "  literal         no_date          test           109        16         2         2",
+    "  literal         silent           train         1191       161         7         7",
+    "  literal         silent           test          2055       176         3         3",
+    "  literal         distractor       train           55        35         4         4",
+    "  literal         distractor       test           159        56         2         2",
+    "  literal         dated_distractor train           22        17         4         4",
+    "  literal         dated_distractor test            65        25         2         2",
+    "  literal         discontinuation  train            9         5         4         4",
+    "  literal         discontinuation  test            76        26         2         2",
+    "pilot: 20 statements, sha256 edd0c9c477b83f79f55e5823aa63484aff50d4407ef1830f7f185175502709f6 (kept from disk)",
+    "pilot: 7 of its items contain a phrase the guide quotes",
+    "check: 20 statements, sha256 eb80b0fc1ceb2485747d1fd5f303bf66ce01f053fda93eaf2617cc8b60b4903d (kept from disk)",
+    "check: 8 of its items contain a phrase the guide quotes",
+    "reserve: 20 statements, sha256 6be05e4f1a000cbd4eae3dd72eed5e1adc39a614fda7482b47de14d78527e747 (kept from disk)",
+    "reserve: 7 of its items contain a phrase the guide quotes",
+    "literal: 120 statements, sha256 05fcaf84b77406d79812b9ace8238be78942705ea832eea0281d1966faced28c (kept from disk)",
+    "literal: 30 of its items contain a phrase the guide quotes"
+   ]
+  },
+  {
+   "name": "dataset",
+   "command": "PYTHONPATH=. python -m analysis.coling.dataset",
+   "sealed": false,
+   "writes": [
+    "analysis/coling/out/statements.csv.gz",
+    "analysis/coling/out/eligible_e3.csv",
+    "analysis/coling/out/dataset_counts.json"
+   ],
+   "status": "ok",
+   "exit_status": 0,
+   "started": "2026-10-05T21:08:16Z",
+   "finished": "2026-10-05T21:08:22Z",
+   "lines": [
+    "capture days 109; last 2026-09-26; train horizon 2022-10-06",
+    "  statements                            fit    dev   test   late  train    all",
+    "  all                                  2838   2687   6024   1776   5525  13325",
+    "  shortage_listing                     2333   2351   5462   1628   4684  11774",
+    "  at_risk_A                            2193   2242   5349   1623   4435  11407",
+    "  at_risk_B                            1482   1639   3772   1225   3121   8118",
+    "  at risk B, dated                     1163   1334   2667    861   2497   6025",
+    "  at risk B, stale                        9     14     16      5     23     44",
+    "  at risk B, tbd                        116    134    376    206    250    832",
+    "  at risk B, silent                     159    147    550    116    306    972",
+    "  at risk B, none                        35     10    163     37     45    245",
+    "E3 eligible: 2593 statements in 115 episodes (73 also hold train statements); first captured after the stated end: 194",
+    "secondary lists (test): tbd 376, silent 550, stale 16",
+    "fit: dated 1163, scoreable 803 in 106 episodes, E_end/E_end90 {'no/no': 453, 'no/yes': 180, 'yes/yes': 170}",
+    "dev: dated 1334, scoreable 644 in 74 episodes, E_end/E_end90 {'no/no': 486, 'no/yes': 82, 'yes/yes': 76}",
+    "subset probe: 300",
+    "subset samples20: 300",
+    "subset paraphrase: 200",
+    "subset twobytwo: 300",
+    "subset reference_check: 100",
+    "cost trial: 20 items, the first of the 60 of sample_dev_prompt.csv in draw_rank order",
+    "wrote analysis/coling/out/statements.csv.gz, analysis/coling/out/eligible_e3.csv, analysis/coling/out/dataset_counts.json",
+    "wrote analysis/coling/out/items/e3_eligible.jsonl: 2593 items, sha256 773707460d800e40",
+    "wrote analysis/coling/out/items/e3_tbd.jsonl: 376 items, sha256 0f671fc15986e426",
+    "wrote analysis/coling/out/items/e3_silent.jsonl: 550 items, sha256 0a69210950c0b97b",
+    "wrote analysis/coling/out/items/e3_stale.jsonl: 16 items, sha256 95c27ed54af5eb3d",
+    "wrote analysis/coling/out/items/subset_probe.jsonl: 300 items, sha256 8fdae52651ed99d9",
+    "wrote analysis/coling/out/items/subset_samples20.jsonl: 300 items, sha256 83dc76368f4b8c94",
+    "wrote analysis/coling/out/items/subset_paraphrase.jsonl: 200 items, sha256 7b92d6dec42bdf9f",
+    "wrote analysis/coling/out/items/subset_twobytwo.jsonl: 300 items, sha256 f97b40237e29475f",
+    "wrote analysis/coling/out/items/subset_reference_check.jsonl: 100 items, sha256 c3af5f6299755768",
+    "wrote analysis/coling/out/items/dev_scoreable.jsonl: 644 items, sha256 130cf7b0e6593536",
+    "wrote analysis/coling/out/items/dev_prompt.jsonl: 20 items, sha256 779c1f1f7eecdfaa"
+   ]
+  },
+  {
+   "name": "sealed build",
+   "command": "PYTHONPATH=. python -m analysis.coling.corpus --cutoff 2023-12-31",
+   "sealed": true,
+   "writes": [
+    "analysis/coling/out/events.csv.gz",
+    "analysis/coling/out/outcomes_train.csv.gz",
+    "external_data/sealed/outcomes_test.csv.gz",
+    "external_data/sealed/outcomes_train_uncensored.csv.gz"
+   ],
+   "status": "ok",
+   "exit_status": 0,
+   "started": "2026-10-05T21:08:22Z",
+   "finished": "2026-10-05T21:08:50Z",
+   "lines": [
+    "Gate 1: shortage events dated 2023-01-01..2025-12-31, Current at statement, with a date-like phrase",
+    "  statement events 4328; distinct statements 3134 (need >= 600)",
+    "  observable outcome (bracket <= 31 d), definition B: presentation-level events 2011, distinct statements 1422 (need >= 250)",
+    "  observable outcome (bracket <= 31 d), definition A: presentation-level events 590, distinct statements 405 (secondary, no threshold)",
+    "  shortage episodes 123 (need >= 100)",
+    "  dated after 2023-12-31, observable outcome, definition B: presentation-level events 1205, distinct statements 834 (need >= 150)",
+    "  dated after 2023-12-31, observable outcome, definition A: presentation-level events 334, distinct statements 214 (secondary, no threshold)",
+    "  dated after 2023-12-31: events 2679, distinct statements 1948; with follow-up 2677, distinct with follow-up 1947 (no threshold)",
+    "wrote analysis/coling/out/events.csv.gz sha256 d8d970a91691e702bacc27ae4d0605122a4170d275f7786bf066212a8d8aa145",
+    "wrote analysis/coling/out/outcomes_train.csv.gz sha256 8772acd6b63afa36ccf311a8495a5b3d593be74ba8847654561cbcb840aa91d5",
+    "sealed external_data/sealed/outcomes_test.csv.gz sha256 67df1acccd9a7174f5a7ab22f91cc98e2811db7b3d4808ad9c795113ffa57cdf",
+    "sealed external_data/sealed/outcomes_train_uncensored.csv.gz sha256 6f4d96d7e18d878a541c5d6b467db553c0cf02a8973dd3aa46a3bb422ae915a8"
+   ]
+  },
+  {
+   "name": "sealed counts",
+   "command": "PYTHONPATH=. python -m analysis.coling.sealed_counts --expect-sha256 67df1acccd9a7174f5a7ab22f91cc98e2811db7b3d4808ad9c795113ffa57cdf --expect-eligible-sha256 8c12fc3e940f250e0a3426ef74355177431273db02736357a946dabb97ef7482 --out analysis/coling/out/sealed_counts.json --gate-observable",
+   "sealed": true,
+   "writes": [
+    "analysis/coling/out/sealed_counts.json"
+   ],
+   "status": "ok",
+   "exit_status": 0,
+   "started": "2026-10-05T21:08:50Z",
+   "finished": "2026-10-05T21:08:55Z",
+   "lines": []
+  },
+  {
+   "name": "power",
+   "command": "PYTHONPATH=. python -m analysis.coling.power",
+   "sealed": false,
+   "writes": [
+    "analysis/coling/out/dev_losses.json",
+    "analysis/coling/out/power.json"
+   ],
+   "status": "ok",
+   "exit_status": 0,
+   "started": "2026-10-05T21:08:55Z",
+   "finished": "2026-10-05T21:09:30Z",
+   "lines": [
+    "dev: 644 scoreable statements in 74 episodes; mix {'no/no': 486, 'no/yes': 82, 'yes/yes': 76}",
+    "  base_rate        primary Brier 0.1950 [0.1830, 0.2093]",
+    "  face_value       primary Brier 0.8183 [0.7621, 0.8655]",
+    "  rules_plus_slip  primary Brier 0.2132 [0.2061, 0.2217]",
+    "  gbm_structured   primary Brier 0.2403 [0.2128, 0.2740]",
+    "  gbm_text         primary Brier 0.2165 [0.1914, 0.2482]",
+    "power, scaled to 1903 statements in 106 episodes:",
+    "  H1 (face_value - rules_plus_slip): dev delta 0.6051, minimum detectable 0.0660",
+    "  H2 (rules_plus_slip - base_rate): dev delta 0.0182, minimum detectable 0.0162",
+    "  H3 (base_rate - gbm_text): dev delta -0.0214, minimum detectable 0.0279",
+    "wrote analysis/coling/out/dev_losses.json, analysis/coling/out/power.json"
+   ]
+  }
+ ],
+ "carried": {
+  "pins": {
+   "read_py_sha256": "c7bd46b5b7e3dd4628c095cdf3816a4d810d83cc4d4576fc7709ff2f028bbeb0",
+   "schemas_sha256": "04705846e804d9a24541fdc16619c2e31e12539386829558da7edc4118294bb8",
+   "templates": {
+    "literal-free-v1": {
+     "kind": "literal",
+     "matches_pin": true,
+     "pending": [],
+     "pinned": "ab87cd7525a49965763f78f55d6f8c47f4ca1476f49216a525635f97d6ef2555",
+     "sha256": "ab87cd7525a49965763f78f55d6f8c47f4ca1476f49216a525635f97d6ef2555"
+    },
+    "literal-v1": {
+     "kind": "literal",
+     "matches_pin": true,
+     "pending": [],
+     "pinned": "855244013a7614501ebdd6fbb45c8998f102a877e1299a6d86f81e1359934b27",
+     "sha256": "855244013a7614501ebdd6fbb45c8998f102a877e1299a6d86f81e1359934b27"
+    },
+    "predictive-track-v1": {
+     "kind": "predictive",
+     "matches_pin": true,
+     "pending": [],
+     "pinned": "d0384c1f860d734bd26fa197de0a99e1bcdf520392941b399ef9d0f7b3213483",
+     "sha256": "d0384c1f860d734bd26fa197de0a99e1bcdf520392941b399ef9d0f7b3213483"
+    },
+    "predictive-v1": {
+     "kind": "predictive",
+     "matches_pin": true,
+     "pending": [],
+     "pinned": "c0732a5b2d109c60a94e56cd0820a4aa5851786bd01fd31acd3b12c9d47534ed",
+     "sha256": "c0732a5b2d109c60a94e56cd0820a4aa5851786bd01fd31acd3b12c9d47534ed"
+    },
+    "probe-v1": {
+     "kind": "predictive",
+     "matches_pin": true,
+     "pending": [],
+     "pinned": "02e8d4338c3532a22615a43c47c54423250bf13474ef3f556925f5c878e8d08e",
+     "sha256": "02e8d4338c3532a22615a43c47c54423250bf13474ef3f556925f5c878e8d08e"
+    }
+   }
+  },
+  "open": {
+   "events.csv.gz": "d8d970a91691e702bacc27ae4d0605122a4170d275f7786bf066212a8d8aa145",
+   "outcomes_train.csv.gz": "8772acd6b63afa36ccf311a8495a5b3d593be74ba8847654561cbcb840aa91d5"
+  },
+  "gate_lines": [
+   "Gate 1: shortage events dated 2023-01-01..2025-12-31, Current at statement, with a date-like phrase",
+   "  statement events 4328; distinct statements 3134 (need >= 600)",
+   "  observable outcome (bracket <= 31 d), definition B: presentation-level events 2011, distinct statements 1422 (need >= 250)",
+   "  observable outcome (bracket <= 31 d), definition A: presentation-level events 590, distinct statements 405 (secondary, no threshold)",
+   "  shortage episodes 123 (need >= 100)",
+   "  dated after 2023-12-31, observable outcome, definition B: presentation-level events 1205, distinct statements 834 (need >= 150)",
+   "  dated after 2023-12-31, observable outcome, definition A: presentation-level events 334, distinct statements 214 (secondary, no threshold)",
+   "  dated after 2023-12-31: events 2679, distinct statements 1948; with follow-up 2677, distinct with follow-up 1947 (no threshold)"
+  ],
+  "eligible": "8c12fc3e940f250e0a3426ef74355177431273db02736357a946dabb97ef7482",
+  "sealed": {
+   "outcomes_test.csv.gz": "67df1acccd9a7174f5a7ab22f91cc98e2811db7b3d4808ad9c795113ffa57cdf",
+   "outcomes_train_uncensored.csv.gz": "6f4d96d7e18d878a541c5d6b467db553c0cf02a8973dd3aa46a3bb422ae915a8"
+  },
+  "built_with": {
+   "corpus.py": "a44cd27ccddad6047f1d92aceadb2f026957f92ab8461a25579c9adc45a035d7",
+   "manifest.py": "b08607c9b6623edf180e58742bef079e63b4588bb38950e45e5d179e069dcaba"
+  },
+  "counted_eligible": "8c12fc3e940f250e0a3426ef74355177431273db02736357a946dabb97ef7482"
+ },
+ "captures": {
+  "manifest": {
+   "file": "analysis/coling/out/capture_manifest.csv",
+   "sha256": "8104e4f23dd0c7b560df4bfb91d141111f7d1f696fb7adbeaddd094efc9db137"
+  }
+ },
+ "code": {
+  "corpus.py": "a44cd27ccddad6047f1d92aceadb2f026957f92ab8461a25579c9adc45a035d7",
+  "rules.py": "6a810bcb1ae277b9f4f02e0cfcedc80c5011f902cf679012174a6047bec1b28a",
+  "forms.py": "b99502d348ea82bece639ef2da62ebc90914b6d04dc185d6bfcb805b6bab69fd",
+  "manifest.py": "b08607c9b6623edf180e58742bef079e63b4588bb38950e45e5d179e069dcaba",
+  "dataset.py": "2fe95d355d3d5c773310e4cc38de5988c3e19af9bfd63356b4db3cb088f9e3c0",
+  "audit_sample.py": "67ddfa330cf441d435ce79db54f50d0153c6d3dbb3db2f11e4f9deaf87f852c0",
+  "audit_outcomes.py": "0cb4d4d93eddb8ea0acda6ca89d6e968ab60c2525fa1a0d3dbf639907f4402b1",
+  "audit_agreement.py": "0a040e036d2b76978aa74e1b4a4d8baf49e24d9c71d435b55b06c90538f50ad1",
+  "sealed_counts.py": "22d592e0b65b339b1c25669fbf7b93d6089f6f7c5677213773a4c42709cd61b4",
+  "freeze.py": "0850418be7315cb0d4c7736b1e84a2cfe65bb2b40cf76c02febeb794fa9f6084",
+  "predictors.py": "452254cac0cb7817327ec82f9f555c81ba8c13e7c327dae8c5e55fe3245b3438",
+  "gbm.py": "1e5eb3791e90b587cd9d7d4d78d101e71ea59dea061b730b6527cf85c54bfce3",
+  "power.py": "6948ee5f2f27e111d3b611b414b51a5c2216eb776f2b42bc3e19c9cacc7087fc",
+  "track_record.py": "53873bade0dd0e4bb232dd62c7fce9cd28f2a107675e3c68d832920766c3b99e"
+ },
+ "code_other": {
+  "read.py": "c7bd46b5b7e3dd4628c095cdf3816a4d810d83cc4d4576fc7709ff2f028bbeb0"
+ },
+ "sample_lists": {
+  "pilot": {
+   "file": "analysis/coling/out/audit/samples/sample_pilot.csv",
+   "sha256": "edd0c9c477b83f79f55e5823aa63484aff50d4407ef1830f7f185175502709f6",
+   "rows": 20
+  },
+  "check": {
+   "file": "analysis/coling/out/audit/samples/sample_check.csv",
+   "sha256": "eb80b0fc1ceb2485747d1fd5f303bf66ce01f053fda93eaf2617cc8b60b4903d",
+   "rows": 20
+  },
+  "reserve": {
+   "file": "analysis/coling/out/audit/samples/sample_reserve.csv",
+   "sha256": "6be05e4f1a000cbd4eae3dd72eed5e1adc39a614fda7482b47de14d78527e747",
+   "rows": 20
+  },
+  "literal": {
+   "file": "analysis/coling/out/audit/samples/sample_literal.csv",
+   "sha256": "05fcaf84b77406d79812b9ace8238be78942705ea832eea0281d1966faced28c",
+   "rows": 120
+  },
+  "outcome_audit_train": {
+   "file": "analysis/coling/out/audit_outcomes/outcome_train_sample.csv",
+   "sha256": "53a1c2449c26a2331ad59ffe61ef9190beb819de18e86a3e48f2c2ba096f48d0",
+   "rows": 56
+  },
+  "later_dev_prompt": {
+   "file": "analysis/coling/out/audit/samples_later/sample_dev_prompt.csv",
+   "sha256": "b404466c9a22a1b640e18de6207510da1e659de40c0f868bd7ba098aaeb3b0f4",
+   "rows": 60
+  },
+  "later_incontext_pool": {
+   "file": "analysis/coling/out/audit/samples_later/sample_incontext_pool.csv",
+   "sha256": "ba42ebab7b3d1bb6c7ed46ed477e7028168693edc1a8be143bc2613a3c09e4ab",
+   "rows": 50
+  },
+  "later_pair_seeds": {
+   "file": "analysis/coling/out/audit/samples_later/sample_pair_seeds.csv",
+   "sha256": "17caf511bf2bf3e179b5f12e3943a431ac631452f8e4115949651a1ff0fc980a",
+   "rows": 100
+  }
+ },
+ "annotation": {
+  "guide": {
+   "file": "analysis/coling/plan/AUDIT_GUIDE.md",
+   "sha256": "449c8e049be6cab1f5b3e1904471b0eedc68fdf0a1f0479ec2be6fe49b86938b",
+   "version": "v1"
+  },
+  "availability_strings": {
+   "file": "analysis/coling/out/availability_strings.csv",
+   "sha256": "da0bde1baac484731bd9924e577cc08b0a318dcd9fc4ee10d270ea5a75f987a2"
+  }
+ },
+ "models": {
+  "file": "analysis/coling/plan/MODELS.md",
+  "sha256": "747035397da93c934e602ef271ae691b56a493c8c732834b3fef91c76ea083c5"
+ },
+ "prompts": {
+  "read_py_sha256": "c7bd46b5b7e3dd4628c095cdf3816a4d810d83cc4d4576fc7709ff2f028bbeb0",
+  "schemas_sha256": "04705846e804d9a24541fdc16619c2e31e12539386829558da7edc4118294bb8",
+  "templates": {
+   "literal-free-v1": {
+    "kind": "literal",
+    "matches_pin": true,
+    "pending": [],
+    "pinned": "ab87cd7525a49965763f78f55d6f8c47f4ca1476f49216a525635f97d6ef2555",
+    "sha256": "ab87cd7525a49965763f78f55d6f8c47f4ca1476f49216a525635f97d6ef2555"
+   },
+   "literal-v1": {
+    "kind": "literal",
+    "matches_pin": true,
+    "pending": [],
+    "pinned": "855244013a7614501ebdd6fbb45c8998f102a877e1299a6d86f81e1359934b27",
+    "sha256": "855244013a7614501ebdd6fbb45c8998f102a877e1299a6d86f81e1359934b27"
+   },
+   "predictive-track-v1": {
+    "kind": "predictive",
+    "matches_pin": true,
+    "pending": [],
+    "pinned": "d0384c1f860d734bd26fa197de0a99e1bcdf520392941b399ef9d0f7b3213483",
+    "sha256": "d0384c1f860d734bd26fa197de0a99e1bcdf520392941b399ef9d0f7b3213483"
+   },
+   "predictive-v1": {
+    "kind": "predictive",
+    "matches_pin": true,
+    "pending": [],
+    "pinned": "c0732a5b2d109c60a94e56cd0820a4aa5851786bd01fd31acd3b12c9d47534ed",
+    "sha256": "c0732a5b2d109c60a94e56cd0820a4aa5851786bd01fd31acd3b12c9d47534ed"
+   },
+   "probe-v1": {
+    "kind": "predictive",
+    "matches_pin": true,
+    "pending": [],
+    "pinned": "02e8d4338c3532a22615a43c47c54423250bf13474ef3f556925f5c878e8d08e",
+    "sha256": "02e8d4338c3532a22615a43c47c54423250bf13474ef3f556925f5c878e8d08e"
+   }
+  }
+ },
+ "counts": {
+  "gate1": {
+   "builder_gate_set": {
+    "lines": [
+     "Gate 1: shortage events dated 2023-01-01..2025-12-31, Current at statement, with a date-like phrase",
+     "  statement events 4328; distinct statements 3134 (need >= 600)",
+     "  observable outcome (bracket <= 31 d), definition B: presentation-level events 2011, distinct statements 1422 (need >= 250)",
+     "  observable outcome (bracket <= 31 d), definition A: presentation-level events 590, distinct statements 405 (secondary, no threshold)",
+     "  shortage episodes 123 (need >= 100)",
+     "  dated after 2023-12-31, observable outcome, definition B: presentation-level events 1205, distinct statements 834 (need >= 150)",
+     "  dated after 2023-12-31, observable outcome, definition A: presentation-level events 334, distinct statements 214 (secondary, no threshold)",
+     "  dated after 2023-12-31: events 2679, distinct statements 1948; with follow-up 2677, distinct with follow-up 1947 (no threshold)"
+    ],
+    "thresholds": {
+     "statements": {
+      "count": 3134,
+      "need": 600,
+      "met": true
+     },
+     "observable": {
+      "count": 1422,
+      "need": 250,
+      "met": true
+     },
+     "episodes": {
+      "count": 123,
+      "need": 100,
+      "met": true
+     },
+     "post_cutoff": {
+      "count": 834,
+      "need": 150,
+      "met": true
+     }
+    },
+    "passes": true
+   },
+   "eligible_list": {
+    "thresholds": {
+     "statements": {
+      "count": 2593,
+      "need": 600,
+      "met": true
+     },
+     "observable": {
+      "count": 1275,
+      "need": 250,
+      "met": true
+     },
+     "episodes": {
+      "count": 115,
+      "need": 100,
+      "met": true
+     },
+     "post_cutoff": {
+      "count": 714,
+      "need": 150,
+      "met": true
+     }
+    },
+    "passes": true,
+    "scoreable_statements": 1903
+   }
+  },
+  "sealed_counts": [
+   "e3_eligible_test.eligible_statements: 2593",
+   "e3_eligible_test.eligible_episodes: 115",
+   "e3_eligible_test.scoreable_statements: 1903",
+   "e3_eligible_test.scoreable_episodes: 106",
+   "e3_eligible_test.undetermined_statements: 690",
+   "post_cutoff_slices.scoreable_statements.llama-3.3-70b: 1121",
+   "post_cutoff_slices.scoreable_statements.deepseek-v3: 411",
+   "post_cutoff_slices.scoreable_statements.qwen-2.5-7b: 549",
+   "post_cutoff_slices.scoreable_statements.gemma-3-27b: 607",
+   "post_cutoff_slices.scoreable_statements.gpt-oss-20b: 679",
+   "post_cutoff_slices.scoreable_statements.gpt-4o-mini: 1253",
+   "gate1_on_the_eligible_list.observable_statements: 1275",
+   "gate1_on_the_eligible_list.observable_statements_after_cutoff: 714"
+  ]
+ },
+ "outputs": {
+  "analysis/coling/out/audit/manifest.json": "8324e15780ce2f41cf50ed4dc5f5742fc2a086de834099289b6f58926aa68f70",
+  "analysis/coling/out/audit/samples/sample_check.csv": "eb80b0fc1ceb2485747d1fd5f303bf66ce01f053fda93eaf2617cc8b60b4903d",
+  "analysis/coling/out/audit/samples/sample_literal.csv": "05fcaf84b77406d79812b9ace8238be78942705ea832eea0281d1966faced28c",
+  "analysis/coling/out/audit/samples/sample_pilot.csv": "edd0c9c477b83f79f55e5823aa63484aff50d4407ef1830f7f185175502709f6",
+  "analysis/coling/out/audit/samples/sample_reserve.csv": "6be05e4f1a000cbd4eae3dd72eed5e1adc39a614fda7482b47de14d78527e747",
+  "analysis/coling/out/audit/samples/strata.csv": "740565f0da219ec44fa7568561c60b2d45c932bd8b096e85b99f2e0a3996990d",
+  "analysis/coling/out/availability_strings.csv": "da0bde1baac484731bd9924e577cc08b0a318dcd9fc4ee10d270ea5a75f987a2",
+  "analysis/coling/out/dataset_counts.json": "aefed7e410158cfd6980e234a67af0454bb21a3ffea9c587970a9372b520c377",
+  "analysis/coling/out/dev_losses.json": "b8cb5213fa0f08f3e18551cb29b792d639a6c515d2ff9000a0397bcf3194f37a",
+  "analysis/coling/out/eligible_e3.csv": "8c12fc3e940f250e0a3426ef74355177431273db02736357a946dabb97ef7482",
+  "analysis/coling/out/events.csv.gz": "d8d970a91691e702bacc27ae4d0605122a4170d275f7786bf066212a8d8aa145",
+  "analysis/coling/out/form_counts.json": "f11864c62c4a9ec92e0967716b87056e6014e3c096777a881d92041d72aa73b7",
+  "analysis/coling/out/outcomes_train.csv.gz": "8772acd6b63afa36ccf311a8495a5b3d593be74ba8847654561cbcb840aa91d5",
+  "analysis/coling/out/power.json": "d1ae5135147abd39eb25e63b64324f1c8255bc487d3d62bfc130b2d19412a774",
+  "analysis/coling/out/rule_readings_train_golden.csv.gz": "aa70c7b359b800f3e50f993159c2180cc401ceca83d191331e0c6341127ac2ac",
+  "analysis/coling/out/sealed_counts.json": "a4c871de23ca7a02820f26bf6fad9adaaaa1f931dccdd4152d65f709fe0c3525",
+  "analysis/coling/out/statements.csv.gz": "bcadc718f4e4e6c05330483196fd63bb8696ecf600e50d1cee8de0b0dc79cdbb"
+ },
+ "verify_rerun": {
+  "started": "2026-10-05T21:09:53Z",
+  "finished": "2026-10-05T21:10:26Z",
+  "matches": true,
+  "sealed": {
+   "outcomes_test.csv.gz": "67df1acccd9a7174f5a7ab22f91cc98e2811db7b3d4808ad9c795113ffa57cdf",
+   "outcomes_train_uncensored.csv.gz": "6f4d96d7e18d878a541c5d6b467db553c0cf02a8973dd3aa46a3bb422ae915a8"
+  },
+  "steps": [
+   {
+    "name": "capture manifest",
+    "command": "PYTHONPATH=. python -m analysis.coling.manifest --check --pin 8104e4f23dd0c7b5",
+    "sealed": false,
+    "writes": [],
+    "status": "ok",
+    "exit_status": 0,
+    "started": "2026-10-05T21:09:52Z",
+    "finished": "2026-10-05T21:09:53Z",
+    "lines": [
+     "manifest analysis/coling/out/capture_manifest.csv sha256 8104e4f23dd0c7b560df4bfb91d141111f7d1f696fb7adbeaddd094efc9db137",
+     "external_data/fda_wayback_csv: as in the manifest"
+    ]
+   },
+   {
+    "name": "sealed build",
+    "command": "PYTHONPATH=. python -m analysis.coling.corpus --cutoff 2023-12-31",
+    "sealed": true,
+    "writes": [
+     "analysis/coling/out/events.csv.gz",
+     "analysis/coling/out/outcomes_train.csv.gz",
+     "external_data/sealed/outcomes_test.csv.gz",
+     "external_data/sealed/outcomes_train_uncensored.csv.gz"
+    ],
+    "status": "ok",
+    "exit_status": 0,
+    "started": "2026-10-05T21:09:53Z",
+    "finished": "2026-10-05T21:10:26Z",
+    "lines": [
+     "Gate 1: shortage events dated 2023-01-01..2025-12-31, Current at statement, with a date-like phrase",
+     "  statement events 4328; distinct statements 3134 (need >= 600)",
+     "  observable outcome (bracket <= 31 d), definition B: presentation-level events 2011, distinct statements 1422 (need >= 250)",
+     "  observable outcome (bracket <= 31 d), definition A: presentation-level events 590, distinct statements 405 (secondary, no threshold)",
+     "  shortage episodes 123 (need >= 100)",
+     "  dated after 2023-12-31, observable outcome, definition B: presentation-level events 1205, distinct statements 834 (need >= 150)",
+     "  dated after 2023-12-31, observable outcome, definition A: presentation-level events 334, distinct statements 214 (secondary, no threshold)",
+     "  dated after 2023-12-31: events 2679, distinct statements 1948; with follow-up 2677, distinct with follow-up 1947 (no threshold)",
+     "wrote analysis/coling/out/events.csv.gz sha256 d8d970a91691e702bacc27ae4d0605122a4170d275f7786bf066212a8d8aa145",
+     "wrote analysis/coling/out/outcomes_train.csv.gz sha256 8772acd6b63afa36ccf311a8495a5b3d593be74ba8847654561cbcb840aa91d5",
+     "sealed external_data/sealed/outcomes_test.csv.gz sha256 67df1acccd9a7174f5a7ab22f91cc98e2811db7b3d4808ad9c795113ffa57cdf",
+     "sealed external_data/sealed/outcomes_train_uncensored.csv.gz sha256 6f4d96d7e18d878a541c5d6b467db553c0cf02a8973dd3aa46a3bb422ae915a8"
+    ]
+   }
+  ]
+ }
+}

@@ -1,0 +1,1005 @@
+{
+ "about": "Dev losses of the model-free predictors (PLAN.md sections 7.2 and 8): fitted on the fit split, scored on the dated statements of the dev split. Train-period outcomes only.",
+ "command": "PYTHONPATH=. python -m analysis.coling.power",
+ "inputs": {
+  "statements": "analysis/coling/out/statements.csv.gz",
+  "statements_sha256": "bcadc718f4e4e6c0",
+  "dataset_counts_sha256": "aefed7e410158cfd",
+  "eligible_e3_sha256": "8c12fc3e940f250e",
+  "sealed_counts_sha256": "a4c871de23ca7a02",
+  "predictors_sha256": "452254cac0cb7817",
+  "gbm_sha256": "1e5eb3791e90b587",
+  "power_sha256": "6948ee5f2f27e111",
+  "numpy": "2.5.2",
+  "pandas": "2.3.3",
+  "scikit_learn": "1.9.0"
+ },
+ "parameters": {
+  "seed": 20261001,
+  "cap_days": 365,
+  "listing_age_edges_days": [
+   0,
+   90,
+   365,
+   730,
+   1095,
+   1825
+  ],
+  "turnbull_tolerance": "1e-08",
+  "quantile_levels_reported": [
+   0.1,
+   0.5,
+   0.8,
+   0.9,
+   0.95
+  ],
+  "gbm_quantile_levels": [
+   0.05,
+   0.1,
+   0.15,
+   0.2,
+   0.25,
+   0.3,
+   0.35,
+   0.4,
+   0.45,
+   0.5,
+   0.55,
+   0.6,
+   0.65,
+   0.7,
+   0.75,
+   0.8,
+   0.85,
+   0.9,
+   0.95
+  ],
+  "gbm_settings": {
+   "learning_rate": 0.05,
+   "max_iter": 200,
+   "max_leaf_nodes": 8,
+   "min_samples_leaf": 40,
+   "l2_regularization": 0.0,
+   "max_bins": 255,
+   "early_stopping": false
+  },
+  "gbm_tail_points": 10,
+  "gbm_min_category": 20,
+  "tfidf_settings": {
+   "lowercase": true,
+   "ngram_range": [
+    1,
+    2
+   ],
+   "min_df": 5,
+   "max_features": 300,
+   "sublinear_tf": true
+  }
+ },
+ "fitting": {
+  "split": "fit",
+  "statements_by_analysis_set": {
+   "dated": 1163,
+   "stale": 9,
+   "tbd": 116,
+   "silent": 159
+  },
+  "min_cell": 100,
+  "base_rate_listing_age_bins": [
+   {
+    "listing_age": "under 90 days",
+    "statements": 286,
+    "basis": "bin"
+   },
+   {
+    "listing_age": "90 days to under 1 year",
+    "statements": 326,
+    "basis": "bin"
+   },
+   {
+    "listing_age": "1 to under 2 years",
+    "statements": 241,
+    "basis": "bin"
+   },
+   {
+    "listing_age": "2 to under 3 years",
+    "statements": 268,
+    "basis": "bin"
+   },
+   {
+    "listing_age": "3 to under 5 years",
+    "statements": 98,
+    "basis": "all listing ages"
+   },
+   {
+    "listing_age": "5 years or more",
+    "statements": 113,
+    "basis": "bin"
+   },
+   {
+    "listing_age": "posting date unknown",
+    "statements": 106,
+    "basis": "bin"
+   }
+  ],
+  "calibrator_cells": [
+   {
+    "form": "exact_day",
+    "revision": "first",
+    "cell_statements": 8,
+    "basis": "all dated forms",
+    "statements": 1163,
+    "share_by_stated_end": 0.220803,
+    "share_by_stated_end_90": 0.540945,
+    "median_days_to_recovery": 156.77973
+   },
+   {
+    "form": "exact_day",
+    "revision": "second",
+    "cell_statements": 5,
+    "basis": "all dated forms",
+    "statements": 1163,
+    "share_by_stated_end": 0.220803,
+    "share_by_stated_end_90": 0.540945,
+    "median_days_to_recovery": 156.77973
+   },
+   {
+    "form": "exact_day",
+    "revision": "third or later",
+    "cell_statements": 6,
+    "basis": "all dated forms",
+    "statements": 1163,
+    "share_by_stated_end": 0.220803,
+    "share_by_stated_end_90": 0.540945,
+    "median_days_to_recovery": 156.77973
+   },
+   {
+    "form": "month_no_year",
+    "revision": "first",
+    "cell_statements": 4,
+    "basis": "all dated forms",
+    "statements": 1163,
+    "share_by_stated_end": 0.220803,
+    "share_by_stated_end_90": 0.540945,
+    "median_days_to_recovery": 156.77973
+   },
+   {
+    "form": "month_no_year",
+    "revision": "second",
+    "cell_statements": 7,
+    "basis": "all dated forms",
+    "statements": 1163,
+    "share_by_stated_end": 0.220803,
+    "share_by_stated_end_90": 0.540945,
+    "median_days_to_recovery": 156.77973
+   },
+   {
+    "form": "month_no_year",
+    "revision": "third or later",
+    "cell_statements": 9,
+    "basis": "all dated forms",
+    "statements": 1163,
+    "share_by_stated_end": 0.220803,
+    "share_by_stated_end_90": 0.540945,
+    "median_days_to_recovery": 156.77973
+   },
+   {
+    "form": "month_year",
+    "revision": "first",
+    "cell_statements": 247,
+    "basis": "cell",
+    "statements": 247,
+    "share_by_stated_end": 0.210408,
+    "share_by_stated_end_90": 0.478672,
+    "median_days_to_recovery": 222.643744
+   },
+   {
+    "form": "month_year",
+    "revision": "second",
+    "cell_statements": 240,
+    "basis": "cell",
+    "statements": 240,
+    "share_by_stated_end": 0.177709,
+    "share_by_stated_end_90": 0.561333,
+    "median_days_to_recovery": 168.727008
+   },
+   {
+    "form": "month_year",
+    "revision": "third or later",
+    "cell_statements": 459,
+    "basis": "cell",
+    "statements": 459,
+    "share_by_stated_end": 0.264975,
+    "share_by_stated_end_90": 0.595221,
+    "median_days_to_recovery": 141.591308
+   },
+   {
+    "form": "part_of_month",
+    "revision": "first",
+    "cell_statements": 35,
+    "basis": "all dated forms",
+    "statements": 1163,
+    "share_by_stated_end": 0.220803,
+    "share_by_stated_end_90": 0.540945,
+    "median_days_to_recovery": 156.77973
+   },
+   {
+    "form": "part_of_month",
+    "revision": "second",
+    "cell_statements": 22,
+    "basis": "all dated forms",
+    "statements": 1163,
+    "share_by_stated_end": 0.220803,
+    "share_by_stated_end_90": 0.540945,
+    "median_days_to_recovery": 156.77973
+   },
+   {
+    "form": "part_of_month",
+    "revision": "third or later",
+    "cell_statements": 28,
+    "basis": "all dated forms",
+    "statements": 1163,
+    "share_by_stated_end": 0.220803,
+    "share_by_stated_end_90": 0.540945,
+    "median_days_to_recovery": 156.77973
+   },
+   {
+    "form": "quarter",
+    "revision": "first",
+    "cell_statements": 22,
+    "basis": "all dated forms",
+    "statements": 1163,
+    "share_by_stated_end": 0.220803,
+    "share_by_stated_end_90": 0.540945,
+    "median_days_to_recovery": 156.77973
+   },
+   {
+    "form": "quarter",
+    "revision": "second",
+    "cell_statements": 11,
+    "basis": "all dated forms",
+    "statements": 1163,
+    "share_by_stated_end": 0.220803,
+    "share_by_stated_end_90": 0.540945,
+    "median_days_to_recovery": 156.77973
+   },
+   {
+    "form": "quarter",
+    "revision": "third or later",
+    "cell_statements": 6,
+    "basis": "all dated forms",
+    "statements": 1163,
+    "share_by_stated_end": 0.220803,
+    "share_by_stated_end_90": 0.540945,
+    "median_days_to_recovery": 156.77973
+   },
+   {
+    "form": "range",
+    "revision": "first",
+    "cell_statements": 9,
+    "basis": "all dated forms",
+    "statements": 1163,
+    "share_by_stated_end": 0.220803,
+    "share_by_stated_end_90": 0.540945,
+    "median_days_to_recovery": 156.77973
+   },
+   {
+    "form": "range",
+    "revision": "second",
+    "cell_statements": 15,
+    "basis": "all dated forms",
+    "statements": 1163,
+    "share_by_stated_end": 0.220803,
+    "share_by_stated_end_90": 0.540945,
+    "median_days_to_recovery": 156.77973
+   },
+   {
+    "form": "range",
+    "revision": "third or later",
+    "cell_statements": 22,
+    "basis": "all dated forms",
+    "statements": 1163,
+    "share_by_stated_end": 0.220803,
+    "share_by_stated_end_90": 0.540945,
+    "median_days_to_recovery": 156.77973
+   },
+   {
+    "form": "year",
+    "revision": "first",
+    "cell_statements": 5,
+    "basis": "all dated forms",
+    "statements": 1163,
+    "share_by_stated_end": 0.220803,
+    "share_by_stated_end_90": 0.540945,
+    "median_days_to_recovery": 156.77973
+   },
+   {
+    "form": "year",
+    "revision": "second",
+    "cell_statements": 3,
+    "basis": "all dated forms",
+    "statements": 1163,
+    "share_by_stated_end": 0.220803,
+    "share_by_stated_end_90": 0.540945,
+    "median_days_to_recovery": 156.77973
+   },
+   {
+    "form": "year",
+    "revision": "third or later",
+    "cell_statements": 0,
+    "basis": "all dated forms",
+    "statements": 1163,
+    "share_by_stated_end": 0.220803,
+    "share_by_stated_end_90": 0.540945,
+    "median_days_to_recovery": 156.77973
+   }
+  ],
+  "calibrator_all_dated_forms": {
+   "statements": 1163,
+   "share_by_stated_end": 0.220803,
+   "share_by_stated_end_90": 0.540945
+  },
+  "no_date_listing_age_bins": [
+   {
+    "listing_age": "under 90 days",
+    "statements": 102,
+    "basis": "bin"
+   },
+   {
+    "listing_age": "90 days to under 1 year",
+    "statements": 65,
+    "basis": "all listing ages"
+   },
+   {
+    "listing_age": "1 to under 2 years",
+    "statements": 39,
+    "basis": "all listing ages"
+   },
+   {
+    "listing_age": "2 to under 3 years",
+    "statements": 28,
+    "basis": "all listing ages"
+   },
+   {
+    "listing_age": "3 to under 5 years",
+    "statements": 17,
+    "basis": "all listing ages"
+   },
+   {
+    "listing_age": "5 years or more",
+    "statements": 17,
+    "basis": "all listing ages"
+   },
+   {
+    "listing_age": "posting date unknown",
+    "statements": 7,
+    "basis": "all listing ages"
+   }
+  ],
+  "gbm_structured": {
+   "interval": 1048,
+   "at_cap": 383,
+   "right_censored": 7,
+   "statements": 1438,
+   "training_rows": 1501,
+   "features": 5,
+   "categories_kept": {
+    "reason": 8,
+    "category": 21,
+    "company": 11
+   }
+  },
+  "gbm_text": {
+   "interval": 1048,
+   "at_cap": 383,
+   "right_censored": 7,
+   "statements": 1438,
+   "training_rows": 1501,
+   "features": 305,
+   "categories_kept": {
+    "reason": 8,
+    "category": 21,
+    "company": 11
+   }
+  }
+ },
+ "refit_for_the_test_runs": {
+  "splits": "fit and dev",
+  "statements_by_analysis_set": {
+   "dated": 2497,
+   "stale": 23,
+   "tbd": 250,
+   "silent": 306
+  },
+  "min_cell": 100,
+  "base_rate_listing_age_bins": [
+   {
+    "listing_age": "under 90 days",
+    "statements": 464,
+    "basis": "bin"
+   },
+   {
+    "listing_age": "90 days to under 1 year",
+    "statements": 569,
+    "basis": "bin"
+   },
+   {
+    "listing_age": "1 to under 2 years",
+    "statements": 476,
+    "basis": "bin"
+   },
+   {
+    "listing_age": "2 to under 3 years",
+    "statements": 390,
+    "basis": "bin"
+   },
+   {
+    "listing_age": "3 to under 5 years",
+    "statements": 623,
+    "basis": "bin"
+   },
+   {
+    "listing_age": "5 years or more",
+    "statements": 323,
+    "basis": "bin"
+   },
+   {
+    "listing_age": "posting date unknown",
+    "statements": 208,
+    "basis": "bin"
+   }
+  ],
+  "calibrator_cells": [
+   {
+    "form": "exact_day",
+    "revision": "first",
+    "cell_statements": 28,
+    "basis": "all dated forms",
+    "statements": 2497
+   },
+   {
+    "form": "exact_day",
+    "revision": "second",
+    "cell_statements": 5,
+    "basis": "all dated forms",
+    "statements": 2497
+   },
+   {
+    "form": "exact_day",
+    "revision": "third or later",
+    "cell_statements": 6,
+    "basis": "all dated forms",
+    "statements": 2497
+   },
+   {
+    "form": "month_no_year",
+    "revision": "first",
+    "cell_statements": 7,
+    "basis": "all dated forms",
+    "statements": 2497
+   },
+   {
+    "form": "month_no_year",
+    "revision": "second",
+    "cell_statements": 12,
+    "basis": "all dated forms",
+    "statements": 2497
+   },
+   {
+    "form": "month_no_year",
+    "revision": "third or later",
+    "cell_statements": 21,
+    "basis": "all dated forms",
+    "statements": 2497
+   },
+   {
+    "form": "month_year",
+    "revision": "first",
+    "cell_statements": 309,
+    "basis": "cell",
+    "statements": 309
+   },
+   {
+    "form": "month_year",
+    "revision": "second",
+    "cell_statements": 365,
+    "basis": "cell",
+    "statements": 365
+   },
+   {
+    "form": "month_year",
+    "revision": "third or later",
+    "cell_statements": 1371,
+    "basis": "cell",
+    "statements": 1371
+   },
+   {
+    "form": "part_of_month",
+    "revision": "first",
+    "cell_statements": 54,
+    "basis": "form",
+    "statements": 181
+   },
+   {
+    "form": "part_of_month",
+    "revision": "second",
+    "cell_statements": 42,
+    "basis": "form",
+    "statements": 181
+   },
+   {
+    "form": "part_of_month",
+    "revision": "third or later",
+    "cell_statements": 85,
+    "basis": "form",
+    "statements": 181
+   },
+   {
+    "form": "quarter",
+    "revision": "first",
+    "cell_statements": 28,
+    "basis": "all dated forms",
+    "statements": 2497
+   },
+   {
+    "form": "quarter",
+    "revision": "second",
+    "cell_statements": 22,
+    "basis": "all dated forms",
+    "statements": 2497
+   },
+   {
+    "form": "quarter",
+    "revision": "third or later",
+    "cell_statements": 39,
+    "basis": "all dated forms",
+    "statements": 2497
+   },
+   {
+    "form": "range",
+    "revision": "first",
+    "cell_statements": 10,
+    "basis": "all dated forms",
+    "statements": 2497
+   },
+   {
+    "form": "range",
+    "revision": "second",
+    "cell_statements": 20,
+    "basis": "all dated forms",
+    "statements": 2497
+   },
+   {
+    "form": "range",
+    "revision": "third or later",
+    "cell_statements": 58,
+    "basis": "all dated forms",
+    "statements": 2497
+   },
+   {
+    "form": "year",
+    "revision": "first",
+    "cell_statements": 11,
+    "basis": "all dated forms",
+    "statements": 2497
+   },
+   {
+    "form": "year",
+    "revision": "second",
+    "cell_statements": 4,
+    "basis": "all dated forms",
+    "statements": 2497
+   },
+   {
+    "form": "year",
+    "revision": "third or later",
+    "cell_statements": 0,
+    "basis": "all dated forms",
+    "statements": 2497
+   }
+  ],
+  "no_date_listing_age_bins": [
+   {
+    "listing_age": "under 90 days",
+    "statements": 165,
+    "basis": "bin"
+   },
+   {
+    "listing_age": "90 days to under 1 year",
+    "statements": 111,
+    "basis": "bin"
+   },
+   {
+    "listing_age": "1 to under 2 years",
+    "statements": 76,
+    "basis": "all listing ages"
+   },
+   {
+    "listing_age": "2 to under 3 years",
+    "statements": 48,
+    "basis": "all listing ages"
+   },
+   {
+    "listing_age": "3 to under 5 years",
+    "statements": 95,
+    "basis": "all listing ages"
+   },
+   {
+    "listing_age": "5 years or more",
+    "statements": 36,
+    "basis": "all listing ages"
+   },
+   {
+    "listing_age": "posting date unknown",
+    "statements": 25,
+    "basis": "all listing ages"
+   }
+  ],
+  "gbm_targets": {
+   "interval": 1666,
+   "at_cap": 744,
+   "right_censored": 643
+  }
+ },
+ "dev": {
+  "dated_statements": 1334,
+  "dated_episodes": 121,
+  "scoreable_statements": 644,
+  "scoreable_episodes": 74,
+  "with_a_horizon_event_undetermined": 690,
+  "scoreable_by_E_end_and_E_end90": {
+   "no/no": 486,
+   "no/yes": 82,
+   "yes/yes": 76
+  }
+ },
+ "bootstrap": {
+  "draws": 10000,
+  "seed": 20261001,
+  "clusters": "shortage episodes"
+ },
+ "losses": {
+  "base_rate": {
+   "primary_brier": 0.195048,
+   "ci95": [
+    0.183012,
+    0.209331
+   ],
+   "brier_E_end": 0.132682,
+   "brier_E_end90": 0.257413,
+   "mean_p_E_end": 0.252996,
+   "mean_p_E_end90": 0.473811,
+   "bounds_all_dated": {
+    "undetermined_as_no": 0.20405,
+    "undetermined_as_yes": 0.262757
+   },
+   "pinball_all_dated": {
+    "0.50": {
+     "loss": 61.874761,
+     "statements": 865,
+     "left_out_right_censored": 469,
+     "lower_bound": 44.894599,
+     "upper_bound": 83.972274
+    },
+    "0.80": {
+     "loss": 31.45711,
+     "statements": 865,
+     "left_out_right_censored": 469,
+     "lower_bound": 15.836882,
+     "upper_bound": 40.549475
+    },
+    "0.95": {
+     "loss": 7.864277,
+     "statements": 865,
+     "left_out_right_censored": 469,
+     "lower_bound": 3.95922,
+     "upper_bound": 10.137369
+    }
+   }
+  },
+  "face_value": {
+   "primary_brier": 0.818323,
+   "ci95": [
+    0.762107,
+    0.865507
+   ],
+   "brier_E_end": 0.881988,
+   "brier_E_end90": 0.754658,
+   "mean_p_E_end": 1.0,
+   "mean_p_E_end90": 1.0,
+   "bounds_all_dated": {
+    "undetermined_as_no": 0.854573,
+    "undetermined_as_yes": 0.477886
+   },
+   "pinball_all_dated": {
+    "0.50": {
+     "loss": 68.363006,
+     "statements": 865,
+     "left_out_right_censored": 469,
+     "lower_bound": 49.871814,
+     "upper_bound": 103.36919
+    },
+    "0.80": {
+     "loss": 104.310636,
+     "statements": 865,
+     "left_out_right_censored": 469,
+     "lower_bound": 77.549625,
+     "upper_bound": 154.726687
+    },
+    "0.95": {
+     "loss": 122.284451,
+     "statements": 865,
+     "left_out_right_censored": 469,
+     "lower_bound": 91.388531,
+     "upper_bound": 181.52024
+    }
+   }
+  },
+  "rules_plus_slip": {
+   "primary_brier": 0.213221,
+   "ci95": [
+    0.206081,
+    0.221685
+   ],
+   "brier_E_end": 0.123182,
+   "brier_E_end90": 0.30326,
+   "mean_p_E_end": 0.249089,
+   "mean_p_E_end90": 0.581298,
+   "bounds_all_dated": {
+    "undetermined_as_no": 0.19494,
+    "undetermined_as_yes": 0.255376
+   },
+   "pinball_all_dated": {
+    "0.50": {
+     "loss": 57.634781,
+     "statements": 865,
+     "left_out_right_censored": 469,
+     "lower_bound": 40.292717,
+     "upper_bound": 89.068528
+    },
+    "0.80": {
+     "loss": 33.948339,
+     "statements": 865,
+     "left_out_right_censored": 469,
+     "lower_bound": 18.568403,
+     "upper_bound": 43.330373
+    },
+    "0.95": {
+     "loss": 7.864277,
+     "statements": 865,
+     "left_out_right_censored": 469,
+     "lower_bound": 3.95922,
+     "upper_bound": 10.137369
+    }
+   }
+  },
+  "gbm_structured": {
+   "primary_brier": 0.24034,
+   "ci95": [
+    0.212845,
+    0.274049
+   ],
+   "brier_E_end": 0.167282,
+   "brier_E_end90": 0.313398,
+   "mean_p_E_end": 0.273279,
+   "mean_p_E_end90": 0.528335,
+   "bounds_all_dated": {
+    "undetermined_as_no": 0.249384,
+    "undetermined_as_yes": 0.285675
+   },
+   "pinball_all_dated": {
+    "0.50": {
+     "loss": 69.222242,
+     "statements": 865,
+     "left_out_right_censored": 469,
+     "lower_bound": 49.309441,
+     "upper_bound": 95.352532
+    },
+    "0.80": {
+     "loss": 35.791043,
+     "statements": 865,
+     "left_out_right_censored": 469,
+     "lower_bound": 21.069181,
+     "upper_bound": 47.502842
+    },
+    "0.95": {
+     "loss": 7.864277,
+     "statements": 865,
+     "left_out_right_censored": 469,
+     "lower_bound": 3.95922,
+     "upper_bound": 10.137369
+    }
+   }
+  },
+  "gbm_text": {
+   "primary_brier": 0.216476,
+   "ci95": [
+    0.191358,
+    0.248202
+   ],
+   "brier_E_end": 0.135274,
+   "brier_E_end90": 0.297678,
+   "mean_p_E_end": 0.216022,
+   "mean_p_E_end90": 0.486166,
+   "bounds_all_dated": {
+    "undetermined_as_no": 0.229037,
+    "undetermined_as_yes": 0.285951
+   },
+   "pinball_all_dated": {
+    "0.50": {
+     "loss": 62.370401,
+     "statements": 865,
+     "left_out_right_censored": 469,
+     "lower_bound": 44.03026,
+     "upper_bound": 88.978728
+    },
+    "0.80": {
+     "loss": 36.973905,
+     "statements": 865,
+     "left_out_right_censored": 469,
+     "lower_bound": 22.851362,
+     "upper_bound": 49.878743
+    },
+    "0.95": {
+     "loss": 7.864277,
+     "statements": 865,
+     "left_out_right_censored": 469,
+     "lower_bound": 3.95922,
+     "upper_bound": 10.137369
+    }
+   }
+  }
+ },
+ "contrasts": [
+  {
+   "comparator": "face_value",
+   "tested": "rules_plus_slip",
+   "delta": 0.605102,
+   "ci95": [
+    0.543148,
+    0.656099
+   ],
+   "ci90": [
+    0.554528,
+    0.648395
+   ],
+   "p_one_sided": 0.0001,
+   "p_two_sided": 0.0002
+  },
+  {
+   "comparator": "rules_plus_slip",
+   "tested": "base_rate",
+   "delta": 0.018173,
+   "ci95": [
+    0.004194,
+    0.031085
+   ],
+   "ci90": [
+    0.006637,
+    0.029039
+   ],
+   "p_one_sided": 0.006299,
+   "p_two_sided": 0.012599
+  },
+  {
+   "comparator": "base_rate",
+   "tested": "gbm_text",
+   "delta": -0.021429,
+   "ci95": [
+    -0.044516,
+    -0.002729
+   ],
+   "ci90": [
+    -0.041108,
+    -0.005661
+   ],
+   "p_one_sided": 0.988501,
+   "p_two_sided": 0.023198
+  },
+  {
+   "comparator": "gbm_structured",
+   "tested": "gbm_text",
+   "delta": 0.023864,
+   "ci95": [
+    0.011146,
+    0.037852
+   ],
+   "ci90": [
+    0.013147,
+    0.0355
+   ],
+   "p_one_sided": 0.0005,
+   "p_two_sided": 0.001
+  },
+  {
+   "comparator": "gbm_structured",
+   "tested": "rules_plus_slip",
+   "delta": 0.027119,
+   "ci95": [
+    0.001513,
+    0.058068
+   ],
+   "ci90": [
+    0.005733,
+    0.053243
+   ],
+   "p_one_sided": 0.017698,
+   "p_two_sided": 0.035396
+  },
+  {
+   "comparator": "gbm_structured",
+   "tested": "base_rate",
+   "delta": 0.045292,
+   "ci95": [
+    0.024639,
+    0.069586
+   ],
+   "ci90": [
+    0.027684,
+    0.066082
+   ],
+   "p_one_sided": 0.0001,
+   "p_two_sided": 0.0002
+  },
+  {
+   "comparator": "base_rate",
+   "tested": "face_value",
+   "delta": -0.623275,
+   "ci95": [
+    -0.676403,
+    -0.558423
+   ],
+   "ci90": [
+    -0.669287,
+    -0.570579
+   ],
+   "p_one_sided": 1.0,
+   "p_two_sided": 0.0002
+  },
+  {
+   "comparator": "face_value",
+   "tested": "gbm_structured",
+   "delta": 0.577983,
+   "ci95": [
+    0.499766,
+    0.639977
+   ],
+   "ci90": [
+    0.515291,
+    0.63059
+   ],
+   "p_one_sided": 0.0001,
+   "p_two_sided": 0.0002
+  },
+  {
+   "comparator": "face_value",
+   "tested": "gbm_text",
+   "delta": 0.601847,
+   "ci95": [
+    0.522739,
+    0.665343
+   ],
+   "ci90": [
+    0.537689,
+    0.655741
+   ],
+   "p_one_sided": 0.0001,
+   "p_two_sided": 0.0002
+  },
+  {
+   "comparator": "rules_plus_slip",
+   "tested": "gbm_text",
+   "delta": -0.003256,
+   "ci95": [
+    -0.032775,
+    0.01987
+   ],
+   "ci90": [
+    -0.027666,
+    0.016302
+   ],
+   "p_one_sided": 0.610639,
+   "p_two_sided": 0.778922
+  }
+ ]
+}

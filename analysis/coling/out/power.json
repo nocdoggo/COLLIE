@@ -1,0 +1,177 @@
+{
+ "about": "Minimum detectable difference of H1, H2 and H3 at 80% power and 0.05/6 per test (PLAN.md section 6), from one pair of model-free predictors per hypothesis on the scoreable dev statements. Indicative: the dev outcome mix is given beside it.",
+ "command": "PYTHONPATH=. python -m analysis.coling.power",
+ "inputs": {
+  "statements": "analysis/coling/out/statements.csv.gz",
+  "statements_sha256": "bcadc718f4e4e6c0",
+  "dataset_counts_sha256": "aefed7e410158cfd",
+  "eligible_e3_sha256": "8c12fc3e940f250e",
+  "sealed_counts_sha256": "a4c871de23ca7a02",
+  "predictors_sha256": "452254cac0cb7817",
+  "gbm_sha256": "1e5eb3791e90b587",
+  "power_sha256": "6948ee5f2f27e111",
+  "numpy": "2.5.2",
+  "pandas": "2.3.3",
+  "scikit_learn": "1.9.0"
+ },
+ "parameters": {
+  "seed": 20261001,
+  "cap_days": 365,
+  "listing_age_edges_days": [
+   0,
+   90,
+   365,
+   730,
+   1095,
+   1825
+  ],
+  "turnbull_tolerance": "1e-08",
+  "quantile_levels_reported": [
+   0.1,
+   0.5,
+   0.8,
+   0.9,
+   0.95
+  ],
+  "gbm_quantile_levels": [
+   0.05,
+   0.1,
+   0.15,
+   0.2,
+   0.25,
+   0.3,
+   0.35,
+   0.4,
+   0.45,
+   0.5,
+   0.55,
+   0.6,
+   0.65,
+   0.7,
+   0.75,
+   0.8,
+   0.85,
+   0.9,
+   0.95
+  ],
+  "gbm_settings": {
+   "learning_rate": 0.05,
+   "max_iter": 200,
+   "max_leaf_nodes": 8,
+   "min_samples_leaf": 40,
+   "l2_regularization": 0.0,
+   "max_bins": 255,
+   "early_stopping": false
+  },
+  "gbm_tail_points": 10,
+  "gbm_min_category": 20,
+  "tfidf_settings": {
+   "lowercase": true,
+   "ngram_range": [
+    1,
+    2
+   ],
+   "min_df": 5,
+   "max_features": 300,
+   "sublinear_tf": true
+  }
+ },
+ "proxy_pairs": [
+  {
+   "hypothesis": "H1",
+   "comparator": "face_value",
+   "tested": "rules_plus_slip"
+  },
+  {
+   "hypothesis": "H2",
+   "comparator": "rules_plus_slip",
+   "tested": "base_rate"
+  },
+  {
+   "hypothesis": "H3",
+   "comparator": "base_rate",
+   "tested": "gbm_text"
+  }
+ ],
+ "family": {
+  "familywise_alpha": 0.05,
+  "tests_in_the_family": 6,
+  "alpha_per_test": 0.008333,
+  "power": 0.8
+ },
+ "dev": {
+  "scoreable_statements": 644,
+  "scoreable_episodes": 74,
+  "weighted_statements_per_episode": 25.965839,
+  "scoreable_by_E_end_and_E_end90": {
+   "no/no": 486,
+   "no/yes": 82,
+   "yes/yes": 76
+  }
+ },
+ "test": {
+  "basis": "scoreable test statements and episodes, from sealed_counts.json",
+  "statements": 1903,
+  "episodes": 106,
+  "weighted_statements_per_episode": 45.119927,
+  "eligible_statements": 2593,
+  "eligible_episodes": 115
+ },
+ "scoreable_share_of_dated_train_statements": {},
+ "hypotheses": {
+  "H1": {
+   "stands_for": "loss(m-a) - loss(m-b)",
+   "comparator": "face_value",
+   "tested": "rules_plus_slip",
+   "sides": 1,
+   "critical_value": 3.235601,
+   "dev": {
+    "delta": 0.605102,
+    "sd": 0.384901,
+    "se_clustered": 0.028199,
+    "design_effect": 3.456738,
+    "icc": 0.098404
+   },
+   "test_se": 0.020392,
+   "minimum_detectable_delta": 0.065981,
+   "if_the_scoreable_share_were_that_of": {},
+   "from_episodes_alone": 0.076235
+  },
+  "H2": {
+   "stands_for": "loss(rules + calibrator) - loss(m-c)",
+   "comparator": "rules_plus_slip",
+   "tested": "base_rate",
+   "sides": 2,
+   "critical_value": 3.479879,
+   "dev": {
+    "delta": 0.018173,
+    "sd": 0.120094,
+    "se_clustered": 0.006781,
+    "design_effect": 2.053125,
+    "icc": 0.042183
+   },
+   "test_se": 0.004657,
+   "minimum_detectable_delta": 0.016204,
+   "if_the_scoreable_share_were_that_of": {},
+   "from_episodes_alone": 0.019716
+  },
+  "H3": {
+   "stands_for": "loss(base rate) - loss(m-best)",
+   "comparator": "base_rate",
+   "tested": "gbm_text",
+   "sides": 2,
+   "critical_value": 3.479879,
+   "dev": {
+    "delta": -0.021429,
+    "sd": 0.116189,
+    "se_clustered": 0.010788,
+    "design_effect": 5.551362,
+    "icc": 0.182304
+   },
+   "test_se": 0.00801,
+   "minimum_detectable_delta": 0.027872,
+   "if_the_scoreable_share_were_that_of": {},
+   "from_episodes_alone": 0.031365
+  }
+ }
+}

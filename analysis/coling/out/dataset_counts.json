@@ -1,0 +1,700 @@
+{
+ "about": "Counts from the dataset builder (PLAN.md sections 2 and 3). Outcomes are counted for the train period only; for the test and late splits there are counts of statements.",
+ "command": "PYTHONPATH=. python -m analysis.coling.dataset",
+ "inputs": {
+  "events": "analysis/coling/out/events.csv.gz",
+  "events_sha256": "d8d970a91691e702",
+  "outcomes_train": "analysis/coling/out/outcomes_train.csv.gz",
+  "outcomes_train_sha256": "8772acd6b63afa36",
+  "capture_manifest": "analysis/coling/out/capture_manifest.csv",
+  "capture_manifest_sha256": "8104e4f23dd0c7b5",
+  "rules_sha256": "6a810bcb1ae277b9",
+  "forms_sha256": "b99502d348ea82be",
+  "dataset_sha256": "2fe95d355d3d5c77",
+  "guide_examples": 58,
+  "guide_examples_sha256": "5b91016a6499a64e",
+  "guide_examples_matching_no_event": 0,
+  "fixed_test_item_statements": 1,
+  "first_draw_lists_sha256": {
+   "pilot": "d218de6f1d328b57",
+   "check": "7b17c59c22afeffb",
+   "reserve": "5fbf08b22fe1f6a0",
+   "literal": "e4ec89ed179640e6"
+  },
+  "merged_forms_in_use": {
+   "relative": "range",
+   "range": "range",
+   "exact_day": "exact_day",
+   "part_of_month": "part_of_month",
+   "half_year": "quarter",
+   "quarter": "quarter",
+   "year": "year",
+   "month_no_year": "month_no_year",
+   "month_year": "month_year",
+   "tbd": "tbd",
+   "vague": "no_date",
+   "no_date": "no_date",
+   "discontinuation": "distractor",
+   "distractor": "distractor",
+   "silent": "silent"
+  }
+ },
+ "parameters": {
+  "seed": 20261001,
+  "draw": "ids ordered by sha256('<seed>\\x1f<tag>\\x1f<id>'); the first n are taken",
+  "display_row_tag": "display/<statement_group_id>",
+  "definition": "B",
+  "splits": {
+   "fit": "before 2021-01-01",
+   "dev": "2021-01-01 to before 2023-01-01",
+   "test": "2023-01-01 to before 2026-01-01",
+   "late": "2026-01-01 onward",
+   "train": "fit and dev"
+  },
+  "capture_days": 109,
+  "last_capture": "2026-09-26",
+  "train_horizon": "2022-10-06",
+  "horizon_b_days_after_stated_end": 90,
+  "fallback_horizon_days": [
+   90,
+   180
+  ],
+  "cap_days": 365
+ },
+ "events": {
+  "all": {
+   "fit": 5516,
+   "dev": 4335,
+   "test": 10165,
+   "late": 2711,
+   "train": 9851,
+   "all": 22727
+  },
+  "shortage_listing": {
+   "fit": 4298,
+   "dev": 3722,
+   "test": 8910,
+   "late": 2397,
+   "train": 8020,
+   "all": 19327
+  },
+  "discontinuation_listing": {
+   "fit": 1218,
+   "dev": 613,
+   "test": 1255,
+   "late": 314,
+   "train": 1831,
+   "all": 3400
+  },
+  "at_risk_A": {
+   "fit": 3860,
+   "dev": 3379,
+   "test": 8637,
+   "late": 2386,
+   "train": 7239,
+   "all": 18262
+  },
+  "at_risk_B": {
+   "fit": 2264,
+   "dev": 2297,
+   "test": 5636,
+   "late": 1717,
+   "train": 4561,
+   "all": 11914
+  },
+  "train_first_seen_in_test_period": {
+   "shortage_listing": 295,
+   "at_risk_B": 86
+  }
+ },
+ "statements": {
+  "all": {
+   "fit": 2838,
+   "dev": 2687,
+   "test": 6024,
+   "late": 1776,
+   "train": 5525,
+   "all": 13325
+  },
+  "shortage_listing": {
+   "fit": 2333,
+   "dev": 2351,
+   "test": 5462,
+   "late": 1628,
+   "train": 4684,
+   "all": 11774
+  },
+  "at_risk_A": {
+   "fit": 2193,
+   "dev": 2242,
+   "test": 5349,
+   "late": 1623,
+   "train": 4435,
+   "all": 11407
+  },
+  "at_risk_B": {
+   "fit": 1482,
+   "dev": 1639,
+   "test": 3772,
+   "late": 1225,
+   "train": 3121,
+   "all": 8118
+  },
+  "with_several_presentations": {
+   "fit": 1103,
+   "dev": 786,
+   "test": 1901,
+   "late": 511,
+   "train": 1889,
+   "all": 4301
+  },
+  "with_several_presentations_at_risk_B": {
+   "fit": 411,
+   "dev": 375,
+   "test": 951,
+   "late": 304,
+   "train": 786,
+   "all": 2041
+  },
+  "most_presentations_in_one_statement": 43,
+  "display_reading_differs": 0,
+  "train_first_seen_in_test_period": {
+   "shortage_listing": 119,
+   "at_risk_B": 52
+  }
+ },
+ "at_risk_B_by_analysis_set": {
+  "dated": {
+   "fit": 1163,
+   "dev": 1334,
+   "test": 2667,
+   "late": 861,
+   "train": 2497,
+   "all": 6025
+  },
+  "stale": {
+   "fit": 9,
+   "dev": 14,
+   "test": 16,
+   "late": 5,
+   "train": 23,
+   "all": 44
+  },
+  "tbd": {
+   "fit": 116,
+   "dev": 134,
+   "test": 376,
+   "late": 206,
+   "train": 250,
+   "all": 832
+  },
+  "silent": {
+   "fit": 159,
+   "dev": 147,
+   "test": 550,
+   "late": 116,
+   "train": 306,
+   "all": 972
+  },
+  "none": {
+   "fit": 35,
+   "dev": 10,
+   "test": 163,
+   "late": 37,
+   "train": 45,
+   "all": 245
+  }
+ },
+ "episodes": {
+  "all": 301,
+  "with_a_train_statement": 237,
+  "with_a_test_or_late_statement": 153,
+  "with_both": 89,
+  "at_risk_B_dated_by_split": {
+   "fit": 123,
+   "dev": 121,
+   "test": 116,
+   "late": 53
+  }
+ },
+ "eligible": {
+  "dated": {
+   "fit": 1163,
+   "dev": 1334,
+   "test": 2593,
+   "late": 237,
+   "train": 2497,
+   "all": 5327
+  },
+  "tbd": {
+   "fit": 116,
+   "dev": 134,
+   "test": 376,
+   "late": 64,
+   "train": 250,
+   "all": 690
+  },
+  "silent": {
+   "fit": 159,
+   "dev": 147,
+   "test": 550,
+   "late": 57,
+   "train": 306,
+   "all": 913
+  },
+  "stale": {
+   "fit": 9,
+   "dev": 14,
+   "test": 16,
+   "late": 5,
+   "train": 23,
+   "all": 44
+  }
+ },
+ "dated_with_horizon_b_after_the_last_capture": {
+  "fit": 0,
+  "dev": 0,
+  "test": 74,
+  "late": 624,
+  "train": 0,
+  "all": 698
+ },
+ "e3": {
+  "statements": 2593,
+  "episodes": 115,
+  "ids_sha256": "a65983839e361c6e309709930b16d80f4ad0c0cd6a3fc4ce2d841879b25988cf",
+  "episodes_that_also_hold_train_statements": 73,
+  "covered_presentation_events": 3626,
+  "covered_presentation_events_at_risk_B": 3610,
+  "with_several_presentations_at_risk_B": 575,
+  "by_year": {
+   "2023": 1069,
+   "2024": 933,
+   "2025": 591
+  },
+  "by_form": {
+   "relative": 12,
+   "range": 62,
+   "exact_day": 16,
+   "part_of_month": 123,
+   "half_year": 0,
+   "quarter": 161,
+   "year": 18,
+   "month_no_year": 63,
+   "month_year": 2138
+  },
+  "by_revision": {
+   "first": 120,
+   "second": 191,
+   "third or later": 2282
+  },
+  "first_captured_after_stated_end": 194,
+  "dated_after": {
+   "2022-12-31": 2593,
+   "2023-01-31": 2309,
+   "2023-02-28": 2169,
+   "2023-03-31": 2002,
+   "2023-04-30": 1839,
+   "2023-05-31": 1806,
+   "2023-06-30": 1804,
+   "2023-07-31": 1799,
+   "2023-08-31": 1790,
+   "2023-09-30": 1695,
+   "2023-10-31": 1670,
+   "2023-11-30": 1613,
+   "2023-12-31": 1524,
+   "2024-01-31": 1457,
+   "2024-02-29": 1352,
+   "2024-03-31": 1215,
+   "2024-04-30": 1115,
+   "2024-05-31": 978,
+   "2024-06-30": 943,
+   "2024-07-31": 854,
+   "2024-08-31": 845,
+   "2024-09-30": 761,
+   "2024-10-31": 690,
+   "2024-11-30": 630,
+   "2024-12-31": 591,
+   "2025-01-31": 490,
+   "2025-02-28": 413,
+   "2025-03-31": 341,
+   "2025-04-30": 333,
+   "2025-05-31": 241,
+   "2025-06-30": 181,
+   "2025-07-31": 114,
+   "2025-08-31": 114,
+   "2025-09-30": 114,
+   "2025-10-31": 106,
+   "2025-11-30": 48,
+   "2025-12-31": 0
+  }
+ },
+ "secondary_lists_test": {
+  "tbd": {
+   "statements": 376,
+   "episodes": 76,
+   "ids_sha256": "49466e77d6649d735117f42e8e65755c3c59ddba06c4978c74bbbc8bf5ed58b6",
+   "episodes_that_also_hold_train_statements": 52
+  },
+  "silent": {
+   "statements": 550,
+   "episodes": 96,
+   "ids_sha256": "e2e69a03c89c1d2c58abef63b67a910f4ec6a5848d6613d4a4e7fd1958e8e54d",
+   "episodes_that_also_hold_train_statements": 59
+  },
+  "stale": {
+   "statements": 16,
+   "episodes": 13,
+   "ids_sha256": "be48aa1e4b00e9f9c748650941f1c52195f3b8187f83395205a13bbbd962e04b",
+   "episodes_that_also_hold_train_statements": 9
+  }
+ },
+ "budget": {
+  "N_E": 2593,
+  "N_S": 942,
+  "N_D": 644
+ },
+ "dev_scoreable": {
+  "statements": 644,
+  "episodes": 74,
+  "ids_sha256": "9d2bc07beb02f040e64d9fa535d4d08ba6c616c2809738174bb57e93be78c746"
+ },
+ "late": {
+  "statements": 237,
+  "episodes": 41,
+  "ids_sha256": "1568805640d4a93f0d9d5dbca283d50cebdac3aa5f333a5eaa87027245095c5f"
+ },
+ "train": {
+  "fit": {
+   "at_risk_B": 1482,
+   "outcome_of_the_display_row": {
+    "recovered": 1245,
+    "censored": 194,
+    "discontinued": 43
+   },
+   "censor_reason": {
+    "absent_generic_current": 17,
+    "end_of_train": 177
+   },
+   "dated": {
+    "statements": 1163,
+    "episodes": 123,
+    "scoreable": 803,
+    "scoreable_episodes": 106,
+    "with_a_horizon_event_undetermined": 360,
+    "scoreable_by_E_end_and_E_end90": {
+     "no/no": 453,
+     "no/yes": 180,
+     "yes/yes": 170
+    }
+   },
+   "dated_all_covered_presentations": {
+    "statements": 1163,
+    "episodes": 123,
+    "scoreable": 815,
+    "scoreable_episodes": 106,
+    "with_a_horizon_event_undetermined": 348,
+    "scoreable_by_E_end_and_E_end90": {
+     "no/no": 472,
+     "no/yes": 182,
+     "yes/yes": 161
+    }
+   },
+   "dated_any_covered_presentation": {
+    "statements": 1163,
+    "episodes": 123,
+    "scoreable": 787,
+    "scoreable_episodes": 106,
+    "with_a_horizon_event_undetermined": 376,
+    "scoreable_by_E_end_and_E_end90": {
+     "no/no": 433,
+     "no/yes": 176,
+     "yes/yes": 178
+    }
+   },
+   "dated_first_captured_by_stated_end": {
+    "statements": 1086,
+    "episodes": 117,
+    "scoreable": 742,
+    "scoreable_episodes": 98,
+    "with_a_horizon_event_undetermined": 344,
+    "scoreable_by_E_end_and_E_end90": {
+     "no/no": 414,
+     "no/yes": 158,
+     "yes/yes": 170
+    }
+   },
+   "tbd_and_silent": {
+    "statements": 275,
+    "scoreable_at_90_and_180_days": 231
+   },
+   "time_to_recovery_target": {
+    "at_cap": 397,
+    "interval": 1078,
+    "right_censored": 7
+   }
+  },
+  "dev": {
+   "at_risk_B": 1639,
+   "outcome_of_the_display_row": {
+    "recovered": 624,
+    "censored": 975,
+    "discontinued": 40
+   },
+   "censor_reason": {
+    "absent_generic_current": 9,
+    "end_of_train": 966
+   },
+   "dated": {
+    "statements": 1334,
+    "episodes": 121,
+    "scoreable": 644,
+    "scoreable_episodes": 74,
+    "with_a_horizon_event_undetermined": 690,
+    "scoreable_by_E_end_and_E_end90": {
+     "no/no": 486,
+     "no/yes": 82,
+     "yes/yes": 76
+    }
+   },
+   "dated_all_covered_presentations": {
+    "statements": 1334,
+    "episodes": 121,
+    "scoreable": 662,
+    "scoreable_episodes": 74,
+    "with_a_horizon_event_undetermined": 672,
+    "scoreable_by_E_end_and_E_end90": {
+     "no/no": 509,
+     "no/yes": 81,
+     "yes/yes": 72
+    }
+   },
+   "dated_any_covered_presentation": {
+    "statements": 1334,
+    "episodes": 121,
+    "scoreable": 630,
+    "scoreable_episodes": 74,
+    "with_a_horizon_event_undetermined": 704,
+    "scoreable_by_E_end_and_E_end90": {
+     "no/no": 463,
+     "no/yes": 89,
+     "yes/yes": 78
+    }
+   },
+   "dated_first_captured_by_stated_end": {
+    "statements": 1216,
+    "episodes": 113,
+    "scoreable": 605,
+    "scoreable_episodes": 70,
+    "with_a_horizon_event_undetermined": 611,
+    "scoreable_by_E_end_and_E_end90": {
+     "no/no": 466,
+     "no/yes": 63,
+     "yes/yes": 76
+    }
+   },
+   "tbd_and_silent": {
+    "statements": 281,
+    "scoreable_at_90_and_180_days": 132
+   },
+   "time_to_recovery_target": {
+    "at_cap": 365,
+    "interval": 624,
+    "right_censored": 650
+   }
+  }
+ },
+ "subsets": {
+  "pool": 2593,
+  "left_out_as_guide_examples": 0,
+  "first_draw": {
+   "lists_read": {
+    "pilot": 20,
+    "check": 20,
+    "reserve": 20,
+    "literal": 120
+   },
+   "lists_missing": [],
+   "ids_not_in_the_statement_table": 0,
+   "eligible_statements_left_out": 20
+  },
+  "probe": {
+   "use": "E4 no-notice probe",
+   "seed": 20261001,
+   "tag": "e4-probe",
+   "requested": 300,
+   "stratified_by": "statement year",
+   "leaves_out_the_first_draw": false,
+   "final": true,
+   "pool": 2593,
+   "statements": 300,
+   "by_year": {
+    "2023": 124,
+    "2024": 108,
+    "2025": 68
+   },
+   "ids_sha256": "efbeb16e16ce86fffbba45d274775e2f7dd673c5b97a5239128ec3eb648ef2b9"
+  },
+  "samples20": {
+   "use": "E3: 20 samples of condition (a), primaries",
+   "seed": 20261001,
+   "tag": "e3-samples20",
+   "requested": 300,
+   "stratified_by": "statement year",
+   "leaves_out_the_first_draw": false,
+   "final": true,
+   "pool": 2593,
+   "statements": 300,
+   "by_year": {
+    "2023": 124,
+    "2024": 108,
+    "2025": 68
+   },
+   "ids_sha256": "682f734bea32ce6c4fee697946c9b9fb3f450d3d9667c61bd3f69ce46e24f5e9"
+  },
+  "paraphrase": {
+   "use": "E3: 3 paraphrases of condition (b)",
+   "seed": 20261001,
+   "tag": "e3-paraphrase",
+   "requested": 200,
+   "stratified_by": "statement year",
+   "leaves_out_the_first_draw": false,
+   "final": true,
+   "pool": 2593,
+   "statements": 200,
+   "by_year": {
+    "2023": 82,
+    "2024": 72,
+    "2025": 46
+   },
+   "ids_sha256": "80ba3cf00b14b4d73feb21d0498b3aec8e7d0465cd9e52bec8318f96778e7b98"
+  },
+  "twobytwo": {
+   "use": "E4 name and date 2x2, condition (b)",
+   "seed": 20261001,
+   "tag": "e4-name-date-2x2",
+   "requested": 300,
+   "stratified_by": "statement year",
+   "leaves_out_the_first_draw": false,
+   "final": true,
+   "pool": 2593,
+   "statements": 300,
+   "by_year": {
+    "2023": 124,
+    "2024": 108,
+    "2025": 68
+   },
+   "ids_sha256": "7ed79fa3c0db7e72265c00d446073bd5f51638d0ea124c4c6a22798759638305"
+  },
+  "reference_check": {
+   "use": "task E: reference readings",
+   "seed": 20261001,
+   "tag": "e3-reference-check",
+   "requested": 100,
+   "stratified_by": "",
+   "leaves_out_the_first_draw": true,
+   "final": true,
+   "pool": 2573,
+   "statements": 100,
+   "by_year": {
+    "2023": 44,
+    "2024": 30,
+    "2025": 26
+   },
+   "ids_sha256": "d8227bd74cef24858e94361b4581aea2e30af53a0da6b1c342968b0c9766c961"
+  }
+ },
+ "cost_trial": {
+  "use": "cost trial: the first 20 of the dev prompt list, in draw_rank order",
+  "list": "sample_dev_prompt.csv",
+  "list_read": true,
+  "statements_on_the_list": 60,
+  "ids_not_in_the_statement_table": 0,
+  "requested": 20,
+  "file": "dev_prompt.jsonl",
+  "written": true,
+  "statements": 20,
+  "ids_sha256": "26933b5cf7026dbee01c646d3f6b72920593191a2a0a73451e4c084051de3408"
+ },
+ "outputs": {
+  "statements.csv.gz": {
+   "rows": 13325,
+   "columns": 84,
+   "sha256": "bcadc718f4e4e6c0",
+   "content_sha256": "8062e7ba80a0a3bd"
+  },
+  "eligible_e3.csv": {
+   "rows": 2593,
+   "sha256": "8c12fc3e940f250e",
+   "ids_sha256": "a65983839e361c6e309709930b16d80f4ad0c0cd6a3fc4ce2d841879b25988cf"
+  },
+  "items": {
+   "e3_eligible.jsonl": {
+    "rows": 2593,
+    "probe": false,
+    "sha256": "773707460d800e40",
+    "item_ids_sha256": "a65983839e361c6e309709930b16d80f4ad0c0cd6a3fc4ce2d841879b25988cf"
+   },
+   "e3_tbd.jsonl": {
+    "rows": 376,
+    "probe": false,
+    "sha256": "0f671fc15986e426",
+    "item_ids_sha256": "49466e77d6649d735117f42e8e65755c3c59ddba06c4978c74bbbc8bf5ed58b6"
+   },
+   "e3_silent.jsonl": {
+    "rows": 550,
+    "probe": false,
+    "sha256": "0a69210950c0b97b",
+    "item_ids_sha256": "e2e69a03c89c1d2c58abef63b67a910f4ec6a5848d6613d4a4e7fd1958e8e54d"
+   },
+   "e3_stale.jsonl": {
+    "rows": 16,
+    "probe": false,
+    "sha256": "95c27ed54af5eb3d",
+    "item_ids_sha256": "be48aa1e4b00e9f9c748650941f1c52195f3b8187f83395205a13bbbd962e04b"
+   },
+   "subset_probe.jsonl": {
+    "rows": 300,
+    "probe": true,
+    "sha256": "8fdae52651ed99d9",
+    "item_ids_sha256": "efbeb16e16ce86fffbba45d274775e2f7dd673c5b97a5239128ec3eb648ef2b9"
+   },
+   "subset_samples20.jsonl": {
+    "rows": 300,
+    "probe": false,
+    "sha256": "83dc76368f4b8c94",
+    "item_ids_sha256": "682f734bea32ce6c4fee697946c9b9fb3f450d3d9667c61bd3f69ce46e24f5e9"
+   },
+   "subset_paraphrase.jsonl": {
+    "rows": 200,
+    "probe": false,
+    "sha256": "7b92d6dec42bdf9f",
+    "item_ids_sha256": "80ba3cf00b14b4d73feb21d0498b3aec8e7d0465cd9e52bec8318f96778e7b98"
+   },
+   "subset_twobytwo.jsonl": {
+    "rows": 300,
+    "probe": false,
+    "sha256": "f97b40237e29475f",
+    "item_ids_sha256": "7ed79fa3c0db7e72265c00d446073bd5f51638d0ea124c4c6a22798759638305"
+   },
+   "subset_reference_check.jsonl": {
+    "rows": 100,
+    "probe": false,
+    "sha256": "c3af5f6299755768",
+    "item_ids_sha256": "d8227bd74cef24858e94361b4581aea2e30af53a0da6b1c342968b0c9766c961"
+   },
+   "dev_scoreable.jsonl": {
+    "rows": 644,
+    "probe": false,
+    "sha256": "130cf7b0e6593536",
+    "item_ids_sha256": "9d2bc07beb02f040e64d9fa535d4d08ba6c616c2809738174bb57e93be78c746"
+   },
+   "dev_prompt.jsonl": {
+    "rows": 20,
+    "probe": false,
+    "sha256": "779c1f1f7eecdfaa",
+    "item_ids_sha256": "26933b5cf7026dbee01c646d3f6b72920593191a2a0a73451e4c084051de3408"
+   }
+  }
+ }
+}

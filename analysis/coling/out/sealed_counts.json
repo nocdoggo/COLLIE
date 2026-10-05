@@ -1,0 +1,56 @@
+{
+ "about": "Counts over the sealed test-period outcomes, as PLAN.md registers them (splits, power, Gate 1): statements and shortage episodes only, on the displayed presentation under definition B.",
+ "command": "PYTHONPATH=. python -m analysis.coling.sealed_counts --expect-sha256 <sealed file> --expect-eligible-sha256 <eligible list> --out <counts file> --gate-observable",
+ "inputs": {
+  "sealed_outcomes": {
+   "file": "outcomes_test.csv.gz",
+   "sha256": "67df1acccd9a7174f5a7ab22f91cc98e2811db7b3d4808ad9c795113ffa57cdf"
+  },
+  "eligible_list": {
+   "file": "eligible_e3.csv",
+   "sha256": "8c12fc3e940f250e0a3426ef74355177431273db02736357a946dabb97ef7482"
+  },
+  "events": {
+   "file": "events.csv.gz",
+   "sha256": "d8d970a91691e702bacc27ae4d0605122a4170d275f7786bf066212a8d8aa145"
+  },
+  "capture_manifest": {
+   "file": "capture_manifest.csv",
+   "sha256": "8104e4f23dd0c7b560df4bfb91d141111f7d1f696fb7adbeaddd094efc9db137"
+  },
+  "code_sha256": {
+   "sealed_counts.py": "22d592e0b65b339b1c25669fbf7b93d6089f6f7c5677213773a4c42709cd61b4",
+   "dataset.py": "2fe95d355d3d5c773310e4cc38de5988c3e19af9bfd63356b4db3cb088f9e3c0",
+   "corpus.py": "a44cd27ccddad6047f1d92aceadb2f026957f92ab8461a25579c9adc45a035d7",
+   "forms.py": "b99502d348ea82bece639ef2da62ebc90914b6d04dc185d6bfcb805b6bab69fd",
+   "rules.py": "6a810bcb1ae277b9f4f02e0cfcedc80c5011f902cf679012174a6047bec1b28a"
+  }
+ },
+ "masked_below": 5,
+ "e3_eligible_test": {
+  "eligible_statements": 2593,
+  "eligible_episodes": 115,
+  "scoreable_statements": 1903,
+  "scoreable_episodes": 106,
+  "undetermined_statements": 690
+ },
+ "post_cutoff_slices": {
+  "scoreable_statements": {
+   "llama-3.3-70b": 1121,
+   "deepseek-v3": 411,
+   "qwen-2.5-7b": 549,
+   "gemma-3-27b": 607,
+   "gpt-oss-20b": 679,
+   "gpt-4o-mini": 1253
+  },
+  "models_without_a_slice": [
+   "gemini-3.8-flash",
+   "grok-4.20"
+  ]
+ },
+ "gate1_on_the_eligible_list": {
+  "model": "llama-3.3-70b",
+  "observable_statements": 1275,
+  "observable_statements_after_cutoff": 714
+ }
+}
