@@ -509,13 +509,14 @@ literal-task sample is stratified on the unmerged classes. Templates are the nor
 with months and numbers masked; results are also reported weighted by template.
 
 The final inventory and order are the fifteen classes above, from the classifier on the frozen
-build (its hash is in section 17). Four classes hold fewer than 15 train-period statements at
-risk under B and are merged, each into its named neighbour: relative (5) into range; half of a
-year (3) into quarter; vague (6) into no date; discontinuation (10) into distractor, which holds
-10 itself and 20 with it. Year holds 15 and stays a class of its own. Per-form reports, the
-calibrator and the track-record table therefore use eleven classes, in this order: range
-(relative or range), exact day, part of a month, quarter (half of a year or quarter), year,
-month with no year, month and year, TBD or unknown, no date (vague or no date), distractor
+build (its hash is in section 17). Five classes hold fewer than 15 train-period statements at
+risk under B: relative (5), half of a year (3), vague (6), discontinuation (10) and distractor
+(10). Taken in the order above, four of them are merged, each into its named neighbour: relative
+into range; half of a year into quarter; vague into no date; discontinuation into distractor.
+Distractor then holds 20 and stays. Year holds 15 and stays a class of its own. Per-form
+reports, the calibrator and the track-record table therefore use eleven classes, in this order:
+range (relative or range), exact day, part of a month, quarter (half of a year or quarter),
+year, month with no year, month and year, TBD or unknown, no date (vague or no date), distractor
 (discontinuation or distractor), silent. No statement has covered presentations of different
 forms. The count per form and split, as distinct statements at risk under B (Train is Fit and
 Dev together):
@@ -1466,20 +1467,22 @@ Repair calls (at most one per failed answer) are not in these counts and count a
 | grok-4.20 | 1,440 + 3 `N_E` = 9,219 | $0.00168 | $15.51 | $20.93 | $30 |
 | deepseek-v3 | 8,940 + 3 (`N_E` + `N_S` + `N_D`) = 21,477 | $0.00041 | $8.82 | $12.21 | $12 |
 | llama-3.3-70b | 8,940 + 3 (`N_E` + `N_S` + `N_D`) = 21,477 | $0.00013 | $2.82 | $3.95 | $5 |
-| qwen-2.5-7b | 1,440 + 3 `N_E` = 9,219 | $0.00014 | $1.24 | $1.67 | $3 |
+| qwen-2.5-7b | 1,440 + 3 `N_E` = 9,219 | $0.00013 | $1.24 | $1.67 | $3 |
 | gemma-3-27b | 1,440 + 3 `N_E` = 9,219 | $0.00011 | $0.99 | $1.34 | $3 |
 | gpt-oss-20b | 1,440 + 3 `N_E` = 9,219 | $0.00021 (reasoning billed) | $1.98 | $4.23 | $3 |
-| gpt-4o-mini | 1,440 + 3 `N_E` = 9,219 | $0.00022 | $2.08 | $2.94 | $3 |
+| gpt-4o-mini | 1,440 + 3 `N_E` = 9,219 | $0.00023 | $2.08 | $2.94 | $3 |
 | **All** | 97,148 | | $94.90 | $204.16 | caps $169; reserve $31 |
 
-The calls, the costs per call and both estimates are those of the harness's run sheet at these
-counts (`python -m analysis.coling.read --run-sheet`), at the prices of section 4. A call is
+The calls and both estimates are those of the harness's run sheet at these counts
+(`python -m analysis.coling.read --run-sheet`), at the prices of section 4; the cost per call is
+the estimate divided by the calls, and every figure is rounded once. A call is
 priced from the length of its prompt, rendered on the harness's fixed test item at four
 characters to a token (condition (b) with the track record of fit and dev), and from a typical
 answer of 70 tokens for a predictive template and 90 for a literal one; for gemini-3.8-flash and
 gpt-oss-20b the output also counts the median hidden reasoning of logged calls of the same
 model. The upper estimate is the figure the harness checks before a paid call: the prompt length
-times 1.25, an answer of twice the typical length, and the 90th percentile of hidden reasoning.
+times 1.25 plus 16 tokens, an answer of twice the typical length, and the 90th percentile of
+hidden reasoning.
 The median understates the mean of a reasoning model: at the draft's cost of about $0.011 a
 call, the 8,099 calls of gemini-3.8-flash come to $89.09. The costs per call of the 29 September
 draft (about $0.011, $0.0025, $0.0004 and $0.00015 for the first four rows, and $0.0001 to
@@ -2491,7 +2494,12 @@ quoted here are from the build of 29 September.
     the power estimate (now the base rate against the text-trained GBM), and the H3 line of
     the six secondary models, which is reported per condition because they have no dev runs.
     No predictor code changed. *Seen:* train outcomes, on the build of 1 October; no model
-    output (no model had been called) and no test-period outcome. In detail:
+    output (no model had been called) and no test-period outcome. The figures below are
+    those of that build, whose statement table still rested on the events table of
+    29 September; the freeze run of 5 October rests on the events table after the
+    availability-rule fix, where 33 more statements are at risk under B, and gives the
+    registered figures of sections 3 and 6 (644 scoreable dev statements in 74 episodes;
+    0.195 against 0.240). In detail:
     - *Dev.* The primary loss on the 643 scoreable dev statements (73 episodes; 485 no/no, 82
       no/yes, 76 yes/yes): base rate 0.197, rules plus slip 0.214, text-trained GBM 0.215,
       structured-only GBM 0.243, face value 0.818; a constant 0 scores 0.182. Every pairwise
