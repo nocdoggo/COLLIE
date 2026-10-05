@@ -2074,3 +2074,49 @@ def test_a_minimal_pair_sheet_has_its_columns_to_fill_and_its_lists(tmp_path: Pa
     assert len(cells_to_fill(blank)) == 2 * len(PAIR_ENTERED) + 2
     back, problems, notes = X.to_csv(book, blank)
     assert back.encode("utf-8") == blank.read_bytes() and not problems and not notes
+
+
+# --- the sheet of the reference-reading check (task E) and an adjudication sheet ---
+
+
+def reference_text() -> str:
+    """A blank sheet of the reference-reading check: the entry, the rule reading, five columns
+    to fill."""
+    names = study_constants("audit_reference.py", {"RULE", "ENTERED", "VERDICTS"})
+    shown = (*study_constants("audit_sample.py", {"SHOWN"})["SHOWN"], *names["RULE"])
+    out = io.StringIO(newline="")
+    writer = csv.writer(out, lineterminator="\n", quoting=csv.QUOTE_ALL)
+    for line in (
+        "# task: E reference readings (AUDIT_GUIDE.md section 12.2)",
+        "# sheet: reference",
+        "# annotator: A1",
+        "# values of verdict: ok | error | cannot_tell (cannot_tell: say why in note)",
+        "# values of codes: K1; K2; K3; K4 (with error only, and at least one)",
+        "# values of start_differs: 1 or 0 (1: the last day is right but the first day is not)",
+        "# sitting_start:",
+        "# sitting_end:",
+    ):
+        writer.writerow([line])
+    writer.writerow([*shown, *names["ENTERED"]])
+    for n in ("1", "2"):
+        cells = dict.fromkeys(shown, "")
+        cells |= {"item_id": f"I{n}", "drug": f"Name{n} Injection", "date_of_update": "2023-05-01"}
+        writer.writerow([*cells.values(), *[""] * len(names["ENTERED"])])
+    return out.getvalue()
+
+
+def test_a_reference_sheet_has_its_columns_to_fill_and_its_lists(tmp_path: Path) -> None:
+    names = study_constants("audit_reference.py", {"ENTERED", "VERDICTS"})
+    blank = written(tmp_path, "reference_A1.csv", reference_text())
+    sheet = X.read_csv_sheet(blank)
+    assert sheet.header[X.first_entered(sheet.header) :] == list(names["ENTERED"])
+    assert X.value_lists(sheet) == {"verdict": names["VERDICTS"], "start_differs": ("1", "0")}
+    book = blank.with_suffix(".xlsx")
+    X.to_xlsx(blank, book)
+    back, problems, notes = X.to_csv(book, blank)
+    assert back.encode("utf-8") == blank.read_bytes() and not problems and not notes
+
+
+def test_an_adjudication_sheet_is_filled_from_its_decision_column() -> None:
+    header = ["item_id", "A1_verdict", "A1_codes", "A2_verdict", "A2_codes", "decision", "adj_note"]
+    assert X.first_entered(header) == header.index("decision")

@@ -108,7 +108,8 @@ appendices are for ADJ and the sheet builder.
   check a returned sheet and score the pair. For the literal task (and its pilot and check
   sets) the samples, the sheets and the validator are in `audit_sample.py`, and the statistics
   of section 8.1, the gate, the adjudication sheet and the gold are in `audit_agreement.py`,
-  called the agreement script below. For task B everything is in `audit_outcomes.py`. Nobody
+  called the agreement script below. For task B everything is in `audit_outcomes.py`, and for
+  task E in `audit_reference.py`. Nobody
   opens the planted-error keys: the scoring script reads them (sections 6.2 and 7.1).
 
 Who A1, A2 and ADJ are is recorded by the owner outside the repository. No file carries a name.
@@ -1228,7 +1229,9 @@ a secondary, and the kappas on abstention, certainty class and statement type. T
   moved-out strings that the checker would have kept. Section 12.1 gives them.
 - **E.** The share of the 100 reference readings without a confirmed error, with a Wilson 95%
   interval; the errors by form class and by code K1 to K4; the number with `start_differs`; raw
-  agreement on the 10 shared items.
+  agreement on the 10 shared items; the same share by statement year; the items ADJ left
+  unresolved; and the share whose rule reading is confirmed (an unresolved item is not), whose
+  statements are the list E7 uses.
 
 ## 9. Sheet layout
 
@@ -1251,7 +1254,8 @@ One CSV file (UTF-8, comma-separated, every cell quoted, a header row) per annot
   read these rows by position, so a `#` inside an entry is harmless.
 - **Times.** Two header lines are yours to fill, with the time as `HH:MM`. The two builders
   name them differently:
-  - task A sheets (pilot, check, reserve, literal): `# sitting_start:` and `# sitting_end:`.
+  - task A sheets (pilot, check, reserve, literal) and task E sheets: `# sitting_start:` and
+    `# sitting_end:`.
     For a further sitting, add another pair of these lines under the first. The validator
     rejects a sheet without them.
   - task B sheets: `# session_start:` and `# session_end:`. For more than one sitting, give
@@ -1267,13 +1271,16 @@ One CSV file (UTF-8, comma-separated, every cell quoted, a header row) per annot
   - task B: `python -m analysis.coling.audit_outcomes validate <sheet> --blank <blank sheet>`.
 
   Task C: `python -m analysis.coling.minimal_pairs validate <sheet>`, with `# sitting_start:`
-  and `# sitting_end:` as in task A. The script of task E gives its own in its docstring when
-  it is written.
+  and `# sitting_end:` as in task A. Task E:
+  `python -m analysis.coling.audit_reference validate <sheet>`, with the same two lines; it
+  finds the blank by the header lines of the sheet (`--blank` names another).
 - **Submission checks.** For task A, `agree` validates both sheets against the blanks again
   and refuses a sheet that was filled in place (it is then the blank's own file) and one
   whose blank is missing or is not the file the manifest records. For task B, `score`
   validates both sheets against the blanks, reads the key only when both pass, and refuses a
-  set whose blanks or key are not the files its manifest lists.
+  set whose blanks or key are not the files its manifest lists. For task E, `score`
+  validates both sheets against the blanks its manifest records and refuses a sheet that was
+  filled in place.
 
 **Task A: `literal_<A1|A2>.csv`** (the pilot and check sheets, `pilot_`, `check_` and
 `reserve_`, have the same layout; all are written by `audit_sample.py`)
@@ -1368,10 +1375,17 @@ and `note`.
 | `item_id` and the entry-block columns of task A | shown | |
 | `rule_statement_type`, `rule_start`, `rule_end`, `rule_stale` | shown | the frozen rule reading; `rule_end` is the `stated_end` used in E3 |
 | `verdict` | entered | `ok`, `error`, `cannot_tell` |
-| `codes` | entered | K1 to K4 (section 12.2) |
-| `true_end` | entered | when `error`: the right last day, or blank if the target gives no date |
-| `start_differs` | entered | 1 or 0 |
-| `note` | entered | |
+| `codes` | entered | K1 to K4 (section 12.2), a semicolon list when more than one applies; exactly when the verdict is `error` |
+| `true_end` | entered | when `error`: the right last day (`YYYY-MM-DD`, or `YYYY-MM` for the last day of that month), or blank if the target gives no date |
+| `start_differs` | entered | 1 or 0; blank counts as 0 |
+| `note` | entered | free text; required for `cannot_tell` |
+
+The scorer (`python -m analysis.coling.audit_reference score --a1 <sheet> --a2 <sheet>`) copies
+both sheets to `submitted/`, saves the agreement on the shared items and writes
+`reference_adjudication.csv`: one row per item that an annotator marked `error` or
+`cannot_tell`, with both annotators' entries. ADJ fills `decision` (`confirmed`, `rejected` or
+`unresolved`), `confirmed_codes`, `confirmed_true_end` and `adj_note` in a copy; run again with
+`--adjudication`, the scorer writes `reference_result.json` and `reference_confirmed.csv`.
 
 ## 10. Files, hashes and sealing
 
@@ -1380,9 +1394,10 @@ The folders below are the scripts' defaults on 1 October, as `PLAN.md` section 1
 - **Blank sheets.** The task A sheets (pilot, check, reserve, literal) go to
   `analysis/coling/out/audit/`, with the matching item file for the reading harness
   (`<task>_items.jsonl`); the task C blanks are in `analysis/coling/out/e5/`
-  (`pairs_<A1|A2>.csv`, each with `pairs_<A1|A2>_items.txt`); the task E blanks are to go
-  beside the task A ones, once its script is written. They contain only public notice text,
-  rule readings (task E) and fictitious pairs
+  (`pairs_<A1|A2>.csv`, each with `pairs_<A1|A2>_items.txt`); the task E blanks are in
+  `analysis/coling/out/audit_reference/` (`reference_<A1|A2>.csv`, each with
+  `reference_<A1|A2>_items.txt`, and `reference_manifest.json`). They contain only public
+  notice text, rule readings (task E) and fictitious pairs
   (task C). The task D list is `analysis/coling/out/availability_strings.csv`, where
   `corpus.py` writes it. Train-half task B sheets and traces go to the folder the builder is
   given (`analysis/coling/out/audit_outcomes/` unless another is named); they hold
@@ -1394,7 +1409,9 @@ The folders below are the scripts' defaults on 1 October, as `PLAN.md` section 1
 - **Submission.** The agreement script copies each submitted task A sheet to
   `analysis/coling/out/audit/submitted/` and records its sha256 in
   `analysis/coling/out/audit/manifest.json`, with the hashes of the agreement output and later
-  of the gold; for task B the scorer writes its files beside the sheets. The pair is committed
+  of the gold; for task B the scorer writes its files beside the sheets; for task E the scorer
+  copies the submitted sheets to `analysis/coling/out/audit_reference/submitted/` and records
+  their sha256 in `reference_manifest.json`. The pair is committed
   together. The gold hash is recorded before any reader output on those items is opened.
 - **Sample lists.** The list of ids of every sample and its sha256 go into the manifest and
   into the registration record. The lists of the pilot, the check set, the reserve and the
@@ -1556,7 +1573,8 @@ It changes no item: the eligible list and every `stated_end` are registered befo
   3. Is `rule_end` the last day of that period?
   4. Does the period end on or after the Date of update (not stale)?
 - **Verdict.** `ok` when all four hold; `cannot_tell` when the text does not let you decide
-  (say why in `note`). Otherwise `error`, with a code:
+  (say why in `note`). Otherwise `error`, with a code (several, separated by semicolons, when
+  more than one applies):
 
   | Code | Error |
   |---|---|
@@ -1929,3 +1947,13 @@ stand, and neither is a difference in a rule:
   was inserted. Section 6.7 and appendix B: the rules that waited for the owner are confirmed;
   the list of differences from `PLAN.md` is redone against the plan as registered, which has
   taken up every difference in a rule; D14 names the two conventions added after the pilot.
+- **v1, 5 October 2026, later the same day,** after the script of task E was written and
+  checked (`audit_reference.py`). No convention of task A, B or C changed, and no sample.
+  Sections 1, 9 and 10: the script of task E, its validator and scorer commands, the header
+  lines of its sheets, where its blanks and its submitted sheets are kept, and what its
+  columns take. Section 12.2: an error may carry several codes. Section 8.4: the check is also
+  reported by statement year, with the items ADJ left unresolved, and with the share whose
+  rule reading is confirmed. One disclosure on the task E sample: one of its statements has
+  the same text as a statement of the literal sample for another drug; the registered rule
+  leaves out the same text only for the same drug and company. The check sheets were labelled
+  under the text of `449c8e049be6cab1`, as the entry above says.

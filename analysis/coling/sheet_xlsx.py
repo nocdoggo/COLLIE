@@ -63,9 +63,10 @@ from itertools import zip_longest
 from pathlib import Path
 from typing import Any
 
-FIRST_ENTERED = ("statement_type", "verdict_B", "ok_type")
-"""The first column an annotator fills, on a literal-reading sheet, on an outcome sheet and on
-a minimal-pair sheet (task C)."""
+FIRST_ENTERED = ("statement_type", "verdict_B", "ok_type", "verdict", "decision")
+"""The first column that is filled: on a literal-reading sheet, on an outcome sheet, on a
+minimal-pair sheet (task C), on a reference-reading sheet (task E), and on an adjudication
+sheet."""
 OUTCOME_LISTS = {
     "verdict_B": ("ok", "error", "cannot_tell"),
     "verdict_A": ("ok", "error", "cannot_tell"),
@@ -89,8 +90,18 @@ PAIR_LISTS = {
 }
 """Closed value sets of the minimal-pair sheet: its eight marks (``ERROR_CHECKS`` and
 ``natural`` of ``minimal_pairs.py``), which its ``# values of ...`` lines describe in words."""
-SINGLE_VALUED = ("statement_type", "abstain", "abstain_reason", "certainty", "hard")
-"""Columns of the literal-reading sheet that hold one value of a closed set."""
+SINGLE_VALUED = (
+    "statement_type",
+    "abstain",
+    "abstain_reason",
+    "certainty",
+    "hard",
+    "verdict",
+    "start_differs",
+)
+"""Columns that hold one value of a closed set which the sheet names in a ``# values of ...``
+line: those of the literal-reading sheet, and the verdict and the start flag of the
+reference-reading sheet."""
 WIDE = 45
 NARROW = 12
 ENTERED = 18
