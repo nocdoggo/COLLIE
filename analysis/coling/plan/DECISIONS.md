@@ -156,3 +156,17 @@ carry the registered text.
     adjudicated by the owner on 5 October); pass, no rule fix required. The returned workbooks
     are under `external_data/annotation/returned/`, their converted sheets under
     `external_data/annotation/pilot/` and `outcome_train/`.
+30. **Owner, 5 October, evening: the October cycle after all.** The paper is registered with
+    ARR for the October cycle, and the owner reversed the hold of decision 28 the same day:
+    submission on 12 October. New dates, with no relaxation: registration by Tuesday 6 October
+    23:59 AoE, numbers frozen by Friday 9 October 23:59 AoE. E6 stays cut.
+31. **Pilot points [owner, 5 Oct].** Settled from the pilot itself, without a meeting, and
+    told to A1 and A2 with guide v1: D1 as the guide has it (an abstaining target with no
+    unknown marker is `estimated` when vague and `undetermined` when undated or TBD); D3 as C11
+    ("until X" and "through X" are the period X); D13 as C17 (seasons); "temporarily on
+    backorder" and "Sporadic availability expected" are not statements about timing; "Partial
+    shipments on allocation April-July 2021" beside "No current supply" is a next delivery (a
+    recovery needs wording that the shortage state ends). D14: the prompt is not extended; ADJ
+    marks the gold items whose reading rests on a convention the prompt does not state, and
+    E2 is reported with and without them. The pilot sentences D1 and D3 and the sentence on a
+    median of 365 are in `read.py` (commit `29b10a4`).

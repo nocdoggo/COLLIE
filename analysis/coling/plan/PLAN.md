@@ -11,11 +11,11 @@ the following hold, before any language-model call of this study:
 - this paragraph is replaced by the registration statement, and the commit is pushed and tagged
   (section 17, "Identity").
 
-The target was Saturday 3 October 2026, 23:59 AoE; missing it was a hold trigger (section 12).
-It was missed: the annotators returned the pilot and the train-half outcome audit on
-5 October. By the owner's decision of that day the paper is held for the ARR cycle of January
-2027 (section 12, "The hold"), and this file is registered on a new date before any
-language-model call. Until then anything here may change. What changed since the draft of 29 September, and what had
+The first target was Saturday 3 October 2026, 23:59 AoE. It was missed: the annotators returned
+the pilot and the train-half outcome audit on 5 October. The owner moved the target to Tuesday
+6 October 2026, 23:59 AoE, and kept the submission to the October cycle (section 12, "The
+schedule from 5 October"). This file is registered before any language-model call. Until then
+anything here may change. What changed since the draft of 29 September, and what had
 been seen when it changed, is listed in "Changes from the 29 September draft" near the end of
 this file. After registration every change is a dated amendment at the end of this file (A1, A2,
 ...), and the freeze of prompts, parsers, harness and the one registered model selection is
@@ -1630,17 +1630,38 @@ The gate passes only if the thresholds hold in both parts.
 - numbers are not frozen by 6 October, 23:59 AoE (7 October under the one relaxation);
 - the UV camera-ready needs more than 1.5 days before 12 October.
 
-**The hold (owner decision, 5 October).** The third trigger fired. A1 and A2 started on
-Saturday 3 October and returned the pilot sheets and the train-half outcome audit on Monday
-5 October, after both the deadline and its one relaxation; nothing was registered, and no
-language model had been called. The paper goes to the ARR cycle of January 2027 and cannot
-go to COLING 2027. The schedule above, Gate 2 below and the dates in the standing rules
-describe the October attempt and are replaced, before registration, by the schedule of the
-January version (Plan B, below). What was done by 5 October stands: the corpus code, the
-samples, the guide draft, the pilot (both sheets valid; one disagreement in 20 notices) and
-the train-half outcome audit (passed: no confirmed error in 50 items under B, one under A).
+**The schedule from 5 October (owner decision, 5 October).** The third trigger above fired:
+A1 and A2 started on Saturday 3 October and returned the pilot sheets and the train-half
+outcome audit on Monday 5 October, after the deadline and its one relaxation. Nothing was
+registered, and no language model had been called. On 5 October the owner first decided to hold
+the paper for the ARR cycle of January 2027, and the same evening decided to submit to the
+October cycle after all, on a later schedule; the paper was by then registered with ARR for
+that cycle. The triggers above are replaced by those below, once, and nothing in the design
+changed with the dates. What was done by 5 October stands: the corpus code, the samples, the
+pilot (both sheets valid; one disagreement in 20 notices) and the train-half outcome audit
+(passed: no confirmed error in 50 items under B, one under A).
 
-**Gate 2 (6 October).** Submit if:
+| Day | Work |
+|---|---|
+| **Mon 5 Oct** | Pilot points settled and guide v1; pilot sentences in the prompts; check sheets to A1 and A2; the freeze run of the corpus builder (the one sealed write) and the counts-only code; every gate value filled in. |
+| **Tue 6 Oct** | Check-set gate. Independent check of every filled number against the code. **Registration pushed and tagged, by 23:59 AoE.** Then cost trials and dev runs. Literal task starts. |
+| Wed 7 Oct | Selection of `m-best`. Refit on fit and dev. **F1 pushed.** Confirmatory runs: E3 conditions a, b, c and the probe, both primaries. Then E2, E5, the 2×2 and the secondaries, in cost order. |
+| Thu 8 Oct | Runs finish. Literal task, reference-reading check and minimal-pair audit done; agreement computed; gold hashed. Test-half outcome audit, after the last confirmatory run. |
+| **Fri 9 Oct** | Registered evaluator. **Gate 2: submit or hold. All numbers frozen by 23:59 AoE.** |
+| 10 to 11 Oct | Write the 8 pages. Limitations, ethics, datasheet, Responsible NLP checklist. Overlap check against the UV text. Independent check of every number and claim. Anonymised supplement. |
+| Mon 12 Oct | ARR submission (23:59 AoE). |
+
+*Hold triggers from 5 October.* Any one of these moves the paper to ARR January 2027:
+
+- Gate 1 fails on the freeze run;
+- the check-set alpha stays below 0.6 after the one allowed revision;
+- the registration is not pushed by Tuesday 6 October, 23:59 AoE;
+- numbers are not frozen by Friday 9 October, 23:59 AoE.
+
+There is no relaxation of these dates. The secondaries that are not finished by the freeze of
+numbers are left out and named as not run. The cut order below applies as written.
+
+**Gate 2 (Friday 9 October; 6 October in the schedule of 1 October).** Submit if:
 
 - every confirmatory run is complete;
 - the registered evaluator has run;
@@ -2296,6 +2317,14 @@ quoted here are from the build of 29 September.
     The change makes H3 harder to hold in favour of the text on dev; on 2020 it does not
     decide the sign. The draft's contrast is reported beside H3 so that both can be read.
 
+37. **Dates.** Draft and revision of 1 October: registration by 3 October (4 October under one
+    relaxation), numbers frozen by 6 October (7 October). Now: registration by Tuesday
+    6 October and numbers frozen by Friday 9 October, with no relaxation; E6 is cut. *Seen:*
+    the pilot and the train-half outcome audit, returned on 5 October; no model output and no
+    test-period outcome. *Why:* A1 and A2 started on 3 October and returned on 5 October. The
+    owner first decided to hold for January and then, the same day, to keep the October cycle;
+    nothing in the design, the samples or the tests changed with the dates.
+
 **Status of these changes.** The owner confirmed on 1 October the scope (item 1), the deadlines
 and their one relaxation (item 2), the availability rule, the capture freeze and the result of
 the availability check (items 9 and 26), the roles (item 24), the public repository with
@@ -2303,7 +2332,7 @@ an anonymised copy of the plan and guide in the supplement (item 17), deepseek-v
 endpoint (item 16), the E6 gate rule and the reading of a route extension (item 33), and the
 four sample rules of item 35. The other items, item 36
 included, were provisional rules of 1 October; the owner confirmed them as written on
-3 October.
+3 October. Item 37 is the owner's decision of 5 October.
 
 **Corrections of the text to the code as it stood on 29 September** (the builder did not change
 for these; the draft described it wrongly). *Seen:* train outcomes; the builder had been tested
