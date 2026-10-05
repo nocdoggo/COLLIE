@@ -34,24 +34,26 @@ hashed. Appendix B lists the differences known on 1 October.
 | Task | Items | Who | When | Pass rule |
 |---|---|---|---|---|
 | D. Availability strings (12.1) | the whole list: every string classed available or limited, now or before the 1 October rule change | ADJ | done on 1 October, before the corpus is frozen | none; no string was rejected, so the frozen list is empty |
-| Pilot | 20 | A1 and A2, independently | Fri 2 Oct | none |
-| Check set | 20, with 20 in reserve | A1 and A2, independently | Fri 2 Oct | alpha of at least 0.6 on the start and on the end month offsets |
-| B. Outcome audit, train half | 50, plus 6 planted | 20 each, 10 shared, 3 planted each | Fri 2 Oct, before registration | at most 2 confirmed errors in the 50, for definition B and for definition A |
-| A. Literal reading | 120 | A1 and A2, independently | Sat 3 to Mon 5 Oct | reported, no pass rule |
+| Pilot | 20 | A1 and A2, independently | 3 to 5 Oct | none |
+| Check set | 20, with 20 in reserve | A1 and A2, independently | 5 to 6 Oct | alpha of at least 0.6 on the start and on the end month offsets |
+| B. Outcome audit, train half | 50, plus 6 planted | 20 each, 10 shared, 3 planted each | 3 to 5 Oct, before registration | at most 2 confirmed errors in the 50, for definition B and for definition A |
+| A. Literal reading | 120 | A1 and A2, independently | 6 to 8 Oct | reported, no pass rule |
 | E. Reference readings (12.2) | 100 | 45 each, 10 shared | after both task A sheets are in | reported, no pass rule |
 | C. Minimal-pair audit | 100, plus 10 planted | 45 each, 10 shared, 5 planted each | after both task A sheets are in | at least 95 of the 100 free of confirmed errors |
 | B. Outcome audit, test half | 50, plus 4 planted | 20 each, 10 shared, 2 planted each | after every confirmatory run, before the evaluator | at most 2 confirmed errors in the 50, for B and for A |
 | Adjudication | disagreements and reported errors | ADJ (section 5) | after each task | |
 
-**Hours.** Minutes per person, from 2 October on, at the planning rates in the third column.
-The range uses the low and high rates in brackets. The pilot measures the literal rate, and the
-train-half audit measures the audit rate; both are written into v1.
+**Hours.** Minutes per person at the planning rates in the third column, as they were written
+before the pilot. The range uses the low and high rates in brackets. The sitting times on the
+pilot sheets and on the train-half audit sheets include reading this guide, so they give no
+rate. The literal rate is measured on the check set, and `PLAN.md` section 10 gives the load at
+the measured rate.
 
 | Step | Items per person | Rate (low to high) | A1 | A2 | ADJ | Range, per annotator |
 |---|---|---|---|---|---|---|
 | Read this guide | | | 40 | 40 | 40 | 30 to 45 |
 | Pilot | 20 | 45 s (30 to 60) | 15 | 15 | | 10 to 20 |
-| Pilot meeting | | | 40 | 40 | 40 | 30 to 45 |
+| Pilot meeting (not held; section 4) | | | 40 | 40 | 40 | 30 to 45 |
 | Check set | 20 | 45 s (30 to 60) | 15 | 15 | | 10 to 20 |
 | B. Outcome audit, train half | 33 | 2 min (1 to 3) | 65 | 65 | | 35 to 100 |
 | Adjudication, train half | | | | | 20 | |
@@ -70,11 +72,7 @@ Not in the table:
 - Task D, which ADJ did on 1 October (section 12.1); its time was not measured.
 - A check set that fails once adds about 35 minutes for each annotator (20 reserve items and a
   second, shorter meeting).
-- If E6 is still in the study on 4 October, the hand check of at least 150 links that is its
-  gate (`PLAN.md` section 10, task 7) is done by A1 and A2. At 30 seconds a link that is
-  about 75 minutes of checking between them, and more with the links that both check. The
-  sheets and the procedure come with the linker code and E6's amendment; this guide does not
-  cover them.
+- E6 was cut on 5 October (`PLAN.md` section 12), so the hand check of its links is not done.
 - The sheet builder's work is engineering time.
 
 **If the hours do not fit.** Sizes are fixed before v1 is hashed; nothing is resized after
@@ -637,8 +635,9 @@ is the blank's own file, and one whose blank is missing or changed.
 
 ## 4. Pilot, revision and check set
 
-1. **Pilot (the draft of 1 October).** 20 train-period items, allocated as in section 3.2. A1 and
-   A2 label them independently under the draft and write the start and end time of the sitting in the
+1. **Pilot (the draft of 1 October).** 20 train-period items, allocated as in section 3.2. A1
+   and A2 label them independently under the draft and write the start and end time of the
+   sitting in the
    sheet header (`# sitting_start:` and `# sitting_end:`, section 9).
 2. **Agreement.** The agreement script (`audit_agreement.py agree --task pilot`) computes the
    statistics of section 8.1 on the pilot, lists every disagreement, and gives the mean seconds
@@ -1081,11 +1080,10 @@ field that is cut). Say why in `note`. It goes to ADJ (section 5).
     the first round is scored. It draws nothing: the items are those of the first round whose
     bracket, derived again, differs from the one the key records, and each goes to the
     auditor who had it. Planted items are added only with `--planted`.
-- **Pass rule of a re-audit (provisional, for the owner to confirm).** The scorer allows
+- **Pass rule of a re-audit (confirmed by the owner on 3 October).** The scorer allows
   confirmed errors up to 5% of the real items of the set, rounded down, for B and separately
   for A. That is 1 error among 20 fresh items, and none in an affected set of fewer than 20
-  items. `PLAN.md` gives no rule for these two sets; this one is what the scorer applies, and
-  it is confirmed or changed by the owner before a re-audit is scored.
+  items. `PLAN.md` section 10 states the same rule.
 - **Test half.** A failure after registration is handled the same way, logged as a dated
   amendment with the new sealed hash, before the evaluator runs.
 - **Flags** (N1 to N6) are counted and reported. A flag does not change the rule after
@@ -1128,7 +1126,7 @@ minimal pairs are not collected in October.
 2. **Minimal.** Does the edit change only the named factor? Its gold may differ from the seed's
    only as that factor implies.
 3. **Attested.** Does the inserted marker or form appear in `attested_text`, with only months and
-   numbers changed?
+   numbers changed? Mark 1 when nothing was inserted.
 4. **Natural** (secondary; not part of the pass rule). Would the edited entry look unremarkable on
    the FDA list?
 
@@ -1383,7 +1381,8 @@ The folders below are the scripts' defaults on 1 October, as `PLAN.md` section 1
   `analysis/coling/out/audit/`, with the matching item file for the reading harness
   (`<task>_items.jsonl`); the task C blanks are in `analysis/coling/out/e5/`
   (`pairs_<A1|A2>.csv`, each with `pairs_<A1|A2>_items.txt`); the task E blanks are to go
-  beside the task A ones, once its script is written. They contain only public notice text, rule readings (task E) and fictitious pairs
+  beside the task A ones, once its script is written. They contain only public notice text,
+  rule readings (task E) and fictitious pairs
   (task C). The task D list is `analysis/coling/out/availability_strings.csv`, where
   `corpus.py` writes it. Train-half task B sheets and traces go to the folder the builder is
   given (`analysis/coling/out/audit_outcomes/` unless another is named); they hold
@@ -1783,41 +1782,28 @@ more: none occurs only in texts dated 2023 or later, after one cue of section 3.
 | D11 | Outcome definitions and audit unit | | `corpus.py`: A, B and BL; one bracket per presentation thread, and a statement-level bracket | section 6: the audit follows the frozen `corpus.py`; the unit is the thread's bracket under B and A; the statement-level bracket is shown, not audited | closed (decision 5 makes the shown presentation's bracket the primary outcome) |
 | D12 | Size of the literal task | | | 120 items double-labelled, a 20-item pilot, a 20-item check set with 20 in reserve | closed (decisions 7 and 10) |
 | D13 | Seasons ("winter 2021", "in the summer") | not covered | with a year, the year (the season word is ignored); with no year, `none` | the year; with no year, `vague` (C17); `hard` | **closed on 5 October.** No train-period statement contains a season word, and no pilot item bears on it. C17 stays; the yearless case is a known mismatch with `rules.py` |
-| D14 | Conventions the prompt does not state (weeks, parts of a year, "over the next N", calendar units such as "next month", a month followed by a two-digit number, "from X to Y", no clipping, the choice between two statements of one type) | not covered; no sentence is reserved for them | covered (frozen conventions) | C4, C7, C8, C9, C12, C16 and rules 2 to 4 of 3.6, marked [R] or [G] | **closed on 5 October.** The gold follows conventions the models are not given. The prompt is not extended: ADJ marks the gold items whose reading rests on them, and E2 is also reported without those items |
+| D14 | Conventions the prompt does not state (weeks, parts of a year, "over the next N", calendar units such as "next month", a month followed by a two-digit number, "from X to Y", no clipping, the choice between two statements of one type) | not covered; no sentence is reserved for them | covered (frozen conventions) | C4, C7, C8, C9, C12, C16 and rules 2 to 4 of 3.6, marked [R] or [G] | **closed on 5 October.** The gold follows conventions the models are not given. The prompt is not extended: ADJ marks the gold items whose reading rests on them, and E2 is also reported without those items. Rule 7 of section 3.6 and the C14 sentence on *temporarily* and on sporadic availability, both added after the pilot, are conventions of this kind |
 | D15 | Reference reading for E3 | `stated_end` is supplied to the prompt | the frozen rule reading | task E checks 100 eligible statements (12.2); no further author labels in October | closed (decision 4) |
 | D16 | Authors' predictive readings of minimal pairs | | | not collected (section 7) | closed (decision 15) |
 | D17 | Distractor roles | the answer has no distractor field | seven roles, with `availability_until`; in example 17 "May and July delivery" is listed as `other` | six roles; "available until" is `depletion`; delivery mentions are not distractors | closed: the scorer maps `availability_until` to `depletion`; example 17 is a known mismatch |
-| D18 | Forms the rule reader misses | covers "N to M" and a half without a year; says nothing on the others | "Estimated recovery 4-6 weeks" and "Next release 4 to 6 weeks" (no "in", no colon) read as `none`; "Will remain on backorder for 3 months" reads as `none`; "early to mid 2021" reads as May to August; a half with no year ("Estimated recovery: 1H") reads as `none`; a numeric day with no year and no word before it ("Next release 10/5") reads as `none`, though "on 10/5", "by 10/5" and "week of 10/5" are read; "cannot be estimated" is not taken as an unknown marker; "fifth week of May" and "5th week of May" read as the whole month, though "week 5 of May" is read; "middle of Q3 2021", "start of Q3 2021" and "mid of Q3 2021" read as the whole quarter; "mid-2021" reads as `none`; "Shortage is estimated for 18 months" is a recovery only while the text holds nothing else | C12 and C9: 4 to 6 weeks later; 3 months later; January to August. C8: the first occurrence of the half that ends on or after the Date of update, and of the day on or after it. 3.7: an unknown marker, so abstain with `tbd`. C4: days 29 to the last | known mismatch, found by probes on 1 October (not corpus texts); disclosed, not patched |
+| D18 | Forms the rule reader misses | covers "N to M" and a half without a year; says nothing on the others | "Estimated recovery 4-6 weeks" and "Next release 4 to 6 weeks" (no "in", no colon) read as `none`; "Will remain on backorder for 3 months" reads as `none`; "early to mid 2021" reads as May to August; a half with no year ("Estimated recovery: 1H") reads as `none`; a numeric day with no year and no word before it ("Next release 10/5") reads as `none`, though "on 10/5", "by 10/5" and "week of 10/5" are read; "cannot be estimated" is not taken as an unknown marker; "fifth week of May" and "5th week of May" read as the whole month, though "week 5 of May" is read; "middle of Q3 2021", "start of Q3 2021" and "mid of Q3 2021" read as the whole quarter; "mid-2021" reads as `none`; "Shortage is estimated for 18 months" is a recovery only while the text holds nothing else | C12 and C9: 4 to 6 weeks later; 3 months later; January to August. C8: the first occurrence of the half that ends on or after the Date of update, and of the day on or after it. 3.7: an unknown marker, so abstain with `tbd`. C4: days 29 to the last | known mismatch, found by probes on 1 October and by the check of the minimal pairs on 2 October (not corpus texts); disclosed, not patched |
 | D19 | Sample of the alpha gate | | | the 20-item check set, with the share of identical intervals beside it (section 4) | closed (decision 10) |
-| D20 | Who adjudicates, and who may read model outputs | | | ADJ adjudicates and does not label; A1 and A2 do not read reader outputs on their items before the gold is hashed (section 2, rule 1) | closed (decision 10). The limit on ADJ's looks at items still to be adjudicated is this guide's addition, for the owner to confirm |
-| D21 | Exclusion unit of the train-half outcome sample | | | statement and presentation thread (section 6.2), as `audit_outcomes.py` implements it, not the whole shortage episode of v0 | closed in this draft, for the owner to confirm: the episode rule would leave about a quarter of the train events; this one leaves 5,011 of the 8,020 (62%) in the draw of 1 October, with all four sample lists read. Of the 3,009 left out, 1,826 are on a thread that carries a sampled or appendix A statement; the other 1,183 come from the further step for the thread of the shown row (6.2) |
+| D20 | Who adjudicates, and who may read model outputs | | | ADJ adjudicates and does not label; A1 and A2 do not read reader outputs on their items before the gold is hashed (section 2, rule 1) | closed (decision 10). The limit on ADJ's looks at items still to be adjudicated is this guide's addition, confirmed by the owner on 3 October |
+| D21 | Exclusion unit of the train-half outcome sample | | | statement and presentation thread (section 6.2), as `audit_outcomes.py` implements it, not the whole shortage episode of v0 | closed (confirmed by the owner on 3 October): the episode rule would leave about a quarter of the train events; this one leaves 5,011 of the 8,020 (62%) in the draw of 1 October, with all four sample lists read. Of the 3,009 left out, 1,826 are on a thread that carries a sampled or appendix A statement; the other 1,183 come from the further step for the thread of the shown row (6.2) |
 | D22 | Choice of the target among several statements | the type order (recovery, next delivery, discontinuation, depletion); nothing on two statements of one type | `_score`: the type order, except that a dated discontinuation outranks a next delivery stated with no time and ties with one under an unknown marker, and a discontinuation under an unknown marker ties with a next delivery stated with no time (the first mentioned then wins); within recovery the kind of cue first, then dated over unknown marker, a vague statement last, except for two ties that go to the first mentioned: a shortage state under an unknown marker against a dated statement with a bare cue, and a bare cue under an unknown marker against a vague statement; a cue written after the date ("October 2021 supply") ranks with the resupply cues | rule 1 of 3.6 is the prompt's order, with no exception; rules 2 to 4 are the ranking of `rules.py`, without the two ties | known mismatch in these corners, disclosed. They decide no target in the sampling frame: on 1 October the ranking of 3.6, coded with the reader's own cue table, was compared with `_score` on every statement of the frame that makes two or more statements (texts only, with and without the bare availability label), and the two chose the same statement every time. v0 and the first draft of 1 October put "dated over unknown marker" before the kind of cue, which differed from `rules.py` on a handful of statements |
 
-**Differences from `PLAN.md` and from the code, known on 1 October.** The plan was being amended
-while this draft was written, and it has taken up most of the differences listed in earlier
-drafts: the roles, the draft the pilot is labelled under, the gate with its pooling rule and its
-reserve items, the timing of the reference-reading check and the statements its draw leaves out,
-the E2 test over the items outside the month-and-year stratum, the display row of a statement
-that is not at risk, the availability-string check and its result, the error rule of the
-minimal-pair audit, the output folder of the literal task, the E6 link checks, the two
-distractor rows of E2, the rule on quoted phrases and the seeds of the relative form. What
-remains, compared with `PLAN.md` at sha256 prefix `f24a449d57dbaf03`, is below. This list is
-emptied before v1 is hashed.
+**Differences from `PLAN.md` and from the code.** The plan and this guide were written side by
+side from 1 to 5 October, and each took up what the other had settled. Compared with `PLAN.md`
+as it stands with this version, no difference in a rule remains: the plan now states the
+order of the test-half outcome audit after tasks A, C and E, the statements that the later
+lists leave out, what the per-form figures of the literal task describe, the wider exclusion
+of the train-half outcome sample, and the pass rule of a re-audit. Two remarks on the code
+stand, and neither is a difference in a rule:
 
 | Where | Says or does | This guide |
 |---|---|---|
-| `PLAN.md` 3, calendar overlap | a train-period statement first archived in 2023 is "first seen in the capture of 2023-01-13" | nearly all are (6.1); in the open events table, 7 of the 377 train events first captured in 2023 are first seen in a later capture of that year |
-| `PLAN.md` 10, tasks 4 to 6 | gives no order between the test-half outcome audit and tasks C and E | the test-half audit starts only after A1 and A2 have submitted their sheets of tasks A, C and E (section 1) |
-| `PLAN.md` 3, samples and their order, step 3 | the in-context examples, the dev prompt items and the seeds "exclude everything drawn in steps 1 and 2 and one another" | they also leave out every statement that reads like an item of step 1: the same whole text whatever the drug or the company, and the item's notice on another presentation (section 10) |
-| `PLAN.md` 7.1 and 5, E2 | every literal metric is reported per form, "weighted by event and by template" | no sample holds a statement whose whole text is a quoted phrase (A.4), 486 silent statements among them; the plan does not say that the per-form figures and their event weights describe the frame without those statements |
-| `PLAN.md` 10, blinding and task 5 | the train-half sample "leaves out every thread that carries a statement they label" | it does, and it also leaves out every statement that the thread of a shown row carried at any date, with all its presentations (6.2, D21); the pool is 5,011 events, where the plan's wording alone would give 6,194 |
-| `PLAN.md` 10, task 5 | the affected items and 20 fresh ones are audited again; no pass rule for these two sets | 6.7: the scorer allows confirmed errors up to 5% of the real items of a set, rounded down (1 in 20, none below 20); provisional, for the owner to confirm |
-| `dataset.py`, the subsets of the eligible list | leave out appendix A and the fixed test item, and `reference_check` the first draw as well; the rule on quoted phrases (A.4) is not applied | A.4 names the samples it covers. No eligible statement has a quoted phrase as its whole text in the 1 October build: the 469 such frame statements dated 2023 or later are TBD, undated or silent, and the eligible list holds dated forms only. The eligible list is built again after the first draw (12.2) |
+| `dataset.py`, the subsets of the eligible list | leave out appendix A and the fixed test item, and `reference_check` the first draw as well; the rule on quoted phrases (A.4) is not applied | A.4 names the samples it covers. No eligible statement has a quoted phrase as its whole text: such frame statements dated 2023 or later are TBD, undated or silent, and the eligible list holds dated statements only |
 | `audit_sample.py` and `audit_outcomes.py`, header lines | the task A sheets take the times as `sitting_start` and `sitting_end`, one pair of lines per sitting; the task B sheets as `session_start` and `session_end`, with semicolons | section 9 describes both; one form for all sheets would be easier on the annotators |
-
-Two lines of `PLAN.md` section 10 wait on this guide and on the owner: the load figure, which
-is filled from the hours table of section 0 at the rates the pilot and the train-half audit
-measure, and the owner's confirmation of the limit on what ADJ looks at (D20).
 
 ## Changelog
 
@@ -1886,7 +1872,7 @@ measure, and the owner's confirmation of the limit on what ADJ looks at (D20).
     a row of appendix A that matches no event and on a listed id unknown to the build; a
     stratum whose pool has one event gets that one.
   - 6.7: the two re-audit commands, and the pass rule the scorer applies to a re-audit set
-    (provisional, for the owner to confirm).
+    (provisional then; confirmed by the owner on 3 October).
   - 8.1: a small stratum gets no alpha; its kappas stay in the output.
   - 10: the later lists (`samples_later/`, `draw_rank`, `period`, their three rules), the
     flags `--fixed` and `--replace`, and what a revised guide does to sheets already written.
@@ -1935,3 +1921,11 @@ measure, and the owner's confirmation of the limit on what ADJ looks at (D20).
   (`expected`), the validator and scorer commands of task C, where its blanks and its gold
   are kept. Appendix B, D18: three more readings of the rule reader. The labelling rate is
   measured on the check set, since the pilot's sitting times include reading the guide.
+- **v1, 5 October 2026, corrections the same day,** after the check sheets were written (they
+  name this version at sha256 prefix `449c8e049be6cab1`, the text the check set is labelled
+  under). No convention of task A changed. Section 0: the dates as they fell, the hours
+  paragraph (the sheets' sitting times include reading the guide; the literal rate comes from
+  the check set), and E6 as cut. Section 7.2: a check of "attested" is marked 1 when nothing
+  was inserted. Section 6.7 and appendix B: the rules that waited for the owner are confirmed;
+  the list of differences from `PLAN.md` is redone against the plan as registered, which has
+  taken up every difference in a rule; D14 names the two conventions added after the pilot.

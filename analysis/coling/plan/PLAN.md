@@ -600,11 +600,9 @@ Late).
     and that capture date is the only test-period date in its row. There are 119 such statements
     on the shortage listing (295 presentation-level events), of which 52 are at risk under B (86
     events); the track record of fit and dev holds those 52, each censored at its first capture.
-    <!-- the open events table also holds 38 such statements of the discontinuation listing,
-    which enter no outcome analysis: 35 first seen in the capture of 2023-01-13, one in that of
-    2023-05-14 and two in that of 2023-11-14 (computed from events.csv.gz, first-sight fields
-    only; not printed by the dataset builder). Every such statement of the shortage listing was
-    first seen on 2023-01-13. -->
+    Every such statement of the shortage listing is first seen in the capture of 2023-01-13.
+    The open events table also holds 38 such statements of the discontinuation listing, which
+    enter no outcome analysis; three of them are first seen in later captures of 2023.
   - Statements dated after 2021-11-30 have at most two days of follow-up in the train period
     (the captures of 2022-10-04 and 2022-10-06), so the dev split scores almost only statements
     dated in 2021.
@@ -1440,8 +1438,7 @@ reasoning or thinking) × the output price per 1M, at the registered prices of s
   else beyond its cost trial: no probe, no E5 and no E6.
 - The TBD, silent and stale-at-issue secondaries are read by the two primaries only.
 - The Late split is not read for outcomes.
-- E6, if it passes its gate, is read by the seven other models. Its calls go through the same
-  harness, ledger and caps; its prompts and item sets are fixed by its amendment.
+- E6 was cut on 5 October (section 12) and is read by no model.
 
 **Calls per model.** `N_E` is the number of eligible statements, `N_S` the number of statements
 in the three secondary lists together, and `N_D` the number of scoreable dev statements. At the
@@ -1454,7 +1451,6 @@ freeze they are 2,593, 942 (376 TBD, 550 silent and 16 stale at issue) and 644.
 | E4 probe | 300 | seven (not gemini-3.8-flash) |
 | E5: about 800 items | 800 | seven (not gemini-3.8-flash) |
 | Cost trial: 20 dev items per template used | 100 (gemini-3.8-flash: 80) | all eight |
-| E6, if it passes its gate | about 1,200 | seven (not gemini-3.8-flash) |
 | E3 secondaries: conditions a, b, c on the secondary lists | 3 × `N_S` | primaries |
 | Dev runs for the H3 selection | 3 × `N_D` | primaries |
 | E4 2×2: three further cells on 300 items | 900 | primaries |
@@ -1463,8 +1459,6 @@ freeze they are 2,593, 942 (376 TBD, 550 silent and 16 stale at issue) and 644.
 
 Repair calls (at most one per failed answer) are not in these counts and count against the caps.
 
-The table below gives the calls without E6; E6 adds about 1,200 to every model but
-gemini-3.8-flash.
 
 | Model | Calls | Cost per call | Estimate | Upper estimate | Cap |
 |---|---|---|---|---|---|
@@ -1490,10 +1484,6 @@ The median understates the mean of a reasoning model: at the draft's cost of abo
 call, the 8,099 calls of gemini-3.8-flash come to $89.09. The costs per call of the 29 September
 draft (about $0.011, $0.0025, $0.0004 and $0.00015 for the first four rows, and $0.0001 to
 $0.00025 for the four small models) are withdrawn. All of these are replaced by the cost trial.
-<!-- the table, the check of the caps and the run sheet below are those of `read.py`
-`c7bd46b5b7e3dd46`, which holds the two pilot sentences. They are printed again, with the
-command of this paragraph and the counts above, if that file changes before registration: a
-longer prompt moves every figure. -->
 
 **Check of the caps at the registered counts.** With `N_E` 2,593, `N_S` 942 and `N_D` 644 the
 formulas give 8,099 calls for gemini-3.8-flash, 9,219 for grok-4.20 and for each of the four
@@ -1575,10 +1565,9 @@ uses. The trial's cost is scaled to the registered call counts and recorded in F
 **If a projection exceeds a cap or the total**, the following apply in order until the
 projection fits:
 
-1. E6 is dropped for grok-4.20;
-2. a cap is raised within the reserve, recorded in F1;
-3. gemini-3.8-flash is dropped;
-4. the cut order of section 12.
+1. a cap is raised within the reserve, recorded in F1;
+2. gemini-3.8-flash is dropped;
+3. the cut order of section 12.
 
 **Resuming a run.** A run stopped by its cap or by a provider error is resumed from its cache,
 under the same name, and each resumption is recorded in the study ledger. A cap may be raised
@@ -1600,7 +1589,7 @@ a difference found before then is settled in both before either is hashed.
   or run the prompts. They read no output of a language model or of the rule reader on an item
   they label until the gold of that task is hashed.
 - The owner is the adjudicator and does not label. The adjudicator settles disagreements,
-  chairs the pilot meeting and does the availability-string check.
+  settles the open points of the pilot and does the availability-string check.
 - The adjudicator may develop prompts and read model outputs. On the items of a task still to
   be adjudicated, the adjudicator looks only at aggregates (calls made and remaining,
   parse-failure and repair counts for the whole run, spend) until that task's gold is hashed.
@@ -1665,7 +1654,9 @@ that thread carried at any date, with all its presentations.
      literal samples and exclude them as the guide specifies; the audit is reported for the pool
      it was drawn from, with the size of that pool.
    - 50 are from the test period, audited only after every confirmatory run has finished and
-     before the evaluator runs. Their sheets exist only under the sealed folder.
+     before the evaluator runs, and only after A1 and A2 have submitted their sheets of the
+     literal task, the reference-reading check and the minimal-pair audit. Their sheets exist
+     only under the sealed folder.
    - Each auditor also gets planted errors. Their key is scored by code after both sheets are
      in; no auditor opens it.
    - Pass, for each half: at most 2 confirmed errors among its 50 items, that is, at least 95%
@@ -1674,7 +1665,8 @@ that thread carried at any date, with all its presentations.
    - A failure fixes the rule, never single items. In the train half the rule is also fixed
      when the same kind of error is confirmed twice with the same cause. For the train half
      that happens before the freeze run: the outcomes are derived again, and the affected items
-     and 20 fresh ones are audited again. For the test half the outcomes are derived and sealed
+     and 20 fresh ones are audited again; each of these two sets passes with confirmed errors
+     up to 5% of its items, rounded down (1 in 20, none below 20). For the test half the outcomes are derived and sealed
      again, and the new hash is logged as an amendment before the evaluator runs.
 6. **Minimal-pair audit.** 100 E5 items: 45 to each annotator and 10 to both, with planted
    errors scored as in the outcome audit. An item has an error when a gold label does not
@@ -1688,19 +1680,14 @@ that thread carried at any date, with all its presentations.
 
 The draft's E5 predictive readings are cut.
 
-**Estimated load.** **TBD-at-gate**: minutes per person, from the guide's hours table at the
-rates the pilot and the train-half audit measure; the same figure here and in the guide. The
-draft's figure (10 to 12 hours per author, plus reference labels) is withdrawn. The E6 link
-checks are not in the guide's table and are added to the figure if E6 runs. The owner
-planned on 1 October that A1 and A2 do the pilot and the train-half audit on Friday 2 October
-and the main labelling on 3 to 5 October. A1 and A2 started on Saturday 3 October, with the
-pilot and the train-half audit; the figure must fit the hours they can give.
-<!-- the estimated load comes from the hours table of `AUDIT_GUIDE.md`, section 0, once v1
-carries the measured rates: the literal rate from the check set (`DECISIONS.md`, item 29: the
-sitting times on the pilot sheets include reading the guide) and the audit rate from the
-train-half outcome audit. At the planning rates of the draft the table gives 400 minutes for
-each annotator (175 before registration and 225 after) and 190 for the adjudicator (100 and 90),
-with a range of 250 to 550 minutes per annotator. -->
+**Estimated load.** **TBD-at-gate**: minutes per person at the rate measured on the check
+set. The guide's hours table gives the planning rates written before the pilot: 400 minutes for
+each annotator (175 before registration and 225 after) and 190 for the adjudicator, with a
+range of 250 to 550 minutes per annotator. The sitting times on the pilot sheets (120 and 300
+minutes) and on the train-half audit sheets (300 minutes each) include reading the guide, so
+they give no rate. The draft's figure (10 to 12 hours per author, plus reference labels) is
+withdrawn. A1 and A2 started on Saturday 3 October and returned the pilot and the train-half
+audit on 5 October; the figure must fit the hours they can give.
 
 ## 11. Leakage controls
 
@@ -1712,10 +1699,11 @@ with a range of 250 to 550 minutes per annotator. -->
   appears in any prompt's context.
 - **Prompt development.** The text changes of 1 October are made before registration, with no
   model call: the two fields added to the entry block and the probe, and the wording of the
-  track-record table. Two sentences of the literal prompts are settled at the pilot meeting
-  and entered before registration: how "until X" and "through X" are read (`literal-v1`), and
-  the certainty class of a statement that gives no date and has no unknown marker (both
-  literal templates). After registration, development uses dev items only, with at most 3
+  track-record table. Two sentences of the literal prompts were settled from the pilot on
+  5 October and entered before registration: how "until X" and "through X" are read
+  (`literal-v1`), and the certainty class of a statement that gives no date and has no unknown
+  marker (both literal templates). The same day one sentence was added to the track-record
+  prompt: a median of 365 means 365 days or more. After registration, development uses dev items only, with at most 3
   variants per prompt, all disclosed. Prompts are selected by parse rate and format compliance,
   and never by an outcome loss. The one outcome-based choice after registration is the selection of
   `m-best` on dev, recorded in F1. The H3 comparator was fixed before registration, after
@@ -2212,15 +2200,18 @@ depend on the pandas version, so the environment is part of the record.
   <!-- from `analysis/coling/out/freeze_record.json`, `annotation.guide.sha256` (first 16
   characters), once the guide's version line says v1 and `annotation.guide.version` is `v1`; the
   file on disk is still the draft of 1 October. -->
-- The pilot and check-set result (both alphas, the share of identical intervals) and the
-  train-half outcome-audit result (confirmed errors for B and for A), with the hashes of the
-  submitted sheets. **TBD-at-gate.**
-  <!-- from the agreement code on the two pilot sheets and the two check-set sheets (alpha on
-  the start and on the end month offsets, share of identical intervals), from the scorer of the
-  train-half outcome audit on its two sheets (confirmed errors under B and under A), and the
-  sha256 of each submitted sheet. `DECISIONS.md`, item 29, records the pilot and the train-half
-  audit as returned on 5 October; the check set, which is the gate, is labelled under v1 and is
-  still to come. -->
+- The pilot, on 20 items, both sheets valid: alpha 1.0 on the start and on the end month
+  offsets; identical intervals on all 13 items where both annotators gave one; one item to
+  adjudication (a statement type). Submitted sheets: `efea7ec22465b953` (A1) and
+  `66da9e436ff06bc3` (A2).
+- The train-half outcome audit, on 50 real and 6 planted items, both sheets valid: all six
+  planted errors caught; definition B, no confirmed error; definition A, one confirmed error
+  (code O1, a thread lost when a product's NDC was renumbered; adjudicated on 5 October). It
+  passes for both definitions, and no rule fix is required. Submitted sheets:
+  `8f5a9b9a4dab71ae` (A1) and `55da2448f7053a0b` (A2); the adjudication sheet
+  `63ebd2182ab482a3`.
+- The check-set result, which is the gate (both alphas, the share of identical intervals),
+  with the hashes of the two submitted sheets. **TBD-at-gate.**
 - The availability-string check (section 2.2): done on 1 October 2026; 910 strings read, none
   rejected; the list as read has hash `da0bde1baac48473`, re-read at the freeze run.
 
@@ -2444,7 +2435,8 @@ quoted here are from the build of 29 September.
     data. *Why:* the plan and the guide have to state one rule.
 31. **Prompt text before registration.** Draft: prompts are developed on dev items and frozen
     at F1. Now: the text changes of 1 October (the two added fields, the wording of the
-    track-record table) and the two sentences settled at the pilot meeting are entered before
+    track-record table), the two sentences settled from the pilot and one sentence on the
+    median in the track-record prompt are entered before
     registration, with no model call, and the five templates are pinned again under the same
     ids; from F1 on a changed prompt takes a new id. *Seen:* nothing from the data, and no
     model output. *Why:* the annotation sheets show the entry block that the models see, and
