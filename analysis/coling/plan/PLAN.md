@@ -62,8 +62,14 @@ All deadlines in this file are in Anywhere on Earth time (AoE, UTC−12): 23:59 
     count below 5 by subtraction, it prints a lower bound (`>N`) or `withheld`. A masked count
     is registered as printed.
   - After registration the sealed outcomes are read only by the sampler and the sheets of the
-    test-period outcome audit (section 10), after every confirmatory run has finished, and by
-    the registered evaluator.
+    test-period outcome audit (section 10), by the registered evaluator, and by the secondary
+    scorers; by each only after every confirmatory run has finished. The registered evaluator
+    is `evaluate.py`, hashed in F1; it computes the six tests and what section 6 lists under
+    "Evaluator". A secondary scorer is a script that computes a registered secondary analysis
+    from the sealed outcomes. Each one is named, with its hash, in F1 or in a later dated
+    amendment that is pushed before the script first reads a sealed file. The evaluator reads
+    the sealed rows through the checked reader of the counts-only code (`_checked_rows` and
+    `_same_build` of `sealed_counts.py`), behind its own hash check.
 - *Open train outcomes.* Outcomes of train-period statements (dated before 2023-01-01) are
   followed only to the train horizon, the last capture before 2023-01-01 (2022-10-06), and may
   be examined at any time (section 3, "Calendar overlap").
@@ -741,10 +747,14 @@ recorded in F1. Reasoning and thinking tokens are billed as output.
     a failure.
   - After a failure, a literal reading counts as ABSTAIN, and a predictive reading is replaced
     by the base-rate predictor's output for that event (flagged).
+  - Under condition (c), a literal interval given for a depletion or a discontinuation
+    statement, or for no statement, is not a stated period: the calibrator's no-date table is
+    used, and such readings are counted.
   - A predictive answer with `P(E_end90)` below `P(E_end)` is kept as given, and the number of
     such answers is reported per model and condition.
-  - Parse and refusal rates are reported per model and condition. A sensitivity analysis uses
-    only the events that both compared conditions parsed.
+  - The failure rate (no valid answer after the repair) and the refusal rate are reported
+    separately, per model and condition. A sensitivity analysis uses only the events that
+    both compared conditions parsed.
 
 ## 5. Experiments
 
@@ -756,8 +766,8 @@ E7 follows it in the cut order (section 12). E8 and E9 are not run in October (o
 
 Build the statement events, clusters and outcomes of section 2.
 
-**Descriptives, computed by the registered evaluator after every confirmatory run for the test
-period, and at any time for the train period.**
+**Descriptives, computed by a secondary scorer (standing rules) after every confirmatory run
+for the test period, and at any time for the train period.**
 
 - The hold rate of the stated period, `P(E_end)`, conditional on survival to first sight
   (section 2.5).
@@ -916,6 +926,8 @@ the primary Brier (section 7.2):
 
 The rule reading is the reference reading (section 2.5), so "rule reading plus calibrator" is
 both the reference of this decomposition and the "rules plus slip" baseline of section 8.
+The decomposition, the overconfidence criterion (section 13), the outcome variants and the
+company clusters below use the item set that the E4 probe fixed for the model.
 
 **Secondaries (no multiplicity claim).**
 
@@ -947,7 +959,10 @@ Date, but no statement text. It gives the two probabilities and the time-to-reco
 - Probe items carry no stated period: their horizons are 90 and 180 days after the statement
   date, so nothing from the notice text reaches the probe.
 - *Test.* Pinball loss at 0.5, against the base-rate predictor by listing age. The comparison
-  uses a one-sided paired cluster bootstrap at 0.05, not adjusted.
+  is one-sided at 0.05, not adjusted, with the resampling and the p-value of section 6, on
+  the probe statements whose time to recovery is not right-censored before the cap. With
+  fewer than two episodes left the switch is undecided, and the model's three tests are not
+  evaluable.
 - *Rule.* A model that beats the base rate is excluded from outcome claims on events dated before
   its cutoff.
 - *For a primary model,* its three confirmatory tests are then evaluated on its post-cutoff slice
@@ -1111,7 +1126,8 @@ Brier and in pinball loss is reported.
   collected in October (section 10), so the reference is the frozen rule reading (section 2.5),
   on the scoreable E3 statements. E7 is also reported on the statements of the
   reference-reading check whose rule reading the annotators confirmed.
-- The error classes are fixed in the evaluator at F1, before any test call.
+- The error classes are fixed at F1, before any test call: in the scorer of E7 if it exists
+  by then, and otherwise in the text of F1.
 - **Positive result.** Named error classes carry most of the cost.
 - **Negative result.** Reading errors are cheap next to the trust loss, which supports the
   headline.
@@ -1146,8 +1162,9 @@ condition (a).
 **H2: reading in isolation** (two-sided). `Δ = loss(rules + calibrator) − loss(m-c) ≠ 0`. Both
 sides share the same frozen calibrator, so only the literal reading differs.
 
-- *Equivalence.* It is declared when the 90% interval lies inside ±0.02 Brier. This is part of
-  the H2 reading, but not a separate test in the family.
+- *Equivalence.* It is declared when the 90% interval of the registered test ("Intervals",
+  below) lies strictly inside ±0.02 Brier: its lower end above −0.02 and its upper end below
+  0.02. This is part of the H2 reading, but not a separate test in the family.
 - *Caveat.* The stated period that defines the horizon events is the rule reading itself
   (section 2.5), which favours the rules: a model reading that is right where the rule is wrong
   is scored against the rule's horizon. The accuracy of the rule reading on the 100-statement
@@ -1175,9 +1192,12 @@ sides share the same frozen calibrator, so only the literal reading differs.
   the base-rate output (section 4), so it adds zero to `Δ`. The number of such answers is
   reported with H3, beside the sensitivity analysis on the events that both sides parsed.
 - `m-best` is the one of `m`'s three conditions (a, b, c) with the lowest primary loss on the
-  scoreable dev statements.
+  scoreable dev statements. Dev losses are compared at six decimals, as the selection file
+  records them; a tie goes to the earlier of (a), (b), (c).
 - The selection is recorded in F1, before any test call, with the dev loss of all three
-  conditions, their bounds (section 7.2) and the dev outcome mix. The dev split is dominated by
+  conditions and the dev outcome mix. The dev runs read the 644 scoreable dev statements
+  only, so the bounds of section 7.2 equal the loss there; the 690 dated dev statements that
+  are not read are counted beside it. The dev split is dominated by
   "no" answers (section 3), which favours the condition that gives the lowest probabilities.
   The H3 contrast is also reported with each of the three conditions in place of `m-best`, as
   secondaries.
@@ -1201,19 +1221,94 @@ sides share the same frozen calibrator, so only the literal reading differs.
   text-trained GBM, and rules plus slip, each against the base rate and against the
   structured-only GBM; and the structured-only GBM against the base rate.
 
-**Resampling.** A paired cluster bootstrap by shortage episode: 10,000 draws, seed 20261001. Each
-draw resamples episodes with replacement and computes both predictors' mean losses on the same
-draw.
+**Resampling.** Shortage episodes are the resampling unit. For a contrast, `S_g` is the sum of
+the paired loss differences (comparator minus tested) over the scoreable statements of episode
+`g`, `n_g` their number, `G` the number of episodes and `N = Σ n_g`. Two sets of resamples are
+drawn once, with seed 20261001, and used for every contrast:
 
-**p-values.** They come from the bootstrap distribution of `Δ`.
+- *bootstrap draws:* `B` = 10,000 draws of `G` episodes with replacement, the same draw for
+  both predictors;
+- *sign draws:* 10,000 vectors of one sign per episode, plus or minus with equal chance; every
+  one of the `2^G` vectors when there are at most 13 episodes.
 
-- One-sided (H1): `(1 + #{Δ* <= 0}) / (B + 1)`.
-- Two-sided (H2, H3): `min(1, 2 × min((1 + #{Δ* <= 0}) / (B + 1), (1 + #{Δ* >= 0}) / (B + 1)))`.
+**Test statistic.** The studentised contrast: `Δ = Σ S_g / N`,
+`se² = G / (G − 1) × Σ (S_g − Δ n_g)² / N²` and `t = Δ / se`.
 
-**Intervals.** Estimates carry 95% percentile intervals; H2 also carries its 90% interval. The
-bounds of section 7.2 are reported beside every confirmatory estimate.
+- A bootstrap draw that takes episode `g` `w_g` times gives `N* = Σ w_g n_g`,
+  `Δ* = Σ w_g S_g / N*`, `se*² = G / (G − 1) × Σ w_g (S_g − Δ* n_g)² / N*²` and
+  `t* = (Δ* − Δ) / se*`.
+- A sign draw `s` gives `Δ° = Σ s_g S_g / N`, `se°² = G / (G − 1) × Σ (s_g S_g − Δ° n_g)² / N²`
+  and `t° = Δ° / se°`.
+- A draw whose standard error is zero counts as plus or minus infinity, by the sign of its
+  numerator, and as zero when the numerator is zero too.
 
-**Sensitivity.** A cluster sign-flip test on the episode sums of the paired differences.
+**p-values.** Each one-sided p-value is the larger of two: that of the bootstrap-t, which
+corrects for skewed differences, and that of the studentised sign-flip test, which is exact
+when the episode sums are symmetric about zero. A test rejects only when both reject.
+
+- `p_up = max((1 + #{t* >= t}) / (B + 1), (1 + #{t° >= t}) / (B + 1))`.
+- `p_low = max((1 + #{t* <= t}) / (B + 1), (1 + #{t° <= t}) / (B + 1))`.
+- When every sign vector is used, the sign-flip term is the share of the vectors itself.
+- One-sided (H1): `p_up`. Two-sided (H2, H3): `min(1, 2 × min(p_up, p_low))`.
+- A value `Δ0` other than zero is tested in the same way on the sums `S_g − Δ0 n_g`.
+
+**Why this test.** It was chosen on a simulation run before registration, with no model called
+and no test-period outcome read (`analysis/coling/size_check.py`, `out/size_check.json`; hashes
+in section 17). Eleven procedures were tried at the episode sizes of the eligible list (115
+episodes, the ten largest holding 39% of the statements), of its thinning to the registered
+1,903 scoreable statements, and of the scoreable dev statements (74 episodes). The paired
+differences were built from the dev losses of the three proxy pairs of the power estimate: as
+whole dev episodes, and from a random-effects model with the dev distribution, also at half
+and at twice the dev correlation within an episode, with heavy-tailed episode effects, with
+added extremes, and with differences that are zero outside one episode in seven. At the
+per-test level of Holm's first step, 0.05/6 = 0.83%, and at the eligible sizes:
+
+- the percentile p-values of the draft reject a true null in 0.2% to 1.6% of data sets
+  two-sided (2.5% with the zeros), and in 0.5% to 2.5% one-sided on the H1 proxy (3.1% with
+  heavy-tailed episode effects). Holm's familywise error is 5.5% to 9.2%;
+- the registered test rejects in 0.1% to 1.0% two-sided, zeros included, and in 0.5% to 1.5%
+  one-sided on the H1 proxy (1.6% with the zeros, 2.2% with heavy-tailed episode effects).
+  Holm's familywise error is 3.9% to 6.0%, and 1.9% to 3.1% if the two models' losses were
+  the same.
+
+At the dev sizes the same figures are 2.0% (3.0%), 3.1% and 5.9% to 10.1% for the percentile
+p-values, and 1.1%, 1.8% and 3.6% to 5.8% for the registered test. No procedure tried holds
+0.83% for the one-sided test when the differences are skewed against it as those of the H1
+proxy are (skewness −1.9: a hedged forecast gains a little on most statements and loses much
+on a few); the registered test comes nearest, and the paper reports H1 with these rates beside
+it. Neither part does as well alone: the bootstrap-t rejects in up to 3.5% when most
+differences are zero, and the sign-flip test in up to 2.5% under that skew.
+
+**Intervals.** Every confirmatory contrast, and `Δ_GBM`, carries the interval of the values
+`Δ0` that the registered test does not reject: at level `1 − a`, every `Δ0` whose two-sided
+p-value is not below `a`. Each end is found by bisection between `Δ` and the value 50 standard
+errors away, in 60 halvings, and is the last value not rejected; an end that the test cannot
+reach is reported as unbounded. The level is 95%. H2 also carries its 90% interval, so
+equivalence is declared when `p_low` at `Δ0 = 0.02` and `p_up` at `Δ0 = −0.02` are both below
+0.05. In the simulation the 95% interval covers the true value in 94.1% to 99.1% of data sets
+(the percentile interval of the draft: 91.1% to 98.7%), and the one-sided error at 0.05 that
+governs the equivalence reading is 3.5% to 6.1% on the H2 proxy (percentile: 4.0% to 8.4%).
+The losses of single predictors and the other secondaries keep 95% percentile intervals from
+the bootstrap draws, as descriptions. The bounds of section 7.2 are reported beside every
+confirmatory estimate.
+
+**Sensitivity.** Reported beside every confirmatory p-value, and never used in Holm's rule:
+
+- the percentile p-values of the draft, from the bootstrap distribution of `Δ*`: one-sided
+  `(1 + #{Δ* <= 0}) / (B + 1)`; two-sided `min(1, 2 × min((1 + #{Δ* <= 0}) / (B + 1),
+  (1 + #{Δ* >= 0}) / (B + 1)))`; with the 95% percentile interval. `Δ*` is the mean of the
+  paired differences over the drawn episodes; a draw whose differences sum to zero counts on
+  both sides, and a sum within 1e-12 of zero, relative to the largest absolute episode sum,
+  is a zero;
+- the two parts of the registered p-value, each on its own;
+- the cluster sign-flip test on the episode sums of the paired differences, on the same sign
+  draws, two-sided on the absolute sum.
+
+For H2, where the two sides have the same loss wherever the model's reading is the rule's, the
+paper also reports the number of statements and of episodes on which the two losses differ,
+and how many of those episodes have a positive and a negative sum. When the losses differ in
+few episodes and mostly in one direction, no procedure tried holds its level, and the paper
+says so beside the H2 result.
 
 **Power.**
 
@@ -1222,6 +1317,11 @@ bounds of section 7.2 are reported beside every confirmatory estimate.
   for H2 and 0.028 for H3 (0.076, 0.020 and 0.031 from episodes alone). The dev outcome mix
   behind them is 486 no/no, 82 no/yes and 76 yes/yes, on 644 scoreable dev statements in 74
   episodes.
+- These figures use normal critical values. In the simulation above, at the registered counts
+  and with differences distributed as the proxy pairs' are, the registered test detects them
+  with power 61% (H1), 69% to 73% (H2) and 66% to 73% (H3), where the percentile p-values have
+  75%, 80% to 82% and 78% to 84%. The difference it detects with 80% power is about 1.3 times
+  the H1 figure and 1.1 to 1.2 times those of H2 and H3.
 - Each hypothesis has a language model on one side, and no paid call precedes registration. The
   estimate therefore uses one pair of model-free predictors per hypothesis as a proxy: the
   paired loss variance of the pair on the scoreable dev statements, with its inflation from
@@ -1251,16 +1351,36 @@ bounds of section 7.2 are reported beside every confirmatory estimate.
 
 If a primary's confirmatory runs cannot be completed on its registered route, its three tests
 are reported as not evaluable and stay in the family. No other model takes its place without an
-amendment made before any evaluation.
+amendment made before any evaluation. The evaluator takes this as a declaration on its command
+line, recorded in the result file, and refuses when both primaries are declared. A contrast
+over fewer than two episodes is not evaluable.
 
-**Evaluator.** The registered evaluator (**TBD-at-F1**: file and hash) accepts a run stored in
-several parts and refuses:
+**Evaluator.** The registered evaluator (`evaluate.py`; **TBD-at-F1**: its hash) accepts a run
+stored in several parts and refuses:
 
 - a run that is partial;
 - a run whose stored model id or serving provider differs from the registered route (the
   harness stores both with every call and stops at a mismatch);
 - a run whose item set differs from its registered item list (the eligible list, or one of the
-  secondary lists of section 3).
+  secondary lists of section 3);
+- a run that showed another track record than the one of its phase;
+- a plan of runs that names a file in a sealed folder;
+- a start without the sha256 of the sealed file, of the eligible list, of the model-free test
+  predictions and of each primary's selection file.
+
+It computes the six tests and Holm's rule; the secondaries of this section; the E4 probe rule;
+and, of section 5, the E3 decomposition, the overconfidence criterion, the post-cutoff slices,
+definition A, the outcome over all and over any covered presentation, the delayed-entry
+analysis, the resampling by company and the metrics of section 7.2 for the two primaries. The
+other registered analyses are computed by secondary scorers (standing rules): the
+descriptives of E1; every contrast and metric of the six secondary models; the TBD, silent
+and stale-at-issue lists; the sampled quantiles and the paraphrases; the 2×2 of E4; the fit
+that leaves out the dominant company and the full-follow-up refit; the sensitivity analyses
+of the recovery rule (section 2.5); selective prediction; and E2, E5 and E7. Two figures come
+from elsewhere: the accuracy of the rule reading beside H2, from the reference-reading check
+(section 10), and the minimum detectable differences beside a null, from the power code at
+the gate. An analysis that is not computed by the freeze of numbers (section 12) is named in
+the paper as not run.
 
 ## 7. Metrics
 
@@ -2256,11 +2376,14 @@ gate result and what section 5 lists.
 
 - the final template ids and pins (until F1 an edit moves the pin under the same id; from F1
   on a changed prompt takes a new id), the three paraphrase templates, and the parsers;
-- the hashes of `read.py` and of the evaluator;
+- the hashes of `read.py`, of the evaluator (`evaluate.py`) and of every secondary scorer that
+  exists by then;
 - the dev prompt variants tried;
 - the cost-trial projection, and any cap raised within the reserve;
-- the H3 selection for each primary, with the dev losses of all three conditions;
-- the hashes of the fitted model-free artefacts, after the refit on fit and dev;
+- the H3 selection for each primary, with the dev losses of all three conditions, and the
+  sha256 of its selection file (written by `evaluate.py dev`);
+- the sha256 of the model-free test predictions after the refit on fit and dev, as
+  `evaluate.py baselines` prints it, with the environment;
 - the provider pin as sent, the provider that served the cost-trial calls, and the reasoning
   setting each model served;
 - the registration's commit id, tag, push time and file hashes ("Identity").
@@ -2568,6 +2691,37 @@ quoted here are from the build of 29 September.
     test-period outcome. *Why:* A1 and A2 started on 3 October and returned on 5 October. The
     owner first decided to hold for January and then, the same day, to keep the October cycle;
     nothing in the design, the samples or the tests changed with the dates.
+38. **Registered test.** Draft and revision of 1 October: p-values from the percentile
+    bootstrap distribution of `Δ`, percentile intervals, and a sign-flip test on the episode
+    sums as the sensitivity analysis. Now: the registered p-value is the larger of the
+    bootstrap-t and the studentised sign-flip p-values; the intervals of the confirmatory
+    contrasts and of `Δ_GBM` are those of that test, and H2's equivalence is read from it;
+    the draft's p-values, its interval and its sign-flip test are sensitivity analyses
+    outside Holm's rule; the power paragraph says what the test costs; the E4 probe rule uses
+    the same test (sections 5 and 6). **[owner to confirm]** *Seen:* train outcomes and the
+    dev losses of the model-free predictors, from which the simulation builds its paired
+    differences; no model output (no model had been called) and no test-period outcome. On
+    the model-free proxy pair of H3 (dev, build of 1 October) the draft's p-value is 0.023
+    and the registered one 0.100, so the change does not favour a finding. *Why:* a
+    simulation at the study's episode sizes, run before registration (section 6, "Why this
+    test"), showed that the draft's p-values reject a true null more often than their level
+    (Holm's familywise error 5.5% to 9.2%, against 5%), that the 90% percentile interval
+    declares equivalence too often when the differences are sparse, and that the sign-flip
+    test on sums does not guard against skew. The test was chosen for its size. It costs
+    power, and section 6 says how much.
+39. **What the evaluator does, said exactly.** A review of the evaluator against this plan
+    found points on which the plan was silent, or said more than the code does. The plan now
+    states them: who reads the sealed outcomes after registration, and which analyses the
+    evaluator computes and which fall to secondary scorers (standing rules; sections 5, E1,
+    and 6, "Evaluator"); ties in the selection of `m-best`, and what the selection records;
+    the test of the E4 probe and the case in which it cannot be made; how a primary is
+    declared not evaluable; three further refusals of the evaluator; draws that sum to zero
+    and the sign patterns of the sensitivity analyses; a literal interval given for a
+    depletion or discontinuation statement (section 4); failure and refusal rates reported
+    separately; the item set of the decomposition; what F1 hashes (selection files, the
+    model-free test predictions, the secondary scorers); where E7's error classes are
+    fixed. *Seen:* as item 38. *Why:* the registered text and the code that will run must
+    agree before either is frozen. No hypothesis, sample or metric changes.
 
 **Status of these changes.** The owner confirmed on 1 October the scope (item 1), the deadlines
 and their one relaxation (item 2), the availability rule, the capture freeze and the result of
@@ -2576,7 +2730,8 @@ an anonymised copy of the plan and guide in the supplement (item 17), deepseek-v
 endpoint (item 16), the E6 gate rule and the reading of a route extension (item 33), and the
 four sample rules of item 35. The other items, item 36
 included, were provisional rules of 1 October; the owner confirmed them as written on
-3 October. Item 37 is the owner's decision of 5 October.
+3 October. Item 37 is the owner's decision of 5 October. Items 38 and 39 follow the simulation
+and the review of the evaluator of 5 October; the choice of item 38 is the owner's.
 
 **Corrections of the text to the code as it stood on 29 September** (the builder did not change
 for these; the draft described it wrongly). *Seen:* train outcomes; the builder had been tested
