@@ -11,8 +11,11 @@ the following hold, before any language-model call of this study:
 - this paragraph is replaced by the registration statement, and the commit is pushed and tagged
   (section 17, "Identity").
 
-The target is Saturday 3 October 2026, 23:59 AoE; missing it is a hold trigger (section 12).
-Until then anything here may change. What changed since the draft of 29 September, and what had
+The target was Saturday 3 October 2026, 23:59 AoE; missing it was a hold trigger (section 12).
+It was missed: the annotators returned the pilot and the train-half outcome audit on
+5 October. By the owner's decision of that day the paper is held for the ARR cycle of January
+2027 (section 12, "The hold"), and this file is registered on a new date before any
+language-model call. Until then anything here may change. What changed since the draft of 29 September, and what had
 been seen when it changed, is listed in "Changes from the 29 September draft" near the end of
 this file. After registration every change is a dated amendment at the end of this file (A1, A2,
 ...), and the freeze of prompts, parsers, harness and the one registered model selection is
@@ -946,8 +949,10 @@ The two authors' predictive readings of 100 pairs, in the draft, are cut for Oct
 
 ### E6. Estimative terms at the FAA Command Center (should; gated on 4 October)
 
-E6 stays in the October study until its linker gate (owner decision, 1 October). It is first in
-the cut order (section 12), and it is cut if the gate is not passed on 4 October.
+E6 stayed in the October study until its linker gate (owner decision, 1 October). It was first
+in the cut order (section 12), to be cut if the gate was not passed on 4 October. No link was
+checked by that day, and E6 was cut on 5 October (owner decision). The text below describes
+E6 as it was built; under Plan B (section 12) it returns with its own amendment.
 
 **State on 1 October.** The collector (`faa_fetch.py`), the parser and statement builder
 (`faa.py`) and the linker with its hand-check sheets (`faa_links.py`) were written on 1 October,
@@ -1625,6 +1630,16 @@ The gate passes only if the thresholds hold in both parts.
 - numbers are not frozen by 6 October, 23:59 AoE (7 October under the one relaxation);
 - the UV camera-ready needs more than 1.5 days before 12 October.
 
+**The hold (owner decision, 5 October).** The third trigger fired. A1 and A2 started on
+Saturday 3 October and returned the pilot sheets and the train-half outcome audit on Monday
+5 October, after both the deadline and its one relaxation; nothing was registered, and no
+language model had been called. The paper goes to the ARR cycle of January 2027 and cannot
+go to COLING 2027. The schedule above, Gate 2 below and the dates in the standing rules
+describe the October attempt and are replaced, before registration, by the schedule of the
+January version (Plan B, below). What was done by 5 October stands: the corpus code, the
+samples, the guide draft, the pilot (both sheets valid; one disagreement in 20 notices) and
+the train-half outcome audit (passed: no confirmed error in 50 items under B, one under A).
+
 **Gate 2 (6 October).** Submit if:
 
 - every confirmatory run is complete;
@@ -1638,7 +1653,9 @@ submitted.
 **Cut order.** The first two cuts of the draft's order were taken on 1 October: E8 and E9
 (owner decision). What remains, in order, when time runs short:
 
-1. E6. It is also cut if its linker gate is not passed on 4 October;
+1. E6. It is also cut if its linker gate is not passed on 4 October. That is what happened:
+   no link was checked by that day, and E6 was cut from the October study on 5 October
+   (owner decision). Under Plan B it returns;
 2. E7;
 3. fewer models, 8 down to 6. The two dropped are the secondary models whose runs are least
    complete at the time of the cut; ties go gemma-3-27b first, then gpt-4o-mini;

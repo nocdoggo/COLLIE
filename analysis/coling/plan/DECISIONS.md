@@ -139,3 +139,20 @@ carry the registered text.
     items of its change list, item 36 included, are confirmed as written. The worktree reaches
     the API keys through links to the main checkout's key files (`cloud_endpoint/`, ignored by
     git; the files themselves are never read).
+28. **Owner, 5 October: the hold.** A1 and A2 returned the pilot and the train-half outcome
+    audit on 5 October. The registration deadline of 3 October and its relaxation had passed,
+    so the hold trigger fired: the paper goes to the ARR cycle of January 2027 and not to
+    COLING 2027. The plan's Plan B (section 12) describes the January version; its scope and
+    its schedule are to be settled with the owner before registration. E6 is cut from the
+    October study by its own gate rule (no link was checked by 4 October) and returns under
+    Plan B.
+29. **Pilot and train-half audit, 5 October.** Both pilot sheets are valid: alpha 1.0 on start
+    and end month offsets, identical intervals on the 13 notices where both gave one, one
+    disagreement on statement type in 20 notices. The sitting times on the sheets (120 and 300
+    minutes) include reading the guide (owner, 5 October), so the labelling rate is measured on
+    the check set. Train-half outcome audit: both sheets valid; all six planted errors caught;
+    definition B, no confirmed error in 50 items; definition A, one confirmed error in 50 (item
+    Q7d21bfff, code O1: the product's NDC was renumbered and the thread was not re-linked;
+    adjudicated by the owner on 5 October); pass, no rule fix required. The returned workbooks
+    are under `external_data/annotation/returned/`, their converted sheets under
+    `external_data/annotation/pilot/` and `outcome_train/`.
