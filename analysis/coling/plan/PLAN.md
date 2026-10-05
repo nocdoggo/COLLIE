@@ -2168,9 +2168,6 @@ depend on the pandas version, so the environment is part of the record.
   is not ready, its code hash moves to F1 by an edit of this line before the push.
 - The track-record builder (`track_record.py`): `53873bade0dd0e4b`. Its two record files and
   their manifest are hashed in F1, before any call that shows them.
-- The minimal-pair generator (`minimal_pairs.py`): `71a89fab1e618a67`. A fix that the
-  minimal-pair audit requires (`AUDIT_GUIDE.md` section 7.4) is a dated amendment with the
-  new hash.
 
 **Tables.**
 
@@ -2200,10 +2197,15 @@ depend on the pandas version, so the environment is part of the record.
   `efbeb16e16ce86ff`; the 20-sample subset (300) `682f734bea32ce6c`; the paraphrase subset (200)
   `80ba3cf00b14b4d7`; the 2×2 subset (300) `7ed79fa3c0db7e72`; the reference-reading check (100)
   `d8227bd74cef2485`.
-- The minimal pairs of E5, `analysis/coling/out/e5/e5_pairs.jsonl` (800 items: the 100
-  unedited seeds and 700 edits of them): file `5acc3a0af1fd13af`, ids `10c21484b8c9b9cc`. The
-  generator's rule reading agrees with the gold on all 800. The sample of the minimal-pair
-  audit (100 items and 10 planted) is drawn from this file by the seeded rule.
+
+**Minimal pairs (E5).** The generator, `minimal_pairs.py`: `71a89fab1e618a67`. The item file
+it wrote, `analysis/coling/out/e5/e5_pairs.jsonl` (800 items: the 100 unedited seeds and 700
+edits of them): file `5acc3a0af1fd13af`, ids `10c21484b8c9b9cc`. The generator's rule reading
+agrees with the gold on all 800. The sample of the minimal-pair audit (100 items and 10
+planted) is drawn from this file by the seeded rule. The freeze script does not run the
+generator, so these hashes are not in the freeze record; the generator's own manifest
+(`e5_manifest.json`) carries them. A fix that the minimal-pair audit requires
+(`AUDIT_GUIDE.md` section 7.4) is a dated amendment with new hashes.
 
 **Annotation.**
 
