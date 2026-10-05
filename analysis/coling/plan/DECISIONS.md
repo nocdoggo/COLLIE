@@ -180,13 +180,22 @@ carry the registered text.
     and 78-84% to 66-73% (H3). The alternatives put to the owner: the same test with H1
     two-sided; or the percentile p-values kept and their size disclosed. The item carries the
     owner tag, so `plan_check` refuses the registration until the owner has chosen. In the
-    evaluator the choice is the constant `P_VALUE_SOURCE`; the intervals follow it.
+    evaluator the choice is the constant `P_VALUE_SOURCE`. At `f57a91d` it is still
+    `percentile` and every interval is a percentile interval; both change before F1 hashes
+    the file. The power figures above are those of the random-effects generator; with whole
+    dev episodes the registered test has 44% (H1), 43-49% (H2) and 70-71% (H3) at the plan's
+    detectable differences, and the percentile p-values 54%, 44-55% and 77-85%. An
+    independent check of the new plan text (5 Oct) found every figure of "Why this test"
+    in the committed output and four statements that rested on runs outside it; the plan now
+    says so where it cites them.
 33. **What the evaluator computes (5 Oct).** `evaluate.py` computes the six tests, Holm, the
     secondaries of section 6, the probe rule and the E3 analyses listed in section 6,
     "Evaluator". Eleven registered analyses are not in it (its own list `NOT_COMPUTED_HERE`);
     they are computed by secondary scorers, each named with its hash in F1 or in a dated
-    amendment pushed before the script first reads a sealed file, and never before every
-    confirmatory run has finished. E2, E5 and the rule accuracy beside H2 read no sealed
+    amendment pushed before the script first reads a sealed file, and never before the
+    evaluator has written its result file (so after the test-half outcome audit too); this
+    widens the draft's sealing rule and carries the owner tag (change-list item 39). E2, E5
+    and the rule accuracy beside H2 read no sealed
     outcome. What is not computed by the freeze of numbers is named in the paper as not run.
     The twelve points on which the evaluator had to decide where the plan was silent are now
     in the plan (change-list item 39). `sealed_counts.py` is not edited (it is hashed in the
