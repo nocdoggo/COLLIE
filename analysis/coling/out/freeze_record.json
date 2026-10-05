@@ -12,9 +12,9 @@
    "availability_strings.csv": "da0bde1baac48473",
    "uv.lock": "3308eeb43cb51580"
   },
-  "commit": "26a43be48408ecc09c396213d3240e6fe5d74fe0",
-  "started": "2026-10-05T21:25:39Z",
-  "finished": "2026-10-05T21:26:48Z",
+  "commit": "e9b3fe085af01a3d573f4f84d7cdbc1593b0f178",
+  "started": "2026-10-05T21:31:02Z",
+  "finished": "2026-10-05T21:31:54Z",
   "earlier_runs": [
    {
     "started": "2026-10-05T21:07:28Z",
@@ -25,6 +25,12 @@
    {
     "started": "2026-10-05T21:24:06Z",
     "finished": "2026-10-05T21:25:13Z",
+    "commit": "26a43be48408ecc09c396213d3240e6fe5d74fe0",
+    "status": "complete"
+   },
+   {
+    "started": "2026-10-05T21:25:39Z",
+    "finished": "2026-10-05T21:26:48Z",
     "commit": "26a43be48408ecc09c396213d3240e6fe5d74fe0",
     "status": "complete"
    }
@@ -88,8 +94,8 @@
    "writes": [],
    "status": "ok",
    "exit_status": 0,
-   "started": "2026-10-05T21:25:39Z",
-   "finished": "2026-10-05T21:25:40Z",
+   "started": "2026-10-05T21:31:02Z",
+   "finished": "2026-10-05T21:31:02Z",
    "lines": [
     "manifest analysis/coling/out/capture_manifest.csv sha256 8104e4f23dd0c7b560df4bfb91d141111f7d1f696fb7adbeaddd094efc9db137",
     "external_data/fda_wayback_csv: as in the manifest"
@@ -104,8 +110,8 @@
    ],
    "status": "ok",
    "exit_status": 0,
-   "started": "2026-10-05T21:25:40Z",
-   "finished": "2026-10-05T21:25:54Z",
+   "started": "2026-10-05T21:31:02Z",
+   "finished": "2026-10-05T21:31:10Z",
    "lines": []
   },
   {
@@ -115,8 +121,8 @@
    "writes": [],
    "status": "ok",
    "exit_status": 0,
-   "started": "2026-10-05T21:25:54Z",
-   "finished": "2026-10-05T21:25:54Z",
+   "started": "2026-10-05T21:31:10Z",
+   "finished": "2026-10-05T21:31:11Z",
    "lines": [
     "{",
     "  \"read_py_sha256\": \"c7bd46b5b7e3dd4628c095cdf3816a4d810d83cc4d4576fc7709ff2f028bbeb0\",",
@@ -211,8 +217,8 @@
    "writes": [],
    "status": "ok",
    "exit_status": 0,
-   "started": "2026-10-05T21:25:54Z",
-   "finished": "2026-10-05T21:25:57Z",
+   "started": "2026-10-05T21:31:11Z",
+   "finished": "2026-10-05T21:31:13Z",
    "lines": [
     "up to date"
    ]
@@ -227,8 +233,8 @@
    ],
    "status": "ok",
    "exit_status": 0,
-   "started": "2026-10-05T21:25:57Z",
-   "finished": "2026-10-05T21:26:00Z",
+   "started": "2026-10-05T21:31:13Z",
+   "finished": "2026-10-05T21:31:15Z",
    "lines": [
     "statements by form and split, population at_risk_B:",
     "  form                fit    dev   test   late  train    all",
@@ -270,8 +276,8 @@
    ],
    "status": "ok",
    "exit_status": 0,
-   "started": "2026-10-05T21:26:00Z",
-   "finished": "2026-10-05T21:26:05Z",
+   "started": "2026-10-05T21:31:15Z",
+   "finished": "2026-10-05T21:31:19Z",
    "lines": [
     "appendix_a_rows: 58",
     "appendix_a_rows_matching_no_event: 0",
@@ -388,8 +394,8 @@
    ],
    "status": "ok",
    "exit_status": 0,
-   "started": "2026-10-05T21:26:05Z",
-   "finished": "2026-10-05T21:26:12Z",
+   "started": "2026-10-05T21:31:19Z",
+   "finished": "2026-10-05T21:31:25Z",
    "lines": [
     "capture days 109; last 2026-09-26; train horizon 2022-10-06",
     "  statements                            fit    dev   test   late  train    all",
@@ -478,8 +484,8 @@
    ],
    "status": "ok",
    "exit_status": 0,
-   "started": "2026-10-05T21:26:12Z",
-   "finished": "2026-10-05T21:26:48Z",
+   "started": "2026-10-05T21:31:25Z",
+   "finished": "2026-10-05T21:31:54Z",
    "lines": [
     "dev: 644 scoreable statements in 74 episodes; mix {'no/no': 486, 'no/yes': 82, 'yes/yes': 76}",
     "  base_rate        primary Brier 0.1950 [0.1830, 0.2093]",
@@ -642,7 +648,7 @@
  },
  "models": {
   "file": "analysis/coling/plan/MODELS.md",
-  "sha256": "747035397da93c934e602ef271ae691b56a493c8c732834b3fef91c76ea083c5"
+  "sha256": "3c64439b5610ee40c96d1184ab0c0f11858730e8f5025c0ead7eed9268d07177"
  },
  "prompts": {
   "read_py_sha256": "c7bd46b5b7e3dd4628c095cdf3816a4d810d83cc4d4576fc7709ff2f028bbeb0",
