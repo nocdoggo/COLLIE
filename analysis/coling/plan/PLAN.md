@@ -1823,7 +1823,10 @@ that thread carried at any date, with all its presentations.
    eligible list by the seeded rule. A1 and A2 check the rule reading's statement type and
    stated period against the text, blind to outcomes (45 statements each, and 10 checked by
    both).
-   - Reported: the share correct with a Wilson 95% interval, and the disagreements by form.
+   - Reported: the share without a confirmed error, with a Wilson 95% interval; the confirmed
+     errors by form, by code and by statement year; the agreement on the 10 shared
+     statements; and the share whose rule reading is confirmed, whose statements E7 uses
+     (`analysis/coling/out/audit_reference/reference_confirmed.csv`).
    - The check does not change the reference: the stated period stays the rule reading for
      every statement. Author labels of the forms other than month and year, in the draft, are
      not collected in October.
@@ -2123,7 +2126,9 @@ claim.
 - Annotation: the sample lists, the blank sheets and the manifest of the literal task, the
   pilot and the check sets in `analysis/coling/out/audit/`, where the sampler writes them; the
   train-half outcome-audit sheets and traces in `analysis/coling/out/audit_outcomes/`; the
-  minimal pairs and the blank sheets of their audit in `analysis/coling/out/e5/`; sheets in
+  minimal pairs and the blank sheets of their audit in `analysis/coling/out/e5/`; the blank
+  sheets, the manifest, the submitted sheets and the result of the reference-reading check in
+  `analysis/coling/out/audit_reference/`; sheets in
   progress, the planted-error keys and the gold of the minimal pairs under
   `external_data/annotation/` (ignored by git). An annotator may fill a sheet as an Excel
   workbook in which every cell is text; `sheet_xlsx.py` writes it from the blank sheet and
@@ -2388,6 +2393,11 @@ generator, so these hashes are not in the freeze record; the generator's own man
 (`e5_manifest.json`) carries them. A fix that the minimal-pair audit requires
 (`AUDIT_GUIDE.md` section 7.4) is a dated amendment with new hashes.
 
+**Reference-reading check (task E).** Its script, `audit_reference.py`: `938cb1b61e5533e4`. It
+draws nothing: it takes the 100 statements that the dataset builder marked on the eligible
+list (ids `d8227bd74cef2485`, above) and splits them by the seeded rule. It reads no outcome
+and no key. The freeze script does not run it, so its hash is not in the freeze record.
+
 **Size simulation (section 6, "Why this test").** `size_check.py`: `b9b01f14e73a980b`. Its output,
 `analysis/coling/out/size_check.json`: `1ce93baffa45a549`, made on the frozen statement table, the
 eligible list and `power.json`, with seed 20261001. The file records its runtime and the
@@ -2398,10 +2408,11 @@ written; the test of section 6 is the procedure it calls `max_t`.
 
 **Annotation.**
 
-- `AUDIT_GUIDE.md` v1: `c7a73851be7246fa`. The check set was labelled under the v1 text of
+- `AUDIT_GUIDE.md` v1: `ce58129993b31d33`. The check set was labelled under the v1 text of
   5 October as it stood before its corrections of the same day (`449c8e049be6cab1`, named in the
-  check sheets); the guide's changelog lists the corrections, none of which touches a
-  convention of the literal task.
+  check sheets). The guide's changelog lists what changed after that text: corrections, and
+  the account of the script of task E once it was written. None of it touches a convention
+  of the literal task.
 - The pilot, on 20 items, both sheets valid: alpha 1.0 on the start and on the end month
   offsets; identical intervals on all 13 items where both annotators gave one; one item to
   adjudication (a statement type). Submitted sheets: `efea7ec22465b953` (A1) and

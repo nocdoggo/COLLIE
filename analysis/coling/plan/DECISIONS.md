@@ -204,3 +204,14 @@ carry the registered text.
     freeze record): the plan's standing rule says that the evaluator calls its checked reader.
     `power.py` holds the secondary pair as (structured GBM, base rate) and the evaluator as
     (base rate, structured GBM), which is the plan's wording; the paper states the direction.
+34. **Task E tool (5 Oct, late).** `audit_reference.py` is built and checked twice. Two points
+    the guide left open are settled as the tool has them and written into the guide: an error
+    may carry several codes (K1 with K3 or K4 can occur together); and two shares are reported,
+    the one without a confirmed error (guide 8.4) and the one whose rule reading is confirmed
+    (an item ADJ leaves unresolved is not), which is the list E7 uses. The blanks are in
+    `analysis/coling/out/audit_reference/`. The guide's text on task E made its hash move to
+    `ce58129993b31d33`; the literal, minimal-pair and task E sheets were written again under it
+    (only their guide line changed), the freeze record was refreshed, and the check sheets,
+    already with A1 and A2, keep the text `449c8e049be6cab1`. One statement of the task E
+    sample has the same text as a literal-sample statement of another drug; the registered
+    rule allows it, and the guide's changelog says so.

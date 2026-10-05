@@ -12,9 +12,9 @@
    "availability_strings.csv": "da0bde1baac48473",
    "uv.lock": "3308eeb43cb51580"
   },
-  "commit": "e9b3fe085af01a3d573f4f84d7cdbc1593b0f178",
-  "started": "2026-10-05T21:31:02Z",
-  "finished": "2026-10-05T21:31:54Z",
+  "commit": "b43db5723e43befb1aa02be4ca31412d1500c2dd",
+  "started": "2026-10-05T23:47:35Z",
+  "finished": "2026-10-05T23:48:48Z",
   "earlier_runs": [
    {
     "started": "2026-10-05T21:07:28Z",
@@ -32,6 +32,12 @@
     "started": "2026-10-05T21:25:39Z",
     "finished": "2026-10-05T21:26:48Z",
     "commit": "26a43be48408ecc09c396213d3240e6fe5d74fe0",
+    "status": "complete"
+   },
+   {
+    "started": "2026-10-05T21:31:02Z",
+    "finished": "2026-10-05T21:31:54Z",
+    "commit": "e9b3fe085af01a3d573f4f84d7cdbc1593b0f178",
     "status": "complete"
    }
   ],
@@ -94,8 +100,8 @@
    "writes": [],
    "status": "ok",
    "exit_status": 0,
-   "started": "2026-10-05T21:31:02Z",
-   "finished": "2026-10-05T21:31:02Z",
+   "started": "2026-10-05T23:47:35Z",
+   "finished": "2026-10-05T23:47:36Z",
    "lines": [
     "manifest analysis/coling/out/capture_manifest.csv sha256 8104e4f23dd0c7b560df4bfb91d141111f7d1f696fb7adbeaddd094efc9db137",
     "external_data/fda_wayback_csv: as in the manifest"
@@ -110,8 +116,8 @@
    ],
    "status": "ok",
    "exit_status": 0,
-   "started": "2026-10-05T21:31:02Z",
-   "finished": "2026-10-05T21:31:10Z",
+   "started": "2026-10-05T23:47:36Z",
+   "finished": "2026-10-05T23:47:52Z",
    "lines": []
   },
   {
@@ -121,8 +127,8 @@
    "writes": [],
    "status": "ok",
    "exit_status": 0,
-   "started": "2026-10-05T21:31:10Z",
-   "finished": "2026-10-05T21:31:11Z",
+   "started": "2026-10-05T23:47:52Z",
+   "finished": "2026-10-05T23:47:52Z",
    "lines": [
     "{",
     "  \"read_py_sha256\": \"c7bd46b5b7e3dd4628c095cdf3816a4d810d83cc4d4576fc7709ff2f028bbeb0\",",
@@ -217,8 +223,8 @@
    "writes": [],
    "status": "ok",
    "exit_status": 0,
-   "started": "2026-10-05T21:31:11Z",
-   "finished": "2026-10-05T21:31:13Z",
+   "started": "2026-10-05T23:47:52Z",
+   "finished": "2026-10-05T23:47:57Z",
    "lines": [
     "up to date"
    ]
@@ -233,8 +239,8 @@
    ],
    "status": "ok",
    "exit_status": 0,
-   "started": "2026-10-05T21:31:13Z",
-   "finished": "2026-10-05T21:31:15Z",
+   "started": "2026-10-05T23:47:57Z",
+   "finished": "2026-10-05T23:48:01Z",
    "lines": [
     "statements by form and split, population at_risk_B:",
     "  form                fit    dev   test   late  train    all",
@@ -276,8 +282,8 @@
    ],
    "status": "ok",
    "exit_status": 0,
-   "started": "2026-10-05T21:31:15Z",
-   "finished": "2026-10-05T21:31:19Z",
+   "started": "2026-10-05T23:48:01Z",
+   "finished": "2026-10-05T23:48:05Z",
    "lines": [
     "appendix_a_rows: 58",
     "appendix_a_rows_matching_no_event: 0",
@@ -394,8 +400,8 @@
    ],
    "status": "ok",
    "exit_status": 0,
-   "started": "2026-10-05T21:31:19Z",
-   "finished": "2026-10-05T21:31:25Z",
+   "started": "2026-10-05T23:48:05Z",
+   "finished": "2026-10-05T23:48:12Z",
    "lines": [
     "capture days 109; last 2026-09-26; train horizon 2022-10-06",
     "  statements                            fit    dev   test   late  train    all",
@@ -484,8 +490,8 @@
    ],
    "status": "ok",
    "exit_status": 0,
-   "started": "2026-10-05T21:31:25Z",
-   "finished": "2026-10-05T21:31:54Z",
+   "started": "2026-10-05T23:48:12Z",
+   "finished": "2026-10-05T23:48:48Z",
    "lines": [
     "dev: 644 scoreable statements in 74 episodes; mix {'no/no': 486, 'no/yes': 82, 'yes/yes': 76}",
     "  base_rate        primary Brier 0.1950 [0.1830, 0.2093]",
@@ -638,7 +644,7 @@
  "annotation": {
   "guide": {
    "file": "analysis/coling/plan/AUDIT_GUIDE.md",
-   "sha256": "c7a73851be7246fa9be722f6edee368a0992ebb2f40b0e9bd3f5dabe5fb90b2c",
+   "sha256": "ce58129993b31d33944a9aa54195a9aa91fb60f09446631925a9b6eda468d8fb",
    "version": "v1"
   },
   "availability_strings": {
@@ -772,7 +778,7 @@
   ]
  },
  "outputs": {
-  "analysis/coling/out/audit/manifest.json": "c27f60c6eca9451a63a9ec3233fdcd8d6e48818032f7234e9e9940590cf71e4f",
+  "analysis/coling/out/audit/manifest.json": "75b89bf952e25d7a44ecf867e474af15a6e3a476d71846ddb8aaa81e8e4a4848",
   "analysis/coling/out/audit/samples/sample_check.csv": "eb80b0fc1ceb2485747d1fd5f303bf66ce01f053fda93eaf2617cc8b60b4903d",
   "analysis/coling/out/audit/samples/sample_literal.csv": "05fcaf84b77406d79812b9ace8238be78942705ea832eea0281d1966faced28c",
   "analysis/coling/out/audit/samples/sample_pilot.csv": "edd0c9c477b83f79f55e5823aa63484aff50d4407ef1830f7f185175502709f6",
