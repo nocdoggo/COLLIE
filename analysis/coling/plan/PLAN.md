@@ -692,7 +692,8 @@ recorded in F1. Reasoning and thinking tokens are billed as output.
 - **How the table is filled.** Release dates, cutoffs, routes and endpoints are collected at
   source, each with its URL and retrieval date, and kept in `MODELS.md` in this folder, whose
   hash is in section 17. No model is called for this, and no key is used. The pages were read
-  on 1 October (standing rules, "Web requests"). The owner reviews the entries of the two
+  on 1 October (standing rules, "Web requests"). They were read again on 5 October, twice and
+  independently, because registration had moved to 6 October; every registered value held. The owner reviews the entries of the two
   primaries before they enter the table.
 - **Cutoff rule.** A cell reads "documented: month (source)" when the model's maker states a
   cutoff, and "bounded: release month" otherwise (section 3).
@@ -2221,12 +2222,9 @@ depend on the pandas version, so the environment is part of the record.
 **Counts.** Every gate value above, with the Gate 1 record (section 12).
 
 **Models.** `MODELS.md` (cutoffs, release dates, routes, endpoints and prices, each with its
-source and retrieval date): its hash, and the table of section 4. As the file stands, its hash
-is `747035397da93c93`, and the table of section 4 is the one it gives. **TBD-at-registration.**
-<!-- the hash is `models.sha256` of `analysis/coling/out/freeze_record.json`. The facts were
-read at their sources on 1 October; `MODELS.md` says under "To repeat the check" that they are
-read again if registration slips, which it has. An edit of `MODELS.md` changes the hash, and a
-changed cutoff is also an edit of `sealed_counts.py`. -->
+source and retrieval date): its hash is `3c64439b5610ee40`, and the table of section 4 is the one it
+gives. The facts were read at their sources on 1 October and read again, twice and
+independently, on 5 October, because registration had moved: every registered value held.
 
 **Prompts.** The SHA-256 pins of the five templates (`literal-v1`, `literal-free-v1`,
 `predictive-v1`, `predictive-track-v1`, `probe-v1`) as they stand at registration, after the

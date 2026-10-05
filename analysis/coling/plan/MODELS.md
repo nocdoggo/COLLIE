@@ -27,6 +27,17 @@ by the counts-only script, not here.
 again, compare, and change the retrieval date. Endpoint lists, uptimes and prices in section 3
 move from day to day; cutoffs, release dates and ids should not.
 
+**Read again on 2026-10-05 (21:20 to 21:29 UTC),** because registration moved from 3 to
+6 October. Two readings were made independently, each of the sources of sections 2 to 6, with no
+key and no model call. Every value that the plan registers holds: for each of the eight models
+the route and model id, the pinned endpoint with its precision, both prices, the release date
+and the documented cutoff or its absence. No pinned model or endpoint is marked deprecated or
+carries an end date. One listed attribute of a pinned endpoint changed and is not a registered
+value: the context of `deepinfra/turbo` is now 131,072 tokens, with an output limit of 16,384
+(it was 65,536 on 1 October; sections 3 and its note below keep the reading of that day). The
+uptimes moved by a few tenths, as they do daily. The retrieval date of the registered values is
+therefore 2026-10-05.
+
 **Owner review.** DECISIONS 14 asks the owner to review the two primaries. The lines to re-open
 are marked **(primary)**; the owner's choice for `deepseek-v3` is in section 5.
 
