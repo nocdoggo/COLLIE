@@ -76,7 +76,9 @@ All deadlines in this file are in Anywhere on Earth time (AoE, UTC−12): 23:59 
     counts-only code (`_checked_rows` and `_same_build` of `sealed_counts.py`), behind its
     own hash check; a scorer that reads the test outcomes reads them in the same way, applies
     the refusals of section 6 to the runs it scores, and writes no value of a single
-    statement.
+    statement. The evaluator and every scorer withhold a figure, its counts apart, wherever it
+    would give back the outcomes of 1 to 4 statements, alone or beside another figure that is
+    written; sections 2.5, 4 and 13 name the cases known at registration.
 - *Open train outcomes.* Outcomes of train-period statements (dated before 2023-01-01) are
   followed only to the train horizon, the last capture before 2023-01-01 (2022-10-06), and may
   be examined at any time (section 3, "Calendar overlap").
@@ -809,7 +811,9 @@ has written its result file (standing rules), and at any time for the train peri
 - The hold rate of the stated period, `P(E_end)`, conditional on survival to first sight
   (section 2.5), over all dated statements and by statement type.
 - The slip distribution: recovery minus `t_end`, a Turnbull estimate by form, by statement
-  type and by revision bucket (first, second, third or later statement of a thread).
+  type and by revision bucket (first, second, third or later statement of a thread). Its
+  intervals use the first 1,000 of the 10,000 registered draws, since every draw needs a fit
+  of its own.
 - The distribution of bracket widths.
 - Counts by year, form, statement type and company.
 
@@ -969,6 +973,8 @@ the readers give:
 - 3 prompt paraphrases of (b) on a 200-item subset, to measure prompt variance.
 - The secondary item lists (TBD, silent and stale at issue; section 3) under conditions (a),
   (b) and (c).
+- For a primary whose probe beat the base rate (E4), the figures of these three analyses that
+  are scored against outcomes are given again on the statements dated after its cutoff.
 
 Subsets are drawn from the eligible list by the seeded rule, stratified by statement year.
 
@@ -3208,11 +3214,13 @@ quoted here are from the build of 29 September.
     interval (sections 5, E4, 6 and 13); (c) what the Date Discontinued cell does in its
     sensitivity analysis, and where the two scenarios are reported (section 2.5); (d) a sample
     that fails to parse in the sampled quantiles (section 5, E3); (e) small completions from a
-    last read of this plan against itself, the guide and the frozen files: the freeze run in
+    last read of this plan against itself, the guide and the frozen files: the general rule
+    of withholding in the standing rules, the draws behind the intervals of the slip
+    distribution, the primaries' subsets after a cutoff, the freeze run in
     section 16, the two outcomes of H2 that section 13 did not word, which items a cut of E5
-    keeps, and what task E checks. *Seen:* nothing from the data: the code and its tests on
-    synthetic readings, and this plan; no model output (no model had been called) and no
-    test-period outcome. *Why:* the code that will run had to decide these before it is
+    keeps, and what task E checks. *Seen:* the code and its tests on synthetic readings, this
+    plan, and one run of the train-period descriptives on the open train table (for its run
+    time); no model output (no model had been called) and no test-period outcome. *Why:* the code that will run had to decide these before it is
     frozen, and a figure on a few statements beside the same figure on all of them gives
     their outcomes back. No hypothesis, sample or test changes.
 
