@@ -781,7 +781,10 @@ recorded in F1. Reasoning and thinking tokens are billed as output.
     such answers is reported per model and condition.
   - Two rates are reported per model and condition, and they do not overlap: the share of
     answers still invalid after the repair call, and the share of refusals. A sensitivity
-    analysis uses only the events that both compared conditions parsed.
+    analysis uses only the events that both compared conditions parsed. Its contrast is
+    withheld, its counts apart, when it leaves out or rests on 1 to 4 scoreable statements:
+    beside the contrast on every scoreable statement it would give the loss difference of
+    those few.
 
 ## 5. Experiments
 
@@ -1041,7 +1044,10 @@ Date, but no statement text. It gives the two probabilities and the time-to-reco
   is computed, and the family keeps six tests.
 - *A switched primary with a small slice.* If that slice holds fewer than 50 scoreable
   statements, the model's three tests are reported as not evaluable. They stay in the family of
-  six and count as not rejected.
+  six and count as not rejected. Nothing that uses the primary's item set is then computed
+  for it: the overconfidence criterion (section 13) has no reading, although its first part
+  uses no scoreable set, and the paper says so with the reason. The same holds when the
+  switch is undecided or the model has no slice.
 - *gemini-3.8-flash is not probed* (section 9). Its E3 results are reported as descriptive, with
   the statement that its memory of the test period was not tested.
 
@@ -1440,8 +1446,10 @@ reading is 3.5% to 6.1% on the H2 proxy (percentile: 4.0% to 8.4%). At the dev s
 94.6% to 97.4% (90.3% to 96.2%) and 3.6% to 6.6% (4.5% to 9.7%). The losses of single
 predictors and every other secondary keep 95% percentile intervals from the bootstrap draws,
 as descriptions; where such a contrast also carries a p-value, it is that of the registered
-test, and the two can disagree. The two scenarios of section 7.2 are reported beside every
-confirmatory estimate.
+test, and the two can disagree. One secondary reads a verdict from such intervals: the
+overconfidence criterion (section 13); there an end on zero does not exclude zero, and with
+a single episode there is no interval and no part is met. The two scenarios of section 7.2
+are reported beside every confirmatory estimate.
 
 **Sensitivity.** Reported beside every confirmatory p-value, and never used in Holm's rule:
 
@@ -2216,7 +2224,7 @@ plus:
     captures allow (every undetermined `E_end` counted as yes) is positive, with an interval
     that excludes zero. This is the least value that calibration in the large can take on the
     item set (section 7.2). It uses no scoreable set and no assumption about the undetermined
-    events.
+    events. A primary without an item set has no reading (section 5, E4).
   - *Against a predictor that reads no text.* The mean of `P(E_end)` minus the mean `P(E_end)`
     of the base rate by listing age on the same statements is positive, with an interval that
     excludes zero. No outcome enters this part: the observed frequency is the same on both
@@ -2243,7 +2251,10 @@ plus:
     scoreable set. Over the 1,334 dated dev statements the least value is −0.144 for the base
     rate and +0.591 for the stated date at face value (`result_rules_check.py`, section 17).
   - *Reported beside it,* for condition (a) and for the base rate on the same statements:
-    both parts for `E_end90`; both parts on the answers that parsed; calibration in the large
+    both parts for `E_end90`; both parts on the answers that parsed (withheld, their counts
+    apart, when 1 to 4 answers failed on the item set or 1 to 4 parsed: beside the figures
+    over every statement they would give the horizon events of those statements);
+    calibration in the large
     on the scoreable statements with its interval, and the difference of the two predictors
     there; the mean of `P(E_end)` minus the Turnbull share recovered by the stated end
     (secondary scorer); and the coverage of the 80% interval. The claim is conditional on

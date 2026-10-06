@@ -252,3 +252,14 @@ carry the registered text.
     criterion in `evaluate.py` before F1; letter accuracy, the floors and a `pattern` command
     in `literal_scores.py` before it runs on model readings; the analysis by type and the
     criterion's quantities in `secondary_scores.py` before its first sealed read.
+38. **Overconfidence criterion in the evaluator; withholding (6 Oct).** The two-part criterion
+    of section 13 is built into `evaluate.py` and was checked by an independent recomputation
+    and by a regression, mutation and sealing check. Points the plan now states because the
+    code had to decide them: a primary without an item set has no reading; an end on zero does
+    not exclude zero; with one episode there is no interval. One sealing point found on the
+    way, in code that was already committed: with one failed answer, the contrast "on the
+    statements both sides parsed" stood beside the contrast on every scoreable statement and
+    gave back that one statement's loss difference by subtraction. Both that contrast and the
+    criterion's parsed-only figures are now withheld when 1 to 4 statements are left out or
+    remain (plan sections 4 and 13). The criterion's code follows the recommended option of
+    change-list item 41(b), which still waits for the owner.
