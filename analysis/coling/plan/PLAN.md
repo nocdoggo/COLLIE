@@ -80,10 +80,13 @@ All deadlines in this file are in Anywhere on Earth time (AoE, UTC−12): 23:59 
     where it rests on 1 to 4 statements, and where the same figure is also written on a set
     that differs from its own by 1 to 4 statements, so that the two together would give back
     the outcomes of those few (a slice within its whole, the answers that parsed within all,
-    one outcome definition beside another). Sections 2.5, 4 and 13 name the cases known at
-    registration. The six confirmatory contrasts are never
-    withheld: where the two sides of one differ on 1 to 4 statements, it gives the loss
-    difference of those few, and for H2 the paper says how many differ (section 6).
+    one outcome definition beside another). The second check is made on pairs of sets. A count
+    is withheld too where it says by itself how many of 1 to 4 statements are scoreable or
+    have a determined event. Sections 2.5, 4, 5 (E1) and 13 name the cases known at
+    registration. The six confirmatory contrasts, and the same contrasts of the six secondary
+    models, are never withheld on the second ground: where the two sides of one differ on 1 to
+    4 statements, it gives the loss difference of those few, and for H2 the paper says how
+    many differ (section 6).
 - *Open train outcomes.* Outcomes of train-period statements (dated before 2023-01-01) are
   followed only to the train horizon, the last capture before 2023-01-01 (2022-10-06), and may
   be examined at any time (section 3, "Calendar overlap").
@@ -493,8 +496,9 @@ train-period event the horizon events are determined within its usable captures 
   the secondary scorers. Where 1 to 4 statements of a set are not scoreable, the figures over
   every statement of the set that fill its undetermined horizon events (the two scenarios, and
   the two limits of calibration in the large) are withheld: beside the figures on its
-  scoreable statements they would give the events of those few. The pinball losses and the
-  coverage stay.
+  scoreable statements they would give the events of those few. A secondary scorer then also
+  withholds the mean probabilities and the calibration in the large on the scoreable
+  statements, which name the few that are not. The pinball losses and the coverage stay.
 - An event is *observable* when its bracket, to recovery or to discontinuation, is finite and no
   wider than 31 days. `corpus.py` records this as `observable31`.
 
@@ -824,7 +828,9 @@ has written its result file (standing rules), and at any time for the train peri
 - The slip distribution: recovery minus `t_end`, a Turnbull estimate by form, by statement
   type and by revision bucket (first, second, third or later statement of a thread). Its
   intervals use the first 1,000 of the 10,000 registered draws, since every draw needs a fit
-  of its own.
+  of its own. In the tables of the hold rate and of the slip, a further cell is withheld and
+  marked where the cells written and the whole would otherwise give back the figure on 1 to
+  4 statements.
 - The distribution of bracket widths.
 - Counts by year, form, statement type and company.
 
