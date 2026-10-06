@@ -233,3 +233,22 @@ carry the registered text.
     end; the six secondary models' H1 to H3 carry the registered-test interval too. No number
     and no rule changed. An outage of about ten hours (5 Oct 21:56 to 6 Oct 08:20 EDT) stopped
     the fixer of that review partway; it was started again on the files as it left them.
+37. **Result rules (6 Oct; points a and b wait for the owner).** A review of the paper draft
+    found five places where the plan did not fix what the paper may write. Three proposals, one
+    merged text and two attacks on it gave the wording now in the plan (change-list item 41):
+    (a) a registered pattern decides the sentence "models read the letter of a notice but not
+    its pragmatics" for a primary: a letter part (letter accuracy on the gold letter items not
+    more than 0.10 below the rule reader's, by the 90% interval; no E5 test on a letter factor
+    holding) and a standing part (an E5 test on a standing factor holding under Holm, at least
+    0.10 above the seeds and above the letter edits, and the factor's own error on at least 0.10
+    of its items); (b) the overconfidence criterion has two parts over every statement of the
+    item set, against the largest frequency the captures allow and against the base rate's
+    mean probability; (c) the two settings of the undetermined events are scenarios, not bounds
+    (the panel's wider proposal of limits over all settings was not taken, to keep the
+    evaluator as reviewed); (d) the anonymised copies are made by a script from a fixed list,
+    their hashes recorded in F1 (the panel's version with a hash file in the registration
+    commit was not taken, for time); (e) a secondary analysis by statement type, computed by a
+    secondary scorer (the panel assigned it to the evaluator). Code that follows: the two-part
+    criterion in `evaluate.py` before F1; letter accuracy, the floors and a `pattern` command
+    in `literal_scores.py` before it runs on model readings; the analysis by type and the
+    criterion's quantities in `secondary_scores.py` before its first sealed read.

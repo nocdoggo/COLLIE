@@ -30,8 +30,8 @@ Four markers are used:
   dates and cutoffs, provider endpoints and their prices). It does not depend on the data.
 - **TBD-at-F1**: fixed by amendment F1 (final prompt pins, code hashes of the harness and the
   evaluator, the hash of the model-free test predictions, the H3 selection).
-- **[owner to confirm]**: a provisional rule, written on 1 October or, for items 38 and 39 of
-  the change list, on 5 October, that the owner has not yet confirmed.
+- **[owner to confirm]**: a provisional rule, written on 1 October or, for the later items
+  of the change list, on 5 and 6 October, that the owner has not yet confirmed.
 
 The commit id and the push time of the registration cannot be written into the file they
 identify, so they carry no marker; section 17 says where they are recorded.
@@ -116,14 +116,26 @@ the FDA's public drug-shortage statements ("Next Delivery: July 2021; Estimated 
 2021", "Backordered. Next release mid-October", "Resupply TBD"). Each reading is scored three
 ways:
 
-1. against a human reading of the letter of the text;
+1. against a human reading of the text, its letter and its standing (the literal task);
 2. against what actually happened, reconstructed from 2019 to 2026 archive captures;
 3. by a decision loss.
 
-The claim under test: models read the letter of an estimate correctly but not its pragmatics.
-They copy optimistic dates, commit to a date where the text says TBD, and treat stale estimates
-as live. The study also tests whether giving a model the track record of earlier estimates on
-the same list closes the gap.
+The claim under test: models read the letter of a notice but not its pragmatics. The *letter*
+of an estimate is what its words denote under the conventions of section 2.5: the kind of event
+they name (the statement type) and its period. The *standing* of an estimate is whether that
+period is on offer as a live estimate: whether the notice gives a period at all, which date in
+the notice is the estimate, how firmly it is put (the certainty class), and whether it had
+passed at the Date of Update (the stale flag). The *literal reading* is the answer to the
+literal task and holds the letter and the standing together: "literal" names the task (E2, E5,
+section 7.1) and not the letter. The *predictive reading* is the forecast of what will happen.
+*Pragmatics* names two things and nothing else: the standing, which the literal task scores,
+and the predictive reading, which is scored against outcomes (E3). The claim names three
+failures: a date given where the text says TBD and a stale estimate treated as live (standing),
+and optimistic dates copied (predictive reading). The terms are operational: every standing
+judgement follows from the words of the notice and its date by the conventions of the guide,
+the rule reader makes it by rule, and `literal-v1` states those conventions to the model. The
+study also tests whether giving a model the track record of earlier estimates on the same list
+closes the gap.
 
 The tests are registered so that either answer can be published (section 13). Issuer optimism
 itself is not a claim: Chicoine and Griffin (2025) reported that estimated release dates slip, on
@@ -421,6 +433,9 @@ sensitivity analysis.
 
 - The stated period is the period the text gives for recovery. If the text gives only a next
   delivery or release, that date is used, and the statement type is recorded as a covariate.
+  For such a statement the horizon events ask whether supply was back by the period the notice
+  gives for a delivery, which is more than the notice states; E3 reports its outcome results
+  by statement type (section 5, E3, "Secondaries").
 - The period comes from the *frozen rule reading* (`rules.py`) for every form and every split:
   train, dev, test and late. It never comes from a predictor's own reading or from an author
   label. The dataset builder supplies its last day to every predictor as `stated_end`, and the
@@ -456,9 +471,10 @@ A horizon event at time `t` is *determined* when `U <= t` and the upper bound sh
 train-period event the horizon events are determined within its usable captures only.
 
 - An event is *scoreable* when both of its horizon events are determined. The scoreable events
-  are E3's primary analysis set. Scoreability depends on where the captures fall: a recovery
-  inside a long gap between captures leaves a horizon event undetermined. The bounds of section
-  7.2 are therefore reported beside every estimate on the scoreable set.
+  are E3's primary analysis set. Scoreability depends on the outcome as well as on where the
+  captures fall: a recovery inside a gap between captures that contains a horizon leaves that
+  event undetermined. The two scenarios of section 7.2 are therefore reported beside every
+  estimate on the scoreable set.
 - An event is *observable* when its bracket, to recovery or to discontinuation, is finite and no
   wider than 31 days. `corpus.py` records this as `observable31`.
 
@@ -781,9 +797,9 @@ Build the statement events, clusters and outcomes of section 2.
 for the test period, and at any time for the train period.**
 
 - The hold rate of the stated period, `P(E_end)`, conditional on survival to first sight
-  (section 2.5).
-- The slip distribution: recovery minus `t_end`, a Turnbull estimate by form and by revision
-  bucket (first, second, third or later statement of a thread).
+  (section 2.5), over all dated statements and by statement type.
+- The slip distribution: recovery minus `t_end`, a Turnbull estimate by form, by statement
+  type and by revision bucket (first, second, third or later statement of a thread).
 - The distribution of bracket widths.
 - Counts by year, form, statement type and company.
 
@@ -863,6 +879,10 @@ stratum of the guide's allocation table, the fourteen rows the sample is drawn o
   gold both abstain or the IoU of their intervals is at least 0.5.
 - Holm's correction runs over the two tests at 0.05.
 - Per-form results are descriptive.
+- *Letter reading.* For each primary, the difference between its letter accuracy and the rule
+  reader's (section 7.1), over all gold letter items pooled without weights, with its 90% and
+  95% percentile intervals over episodes. It is read by the rule of section 13 and is not a
+  third test of the family.
 
 **Positive result.**
 
@@ -874,10 +894,15 @@ stratum of the guide's allocation table, the fourteen rows the sample is drawn o
   TBD-or-unknown and silent strata; the rate over every gold-ABSTAIN item of the sample is
   reported beside it.
 
-**Negative result.** Rules match the models everywhere. The paper then says that literal reading
-is solved for this register, and its weight moves to E3.
+These three marks are descriptions. None is a test, and none decides the first sentence of
+section 13: on the at most 22 gold-ABSTAIN items of the two strata, two false commitments pass
+the third (one, if fewer than 20 of the items are gold-ABSTAIN).
 
-### E3. Pragmatic reading against outcomes: the headline (must)
+**Negative result.** Neither McNemar test holds. The paper gives the differences between the
+models and the rule reader with their intervals, says that none was detected, and does not
+write that literal reading is solved. Its weight moves to E3.
+
+### E3. Predictive reading against outcomes (must)
 
 **Items.** Every E3-eligible test statement (section 3). The primary analysis uses the scoreable
 ones.
@@ -963,9 +988,27 @@ statement.
   three conditions (they have no dev runs, so no `m-best`).
 - For each primary: `Δ_GBM`, and the H3 contrast for each of the three conditions (section 6).
 - Post-cutoff slices.
+- By statement type. A next-delivery statement gives a period for a delivery, and its horizon
+  events still ask whether supply was back (section 2.5). For each primary, on the item set
+  its probe fixed, a secondary scorer repeats, on the recovery statements and on the next-delivery
+  statements apart (the type of the frozen rule reading): the H1, H2 and H3 contrasts and
+  `Δ_GBM`; the primary loss and the calibration in the large of the three conditions and of
+  the base rate; and the overconfidence criterion (section 13). The eligible list holds 1,891
+  recovery statements in 101 episodes and 702 next-delivery statements in 67. Each quantity
+  comes with its 95% percentile interval by episode and the two scenarios of section 7.2.
+  Each contrast also comes with the difference between the two types (next delivery minus
+  recovery) and its 95% percentile interval over 10,000 draws of the episodes of the item set,
+  both types taken from each draw; a draw with no scoreable statement of one type is left
+  out. A type with fewer than 50 scoreable statements in an item set is reported by its
+  counts alone. The verdict of each test is the registered one on both types together. Where
+  a contrast has opposite signs in the two types, or the overconfidence criterion holds on
+  the item set and not on its recovery statements, the sentence that states the result says
+  so. The two types differ in certainty class and in form, so a difference is not read as an
+  effect of the type alone. The descriptives of E1 give the hold rate and the slip
+  distribution by statement type.
 - The recovery definition A (FDA resolved).
 - The outcome over all covered presentations, and over any covered presentation.
-- The horizon-event bounds.
+- The two scenarios for the undetermined horizon events (section 7.2).
 - The delayed-entry sensitivity: statements first captured on or before `t_end`.
 - Cluster resampling by company, and a fit that leaves out the dominant company (Hospira and
   Pfizer).
@@ -1012,8 +1055,8 @@ Date, but no statement text. It gives the two probabilities and the time-to-reco
 
 **Post-cutoff slice for each model.** As in section 3.
 
-**Negative result.** Heavy memorisation, which shrinks the headline to the post-cutoff slices.
-That is reportable.
+**Negative result.** Heavy memorisation, which confines the outcome claims to the post-cutoff
+slices. That is reportable.
 
 ### E5. Minimal pairs from attested forms (must, reduced)
 
@@ -1081,9 +1124,16 @@ in the contrast of the stale factor, also when its stale flag is wrong.
 
 The two authors' predictive readings of 100 pairs, in the draft, are cut for October.
 
-**Positive result.** Named factors (stale, distractor, TBD) cause errors in named models.
+**Positive result.** A test of a standing factor holds for a named primary, with the higher
+error rate on the edited items. Whether it counts for the first sentence of section 13 is
+decided by the standing part of the registered pattern there, which says which factors are
+letter and which are standing. A letter-factor test that holds is reported in the same way.
+Error rates by level stand beside each test, so TBD is reported on its own items.
 
-**Negative result.** Invariance holds, and the pairs become a robustness check.
+**Negative result.** No test of a standing factor holds for a primary with the higher error
+rate on the edited items. The paper gives the twelve contrasts with their intervals and says
+that no effect of an edit on the standing was detected; it does not read that as invariance.
+The pairs become a robustness check.
 
 ### E6. Estimative terms at the FAA Command Center (should; gated on 4 October)
 
@@ -1177,8 +1227,8 @@ Brier and in pinball loss is reported.
 - The error classes are fixed at F1, before any test call: in the scorer of E7 if it exists
   by then, and otherwise in the text of F1.
 - **Positive result.** Named error classes carry most of the cost.
-- **Negative result.** Reading errors are cheap next to the trust loss, which supports the
-  headline.
+- **Negative result.** Reading errors are cheap next to the trust loss, which is in line with
+  the claim of section 1.
 
 ### E8. Real revision threads (cut for October)
 
@@ -1228,9 +1278,10 @@ sides share the same frozen calibrator, so only the literal reading differs.
 - *Why this one.* Of the study's two predictors that read no text, the base rate has the lower
   primary loss on the scoreable dev statements, which is the rule that selects `m-best`: 0.195
   against 0.240 for the structured-only GBM on the 644 scoreable dev statements, a difference of
-  0.045 (95% interval 0.025 to 0.070). Under the bounds of section 7.2, over the 1,334 dated dev
-  statements, it is 0.204 against 0.249 with every undetermined horizon event set to no, and
-  0.263 against 0.286 with every one set to yes (from the power code on the freeze-run tables).
+  0.045 (95% interval 0.025 to 0.070). Under the two scenarios of section 7.2, over the 1,334
+  dated dev statements, it is 0.204 against 0.249 with every undetermined horizon event set to
+  no, and 0.263 against 0.286 with every one set to yes (from the power code on the freeze-run
+  tables).
   It also had the lower loss in every check made inside the fit split (item 36).
 - *What the comparator is given.* Like every predictor, it is read at the two horizons, and
   the stated end comes from the rule reading of the text (section 2.5). H3 therefore measures
@@ -1244,8 +1295,8 @@ sides share the same frozen calibrator, so only the literal reading differs.
   records them; a tie goes to the earlier of (a), (b), (c).
 - The selection is recorded in F1, before any test call, with the dev loss of all three
   conditions and the dev outcome mix. The dev runs read the 644 scoreable dev statements
-  only, so the bounds of section 7.2 equal the loss there; the 690 dated dev statements that
-  are not read are counted beside it. The dev split is dominated by
+  only, so the two scenarios of section 7.2 equal the loss there; the 690 dated dev statements
+  that are not read are counted beside it. The dev split is dominated by
   "no" answers (section 3), which favours the condition that gives the lowest probabilities.
   The H3 contrast is also reported with each of the three conditions in place of `m-best`, as
   secondaries.
@@ -1388,8 +1439,8 @@ reading is 3.5% to 6.1% on the H2 proxy (percentile: 4.0% to 8.4%). At the dev s
 94.6% to 97.4% (90.3% to 96.2%) and 3.6% to 6.6% (4.5% to 9.7%). The losses of single
 predictors and every other secondary keep 95% percentile intervals from the bootstrap draws,
 as descriptions; where such a contrast also carries a p-value, it is that of the registered
-test, and the two can disagree. The bounds of section 7.2 are reported beside
-every confirmatory estimate.
+test, and the two can disagree. The two scenarios of section 7.2 are reported beside every
+confirmatory estimate.
 
 **Sensitivity.** Reported beside every confirmatory p-value, and never used in Holm's rule:
 
@@ -1488,7 +1539,8 @@ analysis, the resampling by company and the metrics of section 7.2 for the two p
 for the model-free predictors. The other registered analyses that need a sealed file are
 computed by secondary scorers (standing rules): the descriptives of E1; every contrast and
 metric of the six secondary models; the TBD, silent and stale-at-issue lists; the sampled
-quantiles and the paraphrases; the 2×2 of E4; the fit that leaves out the dominant company
+quantiles and the paraphrases; the 2×2 of E4; the analysis by statement type (section 5, E3);
+the fit that leaves out the dominant company
 and the full-follow-up refit; the sensitivity analyses of the recovery rule (section 2.5:
 definition BL, leaving the list, and the Date Discontinued cell); selective prediction; and
 E7. E2 and E5 read no sealed file; the scorer of each is named, with its hash, in F1 or in a
@@ -1516,6 +1568,14 @@ the freeze of numbers (section 12) is named in the paper as not run.
   0.5 with the gold interval (or the gold abstains). A distractor's interval is its quoted
   words read by the conventions of section 2.5. The answer schema has no distractor field.
 - **Certainty-class** accuracy and Cohen's kappa against gold, over the four classes.
+- **Letter accuracy:** among the gold items that give an interval and carry no distractor date
+  (the *letter items*), the share of readings correct by the E2 rule: the statement type is the
+  gold one and the IoU is at least 0.5.
+
+On the letter items, statement-type accuracy, interval IoU, endpoint error and letter accuracy
+score the letter; over all items the first three also move with errors of standing. Abstention,
+the false-commitment rate, the stale flag, distractor uptake and the certainty class score the
+standing (section 1).
 
 For E2, each is reported per stratum of the guide's allocation table; pooled over the sample
 without weights; and pooled with each stratum weighted by its statements in the frame
@@ -1533,13 +1593,32 @@ the strata's frame sizes, not estimates of a rate over all statements of the fra
 
 - **Primary Brier.** For event `i`, the primary loss is `(BS_i(E_end) + BS_i(E_end90)) / 2`, where
   `BS = (p − y)^2`.
-  - The primary analysis uses scoreable events (complete case).
-  - *Bounds:* every undetermined horizon event is set to 0, and then to 1. Both results are
-    reported.
+  - The primary analysis uses scoreable events (complete case). Whether an event is scoreable
+    depends on its outcome as well as on the captures: an event still seen not recovered after
+    both horizons is scoreable, and one whose recovery bracket contains a horizon is not. On
+    the train period the scoreable events hold fewer recoveries within 90 days of the stated
+    end than the list, and a forecaster who states low probabilities is favoured on such a
+    set. On the dev split the Turnbull share recovered within 90 days of the stated end is
+    0.446 over the 1,334 dated statements and 0.245 over the 644 scoreable ones (0.122 and
+    0.118 by the stated end); always answering no scores 0.182 on the scoreable ones, and the
+    base rate by listing age 0.195 (`result_rules_check.py`, section 17).
+  - *Two scenarios (all no, all yes):* over every statement of the item set, every
+    undetermined horizon event is set to 0, and then to 1. Both results are reported. They are
+    two settings and not limits: a loss is greatest when each undetermined event is set
+    against the predictor's own probability, and a loss or a contrast can lie outside both.
+    Where the change list, the code or a result file says "bounds" of the horizon events,
+    these two scenarios are meant.
+  - *Reading.* The verdict of a test is that of the registered test on the scoreable events,
+    whatever the two scenarios show. When a scenario has the other sign than the estimate, the
+    sentence that states the result says so.
 - **Brier decomposition** into reliability, resolution and uncertainty (Murphy), with 10
   equal-count bins, for each horizon event.
 - **Calibration in the large:** the mean of `P(E_end)` minus the observed frequency of `E_end`
   on the scoreable events, and the same for `E_end90`, with 95% intervals by episode bootstrap.
+  Over every event of an item set it is also given with every undetermined event counted as
+  yes, and then as no. For this quantity, unlike a loss, the two settings are limits: the
+  first is its least value and the second its greatest. Beside it stand the same quantities
+  for the base rate by listing age on the same events (section 13).
 - **Decision loss.** The pinball loss at τ 0.5, 0.8 and 0.95 on the time to recovery.
   - Pinball at the critical fractile τ = c_u / (c_u + c_o) is the expected cost of buffering
     stock until recovery. The three τ are generic cost ratios of 1:1, 4:1 and 19:1.
@@ -2126,15 +2205,48 @@ plus:
 
 **Positive, in the order the paper would state it.**
 
-- Models read the letter well but not the pragmatics. False commitment on TBD or silent text, or
-  stale-value or distractor uptake, is measurably above the rules or above the human ceiling for
-  named models (E2, E5).
+- Models read the letter of a notice but not its pragmatics (E2, E5). The paper states this
+  sentence for a primary model only when the registered pattern below holds for that model.
 - The zero-shot predictive readings are overconfident relative to outcomes (E3). The registered
-  criterion, a secondary with no multiplicity claim: for condition (a), calibration in the
-  large on `E_end` (section 7.2) is positive with a 95% percentile interval, by episode, that
-  excludes zero. The same
-  quantity for `E_end90` and the coverage of the 80% interval are reported beside it. The claim
-  is conditional on survival to first sight (section 2.5).
+  criterion, a secondary with no multiplicity claim, has two parts. Both are for condition (a)
+  and `E_end`, over every statement of the primary's item set (section 5, E3), each with a 95%
+  percentile interval by episode.
+  - *Against outcomes.* The mean of `P(E_end)` minus the largest frequency of `E_end` that the
+    captures allow (every undetermined `E_end` counted as yes) is positive, with an interval
+    that excludes zero. This is the least value that calibration in the large can take on the
+    item set (section 7.2). It uses no scoreable set and no assumption about the undetermined
+    events.
+  - *Against a predictor that reads no text.* The mean of `P(E_end)` minus the mean `P(E_end)`
+    of the base rate by listing age on the same statements is positive, with an interval that
+    excludes zero. No outcome enters this part: the observed frequency is the same on both
+    sides.
+  - *Reading,* for each primary by name, in this order. (1) When the greatest value (every
+    undetermined `E_end` counted as no) is negative with an interval that excludes zero, the
+    paper writes that the readings are underconfident relative to outcomes, and nothing else
+    of this list. (2) When both parts hold, it writes "overconfident relative to outcomes".
+    (3) When only the second holds, it writes that the model states higher probabilities than
+    the base rate, gives the least and the greatest value of its calibration in the large, and
+    says that the captures do not decide whether it is overconfident. (4) When only the first
+    holds, it writes that the model's probabilities exceed every frequency the captures allow,
+    that they were not shown to exceed the base rate's, and that the excess is not put down to
+    the reading. (5) Otherwise it writes that overconfidence was not detected, gives both
+    values, and does not write that the readings are calibrated.
+  - *Why two parts.* On the 644 scoreable dev statements the base rate, which reads no text,
+    stands at +0.135 on `E_end` (mean `P(E_end)` 0.253 against 76 of 644; 95% interval 0.083
+    to 0.177). The selection of the scoreable statements does not make it: over the 1,334 dated
+    dev statements the base rate stands 0.142 above the Turnbull share recovered by the stated
+    end (0.264 against 0.122). On the fit split, where it was fitted, it already stands 0.051
+    above (0.272 against 0.221); the rest goes with the fall of the list's hold rate from fit
+    to dev. The selection acts on `E_end90` (section 7.2). The second part removes an excess
+    that a predictor with no text shares; the first ties the claim to outcomes without a
+    scoreable set. Over the 1,334 dated dev statements the least value is −0.144 for the base
+    rate and +0.592 for the stated date at face value (`result_rules_check.py`, section 17).
+  - *Reported beside it,* for condition (a) and for the base rate on the same statements:
+    both parts for `E_end90`; both parts on the answers that parsed; calibration in the large
+    on the scoreable statements with its interval, and the difference of the two predictors
+    there; the mean of `P(E_end)` minus the Turnbull share recovered by the stated end
+    (secondary scorer); and the coverage of the 80% interval. The claim is conditional on
+    survival to first sight (section 2.5).
 - The models use the list's track record when it is given (H1 holds).
 - The free text carries value beyond the structured fields: H3 holds in favour of the text
   against the base rate by listing age, and the 95% interval of `Δ_GBM` lies above zero
@@ -2143,6 +2255,74 @@ plus:
 - On H2, an LLM reading beats the rules (a reading effect), or equivalence holds (reading is not
   the bottleneck). Both are informative.
 
+**The registered pattern.** It decides the sentence of the first bullet above and nothing else.
+It reads E2 and E5 for the two primary models only. No outcome and none of H1 to H3 enters it.
+
+- *Terms.* Letter, standing and pragmatics are defined in section 1. Of the two things that
+  pragmatics names, only the standing enters the pattern. The predictive reading has its
+  criterion in the second bullet above; wherever the paper states the sentence for a model, the
+  same paragraph gives the outcome of that criterion for the model, whichever way it came out.
+  In E5, surface form and granularity are the *letter factors*: the edit rewrites the period or
+  changes the period itself. Certainty marker, stale, distractor date and silent are the
+  *standing factors*: the edit leaves the words of the period as they are, or takes them away.
+  TBD is a level of the certainty marker: 73 of its 94 items take the date away (TBD, "no
+  estimated release date", "as it is released") and 21 add or change a hedge word and keep the
+  date. In E2, the *letter items* are the gold items whose gold gives an interval and carries
+  no distractor date. By the allocation these are the 72 items of the seven dated strata, 60
+  of them of forms other than month and year, and any dated depletion or discontinuation
+  statement of the other strata; the adjudicated gold fixes the set.
+- *The letter part.* (a) Under `literal-v1`, over all gold letter items pooled without weights
+  (the item set of every gold item), the model's letter accuracy (section 7.1) is not more
+  than 0.10 below the rule reader's: the lower end of the 90% percentile interval of the
+  difference, model minus rule reader, lies above −0.10 (10,000 draws of shortage episodes,
+  seed 20261001). A model better than the rule reader meets (a). This is a one-sided reading
+  at a nominal 0.05, the level of H2's equivalence: in a simulation on the clusters of the 72
+  items (a run that is not in the committed output) a model 0.10 below the rule reader met it
+  in 4% to 7% of data sets. (b) Neither of the model's E5 tests on a letter factor holds with
+  the higher error rate on the edited items. Condition (b) can only withhold; the reading of
+  the letter rests on (a).
+- *The standing part.* For at least one standing factor, all three hold. (a) The model's E5
+  test of the factor holds, under Holm over the twelve tests, with the higher error rate on the
+  edited items. (b) The model's error rate on the items of the factor is at least 0.10 above
+  its error rate on the unedited seed items, and at least 0.10 above its error rate on the
+  items of the two letter factors taken together, every rate under the criterion of the factor
+  (section 5, E5, "Target"). (c) The factor's own error occurs on at least 0.10 of the items of
+  the factor on which it can occur. The own error is a period given where the gold gives none
+  (certainty marker and silent: the false-commitment rate of section 7.1), the distractor's
+  period taken (distractor date: distractor uptake, section 7.1), or a period given without
+  the stale flag (stale). None of the three can occur on an unedited seed item, which is
+  dated, not stale and carries no distractor date. A wrong statement type, a wrong interval or
+  a wrong certainty class does not make a factor count by itself; each is reported.
+  Conditions (b) and (c) can only withhold.
+- *The sentence.* The pattern holds for a model when both parts hold. When it holds for both
+  primaries, the paper states the sentence for the two primary models. When it holds for one,
+  the paper states it for that model by name and says in the same place which part did not
+  hold for the other. When it holds for neither, the paper does not state the sentence and
+  reports each part for each primary. A part that does not hold is not read as its opposite,
+  and the paper says which condition withheld it. A test of the E5 family that holds is
+  reported as that family's result, with its size, also when a floor or the other part
+  withholds the sentence; the paper then does not write that no effect was detected. A primary
+  whose E2 or E5 run is declared not run has no pattern, and the paper says so. If E5 is cut to
+  400 items (section 12), the pattern is read on those items with the same floors; if E5 is
+  not scored by the freeze of numbers, the sentence is not stated.
+- *Error control.* The standing part reads rejections of the E5 family (Holm at 0.05 over its
+  twelve tests) and adds no test to it. The letter part adds one one-sided reading for each
+  primary, outside the Holm rule of E2's two tests; the paper reports it as a reading of this
+  rule and not as a test of that family. The sentence needs a rejection of the E5 family, so
+  where no standing factor has an effect it is written no more often than that family errs.
+- *Support, not the rule.* The false-commitment rate, distractor uptake and the stale-flag
+  scores of E2 are reported for every model with their counts and 95% intervals (for the two
+  rates the exact binomial interval beside the percentile one), beside the rule reader's and
+  each annotator's, and stale-value uptake on the 16 stale-at-issue statements of E3 beside
+  them. The letter accuracy of the model, of the rule reader and of each annotator against the
+  other stands beside the sentence, with the two weighted differences. None of these decides
+  anything, and neither do the three marks of E2's positive result. For each standing factor
+  that counts, the paper gives the rate of its own error in the sentence that names it, and
+  the share of the factor's errors that are of another kind. The secondary models are
+  described by the same quantities (gemini-3.8-flash by those of E2 alone). Their E5 contrasts
+  are outside the family of twelve, so no pattern is computed for them; the paper states the
+  sentence for no secondary model and uses no plural that includes one.
+
 **Negative, publishable because registered.**
 
 - The models do not use the track record even when shown it (H1 fails).
@@ -2150,8 +2330,10 @@ plus:
   of the base rate), or no difference is detected (H3 null). A null is reported with its 95%
   interval and the minimum detectable `Δ` of section 6, with the power that the registered
   test has at it, and is not read as "the text adds nothing".
-- Literal reading is solved for this register (E2).
-- Invariance holds on the minimal pairs (E5).
+- No difference between a primary and the rule reader is detected in the literal task (E2).
+  This is a non-detection and is not read as "literal reading is solved".
+- No test of a standing factor holds on the minimal pairs (E5). This is a non-detection and is
+  not read as invariance.
 - Memorisation confines the outcome claims to post-cutoff slices (E4).
 
 The issuers' own optimism or calibration (E1) is context, never a result for or against the
@@ -2173,7 +2355,8 @@ claim.
 - A new method.
 - Issuer optimism as a new finding.
 - "First" (the paper writes "to our knowledge").
-- That models "understand" anything.
+- That models "understand" anything, or that a standing error is a failure of pragmatic
+  inference in the sense of implicature: "pragmatics" is the operational term of section 1.
 - The term "commitment" (the label layer is "certainty class").
 - That the base rate is the best predictor that could be built from the structured fields: it
   is the better of the two registered ones.
@@ -2210,14 +2393,24 @@ claim.
 - minimal pairs;
 - every model's raw outputs, exported from the run folders;
 - a datasheet;
-- the registered plan and guide (below).
+- the anonymised copies of the registered plan and guide, with the script that makes them
+  and the hash files (below).
 
 **Anonymity and the evidence of registration** (owner decision, 1 October). The repository
 that holds the registration stays public under the owner's account. ARR has no anonymity
 period, and the submission does not link to the repository, so the registration commit itself
-is not cited in the anonymous submission. The registration is evidenced by an anonymised copy
-of the registered `PLAN.md` and `AUDIT_GUIDE.md` in the supplement, with their sha256 and the
-push time. The paper says that the identified record is released on acceptance.
+is not cited in the anonymous submission. The registration is evidenced by anonymised copies
+of the registered `PLAN.md` and `AUDIT_GUIDE.md` in the supplement. A committed script
+(`analysis/coling/anonymise.py`) makes each copy from the registered file: it replaces every
+string of a committed list by a fixed token and changes nothing else. The sha256 of the two
+registered files, of the two copies, of the script and of the list are recorded in amendment
+F1, so whoever holds the registration commit and F1 can rebuild the copies byte for byte;
+each later amendment records the same for the files as amended. The supplement carries the
+copies, the script, those hashes, the tokens with the number of places each replaces, and the
+push time. The replaced strings and the commit id are released with the identified record on
+acceptance, and the paper says so. Before acceptance a reviewer can check that the copies
+match the hashes beside them, and no more: when the text was fixed is shown by the push
+record of the tagged commit, which a reviewer cannot see.
 
 ## 15. Relation to the UV 2026 paper
 
@@ -2363,6 +2556,15 @@ moved out of the study folder before registration.
   the ten in-context examples (13, of which 4 eligible) and on the threads of train statements
   censored at their first capture in 2023 (none). No outcome field of a test-period statement
   was read, and no code or table depends on the counts.
+- **Counts for the result rules (5 and 6 October).** For item 41 of the change list the
+  eligible list was counted by the rule reading's statement type, with form and certainty
+  class, from first-sight fields: 1,891 recovery statements in 101 episodes and 702
+  next-delivery statements in 67. The 120 literal items were counted by first-sight form,
+  distractor flag and episode, for a simulation (72 letter items by the rule reading, in 59
+  clusters), and those 72 by the rule reading's statement type and stale flag (51 recovery
+  and 21 next delivery; 2 stale at issue). The names of the three files in
+  `analysis/coling/out/audit/keys/` were listed once, and none was opened. No outcome field of
+  a test-period statement was read.
 
 To our knowledge, no test-period outcome has been derived, printed or tabulated outside the
 sealed folder, apart from the counts of events with an observable outcome and the one deduction
@@ -2380,8 +2582,9 @@ Hashes are the first 16 hex characters of sha256.
   annotated tag `coling-registration` on that commit. The tag `gate-1` that already exists in
   the repository belongs to the UV study and is not used.
 - The commit id and the push time (UTC) are therefore not written here. They are recorded in
-  amendment F1, with the sha256 of `PLAN.md` and of `AUDIT_GUIDE.md` at that commit, and in
-  the supplement (section 14).
+  amendment F1, with the sha256 of `PLAN.md` and of `AUDIT_GUIDE.md` at that commit and of
+  their anonymised copies (section 14). The supplement gives the push time and not the
+  commit id.
 - F1 is identified in the same way, by its commit and the tag `coling-f1`. The harness checks
   both tags by these names (section 9).
 - Before the push, an independent check runs the study's test files, reruns the corpus builder
@@ -2470,6 +2673,11 @@ simulation reads no sealed file. In the code and in its output the word "registe
 names the percentile p-values of the draft, which were the registered ones when the code was
 written; the test of section 6 is the procedure it calls `max_t`.
 
+**Result-rule checks (sections 7.2 and 13; change-list item 41).** `result_rules_check.py`:
+**TBD-at-gate** (its hash). Its output, `analysis/coling/out/result_rules_check.json`:
+**TBD-at-gate** (its hash), made on the frozen statement table with seed 20261001. It reads
+train-period rows, and first-sight fields of the other periods, and no sealed file.
+
 **Annotation.**
 
 - `AUDIT_GUIDE.md` v1: `ce58129993b31d33`. The check set was labelled under the v1 text of
@@ -2530,7 +2738,9 @@ gate result and what section 5 lists.
   `evaluate.py baselines` prints it, with the environment;
 - the provider pin as sent, the provider that served the cost-trial calls, and the reasoning
   setting each model served;
-- the registration's commit id, tag, push time and file hashes ("Identity").
+- the registration's commit id, tag, push time and file hashes ("Identity"), with the sha256 of the
+  anonymised copies of the plan and the guide, of the script that makes them and of its list
+  of strings (section 14).
 
 ## Changes from the 29 September draft (1 October 2026)
 
@@ -2888,6 +3098,49 @@ quoted here are from the build of 29 September.
     of seeds and factors, and the plan and the scorer's code; no model output (no model had
     been called) and no test-period outcome. *Why:* a test must compare like with like, and
     a p-value that enters Holm's rule must be defined before it is computed.
+41. **Result rules, after a review of the paper draft.** A review of the draft paper against
+    this plan (5 October) found five places where the plan did not fix what the paper may
+    write. All five are fixed here, before any model call. Points (a) and (b) are the owner's
+    to decide. **[owner to confirm]**
+    (a) *The first sentence of section 13.* Draft and revision of 1 October: the sentence held
+    when a rate was "measurably above the rules or above the human ceiling", with no number.
+    Now: the registered pattern of section 13, read on E2 and E5 for the two primaries.
+    Letter, standing and pragmatics are defined in section 1; the six E5 factors are grouped;
+    the three marks of E2 are descriptions; a null of E2 or of E5 is a non-detection; E3 is no
+    longer titled the headline.
+    (b) *The overconfidence criterion.* Before: calibration in the large on `E_end` on the
+    scoreable statements, positive with an interval that excludes zero. Now: two parts over
+    every statement of the item set, against outcomes and against the base rate (section 13).
+    (c) *Scenarios.* The two settings of the undetermined events are called scenarios, and
+    section 7.2 says what the complete case does.
+    (d) *Anonymised copies.* A script and a fixed list of replaced strings, with the hashes of
+    the copies recorded in F1; the commit id is not in the supplement (sections 14 and 17).
+    (e) *By statement type.* A registered secondary of E3, and E1's descriptives by type
+    (section 5).
+    *Seen:* the paper draft and its review; train outcomes and the dev losses of the
+    model-free predictors; first-sight counts (section 16); simulations on synthetic readings
+    (runs that are not in the committed output). No model output (no model had been called)
+    and no test-period outcome. On dev (`result_rules_check.py`, section 17): every model-free
+    predictor meets the earlier criterion of (b) on the scoreable statements (the base rate:
+    +0.135), and over the 1,334 dated statements only the stated date at face value meets its
+    new first part (+0.592; the base rate: −0.144). The base rate minus rules plus slip is
+    −0.018 on the scoreable statements, and +0.009 and +0.007 under the scenarios; by type it is
+    −0.013 on the 457 recovery statements
+    and −0.032 on the 187 next-delivery statements. The Turnbull share recovered by the stated
+    end is 0.252 for recovery and 0.118 for next-delivery statements on fit, and 0.133 and
+    0.109 on dev. Item 36 gives the selection of the scoreable statements on the earlier build
+    (0.447 against 0.246); on the freeze-run tables it is 0.446 against 0.245. In the
+    simulations of (a), on the item file's layout of seeds and factors and under the centred
+    fallback of E5: with no effect of any edit the pattern held for a primary in no data set;
+    with every edit adding 0.10 errors, in 1% to 4% of data sets, where a standing test alone
+    held in 39% to 59%; with stale alone adding 0.15 of its own error, in 40% to 71%.
+    *Why:* the earlier wording of (a) had no number, and one model of eight could meet the 5%
+    mark on 22 items by two false commitments; the earlier criterion of (b) did not separate a
+    reader from a table; the two settings of (c) are not limits of a loss; an anonymised copy
+    cannot have the hash of the registered file, so the earlier text of (d) gave a reviewer
+    nothing to check; a next-delivery statement is scored against recovery, which asks for
+    more than the notice states. No hypothesis, sample, prompt or split changes, and none of
+    the six tests.
 
 **Status of these changes.** The owner confirmed on 1 October the scope (item 1), the deadlines
 and their one relaxation (item 2), the availability rule, the capture freeze and the result of
@@ -2900,8 +3153,10 @@ included, were provisional rules of 1 October; the owner confirmed them as writt
 and the review of the evaluator of 5 October. The owner decided both that evening. Three
 tests were put to the owner: the one of section 6; the same with H1 two-sided; and the draft's
 percentile p-values with their size disclosed. The owner chose the one of section 6, and
-confirmed the sealing rule of item 39 as written. Item 40 follows the review of the scorer of E2 and E5
-of 5 October and is read by the owner with the registration.
+confirmed the sealing rule of item 39 as written. Item 40 follows the review of the scorer of
+E2 and E5 of 5 October and is read by the owner with the registration. Item 41 follows a
+review of the paper draft of 5 October; its points (a) and (b) wait for the owner's
+confirmation (its tag), and the others are read by the owner with the registration.
 
 **Corrections of the text to the code as it stood on 29 September** (the builder did not change
 for these; the draft described it wrongly). *Seen:* train outcomes; the builder had been tested
