@@ -795,16 +795,16 @@ recorded in F1. Reasoning and thinking tokens are billed as output.
 
 ## 5. Experiments
 
-E1 to E5 are the core of the October study. E6 is kept until its linker gate on 4 October, and
-E7 follows it in the cut order (section 12). E8 and E9 are not run in October (owner decision,
-1 October). Call counts and costs are in section 9.
+E1 to E5 are the core of the October study. E6 was kept until its linker gate on 4 October and
+was cut on 5 October; E7 is the next in the cut order (section 12). E8 and E9 are not run in
+October (owner decision, 1 October). Call counts and costs are in section 9.
 
 ### E1. Build OpEst-FDA and describe the issuers (must; no calls)
 
 Build the statement events, clusters and outcomes of section 2.
 
-**Descriptives, computed by a secondary scorer (standing rules) after every confirmatory run
-for the test period, and at any time for the train period.**
+**Descriptives, computed by a secondary scorer: for the test period only after the evaluator
+has written its result file (standing rules), and at any time for the train period.**
 
 - The hold rate of the stated period, `P(E_end)`, conditional on survival to first sight
   (section 2.5), over all dated statements and by statement type.
@@ -815,7 +815,7 @@ for the test period, and at any time for the train period.**
 
 **Intervals.** Percentile bootstrap, 95%, clustered by episode.
 
-**Standing.** None of this is in the confirmatory family. Optimistic or calibrated issuers are
+**Status.** None of this is in the confirmatory family. Optimistic or calibrated issuers are
 both context for E3, and neither is a failure.
 
 **Audit.** 100 outcomes are audited by hand (section 10).
@@ -1129,7 +1129,8 @@ in the contrast of the stale factor, also when its stale flag is wrong.
   draw with no item on one side is left out. The cells of the other five models never decide
   the procedure of the twelve; such a model has no Wald test where its own cell is flat, and
   its bootstrap contrast is given as a description. A contrast whose edited items, or whose
-  unedited items, lie on fewer than two seeds is not evaluable.
+  unedited items, lie on fewer than two seeds is not evaluable; it stays in the family of
+  twelve with p = 1.
 - *Size of the fallback.* Under no effect of any factor, on the item file's own layout of
   seeds and factors and with synthetic errors (a run that is not in the committed output),
   the centred p-value gave a Holm familywise error of 0.2% to 5.8%, where the percentile
@@ -1147,8 +1148,10 @@ letter and which are standing. A letter-factor test that holds is reported in th
 Error rates by level stand beside each test, so TBD is reported on its own items.
 
 **Negative result.** No test of a standing factor holds for a primary with the higher error
-rate on the edited items. The paper gives the twelve contrasts with their intervals and says
-that no effect of an edit on the standing was detected; it does not read that as invariance.
+rate on the edited items. The paper gives the twelve contrasts with their intervals. If no test
+of a standing factor holds in either direction, it says that no effect of an edit on the
+standing was detected, and does not read that as invariance; a test that holds with the lower
+error rate on the edited items is reported as that family's result (section 13).
 The pairs become a robustness check.
 
 ### E6. Estimative terms at the FAA Command Center (should; gated on 4 October)
@@ -1222,7 +1225,7 @@ climatology.
 **Test.** GEE clustered by day. MEDIUM against MODERATE is reported as confounded with programme
 type.
 
-**Standing.** Secondary and descriptive; nothing in E6 enters the confirmatory family.
+**Status.** Secondary and descriptive; nothing in E6 enters the confirmatory family.
 
 **Positive result.** For at least one term, the realised rate differs from both readings by at
 least 15 points, and in-context readings add resolution beyond the lookup.
@@ -1282,8 +1285,8 @@ sides share the same frozen calibrator, so only the literal reading differs.
 - *Caveat.* The stated period that defines the horizon events is the rule reading itself
   (section 2.5), which favours the rules: a model reading that is right where the rule is wrong
   is scored against the rule's horizon. The accuracy of the rule reading on the 100-statement
-  check (section 10) is reported beside H2, and H2 is also reported on the month-and-year form
-  alone, where the rule reading is least in doubt.
+  check (the share without a confirmed error, section 10) is reported beside H2, and H2 is
+  also reported on the month-and-year form alone, where the rule reading is least in doubt.
 
 **H3: value of the text** (two-sided). `Δ = loss(base rate by listing age) − loss(m-best) ≠ 0`.
 
@@ -1560,8 +1563,10 @@ metric of the six secondary models; the TBD, silent and stale-at-issue lists; th
 quantiles and the paraphrases; the 2×2 of E4; the analysis by statement type (section 5, E3);
 the fit that leaves out the dominant company
 and the full-follow-up refit; the sensitivity analyses of the recovery rule (section 2.5:
-definition BL, leaving the list, and the Date Discontinued cell); selective prediction; and
-E7. E2 and E5 read no sealed file; the scorer of each is named, with its hash, in F1 or in a
+definition BL, leaving the list, and the Date Discontinued cell); selective prediction; the
+mean of `P(E_end)` minus the Turnbull share recovered by the stated end, beside the
+overconfidence criterion (section 13); and E7.
+E2 and E5 read no sealed file; the scorer of each is named, with its hash, in F1 or in a
 dated amendment pushed before it is first run on model readings. Two figures come from
 elsewhere: the accuracy of the rule reading beside H2, from the reference-reading check
 (section 10), and the minimum detectable differences beside a null, from the power code at
@@ -1599,10 +1604,11 @@ For E2, each is reported per stratum of the guide's allocation table; pooled ove
 without weights; and pooled with each stratum weighted by its statements in the frame
 ("weighted by event") or by its distinct masked templates in the frame ("weighted by
 template"). Inside a stratum every scored item counts the same. The frame is taken without
-the statements whose whole text is a phrase the guide quotes (685 statements of the frame in
-the draw of 1 October, 486 of them silent and 158 TBD; 688 in the freeze run of 5 October);
-no sample holds one. These weights undo the allocation across strata and nothing else. Inside
-a stratum the sample is not proportional to the frame: at most two items share a masked
+the statements whose whole text is a phrase the guide quotes (685 statements of the frame, 486
+of them silent and 158 TBD; 688 when statements outside the frame are counted too) and
+without the statements of the guide's Appendix A; no sample holds one. These weights undo the
+allocation across strata and nothing else. Inside a stratum the sample is not proportional to
+the frame: at most two items share a masked
 template over the pilot, the check sets and the literal sample together, and one third of each
 quota is dated 2023 or later. The weighted figures are therefore descriptions of the sample at
 the strata's frame sizes, not estimates of a rate over all statements of the frame.
@@ -1956,10 +1962,13 @@ that thread carried at any date, with all its presentations.
 
 1. **Availability-string check** (the adjudicator, before the freeze run): done on 1 October
    (section 2.2).
-2. **Pilot and check set** (before registration; Friday 2 October).
+2. **Pilot and check set** (before registration; the pilot on 3 to 5 October, the check set on
+   5 to 6 October).
    - 20 train-period items are labelled by A1 and A2 independently under the guide's draft of
-     1 October. A meeting of A1, A2 and the adjudicator settles every disagreement, and the
-     guide is revised to v1.
+     1 October. A meeting of A1, A2 and the adjudicator was to settle every disagreement. The
+     pilot left one disagreement and no convention in dispute, so no meeting was held: the
+     adjudicator settled the open points from the two sheets (guide, section 4), and the
+     guide was revised to v1.
    - A check set of 20 fresh train-period items from the dated forms is then labelled
      independently under v1.
    - *Gate.* Krippendorff's alpha (interval metric) on the month offset of the start, and on the
@@ -1972,7 +1981,7 @@ that thread carried at any date, with all its presentations.
    - The pilot may change the guide and the prompt text. It does not change `rules.py`; a
      difference that remains is disclosed.
    - Pilot, check and reserve items stay out of the gold and out of every other sample.
-3. **Literal task (E2 gold; 3 to 5 October).** A1 and A2 each label the 120 E2 statements,
+3. **Literal task (E2 gold; 6 to 8 October).** A1 and A2 each label the 120 E2 statements,
    independently.
    - Agreement is reported before adjudication, overall and by form: Krippendorff's alpha on
      the start and end month offsets (day offsets as a secondary), and Cohen's kappa on
@@ -1981,9 +1990,11 @@ that thread carried at any date, with all its presentations.
    - Disagreements are adjudicated. The gold file is hashed before any model output on those
      items is opened.
 4. **Reference-reading check (E3).** 100 eligible test statements are drawn at random from the
-   eligible list by the seeded rule. A1 and A2 check the rule reading's statement type and
-   stated period against the text, blind to outcomes (45 statements each, and 10 checked by
-   both).
+   eligible list by the seeded rule. A1 and A2 check the rule reading against the text (guide,
+   section 12.2): that it took the target statement, that the statement gives a period, the
+   last day of that period, and that the period is not stale; a wrong first day is noted and
+   is no error, since E3 uses the last day only. They are blind to outcomes (45 statements
+   each, and 10 checked by both).
    - Reported: the share without a confirmed error, with a Wilson 95% interval; the confirmed
      errors by form, by code and by statement year; the agreement on the 10 shared
      statements; and the share whose rule reading is confirmed, whose statements E7 uses
@@ -2022,7 +2033,8 @@ that thread carried at any date, with all its presentations.
    inserted form is not attested in a real notice. Pass: at least 95 of the 100 items are free
    of confirmed errors. Otherwise the generator is fixed and a fresh 100 are audited, with the
    fix logged.
-7. **E6 link checks**, if E6 is still in the study on 4 October: the hand check of at least
+7. **E6 link checks**, had E6 stayed in the study (it was cut on 5 October, section 12): the
+   hand check of at least
    150 links that is the linker gate (section 5, E6), by A1 and A2. Its sheets and its
    procedure come with the linker code and E6's amendment, not with the guide.
 
@@ -2188,7 +2200,8 @@ numbers are left out and named as not run. The cut order below applies as writte
 
 **Gate 2 (Friday 9 October; 6 October in the schedule of 1 October).** Submit if:
 
-- every confirmatory run is complete;
+- every confirmatory run is complete, or its primary has been declared not evaluable
+  (section 6, "Confirmatory runs");
 - the registered evaluator has run;
 - the E2 agreement is computed;
 - no hold trigger has fired.
@@ -2205,7 +2218,9 @@ submitted.
 2. E7;
 3. fewer models, 8 down to 6. The two dropped are the secondary models whose runs are least
    complete at the time of the cut; ties go gemma-3-27b first, then gpt-4o-mini;
-4. E5 down to 400 items.
+4. E5 down to about 400 items: the unedited seed item and every edit of the first 50 seeds of
+   the seed list in its draw order (`draw_rank`), the same for every reader, fixed before any
+   E5 call.
 
 E1, E2, E3 (with conditions b and c) and E4 are never cut.
 
@@ -2274,7 +2289,9 @@ plus:
   (section 6). If only the first holds, the paper says which predictor `m-best` did not beat
   and makes no claim about the structured fields.
 - On H2, an LLM reading beats the rules (a reading effect), or equivalence holds (reading is not
-  the bottleneck). Both are informative.
+  the bottleneck). Both are informative. If H2 holds with `Δ < 0`, the paper writes that the
+  model's literal reading loses to the rule reading through the same calibrator; if H2 is null
+  and equivalence is not declared, it gives the 90% and 95% intervals and reads neither.
 
 **The registered pattern.** It decides the sentence of the first bullet above and nothing else.
 It reads E2 and E5 for the two primary models only. No outcome and none of H1 to H3 enters it.
@@ -2286,7 +2303,7 @@ It reads E2 and E5 for the two primary models only. No outcome and none of H1 to
   In E5, surface form and granularity are the *letter factors*: the edit rewrites the period or
   changes the period itself. Certainty marker, stale, distractor date and silent are the
   *standing factors*: the edit leaves the words of the period as they are, or takes them away.
-  TBD is a level of the certainty marker: 73 of its 94 items take the date away (TBD, "no
+  TBD is a level of the certainty marker: 73 of that factor's 94 items take the date away (TBD, "no
   estimated release date", "as it is released") and 21 add or change a hedge word and keep the
   date. In E2, the *letter items* are the gold items whose gold gives an interval and carries
   no distractor date. By the allocation these are the 72 items of the seven dated strata, 60
@@ -2423,9 +2440,10 @@ claim.
 that holds the registration stays public under the owner's account. ARR has no anonymity
 period, and the submission does not link to the repository, so the registration commit itself
 is not cited in the anonymous submission. The registration is evidenced by anonymised copies
-of the registered `PLAN.md` and `AUDIT_GUIDE.md` in the supplement. A committed script
-(`analysis/coling/anonymise.py`) makes each copy from the registered file: it replaces every
-string of a committed list by a fixed token and changes nothing else. The sha256 of the two
+of the registered `PLAN.md` and `AUDIT_GUIDE.md` in the supplement. A script that is
+committed by F1 (`analysis/coling/anonymise.py`; it is not in the registration commit) makes
+each copy from the registered file: it replaces every string of a list committed with it by a
+fixed token and changes nothing else. The sha256 of the two
 registered files, of the two copies, of the script and of the list are recorded in amendment
 F1, so whoever holds the registration commit and F1 can rebuild the copies byte for byte;
 each later amendment records the same for the files as amended. The supplement carries the
@@ -2465,8 +2483,8 @@ None of it is a method of either paper.
 **One stray file pair.** `analysis/coling/dev_text_size.py` and
 `analysis/coling/out/dev_text_size.json` are a development script of the earlier design and its
 output. The script imports the commitment study's arms and simulator. Neither is part of this
-study, nothing in the study calls them, and they are left out of the release; they are to be
-moved out of the study folder before registration.
+study, nothing in the study calls them, and they are left out of the release; they stay in
+the study folder at registration and are moved out by a later commit.
 
 ## 16. Disclosed prior contact
 
@@ -2486,7 +2504,7 @@ moved out of the study folder before registration.
 - **The draft's author** read the field vocabulary of one 2020 capture and a random sample of
   distinct availability strings from the 29 captures of 2019 to 2021 (train period).
 
-**From 29 September to this revision (1 October).**
+**From 29 September to registration (1 to 6 October).**
 
 - **The full build (29 September).** `corpus.py` was run over all 110 captures. It wrote the
   open events table (every period, first-sight fields only), the open train outcomes, and the
@@ -2579,6 +2597,12 @@ moved out of the study folder before registration.
   the ten in-context examples (13, of which 4 eligible) and on the threads of train statements
   censored at their first capture in 2023 (none). No outcome field of a test-period statement
   was read, and no code or table depends on the counts.
+- **The freeze run (5 October).** The counts-only code read the sealed test file once and
+  printed counts only (section 3): 1,903 scoreable and 690 undetermined statements of the
+  eligible list, in 106 scoreable episodes; the scoreable count of each of the six post-cutoff
+  slices; and 1,275 statements with an observable outcome, 714 of them dated after 2023-12-31
+  (section 12). No count needed a mask. The scoreable counts and the episode sizes of the
+  eligible list entered the power estimate and the size simulation (section 6).
 - **Counts for the result rules (5 and 6 October).** For item 41 of the change list the
   eligible list was counted by the rule reading's statement type, with form and certainty
   class, from first-sight fields: 1,891 recovery statements in 101 episodes and 702
@@ -2590,8 +2614,8 @@ moved out of the study folder before registration.
   a test-period statement was read.
 
 To our knowledge, no test-period outcome has been derived, printed or tabulated outside the
-sealed folder, apart from the counts of events with an observable outcome and the one deduction
-recorded above.
+sealed folder, apart from the counts of events with an observable outcome, the counts that the
+counts-only code printed at the freeze run (above), and the one deduction recorded above.
 
 ## 17. Registration record (to complete before pushing)
 
@@ -2720,6 +2744,9 @@ other periods, and no sealed file.
   passes for both definitions, and no rule fix is required. Submitted sheets:
   `8f5a9b9a4dab71ae` (A1) and `55da2448f7053a0b` (A2); the adjudication sheet
   `63ebd2182ab482a3`.
+- The sample lists, the sample manifest and the minimal-pair items, with their manifest and
+  counts, are in the registration commit. The submitted sheets and the adjudication sheet
+  named in this section are fixed by their hashes and are not in it.
 - The check-set result, which is the gate (both alphas, the share of identical intervals),
   with the hashes of the two submitted sheets. **TBD-at-gate.**
 - The availability-string check (section 2.2): done on 1 October 2026; 910 strings read, none
@@ -2753,8 +2780,9 @@ gate result and what section 5 lists.
 
 - the final template ids and pins (until F1 an edit moves the pin under the same id; from F1
   on a changed prompt takes a new id), the three paraphrase templates, and the parsers;
-- the hashes of `read.py`, of the evaluator (`evaluate.py`) and of every secondary scorer that
-  exists by then;
+- the hashes of `read.py`, of the evaluator (`evaluate.py`), and of every secondary scorer and
+  of the scorer of E2 and E5 (`literal_scores.py`) that exists by then (a scorer hashed later
+  takes a dated amendment: standing rules; section 6, "Evaluator");
 - the dev prompt variants tried;
 - the cost-trial projection, and any cap raised within the reserve;
 - the H3 selection for each primary, with the dev losses of all three conditions, and the
@@ -3169,6 +3197,25 @@ quoted here are from the build of 29 September.
     more than the notice states. No hypothesis, sample, prompt or split changes, and none of
     the six tests.
 
+42. **Withholding, and points the scorers had to decide (6 October).** A check of the
+    evaluator's criterion and a review of the secondary scorer found points on which the plan
+    was silent. Now stated: (a) a figure is withheld, its counts apart, where it would give
+    back the outcomes of 1 to 4 statements: the contrast on the statements both sides parsed
+    (section 4), the two parts of the overconfidence criterion on the answers that parsed
+    (section 13), and the figures over every statement of a set in which 1 to 4 statements
+    are not scoreable (section 2.5); (b) a primary without an item set has no reading of the
+    criterion, an interval end on zero does not exclude zero, and a single episode gives no
+    interval (sections 5, E4, 6 and 13); (c) what the Date Discontinued cell does in its
+    sensitivity analysis, and where the two scenarios are reported (section 2.5); (d) a sample
+    that fails to parse in the sampled quantiles (section 5, E3); (e) small completions from a
+    last read of this plan against itself, the guide and the frozen files: the freeze run in
+    section 16, the two outcomes of H2 that section 13 did not word, which items a cut of E5
+    keeps, and what task E checks. *Seen:* nothing from the data: the code and its tests on
+    synthetic readings, and this plan; no model output (no model had been called) and no
+    test-period outcome. *Why:* the code that will run had to decide these before it is
+    frozen, and a figure on a few statements beside the same figure on all of them gives
+    their outcomes back. No hypothesis, sample or test changes.
+
 **Status of these changes.** The owner confirmed on 1 October the scope (item 1), the deadlines
 and their one relaxation (item 2), the availability rule, the capture freeze and the result of
 the availability check (items 9 and 26), the roles (item 24), the public repository with
@@ -3183,7 +3230,9 @@ percentile p-values with their size disclosed. The owner chose the one of sectio
 confirmed the sealing rule of item 39 as written. Item 40 follows the review of the scorer of
 E2 and E5 of 5 October and is read by the owner with the registration. Item 41 follows a
 review of the paper draft of 5 October; its points (a) and (b) wait for the owner's
-confirmation (its tag), and the others are read by the owner with the registration.
+confirmation (its tag), and the others are read by the owner with the registration. Item 42
+follows the check of the evaluator and the review of the secondary scorer of 6 October and is
+read by the owner with the registration.
 
 **Corrections of the text to the code as it stood on 29 September** (the builder did not change
 for these; the draft described it wrongly). *Seen:* train outcomes; the builder had been tested

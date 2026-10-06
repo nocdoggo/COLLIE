@@ -1,0 +1,333 @@
+{
+ "attested_forms": {
+  "phrases": 1502,
+  "sentences": 1388,
+  "statements": 5016,
+  "time_expressions": 75
+ },
+ "edited_items_per_seed": {
+  "max": 10,
+  "mean": 7.0,
+  "min": 1
+ },
+ "edits_that_could_be_made": {
+  "certainty": {
+   "anticipated": 2,
+   "as_released": 16,
+   "estimated": 3,
+   "expected": 22,
+   "no_estimated_date": 16,
+   "tbd": 53
+  },
+  "distractor": {
+   "available_until": 98,
+   "depletion": 98,
+   "expiry": 98
+  },
+  "granularity": {
+   "early": 54,
+   "late": 57,
+   "mid": 51,
+   "quarter": 45,
+   "range": 32,
+   "timeframe": 38
+  },
+  "silent": {
+   "silent": 92
+  },
+  "stale": {
+   "stale": 80
+  },
+  "surface_form": {
+   "abbreviated_month": 40,
+   "four_digit_year": 5,
+   "full_month": 7,
+   "hyphenated": 10,
+   "no_year": 50,
+   "numeric": 3,
+   "part_word": 15,
+   "quarter_last": 4,
+   "separator": 13,
+   "two_digit_year": 5,
+   "unit": 2,
+   "with_year": 8
+  }
+ },
+ "items": 800,
+ "levels_with_no_item": {
+  "certainty": [],
+  "distractor": [],
+  "granularity": [],
+  "silent": [],
+  "stale": [],
+  "surface_form": [
+   "quarter_first",
+   "quarter_words",
+   "digits",
+   "number_word"
+  ]
+ },
+ "per_attested_scope": {
+  "form": 214,
+  "phrase": 15,
+  "sentence": 299
+ },
+ "per_factor": {
+  "certainty": 94,
+  "distractor": 163,
+  "granularity": 124,
+  "seed": 100,
+  "silent": 92,
+  "stale": 80,
+  "surface_form": 147
+ },
+ "per_factor_and_level": {
+  "certainty": {
+   "anticipated": 2,
+   "as_released": 14,
+   "estimated": 3,
+   "expected": 16,
+   "no_estimated_date": 15,
+   "tbd": 44
+  },
+  "distractor": {
+   "available_until": 54,
+   "depletion": 55,
+   "expiry": 54
+  },
+  "granularity": {
+   "early": 22,
+   "late": 22,
+   "mid": 21,
+   "quarter": 21,
+   "range": 18,
+   "timeframe": 20
+  },
+  "seed": {
+   "unedited": 100
+  },
+  "silent": {
+   "silent": 92
+  },
+  "stale": {
+   "stale": 80
+  },
+  "surface_form": {
+   "abbreviated_month": 39,
+   "four_digit_year": 5,
+   "full_month": 6,
+   "hyphenated": 8,
+   "no_year": 41,
+   "numeric": 3,
+   "part_word": 15,
+   "quarter_last": 4,
+   "separator": 12,
+   "two_digit_year": 4,
+   "unit": 2,
+   "with_year": 8
+  }
+ },
+ "per_factor_and_scope": {
+  "certainty": {
+   "phrase": 10,
+   "sentence": 84
+  },
+  "distractor": {
+   "sentence": 163
+  },
+  "granularity": {
+   "form": 101,
+   "sentence": 23
+  },
+  "silent": {
+   "nothing inserted": 92
+  },
+  "stale": {
+   "nothing inserted": 80
+  },
+  "surface_form": {
+   "form": 113,
+   "phrase": 5,
+   "sentence": 29
+  }
+ },
+ "per_period": {
+  "test": 47,
+  "train": 753
+ },
+ "per_seed_cap": {
+  "certainty": 2,
+  "distractor": 2,
+  "granularity": 2,
+  "silent": 1,
+  "stale": 1,
+  "surface_form": 2
+ },
+ "per_seed_form": {
+  "exact_day": 28,
+  "month_no_year": 26,
+  "month_year": 431,
+  "part_of_month": 111,
+  "quarter": 77,
+  "range": 72,
+  "relative": 40,
+  "year": 15
+ },
+ "per_seed_period": {
+  "test": 40,
+  "train": 760
+ },
+ "seeds_dropped": 0,
+ "seeds_listed": 100,
+ "seeds_per_form": {
+  "exact_day": 4,
+  "month_no_year": 4,
+  "month_year": 44,
+  "part_of_month": 13,
+  "quarter": 11,
+  "range": 13,
+  "relative": 9,
+  "year": 2
+ },
+ "seeds_used": 100,
+ "seeds_whose_own_text_is_reserved": [
+  "S2d840263b317",
+  "S63a7f475cbc4",
+  "S681f7ab7e702",
+  "Sac6655edeaa7"
+ ],
+ "skipped": [
+  {
+   "factor": "certainty",
+   "n": 18,
+   "reason": "made but not kept: the seed's share of the factor, or the size of the file"
+  },
+  {
+   "factor": "certainty",
+   "n": 232,
+   "reason": "no notice attests the wording"
+  },
+  {
+   "factor": "certainty",
+   "n": 8,
+   "reason": "the edited text is that of a statement the labellers read, a prompt shows or the guide works through"
+  },
+  {
+   "factor": "certainty",
+   "n": 1,
+   "reason": "the seed is read as a recovery only while its text holds a date and no cue"
+  },
+  {
+   "factor": "certainty",
+   "n": 36,
+   "reason": "the seed makes another statement of the target's type"
+  },
+  {
+   "factor": "certainty",
+   "n": 4,
+   "reason": "the target carries a hedge that is none of the three"
+  },
+  {
+   "factor": "certainty",
+   "n": 142,
+   "reason": "the target is not a next delivery stated alone in a sentence of its own"
+  },
+  {
+   "factor": "distractor",
+   "n": 131,
+   "reason": "made but not kept: the seed's share of the factor, or the size of the file"
+  },
+  {
+   "factor": "distractor",
+   "n": 3,
+   "reason": "the Availability information does not begin with a capital letter"
+  },
+  {
+   "factor": "distractor",
+   "n": 1,
+   "reason": "the seed is read as a recovery only while its text holds a date and no cue"
+  },
+  {
+   "factor": "granularity",
+   "n": 3,
+   "reason": "every other grain would end before the date"
+  },
+  {
+   "factor": "granularity",
+   "n": 153,
+   "reason": "made but not kept: the seed's share of the factor, or the size of the file"
+  },
+  {
+   "factor": "granularity",
+   "n": 28,
+   "reason": "no notice attests the wording"
+  },
+  {
+   "factor": "granularity",
+   "n": 1,
+   "reason": "the edited text is that of a statement the labellers read, a prompt shows or the guide works through"
+  },
+  {
+   "factor": "granularity",
+   "n": 1,
+   "reason": "the seed is read as a recovery only while its text holds a date and no cue"
+  },
+  {
+   "factor": "granularity",
+   "n": 26,
+   "reason": "the seed's time has no finer or coarser grain here"
+  },
+  {
+   "factor": "silent",
+   "n": 5,
+   "reason": "nothing would be left in the two text fields"
+  },
+  {
+   "factor": "silent",
+   "n": 3,
+   "reason": "the edited text is that of a statement the labellers read, a prompt shows or the guide works through"
+  },
+  {
+   "factor": "stale",
+   "n": 9,
+   "reason": "the period is counted from the Date of update"
+  },
+  {
+   "factor": "stale",
+   "n": 1,
+   "reason": "the period starts at the Date of update (\"by\")"
+  },
+  {
+   "factor": "stale",
+   "n": 10,
+   "reason": "the year of the period is read from the Date of update"
+  },
+  {
+   "factor": "surface_form",
+   "n": 15,
+   "reason": "made but not kept: the seed's share of the factor, or the size of the file"
+  },
+  {
+   "factor": "surface_form",
+   "n": 101,
+   "reason": "no notice attests the wording"
+  },
+  {
+   "factor": "surface_form",
+   "n": 3,
+   "reason": "no other writing reads as the same period"
+  },
+  {
+   "factor": "surface_form",
+   "n": 2,
+   "reason": "the edited text is that of a statement the labellers read, a prompt shows or the guide works through"
+  },
+  {
+   "factor": "surface_form",
+   "n": 4,
+   "reason": "the seed's time is not a form this module rewrites"
+  }
+ ],
+ "target": 800,
+ "text_fields_with_a_name_replaced": 9
+}

@@ -263,3 +263,20 @@ carry the registered text.
     criterion's parsed-only figures are now withheld when 1 to 4 statements are left out or
     remain (plan sections 4 and 13). The criterion's code follows the recommended option of
     change-list item 41(b), which still waits for the owner.
+39. **Last read of the plan, and what the review of the secondary scorer asked of it (6 Oct).**
+    Three sentences came from the review of `secondary_scores.py` (the rule of the Date
+    Discontinued cell analysis; a failed sample is left out of the sampled quantiles; where the
+    two scenarios are reported, with figures over every statement withheld where 1 to 4
+    statements of a set are not scoreable). A last independent read of the whole plan against
+    itself, the guide and the frozen files then gave twelve corrections, all applied: the
+    change list gains item 42 for the rules added on 6 October; section 16 records the counts
+    the freeze run printed; the E5 negative result, Gate 2 and E1 no longer contradict section
+    13, section 6 and the standing rules; the frame count of E2 is 685 (688 counts statements
+    outside the frame); section 10 says that no pilot meeting was held and gives the dates as
+    they fell; the anonymising script is committed by F1, not at registration; a cut of E5
+    keeps the first 50 seeds in draw order; task E checks what the guide says; section 13
+    words all four outcomes of H2. The sample lists, the sample manifest and the minimal-pair
+    items, whose hashes the plan registers, are committed with it; the submitted sheets are
+    fixed by their hashes and stay out of the repository for now. To do in `evaluate.py`
+    before F1: the withholding of figures over every statement where 1 to 4 statements are
+    not scoreable. The secondary scorer's 29 confirmed findings are still being applied.

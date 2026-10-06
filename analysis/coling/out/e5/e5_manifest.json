@@ -1,0 +1,52 @@
+{
+ "about": "Minimal pairs for E5; made by analysis.coling.minimal_pairs generate.",
+ "files": {
+  "e5_counts.json": "1e26e1fe7c2e4c07b47ac7944955987cf42d6e8688e0d2ab71549940138d4a44",
+  "e5_names.csv": "c4d80987ec293684880c4b8700311052510fffeeb83f34d982727e66151eafc6",
+  "e5_pairs.jsonl": "5acc3a0af1fd13afe339701754167b8b03bbfd277dd12e23752f64df431af396",
+  "e5_skips.csv": "a45b9c17602be1b14d62156f54666193d8c8b95b800c009a4312c408cbd10b19"
+ },
+ "inputs": {
+  "audit_sample_sha256": "67ddfa330cf441d435ce79db54f50d0153c6d3dbb3db2f11e4f9deaf87f852c0",
+  "corpus_sha256": "a44cd27ccddad6047f1d92aceadb2f026957f92ab8461a25579c9adc45a035d7",
+  "events": "built in memory from external_data/fda_wayback_csv",
+  "events_fields_sha256": "7fa43dd17d4d23e7771fa7710a14278e0b50b39ecafdb16d0662eee8dbbaf397",
+  "forms_sha256": "b99502d348ea82bece639ef2da62ebc90914b6d04dc185d6bfcb805b6bab69fd",
+  "guide": "v1 sha256 ce58129993b31d33",
+  "guide_sha256": "ce58129993b31d33944a9aa54195a9aa91fb60f09446631925a9b6eda468d8fb",
+  "labelling_samples": {
+   "sample_check.csv": "eb80b0fc1ceb2485747d1fd5f303bf66ce01f053fda93eaf2617cc8b60b4903d",
+   "sample_literal.csv": "05fcaf84b77406d79812b9ace8238be78942705ea832eea0281d1966faced28c",
+   "sample_pilot.csv": "edd0c9c477b83f79f55e5823aa63484aff50d4407ef1830f7f185175502709f6",
+   "sample_reserve.csv": "6be05e4f1a000cbd4eae3dd72eed5e1adc39a614fda7482b47de14d78527e747"
+  },
+  "left_out_of_the_attested_forms": {
+   "all": 1024,
+   "appendix_a_and_fixed_test_item": 156,
+   "appendix_a_rows_matching_no_event": 0,
+   "labelling_samples": 180,
+   "whole_text_quoted_in_the_guide": 733
+  },
+  "minimal_pairs_sha256": "71a89fab1e618a674ce57ecef397537a35a9e5aa064c7fd3776cba39c7f883ff",
+  "prompt_item_lists": {
+   "sample_dev_prompt.csv": "b404466c9a22a1b640e18de6207510da1e659de40c0f868bd7ba098aaeb3b0f4",
+   "sample_incontext_pool.csv": "ba42ebab7b3d1bb6c7ed46ed477e7028168693edc1a8be143bc2613a3c09e4ab"
+  },
+  "rules_is_the_frozen_file": true,
+  "rules_sha256": "6a810bcb1ae277b9f4f02e0cfcedc80c5011f902cf679012174a6047bec1b28a",
+  "seed_list": "analysis/coling/out/audit/samples_later/sample_pair_seeds.csv",
+  "seed_list_sha256": "17caf511bf2bf3e179b5f12e3943a431ac631452f8e4115949651a1ff0fc980a",
+  "texts_no_edit_may_produce": {
+   "statements": 446,
+   "texts": 387
+  }
+ },
+ "item_ids_sha256": "10c21484b8c9b9cc7b17c7f80e49aa4572e566b3832e49356a94dd856924c21c",
+ "items": 800,
+ "key_files": {
+  "e5_gold.csv": "0c165a7604f848410f62c00e925fe64759a673491bb0734a7ab672f7c42eff32",
+  "e5_rule_check.csv": "67478894ef1391b0ffdd7456391f5fbe2ece607a83919f371ba240430d0ab600"
+ },
+ "note": "e5_gold.csv and e5_rule_check.csv are written to the key folder. The gold of an item on an audit sheet would show whether the item is planted, and the cross-check holds rule readings of the items (AUDIT_GUIDE.md, section 2, rule 1). The annotators open neither; the keys are committed with the scores of task C.",
+ "seed": 20261001
+}
