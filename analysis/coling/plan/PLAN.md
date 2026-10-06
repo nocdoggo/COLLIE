@@ -3172,8 +3172,9 @@ quoted here are from the build of 29 September.
     a p-value that enters Holm's rule must be defined before it is computed.
 41. **Result rules, after a review of the paper draft.** A review of the draft paper against
     this plan (5 October) found five places where the plan did not fix what the paper may
-    write. All five are fixed here, before any model call. Points (a) and (b) are the owner's
-    to decide. **[owner to confirm]**
+    write. All five are fixed here, before any model call. Points (a) and (b) were the owner's
+    to decide, and the owner decided them on 6 October: the registered pattern, with a margin
+    of 0.10 in its letter part, and the criterion in two parts.
     (a) *The first sentence of section 13.* Draft and revision of 1 October: the sentence held
     when a rate was "measurably above the rules or above the human ceiling", with no number.
     Now: the registered pattern of section 13, read on E2 and E5 for the two primaries.
@@ -3251,8 +3252,8 @@ tests were put to the owner: the one of section 6; the same with H1 two-sided; a
 percentile p-values with their size disclosed. The owner chose the one of section 6, and
 confirmed the sealing rule of item 39 as written. Item 40 follows the review of the scorer of
 E2 and E5 of 5 October and is read by the owner with the registration. Item 41 follows a
-review of the paper draft of 5 October; its points (a) and (b) wait for the owner's
-confirmation (its tag), and the others are read by the owner with the registration. Item 42
+review of the paper draft of 5 October; the owner decided its points (a) and (b) on 6 October
+(above), and reads the others with the registration. Item 42
 follows the check of the evaluator and the review of the secondary scorer of 6 October and is
 read by the owner with the registration.
 

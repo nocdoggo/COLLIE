@@ -280,3 +280,12 @@ carry the registered text.
     fixed by their hashes and stay out of the repository for now. To do in `evaluate.py`
     before F1: the withholding of figures over every statement where 1 to 4 statements are
     not scoreable. The secondary scorer's 29 confirmed findings are still being applied.
+40. **Owner, 6 October, evening.** (a) The headline rule: the registered pattern of section 13,
+    with a margin of 0.10 against the rule reader in its letter part (the alternatives put to
+    the owner: 0.15, or no switch at all). (b) The overconfidence criterion in two parts over
+    every statement (the alternative: on the scoreable statements only). (c) The check-set zips
+    went to A1 and A2 on 6 October; the sheets are expected the same evening. (d) If the check
+    sheets are not back in time for the deadline of Wednesday 7 October 11:59 UTC, the plan is
+    registered on time without the check-set result: the gate moves to amendment F1 and must
+    pass before the literal task is handed out and before any confirmatory call, and the plan
+    says so openly.
