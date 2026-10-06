@@ -76,9 +76,14 @@ All deadlines in this file are in Anywhere on Earth time (AoE, UTC−12): 23:59 
     counts-only code (`_checked_rows` and `_same_build` of `sealed_counts.py`), behind its
     own hash check; a scorer that reads the test outcomes reads them in the same way, applies
     the refusals of section 6 to the runs it scores, and writes no value of a single
-    statement. The evaluator and every scorer withhold a figure, its counts apart, wherever it
-    would give back the outcomes of 1 to 4 statements, alone or beside another figure that is
-    written; sections 2.5, 4 and 13 name the cases known at registration.
+    statement. The evaluator and every scorer withhold a secondary figure, its counts apart,
+    where it rests on 1 to 4 statements, and where the same figure is also written on a set
+    that differs from its own by 1 to 4 statements, so that the two together would give back
+    the outcomes of those few (a slice within its whole, the answers that parsed within all,
+    one outcome definition beside another). Sections 2.5, 4 and 13 name the cases known at
+    registration. The six confirmatory contrasts are never
+    withheld: where the two sides of one differ on 1 to 4 statements, it gives the loss
+    difference of those few, and for H2 the paper says how many differ (section 6).
 - *Open train outcomes.* Outcomes of train-period statements (dated before 2023-01-01) are
   followed only to the train horizon, the last capture before 2023-01-01 (2022-10-06), and may
   be examined at any time (section 3, "Calendar overlap").
@@ -412,7 +417,11 @@ not listed says nothing.
   - `absent_generic_current`: the row left the list while its generic stayed Current;
   - `absent_generic_unlisted`: the row left the list and its generic is no longer listed.
 - Sensitivity analyses: leaving the list without a resolution counts as recovery at the first
-  capture where the row is missing, and limited supply counts as available (BL).
+  capture where the row is missing, and limited supply counts as available (BL). A contrast
+  under a sensitivity analysis that gives 1 to 4 statements of its item set another horizon
+  event is withheld with its two scenarios, and the number of such statements is given: beside
+  the same contrast under the primary outcome it would give the change of the losses of those
+  few.
 
 **Discontinuation** is a competing event, and it wins ties. A presentation is discontinued when
 it newly appears in the discontinuation listing (by NDC overlap or the same text key). A Date
@@ -482,8 +491,10 @@ train-period event the horizon events are determined within its usable captures 
   confirmatory estimate, in every record of a primary loss (section 7.2), beside each quantity
   of the analysis by statement type (section 5, E3), and beside the primary-loss estimates of
   the secondary scorers. Where 1 to 4 statements of a set are not scoreable, the figures over
-  every statement of the set are withheld: beside the figures on its scoreable statements they
-  would give the events of those few.
+  every statement of the set that fill its undetermined horizon events (the two scenarios, and
+  the two limits of calibration in the large) are withheld: beside the figures on its
+  scoreable statements they would give the events of those few. The pinball losses and the
+  coverage stay.
 - An event is *observable* when its bracket, to recovery or to discontinuation, is finite and no
   wider than 31 days. `corpus.py` records this as `observable31`.
 
@@ -1543,8 +1554,10 @@ power. The paper says so beside the H2 result.
 If a primary's confirmatory runs cannot be completed on its registered route, its three tests
 are reported as not evaluable and stay in the family. No other model takes its place without an
 amendment made before any evaluation. The evaluator takes this as a declaration on its command
-line, recorded in the result file, and refuses when both primaries are declared. A contrast
-over fewer than two episodes is not evaluable.
+line, recorded in the result file, and refuses when both primaries are declared. A secondary
+scorer takes the same declaration, with the same reason, on its own command line: it refuses
+one that the evaluator's result file does not record, and one that the file records and its
+command line does not give. A contrast over fewer than two episodes is not evaluable.
 
 **Evaluator.** The registered evaluator (`evaluate.py`; **TBD-at-F1**: its hash) accepts a run
 stored in several parts and refuses:
@@ -3218,11 +3231,12 @@ quoted here are from the build of 29 September.
     of withholding in the standing rules, the draws behind the intervals of the slip
     distribution, the primaries' subsets after a cutoff, the freeze run in
     section 16, the two outcomes of H2 that section 13 did not word, which items a cut of E5
-    keeps, and what task E checks. *Seen:* the code and its tests on synthetic readings, this
-    plan, and one run of the train-period descriptives on the open train table (for its run
-    time); no model output (no model had been called) and no test-period outcome. *Why:* the code that will run had to decide these before it is
-    frozen, and a figure on a few statements beside the same figure on all of them gives
-    their outcomes back. No hypothesis, sample or test changes.
+    keeps, and what task E checks. The six confirmatory contrasts are never withheld. *Seen:*
+    the code and its tests on synthetic readings, this plan, and one run of the train-period
+    descriptives on the open train table (for its run time); no model output (no model had
+    been called) and no test-period outcome. *Why:* the code that will run had to decide
+    these before it is frozen, and a figure on a few statements beside the same figure on all
+    of them gives their outcomes back. No hypothesis, sample or test changes.
 
 **Status of these changes.** The owner confirmed on 1 October the scope (item 1), the deadlines
 and their one relaxation (item 2), the availability rule, the capture freeze and the result of
