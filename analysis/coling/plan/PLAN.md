@@ -417,7 +417,10 @@ it newly appears in the discontinuation listing (by NDC overlap or the same text
 Discontinued cell on a shortage row is not used: in the train captures it mostly repeats the
 date of a resolution and appears on products that stayed on the market. The first capture where
 such a cell newly appears is kept in the column `date_discontinued_on_row_date`, for a
-sensitivity analysis.
+sensitivity analysis. In that analysis the cell counts as a discontinuation at that capture: a
+displayed presentation that is censored, or whose recovery is first shown at that capture or a
+later one, is discontinued there (discontinuation wins ties); one that had recovered at an
+earlier capture keeps its recovery.
 
 **Statement-event level.**
 
@@ -474,7 +477,11 @@ train-period event the horizon events are determined within its usable captures 
   are E3's primary analysis set. Scoreability depends on the outcome as well as on where the
   captures fall: a recovery inside a gap between captures that contains a horizon leaves that
   event undetermined. The two scenarios of section 7.2 are therefore reported beside every
-  estimate on the scoreable set.
+  confirmatory estimate, in every record of a primary loss (section 7.2), beside each quantity
+  of the analysis by statement type (section 5, E3), and beside the primary-loss estimates of
+  the secondary scorers. Where 1 to 4 statements of a set are not scoreable, the figures over
+  every statement of the set are withheld: beside the figures on its scoreable statements they
+  would give the events of those few.
 - An event is *observable* when its bracket, to recovery or to discontinuation, is finite and no
   wider than 31 days. `corpus.py` records this as `observable31`.
 
@@ -956,7 +963,9 @@ the readers give:
 - 20 samples at temperature 1 of condition (a) on a 300-item subset. For each item, the sampled
   quantiles are the empirical quantiles (0.1, 0.5, 0.8, 0.9, 0.95) of the 20 sampled medians.
   They are compared with the verbalised quantiles of the temperature-0 answer by pinball loss
-  and by coverage of the 80% interval.
+  and by coverage of the 80% interval. A sample that fails to parse is left out and counted,
+  and the quantiles are those of the parsed medians; an item with no parsed sample takes the
+  base-rate quantiles.
 - 3 prompt paraphrases of (b) on a 200-item subset, to measure prompt variance.
 - The secondary item lists (TBD, silent and stale at issue; section 3) under conditions (a),
   (b) and (c).
