@@ -20,22 +20,32 @@ but the last test runs on one synthetic study in a temporary folder:
 Variants of the study are made by rewriting stored rows, manifests or files in place, inside
 ``changed`` (which puts every byte back).
 
-Covered: Holm on a hand-worked example; every p-value procedure on cases small enough to work
-out by hand, against its definition one draw at a time, on the registered draws and against
-``size_check.py``; a bootstrap draw that is exactly zero, counted on both sides; the two
-registered constants and every candidate of each, from the dev command to the result file; the
-readings as predictions, with the base-rate and ABSTAIN fallbacks and their counts; the dev
-command, its selection, its comparator and its refusals; the completeness check, which reads no
-outcome and never looks at the sealed path; every refusal of a partial, mismatched or wrong-set
-run, of a wrong hash, of files of another build and of a stop inside the rules, each with the
-sealed file left unread; the probe test, the switch to the post-cutoff slice, the small-slice
-rule at its boundary and a primary declared not evaluable; the six tests against a computation
-made here from the scripted answers and the synthetic outcomes; bounds, secondaries and scores;
-the hash of the model-free predictions; the same result on a second run; no statement in any
-output. The last test runs the dev command on the open train-period data with stand-in readings
-made from the model-free predictors and compares it with ``power.py`` (and with
-``out/dev_losses.json`` when that file is of the same build); it is skipped when the open
-tables are absent.
+Covered: Holm on a hand-worked example; every p-value procedure on cases small enough to work out by
+hand, against its definition one draw at a time, on the registered draws and against
+``size_check.py``; a bootstrap draw that is exactly zero, counted on both sides; the interval of the
+registered test (each end against the test itself, on few and many episodes, skewed, sparse, tied
+and constant differences; a value other than zero against a computation from the statements and
+against ``size_check.py``; the search written out again, with another seed too; a p-value on the
+level itself; unbounded ends in the file, the table and the flag beside H3, and the line that says
+what such an end is); the equivalence reading by two p-values against the 90% interval, with the
+margin on an end, and the three cases in which the rule and the interval part (the interval beyond a
+margin that is rejected, inside one that is not, and without an end although the margin is
+rejected); the counts of statements and episodes on which two losses differ, on the item set of the
+test; the percentile source against numbers the evaluator gave before it had another interval; the
+two registered constants and every candidate of each, from the dev command to the result file; the
+decisions the result file lists where the plan is silent; the readings as predictions, with the
+base-rate and ABSTAIN fallbacks and their counts; the dev command, its selection, its comparator
+and its refusals; the completeness check, which reads no outcome and never looks at the sealed
+path; every refusal of a partial, mismatched or wrong-set run, of a stored reading that the harness
+would not have accepted, of a wrong hash, of files of another build and of a stop inside the rules
+or in the texts of the results, each with nothing written and, before the evaluation, the sealed
+file left unread; the probe test, the switch to the post-cutoff slice, the small-slice rule at its
+boundary and a primary declared not evaluable; the six tests against a computation made here from
+the scripted answers and the synthetic outcomes; bounds, secondaries and scores; the hash of the
+model-free predictions; the same result on a second run; no statement in any output. The last test
+runs the dev command on the open train-period data with stand-in readings made from the model-free
+predictors and compares it with ``power.py`` (and with ``out/dev_losses.json`` when that file is of
+the same build); it is skipped when the open tables are absent.
 
 Run::
 
@@ -126,8 +136,14 @@ TRACK = {
     ],
     "examples": [{"item_id": "X0001", "date_of_update": "2020-07-01", "outcome": "discontinued"}],
 }
-MEMO: dict[tuple[str, int], Any] = {}
+MEMO: dict[tuple, Any] = {}
 REAL_REFIT, REAL_DEV_FIT = ev.refit, W.fit_and_predict
+REAL_INTERVAL = ev.larger_of_interval
+SOURCE = ev.P_VALUE_SOURCE
+"""The registered p-value source, as the evaluator has it."""
+LARGER = "larger_of_studentised_and_sign_flip_t"
+BY_TEST = ev.interval_method(SOURCE) == ev.TEST_INTERVAL
+"""Whether the confirmatory intervals are those of the registered test under ``SOURCE``."""
 
 
 # --------------------------------------------------------------------------------------------
@@ -155,6 +171,26 @@ def cached_dev_fit(frame: pd.DataFrame, min_cell: int = P.MIN_CELL) -> Any:
     return MEMO[key]
 
 
+def cached_interval(
+    sums: np.ndarray,
+    sizes: np.ndarray,
+    taken: np.ndarray,
+    coverage: float,
+    draws: int = ev.DRAWS,
+    seed: int = ev.SEED,
+) -> list[float | None]:
+    """``evaluate.larger_of_interval``, searched once per contrast for the whole module (the
+    search is slow and deterministic; the tests of the search itself call the real one)."""
+    held = hashlib.sha256()
+    for part in (sums, sizes, taken):
+        held.update(np.ascontiguousarray(part, dtype=float).tobytes())
+    key = ("interval", held.hexdigest(), coverage, draws, seed)
+    key += (ev.INTERVAL_REACH, ev.INTERVAL_STEPS)
+    if key not in MEMO:
+        MEMO[key] = REAL_INTERVAL(sums, sizes, taken, coverage, draws, seed)
+    return list(MEMO[key])
+
+
 def guard(monkeypatch: pytest.MonkeyPatch, nowhere: Path) -> None:
     """What no test may do, made impossible: reach the study's sealed file by default, open a
     network connection, read a key, or use the real repository."""
@@ -177,6 +213,7 @@ def guard(monkeypatch: pytest.MonkeyPatch, nowhere: Path) -> None:
     monkeypatch.setattr(S, "SEALED", nowhere / "no_default" / "outcomes_test.csv.gz")
     monkeypatch.setattr(ev, "refit", cached_refit)
     monkeypatch.setattr(W, "fit_and_predict", cached_dev_fit)
+    monkeypatch.setattr(ev, "larger_of_interval", cached_interval)
 
 
 @pytest.fixture(autouse=True)
@@ -790,6 +827,29 @@ def brier(pred: pd.DataFrame, y: pd.DataFrame) -> pd.Series:
     return ((pred["p_a"] - y["y_a"]) ** 2 + (pred["p_b"] - y["y_b"]) ** 2) / 2
 
 
+def counts_apart(d: pd.Series, episode: pd.Series) -> dict[str, int]:
+    """The counts beside H2 from the paired differences ``d`` of the statements of a test."""
+    apart = d[d.abs() > 1e-12]
+    held = d.groupby(episode.loc[d.index]).sum().loc[sorted(set(episode.loc[apart.index]))]
+    return {
+        "statements": len(apart),
+        "episodes": len(held),
+        "episodes_with_a_positive_sum": int((held > 1e-12).sum()),
+        "episodes_with_a_negative_sum": int((held < -1e-12).sum()),
+        "episodes_whose_differences_cancel": int((held.abs() <= 1e-12).sum()),
+    }
+
+
+def counts_line(apart: dict[str, int]) -> str:
+    """The sentence of the table that gives the counts beside H2."""
+    return (
+        f"The two losses differ on {apart['statements']} statements in {apart['episodes']} "
+        f"episodes: {apart['episodes_with_a_positive_sum']} with a positive sum, "
+        f"{apart['episodes_with_a_negative_sum']} with a negative one, "
+        f"{apart['episodes_whose_differences_cancel']} whose differences cancel."
+    )
+
+
 # --------------------------------------------------------------------------------------------
 # The synthetic study is what the tests assume
 # --------------------------------------------------------------------------------------------
@@ -1096,10 +1156,10 @@ SIZE_CHECK_NAMES = {
 def test_every_procedure_gives_the_p_values_of_the_size_check(episodes: int) -> None:
     """The evaluator imports nothing from ``size_check.py``; on the same paired differences
     (continuous, mostly zero, few distinct values, skewed) both give the same p-values on each
-    side, with the registered draws and sign patterns. One case is left out: differences that
-    cancel in a draw to a rounding error, which the evaluator counts as a zero, on both sides
-    (``test_a_draw_whose_differences_cancel_counts_on_both_sides``), and the size check on the
-    side of the error's sign."""
+    side, with the registered draws and sign patterns. The two part only where rounding settles
+    a statistic (``test_the_size_check_parts_where_rounding_settles_a_statistic``); a draw whose
+    differences cancel to a rounding error is a zero for both
+    (``test_a_draw_whose_differences_cancel_counts_on_both_sides``)."""
     assert set(SIZE_CHECK_NAMES) == set(ev.PROCEDURES)
     assert SC.DRAWS == SC.FLIPS == ev.DRAWS and SC.SEED == ev.SEED
     rng = np.random.default_rng(episodes)
@@ -1258,6 +1318,27 @@ def test_a_draw_whose_differences_cancel_counts_on_both_sides() -> None:
     # smaller cancel in the same draws and in no other
     small = ev.drawn_deltas((comparator - tested) * 1e-6, clusters, 2000, ev.SEED)
     assert int((small == 0).sum()) == zero
+    # the size check takes the same draws for zero, in its own code
+    theirs = SC.contrast_tests(comparator - tested, clusters, 0.0, 2000)["percentile"]
+    assert [theirs[key] for key in ("p_upper", "p_lower", "p_two_sided")] == list(
+        result["p_values"]["percentile"].values()
+    )
+
+
+def test_the_size_check_parts_where_rounding_settles_a_statistic() -> None:
+    """Differences without any variance: the standard error is zero up to rounding, and the
+    plan's statistic is then plus infinity (PLAN section 6, "Test statistic"), reached by one
+    sign pattern in 128, whatever the sizes of the seven episodes. The size check divides
+    without that tolerance, and what it gives depends on how the rounding falls."""
+    theirs = []
+    for sizes in ([1] * 7, [5] * 7, [3, 5, 2, 7, 4, 6, 1]):
+        clusters = [f"g{g}" for g, size in enumerate(sizes) for _ in range(size)]
+        d = np.full(len(clusters), 0.1)
+        sums, counts, taken = summed(d, clusters, 2000)
+        mine = ev.larger_of_at(sums, counts, taken, 0.0, 2000)
+        assert (mine["one_sided"], mine["one_sided_lower"]) == (1 / 128, 1.0)
+        theirs.append(SC.contrast_tests(d, clusters, 0.0, 2000)["max_t"]["p_upper"])
+    assert theirs[2] == 1 / 128 and theirs[0] != 1 / 128 != theirs[1]
 
 
 def test_a_draw_of_episodes_on_which_two_predictors_agree_is_a_zero() -> None:
@@ -1308,13 +1389,1046 @@ def test_contrast_is_the_same_on_every_run() -> None:
 
 
 # --------------------------------------------------------------------------------------------
+# The interval of the registered test, the equivalence reading and the counts beside H2
+# --------------------------------------------------------------------------------------------
+
+
+def differences(shape: str, episodes: int, seed: int = 0) -> tuple[np.ndarray, list[str]]:
+    """Paired differences over episodes of 1 to 11 statements, of one of five shapes: ``even``
+    (normal), ``skewed``, ``sparse`` (zero outside about three episodes in ten, the shape of
+    H2), ``few values`` (many ties and exact zeros) and ``no variance`` (0.25 everywhere)."""
+    rng = np.random.default_rng([seed, episodes])
+    sizes = rng.integers(1, 12, size=episodes)
+    clusters = [f"g{g:03d}" for g in range(episodes) for _ in range(sizes[g])]
+    n = len(clusters)
+    on = np.repeat(rng.random(episodes) < 0.3, sizes)
+    shapes = {
+        "even": rng.normal(0.01, 0.2, size=n),
+        "skewed": rng.exponential(0.1, size=n) - 0.08,
+        "sparse": on * rng.normal(0.02, 0.3, size=n),
+        "few values": rng.choice([-0.18, 0.0, 0.07, 0.32], size=n),
+        "no variance": np.full(n, 0.25),
+    }
+    return shapes[shape], clusters
+
+
+def summed(d: np.ndarray, clusters: list[str], draws: int) -> tuple[np.ndarray, ...]:
+    """The episode sums and sizes of paired differences, and ``draws`` bootstrap draws."""
+    sums, sizes = P.cluster_sums(d, clusters)
+    return sums[:, 0], sizes, P.cluster_draws(len(sizes), draws, ev.SEED).astype(float)
+
+
+SHAPES = ("even", "skewed", "sparse", "few values", "no variance")
+
+
+@pytest.mark.parametrize("episodes", [3, 5, 6, 13, 14, 40])
+@pytest.mark.parametrize("shape", SHAPES)
+def test_the_interval_of_the_registered_test_holds_the_values_it_does_not_reject(
+    shape: str, episodes: int
+) -> None:
+    """PLAN section 6, "Intervals": at coverage ``1 - a`` the interval runs from the smallest
+    value whose one-sided p-value for a larger contrast is not below ``a / 2`` to the largest
+    whose one-sided p-value for a smaller contrast is not below ``a / 2``. Checked with the test
+    itself (``larger_of_at``), each end on its own p-value: an end is not rejected, a value just
+    inside it is not, a value just outside it is; the estimate lies inside; and an end is
+    unbounded when, and only when, the test does not reject 50 standard errors away. The
+    two-sided p-value (twice the smaller of the two) gives the same answers on these data."""
+    draws = 400
+    sums, sizes, taken = summed(*differences(shape, episodes), draws)
+    delta, se, _ = ev.robust_t(sums, sizes, ev.rounding_tolerance(sums))
+    flat = shape == "no variance"
+    assert (se == 0) is flat and delta == pytest.approx(float(sums.sum() / sizes.sum()))
+    far = 1.0 if flat else 50 * se
+
+    def rejected(value: float, side: str, level: float) -> bool:
+        found = ev.larger_of_at(sums, sizes, taken, value, draws)
+        assert (found[side] < level / 2) is (found["two_sided"] < level)
+        return found[side] < level / 2
+
+    for coverage in (0.95, 0.90):
+        level = 1 - coverage
+        ends = REAL_INTERVAL(sums, sizes, taken, coverage, draws)
+        assert len(ends) == 2 and ends == REAL_INTERVAL(sums, sizes, taken, coverage, draws)
+        # the lower end rests on the p-value for a larger contrast, the upper end on the other
+        for end, direction, side in zip(ends, (-1, 1), ev.SIDES[:2], strict=True):
+            assert (end is not None) is rejected(delta + direction * far, side, level)
+            if end is None:
+                continue
+            assert isinstance(end, float) and direction * (end - delta) >= 0
+            assert not rejected(end, side, level)  # the end is the last value not rejected
+            step = 1e-6 * far
+            assert rejected(end + direction * step, side, level)
+            if flat:
+                assert end == delta == 0.25  # every other value has the one same p-value
+            else:
+                assert end != delta and not rejected(end - direction * step, side, level)
+        # the smallest p-value the sign patterns can give is one in 2^episodes: with few
+        # episodes nothing is ever rejected, whatever the data
+        if 2.0**-episodes >= level / 2:
+            assert ends == [None, None]
+        elif shape != "sparse":
+            assert None not in ends
+    # a wider coverage never gives a narrower interval
+    wide, narrow = (REAL_INTERVAL(sums, sizes, taken, c, draws) for c in (0.95, 0.90))
+    for (a, b), sign in zip(zip(wide, narrow, strict=True), (-1, 1), strict=True):
+        assert a is None or (b is not None and sign * (a - b) >= 0)
+
+
+def test_the_interval_is_unbounded_where_too_many_draws_have_no_variance() -> None:
+    """The shape of H2 with few episodes that differ, all in one direction. A bootstrap draw
+    that takes neither of the two episodes has a mean of zero and no variance: its statistic is
+    minus infinity, below any observed one, so the p-value for a smaller contrast never falls
+    below the share of such draws and no larger value of the contrast is ever rejected. The
+    interval has no upper end, and equivalence cannot be declared at any margin."""
+    rng = np.random.default_rng(12)
+    sizes = rng.integers(1, 9, size=12)
+    clusters = [f"g{g:02d}" for g in range(12) for _ in range(sizes[g])]
+    differs = np.isin(clusters, ["g03", "g07"])
+    d = np.where(differs, rng.uniform(0.05, 0.3, size=len(clusters)), 0.0)
+    sums, counts, taken = summed(d, clusters, ev.DRAWS)
+    neither = int(((taken[:, 3] == 0) & (taken[:, 7] == 0)).sum())
+    floor = (1 + neither) / (ev.DRAWS + 1)
+    assert floor > 0.10
+    low, high = REAL_INTERVAL(sums, counts, taken, 0.90)
+    assert high is None and low is not None and low <= float(d.mean())
+    for null in (0.0, 0.02, 0.5, 40.0):
+        assert ev.larger_of_at(sums, counts, taken, null)["one_sided_lower"] >= floor
+    assert ev.larger_of_at(sums, counts, taken, 0.5)["one_sided_lower"] == pytest.approx(floor)
+    entry = ev.contrast(
+        d, np.zeros(len(d)), clusters, source=LARGER, levels=["ci95", "ci90"], margin=0.5
+    )
+    assert entry["ci90"] == [low, None] and entry["ci95"][1] is None
+    found = ev.equivalence(entry, 0.5)
+    assert found["declared"] is False and found["p_smaller_at_the_margin"] == pytest.approx(floor)
+    # the percentile interval of the same draws has both ends, and would have declared it
+    assert entry["percentile"]["ci90"][0] == 0.0 and entry["percentile"]["ci90"][1] < 0.5
+    with_ends = ev.contrast(d, np.zeros(len(d)), clusters, source="percentile")
+    assert ev.equivalence(with_ends, 0.5)["declared"] is True
+
+
+def by_hand_larger_of(
+    d: np.ndarray,
+    clusters: list[str],
+    null: float,
+    taken: np.ndarray,
+    signs: np.ndarray,
+    all_: bool,
+) -> dict[str, float]:
+    """The larger-of p-values for the hypothesis that the mean difference is ``null``, from the
+    statements themselves: ``null`` is taken off every difference, and every bootstrap draw and
+    every sign pattern is a list of episodes worked out on its own."""
+    names = sorted(set(clusters))
+    members = [
+        np.array([x - null for x, c in zip(d, clusters, strict=True) if c == name])
+        for name in names
+    ]
+    scale = max(1.0, max(abs(float(part.sum())) for part in members))
+
+    def mean_of(parts: list[np.ndarray]) -> float:
+        return sum(float(part.sum()) for part in parts) / sum(len(part) for part in parts)
+
+    def t_of(parts: list[np.ndarray], centre: float) -> float:
+        n, mean = sum(len(part) for part in parts), mean_of(parts)
+        spread = sum((float(part.sum()) - mean * len(part)) ** 2 for part in parts)
+        se = float(np.sqrt(len(parts) / (len(parts) - 1) * spread)) / n
+        if se <= 1e-12 * scale:  # no variance: infinite by the sign of what is on top, or zero
+            return (
+                0.0
+                if abs(mean - centre) <= 1e-12 * scale
+                else float(np.copysign(np.inf, mean - centre))
+            )
+        return (mean - centre) / se
+
+    observed = t_of(members, 0.0)
+    stars = [
+        t_of([members[g] for g, k in enumerate(row) for _ in range(int(k))], mean_of(members))
+        for row in taken
+    ]
+    flipped = [
+        t_of([sign * part for sign, part in zip(row, members, strict=True)], 0.0) for row in signs
+    ]
+    slack = 1e-9 * max([abs(t) for t in flipped if np.isfinite(t)] or [0.0])
+    extra = 0 if all_ else 1
+    upper = max(
+        (1 + sum(star >= observed for star in stars)) / (len(stars) + 1),
+        (extra + sum(t >= observed - slack for t in flipped)) / (len(flipped) + extra),
+    )
+    lower = max(
+        (1 + sum(star <= observed for star in stars)) / (len(stars) + 1),
+        (extra + sum(t <= observed + slack for t in flipped)) / (len(flipped) + extra),
+    )
+    return {
+        "one_sided": upper,
+        "one_sided_lower": lower,
+        "two_sided": min(1.0, 2 * min(upper, lower)),
+    }
+
+
+@pytest.mark.parametrize("episodes", [5, 7, 15])
+@pytest.mark.parametrize("shape", SHAPES)
+def test_a_value_other_than_zero_is_tested_on_the_differences_minus_that_value(
+    shape: str, episodes: int
+) -> None:
+    """PLAN section 6: "A value other than zero is tested in the same way on the sums ``S_g -
+    delta0 n_g``." ``larger_of_at`` against a computation made here from the statements, one
+    draw and one sign pattern at a time, for values on both sides of the estimate."""
+    draws = 150
+    d, clusters = differences(shape, episodes)
+    sums, sizes, taken = summed(d, clusters, draws)
+    if episodes <= ev.EXACT_FLIPS_UP_TO:
+        signs = np.array(
+            [[1 - 2 * ((k >> g) & 1) for g in range(episodes)] for k in range(2**episodes)]
+        )
+    else:
+        signs = 1 - 2 * np.random.default_rng(ev.SEED).integers(0, 2, size=(draws, episodes))
+    delta = float(d.mean())
+    seen = set()
+    for null in (0.0, -0.07, 0.013, 0.2, delta - 0.031, delta + 0.044, 3.0):
+        got = ev.larger_of_at(sums, sizes, taken, null, draws)
+        want = by_hand_larger_of(d, clusters, null, taken, signs, episodes <= ev.EXACT_FLIPS_UP_TO)
+        assert got == pytest.approx(want, abs=1e-12), null
+        assert list(got) == list(ev.SIDES)
+        seen.add((got["one_sided"], got["one_sided_lower"]))
+        # the two parts, each on its own, are the tests of zero on the moved sums
+        moved = sums - null * sizes
+        assert got == ev.larger_of(
+            ev.studentised(moved, sizes, taken), ev.sign_flip_t(moved, sizes, draws)
+        )
+    assert len(seen) >= (2 if shape == "no variance" else 3)  # the value tested matters
+    # zero is the test every contrast reports
+    at_zero = ev.contrast(d, np.zeros(len(d)), clusters, draws=draws)["p_values"][LARGER]
+    assert ev.larger_of_at(sums, sizes, taken, 0.0, draws) == at_zero
+
+
+@pytest.mark.parametrize(("shape", "episodes"), [("skewed", 9), ("sparse", 14), ("even", 30)])
+def test_a_value_other_than_zero_gives_the_p_values_of_the_size_check(
+    shape: str, episodes: int
+) -> None:
+    """The same on the registered draws and sign patterns, against ``size_check.py``, which
+    takes the value off the episode sums in its own code."""
+    d, clusters = differences(shape, episodes)
+    sums, sizes, taken = summed(d, clusters, ev.DRAWS)
+    for null in (-0.05, 0.02, float(d.mean()) + 0.01):
+        mine = ev.larger_of_at(sums, sizes, taken, null)
+        theirs = SC.contrast_tests(d, clusters, null=null)["max_t"]
+        assert [mine[side] for side in ev.SIDES] == pytest.approx(
+            [theirs[key] for key in ("p_upper", "p_lower", "p_two_sided")], abs=1e-12
+        )
+
+
+def test_sign_patterns_that_are_handed_over_are_the_ones_used() -> None:
+    """The search makes the sign patterns once and hands them to every test of a value. Two
+    patterns in place of the registered ones: the observed signs and their mirror image."""
+    d, clusters = differences("even", 7)
+    sums, sizes, taken = summed(d, clusters, 150)
+    usual = ev.sign_patterns(7, 150, ev.SEED)
+    assert usual[0].shape == (2**7, 7) and usual[1] is True
+    assert ev.sign_flip_t(sums, sizes, 150, ev.SEED, usual) == ev.sign_flip_t(sums, sizes, 150)
+    two = (np.array([[1.0] * 7, [-1.0] * 7]), True)
+    mirrored = ev.sign_flip_t(sums, sizes, patterns=two)
+    assert mirrored["patterns"] == 2 and float(sums.sum()) > 0
+    assert (mirrored["one_sided"], mirrored["one_sided_lower"]) == (0.5, 1.0)
+    null = float(d.mean()) - 0.3
+    default = ev.larger_of_at(sums, sizes, taken, null, 150)
+    assert ev.larger_of_at(sums, sizes, taken, null, 150, ev.SEED, usual) == default
+    handed = ev.larger_of_at(sums, sizes, taken, null, 150, ev.SEED, two)
+    assert default["one_sided"] < 0.05 and handed["one_sided"] == 0.5
+
+
+def plain_search(
+    sums: np.ndarray,
+    sizes: np.ndarray,
+    taken: np.ndarray,
+    coverage: float,
+    draws: int,
+    halvings: int = 60,
+    reach: float = 50.0,
+    not_below: bool = True,
+    seed: int = ev.SEED,
+) -> list[float | None]:
+    """The search of PLAN section 6 written out again: from the estimate to the value ``reach``
+    standard errors away, ``halvings`` times; the end is the last value not rejected. With
+    ``not_below`` false a p-value that equals the level counts as rejected. The two registered
+    levels are written here as the plan has them, 0.025 and 0.05, and not computed; ``seed`` is
+    that of the sign patterns (``taken`` holds the bootstrap draws)."""
+    half = {0.95: 0.025, 0.90: 0.05}.get(coverage, (1 - coverage) / 2)
+    total = float(sizes.sum())
+    delta = float(sums.sum()) / total
+    residuals = sums - delta * sizes
+    se = float(np.sqrt(len(sizes) / (len(sizes) - 1) * (residuals**2).sum())) / total
+    found: list[float | None] = []
+    for key, far in (("one_sided", delta - reach * se), ("one_sided_lower", delta + reach * se)):
+
+        def stays(value: float, key: str = key) -> bool:
+            p = ev.larger_of_at(sums, sizes, taken, value, draws, seed)[key]
+            return p >= half if not_below else p > half
+
+        if stays(far):
+            found.append(None)
+            continue
+        kept, dropped = delta, far
+        for _ in range(halvings):
+            between = (kept + dropped) / 2
+            kept, dropped = (between, dropped) if stays(between) else (kept, between)
+        found.append(kept)
+    return found
+
+
+def test_the_search_is_sixty_halvings_from_fifty_standard_errors() -> None:
+    """Each end is found by bisection between the estimate and the value 50 standard errors
+    away, in 60 halvings. On differences moved so that the lower end falls next to zero the
+    search has not closed on two neighbouring numbers by then, and one halving more or fewer,
+    or another starting distance, ends on another number."""
+    assert (ev.INTERVAL_REACH, ev.INTERVAL_STEPS) == (50.0, 60)
+    draws, told_apart = 300, 0
+    for seed in range(2, 8):
+        d, clusters = differences("even", 14, seed)
+        sums, sizes, taken = summed(d, clusters, draws)
+        first = REAL_INTERVAL(sums, sizes, taken, 0.95, draws)
+        assert first == plain_search(sums, sizes, taken, 0.95, draws) and None not in first
+        sums, sizes, taken = summed(d - first[0], clusters, draws)
+        ends = REAL_INTERVAL(sums, sizes, taken, 0.95, draws)
+        assert ends == plain_search(sums, sizes, taken, 0.95, draws)
+        assert abs(ends[0]) < 1e-15 < ends[1]
+        others = [
+            plain_search(sums, sizes, taken, 0.95, draws, halvings=59),
+            plain_search(sums, sizes, taken, 0.95, draws, halvings=61),
+            plain_search(sums, sizes, taken, 0.95, draws, reach=49.0),
+        ]
+        assert others[2] != ends
+        told_apart += others[0] != ends and others[1] != ends
+        for other in others:  # the same interval for every use, to the last few digits
+            assert other == pytest.approx(ends, abs=1e-12)
+    assert told_apart >= 2
+
+
+def test_another_seed_gives_other_draws_and_other_sign_patterns() -> None:
+    """The seed asked for reaches the bootstrap draws and the sign patterns alike, in the search
+    for each end and in the two tests at the margin. Twenty episodes, so that the sign patterns
+    are drawn and not enumerated: with another seed the interval and the two p-values at the
+    margin are those of that seed's draws and that seed's patterns, and the registered patterns
+    on the same draws give other numbers."""
+    d, clusters = differences("even", 20, 5)
+    draws, seed = 300, ev.SEED + 1
+    sums, sizes = P.cluster_sums(d, clusters)
+    sums = sums[:, 0]
+    assert len(sizes) == 20 > ev.EXACT_FLIPS_UP_TO
+    taken = P.cluster_draws(20, draws, seed).astype(float)
+    want = plain_search(sums, sizes, taken, 0.95, draws, seed=seed)
+    registered = plain_search(sums, sizes, taken, 0.95, draws)
+    assert None not in want and want != registered
+    margin = 0.9 * max(abs(want[0]), abs(want[1]))  # inside the far end: no p-value is tiny
+
+    def at_the_margin(patterns_of: int) -> dict[str, float]:
+        above = ev.larger_of_at(sums, sizes, taken, margin, draws, patterns_of)
+        below = ev.larger_of_at(sums, sizes, taken, -margin, draws, patterns_of)
+        return {
+            "p_smaller_at_the_margin": above["one_sided_lower"],
+            "p_larger_at_minus_the_margin": below["one_sided"],
+        }
+
+    entry = ev.contrast(
+        d,
+        np.zeros(len(d)),
+        clusters,
+        draws=draws,
+        seed=seed,
+        source=LARGER,
+        levels=["ci95"],
+        margin=margin,
+    )
+    assert entry["ci95"] == want == REAL_INTERVAL(sums, sizes, taken, 0.95, draws, seed)
+    assert entry["at_the_margin"] == at_the_margin(seed) != at_the_margin(ev.SEED)
+
+
+def test_a_p_value_that_equals_the_level_is_not_below_it() -> None:
+    """The interval holds every value whose p-value is "not below" the level, and equivalence
+    needs p-values "below" it. With five episodes the sign patterns give p-values in steps of
+    1/32, and an interval of coverage 0.5 is cut at 8/32 exactly: the values with that p-value
+    belong to the interval, and a margin among them declares nothing."""
+    draws, hit, margins = 200, 0, 0
+    for seed in range(12):
+        d, clusters = differences("skewed", 5, seed)
+        sums, sizes, taken = summed(d, clusters, draws)
+        ends = REAL_INTERVAL(sums, sizes, taken, 0.5, draws)
+        assert ends == plain_search(sums, sizes, taken, 0.5, draws)
+        strict = plain_search(sums, sizes, taken, 0.5, draws, not_below=False)
+        sides = [ev.larger_of_at(sums, sizes, taken, end, draws) for end in ends]
+        on_level = [sides[0]["one_sided"] == 0.25, sides[1]["one_sided_lower"] == 0.25]
+        assert None not in ends and None not in strict
+        for k, outwards in ((0, -1), (1, 1)):
+            assert (ends[k] != strict[k]) is on_level[k]
+            assert not on_level[k] or outwards * (ends[k] - strict[k]) > 0
+        hit += sum(on_level)
+        if not on_level[1] or strict[1] <= 0:
+            continue
+        margins += 1
+        # a margin between the two upper ends: its p-value is the level itself
+        with pytest.MonkeyPatch.context() as patch:
+            patch.setitem(ev.LEVELS, "ci90", 0.5)
+            margin = (ends[1] + strict[1]) / 2
+            entry = ev.contrast(
+                d,
+                np.zeros(len(d)),
+                clusters,
+                draws=draws,
+                source=LARGER,
+                levels=["ci90"],
+                margin=margin,
+            )
+            found = ev.equivalence(entry, margin)
+            assert entry["ci90"] == ends and found["level"] == 0.25
+            assert found["p_smaller_at_the_margin"] == 0.25 and found["declared"] is False
+            wide = 2 * max(abs(ends[0]), abs(ends[1]))
+            entry = ev.contrast(
+                d,
+                np.zeros(len(d)),
+                clusters,
+                draws=draws,
+                source=LARGER,
+                levels=["ci90"],
+                margin=wide,
+            )
+            assert ev.equivalence(entry, wide)["declared"] is True
+    assert hit >= 6 and margins >= 3
+    # the same far away: three episodes give no p-value below 1/8, the level of a coverage of
+    # 0.75, so the search does not start and both ends are unbounded
+    d, clusters = differences("even", 3)
+    sums, sizes, taken = summed(d, clusters, draws)
+    delta, se, _ = ev.robust_t(sums, sizes, ev.rounding_tolerance(sums))
+    for side, far in (("one_sided", delta - 50 * se), ("one_sided_lower", delta + 50 * se)):
+        assert ev.larger_of_at(sums, sizes, taken, far, draws)[side] == 0.125 == ev.tail_of(0.75)
+    assert REAL_INTERVAL(sums, sizes, taken, 0.75, draws) == [None, None]
+    assert None not in REAL_INTERVAL(sums, sizes, taken, 0.70, draws)
+    assert ev.tail_of(0.5) == 0.25 and ev.tail_of(0.70) == 0.15 and ev.tail_of(0.95) == 0.025
+    assert ev.tail_of(0.90) == 0.05 and ev.LEVELS == {"ci95": 0.95, "ci90": 0.90}
+
+
+def test_a_p_value_on_a_registered_level_is_not_below_it() -> None:
+    """The two registered levels are 0.025 and 0.05 themselves, not the floats next to them
+    that ``(1 - 0.95) / 2`` and ``(1 - 0.90) / 2`` give (PLAN section 6, "Intervals": a value is
+    kept when its p-value is not below ``a/2``; equivalence needs p-values below 0.05). No
+    p-value of 10,000 draws, or of every sign pattern of 13 episodes or fewer, falls on either
+    level; a number of draws one short of a multiple of 40 gives p-values that do.
+
+    * 39 draws and 14 episodes: no p-value is below 1/40, so a 95% interval has no end.
+    * 399 and 1,999 draws: each end of a 95% interval is a value whose p-value is 0.025
+      itself, and lies further out than the end of a search that drops such values.
+    * 1,999 draws: a margin whose p-value is 100/2000 declares nothing; one whose p-value is
+      99/2000 declares equivalence."""
+    assert (ev.tail_of(0.95), ev.tail_of(0.90)) == (0.025, 0.05)
+    assert (1 - 0.95) / 2 != 0.025 and (1 - 0.90) / 2 != 0.05  # what a plain division leaves
+    for seed in range(3):
+        sums, sizes, taken = summed(*differences("even", 14, seed), 39)
+        delta, se, _ = ev.robust_t(sums, sizes, ev.rounding_tolerance(sums))
+        for side, far in (("one_sided", delta - 50 * se), ("one_sided_lower", delta + 50 * se)):
+            assert ev.larger_of_at(sums, sizes, taken, far, 39)[side] == 1 / 40 == 0.025
+        assert REAL_INTERVAL(sums, sizes, taken, 0.95, 39) == [None, None]
+        assert None not in REAL_INTERVAL(sums, sizes, taken, 0.90, 39)
+    cases = ((399, "even", 20, 0), (1999, "skewed", 20, 1), (1999, "even", 14, 0))
+    for draws, shape, episodes, seed in cases:
+        sums, sizes, taken = summed(*differences(shape, episodes, seed), draws)
+        ends = REAL_INTERVAL(sums, sizes, taken, 0.95, draws)
+        assert ends == plain_search(sums, sizes, taken, 0.95, draws) and None not in ends
+        strict = plain_search(sums, sizes, taken, 0.95, draws, not_below=False)
+        for end, inner, side, outwards in zip(ends, strict, ev.SIDES[:2], (-1, 1), strict=True):
+            assert outwards * (end - inner) > 0
+            for value in (end, (end + inner) / 2):  # every value between the two is on the level
+                assert ev.larger_of_at(sums, sizes, taken, value, draws)[side] == 0.025
+    # the level of the equivalence reading: differences moved so that the lower end of the 90%
+    # interval lies just above zero, and minus any margin far below it
+    draws = 1999
+    d, clusters = differences("skewed", 20, 1)
+    sums, sizes, taken = summed(d, clusters, draws)
+    d = d - REAL_INTERVAL(sums, sizes, taken, 0.90, draws)[0] + 0.001
+    sums, sizes, taken = summed(d, clusters, draws)
+    low, high = REAL_INTERVAL(sums, sizes, taken, 0.90, draws)
+    assert [low, high] == plain_search(sums, sizes, taken, 0.90, draws) and 0 < low < high
+    for margin, count, verdict in ((high, 100, False), (high * (1 + 1e-9), 99, True)):
+        entry = ev.contrast(
+            d,
+            np.zeros(len(d)),
+            clusters,
+            draws=draws,
+            source=LARGER,
+            levels=["ci90"],
+            margin=margin,
+        )
+        found = ev.equivalence(entry, margin)
+        assert entry["ci90"] == [low, high] and found["level"] == 0.05
+        assert found["p_smaller_at_the_margin"] == count / 2000
+        assert found["p_larger_at_minus_the_margin"] == 1 / 2000
+        assert found["declared"] is verdict
+
+
+EQUIVALENCE_CASES = [(shape, episodes) for episodes in (6, 13, 14, 30) for shape in SHAPES[:4]]
+
+
+@pytest.mark.parametrize(("shape", "episodes"), EQUIVALENCE_CASES)
+def test_equivalence_by_two_p_values_is_the_ninety_percent_interval_inside_the_margin(
+    shape: str, episodes: int
+) -> None:
+    """PLAN section 6: under the registered test, equivalence is declared when the p-value for
+    a smaller contrast at the margin and the p-value for a larger one at minus the margin are
+    both below 0.05, which is the 90% interval of that test lying strictly inside the margin.
+    The verdict of the evaluator against the interval it reports, for margins well inside, well
+    outside, exactly on each end (where the end is the last value not rejected, so nothing is
+    declared) and a billionth of the interval's reach either side of each end. Two cases have
+    an interval that lacks an end, and nothing is declared for them at any margin: the draws
+    that take no episode with a difference keep the p-value above 0.05 however far the margin
+    lies. The episodes here are of ordinary sizes; with one that dominates the two readings can
+    part (``test_with_one_dominant_episode_the_rule_and_the_interval_can_part``), and so they
+    can where an end is missing although the test rejects further away
+    (``test_equivalence_can_be_declared_beside_an_end_that_is_unbounded``)."""
+    draws = 400
+    d, clusters = differences(shape, episodes)
+    d = d / 10  # differences of the size of a margin of 0.02
+    sums, sizes, taken = summed(d, clusters, draws)
+    zeros = np.zeros(len(d))
+
+    def read(margin: float) -> tuple[dict, dict]:
+        entry = ev.contrast(
+            d, zeros, clusters, draws=draws, source=LARGER, levels=["ci95", "ci90"], margin=margin
+        )
+        return entry, ev.equivalence(entry, margin)
+
+    low, high = REAL_INTERVAL(sums, sizes, taken, 0.90, draws)
+    ends = [end for end in (low, high) if end is not None]
+    assert (len(ends) < 2) is ((shape, episodes) in {("sparse", 6), ("sparse", 13)}) and ends
+    reach = max(abs(end) for end in ends)
+    nudge = 1e-9 * reach
+    margins = [0.02, reach / 2, 2 * reach, 50 * reach]
+    for end in ends:
+        margins += [abs(end), abs(end) + nudge, max(abs(end) - nudge, nudge)]
+    verdicts = []
+    for margin in margins:
+        entry, found = read(margin)
+        assert entry["ci90"] == [low, high] and found["ci90"] == [low, high]
+        assert (found["margin"], found["level"]) == (margin, 0.05)
+        assert found["interval_method"] == ev.TEST_INTERVAL == entry["interval_method"]
+        smaller = ev.larger_of_at(sums, sizes, taken, margin, draws)["one_sided_lower"]
+        larger = ev.larger_of_at(sums, sizes, taken, -margin, draws)["one_sided"]
+        assert (found["p_smaller_at_the_margin"], found["p_larger_at_minus_the_margin"]) == (
+            smaller,
+            larger,
+        )
+        assert found["declared"] is bool(smaller < 0.05 and larger < 0.05)
+        # the same verdict from the interval: both ends there, and strictly inside
+        inside = len(ends) == 2 and low > -margin and high < margin
+        assert found["declared"] is inside, (margin, low, high)
+        verdicts.append(found["declared"])
+    if len(ends) < 2:
+        assert not any(verdicts)
+        return
+    assert verdicts[:4] == [reach < 0.02, False, True, True]
+    # the end further from zero decides: on the margin it declares nothing, a little inside the
+    # margin it does, a little outside it does not
+    outer = 4 if abs(low) > abs(high) else 7
+    assert verdicts[outer : outer + 3] == [False, True, False]
+
+
+def record_under(source: str) -> dict[str, Any]:
+    """The record of the constants as a result file holds it with ``source`` in force."""
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setattr(ev, "P_VALUE_SOURCE", source)
+        return ev.registered_record()
+
+
+def h2_report(d: np.ndarray, clusters: list[str]) -> dict[str, Any]:
+    """A report of one H2 test on the paired differences ``d`` under the registered test, as
+    far as the table and the printout read one: the contrast with both intervals, its
+    equivalence reading at the registered margin and the counts beside it."""
+    zeros = np.zeros(len(d))
+    entry = ev.contrast(
+        d, zeros, clusters, source=LARGER, levels=["ci95", "ci90"], margin=ev.H2_MARGIN
+    )
+    entry |= {"hypothesis": "H2", "model": "m", "comparator": "rules_plus_slip", "tested": "m:c"}
+    entry |= {"sides": 2, "p": ev.registered_p(entry, 2, LARGER), "p_holm": 1.0, "holds": False}
+    entry["equivalence"] = ev.equivalence(entry)
+    entry["losses_differ"] = ev.differing(d, zeros, clusters)
+    entry["reading"] = ev.reading_of(entry)
+    episodes = len(set(clusters))
+    return {
+        "registered": record_under(LARGER),
+        "h3": {"comparator": "base_rate"},
+        "items": {
+            "eligible_statements": len(d),
+            "eligible_episodes": episodes,
+            "scoreable_statements": len(d),
+            "scoreable_episodes": episodes,
+        },
+        "family": [entry],
+        "probe": {},
+        "item_sets": {},
+    }
+
+
+def h2_line(report: dict[str, Any]) -> str:
+    """The line of the table on the equivalence reading of the one H2 test of ``report``."""
+    (line,) = [x for x in ev.markdown(report).splitlines() if x.startswith("H2 equivalence, ")]
+    return line
+
+
+RULE = "by the rule, which needs both one-sided p-values below 0.05 at the margin of 0.02: "
+"""How the table words the equivalence reading under the registered test, after the verdict."""
+BESIDE = "(90% interval, reported beside the rule and not read for it: "
+
+
+def test_with_one_dominant_episode_the_rule_and_the_interval_can_part() -> None:
+    """The sign-flip p-value need not fall steadily as the value tested moves away from the
+    estimate. Six episodes of 11, 5, 1, 163, 23 and 13 statements, the fourth holding three
+    statements in four: the p-value for a smaller contrast is 3/64 from about 0.015 to 0.027,
+    rises to 4/64 from 0.03 to 0.045 and falls to 2/64 after that. The search for the upper end
+    of the 90% interval stops at the last of these changes, near 0.046, so the interval reaches
+    beyond a margin of 0.02; the rule tests 0.02 itself, where both p-values are below 0.05,
+    and declares equivalence. The rule is what the evaluator reports."""
+    sizes = [11, 5, 1, 163, 23, 13]
+    sums = [-0.0407, 0.0821, -0.079, -0.1161, -0.1536, -0.3808]
+    clusters = [f"g{k}" for k, size in enumerate(sizes) for _ in range(size)]
+    d = np.array([s / n + 0.0107 for s, n in zip(sums, sizes, strict=True) for _ in range(n)])
+    entry = ev.contrast(
+        d, np.zeros(len(d)), clusters, source=LARGER, levels=["ci95", "ci90"], margin=0.02
+    )
+    found = ev.equivalence(entry)
+    assert found["margin"] == ev.H2_MARGIN == 0.02
+    assert entry["delta"] == pytest.approx(0.007514, abs=1e-6)
+    assert entry["ci90"] == pytest.approx([-0.018592, 0.045665], abs=1e-6)
+    assert (found["p_smaller_at_the_margin"], found["p_larger_at_minus_the_margin"]) == (
+        3 / 64,
+        3 / 64,
+    )
+    assert found["declared"] is True
+    low, high = entry["ci90"]
+    assert not (low > -0.02 and high < 0.02)  # the interval is not inside the margin
+    # the table leads with the rule, which decides, and gives the interval beside it, so that
+    # "declared" does not stand next to an interval that reaches past the margin unexplained
+    assert h2_line(h2_report(d, clusters)) == (
+        f"H2 equivalence, m: declared {RULE}0.0469 at -0.02 and 0.0469 at 0.02 {BESIDE}"
+        "[-0.0186, 0.0457]). The two losses differ on 216 statements in 6 episodes: 4 with a "
+        "positive sum, 2 with a negative one, 0 whose differences cancel."
+    )
+    # the p-value for a smaller contrast, from the estimate outwards: it rises again
+    total, counts, taken = summed(d, clusters, ev.DRAWS)
+    assert counts[3] / counts.sum() > 0.75
+    steps = {0.01: None, 0.015: 3, 0.02: 3, 0.027: 3, 0.03: 4, 0.04: 4, 0.045: 4, 0.05: 2, 0.1: 2}
+    for value, sixty_fourths in steps.items():
+        moved = total - value * counts
+        both = ev.larger_of_at(total, counts, taken, value)["one_sided_lower"]
+        flips = ev.sign_flip_t(moved, counts)["one_sided_lower"]
+        if sixty_fourths is None:
+            assert both > 0.2  # near the estimate nothing is rejected
+            continue
+        # the sign-flip part is the larger of the two here, and the bootstrap-t part falls
+        assert both == flips == sixty_fourths / 64
+        assert ev.studentised(moved, counts, taken)["one_sided_lower"] < 0.03
+    # at 95% the test cannot reject far above at all: 2/64 is not below 0.025
+    assert entry["ci95"][1] is None and entry["ci95"][0] < low
+
+
+def test_with_one_dominant_episode_the_interval_can_be_inside_a_margin_not_rejected() -> None:
+    """The other way round from the test above: the interval inside the margin, and nothing
+    declared. Six episodes of 8, 24, 181, 6, 16 and 8 statements, the third holding three
+    statements in four: the p-value for a smaller contrast falls below 0.05 near 0.009, where
+    the search for the upper end of the 90% interval stops, is 2/64 and then 3/64 up to 0.019,
+    rises to 4/64 from 0.02 to 0.024 and falls to 1/64 after that. The 90% interval lies
+    strictly inside a margin of 0.02; the rule tests 0.02 itself, where that p-value is not
+    below 0.05, and declares nothing. The rule is what the evaluator reports."""
+    sizes = [8, 24, 181, 6, 16, 8]
+    means = [0.0195, -0.0057, 0.003, 0.0055, -0.0153, -0.027]
+    clusters = [f"g{k}" for k, size in enumerate(sizes) for _ in range(size)]
+    d = np.array([mean for mean, size in zip(means, sizes, strict=True) for _ in range(size)])
+    entry = ev.contrast(
+        d, np.zeros(len(d)), clusters, source=LARGER, levels=["ci95", "ci90"], margin=0.02
+    )
+    found = ev.equivalence(entry)
+    assert found["margin"] == ev.H2_MARGIN == 0.02
+    assert entry["delta"] == pytest.approx(0.000553, abs=1e-6)
+    assert entry["ci90"] == pytest.approx([-0.015300, 0.008925], abs=1e-6)
+    low, high = entry["ci90"]
+    assert low > -0.02 and high < 0.02  # the interval is strictly inside the margin
+    assert (found["p_smaller_at_the_margin"], found["p_larger_at_minus_the_margin"]) == (
+        4 / 64,
+        2 / 64,
+    )
+    assert found["level"] == 0.05 and found["declared"] is False
+    # the table says that the rule declares nothing, with the two p-values it read
+    assert h2_line(h2_report(d, clusters)).startswith(
+        f"H2 equivalence, m: not declared {RULE}{2 / 64:.4f} at -0.02 and {4 / 64:.4f} at 0.02 "
+        f"{BESIDE}[-0.0153, 0.0089]). The two losses differ on 243 statements in 6 episodes: "
+    )
+    # the p-value for a smaller contrast, from the estimate outwards: it rises again
+    total, counts, taken = summed(d, clusters, ev.DRAWS)
+    assert counts[2] / counts.sum() > 0.74
+    steps = {0.005: None, 0.012: 2, 0.019: 3, 0.02: 4, 0.024: 4, 0.026: 3, 0.03: 1, 0.1: 1}
+    for value, sixty_fourths in steps.items():
+        moved = total - value * counts
+        both = ev.larger_of_at(total, counts, taken, value)["one_sided_lower"]
+        flips = ev.sign_flip_t(moved, counts)["one_sided_lower"]
+        if sixty_fourths is None:
+            assert both > 0.1  # near the estimate nothing is rejected
+            continue
+        # the sign-flip part is the larger of the two here, and the bootstrap-t part falls
+        assert both == flips == sixty_fourths / 64
+        assert ev.studentised(moved, counts, taken)["one_sided_lower"] < 0.03
+
+
+def test_equivalence_can_be_declared_beside_an_end_that_is_unbounded() -> None:
+    """The second way in which the rule and the interval part: the reach of the search, with
+    a p-value that falls steadily. An end is unbounded when the value 50 standard errors away
+    is not rejected; the test may reject further away, and the rule tests the margin itself.
+
+    Eight episodes of ten statements whose losses differ on one statement in each of three,
+    by 0.003, 0.003 and 0.00003. A bootstrap draw that takes neither of the first two has a
+    statistic that is finite and far beyond 50, so 50 standard errors above the estimate the
+    p-value for a smaller contrast is still the share of such draws, 1001/10001, and the 90%
+    interval has no upper end. From about 200 standard errors on it is 247/10001; the margin of
+    0.02 lies 406 standard errors away, and equivalence is declared."""
+    clusters = [f"g{k}" for k in range(8) for _ in range(10)]
+    d = np.zeros(80)
+    d[[0, 10, 20]] = 0.003, 0.003, 0.00003
+    zeros = np.zeros(80)
+    entry = ev.contrast(d, zeros, clusters, source=LARGER, levels=["ci95", "ci90"], margin=0.02)
+    found = ev.equivalence(entry)
+    low, high = entry["ci90"]
+    assert low == pytest.approx(0.0, abs=1e-9) and high is None and entry["ci95"][1] is None
+    sums, sizes, taken = summed(d, clusters, ev.DRAWS)
+    delta, se = entry["delta"], entry["studentised"]["se"]
+    assert int(((taken[:, 0] == 0) & (taken[:, 1] == 0)).sum()) == 1000
+    steps = {2: 1001, 50: 1001, 100: 1001, 150: 863, 199: 590, 201: 247, 406: 247, 1000: 247}
+    seen = [ev.larger_of_at(sums, sizes, taken, delta + k * se)["one_sided_lower"] for k in steps]
+    assert seen == [count / 10001 for count in steps.values()]  # it never rises
+    assert 406 < (0.02 - delta) / se < 407
+    assert found["p_smaller_at_the_margin"] == 247 / 10001
+    assert found["p_larger_at_minus_the_margin"] == 1 / 256
+    assert found["declared"] is True and found["ci90"] == [low, None]
+    # the table gives the verdict of the rule with its two p-values, the interval beside it,
+    # and a last line on what an end that is not there means; the printout ends on that line
+    report = h2_report(d, clusters)
+    note = ev.unbounded_note(report["registered"], [[low, None]])
+    assert len(note) == 1 and "50 standard errors from Delta" in note[0]
+    assert "It may reject values further away." in note[0]
+    assert h2_line(report) == (
+        f"H2 equivalence, m: declared {RULE}0.0039 at -0.02 and 0.0247 at 0.02 {BESIDE}"
+        "[-0.0000, inf]). The two losses differ on 3 statements in 3 episodes: 3 with a "
+        "positive sum, 0 with a negative one, 0 whose differences cancel."
+    )
+    assert ev.markdown(report).splitlines()[-1] == note[0] == ev.summary_lines(report)[-1]
+    # with the third difference as large as the other two the same search finds the end
+    d[20] = 0.003
+    again = ev.contrast(d, zeros, clusters, source=LARGER, levels=["ci95", "ci90"], margin=0.02)
+    assert again["ci90"] == pytest.approx([0.0, 0.000225], abs=1e-8)
+    assert again["ci95"][1] == pytest.approx(0.0003, abs=1e-8)
+    assert ev.equivalence(again)["declared"] is True
+    whole = h2_report(d, clusters)
+    assert "unbounded" not in ev.markdown(whole) + "\n".join(ev.summary_lines(whole))
+
+
+def test_one_large_difference_among_small_ones_leaves_the_interval_without_an_end() -> None:
+    """The same at sizes like those of the eligible list, with no dominant episode: 40 episodes
+    of 48 statements each, the two losses differing on one statement of the first episode by
+    -0.25 and on one statement of eight more by 0.001, with either sign. The 3,569 bootstrap
+    draws without the first episode keep the p-value for a larger contrast at 3570/10001 fifty
+    standard errors below the estimate, so the interval has no lower end at 90% or at 95%.
+    Minus the margin lies 153 standard errors below; there the p-value is 23/10001, and
+    equivalence is declared. With 0.005 in place of 0.001 the statistics of those draws are
+    within the reach of the search, and the interval has both ends."""
+    clusters = [f"g{g:02d}" for g in range(40) for _ in range(48)]
+
+    def read(small: float) -> tuple[np.ndarray, dict, dict]:
+        d = np.zeros(len(clusters))
+        d[0] = -0.25
+        for k in range(1, 9):
+            d[k * 48] = small if k % 2 else -small
+        entry = ev.contrast(
+            d, np.zeros(len(d)), clusters, source=LARGER, levels=["ci95", "ci90"], margin=0.02
+        )
+        return d, entry, ev.equivalence(entry)
+
+    d, entry, found = read(0.001)
+    assert entry["ci90"][0] is None and entry["ci95"][0] is None
+    assert entry["ci90"][1] == pytest.approx(2.416e-05, abs=1e-8)
+    sums, sizes, taken = summed(d, clusters, ev.DRAWS)
+    delta, se = entry["delta"], entry["studentised"]["se"]
+    assert int((taken[:, 0] == 0).sum()) == 3569
+    far = ev.larger_of_at(sums, sizes, taken, delta - 50 * se)["one_sided"]
+    assert far == 3570 / 10001 and 152 < (delta + 0.02) / se < 153
+    assert found["p_larger_at_minus_the_margin"] == 23 / 10001
+    assert found["p_smaller_at_the_margin"] == 1 / 10001 and found["declared"] is True
+    report = h2_report(d, clusters)
+    assert h2_line(report) == (
+        f"H2 equivalence, m: declared {RULE}0.0023 at -0.02 and 0.0001 at 0.02 {BESIDE}"
+        "[-inf, 0.0000]). The two losses differ on 9 statements in 9 episodes: 4 with a "
+        "positive sum, 5 with a negative one, 0 whose differences cancel."
+    )
+    assert ev.markdown(report).splitlines()[-1].startswith("An end shown as -inf or inf is ")
+    d, entry, found = read(0.005)
+    assert entry["ci90"] == pytest.approx([-0.002935, 2.43e-05], abs=1e-6)
+    assert entry["ci95"] == pytest.approx([-0.003254, 2.92e-05], abs=1e-6)
+    assert found["declared"] is True and "unbounded" not in ev.markdown(h2_report(d, clusters))
+
+
+def test_the_counts_in_the_table_add_up_with_an_episode_whose_differences_cancel() -> None:
+    """PLAN section 6, "Sensitivity": an episode whose differing statements cancel is counted
+    apart. Nine episodes of four statements: two statements differ by 0.01 in each of six
+    episodes, and in a seventh one differs by 0.01 and one by -0.01. The table gives the three
+    counts, which add up to the episodes that differ."""
+    clusters = [f"g{k}" for k in range(9) for _ in range(4)]
+    d = np.zeros(36)
+    for k in range(6):
+        d[[4 * k, 4 * k + 1]] = 0.01
+    d[[24, 25]] = 0.01, -0.01
+    report = h2_report(d, clusters)
+    assert report["family"][0]["losses_differ"] == {
+        "statements": 14,
+        "episodes": 7,
+        "episodes_with_a_positive_sum": 6,
+        "episodes_with_a_negative_sum": 0,
+        "episodes_whose_differences_cancel": 1,
+    }
+    assert h2_line(report).endswith(
+        "). The two losses differ on 14 statements in 7 episodes: 6 with a positive sum, 0 with "
+        "a negative one, 1 whose differences cancel."
+    )
+
+
+def test_the_line_on_an_unbounded_end_is_printed_only_when_one_is_shown() -> None:
+    made = record_under(LARGER)
+    assert ev.unbounded_note(made, [[-0.1, 0.2], None, [0.0, 0.0]]) == []
+    assert ev.unbounded_note(made, []) == []
+    for pair in ([None, 0.2], [-0.1, None], [None, None]):
+        assert ev.unbounded_note(made, [[-0.1, 0.2], pair]) == [
+            "An end shown as -inf or inf is unbounded: the registered test does not reject the "
+            "furthest value searched on that side (50 standard errors from Delta; with a "
+            "standard error of zero, one unit from Delta, or the size of Delta if that is "
+            "more). It may reject values further away."
+        ]
+    # the reach is the one the record holds, and a percentile interval never lacks an end
+    made["intervals"]["search_reach_in_standard_errors"] = 12.5
+    assert "(12.5 standard errors from Delta;" in ev.unbounded_note(made, [[None, 0.2]])[0]
+    assert ev.unbounded_note(record_under("percentile"), [[None, 0.2]]) == []
+
+
+def test_with_four_episodes_nothing_is_declared_at_any_margin() -> None:
+    """Four episodes give no p-value below 1/16, so the test rejects no value at all: both
+    intervals are unbounded on both sides and nothing is declared, whatever the margin. (An
+    unbounded end does not by itself keep equivalence from being declared:
+    ``test_equivalence_can_be_declared_beside_an_end_that_is_unbounded``.)"""
+    d, clusters = differences("even", 4)
+    for margin in (0.02, 1.0, 1e6):
+        entry = ev.contrast(
+            d, np.zeros(len(d)), clusters, source=LARGER, levels=["ci95", "ci90"], margin=margin
+        )
+        assert entry["ci90"] == [None, None] == entry["ci95"]
+        found = ev.equivalence(entry, margin)
+        assert found["declared"] is False and found["ci90"] == [None, None]
+        assert (
+            min(found["p_smaller_at_the_margin"], found["p_larger_at_minus_the_margin"]) >= 1 / 16
+        )
+
+
+COMMITTED_CONTRASTS = {
+    ("even", 6): [
+        [-0.015323935498659354, 0.09474834700828498],
+        [-0.005871817635877019, 0.08562517222973692],
+    ],
+    ("skewed", 14): [
+        [0.0003220681400501168, 0.04209351015947291],
+        [0.0034256998765642274, 0.03815891263775002],
+    ],
+    ("sparse", 13): [
+        [-0.03327760010576765, 0.031873904021841384],
+        [-0.025501955306295745, 0.021539256016815524],
+    ],
+    ("few values", 40): [
+        [0.022114426302388565, 0.06058841036414566],
+        [0.02591053463505347, 0.057783305439330544],
+    ],
+    ("no variance", 5): [[0.25, 0.25], [0.25, 0.25]],
+}
+"""The 95% and 90% intervals that ``contrast`` gave before it knew any interval but the
+percentile one (``evaluate.py`` at sha256 f7f3b4df6f1ab58a), on ``differences`` of each shape
+and number of episodes."""
+
+
+@pytest.mark.parametrize("case", list(COMMITTED_CONTRASTS))
+def test_under_another_source_the_intervals_are_the_percentile_intervals_of_before(
+    case: tuple[str, int], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Only the larger-of procedure has the interval of its test. Under ``percentile``, and
+    under the three other candidates, a confirmatory contrast carries the percentile intervals
+    as the evaluator computed them before, at both levels, whatever levels are asked for, and
+    reads equivalence from the two ends; no value is ever tested."""
+    d, clusters = differences(*case)
+    zeros = np.zeros(len(d))
+    plain = ev.contrast(d, zeros, clusters)
+    want95, want90 = COMMITTED_CONTRASTS[case]
+    assert plain["ci95"] == pytest.approx(want95, abs=1e-12)
+    assert plain["ci90"] == pytest.approx(want90, abs=1e-12)
+    assert plain["percentile"] == {"ci95": plain["ci95"], "ci90": plain["ci90"]}
+    assert plain["interval_method"] == "percentile" and "at_the_margin" not in plain
+
+    def never(*args: Any, **kwargs: Any) -> None:
+        raise AssertionError("a value was tested under a source that has percentile intervals")
+
+    monkeypatch.setattr(ev, "larger_of_interval", never)
+    monkeypatch.setattr(ev, "larger_of_at", never)
+    for source in ev.P_VALUE_SOURCES:
+        if source == LARGER:
+            continue
+        assert ev.interval_method(source) == "percentile"
+        for levels in ([], ["ci95"], ["ci95", "ci90"]):
+            assert (
+                ev.contrast(d, zeros, clusters, source=source, levels=levels, margin=0.02) == plain
+            )
+        low, high = plain["ci90"]
+        for margin in (0.02, 0.05, abs(low), abs(high), 1.0):
+            found = ev.equivalence(plain, margin)
+            assert found == {
+                "margin": margin,
+                "ci90": [low, high],
+                "interval_method": "percentile",
+                "declared": low > -margin and high < margin,
+            }
+    assert (
+        ev.interval_method(LARGER)
+        == ev.TEST_INTERVAL
+        == "values_not_rejected_by_the_registered_test"
+    )
+    assert ev.interval_method(None) == "percentile" and ev.TEST_INTERVAL_SOURCES == (LARGER,)
+
+
+def test_a_confirmatory_contrast_carries_the_levels_it_is_asked_for() -> None:
+    d, clusters = differences("skewed", 14)
+    zeros = np.zeros(len(d))
+    sums, sizes, taken = summed(d, clusters, 300)
+    plain = ev.contrast(d, zeros, clusters, draws=300)
+    both = ev.contrast(
+        d, zeros, clusters, draws=300, source=LARGER, levels=["ci95", "ci90"], margin=0.02
+    )
+    assert both["ci95"] == REAL_INTERVAL(sums, sizes, taken, 0.95, 300)
+    assert both["ci90"] == REAL_INTERVAL(sums, sizes, taken, 0.90, 300)
+    assert both["ci95"][0] < both["ci90"][0] < both["delta"] < both["ci90"][1] < both["ci95"][1]
+    assert both["interval_method"] == ev.TEST_INTERVAL
+    assert both["at_the_margin"] == {
+        "p_smaller_at_the_margin": ev.larger_of_at(sums, sizes, taken, 0.02, 300)[
+            "one_sided_lower"
+        ],
+        "p_larger_at_minus_the_margin": ev.larger_of_at(sums, sizes, taken, -0.02, 300)[
+            "one_sided"
+        ],
+    }
+    assert len(set(both["at_the_margin"].values())) == 2
+    # everything else is what any contrast reports, the percentile intervals among it
+    rest = {
+        k: v
+        for k, v in both.items()
+        if k not in ("ci95", "ci90", "interval_method", "at_the_margin")
+    }
+    assert rest == {k: v for k, v in plain.items() if k not in ("ci95", "ci90", "interval_method")}
+    assert both["percentile"] == {"ci95": plain["ci95"], "ci90": plain["ci90"]}
+    assert both["ci95"] != plain["ci95"] and both["ci90"] != plain["ci90"]
+    # the 95% interval alone, and no p-value at a margin that is not given
+    one = ev.contrast(d, zeros, clusters, draws=300, source=LARGER, levels=["ci95"])
+    assert one["ci95"] == both["ci95"] and "ci90" not in one and "at_the_margin" not in one
+    # in short, for the result file: the interval with the way it was made
+    assert ev.short(one, 2, LARGER) == {
+        "statements": len(d),
+        "episodes": 14,
+        "evaluable": True,
+        "delta": one["delta"],
+        "ci95": one["ci95"],
+        "interval_method": ev.TEST_INTERVAL,
+        "p": one["p_values"][LARGER]["two_sided"],
+    }
+    assert ev.short(plain, 1, LARGER)["interval_method"] == "percentile"
+    assert ev.short(plain, 1, LARGER)["ci95"] == plain["ci95"]
+    # in short a contrast gives its 95% interval alone, also when it holds a 90% one
+    assert "ci90" in plain and "ci90" in both
+    for held in (plain, both):
+        assert list(ev.short(held, 2, LARGER)) == list(ev.short(one, 2, LARGER))
+
+
+def test_the_counts_of_statements_and_episodes_on_which_two_losses_differ() -> None:
+    """Beside H2 (PLAN section 6, "Sensitivity"). Seven episodes worked by hand:
+
+    * ``a``: the same loss on both statements;
+    * ``b``: one of two statements differs, by +0.1;
+    * ``c``: one statement, -0.3;
+    * ``d``: two statements, +0.3 and -0.3, which cancel;
+    * ``e``: 0.3 - 0.2 and 0.1 - 0.2, which cancel to a rounding error and not to zero;
+    * ``f``: three statements, +0.2, -0.05 and no difference: a positive sum;
+    * ``g``: 0.1 + 0.2 against 0.3, the same loss up to a rounding error: no difference.
+    """
+    rows = {
+        "a": [(0.4, 0.4), (0.1, 0.1)],
+        "b": [(0.3, 0.2), (0.25, 0.25)],
+        "c": [(0.2, 0.5)],
+        "d": [(0.4, 0.1), (0.1, 0.4)],
+        "e": [(0.3, 0.2), (0.1, 0.2)],
+        "f": [(0.5, 0.3), (0.2, 0.25), (0.6, 0.6)],
+        "g": [(0.1 + 0.2, 0.3)],
+    }
+    clusters = [name for name, pairs in rows.items() for _ in pairs]
+    comparator = [c for pairs in rows.values() for c, _ in pairs]
+    tested = [t for pairs in rows.values() for _, t in pairs]
+    assert (0.3 - 0.2) + (0.1 - 0.2) != 0  # the sum of episode e, in floating point
+    assert (0.1 + 0.2) - 0.3 != 0  # the one difference of episode g
+    assert ev.differing(comparator, tested, clusters) == {
+        "statements": 8,
+        "episodes": 5,
+        "episodes_with_a_positive_sum": 2,
+        "episodes_with_a_negative_sum": 1,
+        "episodes_whose_differences_cancel": 2,
+    }
+    # the other way round, the signs change places
+    assert ev.differing(tested, comparator, clusters) == {
+        "statements": 8,
+        "episodes": 5,
+        "episodes_with_a_positive_sum": 1,
+        "episodes_with_a_negative_sum": 2,
+        "episodes_whose_differences_cancel": 2,
+    }
+    same = ev.differing(tested, tested, clusters)
+    assert set(same.values()) == {0} and list(same) == list(ev.differing([], [], []))
+    assert set(ev.differing([], [], []).values()) == {0}
+    one = ev.differing([0.5, 0.2, 0.2], [0.1, 0.2, 0.2], ["g", "h", "h"])
+    assert (one["statements"], one["episodes"], one["episodes_with_a_positive_sum"]) == (1, 1, 1)
+    # the tolerance is that of the episode sums, not of the single differences ("1e-12 times the
+    # largest absolute episode sum"): episode ``a`` sums to 100, so anything up to 1e-10 is a
+    # zero, and the one difference of ``b`` is 5e-11, far above 1e-12 times the largest single
+    # difference
+    wide = ["a"] * 200 + ["b", "c", "c"]
+    apart = np.array([0.5] * 200 + [5e-11, 0.25, -0.25])
+    assert ev.differing(apart, np.zeros(len(apart)), wide) == {
+        "statements": 202,
+        "episodes": 2,
+        "episodes_with_a_positive_sum": 1,
+        "episodes_with_a_negative_sum": 0,
+        "episodes_whose_differences_cancel": 1,
+    }
+
+
+def test_an_unbounded_end_is_null_in_the_file_and_infinite_in_the_printout() -> None:
+    assert ev._interval([None, 0.03]) == "[-inf, 0.0300]"
+    assert ev._interval([-0.01, None]) == "[-0.0100, inf]"
+    assert ev._interval([None, None]) == "[-inf, inf]" and ev._interval(None) == "n/a"
+    assert ev._interval([-0.5, 0.25]) == "[-0.5000, 0.2500]"
+    assert json.loads(ev.report_text({"ci95": [None, 0.03]})) == {"ci95": [None, 0.03]}
+    # the flag beside H3: a lower end that is not there does not lie above zero
+    assert ev.beats_both(h3_entry(0.03, True, [None, 0.04])) is False
+    assert ev.beats_both(h3_entry(0.03, True, [None, None])) is False
+    assert ev.beats_both(h3_entry(0.03, True, [0.001, None])) is True
+
+
+# --------------------------------------------------------------------------------------------
 # The two registered constants
 # --------------------------------------------------------------------------------------------
 
 
 def test_the_registered_constants_are_the_plans_wording_today() -> None:
     """Both constants are set once before registration. This test holds them at the candidate
-    the plan words today; changing a constant means changing it here too."""
+    the plan words today; changing a constant means changing it here too. Every other test
+    reads the p-value source from the evaluator (``SOURCE``), so that this is the one place."""
     assert ev.P_VALUE_SOURCES == (
         "percentile",
         "studentised",
@@ -1324,9 +2438,19 @@ def test_the_registered_constants_are_the_plans_wording_today() -> None:
     )
     assert ev.PROCEDURES[:-1] == ev.P_VALUE_SOURCES and ev.PROCEDURES[-1] == "sign_flip"
     assert ev.H3_COMPARATORS == ("gbm_structured", "base_rate", "better_on_dev")
-    assert (ev.P_VALUE_SOURCE, ev.H3_COMPARATOR) == ("percentile", "base_rate")
+    assert (ev.P_VALUE_SOURCE, ev.H3_COMPARATOR) == (LARGER, "base_rate")
     record = ev.registered_record()
-    assert (record["p_value_source"], record["h3_comparator"]) == ("percentile", "base_rate")
+    assert (record["p_value_source"], record["h3_comparator"]) == (LARGER, "base_rate")
+    assert record["intervals"] == {
+        "of_the_confirmatory_contrasts_and_delta_gbm": "values_not_rejected_by_the_registered_test",
+        "of_the_other_contrasts_and_single_predictors_of_the_evaluator": "percentile",
+        "coverage": 0.95,
+        "coverage_for_the_equivalence_of_h2": 0.90,
+        "sources_with_the_interval_of_their_own_test": [LARGER],
+        "search_reach_in_standard_errors": 50.0,
+        "search_halvings": 60,
+        "an_end_that_is_null": "unbounded: the test does not reject at the reach of the search",
+    }
     assert record["p_value_source_candidates"] == list(ev.P_VALUE_SOURCES)
     assert record["p_value_procedures_reported"] == list(ev.PROCEDURES)
     assert record["sign_flip_patterns"] == {"every_pattern_up_to_episodes": 13, "drawn": 10_000}
@@ -1345,6 +2469,61 @@ def test_the_registered_constants_are_the_plans_wording_today() -> None:
     )
     assert record["cutoff_month_ends"] == {LLAMA: "2023-12-31", DEEPSEEK: "2024-12-31"}
     assert tuple(record["primaries"]) == rd.PRIMARIES == S.PRIMARY
+
+
+def words(text: str | None) -> str:
+    """A text on one line, as its words."""
+    return " ".join((text or "").split())
+
+
+def test_the_evaluator_describes_the_registered_test_as_it_is_today() -> None:
+    """The docstrings and names of the evaluator follow the registered test. The percentile
+    p-values are a sensitivity analysis and no longer "the registered" ones; the cluster
+    sign-flip test is one sensitivity analysis of three; the 90% interval of H2 is reported
+    beside a rule on two p-values, from which it can part in two ways; an unbounded end says
+    that the test does not reject 50 standard errors away, not that it rejects nowhere; and
+    the size check zeroes a cancelling draw as this file does."""
+    module, source = words(ev.__doc__), words(Path(ev.__file__).read_text(encoding="utf-8"))
+    left_behind = (
+        "the paired cluster bootstrap of PLAN section 6 as it is worded",
+        "the sensitivity analysis of PLAN section 6",
+        "the registered p-values count such a draw on both sides",
+        "The interval that reads the equivalence of H2",
+        "That is the 90% interval of the registered test lying strictly inside",
+        "are reported for every contrast under ``percentile``",
+        "but for one case",
+        "An end the test cannot reach",
+        "or an unbounded one, goes with a margin that is not rejected",
+        "the largest absolute flipped statistic",
+    )
+    assert not [text for text in left_behind if text in source]
+    said = (
+        "the percentile p-values of the draft, now a sensitivity analysis of PLAN section 6",
+        "(one of the sensitivity analyses of PLAN section 6)",
+        "As a rule of thumb that is the 90% interval of the registered test lying strictly inside",
+        "for every contrast given in full (the six tests and the probe)",
+        "but where rounding settles a statistic",
+        "(it may reject further away, which the interval does not show)",
+        "equivalence is then declared beside an end that is null",
+        "a stored reading that the harness's own parser accepts",
+        "a declaration ``--not-evaluable`` whose reason is not printable text on one line",
+    )
+    assert not [text for text in said if text not in module]
+    # the constants: their docstrings are in the source alone
+    assert "one of the sensitivity analyses of PLAN section 6, reported for every" in source
+    assert "and the interval is reported beside them; under a source with percentile" in source
+    for function, text in (
+        (ev.drawn_deltas, "the percentile p-values count such a draw on both sides"),
+        (ev.tail_of, "so that the registered levels are 0.025 and 0.05 exactly"),
+        (REAL_INTERVAL, "no end within the reach, not that no value is rejected"),
+        (ev.equivalence, "The two can part in two ways, and the rule decides."),
+        (ev.equivalence, "equivalence is declared beside an unbounded end"),
+    ):
+        assert text in words(function.__doc__), text
+    # the percentile p-values are the draft's: the name that holds them does not call them
+    # the registered ones
+    names = ev.contrast.__code__.co_varnames
+    assert "draft" in names and "registered" not in names
 
 
 def test_registered_p_takes_the_named_procedure() -> None:
@@ -1392,12 +2571,30 @@ def test_the_p_value_source_in_force_enters_holm_and_the_record(
     monkeypatch.setattr(ev, "P_VALUE_SOURCE", source)
     report, table, _ = confirm(study, tmp_path, capsys)
     assert report["registered"]["p_value_source"] == source and f"p-values: {source}." in table
+    method = ev.interval_method(source)
+    assert method == ("percentile" if source != LARGER else ev.TEST_INTERVAL)
+    assert (
+        report["registered"]["intervals"]["of_the_confirmatory_contrasts_and_delta_gbm"] == method
+    )
+    assert f"Intervals of the six contrasts and of Delta_GBM: {method}." in table
     for entry, before in zip(report["family"], base.report["family"], strict=True):
         side = "one_sided" if entry["sides"] == 1 else "two_sided"
         assert entry["p"] == entry["p_values"][source][side]
-        # the estimate, its intervals and every p-value do not depend on the constant
-        for key in ("delta", "ci95", "ci90", "p_values"):
+        # the estimate, every p-value and the percentile intervals do not depend on the constant
+        for key in ("delta", "p_values", "percentile", "studentised", "sign_flip"):
             assert entry[key] == before[key]
+        # the intervals do: those of the source in force, and the entry says which they are
+        assert entry["interval_method"] == method
+        if method == "percentile":
+            assert (entry["ci95"], entry["ci90"]) == (
+                before["percentile"]["ci95"],
+                before["percentile"]["ci90"],
+            )
+        else:
+            assert entry["ci95"] != entry["percentile"]["ci95"]
+            assert ("ci90" in entry) is (entry["hypothesis"] == "H2")
+        if method == before["interval_method"]:
+            assert entry["ci95"] == before["ci95"] and entry.get("ci90") == before.get("ci90")
     adjusted = ev.holm([entry["p"] for entry in report["family"]])
     assert [entry["p_holm"] for entry in report["family"]] == pytest.approx(adjusted, abs=5e-6)
     assert report["probe"][LLAMA]["p"] == report["probe"][LLAMA]["p_values"][source]["one_sided"]
@@ -1494,6 +2691,102 @@ def test_literal_readings_give_the_end_of_a_stated_period_or_nothing() -> None:
         "period_of_another_statement_type": 2,
     }
     assert rows["d"]["fallback"] == "abstain" and ev.PERIOD_TYPES == ("recovery", "next_delivery")
+
+
+def test_a_stored_reading_is_held_to_the_parser_of_the_harness() -> None:
+    """A stored row with a reading must hold one that ``read.parse_reading`` would have let
+    through: the schema of its kind and the semantic checks, applied to the stored object
+    itself. Its text is not parsed again, because the parser first takes a reply apart: a list
+    around a good reading passes as text and is no reading."""
+    good = forecast(0.7, 0.4, 100)
+    period = literal("recovery", "2024-03-01", "2024-03-31")
+    assert ev.reading_accepted(good, "predictive") and ev.reading_accepted(period, "literal")
+    assert ev.reading_accepted(literal("depletion", "", ""), "literal")  # ABSTAIN
+    assert not ev.reading_accepted(good, "literal")
+    assert not ev.reading_accepted(period, "predictive")
+    assert rd.parse_reading(json.dumps([good]), "predictive").ok
+    assert not ev.reading_accepted([good], "predictive")
+    days = good["days_to_recovery"]
+    for bad in (
+        good | {"p_by_horizon_a": 1.7},
+        good | {"p_by_horizon_a": -0.01},
+        good | {"p_by_horizon_b": "0.4"},
+        good | {"p_by_horizon_b": float("nan")},
+        good | {"p_by_horizon_a": True},
+        good | {"days_to_recovery": dict(zip(days, (250, 200, 150, 100, 50), strict=True))},
+        good | {"days_to_recovery": days | {"q95": 366}},
+        good | {"days_to_recovery": days | {"q50": 100.5}},
+        good | {"days_to_recovery": {k: v for k, v in days.items() if k != "q50"}},
+        good | {"note": "one key more"},
+        None,
+        "ABSTAIN",
+    ):
+        assert not ev.reading_accepted(bad, "predictive"), bad
+    for bad in (
+        period | {"interval": {"start": "2024-03-31", "end": "2024-03-01"}},
+        period | {"interval": {"start": "2024-02-30", "end": "2024-03-01"}},
+        period | {"interval": {"start": "2024-03-01"}},
+        period | {"interval": 7},
+        period | {"interval": "abstain"},
+        period | {"statement_type": "restock"},
+        period | {"stale": "no"},
+        {k: v for k, v in period.items() if k != "quote"},
+    ):
+        assert not ev.reading_accepted(bad, "literal"), bad
+    # whole days given as floats are days for the harness too, and the stored reading stays
+    # as it is: the check works on a copy
+    whole = good | {"days_to_recovery": {k: float(v) for k, v in days.items()}}
+    before = json.dumps(whole)
+    assert ev.reading_accepted(whole, "predictive") and json.dumps(whole) == before
+    assert rd.parse_reading(before, "predictive").ok
+    # what the harness lets through with a warning is a reading here too; the evaluator scores
+    # and counts such answers (a later horizon given the lower probability, an interval for no
+    # statement or for an undetermined one, a stale flag without an interval)
+    for kind, reading, warning in (
+        ("predictive", good, "p_by_horizon_b_below_a"),
+        ("literal", period | {"statement_type": "none"}, "interval_without_statement"),
+        ("literal", period | {"certainty": "undetermined"}, "interval_for_undetermined"),
+        ("literal", literal("recovery", "", "") | {"stale": True}, "stale_without_interval"),
+    ):
+        parsed = rd.parse_reading(json.dumps(reading), kind)
+        assert parsed.ok and warning in parsed.warnings
+        assert ev.reading_accepted(reading, kind), warning
+    # the fault of a row, beside its other faults and only for a row that holds a reading
+    route = rd.ROUTES[DEEPSEEK]
+    served = {"model": DEEPSEEK, "model_id": route.model_id, "provider_pin": route.provider}
+    for template, reading, bad in (
+        ("predictive-v1", good, good | {"p_by_horizon_a": 1.7}),
+        ("literal-v1", period, period | {"interval": 7}),
+    ):
+        kind = rd.TEMPLATES[template].kind
+        pinned = served | {"template": template, "template_sha256": rd.FROZEN_SHA256[template]}
+        row = pinned | stored(reading, kind)
+        assert ev.row_faults(row, DEEPSEEK, template) == []
+        broken = row | {"reading": bad}
+        assert ev.row_faults(broken, DEEPSEEK, template) == [
+            "a stored reading that the harness's parser does not accept"
+        ]
+        assert ev.row_faults(broken | {"status": "failed"}, DEEPSEEK, template) == [
+            "a status, a reading and a fallback flag that contradict one another",
+            "a stored reading that the harness's parser does not accept",
+        ]
+        # a row without a reading has none to hold to the parser
+        assert ev.row_faults(pinned | stored(None, kind), DEEPSEEK, template) == []
+
+
+def test_every_reading_the_harness_wrote_is_one_it_accepts(study: SimpleNamespace) -> None:
+    """The dev and confirmatory runs of the synthetic study were written by the harness's own
+    reader: none of their rows is faulted for its reading."""
+    seen = 0
+    for model in rd.PRIMARIES:
+        for line in (*ev.LINES["dev"].values(), *ev.LINES["confirmatory"].values()):
+            rows = stored_rows(study, model, line)
+            kind = rd.TEMPLATES[rows[0]["template"]].kind
+            parsed = [row["reading"] for row in rows if row["reading"] is not None]
+            assert all(ev.reading_accepted(reading, kind) for reading in parsed)
+            assert not [row for row in rows if ev.row_faults(row, model, row["template"])]
+            seen += len(parsed)
+    assert seen > 3000
 
 
 @pytest.fixture(scope="module")
@@ -2196,6 +3489,21 @@ def break_row(item_index: int, **change: Any) -> Callable[[dict], dict]:
     return apply
 
 
+def first_reading(study: SimpleNamespace, change: Callable[[dict], Any]) -> Callable[[dict], dict]:
+    """Pass the stored reading of the first eligible statement through ``change``. The row
+    keeps its status, its fallback flag and everything else, so the reading alone is at fault."""
+
+    def apply(row: dict) -> dict:
+        if row["item_id"] != first_id(study):
+            return row
+        assert row["status"] == "ok" and isinstance(row["reading"], dict)
+        return row | {"reading": change(row["reading"])}
+
+    return apply
+
+
+NOT_ACCEPTED = "1 rows with a stored reading that the harness's parser does not accept"
+"""The fault of a stored reading that ``read.parse_reading`` would not have let through."""
 REFUSED_RUNS: dict[str, tuple[Callable[[SimpleNamespace], Any], str]] = {
     "a partial run": (
         lambda s: manifest_with(s, LLAMA, "e3-a", complete=False),
@@ -2500,6 +3808,100 @@ REFUSED_RUNS: dict[str, tuple[Callable[[SimpleNamespace], Any], str]] = {
         ),
         "deepseek-v3 e3-a: the plan holds runs under several templates, or one the harness lacks",
     ),
+    # stored readings that the harness's own parser rejects: no run of this harness holds one,
+    # and the hash of the readings is the one in the manifest
+    "a stored probability above one": (
+        lambda s: rewritten(
+            s, DEEPSEEK, "e3-a", first_reading(s, lambda r: r | {"p_by_horizon_a": 1.7})
+        ),
+        f"e3-a: {NOT_ACCEPTED}",
+    ),
+    "a stored probability that is text": (
+        lambda s: rewritten(
+            s, DEEPSEEK, "e3-a", first_reading(s, lambda r: r | {"p_by_horizon_b": "0.4"})
+        ),
+        f"e3-a: {NOT_ACCEPTED}",
+    ),
+    "a stored probability that is no number": (
+        lambda s: rewritten(
+            s, DEEPSEEK, "e3-a", first_reading(s, lambda r: r | {"p_by_horizon_a": float("nan")})
+        ),
+        f"e3-a: {NOT_ACCEPTED}",
+    ),
+    "stored quantiles that decrease": (
+        lambda s: rewritten(
+            s,
+            DEEPSEEK,
+            "e3-a",
+            first_reading(
+                s,
+                lambda r: (
+                    r
+                    | {
+                        "days_to_recovery": dict(
+                            zip(P.QUANTILE_KEYS, (50, 40, 30, 20, 10), strict=True)
+                        )
+                    }
+                ),
+            ),
+        ),
+        f"e3-a: {NOT_ACCEPTED}",
+    ),
+    "a stored reading without its median": (
+        lambda s: rewritten(
+            s,
+            DEEPSEEK,
+            "e3-a",
+            first_reading(
+                s,
+                lambda r: (
+                    r
+                    | {
+                        "days_to_recovery": {
+                            k: v for k, v in r["days_to_recovery"].items() if k != "q50"
+                        }
+                    }
+                ),
+            ),
+        ),
+        f"e3-a: {NOT_ACCEPTED}",
+    ),
+    "a stored reading inside a list": (
+        lambda s: rewritten(s, DEEPSEEK, "e3-a", first_reading(s, lambda r: [r])),
+        f"e3-a: {NOT_ACCEPTED}",
+    ),
+    "a stored literal interval that ends before it starts": (
+        lambda s: rewritten(
+            s,
+            DEEPSEEK,
+            "e3-c",
+            first_reading(
+                s, lambda r: r | {"interval": {"start": "2026-03-01", "end": "2026-02-01"}}
+            ),
+        ),
+        f"e3-c: {NOT_ACCEPTED}",
+    ),
+    "a stored literal interval on a day that does not exist": (
+        lambda s: rewritten(
+            s,
+            DEEPSEEK,
+            "e3-c",
+            first_reading(
+                s, lambda r: r | {"interval": {"start": "2026-02-30", "end": "2026-03-31"}}
+            ),
+        ),
+        f"e3-c: {NOT_ACCEPTED}",
+    ),
+    "a stored literal interval that is a number": (
+        lambda s: rewritten(s, DEEPSEEK, "e3-c", first_reading(s, lambda r: r | {"interval": 7})),
+        f"e3-c: {NOT_ACCEPTED}",
+    ),
+    "a stored statement type outside the five": (
+        lambda s: rewritten(
+            s, DEEPSEEK, "e3-c", first_reading(s, lambda r: r | {"statement_type": "restock"})
+        ),
+        f"e3-c: {NOT_ACCEPTED}",
+    ),
 }
 
 
@@ -2751,6 +4153,48 @@ def test_a_stop_inside_the_rules_withholds_its_message(
     assert not [w for w in recwarn if secret in str(w.message)]
 
 
+def test_a_stop_in_the_texts_of_the_results_is_a_refusal_that_leaves_no_file(
+    study: SimpleNamespace,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+    base: SimpleNamespace,
+) -> None:
+    """Once the sealed rows are in memory every stop is one sentence and nothing is written:
+    also a stop in putting the results into the text of the result file, of the table or of the
+    printout, and a text that cannot be written as UTF-8. Both texts are made before either
+    file exists. The evaluation itself is replaced by the results of the untouched study, so
+    that the stops are those of the texts alone."""
+    parts = ("items", "probe", "item_sets", "family", "secondaries", "losses")
+    held = {key: base.report[key] for key in (*parts, "where_the_plan_is_silent")}
+    held["not_computed_here"] = base.report["not_computed_here"]
+    monkeypatch.setattr(ev, "evaluate", lambda *args, **kwargs: dict(held))
+    secret = "recovered on 2024-05-01"
+
+    def stop(*args: Any, **kwargs: Any) -> None:
+        raise KeyError(secret)
+
+    for name in ("report_text", "markdown", "summary_lines"):
+        with pytest.MonkeyPatch.context() as patch:
+            patch.setattr(ev, name, stop)
+            why = refused(study, tmp_path, capsys)  # nothing printed, no file in the folder
+        assert why == (
+            "refused: the evaluation stopped on the sealed rows (KeyError); the message is "
+            "withheld because it may quote a sealed value"
+        )
+    # a character that no file can hold (a byte that was no text reaches a program as one)
+    real = {name: getattr(ev, name) for name in ("report_text", "markdown")}
+    for name, text in real.items():
+        with pytest.MonkeyPatch.context() as patch:
+            patch.setattr(ev, name, lambda report, text=text: text(report) + "\udce9")
+            why = refused(study, tmp_path, capsys)
+        assert "the evaluation stopped on the sealed rows (UnicodeEncodeError)" in why
+    # without a stop the same run writes the two files of the untouched study
+    report, table, printed = confirm(study, tmp_path, capsys)
+    assert report["family"] == base.report["family"] and table == base.table
+    assert printed.splitlines()[:-1] == base.printed.splitlines()[:-1]
+
+
 def test_a_malformed_declaration_is_refused(
     study: SimpleNamespace,
     tmp_path: Path,
@@ -2760,6 +4204,17 @@ def test_a_malformed_declaration_is_refused(
     for value in ("gemma-3-27b=slow", LLAMA, f"{LLAMA}=", f"{LLAMA}= "):
         why = refused(study, tmp_path, capsys, "--not-evaluable", value)
         assert "--not-evaluable takes MODEL=REASON with a primary model" in why
+    # the reason is written into the result file and the table: it must be printable text on
+    # one line. A byte of the command line that was no text reaches the program as a lone
+    # surrogate, which no file can hold; that is refused here, before anything is read
+    assert b"\xe9".decode("utf-8", "surrogateescape") == "\udce9"
+    for reason in ("its route \udce9 was withdrawn", "withdrawn\non 20 October", "with\tdrawn"):
+        why = refused(study, tmp_path, capsys, "--not-evaluable", f"{DEEPSEEK}={reason}")
+        assert why == "refused: --not-evaluable takes a REASON of printable text, on one line"
+    reason = "la route a été retirée (経路の撤回) on 2026-10-20"  # any script is text
+    assert ev.skipped_models([f"{LLAMA}={reason}"]) == {
+        LLAMA: f"declared on the command line: {reason}"
+    }
     why = refused(study, tmp_path, capsys, "--by-form")
     assert "unrecognized arguments: --by-form" in why
     with pytest.raises(SystemExit) as stop:
@@ -2863,6 +4318,13 @@ def test_result_file_holds_the_registered_record(
         (h, m) for m in rd.PRIMARIES for h in ("H1", "H2", "H3")
     ]
     assert len(report["not_computed_here"]) == len(ev.NOT_COMPUTED_HERE) > 5
+    assert ev.NOT_COMPUTED_HERE[-1] == "E2, E5 and E7"
+    assert not [item for item in report["not_computed_here"] if "E6" in item]
+    # the three sensitivity analyses of the recovery rule that PLAN section 6, "Evaluator",
+    # leaves to secondary scorers, in one item
+    (recovery,) = [item for item in report["not_computed_here"] if "recovery rule" in item]
+    for analysis in ("the BL definition", "leaving the list", "the Date Discontinued cell"):
+        assert analysis in recovery
 
 
 def test_a_planted_effect_is_found_and_a_null_is_not(
@@ -2898,17 +4360,20 @@ def test_a_planted_effect_is_found_and_a_null_is_not(
     assert null["ci95"][0] < 0 < null["ci95"][1]
     assert null["both_sides_parsed"]["statements"] == len(scoreable)
     assert null["both_sides_parsed"]["delta"] == pytest.approx(null["delta"], abs=1e-6)
-    # the registered p-value is the one-sided percentile one, counted by hand on the draws
+    # the registered p-value is the one-sided one of the source in force; the percentile one
+    # of the draft stands beside it with its interval, counted here by hand on the draws
+    assert null["p"] == null["p_values"][SOURCE]["one_sided"]
     pair = np.column_stack([loss["a"], loss["b"]])
     draws = P.bootstrap_means(pair, y.loc[scoreable, "episode"])
     by_hand = (1 + int((draws[:, 0] - draws[:, 1] <= 0).sum())) / 10_001
-    assert null["p"] == pytest.approx(by_hand, abs=1e-6)
-    assert null["ci95"] == pytest.approx(
+    assert null["p_values"]["percentile"]["one_sided"] == pytest.approx(by_hand, abs=1e-6)
+    assert null["percentile"]["ci95"] == pytest.approx(
         list(np.quantile(draws[:, 0] - draws[:, 1], [0.025, 0.975])), abs=1e-6
     )
+    assert (null["ci95"] == null["percentile"]["ci95"]) is (not BY_TEST)
 
 
-def test_h2_reads_equivalence_from_the_ninety_percent_interval(
+def test_h2_carries_its_equivalence_reading_and_it_agrees_with_the_interval_on_the_synthetic_study(
     study: SimpleNamespace, base: SimpleNamespace
 ) -> None:
     same = entry_of(base.report, "H2", LLAMA)
@@ -2920,12 +4385,26 @@ def test_h2_reads_equivalence_from_the_ninety_percent_interval(
     # the first primary's literal reading is the rule's: where it parsed, the two sides agree
     assert same["both_sides_parsed"]["delta"] == 0 and same["both_sides_parsed"]["p"] == 1.0
     assert same["holds"] is False and abs(same["delta"]) < 0.001
-    assert same["equivalence"] == {"margin": 0.02, "ci90": same["ci90"], "declared": True}
+    found = same["equivalence"]
+    assert (found["margin"], found["ci90"], found["declared"]) == (0.02, same["ci90"], True)
+    assert found["interval_method"] == same["interval_method"] == ev.interval_method(SOURCE)
     other = entry_of(base.report, "H2", DEEPSEEK)
-    assert other["delta"] != 0 and other["p"] == other["p_values"]["percentile"]["two_sided"]
-    low, high = other["ci90"]
-    assert other["equivalence"]["declared"] is (low > -0.02 and high < 0.02)
-    assert "H2 equivalence, llama-3.3-70b: declared (90% interval" in base.table
+    assert other["delta"] != 0 and other["p"] == other["p_values"][SOURCE]["two_sided"]
+    for entry in (same, other):
+        low, high = entry["ci90"]
+        # the verdict and the interval agree on these data; under the registered test that is
+        # not the rule, which reads the two p-values at the margin (the two can part)
+        assert entry["equivalence"]["declared"] is (low > -0.02 and high < 0.02)
+        # read from the two p-values at the margin under the interval of the registered test
+        # (0.05 is the level at which a 90% interval is cut), from the two ends otherwise
+        keys = ["margin", "ci90", "interval_method"]
+        if BY_TEST:
+            keys += ["p_smaller_at_the_margin", "p_larger_at_minus_the_margin", "level"]
+            assert entry["equivalence"]["level"] == 0.05
+        assert list(entry["equivalence"]) == [*keys, "declared"]
+        assert "at_the_margin" not in entry
+    how = RULE if BY_TEST else "(90% interval"
+    assert f"H2 equivalence, llama-3.3-70b: declared {how}" in base.table
     for entry in base.report["family"]:
         assert ("equivalence" in entry) is (entry["hypothesis"] == "H2")
 
@@ -2950,6 +4429,424 @@ def test_equivalence_needs_the_interval_strictly_inside_the_margin(
     assert at(-0.03, 0.0)["declared"] is False and at(0.0, 0.03)["declared"] is False
 
 
+def test_h2_under_the_registered_test_reads_the_p_values_at_the_margin(
+    study: SimpleNamespace, base: SimpleNamespace, opened: SimpleNamespace
+) -> None:
+    """The equivalence reading of the result file, worked out again from the two losses: the
+    90% interval of the registered test, and the p-value for a smaller contrast at 0.02 and for
+    a larger one at -0.02, on the registered draws and sign patterns."""
+    if not BY_TEST:
+        pytest.skip("the registered source has percentile intervals")
+    y = truth(study)
+    scoreable = y.dropna(subset=["y_a", "y_b"]).index
+    clusters = list(y.loc[scoreable, "episode"])
+    for model in rd.PRIMARIES:
+        entry = entry_of(base.report, "H2", model)
+        pair = [opened.study.predictions[name] for name in ("rules_plus_slip", f"{model}:c")]
+        d = (brier(pair[0], y) - brier(pair[1], y)).loc[scoreable].to_numpy()
+        sums, sizes, taken = summed(d, clusters, ev.DRAWS)
+        found = entry["equivalence"]
+        assert found["ci90"] == entry["ci90"]
+        assert entry["ci90"] == pytest.approx(REAL_INTERVAL(sums, sizes, taken, 0.90), abs=1e-6)
+        assert entry["ci95"] == pytest.approx(REAL_INTERVAL(sums, sizes, taken, 0.95), abs=1e-6)
+        smaller = ev.larger_of_at(sums, sizes, taken, 0.02)["one_sided_lower"]
+        larger = ev.larger_of_at(sums, sizes, taken, -0.02)["one_sided"]
+        assert found["p_smaller_at_the_margin"] == pytest.approx(smaller, abs=1e-6)
+        assert found["p_larger_at_minus_the_margin"] == pytest.approx(larger, abs=1e-6)
+        assert found["declared"] is bool(smaller < 0.05 and larger < 0.05) is True
+        # on the other side of the estimate the same p-values are far from any level
+        assert ev.larger_of_at(sums, sizes, taken, 0.02)["one_sided"] > 0.9
+        assert ev.larger_of_at(sums, sizes, taken, -0.02)["one_sided_lower"] > 0.9
+        # the table leads with the rule and its two p-values; the interval stands beside it
+        assert (
+            f"H2 equivalence, {model}: declared {RULE}{larger:.4f} at -0.02 and {smaller:.4f} "
+            f"at 0.02 {BESIDE}{ev._interval(entry['ci90'])}). The two losses differ on "
+        ) in base.table
+        # H2 on the month-and-year form is a secondary: described, not read for equivalence
+        short = base.report["secondaries"]["h2_on_the_month_and_year_form"][f"H2 {model}"]
+        assert short["interval_method"] == "percentile" and "equivalence" not in short
+
+
+def test_h2_carries_the_counts_of_statements_and_episodes_that_differ(
+    study: SimpleNamespace, base: SimpleNamespace, opened: SimpleNamespace
+) -> None:
+    y = truth(study)
+    scoreable = y.dropna(subset=["y_a", "y_b"]).index
+    for model in rd.PRIMARIES:
+        entry = entry_of(base.report, "H2", model)
+        pair = [opened.study.predictions[name] for name in ("rules_plus_slip", f"{model}:c")]
+        d = (brier(pair[0], y) - brier(pair[1], y)).loc[scoreable]
+        want = counts_apart(d, y["episode"])
+        assert entry["losses_differ"] == want and 0 < want["statements"] < len(scoreable)
+        assert want["episodes_with_a_positive_sum"] and want["episodes_with_a_negative_sum"]
+        # the table gives the three kinds of episode, which add up to those that differ
+        assert sum(list(want.values())[2:]) == want["episodes"]
+        assert counts_line(want) in base.table
+    # the first primary reads as the rule does: its losses differ only where its answer failed
+    failed = [i for i in scoreable if fails(LLAMA, "c", i) == 2]
+    assert entry_of(base.report, "H2", LLAMA)["losses_differ"]["statements"] <= len(failed)
+    for entry in base.report["family"]:
+        assert ("losses_differ" in entry) is (entry["hypothesis"] == "H2")
+    assert base.table.count("The two losses differ on ") == 2
+
+
+def test_the_result_file_says_how_every_interval_was_made(base: SimpleNamespace) -> None:
+    report, method = base.report, ev.interval_method(SOURCE)
+    assert method == (ev.TEST_INTERVAL if SOURCE == LARGER else "percentile")
+    made = report["registered"]["intervals"]
+    assert made["of_the_confirmatory_contrasts_and_delta_gbm"] == method
+    # the key names the evaluator, whose file it is true of: the record is also written into
+    # the result files of other scorers, where other contrasts carry the interval of the test.
+    # And it names contrasts and single predictors, not every other interval: the bootstrap-t
+    # intervals under ``studentised`` are neither percentile intervals nor those of the test
+    assert made["of_the_other_contrasts_and_single_predictors_of_the_evaluator"] == "percentile"
+    assert not [key for key in made if "everything" in key or "every_other_interval" in key]
+    for entry in (*report["family"], *report["probe"].values()):
+        by_t = entry["studentised"]["ci95"]  # null when a draw has no finite statistic
+        assert by_t is None or by_t not in (entry["ci95"], entry["percentile"]["ci95"])
+    assert sum(entry["studentised"]["ci95"] is not None for entry in report["family"]) >= 4
+    assert f"Intervals of the six contrasts and of Delta_GBM: {method}. H3" in base.table
+    assert f"; intervals of the six contrasts and of Delta_GBM: {method}; H3" in base.printed
+    for entry in report["family"]:
+        assert entry["interval_method"] == method
+        # the sensitivity analyses beside every confirmatory p-value: each procedure on its
+        # own, and the percentile intervals of the draft
+        assert list(entry["p_values"]) == list(ev.PROCEDURES)
+        assert all(list(entry["p_values"][name]) == list(ev.SIDES) for name in ev.PROCEDURES)
+        assert list(entry["percentile"]) == ["ci95", "ci90"]
+        assert entry["percentile"]["ci95"][0] < entry["delta"] < entry["percentile"]["ci95"][1]
+        assert ("ci90" in entry) is (not BY_TEST or entry["hypothesis"] == "H2")
+        assert (entry["ci95"] == entry["percentile"]["ci95"]) is (not BY_TEST)
+        larger = entry["p_values"][LARGER]
+        for side in ("one_sided", "one_sided_lower"):
+            parts = [entry["p_values"][name][side] for name in ("studentised", "sign_flip_t")]
+            assert larger[side] == max(parts)
+        assert entry["both_sides_parsed"]["interval_method"] == "percentile"
+        assert "at_the_margin" not in entry
+        for beside in entry.get("beside", {}).values():
+            assert beside["interval_method"] == method
+        if "equivalence" in entry:
+            assert entry["equivalence"]["interval_method"] == method
+    second = report["secondaries"]
+    for found in second["delta_gbm"].values():
+        assert found["interval_method"] == method and len(found["ci95"]) == 2
+    # every other contrast is described by a percentile interval, and says so
+    rest = {key: value for key, value in second.items() if key != "delta_gbm"}
+    others = [v for v in walk(rest) if isinstance(v, dict) and "delta" in v and "ci95" in v]
+    assert len(others) > 30 and {v["interval_method"] for v in others} == {"percentile"}
+    assert {probe["interval_method"] for probe in report["probe"].values()} == {"percentile"}
+    said = " ".join(report["where_the_plan_is_silent"])
+    assert "unbounded and written as null" in said and "strictly inside the margin" in said
+    assert report["where_the_plan_is_silent"] == list(ev.WHERE_THE_PLAN_IS_SILENT)
+    # no end is missing on this study, so neither text carries the line on unbounded ends
+    assert "unbounded" not in base.table + base.printed
+    # the intervals that carry no ``interval_method`` are those of single predictors, which the
+    # list names: their losses and their calibration in the large
+    single = [v for v in walk(report["losses"]) if isinstance(v, dict) and "ci95" in v]
+    assert len(single) > 30 and not [v for v in single if "interval_method" in v]
+
+
+DECISIONS = (
+    "the largest finite absolute flipped statistic",
+    "a symmetric two-sided p-value",
+    "carry percentile intervals",
+    "carry no such field",
+    "unbounded and written as null",
+    "equivalence is declared beside an end that is null",
+    "needs both ends strictly inside the margin",
+    "need not fall steadily",
+    "a tie between the two comparators of H3",
+    "an episode and a company before the sealed file is read",
+    "an unbounded lower end does not lie above zero",
+    "for both predictors at once",
+    "ten runs of equal length",
+    "definition A is one of the outcome variants",
+)
+"""A phrase of every decision in ``evaluate.WHERE_THE_PLAN_IS_SILENT``."""
+STATED_BY_THE_PLAN = (
+    "fewer than two episodes",  # section 6, "Confirmatory runs", and E4
+    "plus or minus infinity",  # "Test statistic"
+    "enumerate every sign pattern",  # "Resampling"
+    "the probe test takes its p-value",  # E4, "Test"
+    "a contrast of exactly zero",  # "Sensitivity": a draw that sums to zero, with its tolerance
+    "differences without any variance",  # "Intervals"
+    "the rule on two p-values",  # "Intervals", the equivalence rule
+    "further from zero than the rounding tolerance",  # "Sensitivity"
+    "calibrator's no-date table",  # section 4
+    "at six decimals",  # H3, the selection
+    "every primary is declared not evaluable",  # "Confirmatory runs"
+    "held to the hashes of the freeze",  # "Evaluator"
+)
+"""A phrase of every sentence the list held before the plan stated the decision itself."""
+
+
+def test_the_list_of_decisions_holds_what_the_plan_does_not_say() -> None:
+    """``where_the_plan_is_silent`` in every result file. Each decision is looked for by a
+    phrase, in exactly one sentence, and every sentence holds one of the phrases, so that no
+    sentence can be dropped or added unseen. What the plan words itself is not repeated, and
+    two details are as the code and the plan have them: the slack of the sign-flip tests is
+    measured on the largest finite statistic, and no sentence says that every other interval
+    is a percentile interval (the bootstrap-t intervals under ``studentised`` are not)."""
+    held = ev.WHERE_THE_PLAN_IS_SILENT
+    for words in DECISIONS:
+        assert sum(words in sentence for sentence in held) == 1, words
+    assert all(any(words in sentence for words in DECISIONS) for sentence in held)
+    said = " ".join(held)
+    assert not [words for words in STATED_BY_THE_PLAN if words in said]
+    assert "the largest absolute flipped statistic" not in said
+    assert "every other interval is a percentile interval" not in said
+    assert "equal-tailed and symmetric intervals under studentised" in said
+
+
+COMMITTED_FAMILY = [
+    {"ci95": [0.42466, 0.503619], "ci90": [0.430223, 0.49696], "p": 0.0001, "p_holm": 0.0006},
+    {"ci95": [-0.000339, 8.6e-05], "ci90": [-0.000294, 5.8e-05], "p": 0.324568, "p_holm": 1.0},
+    {"ci95": [0.182611, 0.205406], "ci90": [0.184501, 0.20382], "p": 0.0002, "p_holm": 0.001},
+    {"ci95": [-0.005356, 0.008157], "ci90": [-0.004054, 0.00716], "p": 0.314369, "p_holm": 1.0},
+    {"ci95": [-0.002916, 0.002285], "ci90": [-0.002506, 0.001901], "p": 0.874113, "p_holm": 1.0},
+    {"ci95": [-0.002879, 0.008996], "ci90": [-0.002045, 0.007995], "p": 0.338766, "p_holm": 1.0},
+]
+"""The six tests of the synthetic study as ``evaluate.py`` at sha256 f7f3b4df6f1ab58a wrote
+them, when ``percentile`` was its p-value source and its only kind of interval. Beside them:
+both equivalence readings declared; the first H3 held and carried the flag, the second did not;
+and Delta_GBM had the intervals below, with p = 0.0002 for both primaries."""
+COMMITTED_DELTA_GBM = {LLAMA: [0.195922, 0.239466], DEEPSEEK: [0.012487, 0.040572]}
+COMMITTED_PROBE = {LLAMA: [-31.383208, -22.187679], DEEPSEEK: [-29.9206, -20.70329]}
+
+
+def test_under_the_percentile_source_the_results_are_those_of_before(
+    study: SimpleNamespace,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """With ``percentile`` as the registered source every interval, the equivalence reading and
+    the flag beside H3 are what the evaluator gave before it knew another kind of interval, and
+    no value but zero is tested."""
+
+    def never(*args: Any, **kwargs: Any) -> None:
+        raise AssertionError("a value was tested under the percentile source")
+
+    monkeypatch.setattr(ev, "P_VALUE_SOURCE", "percentile")
+    monkeypatch.setattr(ev, "larger_of_interval", never)
+    monkeypatch.setattr(ev, "larger_of_at", never)
+    report, table, printed = confirm(study, tmp_path, capsys)
+    assert report["registered"]["p_value_source"] == "percentile"
+    for entry, want in zip(report["family"], COMMITTED_FAMILY, strict=True):
+        for key, value in want.items():
+            assert entry[key] == pytest.approx(value, abs=2e-6), (entry["hypothesis"], key)
+        assert entry["percentile"] == {"ci95": entry["ci95"], "ci90": entry["ci90"]}
+        assert entry["interval_method"] == "percentile"
+        assert (
+            entry["p"]
+            == entry["p_values"]["percentile"]["one_sided" if entry["sides"] == 1 else "two_sided"]
+        )
+    assert [entry["holds"] for entry in report["family"]] == [
+        True,
+        False,
+        True,
+        False,
+        False,
+        False,
+    ]
+    for model in rd.PRIMARIES:
+        h2, h3 = entry_of(report, "H2", model), entry_of(report, "H3", model)
+        assert h2["equivalence"] == {
+            "margin": 0.02,
+            "ci90": h2["ci90"],
+            "interval_method": "percentile",
+            "declared": True,
+        }
+        assert h3["beats_both_comparators"] is (model == LLAMA)
+        assert h3["beside"]["base_rate"]["ci95"] == h3["ci95"]
+        other = h3["beside"]["gbm_structured"]
+        assert other["ci95"] == pytest.approx(COMMITTED_DELTA_GBM[model], abs=2e-6)
+        assert other["p"] == pytest.approx(0.0002, abs=2e-6) and other["ci95"][0] > 0
+        assert report["secondaries"]["delta_gbm"][model]["ci95"] == other["ci95"]
+        probe = report["probe"][model]
+        assert probe["ci95"] == pytest.approx(COMMITTED_PROBE[model], abs=2e-6)
+        assert probe["p"] == 1.0 and probe["beats_base_rate"] is False
+    assert (
+        "Registered p-values: percentile. Intervals of the six contrasts and of Delta_GBM: percentile."
+        in table
+    )
+    assert (
+        "H2 equivalence, llama-3.3-70b: declared (90% interval [-0.0003, 0.0001], margin 0.02)."
+        in table
+    )
+    assert (
+        "H2 equivalence, deepseek-v3: declared (90% interval [-0.0025, 0.0019], margin 0.02)."
+        in table
+    )
+    assert "delta 0.2176, 95% interval [0.1959, 0.2395]; beats both comparators: yes" in table
+    assert "delta 0.0263, 95% interval [0.0125, 0.0406]; beats both comparators: no" in table
+    assert "| 0.4636 | [0.4247, 0.5036] | 0.0001 | 0.0006 |" in table
+    assert "delta 0.0030 [-0.0029, 0.0090] p 0.3388 Holm 1.0000: not rejected" in printed
+
+
+def test_the_flag_and_the_table_read_the_interval_of_the_registered_test(
+    study: SimpleNamespace, opened: SimpleNamespace, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """The six contrasts and the two contrasts beside each H3 are searched, at 95%, and H2 at
+    90% as well: nothing else is. With the search replaced by a fixed answer, the flag beside H3
+    follows the lower end it gives for Delta_GBM, an end that is not there included; under the
+    percentile source the search is not made and the flag follows the percentile interval. The
+    only values tested outside the search are the margin of H2 and minus that margin."""
+    rows = ev.typed_outcomes(study.filled.reset_index(drop=True))
+    asked: list[float] = []
+    tested: list[float] = []
+    real_at = ev.larger_of_at
+
+    def at(sums: Any, sizes: Any, taken: Any, null: float, *more: Any) -> dict[str, float]:
+        tested.append(null)
+        return real_at(sums, sizes, taken, null, *more)
+
+    monkeypatch.setattr(ev, "larger_of_at", at)
+
+    def fixed(low: float | None) -> Callable[..., list[float | None]]:
+        def interval(sums: Any, sizes: Any, taken: Any, coverage: float, *more: Any) -> list:
+            asked.append(coverage)
+            assert more == (500, ev.SEED) and taken.shape == (500, len(sizes))
+            return [low, 0.9]
+
+        return interval
+
+    for low, flag in ((0.001, True), (0.0, False), (-0.2, False), (None, False)):
+        asked.clear()
+        tested.clear()
+        monkeypatch.setattr(ev, "larger_of_interval", fixed(low))
+        report = ev.evaluate(opened.study, rows, {}, LARGER, draws=500)
+        # two primaries: H1, H2 twice over, H3, and two contrasts beside H3
+        assert sorted(asked) == [0.90] * 2 + [0.95] * 10
+        assert sorted(tested) == [-0.02, -0.02, 0.02, 0.02] and ev.H2_MARGIN == 0.02
+        h3 = entry_of(report, "H3", LLAMA)
+        assert h3["holds"] is True and h3["delta"] > 0 and h3["ci95"] == [low, 0.9]
+        other = h3["beside"]["gbm_structured"]
+        assert other["ci95"] == [low, 0.9] and other["interval_method"] == ev.TEST_INTERVAL
+        assert report["secondaries"]["delta_gbm"][LLAMA]["ci95"] == [low, 0.9]
+        assert h3["beats_both_comparators"] is flag
+        # the percentile interval of the same contrast lies above zero, and is not what is read
+        apart = ev.scored(rows, opened.study.predictions, "gbm_structured", h3["tested"], draws=500)
+        assert apart["interval_method"] == "percentile" and apart["ci95"][0] > 0
+        assert ("also lies above zero" in h3["reading"]) is flag
+        for entry in report["family"]:
+            assert entry["ci95"] == [low, 0.9]
+            assert entry.get("ci90") == ([low, 0.9] if entry["hypothesis"] == "H2" else None)
+        # every other interval is a percentile interval of its own draws
+        short = report["secondaries"]["h3_with_each_condition"][h3["tested"]]
+        assert short["ci95"] == h3["percentile"]["ci95"] and short["p"] == h3["p"]
+        full = {"registered": record_under(LARGER), "h3": {"comparator": "base_rate"}, **report}
+        table, printed = ev.markdown(full), "\n".join(ev.summary_lines(full))
+        shown = "[-inf, 0.9000]" if low is None else f"[{low:.4f}, 0.9000]"
+        assert table.count(f"| {shown} |") == 6 and printed.count(shown) == 6 + 2
+        assert f"95% interval {shown}; beats both comparators: {'yes' if flag else 'no'}" in table
+        assert table.count(f"{BESIDE}{shown}).") == 2
+        # one line on what an end that is not there means, when one is shown and only then
+        note = "An end shown as -inf or inf is unbounded: "
+        assert table.count(note) == printed.count(note) == (1 if low is None else 0)
+        written = json.loads(ev.report_text(full))
+        assert entry_of(written, "H3", LLAMA)["beside"]["gbm_structured"]["ci95"] == [low, 0.9]
+    # the equivalence reading is the test at the margin, whatever interval is shown beside it
+    h2 = entry_of(report, "H2", LLAMA)
+    assert h2["equivalence"]["ci90"] == [None, 0.9] and h2["equivalence"]["declared"] is True
+    assert h2["equivalence"]["p_smaller_at_the_margin"] < 0.05
+    # the table gives each of the two p-values with the value it was tested at
+    found = entry_of(written, "H2", LLAMA)["equivalence"]
+    found |= {"p_smaller_at_the_margin": 0.0312, "p_larger_at_minus_the_margin": 0.0011}
+    line = f"declared {RULE}0.0011 at -0.02 and 0.0312 at 0.02 {BESIDE}[-inf, 0.9000])."
+    assert f"H2 equivalence, {LLAMA}: {line} The two losses differ on " in ev.markdown(written)
+    # a verdict the other way is worded by the rule as well, with the same two p-values
+    found["declared"] = False
+    assert f"H2 equivalence, {LLAMA}: not {line} The two " in ev.markdown(written)
+    # the level named is the one the reading carries, at two decimals
+    found["level"] = 0.1
+    other_level = line.replace("below 0.05 at the margin", "below 0.10 at the margin")
+    assert other_level != line and f"{LLAMA}: not {other_level} The two " in ev.markdown(written)
+    found["level"] = 0.05
+    # the line on unbounded ends follows what each text shows: the 95% intervals of the six
+    # tests and of the contrast beside H3 in both, the 90% interval of H2 in the table alone
+    note = "An end shown as -inf or inf is unbounded: "
+    for entry in written["family"]:
+        entry["ci95"] = [0.0, 0.9]
+        if "equivalence" in entry:
+            entry["equivalence"]["ci90"] = [0.0, 0.9]
+        for beside in entry.get("beside", {}).values():
+            beside["ci95"] = [0.0, 0.9]
+    assert note not in ev.markdown(written) + "\n".join(ev.summary_lines(written))
+    other = entry_of(written, "H3", DEEPSEEK)["beside"]["gbm_structured"]
+    other["ci95"] = [None, 0.9]
+    assert note in ev.markdown(written) and note in "\n".join(ev.summary_lines(written))
+    other["ci95"], found["ci90"] = [0.0, 0.9], [0.0, None]
+    assert note in ev.markdown(written) and note not in "\n".join(ev.summary_lines(written))
+    found["ci90"], first = [0.0, 0.9], entry_of(written, "H1", LLAMA)
+    assert note not in ev.markdown(written) + "\n".join(ev.summary_lines(written))
+    first["ci95"] = [0.0, None]  # one of the six tests alone
+    assert ev.markdown(written).count(note) == 1 == "\n".join(ev.summary_lines(written)).count(note)
+
+    def never(*args: Any, **kwargs: Any) -> None:
+        raise AssertionError("an interval was searched under the percentile source")
+
+    monkeypatch.setattr(ev, "larger_of_interval", never)
+    report = ev.evaluate(opened.study, rows, {}, "percentile", draws=500)
+    h3 = entry_of(report, "H3", LLAMA)
+    other = h3["beside"]["gbm_structured"]
+    assert other["interval_method"] == "percentile" and other["ci95"][0] > 0
+    assert h3["beats_both_comparators"] is True and h3["ci95"] == h3["percentile"]["ci95"]
+
+
+def test_with_few_episodes_the_intervals_of_the_registered_test_have_no_ends(
+    study: SimpleNamespace, opened: SimpleNamespace
+) -> None:
+    """Four episodes: the sign patterns cannot give a p-value below 1/16, so no value of any
+    contrast is rejected. Every confirmatory interval is unbounded on both sides, nothing is
+    declared equivalent and no flag is set, and the outputs are written all the same."""
+    rows = ev.typed_outcomes(study.filled.reset_index(drop=True))
+    four = rows.assign(episode_id=[f"g{k % 4}" for k in range(len(rows))])
+    report = ev.evaluate(opened.study, four, {}, LARGER, draws=300)
+    for entry in report["family"]:
+        assert entry["evaluable"] and entry["episodes"] == 4 and entry["ci95"] == [None, None]
+        assert entry["p"] >= 1 / 16 and entry["holds"] is False
+        assert None not in entry["percentile"]["ci95"]
+    for model in rd.PRIMARIES:
+        found = entry_of(report, "H2", model)["equivalence"]
+        assert found["ci90"] == [None, None] and found["declared"] is False
+        h3 = entry_of(report, "H3", model)
+        assert h3["beats_both_comparators"] is False
+        assert h3["beside"]["gbm_structured"]["ci95"] == [None, None]
+    full = {"registered": record_under(LARGER), "h3": {"comparator": "base_rate"}, **report}
+    table = ev.markdown(full)
+    assert table.count("| [-inf, inf] |") == 6 and table.count(f"{BESIDE}[-inf, inf]).") == 2
+    # nothing is declared, and the whole line says so: the rule, the two p-values it read, the
+    # interval beside it and the counts
+    for model in rd.PRIMARIES:
+        entry = entry_of(report, "H2", model)
+        found = entry["equivalence"]
+        larger, smaller = found["p_larger_at_minus_the_margin"], found["p_smaller_at_the_margin"]
+        assert min(larger, smaller) >= 1 / 16
+        assert (
+            f"H2 equivalence, {model}: not declared {RULE}{larger:.4f} at -0.02 and "
+            f"{smaller:.4f} at 0.02 {BESIDE}[-inf, inf]). {counts_line(entry['losses_differ'])}"
+        ) in table.splitlines()
+    assert "n/a" not in table and "None" not in table
+    written = json.loads(ev.report_text(full))
+    assert [entry["ci95"] for entry in written["family"]] == [[None, None]] * 6
+    # the last line of the table and of the printout says what an end that is not there means
+    (note,) = ev.unbounded_note(full["registered"], [[None, None]])
+    printed = ev.summary_lines(full)
+    assert table.splitlines()[-1] == note == printed[-1]
+    assert table.count(note) == 1 and sum("[-inf, inf]" in line for line in printed) == 6 + 2
+    # no contrast in short holds a 90% interval or the percentile intervals
+    shorts = [v for v in walk(report["secondaries"]) if isinstance(v, dict) and "delta" in v]
+    assert len(shorts) > 30 and not [v for v in shorts if "ci90" in v or "percentile" in v]
+    for entry in report["family"]:
+        assert "ci90" not in entry["both_sides_parsed"]
+        assert all("ci90" not in beside for beside in entry.get("beside", {}).values())
+    # the percentile source on the same four episodes gives every interval its two ends
+    before = ev.evaluate(opened.study, four, {}, "percentile", draws=300)
+    for entry in before["family"]:
+        assert None not in entry["ci95"] and None not in entry["ci90"]
+
+
 def test_h3_compares_the_selected_condition_with_the_comparator(
     study: SimpleNamespace, base: SimpleNamespace
 ) -> None:
@@ -2970,16 +4867,18 @@ def test_h3_compares_the_selected_condition_with_the_comparator(
         assert entry["loss_tested"] == pytest.approx(
             losses[f"{model}:{best}"]["primary_brier"], abs=1e-6
         )
-        assert entry["p"] == entry["p_values"]["percentile"]["two_sided"]
+        assert entry["p"] == entry["p_values"][SOURCE]["two_sided"]
         # beside it: the same condition against both predictors that read no text, on the
         # same statements and the same draws
         assert list(entry["beside"]) == ["gbm_structured", "base_rate"]
         mine, other = entry["beside"]["base_rate"], entry["beside"]["gbm_structured"]
-        assert (mine["delta"], mine["ci95"], mine["p"]) == (
+        assert (mine["delta"], mine["ci95"], mine["p"], mine["interval_method"]) == (
             entry["delta"],
             entry["ci95"],
             entry["p"],
+            entry["interval_method"],
         )
+        assert other["interval_method"] == ev.interval_method(SOURCE)
         assert other["statements"] == entry["statements"] and other["delta"] == pytest.approx(
             losses["gbm_structured"]["primary_brier"] - entry["loss_tested"], abs=2e-6
         )
@@ -3035,17 +4934,32 @@ def test_delta_gbm_and_h3_rest_on_the_same_statements_and_draws(
         )
         draws = P.bootstrap_means(losses, clusters)
         delta, delta_gbm = draws[:, 0] - draws[:, 2], draws[:, 1] - draws[:, 2]
-        assert entry["ci95"] == pytest.approx(P.interval(delta), abs=1e-6)
-        assert entry["p"] == pytest.approx(P.p_values(delta)["two_sided"], abs=1e-6)
+        assert entry["percentile"]["ci95"] == pytest.approx(P.interval(delta), abs=1e-6)
+        assert entry["p_values"]["percentile"]["two_sided"] == pytest.approx(
+            P.p_values(delta)["two_sided"], abs=1e-6
+        )
         second = base.report["secondaries"]["delta_gbm"][model]
         assert second["statements"] == entry["statements"] == len(scoreable)
-        assert second["ci95"] == pytest.approx(P.interval(delta_gbm), abs=1e-6)
-        assert second["p"] == pytest.approx(P.p_values(delta_gbm)["two_sided"], abs=1e-6)
+        # the intervals and p-values of the source in force, from the same episode draws (and,
+        # for the interval of the registered test, the same sign patterns): worked out here
+        # from the three losses
+        sums, sizes = P.cluster_sums(losses, clusters)
+        taken = P.cluster_draws(len(sizes), ev.DRAWS, ev.SEED).astype(float)
+        for found, comparator, percentile in ((entry, 0, delta), (second, 1, delta_gbm)):
+            mine = sums[:, comparator] - sums[:, 2]
+            want = REAL_INTERVAL(mine, sizes, taken, 0.95) if BY_TEST else P.interval(percentile)
+            assert found["ci95"] == pytest.approx(want, abs=1e-6)
+            at_zero = ev.contrast(losses[:, comparator], losses[:, 2], clusters)["p_values"]
+            assert found["p"] == pytest.approx(at_zero[SOURCE]["two_sided"], abs=1e-6)
+            assert found["interval_method"] == ev.interval_method(SOURCE)
         # paired draw by draw: Delta_GBM minus Delta is the structured model's loss minus the
         # base rate's in every draw, so its interval is that of the model-free contrast
         gap = draws[:, 1] - draws[:, 0]
         assert np.allclose(delta_gbm - delta, gap)
-        other = ev.contrast(losses[:, 1], losses[:, 2], clusters, seed=ev.SEED + 1)
+        other = ev.contrast(
+            losses[:, 1], losses[:, 2], clusters, seed=ev.SEED + 1, source=SOURCE, levels=["ci95"]
+        )
+        assert other["interval_method"] == second["interval_method"]
         assert other["ci95"] != pytest.approx(second["ci95"], abs=1e-6)
 
 
@@ -3142,7 +5056,7 @@ def test_holm_runs_over_the_six_registered_p_values(base: SimpleNamespace) -> No
     for entry in family:
         side = "one_sided" if entry["hypothesis"] == "H1" else "two_sided"
         assert entry["sides"] == (1 if entry["hypothesis"] == "H1" else 2)
-        assert entry["p"] == entry["p_values"]["percentile"][side]
+        assert entry["p"] == entry["p_values"][SOURCE][side]
     order = sorted(range(6), key=lambda k: p[k])
     running, want = 0.0, [0.0] * 6
     for rank, k in enumerate(order):
@@ -3463,7 +5377,10 @@ def test_the_probe_is_scored_against_the_base_rate(
         assert record["statements"] == len(kept) and record["alpha"] == 0.05
         # a median of a few days is far worse than the base rate: no switch
         assert record["delta"] < 0 and record["p"] > 0.99 and record["beats_base_rate"] is False
-        assert record["p"] == record["p_values"]["percentile"]["one_sided"]
+        assert record["p"] == record["p_values"][SOURCE]["one_sided"]
+        # the probe is a rule on a p-value: its intervals are descriptions
+        assert record["interval_method"] == "percentile"
+        assert record["ci95"] == record["percentile"]["ci95"]
         chosen = base.report["item_sets"][model]
         assert (
             chosen["switched"] is False and chosen["items"] == ev.ALL_ITEMS and chosen["evaluable"]
@@ -3533,6 +5450,7 @@ def test_a_primary_that_beats_the_base_rate_is_evaluated_on_its_slice(
     tmp_path: Path,
     capsys: pytest.CaptureFixture[str],
     base: SimpleNamespace,
+    opened: SimpleNamespace,
 ) -> None:
     with rewritten(study, LLAMA, "e4-probe", informed(study)):
         report, table, _ = confirm(study, tmp_path, capsys)
@@ -3553,6 +5471,13 @@ def test_a_primary_that_beats_the_base_rate_is_evaluated_on_its_slice(
     assert entry_of(report, "H1", LLAMA)["loss_tested"] == pytest.approx(
         float(loss_b.loc[after.index].mean()), abs=1e-6
     )
+    # the counts beside H2 are of the statements of the test, which are fewer than before
+    pair = [opened.study.predictions[name] for name in ("rules_plus_slip", f"{LLAMA}:c")]
+    apart = counts_apart((brier(pair[0], y) - brier(pair[1], y)).loc[after.index], y["episode"])
+    assert entry_of(report, "H2", LLAMA)["losses_differ"] == apart
+    before = entry_of(base.report, "H2", LLAMA)["losses_differ"]
+    assert 0 < apart["statements"] < before["statements"]
+    assert counts_line(apart) in table and counts_line(before) not in table
     # what stands beside H3 is on the same statements: Delta_GBM, H3 with each condition and
     # the decomposition
     second = report["secondaries"]
@@ -3785,6 +5710,21 @@ def test_predictions_can_be_held_to_the_hash_of_the_freeze(
     why = refused(study, tmp_path, capsys, "--expect-baselines-sha256", "0" * 64)
     assert "the model-free predictions are not those hashed at the freeze" in why
     assert sha[:16] in why and "the sealed file" not in sealed_unread
+    # a hash given wrongly after its sixteenth character: the two are shown at the length of
+    # the one given, so that they can be told apart (sixteen characters of each are the same)
+    given = sha[:16] + ("0" if sha[16] != "0" else "1")
+    why = refused(study, tmp_path, capsys, "--expect-baselines-sha256", given)
+    assert f"their sha256 starts with {sha[:17]}, expected {given}" in why
+    why = refused(study, tmp_path, capsys, "--expect-baselines-sha256", "0" * 16)
+    assert f"their sha256 starts with {sha[:16]}, expected {'0' * 16}" in why
+    # the same for the selection file of a primary
+    model, _, chosen = study.selection_shas[0].partition("=")
+    given = chosen[:30] + ("0" if chosen[30] != "0" else "1")
+    hashes = [f"{model}={given}", study.selection_shas[1]]
+    why = refused(study, tmp_path, capsys, expect_selection_sha256=hashes)
+    assert "is not the selection file hashed at the freeze" in why
+    assert f"(its sha256 starts with {chosen[:31]}, expected {given})" in why
+    assert "the sealed file" not in sealed_unread
 
 
 def test_predictions_checked_against_the_freeze_are_recorded(

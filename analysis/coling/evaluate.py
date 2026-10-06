@@ -14,12 +14,12 @@ records which value was in force):
   ``g``, ``G`` episodes, ``N`` statements, ``delta = sum S_g / N``, the cluster-robust standard
   error ``se = sqrt(G / (G - 1) * sum (S_g - delta n_g)^2) / N`` and ``t = delta / se``:
 
-  - ``percentile``: the paired cluster bootstrap of PLAN section 6 as it is worded
-    (``predictors.p_values`` on the draws of ``predictors.bootstrap_means``): one-sided ``(1 +
-    #{delta* <= 0}) / (B + 1)``, two-sided twice the smaller of that and its mirror image, at
-    most 1. ``delta*`` is the mean of the paired differences over the drawn episodes, which is
-    the difference of the two mean losses; a draw whose differences sum to zero up to rounding
-    is zero and counts on both sides (``drawn_deltas``);
+  - ``percentile``: the percentile p-values of the draft, now a sensitivity analysis of PLAN
+    section 6 (``predictors.p_values`` on the draws of ``predictors.bootstrap_means``):
+    one-sided ``(1 + #{delta* <= 0}) / (B + 1)``, two-sided twice the smaller of that and its
+    mirror image, at most 1. ``delta*`` is the mean of the paired differences over the drawn
+    episodes, which is the difference of the two mean losses; a draw whose differences sum to
+    zero up to rounding is zero and counts on both sides (``drawn_deltas``);
   - ``studentised``: the bootstrap-t on the same draws, ``t* = (delta* - delta) / se*`` with
     ``delta*`` and ``se*`` computed on the drawn episodes; one-sided ``(1 + #{t* >= t}) / (B +
     1)``, two-sided equal-tailed (twice the smaller one-sided p-value, at most 1);
@@ -36,13 +36,40 @@ records which value was in force):
   A draw or a pattern whose standard error is zero gives a statistic of plus or minus infinity,
   by the sign of its numerator, and of zero when the numerator is zero too. Every procedure is
   computed and reported for every contrast, with ``sign_flip``, the cluster sign-flip test on
-  the episode sums (the sensitivity analysis of PLAN section 6); the constant says which one
-  enters Holm and the probe rule. The bootstrap draws are those of the plan (10,000, seed
-  20261001); the sign patterns are every one of the ``2^G`` with at most 13 episodes, else
-  10,000 drawn with the same seed (``(1 + #) / (B + 1)``; the exact share when every pattern is
-  used). The p-values are those of ``size_check.py`` on the same differences, but for one case:
-  when the differences of a draw cancel to a rounding error, ``size_check.py`` counts the draw
-  on the side of that error's sign, and this file on both sides, as a zero.
+  the episode sums (one of the sensitivity analyses of PLAN section 6); the constant says
+  which one enters Holm and the probe rule. The bootstrap draws are those of the plan (10,000,
+  seed 20261001); the sign patterns are every one of the ``2^G`` with at most 13 episodes,
+  else 10,000 drawn with the same seed (``(1 + #) / (B + 1)``; the exact share when every
+  pattern is used). The p-values are those of ``size_check.py`` on the same differences, but
+  where rounding settles a statistic. ``size_check.py`` divides without the tolerance for a
+  zero (``rounding_tolerance``), so when a standard error is zero only up to rounding
+  (differences without variance) its statistic is whatever the division leaves, and this
+  file's is the plan's; and when the value tested is the estimate itself, so that the observed
+  statistic is zero up to rounding, the two can count the draws that tie with it differently.
+
+  The constant also says how the intervals of the six confirmatory contrasts and of
+  ``Delta_GBM`` are made (``interval_method``; every result records it as ``interval_method``):
+
+  - under ``larger_of_studentised_and_sign_flip_t`` they hold the values ``delta0`` that the
+    registered test does not reject (``larger_of_interval``): at coverage ``1 - a`` the
+    interval runs from the smallest ``delta0`` whose one-sided p-value for a larger contrast
+    is not below ``a / 2`` to the largest ``delta0`` whose one-sided p-value for a smaller
+    contrast is not below ``a / 2``. A value ``delta0`` is tested as zero is, on the sums ``S_g
+    - delta0 n_g`` (``larger_of_at``). Each end is found by bisection between ``delta`` and
+    the value 50 standard errors away, in 60 halvings, and is the last value not rejected. An
+    end is written as unbounded when the test does not reject 50 standard errors away (it may
+    reject further away, which the interval does not show): None here, null in the result
+    file, ``-inf`` or ``inf`` in the printout. Differences without any variance have one
+    p-value at every value but the estimate: an end is then the estimate itself when a value
+    one unit away (or the size of the estimate, if that is more) is rejected, and unbounded
+    when it is not. The coverage is 95%; H2 also carries its 90% interval;
+  - under every other candidate they are the percentile intervals of the bootstrap draws, at
+    95% and 90%, as in the draft of the plan.
+
+  The percentile intervals are reported under ``percentile`` for every contrast given in full
+  (the six tests and the probe), whatever the constant; a contrast given in short,
+  ``Delta_GBM`` among them, carries its ``ci95`` alone. The losses of single predictors and
+  every secondary but ``Delta_GBM`` keep 95% percentile intervals as descriptions.
 * ``H3_COMPARATOR``: what the model's best condition is compared with in H3. ``base_rate`` is
   the base rate by listing age, the comparator of the plan (section 6, DECISIONS 26);
   ``gbm_structured`` is the structured-only gradient-boosted model, the comparator of the draft;
@@ -87,8 +114,12 @@ when nothing is missing, 3 otherwise.
 of hash are those the registration and the freeze amendment record: the sealed file, the
 eligible list, the model-free predictions (as ``baselines`` prints them) and the selection file
 of each primary (as written by ``dev``). All are required, a selection hash for every primary
-that is not declared not evaluable; each is checked before the sealed file is read. In this
-order:
+that is not declared not evaluable; each is checked before the sealed file is read.
+``--not-evaluable MODEL=REASON`` declares that a primary's confirmatory runs could not be
+completed on its registered route (PLAN section 6, "Confirmatory runs"): its runs are not read
+and its three tests stay in the family with p = 1. Without it a missing or partial run is a
+refusal; with every primary declared no test of the family can be computed, and the command
+refuses without opening the sealed file. In this order:
 
 1. the open inputs (the eligible list behind its registered hash; the statement table, the
    events table and the counts file of one build);
@@ -129,11 +160,12 @@ ready when:
   echo the harness accepts on every row (``read.echo_acceptable``), and exactly the items of
   the list;
 * every row carries the registered model id and provider pin, the frozen template pin, no
-  masking, shift or temperature, a status, reading and fallback flag that agree, no answer
-  served as another model or, by its stored name, by another provider than the pinned one, no
-  track record that reaches the item's date, and, for a predictive template, the horizons of
-  the statement table (the stated end and 90 days later; 90 and 180 days after the statement
-  date for the probe);
+  masking, shift or temperature, a status, reading and fallback flag that agree, a stored
+  reading that the harness's own parser accepts (the schema of its kind and the semantic
+  checks, on the stored object: ``reading_accepted``), no answer served as another model or,
+  by its stored name, by another provider than the pinned one, no track record that reaches
+  the item's date, and, for a predictive template, the horizons of the statement table (the
+  stated end and 90 days later; 90 and 180 days after the statement date for the probe);
 * each selection file is the one hashed at the freeze, of this model, this statement table and
   this comparator rule; it selects the condition its own dev losses give and names the
   comparator the rule in force gives;
@@ -165,76 +197,107 @@ How readings become predictions (PLAN sections 4 and 8).
 The tests (PLAN section 6). Every contrast is the comparator's mean primary loss minus the
 tested predictor's, on the scoreable statements of the item set, resampled by shortage episode
 (10,000 draws, seed 20261001). H1 (one-sided): (a) against (b). H2 (two-sided): rules plus slip
-against (c), with equivalence declared when the 90% percentile interval lies strictly inside
-plus or minus ``H2_MARGIN``. H3 (two-sided): the comparator against the model's selected
-condition; beside it stand the contrasts of that condition with both predictors that read no
-text, on the same statements and draws (``Delta_GBM`` among them), and the number of its
-answers that were not parsed. Holm's step-down runs over the six p-values at 0.05, and a
+against (c), with an equivalence reading (``equivalence``). Under the registered test the rule
+is on two p-values: equivalence is declared when the p-value for a smaller contrast at ``delta0
+= H2_MARGIN`` and the p-value for a larger contrast at ``delta0 = -H2_MARGIN`` are both below
+0.05, the level at which the 90% interval is cut. As a rule of thumb that is the 90% interval
+of the registered test lying strictly inside plus or minus ``H2_MARGIN``; the two can part
+(``equivalence``), so the interval is reported beside the two p-values and its ends are not
+what is read. Under a source with percentile intervals it is declared when the 90% percentile
+interval lies strictly inside the margin. H3 (two-sided): the comparator against the model's
+selected condition; beside it stand the contrasts of that condition with both predictors that
+read no text, on the same statements and draws (``Delta_GBM`` among them), and the number of
+its answers that were not parsed. Holm's step-down runs over the six p-values at 0.05, and a
 hypothesis holds when its adjusted p is below 0.05. Every H3 entry carries the flag
 ``beats_both_comparators``: true only when H3 holds in favour of the text (adjusted p below
 0.05 and ``delta`` above zero) and the 95% interval of the contrast with the other predictor
-that reads no text (``Delta_GBM`` under the base rate) lies above zero. The plan lets the paper
-write "value beyond the structured fields" only then; the flag never enters the family.
-Intervals are percentile intervals whatever the p-value source; the bootstrap-t intervals,
-equal-tailed and symmetric, are reported beside them (null when a draw has no variance).
+that reads no text (``Delta_GBM`` under the base rate), made as the registered source makes it,
+lies above zero; an unbounded lower end does not. The plan lets the paper write "value beyond
+the structured fields" only then; the flag never enters the family.
+
+Beside every confirmatory p-value, and never in Holm's rule, stand the sensitivity analyses of
+the plan: the percentile p-values of the draft with the 95% percentile interval
+(``p_values.percentile``, ``percentile.ci95``); the two parts of the registered p-value, each
+on its own (``p_values.studentised`` and ``p_values.sign_flip_t``); and the cluster sign-flip
+test on the episode sums (``p_values.sign_flip``). The bootstrap-t intervals, equal-tailed and
+symmetric, are reported too (null when a draw has no variance). H2 has the same loss on both
+sides wherever the model's reading is the rule's, so it also carries ``losses_differ``: the
+number of statements and of episodes on which the two losses differ, and how many of those
+episodes have a positive and how many a negative sum of the paired differences; an episode
+whose differences cancel is counted apart (``differing``).
 
 The probe rule (PLAN section 5, E4). Pinball loss at 0.5 of the probe's median against the
 base rate's, on the probe statements whose time to recovery is not right-censored before the
 cap, as a one-sided paired contrast at 0.05 with the p-value source in force. A primary that
 beats the base rate is evaluated on its post-cutoff slice (``sealed_counts.CUTOFF_MONTH_ENDS``);
 a slice with fewer than 50 scoreable statements makes its three tests not evaluable, with p = 1
-in the family. The item set of each primary is fixed before any test is computed.
+in the family. A contrast over fewer than two episodes is not evaluable either, and a probe
+that cannot be tested for that reason leaves the switch undecided and the model's three tests
+not evaluable. The item set of each primary is fixed before any test is computed.
 
-Where the plan is silent, this file decides as follows, and the result file says so.
+Where the plan is silent, this file decides as follows, and the result file says so
+(``WHERE_THE_PLAN_IS_SILENT``).
 
-* A contrast over fewer than two episodes has no resampling distribution: it is not evaluable
-  (p = 1 in the family). A probe that cannot be tested for that reason leaves the switch
-  undecided, and the model's three tests are not evaluable.
-* The sign-flip tests enumerate every sign pattern when there are at most 13 episodes and draw
-  10,000 patterns otherwise; their two-sided p-values compare absolute values, and a flipped
-  statistic that falls short of the observed one by less than 1e-9 times the largest absolute
-  flipped statistic counts as reaching it.
-* The bootstrap-t is reported with an equal-tailed and a symmetric two-sided p-value; the
-  larger-of procedure takes the equal-tailed one's one-sided p-values.
-* A bootstrap draw whose paired differences sum to zero within 1e-12 times the largest absolute
-  episode sum (at least 1e-12) has a contrast of exactly zero and counts on both sides of the
-  percentile p-values: the sign of a rounding error decides nothing.
-* Dev losses are compared as the selection file records them, at six decimals, so that the
-  file can be checked against itself; a tie goes to the earlier condition.
-* ``--not-evaluable MODEL=REASON`` declares that a primary's confirmatory runs could not be
-  completed on its registered route (section 6): its runs are not read and its three tests stay
-  in the family with p = 1. Without it a missing or partial run is a refusal. When every
-  primary is declared, no test of the family can be computed and the command refuses: the
-  sealed file is not opened for the secondaries alone.
-* The bounds beside a contrast are the two mean losses, and their difference, over every
-  statement of the item set with each undetermined horizon event set to no and then to yes.
-* The dev runs read the scoreable dev statements only, so the bounds the dev command reports
-  are over those statements and equal the loss; the file says how many dated dev statements
-  were not read.
+* The cluster sign-flip test on the episode sums counts as the studentised sign-flip test
+  does: the exact share when every sign pattern is used, and a flipped statistic that falls
+  short of the observed one by less than 1e-9 times the largest finite absolute flipped
+  statistic counts as reaching it.
+* The bootstrap-t part is also reported with a symmetric two-sided p-value, and with its own
+  equal-tailed and symmetric intervals (``studentised``).
+* Under ``percentile``, ``studentised``, ``studentised_symmetric`` and ``sign_flip_t`` the
+  confirmatory contrasts and ``Delta_GBM`` carry percentile intervals: the plan words an
+  interval of the test for the larger-of procedure only. Every contrast says which interval
+  it carries (``interval_method``); the intervals of single-predictor losses and of
+  calibration in the large are percentile intervals and carry no such field.
+* The interval of the registered test: an end the search does not find is unbounded, and
+  written as null. That says only that the test does not reject 50 standard errors away. It
+  may reject further away, and the margin of H2 can be among those values: equivalence is
+  then declared beside an end that is null.
+* Under a source with percentile intervals, H2 equivalence is read from the 90% percentile
+  interval, which must lie strictly inside the margin.
+* The rule and the interval can part where the p-value does not fall steadily with the distance
+  from the estimate: within a few rounding steps of an end, where the count behind a p-value
+  can go either way, and further away when a few episodes hold most of the statements between
+  them, where the sign-flip p-value can rise again. The search then ends on one of the values
+  at which the verdict changes, and the rule is the one that counts.
+* Under the rule ``better_on_dev``, a tie between the two comparators of H3 goes to the
+  structured-only model.
+* Every eligible statement needs an episode and a company before the sealed file is read.
+* The bounds beside a contrast set every undetermined horizon event of the item set to no,
+  then to yes, for both predictors at once.
 
 Refusals (status 1, the reason alone on the error stream, nothing written). A missing or wrong
 hash; an output that exists or lies in a sealed folder; an open input in a sealed folder; files
-of different builds; anything the completeness check finds; a selection file that is missing,
-not the one hashed at the freeze, of another model, of another statement table or of another
-comparator rule, or that contradicts its own dev losses or the rule in force; a plan or
-stored runs on which the check itself stops, and readings that cannot be turned into
-predictions (the type of the error alone is given); predictions that
-are not the ones hashed at the freeze, or a statement left without one; every primary declared
-not evaluable; a sealed file that is not the outcome table of this events table and this list;
-and any stop inside the rules once the sealed rows are in memory, whose message is withheld. A
-refusal names runs and gives counts, never an item.
+of different builds; a declaration ``--not-evaluable`` whose reason is not printable text on
+one line; anything the completeness check finds; a selection file that is missing, not the one
+hashed at the freeze, of another model, of another statement table or of another comparator
+rule, or that contradicts its own dev losses or the rule in force; a plan or stored runs on
+which the check itself stops, and readings that cannot be turned into predictions (the type of
+the error alone is given); predictions that are not the ones hashed at the freeze, or a
+statement left without one; every primary declared not evaluable; a sealed file that is not
+the outcome table of this events table and this list; and any stop once the sealed rows are in
+memory, inside the rules or in putting the results into the texts of the two files and of the
+printout, whose message is withheld. Both texts are made, and shown to be writable as UTF-8,
+before either file exists. Two stops are left as they are: when the table cannot be written
+after the result file (the disk, say), the refusal leaves the result file without its table;
+and when the printout itself fails after both files are written, the files are complete and
+the error is not a refusal. A refusal names runs and gives counts, never an item.
 
-The result file. ``registered`` (the constants in force); ``inputs`` (the sha256 of every file
-read and of the code); ``refit``; ``h3`` (the comparator and the two selections);
-``not_evaluable_by_declaration``; ``runs`` (the sha256 of each readings file, rows, statuses,
-echoes, parse and refusal rates and fallback counts per model and condition); ``items`` (counts
-on the eligible list);
+The result file. ``registered`` (the constants in force, with how the intervals are made);
+``inputs`` (the sha256 of every file read and of the code); ``refit``; ``h3`` (the comparator
+and the two selections); ``not_evaluable_by_declaration``; ``runs`` (the sha256 of each
+readings file, rows, statuses, echoes, parse and refusal rates and fallback counts per model
+and condition); ``items`` (counts on the eligible list);
 ``probe`` and ``item_sets`` per primary; ``family`` (six entries in the order H1, H2, H3 for
 each primary: comparator, tested, sides, item set, statements, episodes, the two losses,
-``delta``, ``ci95``, ``ci90``, ``p_values`` of every procedure, ``studentised``,
-``sign_flip``, ``p``, ``p_holm``, ``holds``, ``reading``, ``bounds``, ``both_sides_parsed``,
-``scoreable_not_parsed``, for H2 ``equivalence``, and for H3 ``beside`` and
-``beats_both_comparators``); ``secondaries`` (the model-free contrasts, H2 on the
+``delta``, ``ci95``, ``ci90`` (under the interval of the registered test: for H2 only),
+``interval_method`` (how ``ci95`` and ``ci90`` were made), ``percentile`` (the 95% and 90%
+percentile intervals), ``p_values`` of every procedure, ``studentised``, ``sign_flip``, ``p``,
+``p_holm``, ``holds``, ``reading``, ``bounds``, ``both_sides_parsed``,
+``scoreable_not_parsed``, for H2 ``equivalence`` and ``losses_differ``, and for H3 ``beside``
+and ``beats_both_comparators``). Every other contrast is given in short, with its own
+``interval_method`` beside its ``ci95``. An interval end that is null is unbounded on that
+side. ``secondaries`` (the model-free contrasts, H2 on the
 month-and-year form, ``Delta_GBM``, H3 with each condition in place of the selected one, the
 post-cutoff slice, statements first captured by the stated end, clusters by company, the two
 other statement-level brackets, definition A, the decomposition of E3, the overconfidence
@@ -292,16 +355,38 @@ P_VALUE_SOURCES = (
     "larger_of_studentised_and_sign_flip_t",
 )
 """The candidates of ``P_VALUE_SOURCE`` (see the module docstring)."""
-P_VALUE_SOURCE = "percentile"
-"""REGISTERED CONSTANT. The procedure whose p-values enter Holm and the probe rule:
-``percentile`` is PLAN section 6 as it is worded today."""
+P_VALUE_SOURCE = "larger_of_studentised_and_sign_flip_t"
+"""REGISTERED CONSTANT. The procedure whose p-values enter Holm and the probe rule: the
+larger of the bootstrap-t and the studentised sign-flip p-values (PLAN section 6)."""
 SENSITIVITY = "sign_flip"
-"""The cluster sign-flip test on the episode sums: the sensitivity analysis of PLAN section 6,
-reported for every contrast and never a source of the registered p-values."""
+"""The cluster sign-flip test on the episode sums: one of the sensitivity analyses of PLAN
+section 6, reported for every contrast and never a source of the registered p-values."""
 PROCEDURES = (*P_VALUE_SOURCES, SENSITIVITY)
 """Every procedure whose p-values are reported for every contrast."""
 SIDES = ("one_sided", "one_sided_lower", "two_sided")
 """The p-values of a procedure: for ``delta > 0``, for ``delta < 0``, and two-sided."""
+PERCENTILE_INTERVAL = "percentile"
+"""An interval made from the quantiles of the bootstrap draws of the contrast."""
+TEST_INTERVAL = "values_not_rejected_by_the_registered_test"
+"""An interval made of the values of the contrast that the registered test does not reject."""
+TEST_INTERVAL_SOURCES = ("larger_of_studentised_and_sign_flip_t",)
+"""The p-value sources under which the confirmatory contrasts and ``Delta_GBM`` carry the
+interval of their own test (PLAN section 6, "Intervals"). Under any other source they carry
+percentile intervals."""
+LEVELS = {"ci95": 0.95, "ci90": 0.90}
+"""The intervals of a contrast and their coverage. Every confirmatory contrast carries the
+first; H2 carries the second too, beside its equivalence reading."""
+EQUIVALENCE_LEVEL = "ci90"
+"""The key of the second interval H2 carries, the 90% one. Under the registered test
+equivalence is read from two p-values at the level that cuts this interval (``tail_of``), and
+the interval is reported beside them; under a source with percentile intervals the interval
+itself is read."""
+INTERVAL_REACH = 50.0
+"""The interval of the registered test is searched this many standard errors either side of the
+estimate. An end that is not found there is written as unbounded, although the test may reject
+values further away."""
+INTERVAL_STEPS = 60
+"""Halvings of the search for each end of that interval."""
 H3_COMPARATORS = ("gbm_structured", "base_rate", "better_on_dev")
 H3_COMPARATOR = "base_rate"
 """REGISTERED CONSTANT. The rule that names the comparator of H3: ``base_rate`` (the base rate
@@ -366,46 +451,49 @@ NOT_COMPUTED_HERE = (
     "sampled against verbalised quantiles (20 samples) and prompt variance (paraphrases)",
     "the name and date 2x2 of E4",
     "the fit that leaves out the dominant company, and the full-follow-up refit",
-    "the BL definition and the leaving-the-list sensitivity of the recovery rule",
+    "the sensitivity analyses of the recovery rule: the BL definition, leaving the list, and "
+    "the Date Discontinued cell",
     "selective prediction (loss against abstention rate)",
-    "E2, E5, E6 and E7",
+    "E2, E5 and E7",
 )
 WHERE_THE_PLAN_IS_SILENT = (
-    "a contrast over fewer than two episodes is not evaluable (p = 1 in the family); a probe "
-    "that cannot be tested for that reason leaves the model's three tests not evaluable",
-    "the sign-flip tests enumerate every sign pattern for at most 13 episodes and draw 10,000 "
-    "otherwise; their two-sided p-values compare absolute values; a flipped statistic short of "
-    "the observed one by less than 1e-9 times the largest absolute flipped statistic reaches it",
-    "a bootstrap draw or a sign pattern whose standard error is zero gives a statistic of plus "
-    "or minus infinity by the sign of its numerator, and zero when the numerator is zero too",
-    "the bootstrap-t is reported with an equal-tailed and a symmetric two-sided p-value; the "
-    "larger-of procedure compares the equal-tailed one's one-sided p-values with the studentised "
-    "sign-flip ones, side by side, and doubles the smaller of the two",
-    "a bootstrap draw whose paired differences sum to zero within 1e-12 times the largest "
-    "absolute episode sum (at least 1e-12) is a contrast of exactly zero: it counts on both "
-    "sides of the percentile p-values, whatever the rounding of the sum",
-    "the probe test takes its p-value from the registered p-value source",
-    "intervals are percentile intervals whatever the p-value source; H2 equivalence needs the "
-    "90% percentile interval strictly inside the margin",
-    "a literal interval of a depletion or discontinuation statement, or of no statement, is not "
-    "a stated period: it takes the calibrator's no-date table, as ABSTAIN does",
-    "dev losses are compared as the selection file records them, at six decimals; a tie goes to "
-    "the earlier condition (a, b, c) and, under the rule better_on_dev, to the structured-only "
-    "model over the base rate",
-    "when every primary is declared not evaluable nothing is evaluated: the sealed file is not "
-    "opened for the secondaries alone",
-    "the selection files and the model-free predictions are held to the hashes of the freeze, "
-    "and every eligible statement needs an episode and a company, before the sealed file is "
-    "read",
+    "the cluster sign-flip test on the episode sums, one of the sensitivity analyses, counts as "
+    "the studentised sign-flip test does: the exact share when every sign pattern is used, and a "
+    "flipped statistic short of the observed one by less than 1e-9 times the largest finite "
+    "absolute flipped statistic reaches it",
+    "the bootstrap-t part is also reported with a symmetric two-sided p-value, and with its own "
+    "equal-tailed and symmetric intervals under studentised (null when a draw has no finite "
+    "statistic)",
+    "under a p-value source other than the larger-of procedure the confirmatory contrasts and "
+    "Delta_GBM carry percentile intervals; every contrast says in interval_method which interval "
+    "it carries; the intervals of single-predictor losses and of calibration in the large are "
+    "percentile intervals and carry no such field",
+    "an end of the interval of the registered test that the search does not find is unbounded "
+    "and written as null: the test does not reject the value 50 standard errors from the "
+    "estimate; it may still reject values further away, which the interval does not show, and "
+    "when the margin of H2 is among them equivalence is declared beside an end that is null",
+    "under a p-value source with percentile intervals, H2 equivalence is read from the 90% "
+    "percentile interval and needs both ends strictly inside the margin",
+    "the p-value of the registered test need not fall steadily with the distance from the "
+    "estimate (the sign-flip part can rise again when a few episodes hold most of the statements "
+    "between them): "
+    "the search for an end of the interval then stops on one of the values at which the verdict "
+    "changes, and the equivalence rule, which tests the margin itself, can differ from the "
+    "interval",
+    "under the rule better_on_dev, a tie between the two comparators of H3 goes to the "
+    "structured-only model",
+    "every eligible statement needs an episode and a company before the sealed file is read",
     "beats_both_comparators is false whenever H3 does not hold in favour of the text, including "
-    "when it is not evaluable",
+    "when it is not evaluable; the interval it reads is that of the registered source, and an "
+    "unbounded lower end does not lie above zero",
     "the bounds beside a contrast set every undetermined horizon event of the item set to no, "
     "then to yes, for both predictors at once",
     "Murphy's decomposition cuts the statements, ordered by probability and then by id, into "
     "ten runs of equal length; the coverage of the 80% interval treats a bracket as closed",
-    "the outcome variants (all or any covered presentation, definition A) and the company "
-    "clusters keep the item set that the probe fixed on the primary outcome",
+    "definition A is one of the outcome variants that keep the item set the probe fixed",
 )
+"""The decisions every result file carries as ``where_the_plan_is_silent`` (see the module
+docstring)."""
 CODE = {
     f"{module.__name__.rsplit('.', 1)[-1]}.py": module.__file__
     for module in (dataset, forms, gbm, power, P, rd, lp, sealed_counts)
@@ -473,7 +561,7 @@ def drawn_deltas(
     clusters, which is the comparator's mean loss minus the tested predictor's on that draw.
 
     A draw whose differences sum to zero is exactly zero here, also when rounding leaves a sum
-    of 1e-17 (``rounding_tolerance``): the registered p-values count such a draw on both sides
+    of 1e-17 (``rounding_tolerance``): the percentile p-values count such a draw on both sides
     (``<= 0`` and ``>= 0``), and the sign of a rounding error must not decide on which one."""
     sums, sizes = P.cluster_sums(difference, clusters)
     means = P.bootstrap_means(difference, clusters, draws, seed)[:, 0]
@@ -578,17 +666,22 @@ def sign_flip(sums: np.ndarray, draws: int = DRAWS, seed: int = SEED) -> dict[st
 
 
 def sign_flip_t(
-    sums: np.ndarray, sizes: np.ndarray, draws: int = DRAWS, seed: int = SEED
+    sums: np.ndarray,
+    sizes: np.ndarray,
+    draws: int = DRAWS,
+    seed: int = SEED,
+    patterns: tuple[np.ndarray, bool] | None = None,
 ) -> dict[str, Any]:
     """The studentised sign-flip test (the wild cluster bootstrap-t with the null imposed and
     signs as weights): each sign pattern ``s`` gives the cluster sums ``s_g * sums_g`` and their
     statistic ``t° = delta° / se°`` (``robust_t``), to which the observed ``t`` is compared as
-    in ``sign_flip``. The patterns are those of ``sign_flip``."""
+    in ``sign_flip``. The patterns are those of ``sign_flip``; ``patterns`` hands them over when
+    they are made already (``sign_patterns`` for this number of clusters, draws and seed)."""
     sums, sizes = np.asarray(sums, dtype=float), np.asarray(sizes, dtype=float)
     groups, n = len(sums), float(sizes.sum())
     tolerance = rounding_tolerance(sums)
     _, _, t = robust_t(sums, sizes, tolerance)
-    signs, exact = sign_patterns(groups, draws, seed)
+    signs, exact = sign_patterns(groups, draws, seed) if patterns is None else patterns
     flipped = signs * sums[None, :]
     means = flipped.sum(axis=1) / n
     spread = ((flipped - means[:, None] * sizes[None, :]) ** 2).sum(axis=1)
@@ -611,13 +704,144 @@ def larger_of(first: Mapping[str, float], second: Mapping[str, float]) -> dict[s
     }
 
 
+def interval_method(source: str | None) -> str:
+    """How the intervals of a confirmatory contrast are made under the p-value source
+    ``source``: from the registered test itself (``TEST_INTERVAL_SOURCES``), or as percentile
+    intervals of the bootstrap draws. None is for a contrast that is not a confirmatory one."""
+    return TEST_INTERVAL if source in TEST_INTERVAL_SOURCES else PERCENTILE_INTERVAL
+
+
+def tail_of(coverage: float) -> float:
+    """The level of each one-sided test that cuts an interval of ``coverage``: half of what the
+    interval leaves out, rounded to twelve decimals so that the registered levels are 0.025 and
+    0.05 exactly and not the floats next to them that ``(1 - coverage) / 2`` gives. A value is
+    rejected when its p-value is below the level; a p-value that equals it is not."""
+    return round((1.0 - coverage) / 2, 12)
+
+
+def larger_of_at(
+    sums: np.ndarray,
+    sizes: np.ndarray,
+    taken: np.ndarray,
+    null: float,
+    draws: int = DRAWS,
+    seed: int = SEED,
+    patterns: tuple[np.ndarray, bool] | None = None,
+) -> dict[str, float]:
+    """The p-values of the larger-of procedure for the hypothesis that the contrast is ``null``:
+    the test of zero on the cluster sums of the differences minus ``null`` (``sums_g - null *
+    sizes_g``). ``taken`` holds the bootstrap draws and ``patterns`` the sign patterns, as for
+    ``studentised`` and ``sign_flip_t``."""
+    moved = np.asarray(sums, dtype=float) - null * np.asarray(sizes, dtype=float)
+    return larger_of(
+        studentised(moved, sizes, taken), sign_flip_t(moved, sizes, draws, seed, patterns)
+    )
+
+
+def larger_of_interval(
+    sums: np.ndarray,
+    sizes: np.ndarray,
+    taken: np.ndarray,
+    coverage: float,
+    draws: int = DRAWS,
+    seed: int = SEED,
+) -> list[float | None]:
+    """The values of the contrast that the larger-of procedure does not reject, at coverage
+    ``1 - a`` (PLAN section 6, "Intervals"): from the smallest value whose one-sided p-value
+    for a larger contrast is not below ``a / 2`` (``tail_of``) to the largest whose one-sided
+    p-value for a smaller contrast is not below ``a / 2``. Each end rests on that one p-value.
+
+    Each end is found by bisection between the estimate and the value ``INTERVAL_REACH``
+    standard errors away, in ``INTERVAL_STEPS`` halvings, and is the last value not rejected.
+    An end is None, which is unbounded, when the test does not reject at that distance: too few
+    episodes for the sign patterns to reach the level, too many bootstrap draws without
+    variance on that side, or too many whose statistic is finite and still beyond the reach
+    (fewer than about three episodes hold nearly all of the difference). None says that there
+    is no end within the reach, not that no value is rejected: in the last case the test can
+    reject values further away. Differences without any variance have one p-value at every
+    value but the estimate, so one value on each side decides: it lies one unit away, or the
+    size of the estimate if that is more, and the end is the estimate itself when it is
+    rejected.
+
+    The p-value need not fall steadily with the distance from the estimate: the sign-flip part
+    can rise again when a few episodes hold most of the statements between them. The search
+    then ends on one
+    of the values at which the verdict changes, and values nearer the estimate may be rejected
+    or values further away not."""
+    sums, sizes = np.asarray(sums, dtype=float), np.asarray(sizes, dtype=float)
+    tail = tail_of(coverage)
+    tolerance = rounding_tolerance(sums)
+    delta, se, _ = robust_t(sums, sizes, tolerance)
+    patterns = sign_patterns(len(sizes), draws, seed)
+    flat = se <= tolerance
+    reach = max(1.0, abs(delta)) if flat else INTERVAL_REACH * se
+    ends: list[float | None] = []
+    steps = 0 if flat else INTERVAL_STEPS  # without variance the end is the estimate itself
+    for side, direction in (("one_sided", -1.0), ("one_sided_lower", 1.0)):
+        inside, outside = delta, delta + direction * reach
+        if larger_of_at(sums, sizes, taken, outside, draws, seed, patterns)[side] >= tail:
+            ends.append(None)
+            continue
+        for _ in range(steps):
+            middle = (inside + outside) / 2
+            if larger_of_at(sums, sizes, taken, middle, draws, seed, patterns)[side] >= tail:
+                inside = middle
+            else:
+                outside = middle
+        ends.append(float(inside))
+    return ends
+
+
+def differing(comparator: Any, tested: Any, clusters: Sequence[str]) -> dict[str, int]:
+    """Where the losses of two predictors differ (reported beside H2: PLAN section 6,
+    "Sensitivity"): the statements on which they differ, the episodes that hold such a
+    statement, and how many of those episodes have a positive and how many a negative sum of
+    the paired differences (comparator minus tested); in the others the differences cancel. A
+    difference or a sum within the ``rounding_tolerance`` of the episode sums is a zero."""
+    difference = np.asarray(comparator, dtype=float) - np.asarray(tested, dtype=float)
+    ids = list(clusters)
+    names = (
+        "statements",
+        "episodes",
+        "episodes_with_a_positive_sum",
+        "episodes_with_a_negative_sum",
+        "episodes_whose_differences_cancel",
+    )
+    if not ids:
+        return dict.fromkeys(names, 0)
+    every, _ = P.cluster_sums(difference, ids)
+    tolerance = rounding_tolerance(every[:, 0])
+    apart = np.abs(difference) > tolerance
+    holding, _ = P.cluster_sums(apart, ids)
+    sums = every[holding[:, 0] > 0, 0]
+    positive, negative = int((sums > tolerance).sum()), int((sums < -tolerance).sum())
+    counts = (int(apart.sum()), len(sums), positive, negative, len(sums) - positive - negative)
+    return dict(zip(names, counts, strict=True))
+
+
 def contrast(
-    comparator: Any, tested: Any, clusters: Sequence[str], draws: int = DRAWS, seed: int = SEED
+    comparator: Any,
+    tested: Any,
+    clusters: Sequence[str],
+    draws: int = DRAWS,
+    seed: int = SEED,
+    source: str | None = None,
+    levels: Sequence[str] = (),
+    margin: float | None = None,
 ) -> dict[str, Any]:
     """The comparator's mean loss minus the tested predictor's on the same statements, with
-    its percentile intervals and the p-values of every procedure (``PROCEDURES``). ``evaluable``
-    is false, with the reason, when there is no statement or fewer than ``MIN_EPISODES``
-    clusters."""
+    its intervals and the p-values of every procedure (``PROCEDURES``). ``evaluable`` is false,
+    with the reason, when there is no statement or fewer than ``MIN_EPISODES`` clusters.
+
+    ``ci95`` and ``ci90`` are the percentile intervals of the bootstrap draws, which
+    ``percentile`` always holds as well. A confirmatory contrast names the registered p-value
+    ``source``: when the intervals of that source are those of its own test
+    (``interval_method``), the contrast carries the intervals named in ``levels`` (keys of
+    ``LEVELS``) as the values that test does not reject (``larger_of_interval``; an end that is
+    None is unbounded) and no other; and with ``margin`` it carries ``at_the_margin``, the
+    p-value for a smaller contrast at ``margin`` and the one for a larger contrast at minus
+    ``margin``, from which equivalence is read. ``interval_method`` says which kind ``ci95``
+    and ``ci90`` are."""
     comparator = np.asarray(comparator, dtype=float)
     tested = np.asarray(tested, dtype=float)
     ids = list(clusters)
@@ -638,13 +862,13 @@ def contrast(
     by_t = studentised(sums, sizes, taken)
     flips = sign_flip(sums, draws, seed)
     flips_t = sign_flip_t(sums, sizes, draws, seed)
-    registered = P.p_values(delta)
+    draft = P.p_values(delta)
     bootstrap_t = {side: by_t[side] for side in SIDES}
     p_values = {
         "percentile": {
-            "one_sided": registered["one_sided"],
+            "one_sided": draft["one_sided"],
             "one_sided_lower": P.p_values(-delta)["one_sided"],
-            "two_sided": registered["two_sided"],
+            "two_sided": draft["two_sided"],
         },
         "studentised": bootstrap_t,
         "studentised_symmetric": bootstrap_t | {"two_sided": by_t["two_sided_symmetric"]},
@@ -652,11 +876,28 @@ def contrast(
         "larger_of_studentised_and_sign_flip_t": larger_of(bootstrap_t, flips_t),
         SENSITIVITY: {side: flips[side] for side in SIDES},
     }
+    percentile = {name: P.interval(delta, coverage) for name, coverage in LEVELS.items()}
+    method = interval_method(source)
+    shown: dict[str, Any] = dict(percentile)
+    if method == TEST_INTERVAL:
+        shown = {
+            name: larger_of_interval(sums, sizes, taken, LEVELS[name], draws, seed)
+            for name in LEVELS
+            if name in levels
+        }
+        if margin is not None:
+            above = larger_of_at(sums, sizes, taken, margin, draws, seed)
+            below = larger_of_at(sums, sizes, taken, -margin, draws, seed)
+            shown["at_the_margin"] = {
+                "p_smaller_at_the_margin": above["one_sided_lower"],
+                "p_larger_at_minus_the_margin": below["one_sided"],
+            }
     intervals = ("ci95", "ci90", "ci95_symmetric", "ci90_symmetric")
     return out | {
         "evaluable": True,
-        "ci95": P.interval(delta, 0.95),
-        "ci90": P.interval(delta, 0.90),
+        **shown,
+        "interval_method": method,
+        "percentile": percentile,
         "p_values": {name: p_values[name] for name in PROCEDURES},
         "studentised": {key: by_t[key] for key in ("se", "t", *intervals)},
         "sign_flip": {key: flips[key] for key in ("patterns", "exact")},
@@ -713,6 +954,16 @@ def registered_record() -> dict[str, Any]:
         "p_value_source": P_VALUE_SOURCE,
         "p_value_source_candidates": list(P_VALUE_SOURCES),
         "p_value_procedures_reported": list(PROCEDURES),
+        "intervals": {
+            "of_the_confirmatory_contrasts_and_delta_gbm": interval_method(P_VALUE_SOURCE),
+            "of_the_other_contrasts_and_single_predictors_of_the_evaluator": PERCENTILE_INTERVAL,
+            "coverage": LEVELS["ci95"],
+            "coverage_for_the_equivalence_of_h2": LEVELS[EQUIVALENCE_LEVEL],
+            "sources_with_the_interval_of_their_own_test": list(TEST_INTERVAL_SOURCES),
+            "search_reach_in_standard_errors": INTERVAL_REACH,
+            "search_halvings": INTERVAL_STEPS,
+            "an_end_that_is_null": "unbounded: the test does not reject at the reach of the search",
+        },
         "sign_flip_patterns": {"every_pattern_up_to_episodes": EXACT_FLIPS_UP_TO, "drawn": DRAWS},
         "h3_comparator": H3_COMPARATOR,
         "h3_comparator_rules": list(H3_COMPARATORS),
@@ -870,12 +1121,28 @@ def registered_route(model: str) -> dict[str, Any]:
     return sent(asdict(rd.ROUTES[model]))
 
 
+def reading_accepted(reading: Any, kind: str) -> bool:
+    """Whether a stored reading is one the harness's parser accepts (``read.parse_reading``):
+    the schema of its kind on the stored object itself, then the semantic checks (real calendar
+    dates, a start not after the end, quantiles that do not decrease), on a copy, because the
+    predictive check rewrites the quantiles of what it is given."""
+    if rd.validate(reading, rd.SCHEMAS[kind]):
+        return False
+    held = json.loads(json.dumps(reading))
+    if kind == "literal":
+        errors, _ = rd._literal_checks(held, None)
+    else:
+        errors, _ = rd._predictive_checks(held)
+    return not errors
+
+
 def row_faults(row: Mapping[str, Any], model: str, template: str) -> list[str]:
     """What makes a stored row unusable: another route, template or decoding than the
-    registered ones, flags that contradict one another, an answer served as another model or,
-    by the provider names stored with it, by another provider than the pinned one
-    (``read.provider_problem``), or a track record in context that is not wholly before the
-    item (the harness's own warning)."""
+    registered ones, flags that contradict one another, a reading that the harness's parser
+    would have rejected (``reading_accepted``: the harness stores none, so such a row was not
+    written by this harness), an answer served as another model or, by the provider names
+    stored with it, by another provider than the pinned one (``read.provider_problem``), or a
+    track record in context that is not wholly before the item (the harness's own warning)."""
     route, kind = rd.ROUTES[model], rd.TEMPLATES[template].kind
     found = []
     served = (row.get("model"), row.get("model_id"), row.get("provider_pin"))
@@ -895,6 +1162,8 @@ def row_faults(row: Mapping[str, Any], model: str, template: str) -> list[str]:
         or row.get("fallback") != rd.fallback_for(kind, str(status))
     ):
         found.append("a status, a reading and a fallback flag that contradict one another")
+    if parsed and not reading_accepted(row["reading"], kind):
+        found.append("a stored reading that the harness's parser does not accept")
     accepted = rd.served_as(model)
     answered = [a for a in row.get("attempts") or () if not a.get("refused")]
     if any(a.get("served_model") not in (None, *accepted) for a in answered):
@@ -1374,7 +1643,8 @@ def read_selection(
 ) -> tuple[dict, list[str]]:
     """The H3 selection the dev command recorded for ``model``, and what is wrong with it: a
     file that is not the one of ``expected`` (the sha256, or its first characters, recorded at
-    the freeze), of another model, statement table or comparator rule, or one that contradicts
+    the freeze; both hashes are then shown at the length of the one given, so that they can be
+    compared), of another model, statement table or comparator rule, or one that contradicts
     itself (a selected condition that is not the lowest of its own dev losses, or a comparator
     that is not the one the rule in force gives on its own dev losses)."""
     if not path.is_file():
@@ -1385,7 +1655,7 @@ def read_selection(
     if expected is not None and not sha.startswith(expected):
         problems.append(
             f"{model}: {path.name} is not the selection file hashed at the freeze (its sha256 "
-            f"starts with {sha[:16]}, expected {expected[:16]})"
+            f"starts with {sha[: len(expected)]}, expected {expected})"
         )
     try:
         record = json.loads(data)
@@ -1659,6 +1929,21 @@ def bounds(
     return out
 
 
+def paired_losses(
+    rows: pd.DataFrame,
+    predictions: Mapping[str, pd.DataFrame],
+    comparator: str,
+    tested: str,
+    cluster: str = "episode_id",
+) -> tuple[pd.Series, pd.Series, list[str]]:
+    """The primary losses of two predictors on the scoreable statements of ``rows``, and the
+    cluster of each of those statements."""
+    scoreable = rows[rows["scoreable"]]
+    pair = {name: predictions[name] for name in (comparator, tested)}
+    losses = power.primary_losses(scoreable, pair)
+    return losses[comparator], losses[tested], list(scoreable[cluster])
+
+
 def scored(
     rows: pd.DataFrame,
     predictions: Mapping[str, pd.DataFrame],
@@ -1667,18 +1952,21 @@ def scored(
     cluster: str = "episode_id",
     draws: int = DRAWS,
     seed: int = SEED,
+    source: str | None = None,
+    levels: Sequence[str] = (),
+    margin: float | None = None,
 ) -> dict[str, Any]:
-    """The contrast of two predictors on the scoreable statements of ``rows``."""
-    scoreable = rows[rows["scoreable"]]
-    pair = {name: predictions[name] for name in (comparator, tested)}
-    losses = power.primary_losses(scoreable, pair)
-    return contrast(losses[comparator], losses[tested], list(scoreable[cluster]), draws, seed)
+    """The contrast of two predictors on the scoreable statements of ``rows``. ``source``,
+    ``levels`` and ``margin`` are those of ``contrast``: they are given for a confirmatory
+    contrast, which carries the intervals of the registered source."""
+    pair = paired_losses(rows, predictions, comparator, tested, cluster)
+    return contrast(*pair, draws, seed, source, levels, margin)
 
 
 def short(result: Mapping[str, Any], sides: int, source: str) -> dict[str, Any]:
-    """A contrast in short, for the secondaries: sizes, the estimate, its 95% interval and the
-    p-value of the procedure in force."""
-    keys = ("statements", "episodes", "evaluable", "reason", "delta", "ci95")
+    """A contrast in short, for the secondaries: sizes, the estimate, its 95% interval with the
+    way it was made, and the p-value of the procedure in force."""
+    keys = ("statements", "episodes", "evaluable", "reason", "delta", "ci95", "interval_method")
     out = {key: result[key] for key in keys if key in result}
     out["p"] = registered_p(result, sides, source) if result["evaluable"] else None
     return out
@@ -1794,15 +2082,59 @@ def beats_both(entry: Mapping[str, Any]) -> bool:
     """The flag ``beats_both_comparators`` of an H3 entry (PLAN section 6, "Reading"): whether
     the paper may claim value beyond both predictors that read no text. True only when H3 holds
     in favour of the text (Holm-adjusted p below 0.05 and a positive contrast) and the 95%
-    percentile interval of the contrast with the other one (``Delta_GBM``, under the registered
-    rule) lies above zero. It can only withhold a claim: it never enters the family."""
+    interval of the contrast with the other one (``Delta_GBM``, under the registered rule) lies
+    above zero. That interval is the one the registered p-value source gives (``beside`` holds
+    it, with its ``interval_method``); a lower end that is None is unbounded and does not lie
+    above zero. The flag can only withhold a claim: it never enters the family."""
     if not (entry["evaluable"] and entry["holds"] and entry["delta"] > 0):
         return False
     beside = entry.get("beside") or {}
     intervals = [
         (beside.get(name) or {}).get("ci95") for name in other_comparators(entry["comparator"])
     ]
-    return all(interval is not None and interval[0] > 0 for interval in intervals)
+    return all(
+        interval is not None and interval[0] is not None and interval[0] > 0
+        for interval in intervals
+    )
+
+
+def equivalence(entry: Mapping[str, Any], margin: float = H2_MARGIN) -> dict[str, Any]:
+    """The equivalence reading of an H2 entry (PLAN section 6).
+
+    Under the registered test the rule is on two p-values, those of the entry's
+    ``at_the_margin`` (``contrast``, given the same ``margin``): equivalence is declared when
+    the p-value for a smaller contrast at the margin and the p-value for a larger one at minus
+    the margin are both below the level at which the 90% interval is cut (``tail_of``: 0.05).
+    The ends of the interval are reported and not read. They say the same only where the
+    p-value falls steadily with the distance from the estimate and the margin lies within the
+    reach of the search: an end is the last value the test does not reject, so the interval
+    ends before the margin when the margin is rejected, and an end on the margin goes with a
+    margin that is not rejected. The two can part in two ways, and the rule decides. Where the
+    p-value does not fall steadily (``larger_of_interval``), the interval can reach past a
+    margin that is rejected, or end inside one that is not. And an end is None whenever the
+    value ``INTERVAL_REACH`` standard errors away is not rejected, although the test may reject
+    values further away: with the margin among those, equivalence is declared beside an
+    unbounded end.
+
+    Under a source with percentile intervals it is declared when the 90% percentile interval
+    lies strictly inside plus or minus ``margin``."""
+    low, high = entry[EQUIVALENCE_LEVEL]
+    out = {
+        "margin": margin,
+        EQUIVALENCE_LEVEL: [low, high],
+        "interval_method": entry["interval_method"],
+    }
+    if entry["interval_method"] != TEST_INTERVAL:
+        return out | {"declared": bool(low > -margin and high < margin)}
+    level = tail_of(LEVELS[EQUIVALENCE_LEVEL])
+    smaller = entry["at_the_margin"]["p_smaller_at_the_margin"]
+    larger = entry["at_the_margin"]["p_larger_at_minus_the_margin"]
+    return out | {
+        "p_smaller_at_the_margin": smaller,
+        "p_larger_at_minus_the_margin": larger,
+        "level": level,
+        "declared": bool(smaller < level and larger < level),
+    }
 
 
 def evaluate(
@@ -1854,7 +2186,22 @@ def evaluate(
             else:
                 entry["items"] = set_records[model]["items"]
                 chosen = rows.loc[ids]
-                entry |= scored(chosen, predictions, comparator, tested, draws=draws, seed=seed)
+                h2 = hypothesis == "H2"  # the one test read for equivalence as well
+                entry |= scored(
+                    chosen,
+                    predictions,
+                    comparator,
+                    tested,
+                    draws=draws,
+                    seed=seed,
+                    source=source,
+                    levels=("ci95", EQUIVALENCE_LEVEL) if h2 else ("ci95",),
+                    margin=H2_MARGIN if h2 else None,
+                )
+                if h2:
+                    entry["losses_differ"] = differing(
+                        *paired_losses(chosen, predictions, comparator, tested)
+                    )
                 entry["bounds"] = bounds(chosen, predictions, comparator, tested)
                 parsed = rows.loc[both_parsed(ids, (comparator, tested))]
                 entry["both_sides_parsed"] = short(
@@ -1870,7 +2217,16 @@ def evaluate(
                 if hypothesis == "H3":  # the same statements and draws as the test itself
                     entry["beside"] = {
                         name: short(
-                            scored(chosen, predictions, name, tested, draws=draws, seed=seed),
+                            scored(
+                                chosen,
+                                predictions,
+                                name,
+                                tested,
+                                draws=draws,
+                                seed=seed,
+                                source=source,
+                                levels=("ci95",),
+                            ),
                             sides,
                             source,
                         )
@@ -1882,12 +2238,8 @@ def evaluate(
         entry["p_holm"] = adjusted
         entry["holds"] = bool(entry["evaluable"] and adjusted < FAMILY_ALPHA)
         if entry["hypothesis"] == "H2" and entry["evaluable"]:
-            low, high = entry["ci90"]
-            entry["equivalence"] = {
-                "margin": H2_MARGIN,
-                "ci90": [low, high],
-                "declared": bool(low > -H2_MARGIN and high < H2_MARGIN),
-            }
+            entry["equivalence"] = equivalence(entry)
+            entry.pop("at_the_margin", None)  # the reading holds the two p-values
         if entry["hypothesis"] == "H3":  # read after Holm; it never enters the family
             entry["beats_both_comparators"] = beats_both(entry)
         entry["reading"] = reading_of(entry)
@@ -2056,16 +2408,43 @@ def _number(value: Any, digits: int = 4) -> str:
 
 
 def _interval(pair: Any) -> str:
-    return "n/a" if not pair else f"[{_number(pair[0])}, {_number(pair[1])}]"
+    """An interval for the printout; an end that is None is unbounded on its side."""
+    if not pair:
+        return "n/a"
+    low = "-inf" if pair[0] is None else _number(pair[0])
+    high = "inf" if pair[1] is None else _number(pair[1])
+    return f"[{low}, {high}]"
+
+
+def unbounded_note(registered: Mapping[str, Any], shown: Iterable[Any]) -> list[str]:
+    """The line that says what an end printed as ``-inf`` or ``inf`` is, when one of the
+    intervals ``shown`` in a text has such an end, and no line otherwise. Only an interval of
+    the registered test can lack an end; the reach of its search is read from the record."""
+    made = registered["intervals"]
+    by_test = made["of_the_confirmatory_contrasts_and_delta_gbm"] == TEST_INTERVAL
+    if not by_test or not any(pair is not None and None in pair for pair in shown):
+        return []
+    reach = made["search_reach_in_standard_errors"]
+    return [
+        "An end shown as -inf or inf is unbounded: the registered test does not reject the "
+        f"furthest value searched on that side ({reach:g} standard errors from Delta; with a "
+        "standard error of zero, one unit from Delta, or the size of Delta if that is more). It "
+        "may reject values further away."
+    ]
 
 
 def markdown(report: Mapping[str, Any]) -> str:
-    """The short table of the confirmatory results."""
+    """The short table of the confirmatory results. Under the registered test the line of H2
+    leads with the rule on the two p-values at the margin, which decides, and gives the 90%
+    interval beside it; the counts beside it add up to the episodes that differ. A last line
+    says what an unbounded end is, when one is shown (``unbounded_note``)."""
     registered = report["registered"]
+    made = registered["intervals"]["of_the_confirmatory_contrasts_and_delta_gbm"]
     lines = [
         "# Confirmatory results (PLAN.md section 6)",
         "",
-        f"Registered p-values: {registered['p_value_source']}. H3 comparator rule: "
+        f"Registered p-values: {registered['p_value_source']}. Intervals of the six contrasts "
+        f"and of Delta_GBM: {made}. H3 comparator rule: "
         f"{registered['h3_comparator']}. Holm over {registered['tests_in_the_family']} tests at "
         f"{registered['familywise_alpha']}; {registered['draws']} draws by shortage episode, seed "
         f"{registered['seed']}. Delta is the comparator's mean primary Brier minus the tested "
@@ -2092,16 +2471,32 @@ def markdown(report: Mapping[str, Any]) -> str:
         ]
         lines.append("| " + " | ".join(cells) + " |")
     lines.append("")
+    shown = [entry.get("ci95") for entry in report["family"]]
     for entry in report["family"]:
         if "equivalence" in entry:
-            said = "declared" if entry["equivalence"]["declared"] else "not declared"
+            found, apart = entry["equivalence"], entry["losses_differ"]
+            said = "declared" if found["declared"] else "not declared"
+            shown.append(found["ci90"])
+            how = f"{said} (90% interval {_interval(found['ci90'])}, margin {H2_MARGIN})"
+            if "level" in found:  # the registered test at the margin decides, not the interval
+                how = (
+                    f"{said} by the rule, which needs both one-sided p-values below "
+                    f"{_number(found['level'], 2)} at the margin of {H2_MARGIN}: "
+                    f"{_number(found['p_larger_at_minus_the_margin'])} at {-H2_MARGIN} and "
+                    f"{_number(found['p_smaller_at_the_margin'])} at {H2_MARGIN} (90% interval, "
+                    f"reported beside the rule and not read for it: {_interval(found['ci90'])})"
+                )
             lines.append(
-                f"H2 equivalence, {entry['model']}: {said} (90% interval "
-                f"{_interval(entry['equivalence']['ci90'])}, margin {H2_MARGIN})."
+                f"H2 equivalence, {entry['model']}: {how}. The two losses differ on "
+                f"{apart['statements']} statements in {apart['episodes']} episodes: "
+                f"{apart['episodes_with_a_positive_sum']} with a positive sum, "
+                f"{apart['episodes_with_a_negative_sum']} with a negative one, "
+                f"{apart['episodes_whose_differences_cancel']} whose differences cancel."
             )
         for name, beside in entry.get("beside", {}).items():
             if name == entry["comparator"]:
                 continue  # that one is the row of the table itself
+            shown.append(beside.get("ci95"))
             flag = "yes" if entry["beats_both_comparators"] else "no"
             lines.append(
                 f"Beside H3, {entry['model']}: {name} minus {entry['tested']}: delta "
@@ -2116,18 +2511,23 @@ def markdown(report: Mapping[str, Any]) -> str:
             f"Probe, {model}: delta {_number(probe.get('delta'))} days of pinball loss at 0.5 "
             f"(base rate minus probe), p {_number(probe['p'])}; tests on: {where}."
         )
+    lines += unbounded_note(registered, shown)
     return "\n".join(lines) + "\n"
 
 
 def summary_lines(report: Mapping[str, Any]) -> list[str]:
     items = report["items"]
+    made = report["registered"]["intervals"]["of_the_confirmatory_contrasts_and_delta_gbm"]
     lines = [
         f"eligible: {items['eligible_statements']} statements in {items['eligible_episodes']} "
         f"episodes; scoreable: {items['scoreable_statements']} in {items['scoreable_episodes']}",
-        f"p-values: {report['registered']['p_value_source']}; H3 comparator: "
+        f"p-values: {report['registered']['p_value_source']}; intervals of the six contrasts "
+        f"and of Delta_GBM: {made}; H3 comparator: "
         f"{report['h3']['comparator']} (rule {report['registered']['h3_comparator']})",
     ]
+    shown = []
     for entry in report["family"]:
+        shown.append(entry.get("ci95"))
         lines.append(
             f"  {entry['hypothesis']} {entry['model']:15s} delta {_number(entry.get('delta'))} "
             f"{_interval(entry.get('ci95'))} p {_number(entry['p'])} Holm {_number(entry['p_holm'])}"
@@ -2135,13 +2535,14 @@ def summary_lines(report: Mapping[str, Any]) -> list[str]:
         )
         for name in other_comparators(entry["comparator"]) if "beside" in entry else ():
             beside = entry["beside"][name]
+            shown.append(beside.get("ci95"))
             flag = "yes" if entry["beats_both_comparators"] else "no"
             lines.append(
                 f"     beside: {name} minus the tested condition, delta "
                 f"{_number(beside.get('delta'))} {_interval(beside.get('ci95'))}; beats both "
                 f"comparators: {flag}"
             )
-    return lines
+    return lines + unbounded_note(report["registered"], shown)
 
 
 # --------------------------------------------------------------------------------------------
@@ -2178,12 +2579,16 @@ def selection_hashes(values: Sequence[str]) -> dict[str, str]:
 
 
 def skipped_models(values: Sequence[str]) -> dict[str, str]:
-    """``--not-evaluable MODEL=REASON`` as a mapping; the model must be a primary."""
+    """``--not-evaluable MODEL=REASON`` as a mapping; the model must be a primary, and the
+    reason printable text on one line: it is written into the result file and the table, and a
+    byte of the command line that was no text could not be written there."""
     out = {}
     for value in values:
         model, _, reason = value.partition("=")
         if model not in PRIMARIES or not reason.strip():
             refuse(f"--not-evaluable takes MODEL=REASON with a primary model of {list(PRIMARIES)}")
+        if not reason.isprintable():  # a line break, or a byte that was no text
+            refuse("--not-evaluable takes a REASON of printable text, on one line")
         out[model] = "declared on the command line: " + reason.strip()
     return out
 
@@ -2447,9 +2852,9 @@ def run_confirmatory(args: argparse.Namespace) -> int:
     if study.problems:
         refuse("the readings cannot be scored: " + "; ".join(study.problems))
     if not baselines_sha.startswith(want_baselines):
-        refuse(
+        refuse(  # both at the length of the hash given, so that the two can be compared
             "the model-free predictions are not those hashed at the freeze: their sha256 "
-            f"starts with {baselines_sha[:16]}, expected {want_baselines[:16]}"
+            f"starts with {baselines_sha[: len(want_baselines)]}, expected {want_baselines}"
         )
 
     # the sealed file: hashed as bytes, parsed only when the hash is the expected one
@@ -2460,6 +2865,35 @@ def run_confirmatory(args: argparse.Namespace) -> int:
             warnings.simplefilter("ignore")  # a warning may quote a cell
             rows, variants = unseal(sealed, events, listed)
             results = evaluate(study, rows, variants, P_VALUE_SOURCE)
+        report = {
+            "about": ABOUT_RESULTS,
+            "command": "PYTHONPATH=. python -m analysis.coling.evaluate confirmatory "
+            "--expect-sha256 <sealed file> --expect-eligible-sha256 <eligible list> "
+            "--expect-baselines-sha256 <model-free predictions> --expect-selection-sha256 "
+            "<model>=<selection file> (one for each primary) --out <file>",
+            "registered": registered_record(),
+            "inputs": {
+                "sealed_outcomes_sha256": sealed_sha,
+                "eligible_sha256": hashes["the eligible list"],
+                "statements_sha256": hashes["the statement table"],
+                "events_sha256": hashes["the events table"],
+                "dataset_counts_sha256": hashes["the counts file"],
+                "plan_sha256": found.plan_sha256,
+                "baseline_predictions_sha256": baselines_sha,
+                "baseline_predictions_checked_against_the_freeze": True,
+                "code_sha256": code_record(),
+            },
+            "refit": study.refit,
+            "h3": {"comparator": study.comparator, "selections": found.selections},
+            "not_evaluable_by_declaration": skipped,
+            "runs": study.runs,
+            **results,
+        }
+        # every text is made before a file exists: a stop here must leave nothing behind
+        record, table = report_text(report), markdown(report)
+        printed = "\n".join(summary_lines(report))
+        for text in (record, table):  # what cannot be written stops here too
+            text.encode("utf-8")
     except Exception as error:
         stopped = type(error).__name__  # the error itself, and its message, go no further
     if stopped:
@@ -2467,34 +2901,10 @@ def run_confirmatory(args: argparse.Namespace) -> int:
             f"the evaluation stopped on the sealed rows ({stopped}); the message is withheld "
             "because it may quote a sealed value"
         )
-    report = {
-        "about": ABOUT_RESULTS,
-        "command": "PYTHONPATH=. python -m analysis.coling.evaluate confirmatory "
-        "--expect-sha256 <sealed file> --expect-eligible-sha256 <eligible list> "
-        "--expect-baselines-sha256 <model-free predictions> --expect-selection-sha256 "
-        "<model>=<selection file> (one for each primary) --out <file>",
-        "registered": registered_record(),
-        "inputs": {
-            "sealed_outcomes_sha256": sealed_sha,
-            "eligible_sha256": hashes["the eligible list"],
-            "statements_sha256": hashes["the statement table"],
-            "events_sha256": hashes["the events table"],
-            "dataset_counts_sha256": hashes["the counts file"],
-            "plan_sha256": found.plan_sha256,
-            "baseline_predictions_sha256": baselines_sha,
-            "baseline_predictions_checked_against_the_freeze": True,
-            "code_sha256": code_record(),
-        },
-        "refit": study.refit,
-        "h3": {"comparator": study.comparator, "selections": found.selections},
-        "not_evaluable_by_declaration": skipped,
-        "runs": study.runs,
-        **results,
-    }
-    write_new(out, report_text(report))
+    write_new(out, record)
     assert beside is not None
-    write_new(beside, markdown(report))
-    print("\n".join(summary_lines(report)))
+    write_new(beside, table)
+    print(printed)
     print(f"wrote {out.as_posix()} and {beside.as_posix()}")
     return 0
 
