@@ -841,8 +841,9 @@ both context for E3, and neither is a failure.
 from the two submitted sheets and the adjudication sheet alone, ADJ lists the gold items whose
 reading rests on a convention the prompt does not state (guide, D14):
 `analysis/coling/out/audit/literal_convention_items.csv`, one column `item_id`, with the
-header only when there is none. It is committed with the gold file, its sha256 logged beside
-the gold's, before any reader output on those items is opened, and changes afterwards only by
+header only when there is none. It is committed with the gold file, its sha256 written in
+that commit's message beside the gold's, before any reader output on those items is opened,
+and changes afterwards only by
 a dated amendment. Every E2 result is also given without these items and without the items
 the adjudication marked as a gap of the guide; the registered family is the one on every gold
 item.
@@ -1112,8 +1113,8 @@ in the contrast of the stale factor, also when its stale flag is wrong.
   `(1 + #{|d* − d| >= |d|}) / (B + 1)`, with `d*` the same difference in a draw of seeds; a
   draw with no item on one side is left out. The cells of the other five models never decide
   the procedure of the twelve; such a model has no Wald test where its own cell is flat, and
-  its bootstrap contrast is given as a description. A contrast over fewer than two seeds is
-  not evaluable.
+  its bootstrap contrast is given as a description. A contrast whose edited items, or whose
+  unedited items, lie on fewer than two seeds is not evaluable.
 - *Size of the fallback.* Under no effect of any factor, on the item file's own layout of
   seeds and factors and with synthetic errors (a run that is not in the committed output),
   the centred p-value gave a Holm familywise error of 0.2% to 5.8%, where the percentile
@@ -2290,7 +2291,8 @@ It reads E2 and E5 for the two primary models only. No outcome and none of H1 to
   the factor on which it can occur. The own error is a period given where the gold gives none
   (certainty marker and silent: the false-commitment rate of section 7.1), the distractor's
   period taken (distractor date: distractor uptake, section 7.1), or a period given without
-  the stale flag (stale). None of the three can occur on an unedited seed item, which is
+  the stale flag on an item whose gold is stale (stale). None of the three can occur on an
+  unedited seed item, which is
   dated, not stale and carries no distractor date. A wrong statement type, a wrong interval or
   a wrong certainty class does not make a factor count by itself; each is reported.
   Conditions (b) and (c) can only withhold.
@@ -2315,7 +2317,8 @@ It reads E2 and E5 for the two primary models only. No outcome and none of H1 to
   rates the exact binomial interval beside the percentile one), beside the rule reader's and
   each annotator's, and stale-value uptake on the 16 stale-at-issue statements of E3 beside
   them. The letter accuracy of the model, of the rule reader and of each annotator against the
-  other stands beside the sentence, with the two weighted differences. None of these decides
+  other (on the gold's letter items, by the E2 rule against the other's label) stands beside
+  the sentence, with the two weighted differences. None of these decides
   anything, and neither do the three marks of E2's positive result. For each standing factor
   that counts, the paper gives the rate of its own error in the sentence that names it, and
   the share of the factor's errors that are of another kind. The secondary models are
