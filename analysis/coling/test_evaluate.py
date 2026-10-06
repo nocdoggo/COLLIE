@@ -41,8 +41,16 @@ would not have accepted, of a wrong hash, of files of another build and of a sto
 or in the texts of the results, each with nothing written and, before the evaluation, the sealed
 file left unread; the probe test, the switch to the post-cutoff slice, the small-slice rule at its
 boundary and a primary declared not evaluable; the six tests against a computation made here from
-the scripted answers and the synthetic outcomes; bounds, secondaries and scores; the hash of the
-model-free predictions; the same result on a second run; no statement in any output. The last test
+the scripted answers and the synthetic outcomes; bounds, secondaries and scores; the
+overconfidence criterion of PLAN section 13 (each of its five readings on rows worked by hand, an
+interval that holds zero or has an end on it, an event undetermined at one horizon alone, failed
+answers in the main figures and out of the parsed-only ones, a reading that the parsed answers
+alone would give otherwise, the parsed-only figures withheld when a few answers failed or parsed,
+every interval against a loop over the registered draws, a draw that is zero up to rounding, the
+base rate on the item set of a switched primary in a study built by hand, an item set without a
+scoreable statement, a primary without an item set, the keys of the result file and the line of
+the table and of the printout); the hash of the model-free predictions; the same result on a second
+run; no statement in any output. The last test
 runs the dev command on the open train-period data with stand-in readings made from the model-free
 predictors and compares it with ``power.py`` (and with ``out/dev_losses.json`` when that file is of
 the same build); it is skipped when the open tables are absent.
@@ -1960,6 +1968,7 @@ def h2_report(d: np.ndarray, clusters: list[str]) -> dict[str, Any]:
         "family": [entry],
         "probe": {},
         "item_sets": {},
+        "secondaries": {"overconfidence_of_condition_a": {}},
     }
 
 
@@ -4325,6 +4334,16 @@ def test_result_file_holds_the_registered_record(
     (recovery,) = [item for item in report["not_computed_here"] if "recovery rule" in item]
     for analysis in ("the BL definition", "leaving the list", "the Date Discontinued cell"):
         assert analysis in recovery
+    # two things that PLAN sections 13 and 5 give to a secondary scorer, each in one item: the
+    # Turnbull share beside the overconfidence criterion, and the analysis by statement type
+    (share,) = [item for item in report["not_computed_here"] if "Turnbull" in item]
+    assert share == (
+        "the mean of P(E_end) minus the Turnbull share recovered by the stated end, reported "
+        "beside the overconfidence criterion (a secondary scorer)"
+    )
+    (by_type,) = [item for item in report["not_computed_here"] if "by statement type" in item]
+    assert "the overconfidence criterion on the recovery statements" in by_type
+    assert "Turnbull" not in json.dumps(report["secondaries"]) + json.dumps(report["losses"])
 
 
 def test_a_planted_effect_is_found_and_a_null_is_not(
@@ -4561,6 +4580,10 @@ DECISIONS = (
     "for both predictors at once",
     "ten runs of equal length",
     "definition A is one of the outcome variants",
+    "an end on zero does not",
+    "except in the base rate's own record",
+    "a primary without an item set has no reading",
+    "the horizon events of those few statements",
 )
 """A phrase of every decision in ``evaluate.WHERE_THE_PLAN_IS_SILENT``."""
 STATED_BY_THE_PLAN = (
@@ -4596,6 +4619,51 @@ def test_the_list_of_decisions_holds_what_the_plan_does_not_say() -> None:
     assert "the largest absolute flipped statistic" not in said
     assert "every other interval is a percentile interval" not in said
     assert "equal-tailed and symmetric intervals under studentised" in said
+    # the overconfidence criterion: its intervals are named with the others that carry no
+    # ``interval_method``, and what the plan leaves open about them is said in one sentence
+    assert (
+        "of calibration in the large and of the overconfidence criterion (a difference of two "
+        "mean probabilities among them) are percentile intervals and carry no such field"
+    ) in said
+    (zero,) = [sentence for sentence in held if "an end on zero does not" in sentence]
+    for phrase in (
+        "both of its ends lie on one side of zero",
+        "a draw whose values sum to zero up to rounding counts as zero",
+        "an item set of a single episode has no interval",
+        "neither part is met and the reading is the fifth",
+    ):
+        assert phrase in zero, phrase
+    # a primary without an item set: each of the three reasons, the slice on which the first
+    # part could have been read, and the primary whose runs are not read
+    (unread,) = [sentence for sentence in held if "has no reading" in sentence]
+    for phrase in (
+        "its line in the table and in the printout gives the reason",
+        "the probe could not be tested",
+        "the model has no slice inside the test split",
+        "its post-cutoff slice holds fewer than 50 scoreable statements",
+        "the criterion is not read on such a slice, although its first part uses no scoreable set",
+        "a primary declared not evaluable, whose runs are not read, has no entry and no line",
+    ):
+        assert phrase in unread, phrase
+    # the figures on the answers that parsed: when they are withheld, and why
+    (few,) = [sentence for sentence in held if "those few statements" in sentence]
+    for phrase in (
+        "the two parts on the answers that parsed (parsed_only) are withheld",
+        "their three counts apart",
+        "when 1 to 4 answers of condition (a) failed on the item set, or 1 to 4 parsed",
+        "with the figures over every statement they would give the horizon events",
+        "the statements that both of its sides parsed (both_sides_parsed) is withheld",
+        "when it leaves out or rests on 1 to 4 scoreable statements",
+    ):
+        assert phrase in few, phrase
+    assert ev.MIN_SHOWN - 1 == 4 and ev.MIN_SLICE == 50  # the numbers the two sentences give
+    # the module's docstring words the same decisions
+    described = " ".join((ev.__doc__ or "").split())
+    for sentence in held[-4:]:
+        worded = sentence[1:].replace("base_rate", "``base_rate``")
+        for key in ("parsed_only", "both_sides_parsed"):
+            worded = worded.replace(f"({key})", f"(``{key}``)")
+        assert worded in described, sentence
 
 
 COMMITTED_FAMILY = [
@@ -5202,9 +5270,8 @@ def test_secondaries_and_scores(study: SimpleNamespace, base: SimpleNamespace) -
     assert parts["trust_loss"]["delta"] == pytest.approx(
         losses[f"{LLAMA}:a"]["primary_brier"] - losses[f"{LLAMA}:c"]["primary_brier"], abs=2e-6
     )
-    # the overconfidence criterion of PLAN section 13: (a) of the first primary says 0.9
-    over = second["overconfidence_of_condition_a"]
-    assert over[LLAMA]["met"] is True and over[DEEPSEEK]["met"] is False
+    # (the overconfidence criterion of PLAN section 13 has its own tests)
+    assert list(second["overconfidence_of_condition_a"]) == list(rd.PRIMARIES)
     record = losses[f"{DEEPSEEK}:a"]
     a = given(study, DEEPSEEK, "a").loc[scoreable.index]
     gap = float((a["p_a"] - scoreable["y_a"]).mean())
@@ -5271,6 +5338,1252 @@ def test_murphy_decomposition_and_coverage_on_small_cases() -> None:
     assert ev.calibration([0.9, 0.8], [1, 0], ["g", "g"], 200, ev.SEED)["ci95"] is None
 
 
+# --------------------------------------------------------------------------------------------
+# The overconfidence criterion (PLAN section 13)
+# --------------------------------------------------------------------------------------------
+
+
+PLAN = Path(ev.__file__).parent / "plan" / "PLAN.md"
+EVENT_KEYS = ["E_end", "E_end90"]
+LIMIT_KEYS = [
+    "undetermined",
+    "mean_p",
+    "largest_frequency",
+    "least",
+    "least_ci95",
+    "smallest_frequency",
+    "greatest",
+    "greatest_ci95",
+]
+"""What the result file holds of calibration in the large over every statement, per event."""
+GAP_KEYS = ["mean_p_model", "mean_p_base_rate", "difference", "ci95"]
+COVERAGE_KEYS = ["inside", "outside", "bracket_straddles_the_interval", "coverage"]
+PART_KEYS = ["statements", "episodes", "against_outcomes", "against_base_rate"]
+CRITERION_KEYS = [
+    "criterion",
+    *PART_KEYS,
+    "reading",
+    "reading_in_words",
+    "met",
+    "scoreable",
+    "parsed_only",
+    "coverage_80",
+]
+"""The keys of the criterion of one primary, as ``evaluate.overconfidence`` gives them; the
+result file puts ``items`` before them."""
+
+
+def item_rows(
+    e_end: Sequence[float | None],
+    e_end90: Sequence[float | None] | None = None,
+    episodes: Sequence[str] | None = None,
+) -> pd.DataFrame:
+    """Typed rows of an item set built by hand: the two horizon events of each statement as 1,
+    0 or None (undetermined; ``E_end90`` as ``E_end`` unless given), its episode (its own
+    unless given), and a time to recovery between 40 and 60 days."""
+    index = [f"s{k:03d}" for k in range(len(e_end))]
+    rows = pd.DataFrame(
+        {
+            "y_a": pd.Series(list(e_end), index=index, dtype=float),
+            "y_b": pd.Series(list(e_end if e_end90 is None else e_end90), index=index, dtype=float),
+            "episode_id": list(episodes or index),
+            "ttr_kind": "interval",
+            "ttr_lower": 40.0,
+            "ttr_upper": 60.0,
+            "ttr_mid": 50.0,
+        },
+        index=index,
+    )
+    return rows.assign(scoreable=rows["y_a"].notna() & rows["y_b"].notna())
+
+
+def stated(rows: pd.DataFrame, p_a: Any, p_b: Any = 0.5, **quantiles: float) -> pd.DataFrame:
+    """Predictions for the statements of ``rows``: ``P(E_end)`` and ``P(E_end90)`` (one value
+    for all, or one per statement) and quantiles from 30 to 250 days unless given."""
+    days = dict(zip(P.QUANTILE_KEYS, (30.0, 100.0, 150.0, 200.0, 250.0), strict=True)) | quantiles
+    return pd.DataFrame({"p_a": p_a, "p_b": p_b, **days}, index=rows.index, dtype=float)
+
+
+def everyone(rows: pd.DataFrame) -> pd.Series:
+    """Every answer parsed."""
+    return pd.Series(True, index=rows.index)
+
+
+def events_of(found: dict[str, Any], event: str = "E_end") -> tuple[dict, dict]:
+    """The two parts of a criterion for one event: against outcomes, against the base rate."""
+    return found["against_outcomes"][event], found["against_base_rate"][event]
+
+
+def test_an_interval_excludes_zero_when_both_ends_lie_on_one_side() -> None:
+    for interval, verdict in (
+        ([0.001, 0.4], True),
+        ([-0.4, -0.001], True),
+        ([0.0, 0.4], False),  # an end on zero does not exclude it
+        ([-0.4, 0.0], False),
+        ([-0.1, 0.1], False),
+        ([0.0, 0.0], False),
+        (None, False),  # an interval that could not be made excludes nothing
+    ):
+        assert ev.excludes_zero(interval) is verdict, interval
+
+
+def test_the_five_readings_are_tried_in_the_plans_order() -> None:
+    below, above = [-0.3, -0.1], [0.1, 0.3]
+    cases = [
+        # the greatest value and its interval; the part against outcomes; the part against the
+        # base rate; the reading
+        (-0.2, below, False, False, 1),
+        (-0.2, below, False, True, 1),  # underconfident, and nothing else of the list
+        (-0.2, below, True, True, 1),  # the first case is tried first, whatever else is given
+        (-0.2, [-0.3, 0.1], False, True, 3),  # negative, but the interval holds zero
+        (-0.2, [-0.3, 0.0], False, False, 5),  # an end on zero
+        (-0.2, None, False, False, 5),  # no interval
+        (0.0, below, False, False, 5),  # zero is not negative
+        (0.2, above, True, True, 2),  # an interval that excludes zero from above is not the first
+        (0.2, above, False, True, 3),
+        (0.2, above, True, False, 4),
+        (0.2, above, False, False, 5),
+    ]
+    for greatest, interval, first, second, reading in cases:
+        outcomes = {"greatest": greatest, "greatest_ci95": interval, "met": first}
+        assert ev.overconfidence_reading(outcomes, {"met": second}) == reading, outcomes
+    # each reading in the words the plan gives the paper (section 13, "Reading")
+    plan = words(PLAN.read_text(encoding="utf-8"))
+    quoted = {
+        1: ["the readings are underconfident relative to outcomes"],
+        2: ["overconfident relative to outcomes"],
+        3: [
+            "the model states higher probabilities than the base rate",
+            "the captures do not decide whether it is overconfident",
+        ],
+        4: [
+            "the model's probabilities exceed every frequency the captures allow",
+            "they were not shown to exceed the base rate's",
+            "the excess is not put down to the reading",
+        ],
+        5: ["overconfidence was not detected"],
+    }
+    assert list(ev.OVERCONFIDENCE_READINGS) == [1, 2, 3, 4, 5] == list(quoted)
+    for number, phrases in quoted.items():
+        for phrase in phrases:
+            assert phrase in plan and phrase in ev.OVERCONFIDENCE_READINGS[number], phrase
+    assert "and nothing else of this list" in plan  # the first reading says nothing of the rest
+    assert ev.OVERCONFIDENCE_READINGS[1] == quoted[1][0]
+    assert "does not write that the readings are calibrated" in plan
+    assert "does not say that the readings are calibrated" in ev.OVERCONFIDENCE_READINGS[5]
+    # the criterion's own words name both parts, the item set and what met means
+    said = ev.OVERCONFIDENCE_CRITERION
+    for phrase in (
+        "every undetermined E_end counted as yes",
+        "the largest frequency of E_end the captures allow",
+        "the base rate by listing age on the same statements",
+        "over every statement of the item set",
+        "95% percentile interval by episode",
+        "met: both parts hold (reading 2)",
+    ):
+        assert phrase in said, phrase
+    # each of the two parts asks for a value above zero, in the same words; the value below zero
+    # belongs to the first reading, which those words do not describe
+    assert said.count("is positive with an interval that excludes zero") == 2
+    assert "negative" not in said
+
+
+def twenty() -> pd.DataFrame:
+    """Four episodes of five statements, each with ``E_end`` yes, no, no, undetermined,
+    undetermined. Of the 20 statements 4 are yes, 8 no and 8 undetermined: the largest
+    frequency the captures allow is (4 + 8) / 20 = 0.6 and the smallest 4 / 20 = 0.2. The
+    episodes are alike, so every draw of episodes has the same mean and an interval is the
+    value itself: the verdicts follow the signs."""
+    return item_rows([1, 0, 0, None, None] * 4, episodes=[e for e in "ghkm" for _ in range(5)])
+
+
+def forty() -> pd.DataFrame:
+    """``twenty`` twice over: eight episodes of five statements, each with ``E_end`` yes, no,
+    no, undetermined, undetermined. Of the 40 statements 8 are yes and 16 undetermined: the
+    largest frequency the captures allow is 24 / 40 = 0.6 and the smallest 8 / 40 = 0.2."""
+    return item_rows([1, 0, 0, None, None] * 8, episodes=[e for e in "ghkmnpqr" for _ in range(5)])
+
+
+BY_HAND = [
+    # P(E_end) of the model (p) and of the base rate (b) on every statement; the reading; the
+    # part against outcomes (the least value p - 0.6 above zero); the part against the base
+    # rate (p - b above zero). The greatest value is p - 0.2.
+    (0.1, 0.05, 1, False, True),  # greatest -0.1: underconfident, though 0.05 above the base rate
+    (0.9, 0.25, 2, True, True),  # least 0.3, difference 0.65
+    (0.5, 0.25, 3, False, True),  # least -0.1, greatest 0.3, difference 0.25
+    (0.6, 0.3, 3, False, True),  # least 0.6 - 0.6: zero is not above zero
+    (0.2, 0.1, 3, False, True),  # greatest 0.2 - 0.2: zero is not below zero, so not the first
+    (0.9, 0.95, 4, True, False),  # least 0.3, difference -0.05: below zero is not above it
+    (0.9, 0.9, 4, True, False),  # the base rate's own probabilities: a difference of zero
+    (0.5, 0.5, 5, False, False),  # least -0.1, greatest 0.3, difference 0
+    (0.5, 0.7, 5, False, False),  # least -0.1, greatest 0.3, difference -0.2
+]
+
+
+@pytest.mark.parametrize(("p", "b", "reading", "first", "second"), BY_HAND)
+def test_each_reading_of_the_criterion_on_rows_worked_by_hand(
+    p: float, b: float, reading: int, first: bool, second: bool
+) -> None:
+    rows = twenty()
+    found = ev.overconfidence(rows, stated(rows, p), stated(rows, b), everyone(rows), 400, ev.SEED)
+    assert list(found) == CRITERION_KEYS and found["criterion"] == ev.OVERCONFIDENCE_CRITERION
+    assert (found["statements"], found["episodes"]) == (20, 4)
+    outcomes, no_text = events_of(found)
+    assert outcomes["undetermined"] == 8
+    assert outcomes["largest_frequency"] == pytest.approx(0.6)
+    assert outcomes["smallest_frequency"] == pytest.approx(0.2)
+    assert outcomes["mean_p"] == pytest.approx(p) == no_text["mean_p_model"]
+    assert outcomes["least"] == pytest.approx(p - 0.6)
+    assert outcomes["greatest"] == pytest.approx(p - 0.2)
+    assert outcomes["least_ci95"] == pytest.approx([p - 0.6] * 2, abs=1e-12)
+    assert outcomes["greatest_ci95"] == pytest.approx([p - 0.2] * 2, abs=1e-12)
+    assert no_text["mean_p_base_rate"] == pytest.approx(b)
+    assert no_text["difference"] == pytest.approx(p - b)
+    assert no_text["ci95"] == pytest.approx([p - b] * 2, abs=1e-12)
+    assert outcomes["met"] is first and no_text["met"] is second
+    assert found["reading"] == reading and found["met"] is (reading == 2)
+    assert found["reading_in_words"] == ev.OVERCONFIDENCE_READINGS[reading]
+    # the base rate's limits on the same statements stand beside the model's, without a verdict
+    theirs = outcomes["base_rate"]
+    assert list(outcomes) == [*LIMIT_KEYS, "met", "base_rate"] and list(theirs) == LIMIT_KEYS
+    assert theirs["mean_p"] == pytest.approx(b) and theirs["undetermined"] == 8
+    assert theirs["least"] == pytest.approx(b - 0.6) and theirs["greatest"] == pytest.approx(
+        b - 0.2
+    )
+    assert list(no_text) == [*GAP_KEYS, "met"]
+
+
+def test_a_value_whose_interval_holds_zero_decides_nothing() -> None:
+    # two episodes of four statements: in g no E_end happened, in h every one did (4 of 8)
+    rows = item_rows([0] * 4 + [1] * 4, episodes=["g"] * 4 + ["h"] * 4)
+    # The model says 0.6 everywhere: 0.6 above the outcome in g, 0.4 below it in h, and
+    # 0.6 - 4/8 = 0.1 above over both. A draw of two episodes takes g twice (0.6), h twice
+    # (-0.4) or each once (0.1): a quarter, a quarter and a half of the draws, so the interval
+    # runs from -0.4 to 0.6. The base rate says 0.2 in g and 0.8 in h: the model is 0.4 above
+    # it in g, 0.2 below it in h, 0.1 above over both, with an interval from -0.2 to 0.4.
+    base = stated(rows, [0.2] * 4 + [0.8] * 4)
+    found = ev.overconfidence(rows, stated(rows, 0.6), base, everyone(rows), 2000, ev.SEED)
+    outcomes, no_text = events_of(found)
+    assert outcomes["undetermined"] == 0  # so the least value is also the greatest
+    assert outcomes["least"] == pytest.approx(0.1) == outcomes["greatest"]
+    assert outcomes["least_ci95"] == pytest.approx([-0.4, 0.6]) == outcomes["greatest_ci95"]
+    assert no_text["difference"] == pytest.approx(0.1) and no_text["ci95"] == pytest.approx(
+        [-0.2, 0.4]
+    )
+    assert (outcomes["met"], no_text["met"]) == (False, False)
+    assert found["reading"] == 5 and found["met"] is False
+    # the mirror image: 0.4 is 0.1 below the frequency with an interval from -0.6 to 0.4, which
+    # holds zero, so the readings are not called underconfident
+    low = ev.overconfidence(rows, stated(rows, 0.4), stated(rows, 0.4), everyone(rows), 2000, 5)
+    assert events_of(low)[0]["greatest"] == pytest.approx(-0.1)
+    assert events_of(low)[0]["greatest_ci95"] == pytest.approx([-0.6, 0.4])
+    assert low["reading"] == 5
+    # one episode: no interval can be made, no part is met and the reading is the fifth,
+    # however far the values are from zero (0.99 - 0.5 and 0.99 - 0.01)
+    one = rows.assign(episode_id="g")
+    alone = ev.overconfidence(one, stated(one, 0.99), stated(one, 0.01), everyone(one), 2000, 5)
+    outcomes, no_text = events_of(alone)
+    assert alone["episodes"] == 1 and outcomes["least"] == pytest.approx(0.49)
+    assert outcomes["least_ci95"] is None and outcomes["greatest_ci95"] is None
+    assert no_text["difference"] == pytest.approx(0.98) and no_text["ci95"] is None
+    assert (outcomes["met"], no_text["met"], alone["reading"]) == (False, False, 5)
+    assert outcomes["base_rate"]["least_ci95"] is None
+    assert alone["scoreable"]["E_end"]["ci95"] is None
+    assert alone["scoreable"]["E_end"]["against_base_rate"]["ci95"] is None
+    # nor is a model far below every frequency called underconfident without an interval
+    under = ev.overconfidence(one, stated(one, 0.01), stated(one, 0.01), everyone(one), 2000, 5)
+    assert events_of(under)[0]["greatest"] == pytest.approx(-0.49) and under["reading"] == 5
+    assert ev.MIN_EPISODES == 2
+
+
+def test_an_undetermined_event_is_counted_at_its_own_horizon_alone() -> None:
+    # Six statements in three episodes, E_end / E_end90:
+    #   s000 undetermined / yes   (E_end is open and E_end90 is not)
+    #   s001 no / undetermined    (the reverse)
+    #   s002 yes / yes   s003 no / yes   s004 no / no   s005 undetermined / undetermined
+    rows = item_rows([None, 0, 1, 0, 0, None], [1, None, 1, 1, 0, None], episodes=list("gghhkk"))
+    assert rows["scoreable"].tolist() == [False, False, True, True, True, False]
+    pred, base = stated(rows, 0.7, 0.8), stated(rows, 0.3, 0.5)
+    found = ev.overconfidence(rows, pred, base, everyone(rows), 400, ev.SEED)
+    # E_end: 1 yes, 3 no, 2 undetermined. Largest frequency (1 + 2) / 6 = 0.5, smallest 1 / 6.
+    # s001 is not scoreable, and its E_end is still the no that was seen: had the three
+    # statements that are not scoreable been counted as open, the largest would be 4 / 6.
+    outcomes, no_text = events_of(found)
+    assert outcomes["undetermined"] == 2
+    assert outcomes["largest_frequency"] == pytest.approx(3 / 6)
+    assert outcomes["smallest_frequency"] == pytest.approx(1 / 6)
+    assert outcomes["least"] == pytest.approx(0.7 - 3 / 6)
+    assert outcomes["greatest"] == pytest.approx(0.7 - 1 / 6)
+    assert outcomes["base_rate"]["least"] == pytest.approx(0.3 - 3 / 6)
+    assert outcomes["base_rate"]["greatest"] == pytest.approx(0.3 - 1 / 6)
+    assert no_text["difference"] == pytest.approx(0.7 - 0.3)
+    # E_end90: 3 yes, 1 no, 2 undetermined. Largest (3 + 2) / 6, smallest 3 / 6: the yes of
+    # s000 is counted in both, although its E_end is open.
+    later, apart = events_of(found, "E_end90")
+    assert later["undetermined"] == 2 and later["mean_p"] == pytest.approx(0.8)
+    assert later["largest_frequency"] == pytest.approx(5 / 6)
+    assert later["smallest_frequency"] == pytest.approx(3 / 6)
+    assert later["least"] == pytest.approx(0.8 - 5 / 6)
+    assert later["greatest"] == pytest.approx(0.8 - 3 / 6)
+    assert later["base_rate"]["least"] == pytest.approx(0.5 - 5 / 6)
+    assert later["base_rate"]["greatest"] == pytest.approx(0.0)
+    assert apart["mean_p_base_rate"] == pytest.approx(0.5)
+    assert apart["difference"] == pytest.approx(0.8 - 0.5)
+    # beside the criterion, the scoreable statements (s002, s003, s004: E_end 1 of 3, E_end90
+    # 2 of 3), where the two predictors stand against one frequency
+    scoreable = found["scoreable"]
+    assert list(scoreable) == ["statements", "episodes", *EVENT_KEYS]
+    assert (scoreable["statements"], scoreable["episodes"]) == (3, 2)
+    assert list(scoreable["E_end"]) == [
+        "mean_p_minus_frequency",
+        "ci95",
+        "base_rate",
+        "against_base_rate",
+    ]
+    assert scoreable["E_end"]["mean_p_minus_frequency"] == pytest.approx(0.7 - 1 / 3)
+    assert scoreable["E_end"]["base_rate"]["mean_p_minus_frequency"] == pytest.approx(0.3 - 1 / 3)
+    assert list(scoreable["E_end"]["base_rate"]) == ["mean_p_minus_frequency", "ci95"]
+    assert list(scoreable["E_end"]["against_base_rate"]) == GAP_KEYS
+    assert scoreable["E_end"]["against_base_rate"]["difference"] == pytest.approx(0.4)
+    assert scoreable["E_end90"]["mean_p_minus_frequency"] == pytest.approx(0.8 - 2 / 3)
+    assert scoreable["E_end90"]["base_rate"]["mean_p_minus_frequency"] == pytest.approx(0.5 - 2 / 3)
+    assert scoreable["E_end90"]["against_base_rate"]["difference"] == pytest.approx(0.3)
+    held = ev.calibration(pred.loc[rows["scoreable"], "p_a"], [1, 0, 0], list("hhk"), 400, ev.SEED)
+    assert {key: scoreable["E_end"][key] for key in held} == held
+    # the limits on their own: the same numbers, and nothing without a statement
+    limits = ev.calibration_limits([0.7] * 6, rows["y_a"], list("gghhkk"), 400, ev.SEED)
+    assert limits == {key: outcomes[key] for key in LIMIT_KEYS}
+    assert ev.calibration_limits([], [], [], 400, ev.SEED) == {
+        "undetermined": 0,
+        **dict.fromkeys(LIMIT_KEYS[1:]),
+    }
+    assert ev.probability_gap([], [], [], 400, ev.SEED) == dict.fromkeys(GAP_KEYS)
+    # no statement is scoreable: the block holds its counts and nothing else
+    open_rows = item_rows([None, 0], [1, None])
+    bare = ev.overconfidence(
+        open_rows, stated(open_rows, 0.7), stated(open_rows, 0.3), everyone(open_rows), 400, 5
+    )
+    assert bare["scoreable"] == {"statements": 0, "episodes": 0}
+    assert events_of(bare)[0]["least"] == pytest.approx(0.7 - 1 / 2)
+
+
+def test_failed_answers_are_in_the_criterion_and_out_of_the_parsed_only_figures() -> None:
+    # Three times over, six statements in three episodes of two: E_end yes, no, undetermined,
+    # no, yes, undetermined. 18 statements in nine episodes, so that neither the answers that
+    # failed nor those that parsed are few enough for the parsed-only figures to be withheld.
+    rows = item_rows(
+        [1, 0, None, 0, 1, None] * 3, episodes=[e for e in "ghkmnpqrt" for _ in range(2)]
+    )
+    base = stated(rows, [0.1, 0.2, 0.3, 0.4, 0.5, 0.6] * 3, [0.2, 0.3, 0.4, 0.5, 0.6, 0.7] * 3)
+    # the model answers 0.8 (0.9 for E_end90) with an 80% interval from 50 to 200 days on the
+    # first four of each six; its other two answers failed and are replaced by the base rate's
+    # output
+    fourth = [k % 6 < 4 for k in range(18)]
+    answers = {
+        item: stored(forecast(0.8, 0.9, 100) if given else None)
+        for item, given in zip(rows.index, fourth, strict=True)
+    }
+    pred, parsed, counts = ev.predictive(answers, rows, base)
+    assert counts["replaced_by_base_rate"] == 6 and parsed.tolist() == fourth
+    assert pred["p_a"].tolist() == [0.8, 0.8, 0.8, 0.8, 0.5, 0.6] * 3
+    found = ev.overconfidence(rows, pred, base, parsed, 400, ev.SEED)
+    # The main figures hold every statement. In each six, mean P(E_end) is (4 * 0.8 + 0.5 +
+    # 0.6) / 6 = 4.3 / 6 for the model and 2.1 / 6 for the base rate, a difference of 2.2 / 6.
+    # E_end is yes on 2 and undetermined on 2 of 6: largest frequency 4 / 6, smallest 2 / 6.
+    outcomes, no_text = events_of(found)
+    assert (found["statements"], found["episodes"]) == (18, 9)
+    assert outcomes["mean_p"] == pytest.approx(4.3 / 6) == no_text["mean_p_model"]
+    assert outcomes["least"] == pytest.approx(4.3 / 6 - 4 / 6)
+    assert outcomes["greatest"] == pytest.approx(4.3 / 6 - 2 / 6)
+    assert no_text["mean_p_base_rate"] == pytest.approx(2.1 / 6)
+    assert no_text["difference"] == pytest.approx(2.2 / 6)
+    assert outcomes["base_rate"]["least"] == pytest.approx(2.1 / 6 - 4 / 6)
+    # Parsed only: the first four statements of each six, in two of its three episodes. Mean
+    # P(E_end) 0.8 against the base rate's (0.1 + 0.2 + 0.3 + 0.4) / 4 = 0.25. E_end is yes on
+    # 1 and undetermined on 1 of 4: largest frequency 2 / 4, smallest 1 / 4.
+    kept = found["parsed_only"]
+    assert list(kept) == ["not_parsed", *PART_KEYS]
+    assert (kept["not_parsed"], kept["statements"], kept["episodes"]) == (6, 12, 6)
+    outcomes, no_text = events_of(kept)
+    assert outcomes["undetermined"] == 3 and outcomes["mean_p"] == pytest.approx(0.8)
+    assert outcomes["least"] == pytest.approx(0.8 - 2 / 4)
+    assert outcomes["greatest"] == pytest.approx(0.8 - 1 / 4)
+    assert outcomes["base_rate"]["mean_p"] == pytest.approx(0.25)
+    assert outcomes["base_rate"]["least"] == pytest.approx(0.25 - 2 / 4)
+    assert outcomes["base_rate"]["greatest"] == pytest.approx(0.0)
+    assert no_text["mean_p_base_rate"] == pytest.approx(0.25)
+    assert no_text["difference"] == pytest.approx(0.55)
+    assert list(kept["against_outcomes"]) == EVENT_KEYS == list(kept["against_base_rate"])
+    later, apart = events_of(kept, "E_end90")
+    assert later["mean_p"] == pytest.approx(0.9) and apart["mean_p_base_rate"] == pytest.approx(
+        0.35
+    )
+    # with every answer parsed the two sets are the same
+    whole = ev.overconfidence(rows, pred, base, everyone(rows), 400, ev.SEED)
+    assert whole["parsed_only"] == {"not_parsed": 0} | {key: whole[key] for key in PART_KEYS}
+    # and with none there is nothing to give
+    nobody = ev.overconfidence(rows, pred, base, ~everyone(rows), 400, ev.SEED)["parsed_only"]
+    assert list(nobody) == ["not_parsed", *PART_KEYS]
+    assert (nobody["not_parsed"], nobody["statements"], nobody["episodes"]) == (18, 0, 0)
+    assert nobody["against_outcomes"]["E_end"]["least"] is None
+    assert nobody["against_base_rate"]["E_end"] == {**dict.fromkeys(GAP_KEYS), "met": False}
+    assert nobody["against_outcomes"]["E_end"]["met"] is False
+    # the coverage of the 80% interval, for both predictors on every statement: the bracket
+    # of 40 to 60 days straddles the lower end of the model's twelve intervals (50 to 200) and
+    # lies inside the base rate's (30 to 200), which the six failed answers took
+    assert found["coverage_80"] == {
+        "inside": 6,
+        "outside": 0,
+        "bracket_straddles_the_interval": 12,
+        "coverage": 1.0,
+        "base_rate": {
+            "inside": 18,
+            "outside": 0,
+            "bracket_straddles_the_interval": 0,
+            "coverage": 1.0,
+        },
+    }
+    assert list(found["coverage_80"]) == [*COVERAGE_KEYS, "base_rate"]
+
+
+def test_the_parsed_only_figures_are_withheld_when_they_would_give_back_a_few_statements() -> None:
+    """Beside the figures over every statement, those over the answers that parsed give the
+    horizon events of the statements between the two sets: the counts of undetermined events
+    subtract, and so do the frequencies times the numbers of statements. Which answers failed
+    can be told from the stored runs, so with 1 to 4 failed answers the block holds its counts
+    alone; and so it does over 1 to 4 parsed answers, whose events it would give outright."""
+    rows = forty()  # each episode: E_end yes, no, no, undetermined, undetermined
+    base, said = stated(rows, 0.5), stated(rows, 0.9)
+
+    def with_failed(failed: Sequence[int]) -> dict[str, Any]:
+        parsed = pd.Series([k not in failed for k in range(40)], index=rows.index)
+        pred = said.where(parsed, base, axis=0)
+        return ev.overconfidence(rows, pred, base, parsed, 300, ev.SEED)
+
+    # five failed answers, the first episode: the figures are given, and what they give by
+    # subtraction is a count over those five statements (E_end yes on 1, undetermined on 2)
+    found = with_failed(range(5))
+    kept = found["parsed_only"]
+    assert list(kept) == ["not_parsed", *PART_KEYS]
+    assert (kept["not_parsed"], kept["statements"], kept["episodes"]) == (5, 35, 7)
+    whole, part = events_of(found)[0], events_of(kept)[0]
+    assert whole["undetermined"] - part["undetermined"] == 2
+    assert round(whole["smallest_frequency"] * 40) - round(part["smallest_frequency"] * 35) == 1
+    # one failed answer, whose E_end is yes (s000), no (s001) or undetermined (s003); then two
+    # and four: the same subtraction would give the event of one statement, or of a few, and
+    # there is nothing left to subtract
+    for failed in ([0], [1], [3], [0, 3], [0, 1, 2, 3]):
+        found = with_failed(failed)
+        assert found["parsed_only"] == {
+            "not_parsed": len(failed),
+            "statements": 40 - len(failed),
+            "episodes": 8,
+            "withheld": True,
+        }
+        # the criterion and what else stands beside it are on every statement, as before
+        assert list(found) == CRITERION_KEYS and found["statements"] == 40
+        outcomes, no_text = events_of(found)
+        assert outcomes["undetermined"] == 16
+        assert outcomes["largest_frequency"] == pytest.approx(0.6)
+        assert no_text["mean_p_model"] == pytest.approx(0.9 - 0.4 * len(failed) / 40)
+        assert found["reading"] == 2 and found["scoreable"]["statements"] == 24
+    # four answers parsed, or one: the figures over them would be their events themselves
+    for given in (1, 4):
+        found = with_failed(range(given, 40))
+        assert found["parsed_only"] == {
+            "not_parsed": 40 - given,
+            "statements": given,
+            "episodes": 1,
+            "withheld": True,
+        }
+    # five parsed, in one episode: given, without an interval
+    kept = with_failed(range(5, 40))["parsed_only"]
+    assert list(kept) == ["not_parsed", *PART_KEYS]
+    assert (kept["not_parsed"], kept["statements"], kept["episodes"]) == (35, 5, 1)
+    assert events_of(kept)[0]["greatest"] == pytest.approx(0.9 - 1 / 5)
+    assert events_of(kept)[0]["greatest_ci95"] is None
+    # none failed, or none parsed: no statement lies between the two sets, nothing is withheld
+    assert list(with_failed([])["parsed_only"]) == ["not_parsed", *PART_KEYS]
+    assert list(with_failed(range(40))["parsed_only"]) == ["not_parsed", *PART_KEYS]
+    assert ev.MIN_SHOWN == 5
+    assert [ev.few(count) for count in (0, 1, 4, 5, 40)] == [False, True, True, False, False]
+
+
+def test_the_reading_is_that_of_every_statement_not_of_the_answers_that_parsed() -> None:
+    # The model says 0.9 on the first statement of each episode, whose E_end is yes; its other
+    # answers failed and hold the base rate's 0.5.
+    rows = forty()
+    base = stated(rows, 0.5)
+    parsed = pd.Series([True, False, False, False, False] * 8, index=rows.index)
+    pred = stated(rows, 0.9).where(parsed, base, axis=0)
+    found = ev.overconfidence(rows, pred, base, parsed, 400, ev.SEED)
+    # Every statement: mean (8 * 0.9 + 32 * 0.5) / 40 = 0.58. Least 0.58 - 0.6, which is not
+    # above zero; greatest 0.58 - 0.2; 0.08 above the base rate: the third reading.
+    outcomes, no_text = events_of(found)
+    assert outcomes["mean_p"] == pytest.approx(0.58)
+    assert outcomes["least"] == pytest.approx(-0.02)
+    assert outcomes["greatest"] == pytest.approx(0.38)
+    assert no_text["difference"] == pytest.approx(0.08)
+    assert (outcomes["met"], no_text["met"], found["reading"]) == (False, True, 3)
+    assert found["reading_in_words"] == ev.OVERCONFIDENCE_READINGS[3] and found["met"] is False
+    # The eight answers that parsed: 0.9 against E_end yes on all eight, so that the least and
+    # the greatest value are both -0.1 with an interval on it. Read on these alone, the model
+    # would be called underconfident, which is the first reading.
+    kept = found["parsed_only"]
+    assert (kept["not_parsed"], kept["statements"], kept["episodes"]) == (32, 8, 8)
+    outcomes, no_text = events_of(kept)
+    assert outcomes["undetermined"] == 0 and outcomes["largest_frequency"] == 1.0
+    assert outcomes["greatest"] == pytest.approx(-0.1)
+    assert outcomes["greatest_ci95"] == pytest.approx([-0.1, -0.1])
+    assert no_text["difference"] == pytest.approx(0.4) and no_text["met"] is True
+    assert ev.overconfidence_reading(outcomes, no_text) == 1
+
+
+def loop_interval(values: Sequence[float], episodes: Sequence[str]) -> list[float]:
+    """The 95% percentile interval of a mean on the registered draws, one draw at a time:
+    10,000 draws with seed 20261001, each of as many episodes as there are, with replacement;
+    the mean of a draw is the sum of the values of the episodes it takes, each as often as it
+    is taken, over the number of their statements."""
+    names = sorted(set(episodes))
+    rng = np.random.default_rng(20261001)
+    taken = rng.multinomial(len(names), [1.0 / len(names)] * len(names), size=10_000)
+    totals = [sum(v for v, e in zip(values, episodes, strict=True) if e == name) for name in names]
+    sizes = [sum(e == name for e in episodes) for name in names]
+    means = []
+    for draw in taken.tolist():
+        total = sum(times * value for times, value in zip(draw, totals, strict=True))
+        count = sum(times * size for times, size in zip(draw, sizes, strict=True))
+        means.append(total / count)
+    low, high = np.quantile(means, [0.025, 0.975])
+    return [float(low), float(high)]
+
+
+def thirty() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.Series]:
+    """Thirty statements in seven episodes of two to seven, with the predictions of a model
+    and of the base rate and the answers that parsed (all but five, which is enough for the
+    parsed-only figures to be given: ``evaluate.few``). Events and probabilities follow cycles
+    of different lengths, so that no two episodes are alike and an interval moves with the
+    draws. The two statements of the first episode have ``E_end`` undetermined: the scoreable
+    statements lie in fewer episodes than the item set."""
+    sizes = {"e1": 2, "e2": 3, "e3": 4, "e4": 4, "e5": 5, "e6": 5, "e7": 7}
+    episodes = [name for name, size in sizes.items() for _ in range(size)]
+    first = [None, None, 1, 0, 1, 0, 0, None, 1, 0]
+    second = [1, 1, None, 0, 1, None, 1, 0, 1, 1, 0]
+    rows = item_rows(
+        [first[k % 10] for k in range(30)], [second[k % 11] for k in range(30)], episodes
+    )
+    p_a = [0.30 + 0.05 * (k % 9) for k in range(30)]
+    pred = stated(rows, p_a, [min(0.95, p + 0.1 + 0.02 * (k % 4)) for k, p in enumerate(p_a)])
+    base = stated(
+        rows, [0.15 + 0.04 * (k % 6) for k in range(30)], [0.35 + 0.03 * (k % 7) for k in range(30)]
+    )
+    parsed = pd.Series([k not in (3, 11, 12, 19, 26) for k in range(30)], index=rows.index)
+    return rows, pred, base, parsed
+
+
+def test_the_intervals_of_the_criterion_are_on_the_registered_draws() -> None:
+    """Every interval of the criterion against a loop over the registered draws written here:
+    both limits and the difference from the base rate, for both events, on every statement, on
+    the answers that parsed and on the scoreable statements (whose episodes are fewer, so that
+    their draws are others)."""
+    assert (ev.DRAWS, ev.SEED) == (10_000, 20261001)
+    rows, pred, base, parsed = thirty()
+    found = ev.overconfidence(rows, pred, base, parsed)  # the registered draws and seed
+
+    def by_loop(keep: pd.Series, p: str, y: str) -> dict[str, Any]:
+        part, mine, theirs = rows[keep], pred.loc[keep, p].tolist(), base.loc[keep, p].tolist()
+        groups, event = list(part["episode_id"]), part[y].tolist()
+        out: dict[str, Any] = {"model": {}, "base_rate": {}}
+        for name, given_p in (("model", mine), ("base_rate", theirs)):
+            for limit, counted_as in (("least", 1.0), ("greatest", 0.0)):
+                gap = [
+                    q - (counted_as if e != e else e) for q, e in zip(given_p, event, strict=True)
+                ]
+                out[name][limit] = sum(gap) / len(gap)
+                out[name][f"{limit}_ci95"] = loop_interval(gap, groups)
+        apart = [q - b for q, b in zip(mine, theirs, strict=True)]
+        out["difference"], out["ci95"] = sum(apart) / len(apart), loop_interval(apart, groups)
+        return out
+
+    assert 0 < int(rows["scoreable"].sum()) < int(parsed.sum()) < 30
+    assert rows.loc[rows["scoreable"], "episode_id"].nunique() < 7 == rows["episode_id"].nunique()
+    for block, keep in ((found, everyone(rows)), (found["parsed_only"], parsed)):
+        for event, p, y in (("E_end", "p_a", "y_a"), ("E_end90", "p_b", "y_b")):
+            want = by_loop(keep, p, y)
+            outcomes, no_text = events_of(block, event)
+            for key, value in want["model"].items():
+                assert outcomes[key] == pytest.approx(value, abs=1e-12), (event, key)
+            for key, value in want["base_rate"].items():
+                assert outcomes["base_rate"][key] == pytest.approx(value, abs=1e-12), (event, key)
+            assert no_text["difference"] == pytest.approx(want["difference"], abs=1e-12)
+            assert no_text["ci95"] == pytest.approx(want["ci95"], abs=1e-12)
+            assert outcomes["least_ci95"][0] < outcomes["least"] < outcomes["least_ci95"][1]
+    # on the scoreable statements the events are all determined, so that the two limits of the
+    # loop are one value: calibration in the large, for each predictor, and their difference
+    for event, p, y in (("E_end", "p_a", "y_a"), ("E_end90", "p_b", "y_b")):
+        want = by_loop(rows["scoreable"], p, y)
+        got = found["scoreable"][event]
+        assert want["model"]["least"] == want["model"]["greatest"]
+        assert got["mean_p_minus_frequency"] == pytest.approx(want["model"]["least"], abs=1e-12)
+        assert got["ci95"] == pytest.approx(want["model"]["least_ci95"], abs=1e-12)
+        theirs = got["base_rate"]
+        assert theirs["mean_p_minus_frequency"] == pytest.approx(want["base_rate"]["least"])
+        assert theirs["ci95"] == pytest.approx(want["base_rate"]["least_ci95"], abs=1e-12)
+        assert got["against_base_rate"]["difference"] == pytest.approx(want["difference"])
+        assert got["against_base_rate"]["ci95"] == pytest.approx(want["ci95"], abs=1e-12)
+        # one frequency on both sides: the difference of the two calibrations is this one
+        assert got["against_base_rate"]["difference"] == pytest.approx(
+            got["mean_p_minus_frequency"] - theirs["mean_p_minus_frequency"]
+        )
+    # other draws or another seed give other intervals around the same values
+    for other in (
+        ev.overconfidence(rows, pred, base, parsed, 500, ev.SEED),
+        ev.overconfidence(rows, pred, base, parsed, ev.DRAWS, ev.SEED + 1),
+    ):
+        mine, theirs = events_of(other), events_of(found)
+        assert mine[0]["least"] == theirs[0]["least"]
+        assert mine[0]["least_ci95"] != theirs[0]["least_ci95"]
+        assert mine[0]["greatest_ci95"] != theirs[0]["greatest_ci95"]
+        assert mine[0]["base_rate"]["least_ci95"] != theirs[0]["base_rate"]["least_ci95"]
+        assert mine[1]["ci95"] != theirs[1]["ci95"]
+        assert other["scoreable"]["E_end"]["ci95"] != found["scoreable"]["E_end"]["ci95"]
+        assert (
+            other["scoreable"]["E_end"]["against_base_rate"]["ci95"]
+            != found["scoreable"]["E_end"]["against_base_rate"]["ci95"]
+        )
+        assert (
+            events_of(other["parsed_only"])[1]["ci95"] != events_of(found["parsed_only"])[1]["ci95"]
+        )
+
+
+def test_a_draw_that_sums_to_zero_up_to_rounding_is_on_zero() -> None:
+    """Three episodes of five statements, E_end yes on two of five in each, and a model that
+    says 0.4 everywhere: calibration in the large is 0.4 - 2/5, which is zero, in every draw.
+    The base rate says 0.3, 0.3, 0.6, 0.4, 0.4 in each episode, 0.4 on average: the difference
+    is zero in every draw too. In floating point both sums leave a hair above zero, which is
+    no evidence of anything: the intervals are on zero and no part is met."""
+    rows = item_rows([1, 1, 0, 0, 0] * 3, episodes=[e for e in "ghk" for _ in range(5)])
+    pred, base = stated(rows, 0.4), stated(rows, [0.3, 0.3, 0.6, 0.4, 0.4] * 3)
+    clusters = list(rows["episode_id"])
+    for gap in (pred["p_a"] - rows["y_a"], pred["p_a"] - base["p_a"]):
+        plain = P.interval(P.bootstrap_means(gap.to_numpy(), clusters, 300, ev.SEED)[:, 0], 0.95)
+        assert 0 < plain[0] <= plain[1] < 1e-15 and 0 < float(gap.mean()) < 1e-15
+    found = ev.overconfidence(rows, pred, base, everyone(rows), 300, ev.SEED)
+    outcomes, no_text = events_of(found)
+    assert outcomes["least_ci95"] == [0.0, 0.0] == outcomes["greatest_ci95"]
+    assert no_text["ci95"] == [0.0, 0.0]
+    assert (outcomes["met"], no_text["met"], found["reading"]) == (False, False, 5)
+    # each column has its own tolerance: a hair in the first, a value that is not zero in the
+    # second, which keeps its interval however large the sums of the third are
+    columns = np.array([[0.1, 0.2, -0.3] * 2, [1e-9] * 6, [1e6, 2e6, 3e6] * 2]).T
+    hair, near, far = ev.episode_intervals(columns, list("ggghhh"), 300, ev.SEED)
+    assert hair == [0.0, 0.0] and far == pytest.approx([2e6, 2e6])
+    assert near == pytest.approx([1e-9, 1e-9], rel=1e-6) and ev.excludes_zero(near)
+    assert ev.episode_intervals(columns, list("gggggg"), 300, ev.SEED) == [None, None, None]
+
+
+def test_a_predictors_record_holds_the_limits_over_every_statement() -> None:
+    # the statements of the test of undetermined events: E_end 1 yes, 3 no, 2 undetermined;
+    # E_end90 3 yes, 1 no, 2 undetermined; three of the six are scoreable
+    rows = item_rows([None, 0, 1, 0, 0, None], [1, None, 1, 1, 0, None], episodes=list("gghhkk"))
+    pred, base = stated(rows, 0.7, 0.8), stated(rows, 0.3, 0.5)
+    clusters = list(rows["episode_id"])
+    record = ev.predictor_record(rows, pred, 300, ev.SEED)
+    assert (record["statements"], record["scoreable_statements"]) == (6, 3)
+    order = list(record)
+    assert order.index("calibration_all_statements") == order.index("calibration_in_the_large") + 1
+    limits = record["calibration_all_statements"]
+    assert list(limits) == EVENT_KEYS and list(limits["E_end"]) == LIMIT_KEYS
+    assert limits["E_end"] == ev.calibration_limits(
+        pred["p_a"], rows["y_a"], clusters, 300, ev.SEED
+    )
+    assert limits["E_end90"] == ev.calibration_limits(
+        pred["p_b"], rows["y_b"], clusters, 300, ev.SEED
+    )
+    assert limits["E_end"]["least"] == pytest.approx(0.7 - 3 / 6)
+    assert limits["E_end"]["greatest"] == pytest.approx(0.7 - 1 / 6)
+    assert limits["E_end90"]["least"] == pytest.approx(0.8 - 5 / 6)
+    assert limits["E_end90"]["greatest"] == pytest.approx(0.8 - 3 / 6)
+    # the value on the scoreable statements is as it was: 1 of 3 and 2 of 3
+    large = record["calibration_in_the_large"]
+    assert large["E_end"]["mean_p_minus_frequency"] == pytest.approx(0.7 - 1 / 3)
+    assert large["E_end90"]["mean_p_minus_frequency"] == pytest.approx(0.8 - 2 / 3)
+    assert list(large["E_end"]) == ["mean_p_minus_frequency", "ci95"]
+    # beside it, the base rate's on the same statements; the record given is left as it was
+    both = ev.beside_base_rate(record, rows, base, 300, ev.SEED)
+    theirs = ev.predictor_record(rows, base, 300, ev.SEED)
+    assert list(both) == order
+    for key in ("calibration_in_the_large", "calibration_all_statements"):
+        for event in EVENT_KEYS:
+            assert "base_rate" not in record[key][event]
+            assert both[key][event] == record[key][event] | {"base_rate": theirs[key][event]}
+            assert list(both[key][event])[-1] == "base_rate"
+    assert both["calibration_all_statements"]["E_end"]["base_rate"]["least"] == pytest.approx(
+        0.3 - 3 / 6
+    )
+    assert both["calibration_in_the_large"]["E_end90"]["base_rate"][
+        "mean_p_minus_frequency"
+    ] == pytest.approx(0.5 - 2 / 3)
+    rest = [key for key in order if not key.startswith("calibration_")]
+    assert {key: both[key] for key in rest} == {key: record[key] for key in rest}
+    # without other draws given, the registered ones (on statements whose intervals move with
+    # the draws)
+    rows, pred, base, _ = thirty()
+    registered = ev.calibration_scores(rows, base, ev.DRAWS, ev.SEED)
+    assert ev.calibration_scores(rows, base) == registered
+    assert ev.calibration_scores(rows, base, 300, ev.SEED) != registered
+    assert ev.calibration_scores(rows, base, ev.DRAWS, ev.SEED + 1) != registered
+    record = ev.predictor_record(rows, pred)
+    assert {key: record[key] for key in registered} == ev.calibration_scores(rows, pred)
+    again = ev.beside_base_rate(record, rows, base)
+    for key, events in registered.items():
+        for event in EVENT_KEYS:
+            assert again[key][event]["base_rate"] == events[event]
+    fewer = ev.beside_base_rate(record, rows, base, 300, ev.SEED)["calibration_all_statements"]
+    assert fewer["E_end"]["base_rate"] != registered["calibration_all_statements"]["E_end"]
+    # no scoreable statement: the count alone, with nothing to stand beside
+    open_rows = item_rows([None, 0], [1, None])
+    empty = ev.predictor_record(open_rows, stated(open_rows, 0.7), 300, ev.SEED)
+    assert empty == {"scoreable_statements": 0}
+    assert ev.beside_base_rate(empty, open_rows, stated(open_rows, 0.3), 300, ev.SEED) == empty
+
+
+def small_study(switched: Sequence[str] = (LLAMA,)) -> tuple[ev.Study, pd.DataFrame]:
+    """A study built by hand, as ``evaluate.evaluate`` takes it. 160 statements in 16 episodes
+    of ten: eight episodes dated before the cutoff days of both primaries and eight after the
+    first primary's alone.
+
+    * Before: in each episode ``E_end`` is yes on 5 and no on 5; ``E_end90`` yes on 8, no on 2.
+    * After: in each episode ``E_end`` is yes on 2, no on 6, undetermined on 2; ``E_end90`` yes
+      on 4, no on 4 and undetermined on the same 2.
+    * The base rate says 0.2 before and 0.6 after for ``E_end`` (0.5 and 0.7 for ``E_end90``)
+      on average. By episode it adds 0, 1, -1, 2, -2, 3, -3 and 0 times 0.0004 in each period,
+      which leaves the two means as they are and lets its intervals move with the draws.
+    * Condition (a) of the first primary says 0.7 (0.8); its answers failed on the first
+      episode before and on the first episode after, where it holds the base rate's output
+      (0.2 and 0.6, and 0.5 and 0.7: those two episodes add nothing).
+    * Condition (a) of the second primary says 0.41 on average (0.8), from 0.407 in the first
+      episode to 0.413 in the last in equal steps, so that no two episodes are alike. All its
+      answers parsed.
+    * A primary of ``switched`` has probe medians on the midpoint of every bracket, so that it
+      beats the base rate and is evaluated on its slice; the other's are the base rate's."""
+    index = [f"s{k:03d}" for k in range(160)]
+    late, spot = np.arange(160) >= 80, np.arange(160) % 10
+    y_a = np.where(late, np.where(spot < 2, 1.0, np.where(spot < 8, 0.0, np.nan)), spot < 5)
+    y_b = np.where(late, np.where(spot < 4, 1.0, np.where(spot < 8, 0.0, np.nan)), spot < 8)
+    rows = pd.DataFrame(
+        {
+            "episode_id": [f"e{k // 10:02d}" for k in range(160)],
+            "company": [f"c{k % 3}" for k in range(160)],
+            "y_a": y_a,
+            "y_b": y_b,
+            "scoreable": ~np.isnan(y_a),
+            "ttr_kind": "interval",
+            "ttr_lower": 40.0,
+            "ttr_upper": 60.0,
+            "ttr_mid": 50.0,
+        },
+        index=index,
+    )
+    first = pd.DataFrame(
+        {
+            "event_date": np.where(late, "2024-06-01", "2023-06-01"),
+            "form": "month_year",
+            "delayed_entry": "False",
+        },
+        index=index,
+    )
+    predictions = {
+        name: stated(rows, 0.3 + 0.01 * k, 0.5 + 0.01 * k) for k, name in enumerate(G.PREDICTORS)
+    }
+    episode = np.arange(160) // 10
+    step = 0.0004 * np.array([0, 1, -1, 2, -2, 3, -3, 0])[episode % 8]
+    base = stated(rows, np.where(late, 0.6, 0.2) + step, np.where(late, 0.7, 0.5) + step)
+    predictions["base_rate"] = base
+    kept = pd.Series(episode % 8 != 0, index=index)  # all but the first episode of each period
+    parsed = {}
+    for model, p_a in ((LLAMA, 0.7), (DEEPSEEK, 0.41 + 0.0004 * (episode - 7.5))):
+        for condition in ev.CONDITIONS:
+            answers = stated(rows, p_a, 0.8) if condition == "a" else stated(rows, 0.4, 0.6)
+            name = f"{model}:{condition}"
+            parsed[name] = everyone(rows)
+            if name == f"{LLAMA}:a":
+                answers, parsed[name] = answers.where(kept, base, axis=0), kept
+            predictions[name] = answers
+    probe_ids = index[::2]
+    probe = {"base_rate": stated(rows, 0.5).loc[probe_ids]}
+    for model in rd.PRIMARIES:
+        median = 50.0 if model in switched else 100.0
+        probe[model] = probe["base_rate"].assign(q50=median)
+    held = ev.Study(
+        first=first,
+        probe_ids=probe_ids,
+        predictions=predictions,
+        parsed=parsed,
+        probe=probe,
+        selection=dict.fromkeys(rd.PRIMARIES, "b"),
+        comparator="base_rate",
+        runs={},
+        not_evaluable={},
+        refit={},
+    )
+    return held, rows
+
+
+def full_report(report: dict[str, Any]) -> dict[str, Any]:
+    """The results of ``evaluate.evaluate`` as the table and the printout read them."""
+    return {"registered": ev.registered_record(), "h3": {"comparator": "base_rate"}, **report}
+
+
+def criterion_line(model: str, entry: dict[str, Any]) -> str:
+    """The line of the table and of the printout on the criterion of one primary, written out
+    from the entry of the result file."""
+    first, second = events_of(entry)
+    met = {True: "part met", False: "part not met"}
+
+    def shown(pair: list[float]) -> str:
+        return f"[{pair[0]:.4f}, {pair[1]:.4f}]"
+
+    return (
+        f"Overconfidence of condition (a), {model}: reading {entry['reading']} of 5: "
+        f"{entry['reading_in_words']}. P(E_end) on {entry['items']} ({entry['statements']} "
+        f"statements in {entry['episodes']} episodes, {first['undetermined']} with E_end "
+        f"undetermined): mean {first['mean_p']:.4f}. Against outcomes: least value of "
+        f"calibration in the large {first['least']:.4f} {shown(first['least_ci95'])} (every "
+        f"undetermined E_end counted as yes: frequency {first['largest_frequency']:.4f}), "
+        f"greatest {first['greatest']:.4f} {shown(first['greatest_ci95'])} (counted as no: "
+        f"frequency {first['smallest_frequency']:.4f}); {met[first['met']]}. Against the base "
+        f"rate (mean P(E_end) {second['mean_p_base_rate']:.4f}): difference "
+        f"{second['difference']:.4f} {shown(second['ci95'])}; {met[second['met']]}."
+    )
+
+
+def test_the_criterion_of_a_switched_primary_is_read_on_its_slice() -> None:
+    """The item set the probe fixed holds the criterion, for the model and for the base rate:
+    the first primary is switched to its slice of 80 statements, where the base rate says 0.6
+    and not the 0.4 it says over all 160; the second stays on every eligible statement."""
+    held, rows = small_study()
+    report = ev.evaluate(held, rows, {}, "percentile", draws=300)
+    sets = report["item_sets"]
+    assert sets[LLAMA]["items"] == ev.SLICE_ITEMS and sets[DEEPSEEK]["items"] == ev.ALL_ITEMS
+    over = report["secondaries"]["overconfidence_of_condition_a"]
+    assert list(over) == [LLAMA, DEEPSEEK]
+    for entry in over.values():
+        assert list(entry) == ["items", *CRITERION_KEYS]
+        for block in (entry, entry["parsed_only"]):
+            assert list(block["against_outcomes"]) == EVENT_KEYS
+            assert list(block["against_base_rate"]) == EVENT_KEYS
+            for event in EVENT_KEYS:
+                outcomes, no_text = events_of(block, event)
+                assert list(outcomes) == [*LIMIT_KEYS, "met", "base_rate"]
+                assert list(outcomes["base_rate"]) == LIMIT_KEYS and list(no_text) == [
+                    *GAP_KEYS,
+                    "met",
+                ]
+        assert list(entry["scoreable"]) == ["statements", "episodes", *EVENT_KEYS]
+        assert list(entry["parsed_only"]) == ["not_parsed", *PART_KEYS]
+        assert list(entry["coverage_80"]) == [*COVERAGE_KEYS, "base_rate"]
+        assert list(entry["coverage_80"]["base_rate"]) == COVERAGE_KEYS
+        assert entry["criterion"] == ev.OVERCONFIDENCE_CRITERION
+    # The first primary on its slice: 80 statements in 8 episodes, 16 yes and 16 undetermined,
+    # so the largest frequency is 32 / 80 = 0.4 and the smallest 16 / 80 = 0.2. Its ten failed
+    # answers hold the base rate's 0.6: mean P(E_end) (70 * 0.7 + 10 * 0.6) / 80 = 0.6875.
+    mine = over[LLAMA]
+    outcomes, no_text = events_of(mine)
+    assert (mine["items"], mine["statements"], mine["episodes"]) == (ev.SLICE_ITEMS, 80, 8)
+    assert outcomes["undetermined"] == 16
+    assert outcomes["largest_frequency"] == pytest.approx(0.4)
+    assert outcomes["smallest_frequency"] == pytest.approx(0.2)
+    assert outcomes["mean_p"] == pytest.approx(0.6875)
+    assert outcomes["least"] == pytest.approx(0.6875 - 0.4)
+    assert outcomes["greatest"] == pytest.approx(0.6875 - 0.2)
+    # the base rate on the same 80 statements says 0.6: least 0.2, greatest 0.4. Over all 160
+    # it says (80 * 0.2 + 80 * 0.6) / 160 = 0.4 against frequencies of 0.45 and 0.35.
+    assert outcomes["base_rate"]["mean_p"] == pytest.approx(0.6) == no_text["mean_p_base_rate"]
+    assert outcomes["base_rate"]["least"] == pytest.approx(0.2)
+    assert outcomes["base_rate"]["greatest"] == pytest.approx(0.4)
+    assert no_text["difference"] == pytest.approx(0.6875 - 0.6)
+    assert (outcomes["met"], no_text["met"], mine["reading"], mine["met"]) == (True, True, 2, True)
+    # the intervals are those of the draws the evaluation was given, on the slice's episodes
+    part = rows[rows.index >= "s080"]
+    clusters = list(part["episode_id"])
+    p_a = held.predictions[f"{LLAMA}:a"].loc[part.index, "p_a"]
+    limits = ev.calibration_limits(p_a, part["y_a"], clusters, 300, ev.SEED)
+    assert {key: outcomes[key] for key in LIMIT_KEYS} == limits
+    assert limits["least_ci95"][0] > 0 and limits["least_ci95"][0] < limits["least_ci95"][1]
+    base_p = held.predictions["base_rate"].loc[part.index, "p_a"]
+    gap = ev.probability_gap(p_a, base_p, clusters, 300, ev.SEED)
+    assert {key: no_text[key] for key in GAP_KEYS} == gap and gap["ci95"][0] > 0
+    # E_end90 beside it: yes on 32 and undetermined on 16 of 80; mean (70 * 0.8 + 10 * 0.7) / 80
+    later, apart = events_of(mine, "E_end90")
+    assert later["mean_p"] == pytest.approx(0.7875) and later["undetermined"] == 16
+    assert later["least"] == pytest.approx(0.7875 - 48 / 80)
+    assert later["greatest"] == pytest.approx(0.7875 - 32 / 80)
+    assert apart["mean_p_base_rate"] == pytest.approx(0.7)
+    assert apart["difference"] == pytest.approx(0.0875)
+    # the answers that parsed: 70 of the slice (the ten failed answers before the cutoff are
+    # not in the item set). 0.7 against 28 / 70 and 14 / 70, and against the base rate's 0.6.
+    kept = mine["parsed_only"]
+    assert (kept["not_parsed"], kept["statements"], kept["episodes"]) == (10, 70, 7)
+    outcomes, no_text = events_of(kept)
+    assert outcomes["mean_p"] == pytest.approx(0.7) and outcomes["undetermined"] == 14
+    assert outcomes["least"] == pytest.approx(0.7 - 0.4)
+    assert outcomes["greatest"] == pytest.approx(0.7 - 0.2)
+    assert outcomes["base_rate"]["least"] == pytest.approx(0.2)
+    assert no_text["difference"] == pytest.approx(0.1) and no_text["met"] is True
+    # the scoreable statements of the slice: 64, with E_end yes on 16; mean P(E_end)
+    # (56 * 0.7 + 8 * 0.6) / 64 = 0.6875 again, against 0.25; the base rate 0.6 - 0.25
+    scoreable = mine["scoreable"]
+    assert (scoreable["statements"], scoreable["episodes"]) == (64, 8)
+    assert scoreable["E_end"]["mean_p_minus_frequency"] == pytest.approx(0.6875 - 0.25)
+    assert scoreable["E_end"]["base_rate"]["mean_p_minus_frequency"] == pytest.approx(0.35)
+    assert scoreable["E_end"]["against_base_rate"]["difference"] == pytest.approx(0.0875)
+    assert scoreable["E_end"]["against_base_rate"]["mean_p_base_rate"] == pytest.approx(0.6)
+    # it is the calibration in the large of the predictor's own record, which is on the slice
+    record = report["losses"][f"{LLAMA}:a"]
+    assert record["statements"] == 80 and record["scoreable_statements"] == 64
+    for event in EVENT_KEYS:
+        large = record["calibration_in_the_large"][event]
+        assert list(large) == ["mean_p_minus_frequency", "ci95", "base_rate"]
+        for key in ("mean_p_minus_frequency", "ci95"):
+            assert scoreable[event][key] == large[key]
+            assert scoreable[event]["base_rate"][key] == large["base_rate"][key]
+        everywhere = record["calibration_all_statements"][event]
+        assert list(everywhere) == [*LIMIT_KEYS, "base_rate"]
+        outcomes = mine["against_outcomes"][event]
+        assert everywhere == {key: outcomes[key] for key in [*LIMIT_KEYS, "base_rate"]}
+    assert mine["coverage_80"] == record["coverage_80"] | {
+        "base_rate": ev.coverage80(held.predictions["base_rate"].loc[part.index], part)
+    }
+    # every condition of the switched primary has the base rate of its slice beside it
+    for condition in ev.CONDITIONS:
+        beside = report["losses"][f"{LLAMA}:{condition}"]["calibration_all_statements"]["E_end"]
+        assert beside["base_rate"]["mean_p"] == pytest.approx(0.6)
+        assert beside["base_rate"] == mine["against_outcomes"]["E_end"]["base_rate"]
+    # The second primary on every eligible statement: 160 in 16 episodes, 56 yes and 16
+    # undetermined, so the largest frequency is 72 / 160 = 0.45 and the smallest 0.35. It says
+    # 0.41 on average: least -0.04, greatest 0.06; the base rate says 0.4 on average, a
+    # difference of 0.01.
+    other = over[DEEPSEEK]
+    outcomes, no_text = events_of(other)
+    assert (other["items"], other["statements"], other["episodes"]) == (ev.ALL_ITEMS, 160, 16)
+    assert outcomes["mean_p"] == pytest.approx(0.41)
+    assert outcomes["least"] == pytest.approx(0.41 - 0.45)
+    assert outcomes["greatest"] == pytest.approx(0.41 - 0.35)
+    assert no_text["mean_p_base_rate"] == pytest.approx(0.4)
+    assert no_text["difference"] == pytest.approx(0.01)
+    assert outcomes["base_rate"]["least"] == pytest.approx(0.4 - 0.45)
+    # the intervals are on the draws and the seed the evaluation was given, not on others
+    every = list(rows["episode_id"])
+    said, base_all = held.predictions[f"{DEEPSEEK}:a"]["p_a"], held.predictions["base_rate"]["p_a"]
+    wide = ev.calibration_limits(said, rows["y_a"], every, 300, ev.SEED)
+    apart = ev.probability_gap(said, base_all, every, 300, ev.SEED)
+    assert {key: outcomes[key] for key in LIMIT_KEYS} == wide
+    assert {key: no_text[key] for key in GAP_KEYS} == apart
+    for draws, seed in ((ev.DRAWS, ev.SEED), (300, ev.SEED + 1)):
+        elsewhere = ev.calibration_limits(said, rows["y_a"], every, draws, seed)
+        assert elsewhere["least_ci95"] != wide["least_ci95"]
+        assert elsewhere["greatest_ci95"] != wide["greatest_ci95"]
+        assert ev.probability_gap(said, base_all, every, draws, seed)["ci95"] != apart["ci95"]
+    reseeded = ev.evaluate(held, rows, {}, "percentile", draws=300, seed=ev.SEED + 1)
+    again = reseeded["secondaries"]["overconfidence_of_condition_a"][DEEPSEEK]
+    elsewhere = ev.calibration_limits(said, rows["y_a"], every, 300, ev.SEED + 1)
+    assert {key: events_of(again)[0][key] for key in LIMIT_KEYS} == elsewhere
+    assert events_of(again)[1]["ci95"] != no_text["ci95"]
+    assert again["scoreable"]["E_end"]["ci95"] != other["scoreable"]["E_end"]["ci95"]
+    assert events_of(again["parsed_only"])[1]["ci95"] != events_of(other["parsed_only"])[1]["ci95"]
+    moved = reseeded["losses"][f"{DEEPSEEK}:a"]["calibration_all_statements"]["E_end"]
+    assert moved == elsewhere | {"base_rate": moved["base_rate"]}
+    assert (
+        moved["base_rate"] != report["losses"]["base_rate"]["calibration_all_statements"]["E_end"]
+    )
+    # its least value is below zero with an interval that excludes zero: that is no excess.
+    # Its greatest value and its difference from the base rate have intervals that hold zero
+    assert outcomes["least_ci95"][1] < 0 and outcomes["met"] is False
+    assert outcomes["greatest_ci95"][0] < 0 < outcomes["greatest_ci95"][1]
+    assert no_text["ci95"][0] < 0 < no_text["ci95"][1] and no_text["met"] is False
+    assert (other["reading"], other["met"]) == (5, False)
+    assert other["parsed_only"] == {"not_parsed": 0} | {key: other[key] for key in PART_KEYS}
+    # the model-free predictors are scored on every eligible statement, with the base rate of
+    # those statements beside them; the base rate's own record has nothing beside it
+    losses = report["losses"]
+    whole = losses["base_rate"]["calibration_all_statements"]["E_end"]
+    assert list(whole) == LIMIT_KEYS and whole["mean_p"] == pytest.approx(0.4)
+    assert whole == other["against_outcomes"]["E_end"]["base_rate"]
+    assert list(losses["base_rate"]["calibration_in_the_large"]["E_end"]) == [
+        "mean_p_minus_frequency",
+        "ci95",
+    ]
+    for name in (*(n for n in G.PREDICTORS if n != "base_rate"), f"{DEEPSEEK}:b"):
+        for key in ("calibration_all_statements", "calibration_in_the_large"):
+            for event in EVENT_KEYS:
+                assert losses[name][key][event]["base_rate"] == losses["base_rate"][key][event]
+    # one line for each primary in the table and in the printout, after the probe lines
+    full = full_report(report)
+    table, printed = ev.markdown(full).splitlines(), ev.summary_lines(full)
+    lines = [criterion_line(model, over[model]) for model in rd.PRIMARIES]
+    assert table[-2:] == lines and table[-3].startswith(f"Probe, {DEEPSEEK}: ")
+    assert printed[-2:] == [f"  {line}" for line in lines]
+    assert lines[0].startswith(
+        f"Overconfidence of condition (a), {LLAMA}: reading 2 of 5: the readings are "
+        "overconfident relative to outcomes. P(E_end) on the post-cutoff slice (80 statements "
+        "in 8 episodes, 16 with E_end undetermined): mean 0.6875. Against outcomes: least value "
+        "of calibration in the large 0.2875 ["
+    )
+    assert "counted as yes: frequency 0.4000), greatest 0.4875 [" in lines[0]
+    assert (
+        "(counted as no: frequency 0.2000); part met. Against the base rate (mean P(E_end) "
+        in lines[0]
+    )
+    assert "0.6000): difference 0.0875 [" in lines[0] and lines[0].endswith("]; part met.")
+    assert lines[1].startswith(
+        f"Overconfidence of condition (a), {DEEPSEEK}: reading 5 of 5: overconfidence was not "
+        "detected, which does not say that the readings are calibrated. P(E_end) on every "
+        "eligible statement (160 statements in 16 episodes, 16 with E_end undetermined): mean "
+        "0.4100. Against outcomes: least value of calibration in the large -0.0400 ["
+    )
+    assert "greatest 0.0600 [" in lines[1] and "; part not met. Against the base rate" in lines[1]
+    assert "(mean P(E_end) 0.4000): difference 0.0100 [" in lines[1]
+    assert lines[1].endswith("]; part not met.")
+    # the text of the result file holds the same entry
+    written = json.loads(ev.report_text(full))["secondaries"]["overconfidence_of_condition_a"]
+    assert list(written[LLAMA]) == ["items", *CRITERION_KEYS] and written[LLAMA]["reading"] == 2
+    assert written[LLAMA]["met"] is True and written[DEEPSEEK]["met"] is False
+
+
+def test_a_primary_without_an_item_set_has_no_reading() -> None:
+    """The second primary beats the base rate in its probe and has no statement after its
+    cutoff day: its tests are not evaluable, the criterion has no item set to be read on, and
+    its line says so. The first primary is then read on every eligible statement."""
+    held, rows = small_study(switched=(DEEPSEEK,))
+    report = ev.evaluate(held, rows, {}, "percentile", draws=300)
+    sets = report["item_sets"]
+    assert sets[DEEPSEEK]["evaluable"] is False and sets[LLAMA]["items"] == ev.ALL_ITEMS
+    over = report["secondaries"]["overconfidence_of_condition_a"]
+    assert list(over) == [LLAMA] and over[LLAMA]["items"] == ev.ALL_ITEMS
+    # on all 160 statements: 20 failed answers hold the base rate's 0.2 and 0.6, so the mean
+    # is (140 * 0.7 + 10 * 0.2 + 10 * 0.6) / 160 = 0.6625 against the base rate's 0.4
+    outcomes, no_text = events_of(over[LLAMA])
+    assert (over[LLAMA]["statements"], over[LLAMA]["episodes"]) == (160, 16)
+    assert outcomes["mean_p"] == pytest.approx(0.6625)
+    assert outcomes["least"] == pytest.approx(0.6625 - 0.45)
+    assert no_text["mean_p_base_rate"] == pytest.approx(0.4)
+    assert over[LLAMA]["parsed_only"]["not_parsed"] == 20
+    assert f"{DEEPSEEK}:a" not in report["losses"]
+    full = full_report(report)
+    why = sets[DEEPSEEK]["reason"]
+    assert why.startswith("the probe beat the base rate and the post-cutoff slice holds fewer")
+    line = f"Overconfidence of condition (a), {DEEPSEEK}: no reading ({why})."
+    table, printed = ev.markdown(full).splitlines(), ev.summary_lines(full)
+    assert table[-2:] == [criterion_line(LLAMA, over[LLAMA]), line]
+    assert printed[-2:] == [f"  {criterion_line(LLAMA, over[LLAMA])}", f"  {line}"]
+
+
+def test_an_item_set_without_a_scoreable_statement_still_has_its_reading() -> None:
+    """``E_end90`` is undetermined on every statement and ``E_end`` is as it was: no statement
+    is scoreable and no test is evaluable. The criterion uses no scoreable set, so each primary
+    with an item set has its entry and its line all the same."""
+    held, rows = small_study(switched=())
+    rows = rows.assign(y_b=np.nan, scoreable=False)
+    report = ev.evaluate(held, rows, {}, "percentile", draws=300)
+    assert report["items"]["scoreable_statements"] == 0
+    assert not [entry for entry in report["family"] if entry["evaluable"]]
+    assert {sets["items"] for sets in report["item_sets"].values()} == {ev.ALL_ITEMS}
+    over = report["secondaries"]["overconfidence_of_condition_a"]
+    assert list(over) == [LLAMA, DEEPSEEK]
+    for model, reading in ((LLAMA, 2), (DEEPSEEK, 5)):
+        entry = over[model]
+        assert list(entry) == ["items", *CRITERION_KEYS]
+        assert (entry["statements"], entry["episodes"], entry["reading"]) == (160, 16, reading)
+        # nothing on the scoreable statements but their number, here and in the model's record
+        assert entry["scoreable"] == {"statements": 0, "episodes": 0}
+        assert report["losses"][f"{model}:a"] == {"scoreable_statements": 0}
+        # E_end90 beside it: open everywhere, so its two limits are the mean minus one and the
+        # mean itself
+        later = events_of(entry, "E_end90")[0]
+        assert later["undetermined"] == 160
+        assert (later["largest_frequency"], later["smallest_frequency"]) == (1.0, 0.0)
+        assert later["least"] == pytest.approx(later["mean_p"] - 1)
+        assert later["greatest"] == pytest.approx(later["mean_p"])
+    # E_end on all 160 statements, as with the scoreable ones in place: 0.6625 for the first
+    # primary against a largest frequency of 0.45 and the base rate's 0.4
+    outcomes, no_text = events_of(over[LLAMA])
+    assert outcomes["least"] == pytest.approx(0.6625 - 0.45) and outcomes["met"] is True
+    assert no_text["difference"] == pytest.approx(0.2625) and no_text["met"] is True
+    full = full_report(report)
+    table, printed = ev.markdown(full).splitlines(), ev.summary_lines(full)
+    lines = [criterion_line(model, over[model]) for model in rd.PRIMARIES]
+    assert table[-2:] == lines and printed[-2:] == [f"  {line}" for line in lines]
+    assert sum(line.startswith("Overconfidence of ") for line in table) == 2
+    assert not [line for line in table + printed if "no reading" in line]
+    written = json.loads(ev.report_text(full))["secondaries"]["overconfidence_of_condition_a"]
+    assert [written[model]["reading"] for model in rd.PRIMARIES] == [2, 5]
+
+
+def test_a_primary_whose_tests_are_not_evaluable_has_no_reading_of_the_criterion() -> None:
+    """The first part of the criterion uses no scoreable set, and the criterion is still not
+    read for a primary without an item set: one whose slice holds many statements and fewer
+    than 50 scoreable ones, and one whose probe could not be tested."""
+    # The first primary is switched to its slice of 80 statements. E_end90 is left open on
+    # every statement of the slice but the first four of each episode: E_end is determined on
+    # 64 of the 80 as before, and 32 are scoreable.
+    held, rows = small_study()
+    late = np.arange(160) >= 80
+    left_open = late & (np.arange(160) % 10 >= 4)
+    rows = rows.assign(y_b=rows["y_b"].where(~left_open), scoreable=rows["scoreable"] & ~left_open)
+    assert int(rows.loc[late, "y_a"].notna().sum()) == 64
+    report = ev.evaluate(held, rows, {}, "percentile", draws=300)
+    chosen = report["item_sets"][LLAMA]
+    assert (chosen["slice_statements"], chosen["slice_scoreable"]) == (80, 32)
+    assert chosen["switched"] is True and chosen["evaluable"] is False and "items" not in chosen
+    why = "the probe beat the base rate and the post-cutoff slice holds fewer than 50 scoreable"
+    assert chosen["reason"] == f"{why} statements"
+    over = report["secondaries"]["overconfidence_of_condition_a"]
+    assert list(over) == [DEEPSEEK] and over[DEEPSEEK]["items"] == ev.ALL_ITEMS
+    full = full_report(report)
+    line = f"Overconfidence of condition (a), {LLAMA}: no reading ({chosen['reason']})."
+    lines = [line, criterion_line(DEEPSEEK, over[DEEPSEEK])]
+    assert ev.markdown(full).splitlines()[-2:] == lines
+    assert ev.summary_lines(full)[-2:] == [f"  {line}" for line in lines]
+    # every statement in one episode: no probe can be tested, no switch is decided, and neither
+    # primary has an item set
+    held, rows = small_study(switched=())
+    report = ev.evaluate(held, rows.assign(episode_id="e00"), {}, "percentile", draws=300)
+    assert [sets["evaluable"] for sets in report["item_sets"].values()] == [False, False]
+    assert report["secondaries"]["overconfidence_of_condition_a"] == {}
+    full = full_report(report)
+    lines = [
+        f"Overconfidence of condition (a), {model}: no reading (the probe could not be tested)."
+        for model in rd.PRIMARIES
+    ]
+    assert ev.markdown(full).splitlines()[-2:] == lines
+    assert ev.summary_lines(full)[-2:] == [f"  {line}" for line in lines]
+
+
+def test_one_failed_answer_is_not_given_back_by_the_result_file() -> None:
+    """One answer of condition (a) failed, on a statement whose ``E_end`` is yes (s080) or
+    undetermined (s088). Beside the criterion over all 160 statements, the figures over the 159
+    answers that parsed would give that statement's two horizon events by subtraction: the
+    result file holds their counts alone, and its figures on outcomes are the same whichever
+    statement it was."""
+    seen = {}
+    for failed in ("s080", "s088"):
+        held, rows = small_study(switched=())
+        name = f"{LLAMA}:a"
+        base = held.predictions["base_rate"]
+        parsed = everyone(rows)
+        parsed[failed] = False
+        held.predictions[name] = stated(rows, 0.7, 0.8).where(parsed, base, axis=0)
+        held.parsed[name] = parsed
+        full = full_report(ev.evaluate(held, rows, {}, "percentile", draws=300))
+        written = json.loads(ev.report_text(full))
+        entry = written["secondaries"]["overconfidence_of_condition_a"][LLAMA]
+        assert list(entry) == ["items", *CRITERION_KEYS]
+        assert (entry["statements"], entry["reading"]) == (160, 2)
+        assert entry["parsed_only"] == {
+            "not_parsed": 1,
+            "statements": 159,
+            "episodes": 16,
+            "withheld": True,
+        }
+        # the second primary, all of whose answers parsed, keeps its figures
+        other = written["secondaries"]["overconfidence_of_condition_a"][DEEPSEEK]
+        assert list(other["parsed_only"]) == ["not_parsed", *PART_KEYS]
+        assert criterion_line(LLAMA, entry) in ev.markdown(full).splitlines()
+        seen[failed] = entry
+    assert rows.loc["s080", "y_a"] == 1 and np.isnan(rows.loc["s088", "y_a"])
+    for event in EVENT_KEYS:
+        first, second = (events_of(seen[failed], event)[0] for failed in seen)
+        for key in ("undetermined", "largest_frequency", "smallest_frequency"):
+            assert first[key] == second[key]
+            assert first["base_rate"][key] == second["base_rate"][key]
+
+
+def test_the_result_file_holds_the_criterion_for_each_primary(
+    study: SimpleNamespace, base: SimpleNamespace, opened: SimpleNamespace
+) -> None:
+    """The criterion on the synthetic study, against the scripted answers and the synthetic
+    outcomes: no primary is switched, so each is read on the 320 eligible statements."""
+    y = truth(study)
+    over = base.report["secondaries"]["overconfidence_of_condition_a"]
+    assert list(over) == list(rd.PRIMARIES)
+    base_p = opened.study.predictions["base_rate"]
+    for model in rd.PRIMARIES:
+        entry = over[model]
+        assert list(entry) == ["items", *CRITERION_KEYS]
+        assert (entry["items"], entry["statements"], entry["episodes"]) == (ev.ALL_ITEMS, 320, 40)
+        pred = opened.study.predictions[f"{model}:a"]
+        parsed = opened.study.parsed[f"{model}:a"]
+        failed = [i for i in y.index if fails(model, "a", i) == 2]
+        assert entry["parsed_only"]["not_parsed"] == len(failed) == int((~parsed).sum())
+        assert entry["parsed_only"]["statements"] == 320 - len(failed)
+        for block, ids in ((entry, y.index), (entry["parsed_only"], parsed.index[parsed])):
+            for event, p, e in (("E_end", "p_a", "y_a"), ("E_end90", "p_b", "y_b")):
+                outcomes, no_text = events_of(block, event)
+                mine, theirs, seen = pred.loc[ids, p], base_p.loc[ids, p], y.loc[ids, e]
+                assert outcomes["undetermined"] == int(seen.isna().sum())
+                assert outcomes["mean_p"] == pytest.approx(float(mine.mean()), abs=1e-6)
+                assert outcomes["least"] == pytest.approx(
+                    float((mine - seen.fillna(1.0)).mean()), abs=1e-6
+                )
+                assert outcomes["greatest"] == pytest.approx(
+                    float((mine - seen.fillna(0.0)).mean()), abs=1e-6
+                )
+                assert outcomes["base_rate"]["least"] == pytest.approx(
+                    float((theirs - seen.fillna(1.0)).mean()), abs=1e-6
+                )
+                assert no_text["difference"] == pytest.approx(
+                    float((mine - theirs).mean()), abs=1e-6
+                )
+                assert no_text["mean_p_base_rate"] == pytest.approx(float(theirs.mean()), abs=1e-6)
+                assert outcomes["least_ci95"][0] < outcomes["least"] < outcomes["least_ci95"][1]
+                assert outcomes["met"] is (outcomes["least_ci95"][0] > 0)
+                assert no_text["met"] is (no_text["ci95"][0] > 0)
+        outcomes, no_text = events_of(entry)
+        assert entry["reading"] == ev.overconfidence_reading(outcomes, no_text)
+        assert entry["reading_in_words"] == ev.OVERCONFIDENCE_READINGS[entry["reading"]]
+        assert entry["met"] is (outcomes["met"] and no_text["met"])
+        # the registered draws: 10,000 by shortage episode, seed 20261001
+        limits = ev.calibration_limits(
+            pred.loc[y.index, "p_a"], y["y_a"], list(y["episode"]), ev.DRAWS, ev.SEED
+        )
+        assert outcomes["least_ci95"] == pytest.approx(limits["least_ci95"], abs=1e-6)
+        assert outcomes["greatest_ci95"] == pytest.approx(limits["greatest_ci95"], abs=1e-6)
+        # beside it: the scoreable statements, as in the predictor's own record
+        record = base.report["losses"][f"{model}:a"]
+        for event in EVENT_KEYS:
+            large = record["calibration_in_the_large"][event]
+            assert (
+                entry["scoreable"][event]["mean_p_minus_frequency"]
+                == large["mean_p_minus_frequency"]
+            )
+            assert entry["scoreable"][event]["ci95"] == large["ci95"]
+            assert entry["scoreable"][event]["base_rate"] == large["base_rate"]
+            everywhere = record["calibration_all_statements"][event]
+            assert everywhere == {
+                key: entry["against_outcomes"][event][key] for key in [*LIMIT_KEYS, "base_rate"]
+            }
+        assert entry["scoreable"]["statements"] == record["scoreable_statements"]
+        assert {key: entry["coverage_80"][key] for key in COVERAGE_KEYS} == record["coverage_80"]
+        assert (
+            entry["coverage_80"]["base_rate"] == base.report["losses"]["base_rate"]["coverage_80"]
+        )
+        line = criterion_line(model, entry)
+        assert base.table.splitlines().count(line) == 1 and f"  {line}" in base.printed.splitlines()
+    # condition (a) of the first primary says 0.9 where it parsed, far above every frequency
+    # the captures allow and above the base rate: overconfident relative to outcomes
+    assert (over[LLAMA]["reading"], over[LLAMA]["met"]) == (2, True)
+    assert events_of(over[LLAMA])[0]["least_ci95"][0] > 0.2
+    # condition (a) of the second says about 0.3, inside the frequencies the captures allow
+    # and below the base rate, with an interval that excludes zero on the wrong side: neither
+    # part is met, and nothing says that it is underconfident either
+    outcomes, no_text = events_of(over[DEEPSEEK])
+    assert outcomes["least"] < 0 < outcomes["greatest"] and outcomes["greatest_ci95"][0] < 0
+    assert no_text["difference"] < 0 and no_text["ci95"][1] < 0 and no_text["met"] is False
+    assert (over[DEEPSEEK]["reading"], over[DEEPSEEK]["met"]) == (5, False)
+    assert sum(line.startswith("Overconfidence of ") for line in base.table.splitlines()) == 2
+
+
 def test_parse_and_refusal_counts_are_reported_per_model_and_condition(
     study: SimpleNamespace, base: SimpleNamespace
 ) -> None:
@@ -5329,6 +6642,20 @@ def test_a_refused_reading_is_a_failure_with_the_same_fallback(
     entry = entry_of(report, "H1", DEEPSEEK)
     assert entry["both_sides_parsed"]["statements"] == entry["statements"] - 1
     assert entry["delta"] != entry_of(base.report, "H1", DEEPSEEK)["delta"]
+    # the contrast without that one statement is withheld: beside the contrast on every
+    # scoreable statement it would give the loss difference, and so the events, of the one
+    assert entry["both_sides_parsed"] == {
+        "statements": entry["statements"] - 1,
+        "episodes": entry["both_sides_parsed"]["episodes"],
+        "withheld": True,
+    }
+    # a contrast that leaves no statement out, or leaves out five or more, is given
+    whole = entry_of(base.report, "H1", DEEPSEEK)["both_sides_parsed"]
+    assert "withheld" not in whole and whole["delta"] is not None
+    planted = entry_of(base.report, "H1", LLAMA)
+    left_out = planted["statements"] - planted["both_sides_parsed"]["statements"]
+    assert left_out >= ev.MIN_SHOWN and "withheld" not in planted["both_sides_parsed"]
+    assert not ev.few(0) and ev.few(1) and ev.few(ev.MIN_SHOWN - 1) and not ev.few(ev.MIN_SHOWN)
 
 
 # --------------------------------------------------------------------------------------------
@@ -5489,6 +6816,24 @@ def test_a_primary_that_beats_the_base_rate_is_evaluated_on_its_slice(
     for condition in ev.CONDITIONS:
         assert second["h3_with_each_condition"][f"{LLAMA}:{condition}"]["statements"] == len(after)
     assert {part["statements"] for part in second["decomposition"][LLAMA].values()} == {len(after)}
+    # the overconfidence criterion is read on the slice too, for the model and for the base
+    # rate, whose mean probability there is not its mean over the eligible list
+    over, before = (
+        found["secondaries"]["overconfidence_of_condition_a"] for found in (report, base.report)
+    )
+    inside = y.index[y["day"] > "2023-12-31"]
+    assert (over[LLAMA]["items"], over[LLAMA]["statements"]) == (ev.SLICE_ITEMS, len(inside))
+    base_p = opened.study.predictions["base_rate"]["p_a"]
+    assert abs(float(base_p.loc[inside].mean()) - float(base_p.mean())) > 0.001
+    for block in (events_of(over[LLAMA])[1], events_of(over[LLAMA])[0]["base_rate"]):
+        key = "mean_p_base_rate" if "mean_p_base_rate" in block else "mean_p"
+        assert block[key] == pytest.approx(float(base_p.loc[inside].mean()), abs=1e-6)
+    assert events_of(before[LLAMA])[1]["mean_p_base_rate"] == pytest.approx(
+        float(base_p.mean()), abs=1e-6
+    )
+    assert over[DEEPSEEK] == before[DEEPSEEK] and over[DEEPSEEK]["items"] == ev.ALL_ITEMS
+    assert criterion_line(LLAMA, over[LLAMA]) in table.splitlines()
+    assert criterion_line(LLAMA, before[LLAMA]) not in table.splitlines()
     # the slice of a switched primary is its confirmatory set, not a secondary
     assert report["secondaries"]["post_cutoff_slice"] == {}
     assert report["losses"][f"{LLAMA}:b"]["scoreable_statements"] == len(after)
@@ -5541,6 +6886,10 @@ def test_a_switched_primary_with_a_small_slice_is_not_evaluable(
     ]
     assert f"{DEEPSEEK}:a" not in report["losses"] and f"{LLAMA}:a" in report["losses"]
     assert "not evaluable" in table and "not evaluable" in printed
+    # no item set, no reading of the overconfidence criterion: the line says why
+    assert list(report["secondaries"]["overconfidence_of_condition_a"]) == [LLAMA]
+    line = f"Overconfidence of condition (a), {DEEPSEEK}: no reading ({chosen['reason']})."
+    assert line in table.splitlines() and f"  {line}" in printed.splitlines()
 
 
 def typed_rows(
@@ -5654,6 +7003,9 @@ def test_a_primary_declared_not_evaluable_stays_in_the_family(
         mine, before = entry_of(report, hypothesis, LLAMA), entry_of(base.report, hypothesis, LLAMA)
         assert (mine["delta"], mine["p"]) == (before["delta"], before["p"])
     assert len(report["family"]) == 6 and table.count("not evaluable") == 3
+    # its runs were not read: the overconfidence criterion is the other primary's alone
+    assert list(report["secondaries"]["overconfidence_of_condition_a"]) == [LLAMA]
+    assert sum(line.startswith("Overconfidence of ") for line in table.splitlines()) == 1
 
 
 # --------------------------------------------------------------------------------------------
@@ -5954,8 +7306,9 @@ def test_no_output_says_anything_about_a_single_statement(
     lists = [v for v in walk(base.report) if isinstance(v, list)]
     assert lists and max(len(v) for v in lists) < 30 and not sizes & {len(v) for v in lists}
     assert all(isinstance(v, str | int | float | bool | type(None)) for v in leaves(base.report))
-    assert len(base.printed.splitlines()) == 2 + 6 + 2 + 1  # two lines beside H3
-    assert len(base.table.splitlines()) == 6 + 6 + 1 + 3 * 2
+    # two lines beside H3 and two on the overconfidence criterion, one for each primary
+    assert len(base.printed.splitlines()) == 2 + 6 + 2 + 2 + 1
+    assert len(base.table.splitlines()) == 6 + 6 + 1 + 4 * 2
 
 
 def walk(value: Any) -> Iterator[Any]:

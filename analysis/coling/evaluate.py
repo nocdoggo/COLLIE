@@ -69,7 +69,8 @@ records which value was in force):
   The percentile intervals are reported under ``percentile`` for every contrast given in full
   (the six tests and the probe), whatever the constant; a contrast given in short,
   ``Delta_GBM`` among them, carries its ``ci95`` alone. The losses of single predictors and
-  every secondary but ``Delta_GBM`` keep 95% percentile intervals as descriptions.
+  every secondary but ``Delta_GBM`` keep 95% percentile intervals. They are descriptions,
+  except in the overconfidence criterion, which the plan words on its percentile intervals.
 * ``H3_COMPARATOR``: what the model's best condition is compared with in H3. ``base_rate`` is
   the base rate by listing age, the comparator of the plan (section 6, DECISIONS 26);
   ``gbm_structured`` is the structured-only gradient-boosted model, the comparator of the draft;
@@ -235,6 +236,36 @@ in the family. A contrast over fewer than two episodes is not evaluable either, 
 that cannot be tested for that reason leaves the switch undecided and the model's three tests
 not evaluable. The item set of each primary is fixed before any test is computed.
 
+The overconfidence criterion (PLAN section 13; a secondary with no multiplicity claim). For each
+primary it is read on condition (a) and ``E_end``, over every statement of the item set the
+probe fixed, for the model and for the base rate by listing age on those same statements. A
+failed answer of condition (a) is in it as the base-rate output that replaced it. Every value
+has a 95% percentile interval by episode on the registered draws (``overconfidence``). A primary
+without an item set, whose three tests are not evaluable, has no reading.
+
+* Against outcomes. The mean of ``P(E_end)`` minus the largest frequency of ``E_end`` that the
+  captures allow, every undetermined ``E_end`` counted as yes, whatever the other horizon event
+  of the statement is: the least value that calibration in the large can take on the item set.
+  The greatest value counts every undetermined ``E_end`` as no. The part is met when the least
+  value is positive and its interval excludes zero. No scoreable set enters.
+* Against a predictor that reads no text. The mean of ``P(E_end)`` minus the mean ``P(E_end)``
+  of the base rate on the same statements, met when it is positive and its interval excludes
+  zero. No outcome enters.
+* The reading, one of five tried in the plan's order (``OVERCONFIDENCE_READINGS``): 1, the
+  greatest value is negative with an interval that excludes zero (underconfident, and nothing
+  else is written); 2, both parts are met; 3, only the second; 4, only the first; 5, neither.
+  ``met`` is true for reading 2 alone.
+* Beside it, for condition (a) and for the base rate on the same statements: both parts for
+  ``E_end90``; both parts on the statements whose answer parsed (withheld when they would give
+  the horizon events of a few statements: ``few``); calibration in the large on the scoreable
+  statements with its interval, and the difference of the two predictors there with its
+  interval; and the coverage of the 80% interval. The mean of ``P(E_end)`` minus the Turnbull
+  share recovered by the stated end is left to a secondary scorer.
+
+Wherever a predictor has its calibration in the large (``losses``), it also has the least and
+the greatest value over every statement of its item set (``calibration_all_statements``), and
+the base rate's on the same statements beside both (``beside_base_rate``).
+
 Where the plan is silent, this file decides as follows, and the result file says so
 (``WHERE_THE_PLAN_IS_SILENT``).
 
@@ -247,8 +278,9 @@ Where the plan is silent, this file decides as follows, and the result file says
 * Under ``percentile``, ``studentised``, ``studentised_symmetric`` and ``sign_flip_t`` the
   confirmatory contrasts and ``Delta_GBM`` carry percentile intervals: the plan words an
   interval of the test for the larger-of procedure only. Every contrast says which interval
-  it carries (``interval_method``); the intervals of single-predictor losses and of
-  calibration in the large are percentile intervals and carry no such field.
+  it carries (``interval_method``); the intervals of single-predictor losses, of calibration
+  in the large and of the overconfidence criterion (a difference of two mean probabilities
+  among them) are percentile intervals and carry no such field.
 * The interval of the registered test: an end the search does not find is unbounded, and
   written as null. That says only that the test does not reject 50 standard errors away. It
   may reject further away, and the margin of H2 can be among those values: equivalence is
@@ -265,6 +297,25 @@ Where the plan is silent, this file decides as follows, and the result file says
 * Every eligible statement needs an episode and a company before the sealed file is read.
 * The bounds beside a contrast set every undetermined horizon event of the item set to no,
   then to yes, for both predictors at once.
+* In the overconfidence criterion an interval excludes zero when both of its ends lie on one
+  side of zero, and an end on zero does not; a draw whose values sum to zero up to rounding
+  counts as zero; an item set of a single episode has no interval, so that neither part is met
+  and the reading is the fifth.
+* Beside a predictor's calibration in the large stands the base rate's on the same statements
+  (under ``base_rate``), except in the base rate's own record; a record without a scoreable
+  statement holds no calibration in the large, and so no least or greatest value either.
+* A primary without an item set has no reading of the overconfidence criterion, and its line
+  in the table and in the printout gives the reason: the probe could not be tested, the model
+  has no slice inside the test split, or its post-cutoff slice holds fewer than 50 scoreable
+  statements; the criterion is not read on such a slice, although its first part uses no
+  scoreable set; a primary declared not evaluable, whose runs are not read, has no entry and
+  no line.
+* Beside the overconfidence criterion, the two parts on the answers that parsed
+  (``parsed_only``) are withheld, their three counts apart, when 1 to 4 answers of condition
+  (a) failed on the item set, or 1 to 4 parsed: with the figures over every statement they
+  would give the horizon events of those few statements; the contrast of a test on the
+  statements that both of its sides parsed (``both_sides_parsed``) is withheld in the same
+  way, its two counts apart, when it leaves out or rests on 1 to 4 scoreable statements.
 
 Refusals (status 1, the reason alone on the error stream, nothing written). A missing or wrong
 hash; an output that exists or lies in a sealed folder; an open input in a sealed folder; files
@@ -300,8 +351,18 @@ and ``beats_both_comparators``). Every other contrast is given in short, with it
 side. ``secondaries`` (the model-free contrasts, H2 on the
 month-and-year form, ``Delta_GBM``, H3 with each condition in place of the selected one, the
 post-cutoff slice, statements first captured by the stated end, clusters by company, the two
-other statement-level brackets, definition A, the decomposition of E3, the overconfidence
-criterion of section 13); ``losses`` (every score of section 7.2 per predictor);
+other statement-level brackets, definition A, the decomposition of E3, and under
+``overconfidence_of_condition_a`` the overconfidence criterion of section 13 for each primary
+with an item set: ``criterion``, ``items``, ``statements``, ``episodes``;
+``against_outcomes`` and ``against_base_rate``, each by ``E_end`` and ``E_end90``;
+``reading`` (1 to 5), ``reading_in_words`` and ``met``; and, reported beside the criterion,
+``scoreable``, ``parsed_only`` and ``coverage_80``; the key ``base_rate`` inside a block holds
+the same quantities for the base rate on the same statements; ``parsed_only`` holds
+``not_parsed``, ``statements``, ``episodes`` and ``withheld`` alone when its figures are
+withheld); ``losses`` (every score of section 7.2 per predictor: the model-free ones on every
+eligible statement, the conditions of a primary on its item set;
+``calibration_in_the_large`` on the scoreable statements and ``calibration_all_statements``
+with the least and the greatest value over all of them);
 ``where_the_plan_is_silent``; ``not_computed_here`` (what the plan registers and this file
 does not compute: the descriptives of E1, the secondary models and lists, and the rest).
 
@@ -399,6 +460,11 @@ PROBE_ALPHA = 0.05
 PROBE_LEVEL = 0.5
 MIN_SLICE = 50
 """A post-cutoff slice is analysed only with at least this many scoreable statements."""
+MIN_SHOWN = 5
+"""Fewer statements than this, and at least one, are a few (``few``). Beside the overconfidence
+criterion, the figures on the answers that parsed are withheld when the answers that failed are
+a few, or those that parsed are: next to the figures over every statement they would give the
+horizon events of those statements."""
 MIN_EPISODES = 2
 EXACT_FLIPS_UP_TO = 13
 """With at most this many episodes the sign-flip test enumerates every sign pattern."""
@@ -429,6 +495,33 @@ CLUSTER_COLUMNS = ("episode_id", "company_name")
 both (the company for the registered secondary that resamples by company)."""
 ALL_ITEMS = "every eligible statement"
 SLICE_ITEMS = "the post-cutoff slice"
+EVENTS = (("E_end", "p_a", "y_a"), ("E_end90", "p_b", "y_b"))
+"""The two horizon events, each with the column of its probability in a table of predictions
+and the column of its outcome in the typed frame (1, 0, or missing when undetermined)."""
+OVERCONFIDENCE_CRITERION = (
+    "PLAN section 13, for condition (a) and E_end over every statement of the item set, each "
+    "value with its 95% percentile interval by episode. Against outcomes: the mean of P(E_end) "
+    "minus the largest frequency of E_end the captures allow (every undetermined E_end counted "
+    "as yes; the least value of calibration in the large) is positive with an interval that "
+    "excludes zero. Against a predictor that reads no text: the mean of P(E_end) minus the mean "
+    "P(E_end) of the base rate by listing age on the same statements is positive with an "
+    "interval that excludes zero. met: both parts hold (reading 2)"
+)
+"""What the entry of a primary under ``overconfidence_of_condition_a`` is, in its own words."""
+OVERCONFIDENCE_READINGS = {
+    1: "the readings are underconfident relative to outcomes",
+    2: "the readings are overconfident relative to outcomes",
+    3: "the model states higher probabilities than the base rate, and the captures do not "
+    "decide whether it is overconfident",
+    4: "the model's probabilities exceed every frequency the captures allow; they were not "
+    "shown to exceed the base rate's, and the excess is not put down to the reading",
+    5: "overconfidence was not detected, which does not say that the readings are calibrated",
+}
+"""The five readings of the overconfidence criterion in the order PLAN section 13 tries them,
+each in the words the plan gives the paper: (1) the greatest value of calibration in the large
+(every undetermined ``E_end`` counted as no) is negative with an interval that excludes zero,
+and nothing else of the list is written; (2) both parts hold; (3) only the second; (4) only the
+first; (5) neither."""
 MODEL_FREE_PAIRS = (
     ("base_rate", "gbm_text"),
     ("base_rate", "rules_plus_slip"),
@@ -454,6 +547,11 @@ NOT_COMPUTED_HERE = (
     "the sensitivity analyses of the recovery rule: the BL definition, leaving the list, and "
     "the Date Discontinued cell",
     "selective prediction (loss against abstention rate)",
+    "the mean of P(E_end) minus the Turnbull share recovered by the stated end, reported beside "
+    "the overconfidence criterion (a secondary scorer)",
+    "the analysis by statement type of section 5, E3: the contrasts, the losses, calibration in "
+    "the large and the overconfidence criterion on the recovery statements and on the "
+    "next-delivery statements apart (a secondary scorer)",
     "E2, E5 and E7",
 )
 WHERE_THE_PLAN_IS_SILENT = (
@@ -466,7 +564,8 @@ WHERE_THE_PLAN_IS_SILENT = (
     "statistic)",
     "under a p-value source other than the larger-of procedure the confirmatory contrasts and "
     "Delta_GBM carry percentile intervals; every contrast says in interval_method which interval "
-    "it carries; the intervals of single-predictor losses and of calibration in the large are "
+    "it carries; the intervals of single-predictor losses, of calibration in the large and of "
+    "the overconfidence criterion (a difference of two mean probabilities among them) are "
     "percentile intervals and carry no such field",
     "an end of the interval of the registered test that the search does not find is unbounded "
     "and written as null: the test does not reject the value 50 standard errors from the "
@@ -491,6 +590,26 @@ WHERE_THE_PLAN_IS_SILENT = (
     "Murphy's decomposition cuts the statements, ordered by probability and then by id, into "
     "ten runs of equal length; the coverage of the 80% interval treats a bracket as closed",
     "definition A is one of the outcome variants that keep the item set the probe fixed",
+    "in the overconfidence criterion an interval excludes zero when both of its ends lie on one "
+    "side of zero, and an end on zero does not; a draw whose values sum to zero up to rounding "
+    "counts as zero; an item set of a single episode has no interval, so that neither part is "
+    "met and the reading is the fifth",
+    "beside a predictor's calibration in the large stands the base rate's on the same statements "
+    "(under base_rate), except in the base rate's own record; a record without a scoreable "
+    "statement holds no calibration in the large, and so no least or greatest value either",
+    "a primary without an item set has no reading of the overconfidence criterion, and its line "
+    "in the table and in the printout gives the reason: the probe could not be tested, the model "
+    f"has no slice inside the test split, or its post-cutoff slice holds fewer than {MIN_SLICE} "
+    "scoreable statements; the criterion is not read on such a slice, although its first part "
+    "uses no scoreable set; a primary declared not evaluable, whose runs are not read, has no "
+    "entry and no line",
+    "beside the overconfidence criterion, the two parts on the answers that parsed (parsed_only) "
+    f"are withheld, their three counts apart, when 1 to {MIN_SHOWN - 1} answers of condition (a) "
+    f"failed on the item set, or 1 to {MIN_SHOWN - 1} parsed: with the figures over every "
+    "statement they would give the horizon events of those few statements; the contrast of a "
+    "test on the statements that both of its sides parsed (both_sides_parsed) is withheld in "
+    f"the same way, its two counts apart, when it leaves out or rests on 1 to {MIN_SHOWN - 1} "
+    "scoreable statements",
 )
 """The decisions every result file carries as ``where_the_plan_is_silent`` (see the module
 docstring)."""
@@ -1434,6 +1553,79 @@ def calibration(p: Any, y: Any, clusters: Sequence[str], draws: int, seed: int) 
     return out
 
 
+def episode_intervals(
+    values: np.ndarray, clusters: Sequence[str], draws: int, seed: int
+) -> list[list[float] | None]:
+    """For each column of ``values`` (statements by quantities), the 95% percentile interval of
+    its mean over draws of the episodes ``clusters``, every column on the same draws
+    (``predictors.cluster_draws``, as ``predictors.bootstrap_means`` takes them). None for each
+    column when the statements lie in one episode, or when there is none.
+
+    The overconfidence criterion asks whether such an interval excludes zero, so a draw whose
+    values sum to zero up to rounding is exactly zero, as for a contrast (``drawn_deltas``,
+    ``rounding_tolerance``): the sign of a rounding error must not put an end on one side of
+    zero."""
+    values = np.asarray(values, dtype=float)
+    if len(set(clusters)) < MIN_EPISODES:
+        return [None] * values.shape[1]
+    sums, sizes = P.cluster_sums(values, clusters)
+    taken = P.cluster_draws(len(sizes), draws, seed).astype(float)
+    totals = taken @ sums
+    slack = np.array([rounding_tolerance(column) for column in sums.T])
+    means = np.where(np.abs(totals) <= slack, 0.0, totals / (taken @ sizes)[:, None])
+    return [P.interval(column, 0.95) for column in means.T]
+
+
+def excludes_zero(interval: Sequence[float] | None) -> bool:
+    """Whether an interval excludes zero: both of its ends lie on one side of zero. An end on
+    zero does not exclude it, and an interval that could not be made (None) excludes nothing."""
+    return interval is not None and (interval[0] > 0 or interval[1] < 0)
+
+
+def calibration_limits(
+    p: Any, y: Any, clusters: Sequence[str], draws: int, seed: int
+) -> dict[str, Any]:
+    """The limits of calibration in the large over every statement given, whatever the captures
+    leave open (PLAN 7.2). ``y`` holds the event of each statement as 1, 0, or missing when it
+    is undetermined. ``least``: the mean probability minus ``largest_frequency``, the frequency
+    of the event with every undetermined one counted as yes. ``greatest``: the mean probability
+    minus ``smallest_frequency``, with every undetermined one counted as no. Each limit has its
+    95% percentile interval by episode (``episode_intervals``). No scoreable set enters.
+    Without a statement every value is None."""
+    p, y = np.asarray(p, dtype=float), np.asarray(y, dtype=float)
+    unknown = np.isnan(y)
+    limits = (("least", "largest_frequency", 1.0), ("greatest", "smallest_frequency", 0.0))
+    keys = [key for name, frequency, _ in limits for key in (frequency, name, f"{name}_ci95")]
+    out: dict[str, Any] = {"undetermined": int(unknown.sum()), **dict.fromkeys(("mean_p", *keys))}
+    if not len(p):
+        return out
+    out["mean_p"] = float(p.mean())
+    events = [np.where(unknown, counted_as, y) for _, _, counted_as in limits]
+    gaps = np.stack([p - event for event in events], axis=1)
+    intervals = episode_intervals(gaps, clusters, draws, seed)
+    for (name, frequency, _), event, interval in zip(limits, events, intervals, strict=True):
+        out[frequency], out[name] = float(event.mean()), float((p - event).mean())
+        out[f"{name}_ci95"] = interval
+    return out
+
+
+def probability_gap(
+    p: Any, base: Any, clusters: Sequence[str], draws: int, seed: int
+) -> dict[str, Any]:
+    """The mean probability of a predictor minus the mean probability of the base rate by
+    listing age on the same statements (``p`` and ``base``, one value per statement), with its
+    95% percentile interval by episode (``episode_intervals``). No outcome enters. Without a
+    statement every value is None."""
+    p, base = np.asarray(p, dtype=float), np.asarray(base, dtype=float)
+    out: dict[str, Any] = dict.fromkeys(("mean_p_model", "mean_p_base_rate", "difference", "ci95"))
+    if not len(p):
+        return out
+    out["mean_p_model"], out["mean_p_base_rate"] = float(p.mean()), float(base.mean())
+    out["difference"] = float((p - base).mean())
+    (out["ci95"],) = episode_intervals((p - base)[:, None], clusters, draws, seed)
+    return out
+
+
 def coverage80(pred: pd.DataFrame, rows: pd.DataFrame) -> dict[str, Any]:
     """Coverage of the 80% interval ``[q10, q90]``, counted on the statements whose bracket of
     the capped time to recovery lies wholly inside or wholly outside it (a target censored
@@ -1470,13 +1662,37 @@ def murphy(p: Any, y: Any, bins: int = 10) -> dict[str, Any]:
     }
 
 
+def calibration_scores(
+    rows: pd.DataFrame, pred: pd.DataFrame, draws: int = DRAWS, seed: int = SEED
+) -> dict[str, Any]:
+    """Calibration in the large of one predictor on the statements of ``rows`` (PLAN 7.2), for
+    each horizon event: on the scoreable statements (``calibration_in_the_large``), and over
+    every statement with its least and its greatest value (``calibration_all_statements``:
+    ``calibration_limits``). ``rows`` must hold a scoreable statement."""
+    scoreable = rows[rows["scoreable"]]
+    mine, clusters = pred.loc[scoreable.index], list(scoreable["episode_id"])
+    whole, every = pred.loc[rows.index], list(rows["episode_id"])
+    return {
+        "calibration_in_the_large": {
+            event: calibration(mine[p], scoreable[y], clusters, draws, seed)
+            for event, p, y in EVENTS
+        },
+        "calibration_all_statements": {
+            event: calibration_limits(whole[p], rows[y], every, draws, seed)
+            for event, p, y in EVENTS
+        },
+    }
+
+
 def predictor_record(
     rows: pd.DataFrame, pred: pd.DataFrame, draws: int = DRAWS, seed: int = SEED
 ) -> dict[str, Any]:
     """Every registered score of one predictor on the statements of ``rows`` (PLAN 7.2): the
     record of ``power.predictor_record`` (primary Brier on the scoreable ones with its 95%
     interval, the two horizon events apart, the bounds and the pinball losses over all rows),
-    calibration in the large, Murphy's decomposition and the coverage of the 80% interval."""
+    calibration in the large (on the scoreable statements, and its least and greatest value
+    over all rows: ``calibration_scores``), Murphy's decomposition and the coverage of the 80%
+    interval. Without a scoreable statement the record holds that count alone."""
     pred = pred.loc[rows.index]
     scoreable = rows[rows["scoreable"]]
     if not len(scoreable):
@@ -1488,19 +1704,165 @@ def predictor_record(
     record = power.predictor_record(rows, pred, np.asarray(loss), means)
     record["bounds_all_statements"] = record.pop("bounds_all_dated")
     record["pinball_all_statements"] = record.pop("pinball_all_dated")
-    events = (("E_end", "p_a", "y_a"), ("E_end90", "p_b", "y_b"))
     return {
         "scoreable_statements": len(scoreable),
         "scoreable_episodes": len(set(clusters)),
         "statements": len(rows),
         **record,
         "ci95": record["ci95"] if several else None,
-        "calibration_in_the_large": {
-            event: calibration(mine[p], scoreable[y], clusters, draws, seed)
-            for event, p, y in events
-        },
-        "murphy": {event: murphy(mine[p], scoreable[y]) for event, p, y in events},
+        **calibration_scores(rows, pred, draws, seed),
+        "murphy": {event: murphy(mine[p], scoreable[y]) for event, p, y in EVENTS},
         "coverage_80": coverage80(pred, rows),
+    }
+
+
+def beside_base_rate(
+    record: Mapping[str, Any],
+    rows: pd.DataFrame,
+    base: pd.DataFrame,
+    draws: int = DRAWS,
+    seed: int = SEED,
+) -> dict[str, Any]:
+    """The record of ``predictor_record`` on ``rows`` with the base rate's calibration in the
+    large beside the predictor's own (PLAN 7.2: "the same quantities for the base rate by
+    listing age on the same events"): every event of ``calibration_in_the_large`` and of
+    ``calibration_all_statements`` gains ``base_rate``, what ``calibration_scores`` gives for
+    the base rate's predictions ``base`` on the same statements. A record without a scoreable
+    statement holds no calibration in the large and is returned as it is."""
+    if not record["scoreable_statements"]:
+        return dict(record)
+    beside = calibration_scores(rows, base, draws, seed)
+    return {
+        **record,
+        **{
+            key: {
+                event: {**record[key][event], "base_rate": theirs}
+                for event, theirs in found.items()
+            }
+            for key, found in beside.items()
+        },
+    }
+
+
+def criterion_parts(
+    rows: pd.DataFrame, pred: pd.DataFrame, base: pd.DataFrame, draws: int, seed: int
+) -> dict[str, Any]:
+    """Both parts of the overconfidence criterion of PLAN section 13 over every statement of
+    ``rows``, for each horizon event, for the predictions ``pred`` and the base rate's
+    predictions ``base`` on the same statements.
+
+    ``against_outcomes``: the limits of calibration in the large (``calibration_limits``). The
+    part is ``met`` when the least value is positive and its interval excludes zero. The limits
+    of the base rate stand under ``base_rate``; no verdict is read from them.
+
+    ``against_base_rate``: the mean probability minus the base rate's (``probability_gap``).
+    The part is ``met`` when the difference is positive and its interval excludes zero."""
+    clusters = list(rows["episode_id"])
+    mine, theirs = pred.loc[rows.index], base.loc[rows.index]
+    outcomes, no_text = {}, {}
+    for event, p, y in EVENTS:
+        limits = calibration_limits(mine[p], rows[y], clusters, draws, seed)
+        limits["met"] = excludes_zero(limits["least_ci95"]) and limits["least"] > 0
+        limits["base_rate"] = calibration_limits(theirs[p], rows[y], clusters, draws, seed)
+        gap = probability_gap(mine[p], theirs[p], clusters, draws, seed)
+        gap["met"] = excludes_zero(gap["ci95"]) and gap["difference"] > 0
+        outcomes[event], no_text[event] = limits, gap
+    return {
+        "statements": len(rows),
+        "episodes": len(set(clusters)),
+        "against_outcomes": outcomes,
+        "against_base_rate": no_text,
+    }
+
+
+def overconfidence_reading(outcomes: Mapping[str, Any], no_text: Mapping[str, Any]) -> int:
+    """Which of the five readings of PLAN section 13 applies (``OVERCONFIDENCE_READINGS``), from
+    the two parts of the criterion for ``E_end`` (``criterion_parts``), tried in the plan's
+    order: 1 when the greatest value of calibration in the large is negative with an interval
+    that excludes zero, whatever else holds; 2 when both parts are met; 3 when only the part
+    against the base rate is; 4 when only the part against outcomes is; 5 otherwise."""
+    if excludes_zero(outcomes["greatest_ci95"]) and outcomes["greatest"] < 0:
+        return 1
+    if no_text["met"]:
+        return 2 if outcomes["met"] else 3
+    return 4 if outcomes["met"] else 5
+
+
+def few(count: int) -> bool:
+    """Whether a number of statements is a few: 1 to ``MIN_SHOWN`` - 1. A figure on outcomes
+    that would give the horizon events of so few statements is withheld (over none there is
+    nothing to give)."""
+    return 0 < count < MIN_SHOWN
+
+
+def overconfidence(
+    rows: pd.DataFrame,
+    pred: pd.DataFrame,
+    base: pd.DataFrame,
+    parsed: pd.Series,
+    draws: int = DRAWS,
+    seed: int = SEED,
+) -> dict[str, Any]:
+    """The overconfidence criterion of PLAN section 13 on ``rows``, the typed statements of an
+    item set with their outcomes. ``pred`` holds the predictions of condition (a), in which a
+    failed answer is already the base-rate output; ``base`` the base rate's predictions;
+    ``parsed`` which answers of condition (a) parsed. Every interval is a 95% percentile
+    interval by episode on the draws of ``draws`` and ``seed``.
+
+    The criterion is read on ``E_end``: ``against_outcomes`` and ``against_base_rate``
+    (``criterion_parts``), ``reading`` (1 to 5: ``overconfidence_reading``) with
+    ``reading_in_words``, and ``met``, which is true when both parts hold (reading 2).
+
+    Beside it, for condition (a) and, under ``base_rate``, for the base rate on the same
+    statements: both parts for ``E_end90`` (in the same two blocks); ``scoreable``, calibration
+    in the large on the scoreable statements with, under ``against_base_rate``, the difference
+    of the two predictors there (the scoreable statements have one frequency, so it is the
+    difference of the two mean probabilities); ``parsed_only``, both parts on the statements
+    whose answer parsed, after the number of answers that did not; and ``coverage_80``.
+
+    ``parsed_only`` holds its three counts and ``withheld`` alone when the answers that failed
+    are a few, or those that parsed are (``few``). The frequencies and the counts of
+    undetermined events over every statement and over the parsed ones give, by subtraction,
+    the horizon events of the statements between them, and the answers that failed can be told
+    from the stored runs; over a few parsed answers the figures would give their events
+    outright."""
+    parts = criterion_parts(rows, pred, base, draws, seed)
+    number = overconfidence_reading(
+        parts["against_outcomes"]["E_end"], parts["against_base_rate"]["E_end"]
+    )
+    scoreable = rows[rows["scoreable"]]
+    clusters = list(scoreable["episode_id"])
+    mine, theirs = pred.loc[scoreable.index], base.loc[scoreable.index]
+    on_scoreable: dict[str, Any] = {"statements": len(scoreable), "episodes": len(set(clusters))}
+    if len(scoreable):  # calibration in the large needs a frequency
+        for event, p, y in EVENTS:
+            on_scoreable[event] = {
+                **calibration(mine[p], scoreable[y], clusters, draws, seed),
+                "base_rate": calibration(theirs[p], scoreable[y], clusters, draws, seed),
+                "against_base_rate": probability_gap(mine[p], theirs[p], clusters, draws, seed),
+            }
+    kept = rows[parsed.loc[rows.index].to_numpy()]
+    failed = len(rows) - len(kept)
+    if few(failed) or few(len(kept)):
+        on_parsed: dict[str, Any] = {
+            "statements": len(kept),
+            "episodes": len(set(kept["episode_id"])),
+            "withheld": True,
+        }
+    else:
+        on_parsed = criterion_parts(kept, pred, base, draws, seed)
+    return {
+        "criterion": OVERCONFIDENCE_CRITERION,
+        **parts,
+        "reading": number,
+        "reading_in_words": OVERCONFIDENCE_READINGS[number],
+        "met": number == 2,
+        "scoreable": on_scoreable,
+        "parsed_only": {"not_parsed": failed, **on_parsed},
+        "coverage_80": {
+            **coverage80(pred.loc[rows.index], rows),
+            "base_rate": coverage80(base.loc[rows.index], rows),
+        },
     }
 
 
@@ -2009,7 +2371,8 @@ def item_set(
     section 5, E4): every eligible statement, or its post-cutoff slice when the probe beat the
     base rate. None, with the reason, when the tests are not evaluable: the switch could not
     be decided, the model has no slice, or the slice holds fewer than ``MIN_SLICE`` scoreable
-    statements."""
+    statements. Nothing that is computed on a primary's item set is then computed for it, the
+    overconfidence criterion included, however many statements the slice holds."""
     cutoff = sealed_counts.CUTOFF_MONTH_ENDS[model]
     has_slice = sealed_counts.has_slice(cutoff)
     after = (first.loc[rows.index, "event_date"] > cutoff.isoformat()).to_numpy() & has_slice
@@ -2204,11 +2567,17 @@ def evaluate(
                     )
                 entry["bounds"] = bounds(chosen, predictions, comparator, tested)
                 parsed = rows.loc[both_parsed(ids, (comparator, tested))]
-                entry["both_sides_parsed"] = short(
+                both = short(
                     scored(parsed, predictions, comparator, tested, draws=draws, seed=seed),
                     sides,
                     source,
                 )
+                # beside the contrast on every scoreable statement, the one on those both sides
+                # parsed would give the summed loss difference of the few it leaves out
+                if few(entry["statements"] - both["statements"]) or few(both["statements"]):
+                    both = {key: both[key] for key in ("statements", "episodes")}
+                    both["withheld"] = True
+                entry["both_sides_parsed"] = both
                 kept = chosen.index[chosen["scoreable"].to_numpy()]
                 entry["scoreable_not_parsed"] = {
                     name: len(kept) - len(both_parsed(kept, (name,)))
@@ -2333,30 +2702,37 @@ def evaluate(
         }
     secondaries["decomposition"] = decomposition
 
-    losses = {
-        name: predictor_record(rows, predictions[name], draws, seed) for name in gbm.PREDICTORS
-    }
-    overconfidence = {}
+    def scores(ids: pd.Index, name: str) -> dict[str, Any]:
+        """Every score of one predictor on the statements ``ids``, with the base rate's
+        calibration in the large on the same statements beside its own."""
+        chosen = rows.loc[ids]
+        record = predictor_record(chosen, predictions[name], draws, seed)
+        if name == BASE:
+            return record
+        return beside_base_rate(record, chosen, predictions[BASE], draws, seed)
+
+    losses = {name: scores(rows.index, name) for name in gbm.PREDICTORS}
+    overconfident = {}
     for model in models:
         ids = sets[model]
         if ids is None:
             continue
         for condition in CONDITIONS:
-            name = f"{model}:{condition}"
-            losses[name] = predictor_record(rows.loc[ids], predictions[name], draws, seed)
-        zero_shot = losses[f"{model}:a"]
-        if zero_shot["scoreable_statements"]:
-            large = zero_shot["calibration_in_the_large"]
-            ci = large["E_end"]["ci95"]
-            overconfidence[model] = {
-                "criterion": "calibration in the large of condition (a) on E_end is positive "
-                "with a 95% interval that excludes zero (PLAN section 13)",
-                "E_end": large["E_end"],
-                "E_end90": large["E_end90"],
-                "coverage_80": zero_shot["coverage_80"],
-                "met": bool(ci is not None and ci[0] > 0),
-            }
-    secondaries["overconfidence_of_condition_a"] = overconfidence
+            losses[f"{model}:{condition}"] = scores(ids, f"{model}:{condition}")
+        # the criterion is read on the item set the probe fixed, for both predictors
+        zero_shot = f"{model}:a"
+        overconfident[model] = {
+            "items": set_records[model]["items"],
+            **overconfidence(
+                rows.loc[ids],
+                predictions[zero_shot],
+                predictions[BASE],
+                study.parsed[zero_shot],
+                draws,
+                seed,
+            ),
+        }
+    secondaries["overconfidence_of_condition_a"] = overconfident
 
     return {
         "items": {
@@ -2433,11 +2809,47 @@ def unbounded_note(registered: Mapping[str, Any], shown: Iterable[Any]) -> list[
     ]
 
 
+def overconfidence_lines(report: Mapping[str, Any]) -> list[str]:
+    """One line for each primary whose runs were read: the reading of the overconfidence
+    criterion (PLAN section 13) by its number and in the plan's words, then the numbers it
+    rests on. Those are, for ``P(E_end)`` under condition (a) over every statement of the item
+    set: the least and the greatest value of calibration in the large, each with the frequency
+    taken away and its 95% interval, and the difference from the base rate's mean probability
+    with its 95% interval; each part is said to be met or not. A primary without an item set
+    has no reading, and its line says why."""
+    lines = []
+    found = report["secondaries"]["overconfidence_of_condition_a"]
+    met = {True: "part met", False: "part not met"}
+    for model, chosen in report["item_sets"].items():
+        head = f"Overconfidence of condition (a), {model}"
+        if model not in found:
+            lines.append(f"{head}: no reading ({chosen['reason']}).")
+            continue
+        entry = found[model]
+        first, second = entry["against_outcomes"]["E_end"], entry["against_base_rate"]["E_end"]
+        lines.append(
+            f"{head}: reading {entry['reading']} of {len(OVERCONFIDENCE_READINGS)}: "
+            f"{entry['reading_in_words']}. P(E_end) on {entry['items']} ({entry['statements']} "
+            f"statements in {entry['episodes']} episodes, {first['undetermined']} with E_end "
+            f"undetermined): mean {_number(first['mean_p'])}. Against outcomes: least value of "
+            f"calibration in the large {_number(first['least'])} "
+            f"{_interval(first['least_ci95'])} (every undetermined E_end counted as yes: "
+            f"frequency {_number(first['largest_frequency'])}), greatest "
+            f"{_number(first['greatest'])} {_interval(first['greatest_ci95'])} (counted as no: "
+            f"frequency {_number(first['smallest_frequency'])}); {met[first['met']]}. Against "
+            f"the base rate (mean P(E_end) {_number(second['mean_p_base_rate'])}): difference "
+            f"{_number(second['difference'])} {_interval(second['ci95'])}; {met[second['met']]}."
+        )
+    return lines
+
+
 def markdown(report: Mapping[str, Any]) -> str:
     """The short table of the confirmatory results. Under the registered test the line of H2
     leads with the rule on the two p-values at the margin, which decides, and gives the 90%
-    interval beside it; the counts beside it add up to the episodes that differ. A last line
-    says what an unbounded end is, when one is shown (``unbounded_note``)."""
+    interval beside it; the counts beside it add up to the episodes that differ. After the
+    probe lines stands the reading of the overconfidence criterion for each primary
+    (``overconfidence_lines``). A last line says what an unbounded end is, when one is shown
+    (``unbounded_note``)."""
     registered = report["registered"]
     made = registered["intervals"]["of_the_confirmatory_contrasts_and_delta_gbm"]
     lines = [
@@ -2511,6 +2923,7 @@ def markdown(report: Mapping[str, Any]) -> str:
             f"Probe, {model}: delta {_number(probe.get('delta'))} days of pinball loss at 0.5 "
             f"(base rate minus probe), p {_number(probe['p'])}; tests on: {where}."
         )
+    lines += overconfidence_lines(report)
     lines += unbounded_note(registered, shown)
     return "\n".join(lines) + "\n"
 
@@ -2542,6 +2955,7 @@ def summary_lines(report: Mapping[str, Any]) -> list[str]:
                 f"{_number(beside.get('delta'))} {_interval(beside.get('ci95'))}; beats both "
                 f"comparators: {flag}"
             )
+    lines += [f"  {line}" for line in overconfidence_lines(report)]
     return lines + unbounded_note(report["registered"], shown)
 
 
