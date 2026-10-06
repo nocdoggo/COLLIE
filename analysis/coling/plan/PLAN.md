@@ -518,8 +518,11 @@ A class with fewer than 15 train-period statements at risk under B is merged int
 neighbour class, for per-form reporting and for every table or cell fitted by form (the
 calibrator, the track-record table). A class that is still too small after it has received
 another is merged on in turn; month and year, and silent, are never merged away. The
-literal-task sample is stratified on the unmerged classes. Templates are the normalised texts
-with months and numbers masked; results are also reported weighted by template.
+literal-task sample is stratified on the unmerged classes, and the reports of the literal task
+(the agreement of section 10, and E2) are given by stratum of the guide's allocation table,
+not by the merged classes: "by form" and "per form" mean that there. Templates are the
+normalised texts with months and numbers masked; results are also reported weighted by
+template.
 
 The final inventory and order are the fifteen classes above, from the classifier on the frozen
 build (its hash is in section 17). Five classes hold fewer than 15 train-period statements at
@@ -527,7 +530,8 @@ risk under B: relative (5), half of a year (3), vague (6), discontinuation (10) 
 (10). Taken in the order above, four of them are merged, each into its named neighbour: relative
 into range; half of a year into quarter; vague into no date; discontinuation into distractor.
 Distractor then holds 20 and stays. Year holds 15 and stays a class of its own. Per-form
-reports, the calibrator and the track-record table therefore use eleven classes, in this order:
+reports of the outcome experiments, the calibrator and the track-record table therefore use
+eleven classes, in this order:
 range (relative or range), exact day, part of a month, quarter (half of a year or quarter),
 year, month with no year, month and year, TBD or unknown, no date (vague or no date), distractor
 (discontinuation or distractor), silent. No statement has covered presentations of different
@@ -817,7 +821,15 @@ both context for E3, and neither is a failure.
   each quota taken from statements dated 2023 or later (one third), and the caps per text
   template and per episode.
 
-**Gold.** The adjudicated labels of the two annotators (section 10).
+**Gold.** The adjudicated labels of the two annotators (section 10). While adjudicating, and
+from the two submitted sheets and the adjudication sheet alone, ADJ lists the gold items whose
+reading rests on a convention the prompt does not state (guide, D14):
+`analysis/coling/out/audit/literal_convention_items.csv`, one column `item_id`, with the
+header only when there is none. It is committed with the gold file, its sha256 logged beside
+the gold's, before any reader output on those items is opened, and changes afterwards only by
+a dated amendment. Every E2 result is also given without these items and without the items
+the adjudication marked as a gap of the guide; the registered family is the one on every gold
+item.
 
 **Prompts.**
 
@@ -834,10 +846,12 @@ both context for E3, and neither is a failure.
 - the quoted words the reading rests on.
 
 **Readers.** All eight models, and the rule reader (`rules.py`). HeidelTime and SUTime are not
-run (section 8).
+run (section 8). A model that is dropped under section 9 or section 12 after its E2 or E5
+runs are complete is still scored there.
 
 **Metrics.** See section 7.1. Results are reported by form, and weighted by event and by
-template.
+template, as section 7.1 defines the two weights. In the literal task "by form" means by
+stratum of the guide's allocation table, the fourteen rows the sample is drawn on.
 
 **Test (a secondary family with its own error control, separate from H1 to H3).**
 
@@ -853,9 +867,12 @@ template.
 **Positive result.**
 
 - Rules roughly equal the models on month-and-year text.
-- The models lead by at least 0.15 IoU on part-of-month, no-year and range forms, and on items
-  that carry a distractor date.
-- False commitment on TBD or silent items exceeds 5% for at least one model.
+- The models lead by at least 0.15 IoU on the part-of-month, no-year and range strata (the
+  relative stratum is reported beside them), and on the stratum of dated targets beside a
+  distractor date together with the distractor-only items whose gold gives an interval.
+- False commitment exceeds 5% for at least one model, over the gold-ABSTAIN items of the
+  TBD-or-unknown and silent strata; the rate over every gold-ABSTAIN item of the sample is
+  reported beside it.
 
 **Negative result.** Rules match the models everywhere. The paper then says that literal reading
 is solved for this register, and its weight moves to E3.
@@ -1027,18 +1044,39 @@ That is reportable.
 **Target.** The literal output should not change when the meaning does not, and should change
 correctly when it does. A reading of an edited item is an *error* when it is not correct by the
 E2 rule, or, for the certainty-marker factor, when its certainty class is wrong, or, for the
-stale factor, when its stale flag is wrong.
+stale factor, when its stale flag is wrong. A reading of an unedited seed item is held to the
+criterion of the factor it is compared with: it is an error when it is not correct by the E2
+rule; in the contrast of the certainty-marker factor, also when its certainty class is wrong;
+in the contrast of the stale factor, also when its stale flag is wrong.
 
 **Test.**
 
 - A logistic GEE of error on factor and model with their interaction, clustered by seed
-  (independence working correlation, robust variance). If the robust variance cannot be
-  computed, the same model is fitted by maximum likelihood with a cluster bootstrap over seeds
-  (10,000 draws, seed 20261001).
+  (independence working correlation, robust variance). The model has a cell for every factor
+  and reader, so a reader's contrasts and their robust variances are those of that reader's
+  rows alone. Each unedited seed item enters three times for each reader, once under each of
+  the three criteria above, in the cluster of its seed; the contrast of a factor is against
+  the seed rows under that factor's criterion.
 - For each primary and each of the six factors, one test of "no effect of the factor on the
   error rate": the contrast between the items edited on that factor and the unedited seed
   items, which are among the items every reader gets. Holm's correction runs over the 12 tests
   at 0.05, as a secondary family of its own.
+- *Fallback.* The robust variance cannot be computed when a cell of factor by a primary has an
+  error rate of 0 or 1, when the fit of a primary does not converge, or when a contrast of a
+  primary has no positive variance. All twelve tests then come from a cluster bootstrap over
+  seeds (10,000 draws, seed 20261001) of the difference `d` between the two error rates
+  (edited minus unedited). Its p-value is two-sided on the centred draws,
+  `(1 + #{|d* − d| >= |d|}) / (B + 1)`, with `d*` the same difference in a draw of seeds; a
+  draw with no item on one side is left out. The cells of the other five models never decide
+  the procedure of the twelve; such a model has no Wald test where its own cell is flat, and
+  its bootstrap contrast is given as a description. A contrast over fewer than two seeds is
+  not evaluable.
+- *Size of the fallback.* Under no effect of any factor, on the item file's own layout of
+  seeds and factors and with synthetic errors (a run that is not in the committed output),
+  the centred p-value gave a Holm familywise error of 0.2% to 5.8%, where the percentile
+  p-value of the draft's kind gave 3.1% to 10.1%. The centred p-value is conservative at low
+  error rates: with no error on the unedited items it needs about nine erring seeds, as the
+  exact sign test does. The percentile p-value is reported beside it and enters no rule.
 - 100 items are audited by hand (section 10).
 
 The two authors' predictive readings of 100 pairs, in the draft, are cut for October.
@@ -1303,35 +1341,54 @@ differences are zero, and the sign-flip test in up to 2.5% under that skew (2.8%
 heavy-tailed episode effects).
 
 **Intervals.** Every confirmatory contrast, and `Δ_GBM`, carries the interval of the values
-`Δ0` that the registered test does not reject, at level `1 − a`. The lower end is searched
+`Δ0` that the registered test does not reject, at level `1 − a`. So do the same contrasts of
+the six secondary models (H1, H2, and H3 for each condition), which are outside the family and
+are reported with the percentile interval beside it. The lower end is searched
 with `p_up` and the upper end with `p_low`, each against `a/2`: a bisection between `Δ` and
-the value 50 standard errors away, in 60 halvings, whose result is the last value not
-rejected. An end is unbounded when the value 50 standard errors away is not rejected. When
+the value 50 standard errors away, in 60 halvings, whose result is a value not rejected next
+to one that is. It is the last value not rejected whenever the p-value falls steadily with
+the distance from `Δ`; where the p-value rises again (below), the search ends on one of the
+changes of verdict. An end is unbounded when the value 50 standard errors away is not
+rejected; the test may still reject values further away, and the interval does not show
+them. When
 the standard error is zero, an end is `Δ` itself if a value one unit away (or `|Δ|` away, if
 that is more) is rejected, and unbounded otherwise. The level is 95%. H2 also carries its 90%
 interval.
 
 *Equivalence* is declared when `p_low` at `Δ0 = 0.02` and `p_up` at `Δ0 = −0.02` are both
 below 0.05. That is the rule. As a rule of thumb it says that the 90% interval lies strictly
-inside ±0.02, but the two can part, because the sign-flip part of the p-value need not fall
-steadily as `Δ0` moves away from `Δ`. In a search over synthetic data they parted only when
-one episode held most of the statements (64% or more), and never at episode sizes like those
-of the eligible list. The paper reports the interval and reads the rule.
+inside ±0.02, but the two can part, in two ways.
+
+- The sign-flip part of the p-value need not fall steadily as `Δ0` moves away from `Δ`. In
+  searches over synthetic data this happened only when a few episodes held most of the
+  statements between them (the smallest cases found: one episode with 55% beside another
+  with 32%, two with 40% each, three with 30% each), and never at episode sizes like those
+  of the eligible list.
+- An end is called unbounded on the value 50 standard errors away alone. When fewer than
+  about three episodes (four for a 95% end) hold nearly all of the difference between the
+  two losses, the bootstrap draws that take none of them give statistics that are finite
+  and beyond 50. The interval then has no end on that side, at any episode sizes, although
+  the test rejects values further away, and the rule declares equivalence when the margin
+  is among them.
+
+The paper reports the interval and reads the rule. The ends of the 95% interval, which the
+reading of `Δ_GBM` uses, behave in the same way.
 
 Two properties of these intervals follow from the test and not from the data. When the losses
 of the two sides differ in very few episodes, the bootstrap draws that take none of those
 episodes cannot reject, and the interval is unbounded on one side: about three differing
-episodes are needed for an end at 90% and four at 95%. With five or fewer episodes in all,
-every 95% interval is unbounded on both sides.
+episodes are needed for an end at 90% and four at 95%, and more when their sums are of very
+unlike sizes. With five or fewer episodes in all, every 95% interval is unbounded on both
+sides.
 
 In the simulation, at the eligible sizes,
 the 95% interval covers the true value in 94.1% to 99.1% of data sets (the percentile interval
 of the draft: 91.1% to 98.7%), and the one-sided error at 0.05 that governs the equivalence
 reading is 3.5% to 6.1% on the H2 proxy (percentile: 4.0% to 8.4%). At the dev sizes these are
 94.6% to 97.4% (90.3% to 96.2%) and 3.6% to 6.6% (4.5% to 9.7%). The losses of single
-predictors and the other secondaries keep 95% percentile intervals from the bootstrap draws,
-as descriptions; where a secondary contrast also carries a p-value, it is that of the
-registered test, and the two can disagree. The bounds of section 7.2 are reported beside
+predictors and every other secondary keep 95% percentile intervals from the bootstrap draws,
+as descriptions; where such a contrast also carries a p-value, it is that of the registered
+test, and the two can disagree. The bounds of section 7.2 are reported beside
 every confirmatory estimate.
 
 **Sensitivity.** Reported beside every confirmatory p-value, and never used in Holm's rule:
@@ -1340,8 +1397,8 @@ every confirmatory estimate.
   `(1 + #{Δ* <= 0}) / (B + 1)`; two-sided `min(1, 2 × min((1 + #{Δ* <= 0}) / (B + 1),
   (1 + #{Δ* >= 0}) / (B + 1)))`; with the 95% percentile interval. `Δ*` is the mean of the
   paired differences over the drawn episodes; a draw whose differences sum to zero counts on
-  both sides, and a sum within 1e-12 of zero, relative to the largest absolute episode sum,
-  is a zero;
+  both sides, and a sum within 1e-12 times the largest absolute episode sum (at least 1e-12)
+  of zero is a zero;
 - the two parts of the registered p-value, each on its own (two-sided, the sign-flip part
   compares `|t°|` with `|t|`);
 - the cluster sign-flip test on the episode sums of the paired differences, on the same sign
@@ -1451,8 +1508,8 @@ the freeze of numbers (section 12) is named in the paper as not run.
 - **Endpoint error** of the start and end, in days.
 - **Abstention** precision, recall and F1. Abstention is correct when the gold reading gives no
   date.
-- **False-commitment rate:** the share of gold-ABSTAIN items (TBD, unknown, silent) where the
-  reader outputs a date.
+- **False-commitment rate:** the share of gold-ABSTAIN items (abstain reasons `tbd`, `no_date`,
+  `vague` and `no_statement`) where the reader outputs a date.
 - **Stale-flag** accuracy and F1.
 - **Distractor uptake:** among the gold items that carry a distractor date, the share where the
   reader returns an interval with IoU of at least 0.5 with a distractor's interval and below
@@ -1460,10 +1517,17 @@ the freeze of numbers (section 12) is named in the paper as not run.
   words read by the conventions of section 2.5. The answer schema has no distractor field.
 - **Certainty-class** accuracy and Cohen's kappa against gold, over the four classes.
 
-Each is reported per form, weighted by event and by template. No sample holds a statement
-whose whole text is a phrase the guide quotes (685 statements of the frame in the draw of
-1 October, 486 of them silent and 158 TBD), so the per-form figures and their event weights
-describe the frame without those statements.
+For E2, each is reported per stratum of the guide's allocation table; pooled over the sample
+without weights; and pooled with each stratum weighted by its statements in the frame
+("weighted by event") or by its distinct masked templates in the frame ("weighted by
+template"). Inside a stratum every scored item counts the same. The frame is taken without
+the statements whose whole text is a phrase the guide quotes (685 statements of the frame in
+the draw of 1 October, 486 of them silent and 158 TBD; 688 in the freeze run of 5 October);
+no sample holds one. These weights undo the allocation across strata and nothing else. Inside
+a stratum the sample is not proportional to the frame: at most two items share a masked
+template over the pilot, the check sets and the literal sample together, and one third of each
+quota is dated 2023 or later. The weighted figures are therefore descriptions of the sample at
+the strata's frame sizes, not estimates of a rate over all statements of the frame.
 
 ### 7.2 Against outcomes (E3, E4, and E7 if it runs)
 
@@ -2809,6 +2873,21 @@ quoted here are from the build of 29 September.
     *Seen:* as item 38. *Why:* the registered text and the code that will run must agree
     before either is frozen, and the evaluator does not compute every registered secondary.
     No hypothesis, sample or metric changes.
+40. **The tests of E5, and what E2 reports.** A review of the scorer of E2 and E5 against this
+    plan found that two things in the test of E5 could not stand as worded. (a) An unedited
+    seed item was an error by the E2 rule alone, while an item edited on the certainty marker
+    or made stale was also an error by its certainty class or its stale flag; a reader that
+    errs on the certainty class as often on the seed as on the edit would have shown an
+    effect of the factor. Now the seed item is held to the criterion of the factor it is
+    compared with. (b) The fallback of the GEE had no p-value. Now it is the centred bootstrap
+    p-value on the difference of the two error rates, and only a primary's own cells can
+    call it. For E2 the plan now says that "by form" is by stratum of the guide's table, what
+    the two weights do and do not correct, which items the two bars of its positive result
+    are read on, and where the list of convention items is kept and when it is fixed.
+    *Seen:* nothing from the data: synthetic readings on the registered item file's layout
+    of seeds and factors, and the plan and the scorer's code; no model output (no model had
+    been called) and no test-period outcome. *Why:* a test must compare like with like, and
+    a p-value that enters Holm's rule must be defined before it is computed.
 
 **Status of these changes.** The owner confirmed on 1 October the scope (item 1), the deadlines
 and their one relaxation (item 2), the availability rule, the capture freeze and the result of
@@ -2821,7 +2900,8 @@ included, were provisional rules of 1 October; the owner confirmed them as writt
 and the review of the evaluator of 5 October. The owner decided both that evening. Three
 tests were put to the owner: the one of section 6; the same with H1 two-sided; and the draft's
 percentile p-values with their size disclosed. The owner chose the one of section 6, and
-confirmed the sealing rule of item 39 as written.
+confirmed the sealing rule of item 39 as written. Item 40 follows the review of the scorer of E2 and E5
+of 5 October and is read by the owner with the registration.
 
 **Corrections of the text to the code as it stood on 29 September** (the builder did not change
 for these; the draft described it wrongly). *Seen:* train outcomes; the builder had been tested

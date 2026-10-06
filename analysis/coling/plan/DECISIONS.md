@@ -215,3 +215,21 @@ carry the registered text.
     already with A1 and A2, keep the text `449c8e049be6cab1`. One statement of the task E
     sample has the same text as a literal-sample statement of another drug; the registered
     rule allows it, and the guide's changelog says so.
+35. **E5 test and E2 reports (6 Oct).** The scorer `literal_scores.py` was reviewed by three
+    readers; 26 of 28 findings were confirmed by a second reader each. Plan side, taken as
+    recommended and listed for the owner's read: the unedited seed item is held to the
+    criterion of the factor it is compared with (the registered contrast compared two
+    definitions of error); the GEE's fallback is called by a primary's own cells only and
+    takes the centred bootstrap p-value (the percentile one gave a Holm familywise error up to
+    about 10% at low error rates in a simulation on the item file's layout; the centred one at
+    most 5.8%); "by form" in the literal task is by stratum; the two weights are described for
+    what they are; the convention items are a file fixed with the gold. Code side: 20 findings
+    fixed with tests; the like-for-like error and the centred p-value are still to be put into
+    the scorer, which is hashed in F1 or in an amendment before it runs on model readings.
+36. **Intervals, after the review of the evaluator change (6 Oct).** 18 findings, all
+    confirmed. Plan side: the search ends on a change of verdict, which is the last value not
+    rejected only where the p-value falls steadily; an end is called unbounded on the value 50
+    standard errors away alone, so equivalence can be declared beside a 90% interval with no
+    end; the six secondary models' H1 to H3 carry the registered-test interval too. No number
+    and no rule changed. An outage of about ten hours (5 Oct 21:56 to 6 Oct 08:20 EDT) stopped
+    the fixer of that review partway; it was started again on the files as it left them.
