@@ -1,0 +1,247 @@
+{
+ "about": "Train-period and first-sight figures cited for the result rules (PLAN.md sections 5, 7.2, 13 and 16): fitted on the fit split, read on the dev split. Outcome cells of train-period statements only; first-sight columns of the others; no sealed file.",
+ "command": "PYTHONPATH=. python -m analysis.coling.result_rules_check",
+ "inputs": {
+  "statements_sha256": "bcadc718f4e4e6c0",
+  "eligible_e3_sha256": "8c12fc3e940f250e",
+  "dev_losses_sha256": "b8cb5213fa0f08f3",
+  "sample_literal_sha256": "05fcaf84b77406d7",
+  "strata_sha256": "740565f0da219ec4",
+  "e5_pairs_sha256": "5acc3a0af1fd13af",
+  "e5_counts_sha256": "1e26e1fe7c2e4c07",
+  "result_rules_check_sha256": "23fca5c56da1f17f",
+  "predictors_sha256": "452254cac0cb7817",
+  "power_sha256": "6948ee5f2f27e111",
+  "dataset_sha256": "2fe95d355d3d5c77",
+  "forms_sha256": "b99502d348ea82be",
+  "corpus_sha256": "a44cd27ccddad604"
+ },
+ "parameters": {
+  "seed": 20261001,
+  "draws": 10000,
+  "interval": "95% percentile, by shortage episode",
+  "outcome_cells_used_on_statements_dated_before": "2023-01-01"
+ },
+ "A_base_rate_calibration_scoreable_dev": {
+  "event": "E_end",
+  "statements": 644,
+  "episodes": 74,
+  "mean_p": 0.252996,
+  "yes": 76,
+  "frequency": 0.118012,
+  "difference": 0.134984,
+  "ci95": [
+   0.083262,
+   0.177221
+  ]
+ },
+ "B_base_rate_against_turnbull_share": {
+  "dev": {
+   "statements": 1334,
+   "mean_p_E_end": 0.264445,
+   "turnbull_share_by_stated_end": 0.122341,
+   "difference": 0.142104
+  },
+  "fit": {
+   "statements": 1163,
+   "mean_p_E_end": 0.271664,
+   "turnbull_share_by_stated_end": 0.220803,
+   "difference": 0.05086
+  }
+ },
+ "C_calibration_limits_dated_dev": {
+  "event": "E_end",
+  "statements": 1334,
+  "yes": 76,
+  "no": 789,
+  "undetermined": 469,
+  "episodes": 121,
+  "base_rate": {
+   "mean_p": 0.264445,
+   "least": {
+    "value": -0.144101,
+    "ci95": [
+     -0.196825,
+     -0.099879
+    ]
+   },
+   "greatest": {
+    "value": 0.207474,
+    "ci95": [
+     0.174732,
+     0.236574
+    ]
+   }
+  },
+  "face_value": {
+   "mean_p": 1.0,
+   "least": {
+    "value": 0.591454,
+    "ci95": [
+     0.539925,
+     0.632005
+    ]
+   },
+   "greatest": {
+    "value": 0.943028,
+    "ci95": [
+     0.919773,
+     0.961723
+    ]
+   }
+  }
+ },
+ "D_turnbull_shares_dev": {
+  "dated": {
+   "statements": 1334,
+   "by_stated_end": 0.122341,
+   "within_90_days": 0.446132
+  },
+  "scoreable": {
+   "statements": 644,
+   "by_stated_end": 0.118012,
+   "within_90_days": 0.245342
+  }
+ },
+ "E_primary_brier_scoreable_dev": {
+  "statements": 644,
+  "by_E_end_and_E_end90": {
+   "no/no": 486,
+   "no/yes": 82,
+   "yes/yes": 76
+  },
+  "always_no": 0.181677,
+  "base_rate": 0.195048
+ },
+ "F_base_rate_minus_rules_plus_slip": {
+  "scoreable": {
+   "statements": 644,
+   "episodes": 74,
+   "delta": -0.018173
+  },
+  "scenarios_all_dated": {
+   "statements": 1334,
+   "undetermined_as_no": 0.009109,
+   "undetermined_as_yes": 0.007382
+  },
+  "by_statement_type_scoreable": {
+   "recovery": {
+    "statements": 457,
+    "episodes": 63,
+    "delta": -0.012681
+   },
+   "next_delivery": {
+    "statements": 187,
+    "episodes": 45,
+    "delta": -0.031594
+   }
+  }
+ },
+ "G_turnbull_share_by_statement_type": {
+  "fit": {
+   "recovery": {
+    "statements": 837,
+    "by_stated_end": 0.252082,
+    "within_90_days": 0.563517
+   },
+   "next_delivery": {
+    "statements": 326,
+    "by_stated_end": 0.117795,
+    "within_90_days": 0.501353
+   }
+  },
+  "dev": {
+   "recovery": {
+    "statements": 960,
+    "by_stated_end": 0.133143,
+    "within_90_days": 0.390169
+   },
+   "next_delivery": {
+    "statements": 374,
+    "by_stated_end": 0.108988,
+    "within_90_days": 0.532815
+   }
+  }
+ },
+ "H_eligible_list_by_statement_type": {
+  "statements": 2593,
+  "episodes": 115,
+  "recovery": {
+   "statements": 1891,
+   "episodes": 101
+  },
+  "next_delivery": {
+   "statements": 702,
+   "episodes": 67
+  }
+ },
+ "I_literal_sample_letter_items": {
+  "items": 120,
+  "letter_items": 72,
+  "episodes": 59,
+  "with_no_episode": 0,
+  "by_form": {
+   "relative": 10,
+   "range": 10,
+   "exact_day": 10,
+   "part_of_month": 10,
+   "half_year": 1,
+   "quarter": 9,
+   "month_no_year": 10,
+   "month_year": 12
+  },
+  "of_forms_other_than_month_year": 60,
+  "by_statement_type": {
+   "recovery": 51,
+   "next_delivery": 21
+  },
+  "stale_at_issue": 2,
+  "strata_named_after_a_dated_form": 7,
+  "drawn_from_those_strata": 72
+ },
+ "J_certainty_marker_minimal_pairs": {
+  "items": 94,
+  "date_taken_away": {
+   "items": 73,
+   "levels": [
+    "as_released",
+    "no_estimated_date",
+    "tbd"
+   ]
+  },
+  "date_kept": {
+   "items": 21,
+   "levels": [
+    "anticipated",
+    "estimated",
+    "expected"
+   ]
+  },
+  "by_level": {
+   "anticipated": {
+    "items": 2,
+    "date_kept": 2
+   },
+   "as_released": {
+    "items": 14,
+    "date_kept": 0
+   },
+   "estimated": {
+    "items": 3,
+    "date_kept": 3
+   },
+   "expected": {
+    "items": 16,
+    "date_kept": 16
+   },
+   "no_estimated_date": {
+    "items": 15,
+    "date_kept": 0
+   },
+   "tbd": {
+    "items": 44,
+    "date_kept": 0
+   }
+  }
+ }
+}

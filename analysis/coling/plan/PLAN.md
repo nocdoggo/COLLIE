@@ -2240,7 +2240,7 @@ plus:
     to dev. The selection acts on `E_end90` (section 7.2). The second part removes an excess
     that a predictor with no text shares; the first ties the claim to outcomes without a
     scoreable set. Over the 1,334 dated dev statements the least value is −0.144 for the base
-    rate and +0.592 for the stated date at face value (`result_rules_check.py`, section 17).
+    rate and +0.591 for the stated date at face value (`result_rules_check.py`, section 17).
   - *Reported beside it,* for condition (a) and for the base rate on the same statements:
     both parts for `E_end90`; both parts on the answers that parsed; calibration in the large
     on the scoreable statements with its interval, and the difference of the two predictors
@@ -2673,10 +2673,12 @@ simulation reads no sealed file. In the code and in its output the word "registe
 names the percentile p-values of the draft, which were the registered ones when the code was
 written; the test of section 6 is the procedure it calls `max_t`.
 
-**Result-rule checks (sections 7.2 and 13; change-list item 41).** `result_rules_check.py`:
-**TBD-at-gate** (its hash). Its output, `analysis/coling/out/result_rules_check.json`:
-**TBD-at-gate** (its hash), made on the frozen statement table with seed 20261001. It reads
-train-period rows, and first-sight fields of the other periods, and no sealed file.
+**Result-rule checks (sections 5, 7.2 and 13; change-list item 41).** `result_rules_check.py`:
+`23fca5c56da1f17f`. Its output, `analysis/coling/out/result_rules_check.json`: `515d9c94bf64f7a3`, made with seed
+20261001 on the frozen statement table, the eligible list, `dev_losses.json`, the list and the
+strata of the literal sample, and the minimal pairs with their counts; the output holds the
+hash of each. It reads the outcome cells of train-period rows, first-sight fields of the
+other periods, and no sealed file.
 
 **Annotation.**
 
@@ -3120,10 +3122,12 @@ quoted here are from the build of 29 September.
     *Seen:* the paper draft and its review; train outcomes and the dev losses of the
     model-free predictors; first-sight counts (section 16); simulations on synthetic readings
     (runs that are not in the committed output). No model output (no model had been called)
-    and no test-period outcome. On dev (`result_rules_check.py`, section 17): every model-free
-    predictor meets the earlier criterion of (b) on the scoreable statements (the base rate:
-    +0.135), and over the 1,334 dated statements only the stated date at face value meets its
-    new first part (+0.592; the base rate: −0.144). The base rate minus rules plus slip is
+    and no test-period outcome. On dev (`result_rules_check.py`, section 17): the base rate
+    meets the earlier criterion of (b) on the scoreable statements (+0.135), and over the
+    1,334 dated statements the stated date at face value meets its new first part (+0.591)
+    and the base rate does not (−0.144). Rules plus slip and the two GBMs behave as the base
+    rate does on both counts (a run that is not in the committed output). The base rate minus
+    rules plus slip is
     −0.018 on the scoreable statements, and +0.009 and +0.007 under the scenarios; by type it is
     −0.013 on the 457 recovery statements
     and −0.032 on the 187 next-delivery statements. The Turnbull share recovered by the stated
