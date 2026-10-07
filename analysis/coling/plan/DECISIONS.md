@@ -327,3 +327,30 @@ carry the registered text.
     both projections are inside the registered caps; a raise on the owner's word is made by a
     dated amendment when a run comes near its cap. The OpenRouter lane (six models, both
     primaries) has not run: its key was refused as expired on 7 October.
+45. **The secondary scorer computes three more registered analyses (7 October).**
+    `secondary_scores.py` now gives the analysis by statement type (section 5, E3), the hold
+    rate and the slip by statement type (section 5, E1), the mean of P(E_end) less the Turnbull
+    share beside the overconfidence criterion (section 13), and the base rate beside the
+    calibration in the large of the six secondary models (section 7.2). Not computed by any
+    script: the fit without the dominant company, the full-follow-up refit and E7. Two
+    independent checks on synthetic studies; no sealed file was opened.
+    - *Which figure gives way.* The frequency of an event by statement type on an item set, and
+      the hold rate of the same type over every dated statement at risk, can stand on sets a
+      few statements apart (on the registered list: 702 eligible next-delivery statements
+      against 703 dated ones). The tables of E1 give way: their two cells by statement type
+      are then withheld in both tables, and the analysis by statement type keeps its
+      frequencies. The evaluator's frequency on an item set cannot be withheld, so this
+      direction is the one that closes every pair. The train-period tables are not affected.
+    - *Known and left.* In built cases the second check still worked out a few statements'
+      events in three ways: from the slip of a cell at day 0 beside its hold rate on the
+      determined statements; from the scenarios of a contrast on two slices a few
+      not-scoreable statements apart; and from a day 0 that is withheld because 1 to 4
+      statements of its cell are undetermined, which the whole less the other cells gives back
+      to about 0.002. The second, and two of the three cases of the first, stand in the earlier
+      version as well. By the open counts the first two are not reached on the registered
+      list: the nearest such sets are 74 statements apart or more. The third does occur: on
+      the open train table one form (the exact day, 3 of 39 statements undetermined) has its
+      day 0 withheld, to no effect. Whether any of the three occurs on test-period statements
+      depends on their outcomes and cannot be known before the scorer runs.
+    - The scorer is named with its hash in F1 if F1 is later than this commit, and otherwise
+      by its own amendment, before it first reads a sealed file.

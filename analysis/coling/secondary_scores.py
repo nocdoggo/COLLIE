@@ -17,7 +17,10 @@ function computed it), and so is a figure that is also written on a set that dif
 by so few: the post-cutoff slice within the list and the statements after a cutoff within a
 subset (``beside``, ``beside_the_whole``), the answers that parsed within all (``parsed_only``),
 one outcome definition beside another (``near_definitions``), the parts of selective prediction
-(``selective``), the cells of the two splits of the descriptives (``withheld_cells``). A count
+(``selective``), the cells of the splits of the descriptives (``withheld_cells``), a statement
+type within an item set and the figures that are the same whichever model on two sets that
+stand near one another (``near_sets``, ``known_sets``), and a cell of the descriptives beside a
+set of another section or of the evaluator (``sets_beside_the_tables``). A count
 that would say how many of a few statements anyone can name are scoreable, or have a determined
 event, is withheld as well, and where a few statements of a set are not scoreable so are the mean
 probabilities and the calibration in the large on its scoreable statements, which with the open
@@ -62,7 +65,8 @@ what the check found. Neither command takes a number of draws: a Turnbull estima
 on ``SLIP_DRAWS`` of the registered bootstrap draws for its interval, a constant of this file
 as the draws and the seed of the evaluator are of its own. The sections ``secondary_models``,
 ``selective_prediction`` and ``recovery_rule`` read the three conditions of every secondary
-model that is not left out; the other sections read the runs of the primaries only.
+model that is not left out; the other sections read the runs of the primaries only
+(``by_statement_type`` the confirmatory runs alone).
 
 * ``secondary_models`` (PLAN section 5, E3, "Secondaries" and "Descriptive decomposition";
   section 7.2). For each of the six secondary models: the H1 contrast (a against b, one-sided),
@@ -77,9 +81,10 @@ model that is not left out; the other sections read the runs of the primaries on
   episodes resampled by company, and H2 on the month-and-year form; the E4 probe test for the
   five secondary models that are probed; and for each of the three conditions every score of
   section 7.2 on every eligible statement (primary Brier with its bounds, Murphy's
-  decomposition, calibration in the large, the pinball losses, the coverage of the 80%
-  interval), with the parse and refusal rates of each run. The scores of a primary are not
-  computed here: the evaluator holds them, on the item set the probe fixed.
+  decomposition, calibration in the large with the base rate's beside it, the pinball
+  losses, the coverage of the 80% interval), with the parse and refusal rates of each run.
+  The scores of a primary are not computed here: the evaluator holds them, on the item set
+  the probe fixed.
 * ``secondary_lists`` (PLAN section 3, "E3 eligibility"; section 5, E3, "Primaries only"). For
   each primary on the TBD, silent and stale-at-issue lists under conditions (a), (b) and (c):
   stale-value uptake (the share of readings with ``P(E_end)`` above 0.5 for a period that has
@@ -100,11 +105,12 @@ model that is not left out; the other sections read the runs of the primaries on
   change in primary loss and the mean absolute change in ``P(E_end)``, in ``P(E_end90)`` and in
   the median, from the cell of real names and true dates (the condition (b) run itself) to each
   other cell, with the two main effects and their interaction on the loss.
-* ``descriptives`` (section 5, E1): the hold rate of the stated period, the Turnbull estimate
-  of slip by form and by revision bucket, the bracket widths and the counts by year, form,
-  statement type and company, on the statements of the test split at risk under B. The hold
-  rate and the slip by statement type belong to the analysis by statement type, which is not
-  computed yet (``COMPUTED_BY_NO_SCRIPT``).
+* ``descriptives`` (section 5, E1): the hold rate of the stated period over all dated
+  statements and by statement type (and, beside it, by form and by revision bucket), the
+  Turnbull estimate of slip by form, by statement type and by revision bucket, the bracket
+  widths and the counts by year, form, statement type and company, on the statements of the
+  test split at risk under B. The two tables give way to the sets on which the evaluator or
+  another section writes the same figures.
 * ``selective_prediction`` (section 7.2): for condition (c) of every model and for the rule
   reader on the eligible list, the abstention rate and the primary loss on the statements read,
   on those abstained on and on all. A primary is read on the item set its probe fixed. The rule
@@ -115,6 +121,17 @@ model that is not left out; the other sections read the runs of the primaries on
   list without a resolution counted as recovery at the first capture where the row is missing,
   and with a Date Discontinued cell that newly appears on a shortage row counted as a
   discontinuation at that capture.
+* ``by_statement_type`` (section 5, E3, "Secondaries", "By statement type"): for each primary on
+  the item set its probe fixed, on the recovery statements and on the next-delivery statements
+  apart (the type of the frozen rule reading): the H1, H2 and H3 contrasts and ``Delta_GBM``,
+  each with its 95% percentile interval by episode, the two scenarios of section 7.2 and the
+  difference between the two types with its interval over draws of the episodes of the item
+  set; the primary loss and the calibration in the large of the three conditions and of the
+  base rate; and the overconfidence criterion of section 13. A type with fewer than 50
+  scoreable statements is reported by its counts alone.
+* ``beside_the_overconfidence_criterion`` (section 13, "Reported beside it"): for each primary,
+  over every statement of the item set its probe fixed, the mean of ``P(E_end)`` of condition
+  (a) and of the base rate, each minus the Turnbull share recovered by the stated end.
 
 Order of the ``score`` command, each step a refusal when it fails:
 
@@ -224,6 +241,8 @@ SECTIONS = (
     "descriptives",
     "selective_prediction",
     "recovery_rule",
+    "by_statement_type",
+    "beside_the_overconfidence_criterion",
 )
 MODEL_SECTIONS = ("secondary_models", "selective_prediction", "recovery_rule")
 """The sections that read the three conditions of every secondary model."""
@@ -306,12 +325,52 @@ those of a set whose figure is written, but for a few."""
 WITH_ANOTHER = "withheld_with_another_cell"
 """The mark of a cell of the descriptives whose figure is withheld because the whole, less the
 cells of its split that are written, would give back the figure on a few statements."""
+TYPES = ("recovery", "next_delivery")
+"""The two statement types of a dated statement, by the frozen rule reading (the column
+``statement_type`` of the statement table): the analysis by statement type takes them apart."""
+MIN_TYPE = 50
+"""PLAN section 5, E3, "By statement type": "A type with fewer than 50 scoreable statements in
+an item set is reported by its counts alone"."""
+MODEL_FREE_PARTS = ("content_value_of_the_text", "content_value_against_the_structured_model")
+"""The parts of the descriptive decomposition that compare two predictors that read no text:
+the same figure for every model whose statements they are taken on."""
+DELTA_GBM = "Delta_GBM"
+"""The contrast of the structured-only model with the selected condition of a primary (PLAN
+section 6), by its name in the analysis by statement type."""
+TYPE_SCORES = (
+    "scoreable_statements",
+    "scoreable_episodes",
+    "statements",
+    "primary_brier",
+    "ci95",
+    "bounds_all_statements",
+    "calibration_in_the_large",
+    "calibration_all_statements",
+    "withheld",
+)
+"""What the analysis by statement type keeps of the scores of a predictor on a type: the
+primary loss with its interval and its two scenarios, the calibration in the large with its
+interval and its two limits, and the counts."""
+TYPE_CRITERION = ("criterion", "statements", "episodes")
+"""What the analysis by statement type keeps of the evaluator's record of the overconfidence
+criterion besides its two parts for ``E_end``: none of the five sentences of section 13 is
+read on a type, only whether both parts hold."""
+BY_TYPE_NOTE = (
+    "The verdict of each test is the registered one on both types together (the result file of "
+    "the evaluator). The two types differ in certainty class and in form, so a difference is not "
+    "read as an effect of the type alone (PLAN section 5, E3)."
+)
 LINK_HOPS = 40
 """How many symbolic links are followed on the way to a file before the path counts as one
 that leads nowhere."""
 SLIP_DAYS = (-30, 0, 30, 90, 180, 365)
 SLIP_LEVELS = (0.25, 0.50, 0.75, 0.90)
 SLIP_DRAWS = 1000
+SLIP_SHARES = "share_recovered_by_days_after_the_stated_end"
+EVENT_DAYS = {"y_a": "0", "y_b": "90"}
+"""The day of a slip estimate on which each horizon event falls: the stated end, and 90 days
+after it."""
+SHARES_WITHHELD = "shares_withheld_beside_the_number_of_statements_with_the_event"
 """How many of the registered bootstrap draws give the intervals of a Turnbull estimate (the
 first so many of them). It is fixed with this file and is no option of a command."""
 SLIP_NEAR = 1e-3
@@ -379,6 +438,10 @@ AS_THE_PLAN_SAYS = (
     "section 9)",
     "the hold rate and the slip distribution of E1 are those of the dated statements that are "
     "not stale at issue (section 2.5; section 5, E1)",
+    "the hold rate of the stated period is given over all dated statements and by statement "
+    "type, and the slip distribution as a Turnbull estimate by form, by statement type and by "
+    "revision bucket (section 5, E1); the statement type is that of the frozen rule reading "
+    "(section 2.5)",
     "the H1, H2 and H3 contrasts of the secondary models carry the 95% interval of the "
     "registered test with the percentile interval beside it, and H2 its 90% interval; every "
     'other secondary keeps a 95% percentile interval (section 6, "Intervals")',
@@ -444,6 +507,26 @@ AS_THE_PLAN_SAYS = (
     "this command line as on the evaluator's, with the same reason: a declaration that the "
     "evaluator's result file does not record is refused, and so is one that the file records "
     'and this command line does not give (section 6, "Confirmatory runs")',
+    "for each primary, on the item set its probe fixed, the H1, H2 and H3 contrasts and "
+    "Delta_GBM, the primary loss and the calibration in the large of the three conditions and "
+    "of the base rate, and the overconfidence criterion are repeated on the recovery "
+    "statements and on the next-delivery statements apart (the type of the frozen rule "
+    "reading); each quantity comes with its 95% percentile interval by episode and the two "
+    "scenarios of section 7.2; each contrast also comes with the difference between the two "
+    "types (next delivery minus recovery) and its 95% percentile interval over "
+    f"{ev.DRAWS:,} draws of the episodes of the item set, both types taken from each draw; a "
+    "draw with no scoreable statement of one type is left out; a type with fewer than "
+    f"{MIN_TYPE} scoreable statements in an item set is reported by its counts alone; the "
+    "verdict of each test is the registered one on both types together; the two types differ "
+    "in certainty class and in form, so a difference is not read as an effect of the type "
+    'alone (section 5, E3, "Secondaries", "By statement type")',
+    "beside the overconfidence criterion, for condition (a) and for the base rate on the same "
+    "statements, the mean of P(E_end) minus the Turnbull share recovered by the stated end is "
+    "given for each primary, over every statement of its item set (section 13, "
+    '"Reported beside it")',
+    "beside the calibration in the large of each condition of a secondary model stand the same "
+    "quantities for the base rate by listing age on the same events (section 7.2, "
+    '"Calibration in the large")',
 )
 """What this file does as the plan states it, each point with its section: no choice of the
 code. Every result file carries the list."""
@@ -507,6 +590,30 @@ WHERE_THE_PLAN_IS_SILENT = (
     "the hold rate is given among the statements whose E_end is determined, and with every "
     "undetermined one set to no and then to yes; the Turnbull share recovered by the stated end "
     "stands beside it",
+    "beside the hold rate by statement type of E1 stands the hold rate by form and by revision "
+    "bucket, which the plan asks of the slip alone; where a cell of one split stands near a "
+    "cell of another, the later split gives way, and the splits come in one order for the hold "
+    "rate and for the slip, the plan's for the slip (form, statement type, revision bucket): "
+    "the share recovered by the stated end of a slip estimate is the hold rate where no "
+    "bracket holds the stated end, so the two tables withhold the same cells for their "
+    "statements; since the split by statement type stands in the two tables, a cell by "
+    "revision bucket (and a cell by form where no cell by statement type serves) can be "
+    "withheld for standing near a cell by statement type, in the hold rate as in the slip; a "
+    "type with no dated statement has a cell of no statement",
+    "the tables of E1 beside the other sets, for the test period: the evaluator writes the "
+    "frequency of the horizon events on every eligible statement, on the item set of each "
+    "primary and on its answers of condition (a) that parsed, and this file on the statement "
+    "types of an item set and on the post-cutoff slice of each secondary model, with the "
+    "Turnbull share on the item set; the hold rate and the slip estimate of E1 are the same "
+    "figures on the dated statements at risk, of which the eligible statements are a part, so "
+    "a cell of the two tables, all dated statements, or a set of cells with the whole, that "
+    f"is one of those sets but for 1 to {MIN_SHOWN - 1} statements (or, for the three shares "
+    "of a hold rate, whose statements with a determined first event are those of such a set "
+    "but for so few) is withheld and marked, as the further cell of section 5; the two tables "
+    "give way, in the same cells, because a figure of the evaluator cannot, and the other "
+    "sets then stand beside no figure of the tables that is near, so nothing of theirs is "
+    f"withheld on this ground; a set of fewer than {MIN_SHOWN} statements, which holds no "
+    "figure, is left out; the train period has no such set",
     "the slip quantiles and the share not recovered within reach of a Turnbull estimate, and "
     "the quantiles of the bracket widths, are given without an interval",
     "where a Turnbull curve is flat exactly at a quantile level (a corner at the level, with "
@@ -518,12 +625,21 @@ WHERE_THE_PLAN_IS_SILENT = (
     "how the standing rule is applied in the descriptives of E1: a slip estimate or the "
     f"bracket widths over 1 to {MIN_SHOWN - 1} statements, and the three shares of a hold rate "
     "with so few determined statements, are the figures that rest on a few; a hold rate over "
-    "so few statements keeps their number alone; the further cell withheld in a table is the "
-    "one with the fewest determined statements (for a slip estimate the fewest statements; "
-    "the first by name among equals), one cell after another until the cells written, with "
-    "the whole, give back no hold rate, no count of determined statements and no slip "
+    "so few statements keeps their number alone; the further cell withheld in a table for its "
+    "statements is the one with the fewest statements, the same in both tables, and the "
+    "further cell whose three shares are withheld for its determined statements is the one "
+    "with the fewest of those (the first by name among equals), one cell after another until "
+    "the cells written, with the whole, give back no hold rate, no count of determined "
+    "statements and no slip "
     "estimate on so few, and a set of cells of one split beside a set of cells of the other "
-    "counts among the cells written",
+    "counts among the cells written; a slip estimate of E1 stands beside the hold rate of the "
+    f"same statements, so where 1 to {MIN_SHOWN - 1} of them have an undetermined first event "
+    "its share recovered by the stated end (day 0) is withheld with its interval and named: "
+    "that share times the number of statements, less the number that held, is what the "
+    "estimate puts before the stated end for those few, a figure on their brackets; the share "
+    "recovered by 90 days after the stated end likewise, on a cell that is itself a set on "
+    "which the frequency of the second event is written, where so few have that event "
+    "undetermined; the other days, the quantiles and the share not recovered stay",
     "the standing rule of withholding on the losses: the loss of a part of selective prediction "
     f"over 1 to {MIN_SHOWN - 1} scoreable statements is withheld with its bounds, and the other "
     "part with it (the loss on all, which is given, less the part shown would give it back); "
@@ -593,6 +709,84 @@ WHERE_THE_PLAN_IS_SILENT = (
     "same statements, pair by pair as the standing rule has it, and the models withheld for it "
     "are named; a variant whose column the outcome rows do not hold is recorded as not "
     "computed",
+    "in the analysis by statement type the type is the cell statement_type of the statement "
+    "table; a contrast of a type is in the short form of the other repeats (the estimate, its "
+    "95% percentile interval and, beside it, the p-value of the registered procedure, which is "
+    "no verdict), and Delta_GBM is two-sided; of the scores of a predictor on a type the "
+    "primary loss, its interval and its two scenarios and the calibration in the large (on the "
+    "scoreable statements with its interval, and its least and greatest value over every "
+    "statement) are kept, and no other metric of section 7.2; the overconfidence criterion of "
+    "a type is its two parts for E_end and whether both hold: none of the five sentences of "
+    "section 13 is read on a type, and what is reported beside the criterion is not repeated "
+    "there; a primary without an item set has no analysis by type",
+    "a type within an item set under the standing rule of withholding: a type of 1 to "
+    f"{MIN_SHOWN - 1} statements, and a type that is the item set but for so few, hold the "
+    "number of their statements alone; a type whose scoreable statements differ by so few "
+    "from those of the item set holds its counts; a type of which only the statements that "
+    "are not scoreable differ by so few from those of the item set is written without the "
+    "figures that section 2.5 withholds (the two scenarios of each contrast and of each loss, "
+    "the calibration in the large, and the part of the criterion against outcomes, which then "
+    "has no reading), and keeps what is scored on its scoreable statements; the same is asked "
+    "of a type beside every other set on which the evaluator or this file writes a figure of "
+    "the primary, or one that is the same whichever model (those of a predictor that reads no "
+    "text, the frequencies of the horizon events): every eligible statement, the item set of "
+    "the other primary and its types, the post-cutoff slice of every secondary model, the "
+    "primary's own post-cutoff slice, and of its item set the statements first captured by "
+    "the stated end, those of the month-and-year form, those whose answer of condition (a) "
+    "parsed, those both sides of each of its three tests parsed, the two parts of its "
+    "selective prediction, and the three subsets on which it is read again, with their "
+    "statements after its cutoff; a part of an item set or of a subset counts where a figure "
+    f"is written on it ({MIN_SHOWN} statements or more, and as many fewer than its whole); a "
+    "set that holds the figures of another model alone counts for the first case only, "
+    "because the number of its scoreable statements is written with them; the rule has no "
+    "order: of two such sets written here, both are withheld; where 1 to "
+    f"{MIN_SHOWN - 1} statements of an item set are of neither type, the type of the fewest "
+    "statements keeps their number alone and is marked, or the item set less the two types "
+    f"would be those few; the counts of a type under the floor of {MIN_TYPE} are its "
+    "statements, its episodes and the scoreable ones of each",
+    "the difference between the two types is given where both types carry the contrast with an "
+    "estimate; its draws are the registered ones of every episode of the item set, whether or "
+    "not the episode holds a scoreable statement, and the draws left out are counted; it has "
+    "no scenarios; beside it stand whether the contrast has opposite signs in the two types "
+    "and whether the overconfidence criterion holds on the item set and not on its recovery "
+    "statements, which the plan asks the sentence of a result to say (the criterion on the "
+    "item set is worked out again with the evaluator's function)",
+    "beside the overconfidence criterion, the Turnbull share recovered by the stated end is the "
+    "estimate of the slip distribution at day 0 on every statement of the item set, as the "
+    "descriptives make it; the mean probability less that share carries a 95% percentile "
+    f"interval, which the plan does not ask for, over the same {SLIP_DRAWS:,} draws of the "
+    "episodes as a slip estimate, the mean and the share taken from the same draw; the "
+    "probabilities being open, the figure gives the share itself, so an item set that is the "
+    f"item set of the other primary but for 1 to {MIN_SHOWN - 1} statements holds the number "
+    "of its statements alone (the tables of the descriptives, which write the same estimate, "
+    "give way to the item set); the share is withheld as well where 1 to "
+    f"{MIN_SHOWN - 1} statements of the item set have an undetermined first event: the share "
+    "times the number of statements, less the number that held, which the evaluator's limits "
+    "of calibration in the large give, is what the estimate puts before the stated end for "
+    "those few, a figure on their brackets; the figure is given on the item set and on no "
+    "statement type",
+    "the base rate's calibration in the large stands beside that of a secondary model on every "
+    "eligible statement and on its post-cutoff slice; some figures of a slice are the same "
+    "whichever model it is the slice of (the base rate's, the two parts of the decomposition "
+    "that compare predictors that read no text and, the predictions being open, the "
+    "frequencies of the horizon events in the model's own records: the limits of calibration "
+    "in the large, the calibration in the large with the mean probability, the uncertainty of "
+    "the Brier decomposition), so a slice is held to every other set on which such figures "
+    "are written, pair by pair: a slice that is such a set but for 1 to "
+    f"{MIN_SHOWN - 1} statements keeps the number of its statements alone, its scoreable "
+    "counts included, whether or not it is analysed; where the scoreable statements of the "
+    "two differ by so few, those figures are withheld and the contrasts and losses of the "
+    "model stay; where only their statements that are not scoreable differ by so few, the "
+    "figures that section 2.5 withholds are (the two scenarios, the calibration in the large, "
+    "the mean probabilities), the model's own scenarios with them though they are the "
+    "model's, and the two parts of the decomposition, which fill no event, stay; the loss of "
+    "condition (c) is also written on the two parts of the model's selective prediction, and "
+    "a slice that is one of them but for a few statements gives way in the same three steps "
+    "(its number alone; the record of condition (c) by its counts; that record without the "
+    f"figures of section 2.5); where 1 to {MIN_SHOWN - 1} statements before the cutoff of a "
+    "secondary model are not scoreable, the scores of its slice hold none of the figures that "
+    "section 2.5 withholds for a set with so few, which beside those of the list would be the "
+    "figures of that set",
 )
 """The choices of this file where the plan gives no rule, and how it applies the standing rule
 of withholding where the plan names no case. Every result file carries the list."""
@@ -606,12 +800,6 @@ COMPUTED_BY_ANOTHER_SCRIPT = (
 COMPUTED_BY_NO_SCRIPT = (
     "the fit that leaves out the dominant company (Hospira and Pfizer)",
     "the full-follow-up refit of every train-fitted component (it needs the second sealed file)",
-    "the analysis by statement type (PLAN section 5, E3): the contrasts, the losses, the "
-    "calibration in the large and the overconfidence criterion on the recovery statements and "
-    "on the next-delivery statements apart, and with it the hold rate and the slip "
-    "distribution of E1 by statement type",
-    "the mean of P(E_end) minus the Turnbull share recovered by the stated end, beside the "
-    "overconfidence criterion (PLAN section 13)",
     "E7 (the next in the cut order of PLAN section 12)",
 )
 """Registered secondary analyses over a sealed file that no script of the study computes at
@@ -799,6 +987,10 @@ class More:
     """By secondary model and condition (a, b, c, and the probe where the model is probed)."""
     ids: dict[str, list[str]] = field(default_factory=dict)
     """The statements of each item list besides the eligible one, by the plan's key."""
+    subsets: dict[str, list[str]] = field(default_factory=dict)
+    """The statements of each of the three subsets of the eligible list, by the plan's key,
+    whichever section is asked for: open cells of the list, for the sets known beside a
+    section (``known_sets``)."""
     lists: dict[str, dict[str, dict[str, ev.Group]]] = field(default_factory=dict)
     """By primary, secondary list and condition."""
     samples: dict[str, dict[tuple[str, int], dict]] = field(default_factory=dict)
@@ -828,6 +1020,11 @@ def gather_more(
     more = More()
     ids = list(eligible["statement_group_id"])
     probe_ids = sorted(eligible.loc[eligible[ev.PROBE] == "1", "statement_group_id"])
+    more.subsets = {
+        key: sorted(eligible.loc[eligible[column] == "1", "statement_group_id"])
+        for key, column in SUBSET_COLUMN.items()
+        if column in eligible.columns
+    }
 
     def keep(what: str, group: ev.Group) -> ev.Group:
         more.problems += [f"{what}{problem}" for problem in group.problems]
@@ -1520,6 +1717,194 @@ def near_definitions(
     return out
 
 
+def near_sets(one: pd.DataFrame, other: pd.DataFrame, fills: bool = True) -> str | None:
+    """How the figures on the statements of ``one`` may stand beside the same figures on the
+    statements of ``other`` (typed frames under one outcome definition), one pair of sets at a
+    time (PLAN, standing rules):
+
+    * ``bare`` when the two sets differ by 1 to ``MIN_SHOWN`` - 1 statements: the figures of
+      the two would give the outcomes of those few, and their counts how many of the few are
+      scoreable;
+    * ``counts`` when their scoreable statements differ by so few (unless one of the two holds
+      so few itself: its figures are under the floor): the figures on the scoreable statements
+      would give the few back, and with them those over every statement, which less their
+      filled part are the same sums; the counts stay;
+    * ``fills`` when only their statements that are not scoreable differ by so few (``fills``:
+      the figures over every statement that fill the horizon events are written on ``other``
+      too; unless those of one of the two are withheld already,
+      ``evaluate.fills_withheld``): those figures would give the events of the few, and the
+      mean probabilities on the scoreable statements would name them (PLAN section 2.5, for
+      the statements between the two sets); what is scored on the scoreable statements fills
+      no event and stays;
+    * None otherwise, and for the same set twice."""
+    mine, theirs = set(one.index), set(other.index)
+    if small(len(mine ^ theirs)):
+        return "bare"
+    counted = set(one.index[one["scoreable"].to_numpy(dtype=bool)])
+    counted_there = set(other.index[other["scoreable"].to_numpy(dtype=bool)])
+    scored = small(len(counted ^ counted_there))
+    if scored and not small(len(counted)) and not small(len(counted_there)):
+        return "counts"
+    filled = fills and small(len((mine - counted) ^ (theirs - counted_there)))
+    filled = filled and ev.fills_withheld(one) is None and ev.fills_withheld(other) is None
+    return "fills" if filled else None
+
+
+SCORE_COUNTS = ("scoreable_statements", "scoreable_episodes", "statements")
+"""The counts of a record of ``scores``."""
+NEAR_STATES = (None, "fills", "counts", "bare")
+"""What ``near_sets`` says of two sets, from nothing withheld to the number of statements
+alone."""
+
+
+def known_sets(
+    study: ev.Study,
+    rows: pd.DataFrame,
+    sets: Mapping[str, tuple[pd.Index | None, dict[str, Any]]],
+    reading_days: Mapping[str, pd.Series] | None = None,
+    subsets: Mapping[str, Sequence[str]] | None = None,
+) -> dict[str, tuple[pd.Index, bool, str | None]]:
+    """The sets of eligible statements on which the evaluator, or this file, writes a figure of
+    a primary or of a predictor that reads no text, by a name. Each comes with whether figures
+    over every statement that fill the horizon events are written on it (the two scenarios, the
+    limits of calibration in the large) or contrasts on its scoreable statements alone, and
+    with the primary whose own figures are all that is written on it (None where figures that
+    are the same whichever model stand there too: those of a predictor that reads no text, the
+    frequencies of the horizon events):
+
+    * with figures of every kind, for every model: every eligible statement; the item set of
+      each primary (``sets``: its post-cutoff slice when its probe beat the base rate) and, of
+      it, the statements of each type and those whose answer of condition (a) parsed (the
+      evaluator gives both parts of the overconfidence criterion on them); the post-cutoff
+      slice of every secondary model that has one, on which its calibration in the large
+      stands beside the base rate's;
+    * with the figures of one primary alone: its post-cutoff slice, on which the evaluator
+      repeats its tests when it is not its item set; of its item set, the statements first
+      captured by the stated end, those of the month-and-year form, those that both sides of
+      each of its three tests parsed (the evaluator's sensitivity analysis of section 4), and
+      the two parts of its selective prediction (``reading_days``, by model: the statements
+      its literal reading read, and those it abstained on; where readings are given, that of
+      every primary with an item set must be among them); and the three subsets on which
+      it is read again (``subsets``: the statements of each, by its key), with their
+      statements after its cutoff when its probe beat the base rate.
+
+    A part of an item set, or of a subset, has an entry where a figure is written on it: with
+    ``MIN_SHOWN`` statements or more, and as many fewer than its whole (``written_part``). A
+    part that is its whole but for a few statements holds no figure, by the evaluator's rule
+    and by this file's, and the whole has its own entry. All of them follow from open cells,
+    from the stored runs and from the item sets, whichever section is asked for."""
+    first = study.first.loc[rows.index]
+    known: dict[str, tuple[pd.Index, bool, str | None]] = {
+        "every eligible statement": (rows.index, True, None)
+    }
+    for model in rd.STUDY_MODELS:
+        cutoff = sealed_counts.CUTOFF_MONTH_ENDS.get(model)
+        if cutoff is not None and sealed_counts.has_slice(cutoff):
+            after = rows.index[(first["event_date"] > cutoff.isoformat()).to_numpy()]
+            primary = model in ev.PRIMARIES
+            known[f"the post-cutoff slice of {model}"] = (
+                after,
+                not primary,
+                model if primary else None,
+            )
+    for model, (ids, record) in sets.items():
+        for key, chosen in (subsets or {}).items():
+            if key not in SUBSET_COLUMN:
+                continue
+            part = rows.index[rows.index.isin(list(chosen))]
+            scenarios = key != "samples"  # the sampled quantiles are scored by pinball loss
+            known[f"{model}: the {key} subset"] = (part, scenarios, model)
+            if record.get("switched") is True and "cutoff_month_end" in record:
+                later = (first.loc[part, "event_date"] > str(record["cutoff_month_end"])).to_numpy()
+                if written_part(later):
+                    name = f"{model}: the {key} subset after its cutoff"
+                    known[name] = (part[later], scenarios, model)
+        if ids is None:
+            continue
+        mine = first.loc[ids]
+        known[f"the item set of {model}"] = (ids, True, None)
+        for kind in TYPES:
+            of_kind = (mine["statement_type"] == kind).to_numpy()
+            known[f"{model}: {kind}"] = (ids[of_kind], True, None)
+
+        def parsed(names: Sequence[str], ids: pd.Index = ids) -> np.ndarray:
+            """Which statements of the item set every reading of ``names`` parsed."""
+            flags = [study.parsed[name].loc[ids].to_numpy(dtype=bool) for name in names]
+            return np.logical_and.reduce([np.ones(len(ids), dtype=bool), *flags])
+
+        parts: dict[str, tuple[np.ndarray, bool, str | None]] = {
+            "first captured by the stated end": (
+                (mine["delayed_entry"] != "True").to_numpy(),
+                False,
+                model,
+            ),
+            "month-and-year form": ((mine["form"] == ev.MONTH_YEAR).to_numpy(), False, model),
+            "answers of condition (a) that parsed": (
+                parsed([name for name in (f"{model}:a",) if name in study.parsed]),
+                True,
+                None,
+            ),
+        }
+        for hypothesis, comparator, tested, _ in ev.tests_of(model, study):
+            keep = parsed([name for name in (comparator, tested) if name in study.parsed])
+            parts[f"both sides of {hypothesis} parsed"] = (keep, False, model)
+        if reading_days is not None:
+            if model not in reading_days:  # its parts would stand unknown beside the others
+                raise ValueError(f"the literal reading of {model} is not given")
+            read = reading_days[model].loc[ids].notna().to_numpy()
+            parts["read by condition (c)"] = (read, True, model)
+            parts["abstained on by condition (c)"] = (~read, True, model)
+        for name, (flags, fills, of) in parts.items():
+            if written_part(flags):
+                known[f"{model}: {name}"] = (ids[flags], fills, of)
+    return known
+
+
+def written_part(flags: np.ndarray) -> bool:
+    """Whether a part of a set (``flags``: which statements of the set are of the part) is one
+    on which a figure is written beside that of the set: it holds ``MIN_SHOWN`` statements or
+    more and leaves out as many. A part of fewer statements is under the floor, and a part
+    that is the set but for a few is withheld beside it (PLAN, standing rules)."""
+    inside = int(np.asarray(flags, dtype=bool).sum())
+    return inside >= MIN_SHOWN and len(flags) - inside >= MIN_SHOWN
+
+
+def beside_known(
+    frame: pd.DataFrame,
+    rows: pd.DataFrame,
+    known: Mapping[str, tuple[pd.Index, bool, str | None]],
+    own: str = "",
+    model: str | None = None,
+) -> str | None:
+    """``near_sets`` of the statements of ``frame`` against every set of ``known`` but its own
+    (``own``, its name there): the one that withholds most (``NEAR_STATES``). A set that holds
+    the figures of another model than ``model`` alone counts for ``bare`` only: its figures
+    are not those of ``frame``, but the number of its scoreable statements is written with
+    them, and beside it the counts of ``frame`` would say how many of the few between the two
+    are scoreable (PLAN, standing rules). A set of no statement holds no figure. The rule has
+    no order: of two near sets written by this file, both are withheld."""
+    worst = None
+    for name, (ids, fills, of) in known.items():
+        if name == own or not len(ids):
+            continue
+        state = near_sets(frame, rows.loc[ids], fills)
+        if state == "bare":
+            return state
+        if of is None or of == model:
+            worst = max(worst, state, key=NEAR_STATES.index)
+    return worst
+
+
+def sets_beside_the_tables(
+    known: Mapping[str, tuple[pd.Index, bool, str | None]],
+) -> dict[str, pd.Index]:
+    """The sets of ``known_sets`` on which the frequency of a horizon event over every
+    statement is written whichever model stands beside it (the limits of calibration in the
+    large, the part of the overconfidence criterion against outcomes, the Turnbull share
+    beside it): the sets to which the tables of E1 give way (``descriptives``)."""
+    return {name: ids for name, (ids, fills, of) in known.items() if fills and of is None}
+
+
 # --------------------------------------------------------------------------------------------
 # Scores shared by the sections
 # --------------------------------------------------------------------------------------------
@@ -1735,11 +2120,6 @@ def scores(rows: pd.DataFrame, pred: pd.DataFrame, draws: int, seed: int) -> dic
       are not scoreable, and names them, and the calibration in the large is that mean less
       the frequency of the event, which the uncertainty of the Brier decomposition gives."""
     record = ev.predictor_record(rows, pred, draws, seed)
-    counts = {
-        "statements": len(rows),
-        "with_a_horizon_event_undetermined": int((~rows["scoreable"]).sum()),
-        "withheld": True,
-    }
     scoreable = int(rows["scoreable"].sum())
     if small(len(rows)):  # not even how many of them are scoreable
         return {"statements": len(rows), "withheld": True}
@@ -1754,15 +2134,45 @@ def scores(rows: pd.DataFrame, pred: pd.DataFrame, draws: int, seed: int) -> dic
             | {"withheld": True}
             | {key: record[key] for key in over_all}
         )
-    if few_open(rows):
-        over_all = ("bounds_all_statements", "calibration_all_statements")
-        for key in (*over_all, "calibration_in_the_large"):
-            if key in record:
-                record[key] = dict(counts)
-        for key in ("mean_p_E_end", "mean_p_E_end90"):
-            if key in record:
-                record[key] = None
-    return record
+    return without_fills(record, rows) if few_open(rows) else record
+
+
+def fills_apart(rows: pd.DataFrame) -> dict[str, Any]:
+    """What stands in place of a figure over every statement of ``rows`` that is withheld
+    because it fills the undetermined horizon events: the two counts of the set, as
+    ``evaluate.fills_withheld`` gives them."""
+    return {
+        "statements": len(rows),
+        "with_a_horizon_event_undetermined": int((~rows["scoreable"]).sum()),
+        "withheld": True,
+    }
+
+
+def without_fills(record: Mapping[str, Any], rows: pd.DataFrame) -> dict[str, Any]:
+    """A record of ``scores`` on ``rows`` without what PLAN section 2.5 withholds where a few
+    statements are not scoreable: the two scenarios of the loss, the two limits of
+    calibration in the large, and the calibration in the large and the mean probabilities on
+    the scoreable statements. Each block holds the two counts of the set and ``withheld``; the
+    mean probabilities are None. A record that holds none of them is returned as it is."""
+    counts = fills_apart(rows)
+    out = dict(record)
+    blocks = ("bounds_all_statements", "calibration_all_statements", "calibration_in_the_large")
+    out |= {key: dict(counts) for key in blocks if key in out}
+    out |= {key: None for key in ("mean_p_E_end", "mean_p_E_end90") if key in out}
+    return out
+
+
+def without_free_figures(record: Mapping[str, Any], rows: pd.DataFrame) -> dict[str, Any]:
+    """A record of ``scores`` on ``rows`` without the figures that are the same whichever model
+    the record is of, the predictions being open: what ``without_fills`` takes out (the
+    frequencies of the horizon events over every statement and the count of the undetermined
+    ones; the calibration in the large and the mean probabilities on the scoreable statements,
+    which together are the frequencies there) and the Brier decomposition, whose uncertainty
+    is such a frequency. The losses of the model stay."""
+    out = without_fills(record, rows)
+    if "murphy" in out:
+        out["murphy"] = {"withheld": True}
+    return out
 
 
 def brief(result: Mapping[str, Any], sides: int) -> dict[str, Any]:
@@ -2069,6 +2479,7 @@ def secondary_models(
     draws: int,
     seed: int,
     definitions: Mapping[str, pd.DataFrame | None] | None = None,
+    known: Mapping[str, tuple[pd.Index, bool, str | None]] | None = None,
 ) -> dict[str, Any]:
     """PLAN section 5, E3, "Secondaries" and "Descriptive decomposition", and section 7.2, for
     the six secondary models: the H1 and H2 contrasts and the H3 contrast for each of the three
@@ -2085,13 +2496,51 @@ def secondary_models(
     statements, which anyone can name from their dates, nothing of it is written but the
     number of its statements: its counts, taken from those of the list, would say how many
     of the few are scoreable (PLAN, standing rules), and whether it holds the 50 scoreable
-    statements of an analysed slice would say the same. Beside the repeats under the outcome
-    variants stands how
+    statements of an analysed slice would say the same.
+
+    Beside the calibration in the large of every condition stands the base rate's on the same
+    statements (section 7.2, "Calibration in the large": "Beside it stand the same quantities
+    for the base rate by listing age on the same events"; ``evaluate.beside_base_rate``, which
+    leaves a block that is withheld as it is).
+
+    Some figures of a slice are the same whichever model it is the slice of: the base rate's,
+    the two parts of the decomposition that compare predictors that read no text
+    (``MODEL_FREE_PARTS``), and in each record of the model's own scores the frequencies of
+    the horizon events (the limits of calibration in the large over every statement; on the
+    scoreable statements the calibration in the large with the mean probability, and the
+    uncertainty of the Brier decomposition), the predictions being open. Where the slice
+    stands near another set on which such figures are written (``known``, from
+    ``known_sets``: the slice of another model, an item set of a primary, a type of it;
+    ``beside_known``), what ``near_sets`` says is withheld:
+
+    * ``bare``: nothing of the slice is written but the number of its statements, as for a
+      slice that is the list but for a few (the counts of the two sets would say how many of
+      the few are scoreable); this holds for a slice that is not analysed too;
+    * ``counts``: the two parts of the decomposition, and those figures of every record
+      (``without_free_figures``); the contrasts and the losses of the model stay;
+    * ``fills``: the figures that section 2.5 withholds for a set with a few statements that
+      are not scoreable (``without_fills``), the base rate's with them; the two parts of the
+      decomposition, which fill no event, stay.
+
+    The loss of condition (c) is also written on the two parts of the model's selective
+    prediction, the statements its literal reading read and those it abstained on
+    (``selective_prediction``; ``prepared.reading_days``). A slice that is one of them but for
+    a few statements gives way in the same three steps: its number alone; the record of
+    condition (c) by its counts; that record without the figures of section 2.5.
+
+    Every eligible statement is one of those sets: where 1 to ``MIN_SHOWN`` - 1 statements
+    before the cutoff are not scoreable, the scores of the slice hold none of the figures that
+    section 2.5 withholds for a set with so few (the state ``fills``): beside those of the
+    list they would be the figures of that set.
+
+    Beside the repeats under the outcome variants stands how
     many statements each variant gives another horizon event (``near_definitions``;
     ``definitions``: every outcome definition of the result file)."""
     study = prepared.study
     definitions = outcome_variants if definitions is None else definitions
     moved = near_definitions(rows, definitions, rows.index)
+    known = known_sets(study, rows, {}) if known is None else known
+    base = study.predictions[ev.BASE]
     out: dict[str, Any] = {
         "models": {},
         "scores_on_every_eligible_statement": {},
@@ -2103,7 +2552,13 @@ def secondary_models(
         whole = contrasts_of(model, rows, study, draws, seed)
         parts = decomposition_of(model, rows, study, draws, seed)
         every = {
-            condition: scores(rows, study.predictions[f"{model}:{condition}"], draws, seed)
+            condition: ev.beside_base_rate(
+                scores(rows, study.predictions[f"{model}:{condition}"], draws, seed),
+                rows,
+                base,
+                draws,
+                seed,
+            )
             for condition in ev.CONDITIONS
         }
         entry["on_every_eligible_statement"] = whole
@@ -2126,7 +2581,22 @@ def secondary_models(
         entry["post_cutoff_slice"] = {
             key: record[key] for key in record if key.startswith(("cutoff", "slice"))
         }
-        if small(len(rows) - int(record["slice_statements"])):  # the list but for a few
+        name = f"the post-cutoff slice of {model}"
+        state = read = None
+        if name in known and len(known[name][0]):  # the statements after the cutoff
+            after = rows.loc[known[name][0]]
+            state = beside_known(after, rows, known, name, model)
+            days = prepared.reading_days.get(model)
+            if days is not None:  # the two parts of the model's selective prediction
+                flags = days.loc[rows.index].notna().to_numpy()
+                parts_read = {
+                    "read": (rows.index[flags], True, model),
+                    "abstained on": (rows.index[~flags], True, model),
+                }
+                if written_part(flags):
+                    read = beside_known(after, rows, parts_read, "", model)
+        # the list but for a few statements, or another set on which such counts are written
+        if "bare" in (state, read):
             entry["post_cutoff_slice"] |= {
                 "slice_scoreable": None,
                 "slice_scoreable_episodes": None,
@@ -2142,14 +2612,24 @@ def secondary_models(
             entry["on_the_post_cutoff_slice"] = beside(
                 whole, contrasts_of(model, part, study, draws, seed, within=rows)
             )
-            entry["decomposition_on_the_post_cutoff_slice"] = beside(
-                parts, decomposition_of(model, part, study, draws, seed)
-            )
+            apart = decomposition_of(model, part, study, draws, seed)
+            for free in MODEL_FREE_PARTS if state == "counts" else ():
+                apart[free] = withheld(apart[free])
+            entry["decomposition_on_the_post_cutoff_slice"] = beside(parts, apart)
+            on_the_slice = {}
+            for condition in ev.CONDITIONS:
+                record = scores(part, study.predictions[f"{model}:{condition}"], draws, seed)
+                if state == "counts":
+                    record = without_free_figures(record, part)
+                elif state == "fills":
+                    record = without_fills(record, part)
+                if condition == "c" and read == "counts" and "withheld" not in record:
+                    record = {key: record[key] for key in SCORE_COUNTS} | {"withheld": True}
+                elif condition == "c" and read == "fills":
+                    record = without_fills(record, part)
+                on_the_slice[condition] = ev.beside_base_rate(record, part, base, draws, seed)
             entry["scores_on_the_post_cutoff_slice"] = {
-                condition: beside(
-                    every[condition],
-                    scores(part, study.predictions[f"{model}:{condition}"], draws, seed),
-                )
+                condition: beside(every[condition], on_the_slice[condition])
                 for condition in ev.CONDITIONS
             }
         out["models"][model] = entry
@@ -2919,6 +3399,326 @@ def recovery_rule(
     return out
 
 
+def type_tests(model: str, study: ev.Study) -> list[tuple[str, str, str, int]]:
+    """The contrasts the analysis by statement type repeats for a primary, as (name,
+    comparator, tested, sides): its three tests (``evaluate.tests_of``) and the contrast of
+    each other predictor that reads no text with the selected condition, two-sided
+    (``DELTA_GBM`` for the structured-only model)."""
+    tests = list(ev.tests_of(model, study))
+    best = tests[-1][2]
+    for other in ev.other_comparators(study.comparator or ev.H3_COMPARATOR):
+        name = DELTA_GBM if other == ev.STRUCTURED else f"against_{other}"
+        tests.append((name, other, best, 2))
+    return tests
+
+
+def type_difference(
+    chosen: pd.DataFrame,
+    kinds: pd.Series,
+    predictions: Mapping[str, pd.DataFrame],
+    comparator: str,
+    tested: str,
+    draws: int,
+    seed: int,
+) -> dict[str, Any]:
+    """PLAN section 5, E3, "By statement type": the difference of a contrast between the two
+    types, next delivery minus recovery, on the statements ``chosen`` of an item set (``kinds``:
+    their types), "and its 95% percentile interval over 10,000 draws of the episodes of the
+    item set, both types taken from each draw; a draw with no scoreable statement of one type
+    is left out". The draws are the registered ones (``predictors.cluster_draws``) of every
+    episode of the item set, whether or not it holds a scoreable statement; the draws left out
+    are counted. Without two episodes there is no interval."""
+    scoreable = chosen["scoreable"].to_numpy(dtype=bool)
+    pair = {name: predictions[name] for name in (comparator, tested)}
+    losses = power.primary_losses(chosen[scoreable], pair)
+    difference = np.zeros(len(chosen))
+    difference[scoreable] = (losses[comparator] - losses[tested]).to_numpy(dtype=float)
+    of_type = [scoreable & (kinds.loc[chosen.index] == kind).to_numpy() for kind in TYPES]
+    columns = [column for flags in of_type for column in (difference * flags, flags)]
+    sums, sizes = P.cluster_sums(np.stack(columns, axis=1), list(chosen["episode_id"]))
+    whole = sums.sum(axis=0)
+    out: dict[str, Any] = {
+        "difference": float(whole[2] / whole[3] - whole[0] / whole[1]),
+        "ci95": None,
+        "draws": 0,
+        "draws_left_out": 0,
+    }
+    if len(sizes) >= ev.MIN_EPISODES:
+        totals = P.cluster_draws(len(sizes), draws, seed).astype(float) @ sums
+        kept = (totals[:, 1] > 0) & (totals[:, 3] > 0)
+        drawn = totals[kept, 2] / totals[kept, 3] - totals[kept, 0] / totals[kept, 1]
+        out["draws"], out["draws_left_out"] = int(kept.sum()), int((~kept).sum())
+        out["ci95"] = P.interval(drawn, 0.95) if kept.any() else None
+    return out
+
+
+def type_block(
+    model: str, frame: pd.DataFrame, study: ev.Study, state: str | None, draws: int, seed: int
+) -> dict[str, Any]:
+    """What the analysis by statement type gives of one primary on the statements ``frame`` of
+    one type of its item set (PLAN section 5, E3): the contrasts of ``type_tests``, each with
+    its 95% percentile interval by episode and the two scenarios of section 7.2; the primary
+    loss and the calibration in the large of the three conditions and of the base rate
+    (``scores``, of which ``TYPE_SCORES`` is kept); and the overconfidence criterion of section
+    13 (``criterion_of``: the two parts for ``E_end`` and whether both hold).
+
+    ``state`` is what ``beside_known`` says of the type beside the other sets the same figures
+    are written on, its item set first. The block holds the number of its statements alone
+    when they are 1 to ``MIN_SHOWN`` - 1, or when the type is another such set but for so few
+    statements (``bare``); its counts alone when it holds fewer than ``MIN_TYPE`` scoreable
+    statements (the plan's floor for a type), or when its figures would give a few scoreable
+    statements back beside those of another set (``counts``). Where only its statements that
+    are not scoreable differ by a few from those of another set (``fills``), the block is
+    written without the figures that fill the horizon events (PLAN section 2.5): the two
+    scenarios of each contrast and of each loss, the calibration in the large of each
+    predictor, and the part of the criterion against outcomes, which then has no reading."""
+    out: dict[str, Any] = {"statements": len(frame)}
+    if not len(frame):
+        return out
+    if small(len(frame)) or state == "bare":
+        return out | {"withheld": True}
+    scoreable = frame[frame["scoreable"]]
+    out |= {
+        "episodes": int(frame["episode_id"].nunique()),
+        "scoreable_statements": len(scoreable),
+        "scoreable_episodes": int(scoreable["episode_id"].nunique()),
+    }
+    if len(scoreable) < MIN_TYPE:
+        return out | {"counts_alone": f"fewer than {MIN_TYPE} scoreable statements"}
+    if state == "counts":
+        return out | {"withheld": True}
+    filled = state != "fills"
+    predictions = study.predictions
+    out["contrasts"] = {}
+    for name, comparator, tested, sides in type_tests(model, study):
+        record = brief(
+            ev.scored(frame, predictions, comparator, tested, draws=draws, seed=seed), sides
+        )
+        bounds = contrast_bounds(frame, predictions, comparator, tested, record)
+        out["contrasts"][name] = (
+            {"comparator": comparator, "tested": tested, "sides": sides}
+            | record
+            | {"bounds": bounds if filled or "withheld" in bounds else fills_apart(frame)}
+        )
+    named = {ev.BASE: predictions[ev.BASE]}
+    named |= {condition: predictions[f"{model}:{condition}"] for condition in ev.CONDITIONS}
+    out["scores"] = {}
+    for name, pred in named.items():
+        record = scores(frame, pred, draws, seed)
+        record = record if filled else without_fills(record, frame)
+        out["scores"][name] = {key: record[key] for key in TYPE_SCORES if key in record}
+    out["overconfidence"] = criterion_of(model, frame, study, draws, seed, filled)
+    return out
+
+
+def criterion_of(
+    model: str, frame: pd.DataFrame, study: ev.Study, draws: int, seed: int, filled: bool = True
+) -> dict[str, Any]:
+    """The overconfidence criterion of PLAN section 13 for condition (a) of a primary on the
+    statements of ``frame`` (``evaluate.overconfidence``), as the analysis by statement type
+    gives it: its two parts for ``E_end``, each with its interval and whether it is met, and
+    ``both_parts_hold``. That is None where the part against outcomes is withheld (PLAN
+    section 2.5: the criterion then has no reading): where the evaluator's function withholds
+    it, and without ``filled``, where the figures over every statement of ``frame`` are
+    withheld beside those of another set (``fills_apart``). The five sentences of section 13
+    are read on the item set, in the evaluator's result file, and on no type."""
+    found = ev.overconfidence(
+        frame,
+        study.predictions[f"{model}:a"],
+        study.predictions[ev.BASE],
+        study.parsed[f"{model}:a"],
+        draws,
+        seed,
+    )
+    out: dict[str, Any] = {key: found[key] for key in TYPE_CRITERION}
+    for part in ("against_outcomes", "against_base_rate"):
+        out[part] = dict(found[part]) if "withheld" in found[part] else found[part]["E_end"]
+    read = "withheld" not in found["against_outcomes"]
+    if read and not filled:
+        out["against_outcomes"], read = fills_apart(frame), False
+    return out | {"both_parts_hold": bool(found["met"]) if read else None}
+
+
+def by_statement_type(
+    prepared: Prepared,
+    rows: pd.DataFrame,
+    sets: Mapping[str, tuple[pd.Index | None, dict[str, Any]]],
+    draws: int,
+    seed: int,
+    known: Mapping[str, tuple[pd.Index, bool, str | None]] | None = None,
+) -> dict[str, Any]:
+    """PLAN section 5, E3, "Secondaries", "By statement type": for each primary, on the item
+    set its probe fixed, the registered quantities again on the recovery statements and on the
+    next-delivery statements apart (``type_block``; the type is that of the frozen rule
+    reading, the column ``statement_type`` of the statement table), and for each contrast the
+    difference between the two types with its interval (``type_difference``).
+
+    The two types need not make up the item set. Where 1 to ``MIN_SHOWN`` - 1 of its
+    statements are of another type, the figures and the counts of the item set less those of
+    the two types would be those of the few: the type of the fewest statements then keeps
+    their number alone and is marked (``WITH_ANOTHER``), unless one of the two does already.
+
+    A type within the item set is a set beside its whole (PLAN, standing rules), and it can
+    stand near another set the same figures are written on (``known``, from ``known_sets``:
+    worked out here from the item sets and the literal readings when it is not given):
+    ``beside_known`` says what of it may be written. The difference between the two types is
+    given where both carry the contrast with an estimate. Beside the types stand what the plan
+    asks the sentence of a result to say: whether a contrast has opposite signs in the two
+    types, and whether the overconfidence criterion holds on the item set and not on its
+    recovery statements (the criterion on the item set is worked out again with the
+    evaluator's own function, on the same statements and draws)."""
+    study = prepared.study
+    kinds = study.first.loc[rows.index, "statement_type"]
+    if known is None:
+        known = known_sets(study, rows, sets, prepared.reading_days)
+    out: dict[str, Any] = {
+        "statement_type": "that of the frozen rule reading, as the statement table gives it",
+        "types": list(TYPES),
+        "fewest_scoreable_statements_of_a_type": MIN_TYPE,
+        "note": BY_TYPE_NOTE,
+        "models": {},
+    }
+    for model, (ids, _) in sets.items():
+        entry: dict[str, Any] = {"item_set_fixed_by_the_probe": fixed_record(sets, model)}
+        out["models"][model] = entry
+        if ids is None:
+            continue
+        chosen = rows.loc[ids]
+        mine = kinds.loc[ids]
+        entry |= {
+            "statements": len(chosen),
+            "episodes": int(chosen["episode_id"].nunique()),
+            "statements_of_another_type": int((~mine.isin(TYPES)).sum()),
+            "types": {},
+        }
+        for kind in TYPES:
+            frame = chosen[(mine == kind).to_numpy()]
+            state = beside_known(frame, rows, known, f"{model}: {kind}", model)
+            entry["types"][kind] = type_block(model, frame, study, state, draws, seed)
+        types = entry["types"]
+        bare = [k for k in TYPES if "withheld" in types[k] and "episodes" not in types[k]]
+        held = [k for k in TYPES if types[k]["statements"]]
+        if small(entry["statements_of_another_type"]) and held and not bare:
+            # the item set less both types would be the few of another type: the type of the
+            # fewest statements keeps their number alone
+            kind = min(held, key=lambda k: types[k]["statements"])
+            types[kind] = {
+                "statements": types[kind]["statements"],
+                "withheld": True,
+                WITH_ANOTHER: True,
+            }
+        blocks = [entry["types"][kind].get("contrasts", {}) for kind in TYPES]
+        apart: dict[str, Any] = {}
+        opposite: dict[str, bool] = {}
+        for name, comparator, tested, _ in type_tests(model, study):
+            found = [block.get(name, {}).get("delta") for block in blocks]
+            if None in found:
+                continue
+            apart[name] = type_difference(
+                chosen, mine, study.predictions, comparator, tested, draws, seed
+            )
+            opposite[name] = bool(found[0] * found[1] < 0)
+        entry["next_delivery_minus_recovery"] = apart
+        entry["opposite_signs_in_the_two_types"] = opposite
+        whole = criterion_of(model, chosen, study, draws, seed)["both_parts_hold"]
+        there = entry["types"][TYPES[0]].get("overconfidence", {}).get("both_parts_hold")
+        entry["overconfidence_on_the_item_set"] = {"both_parts_hold": whole}
+        entry["overconfidence_holds_on_the_item_set_and_not_on_its_recovery_statements"] = (
+            None if whole is None or there is None else bool(whole and not there)
+        )
+    return out
+
+
+def turnbull_shares(
+    chosen: pd.DataFrame, slip_draws: int, seed: int
+) -> tuple[float, np.ndarray, np.ndarray]:
+    """The Turnbull share recovered by the stated end over the statements ``chosen``: the
+    estimate of the slip distribution at day 0 (``predictors.slip_brackets`` and
+    ``predictors.turnbull``, as ``slip_record`` gives it for E1), the same in each of the first
+    ``slip_draws`` of the registered bootstrap draws of the episodes (each with a fit of its
+    own), and how often each statement is taken in each of those draws. Without two episodes
+    there is no draw."""
+    left, right = P.slip_brackets(chosen)
+    day = np.array([0.0])
+    share = float(P.turnbull(left, right).cdf(day)[0])
+    codes = pd.Categorical(chosen["episode_id"]).codes
+    groups = int(codes.max()) + 1
+    if groups < ev.MIN_EPISODES or slip_draws <= 0:
+        return share, np.empty(0), np.empty((0, len(chosen)))
+    taken = P.cluster_draws(groups, ev.DRAWS, seed)[:slip_draws][:, codes]
+    position = np.arange(len(chosen))
+    drawn = np.empty(len(taken))
+    for k, counts in enumerate(taken):
+        again = np.repeat(position, counts)
+        drawn[k] = P.turnbull(left[again], right[again]).cdf(day)[0]
+    return share, drawn, taken.astype(float)
+
+
+def beside_the_criterion(
+    prepared: Prepared,
+    rows: pd.DataFrame,
+    sets: Mapping[str, tuple[pd.Index | None, dict[str, Any]]],
+    slip_draws: int,
+    seed: int,
+) -> dict[str, Any]:
+    """PLAN section 13, "Reported beside it, for condition (a) and for the base rate on the
+    same statements: ... the mean of ``P(E_end)`` minus the Turnbull share recovered by the
+    stated end (secondary scorer)": for each primary, over every statement of the item set its
+    probe fixed, the mean probability of each of the two predictors, the Turnbull share
+    (``turnbull_shares``) and their difference, with a 95% percentile interval over the first
+    ``slip_draws`` of the registered draws of the episodes, the mean and the share taken from
+    the same draw. No scoreable set enters.
+
+    The probabilities are open, so the figure is the Turnbull share of the item set. An item
+    set that is the item set of another primary but for 1 to ``MIN_SHOWN`` - 1 statements
+    holds the number of its statements alone (PLAN, standing rules). The descriptives of E1
+    write the same estimate on all dated statements at risk and on the cells of their splits:
+    those tables give way to the item set, with the hold table, which must (``descriptives``,
+    ``sets_beside_the_tables``), so the share stands beside no estimate of theirs that is
+    near.
+
+    On the same item set the evaluator writes how many statements held and how many have an
+    undetermined first event (the limits of calibration in the large). The share times the
+    number of statements, less the number that held, is what the estimate puts before the
+    stated end for the undetermined ones: where those are 1 to ``MIN_SHOWN`` - 1 it is a
+    figure on their brackets, and the share is withheld (``few_undetermined``)."""
+    study = prepared.study
+    beside_it = [set(ids) for ids, _ in sets.values() if ids is not None]
+    fitted: dict[tuple[str, ...], tuple[float, np.ndarray, np.ndarray]] = {}
+    out: dict[str, Any] = {}
+    for model, (ids, _) in sets.items():
+        entry: dict[str, Any] = {"item_set_fixed_by_the_probe": fixed_record(sets, model)}
+        out[model] = entry
+        if ids is None:
+            continue
+        chosen = rows.loc[ids]
+        entry |= {"statements": len(chosen), "episodes": int(chosen["episode_id"].nunique())}
+        near = any(small(len(set(ids) ^ other)) for other in beside_it)
+        if small(len(chosen)) or near or few_undetermined(chosen, "y_a"):
+            entry["withheld"] = True
+            continue
+        key = tuple(ids)
+        if key not in fitted:  # one fit of an item set serves every primary that has it
+            fitted[key] = turnbull_shares(chosen, slip_draws, seed)
+        share, drawn, taken = fitted[key]
+        entry |= {"turnbull_share_recovered_by_the_stated_end": share, "draws": len(drawn)}
+        named = {
+            "condition_a": study.predictions[f"{model}:a"],
+            "base_rate": study.predictions[ev.BASE],
+        }
+        for name, pred in named.items():
+            p = pred.loc[ids, "p_a"].to_numpy(dtype=float)
+            interval = None
+            if len(drawn):
+                interval = P.interval((taken @ p) / taken.sum(axis=1) - drawn, 0.95)
+            entry[name] = {
+                "mean_p_E_end": float(p.mean()),
+                "mean_p_minus_the_turnbull_share": float(p.mean()) - share,
+                "ci95": interval,
+            }
+    return out
+
+
 # --------------------------------------------------------------------------------------------
 # The descriptives of E1
 # --------------------------------------------------------------------------------------------
@@ -2977,12 +3777,29 @@ def near_unions(
     return one[found[0][0]].astype(bool), other[found[0][1]].astype(bool)
 
 
+def near_a_set(labels: np.ndarray, groups: int, inside: np.ndarray, more: int) -> np.ndarray | None:
+    """A union of the groups of one split that differs by 1 to ``MIN_SHOWN`` - 1 items from a
+    set that is no cell of a split: None when there is none, else which groups make it (a
+    mask). ``labels`` gives the group of every item (-1: in no group whose figure is known),
+    ``groups`` how many there are, ``inside`` which items are of the set, and ``more`` how
+    many items the set holds besides."""
+    known = labels >= 0
+    sizes = np.bincount(labels[known], minlength=groups)
+    shared = np.bincount(labels[known & inside], minlength=groups)
+    unions = (np.arange(1, 1 << groups)[:, None] >> np.arange(groups)) & 1
+    mine = unions @ sizes
+    apart = mine + int(inside.sum()) + more - 2 * (unions @ shared)
+    found = np.flatnonzero((apart > 0) & (apart < MIN_SHOWN) & (mine > 0))
+    return unions[found[0]].astype(bool) if len(found) else None
+
+
 def withheld_cells(
     whole: Sequence[Any],
     splits: Mapping[str, Mapping[str, Iterable[Any]]],
     shown: Mapping[str, Iterable[str]],
     total: bool,
     rank: Any,
+    beside: Sequence[Iterable[Any]] = (),
 ) -> dict[tuple[str, str], str]:
     """The cells to withhold, beyond those that already are, so that the figures written on a
     set and on the cells of its splits give none back on 1 to ``MIN_SHOWN`` - 1 items (PLAN,
@@ -2998,7 +3815,10 @@ def withheld_cells(
       withheld (``WITH_ANOTHER``);
     * a union in one split beside a union in another: a cell of the later split is withheld,
       chosen so that the rest of that split lies partly in the union and partly out of it
-      (``NEAR_SET``).
+      (``NEAR_SET``);
+    * a union in a split beside a set of ``beside``, on which the same figure is written by
+      another section or another script and stays (its items may lie outside ``whole``): a
+      cell of the split is withheld in the same way.
 
     The cell withheld is the first by ``rank(split, cell)`` among those that serve, and the
     search starts again until nothing is given back. Returns the mark of each cell."""
@@ -3011,6 +3831,15 @@ def withheld_cells(
     }
     left = {name: [cell for cell in shown[name] if len(member[name][cell])] for name in splits}
     marks: dict[tuple[str, str], str] = {}
+    others = []
+    for items in beside:
+        inside, more = np.zeros(len(place), dtype=bool), 0
+        for item in items:
+            if item in place:
+                inside[place[item]] = True
+            else:
+                more += 1
+        others.append((inside, more))
 
     def groups(name: str) -> np.ndarray:
         """The group of every item: a cell shown, or the rest (known beside the total)."""
@@ -3032,6 +3861,17 @@ def withheld_cells(
         left[name].remove(cell)
         marks[name, cell] = mark
 
+    def beside_a_set() -> bool:
+        """Withholds one cell of a split of which a union stands near a set of ``beside``."""
+        for name in splits:
+            for inside, more in others:
+                union = near_a_set(groups(name), len(left[name]) + 1, inside, more)
+                serve, mark = ([], "") if union is None else straddling(name, union)
+                if serve:
+                    withhold(name, serve, mark)
+                    return True
+        return False
+
     while True:
         before = len(marks)
         for name in splits:
@@ -3040,7 +3880,11 @@ def withheld_cells(
                 break
         else:
             names = list(splits)
-            pairs = [(a, b) for k, a in enumerate(names) for b in names[k + 1 :]]
+            pairs = (
+                []
+                if beside_a_set()
+                else [(a, b) for k, a in enumerate(names) for b in names[k + 1 :]]
+            )
             for first, second in pairs:
                 sizes = (len(left[first]) + 1, len(left[second]) + 1)
                 near = near_unions(groups(first), groups(second), sizes)
@@ -3056,12 +3900,23 @@ def withheld_cells(
             return marks
 
 
+def near_the_whole(whole: pd.Index, beside: Sequence[pd.Index]) -> bool:
+    """Whether a set on which a section writes a figure (``whole``) is one of the sets
+    ``beside``, on which the same figure is written elsewhere and stays, but for 1 to
+    ``MIN_SHOWN`` - 1 items."""
+    return any(small(len(whole.symmetric_difference(other))) for other in beside)
+
+
 def hold_tables(
-    dated: pd.DataFrame, splits: Mapping[str, Mapping[str, pd.DataFrame]], draws: int, seed: int
+    dated: pd.DataFrame,
+    splits: Mapping[str, Mapping[str, pd.DataFrame]],
+    draws: int,
+    seed: int,
+    beside: Sequence[pd.DataFrame] = (),
 ) -> dict[str, Any]:
     """The hold rate on all dated statements and on every cell of the splits of them (by form,
-    by revision bucket), with what ``withheld_cells`` withholds so that the cells written give
-    back neither of two things about 1 to ``MIN_SHOWN`` - 1 statements:
+    by statement type, by revision bucket), with what ``withheld_cells`` withholds so that the
+    cells written give back neither of two things about 1 to ``MIN_SHOWN`` - 1 statements:
 
     * how many of them have a determined event (a fact of their outcomes): a cell of that few
       statements keeps their number alone (``counts_apart``), and so does each cell withheld
@@ -3070,13 +3925,24 @@ def hold_tables(
       withheld (``hold_record``), and so are those of each cell withheld for it
       (``hold_withheld``), over the statements with a determined event.
 
-    A cell withheld for another carries the mark that says why. The cell chosen is the one
-    with the fewest determined statements (the first by name among equals)."""
+    A cell withheld for another carries the mark that says why. The cell chosen for the
+    statements is the one with the fewest statements, as ``slip_tables`` chooses it, so that
+    the two tables withhold the same cells there; the cell chosen for the shares is the one
+    with the fewest determined statements (the first by name among equals).
+
+    ``beside``: the typed statements of every other set on which the frequency of the first
+    horizon event is written (``sets_beside_the_tables``). Those figures stay, so the table
+    gives way to them as to its own cells, for the statements and for the determined ones:
+    a cell, or a set of cells with the whole, that is such a set but for a few; and the whole
+    itself, which then keeps its number alone (or its counts) and is marked (``NEAR_SET``)."""
     records = {
         name: {cell: hold_record(frame, draws, seed) for cell, frame in cells.items()}
         for name, cells in splits.items()
     }
     whole = hold_record(dated, draws, seed)
+
+    def size(name: str, cell: str) -> tuple[int, str]:
+        return records[name][cell]["statements"], cell
 
     def rank(name: str, cell: str) -> tuple[int, str]:
         return records[name][cell]["determined"], cell
@@ -3091,6 +3957,10 @@ def hold_tables(
         name: [cell for cell, frame in cells.items() if len(frame) >= MIN_SHOWN]
         for name, cells in splits.items()
     }
+    others = [frame.index for frame in beside]
+    settled = [determined(frame) for frame in beside]
+    bare_whole = near_the_whole(dated.index, others)
+    hidden_whole = bare_whole or near_the_whole(determined(dated), settled)
     bare = withheld_cells(
         list(dated.index),
         {
@@ -3098,8 +3968,9 @@ def hold_tables(
             for name, cells in splits.items()
         },
         counted,
-        len(dated) >= MIN_SHOWN,
-        rank,
+        len(dated) >= MIN_SHOWN and not bare_whole,
+        size,
+        others,
     )
     hidden = withheld_cells(
         list(determined(dated)),
@@ -3111,10 +3982,15 @@ def hold_tables(
             name: [c for c in cells if (name, c) not in bare and rated(records[name][c])]
             for name, cells in counted.items()
         },
-        len(dated) >= MIN_SHOWN and rated(whole),
+        len(dated) >= MIN_SHOWN and rated(whole) and not hidden_whole,
         rank,
+        settled,
     )
-    out: dict[str, Any] = {"all_dated_forms": counts_apart(whole) if small(len(dated)) else whole}
+    if small(len(dated)):
+        whole = counts_apart(whole)
+    elif hidden_whole:
+        whole = (counts_apart(whole) if bare_whole else hold_withheld(whole)) | {NEAR_SET: True}
+    out: dict[str, Any] = {"all_dated_forms": whole}
     for name, cells in records.items():
         out[name] = {}
         for cell, record in cells.items():
@@ -3208,7 +4084,7 @@ def slip_record(rows: pd.DataFrame, slip_draws: int, seed: int) -> dict[str, Any
 
     quantiles = {f"{level:.2f}": slip_quantile(curve, tighter, level) for level in SLIP_LEVELS}
     out |= {
-        "share_recovered_by_days_after_the_stated_end": {
+        SLIP_SHARES: {
             str(day): float(share) for day, share in zip(SLIP_DAYS, curve.cdf(days), strict=True)
         },
         "slip_quantiles_days": {level: value for level, (value, _, _) in quantiles.items()},
@@ -3233,18 +4109,64 @@ def slip_record(rows: pd.DataFrame, slip_draws: int, seed: int) -> dict[str, Any
     return out
 
 
+def few_undetermined(rows: pd.DataFrame, event: str) -> bool:
+    """Whether 1 to ``MIN_SHOWN`` - 1 statements of ``rows`` have the horizon event ``event``
+    (its column: ``y_a``, ``y_b``) undetermined."""
+    return small(int(rows[event].isna().sum()))
+
+
+def beside_the_frequencies(
+    record: Mapping[str, Any], rows: pd.DataFrame, events: Sequence[str]
+) -> dict[str, Any]:
+    """A slip estimate on ``rows`` as it may stand beside the number of the same statements
+    that have a horizon event of ``events`` (``EVENT_DAYS``: the day of the estimate on which
+    each falls), which the hold rate or a limit of calibration in the large gives. The share
+    recovered by that day times the number of statements, less the number with the event, is
+    what the estimate puts before the day for the statements whose event is undetermined:
+    where those are 1 to ``MIN_SHOWN`` - 1 (``few_undetermined``) it is a figure on their
+    brackets, and the share of that day is withheld with its interval (None) and named under
+    ``SHARES_WITHHELD``. The other days, the quantiles and the share not recovered stay."""
+    days = [EVENT_DAYS[event] for event in events if few_undetermined(rows, event)]
+    if not days or SLIP_SHARES not in record:
+        return dict(record)
+    out = dict(record)
+    out[SLIP_SHARES] = {day: None if day in days else v for day, v in record[SLIP_SHARES].items()}
+    if record.get("ci95") is not None:
+        out["ci95"] = {day: None if day in days else v for day, v in record["ci95"].items()}
+    return out | {SHARES_WITHHELD: days}
+
+
 def slip_tables(
     dated: pd.DataFrame,
     splits: Mapping[str, Mapping[str, pd.DataFrame]],
     slip_draws: int,
     seed: int,
+    beside: Sequence[pd.DataFrame] = (),
 ) -> dict[str, Any]:
     """The slip estimate on all dated statements and on every cell of the splits of them. The
     estimate of a set is, where the brackets of its statements do not overlap, the mean of
     those of its cells weighted by their size, so that the cells of a split come back from the
     whole as a count would: ``withheld_cells`` withholds a further cell, and marks it, where
     the estimates written would give back that of 1 to ``MIN_SHOWN`` - 1 statements (the cell
-    of the fewest statements, the first by name among equals)."""
+    of the fewest statements, the first by name among equals).
+
+    ``beside``: the typed statements of every other set on which the frequency of a horizon
+    event or the Turnbull share is written (``sets_beside_the_tables``): the share recovered
+    by a day of a slip estimate is such a frequency where no bracket holds that day. The table
+    gives way to them as ``hold_tables`` does, and withholds the same cells for it.
+
+    An estimate that is written stands beside the hold rate of the same statements, and, on
+    a cell that is one of the sets ``beside``, beside the frequency of the second event too:
+    ``beside_the_frequencies`` withholds the share of the day of an event that 1 to
+    ``MIN_SHOWN`` - 1 of the statements have undetermined."""
+    others = [frame.index for frame in beside]
+    near_whole = near_the_whole(dated.index, others)
+
+    def estimate(frame: pd.DataFrame) -> dict[str, Any]:
+        same = any(len(other) == len(frame) and other.isin(frame.index).all() for other in others)
+        events = [event for event in EVENT_DAYS if event == "y_a" or (same and event in frame)]
+        return beside_the_frequencies(slip_record(frame, slip_draws, seed), frame, events)
+
     dropped = withheld_cells(
         list(dated.index),
         {
@@ -3255,10 +4177,20 @@ def slip_tables(
             name: [cell for cell, frame in cells.items() if len(frame) >= MIN_SHOWN]
             for name, cells in splits.items()
         },
-        len(dated) >= MIN_SHOWN,
+        len(dated) >= MIN_SHOWN and not near_whole,
         lambda name, cell: (len(splits[name][cell]), cell),
+        others,
     )
-    out: dict[str, Any] = {"all_dated_forms": slip_record(dated, slip_draws, seed)}
+    out: dict[str, Any] = {}
+    if near_whole and len(dated) >= MIN_SHOWN:
+        out["all_dated_forms"] = {
+            "statements": len(dated),
+            "episodes": int(dated["episode_id"].nunique()),
+            "withheld": True,
+            NEAR_SET: True,
+        }
+    else:
+        out["all_dated_forms"] = estimate(dated)
     for name, cells in splits.items():
         out[name] = {}
         for cell, frame in cells.items():
@@ -3270,7 +4202,7 @@ def slip_tables(
                     dropped[name, cell]: True,
                 }
             else:
-                out[name][cell] = slip_record(frame, slip_draws, seed)
+                out[name][cell] = estimate(frame)
     return out
 
 
@@ -3319,12 +4251,26 @@ def count_record(rows: pd.DataFrame, first: pd.DataFrame) -> dict[str, dict[str,
     }
 
 
+def dated_splits(dated: pd.DataFrame, first: pd.DataFrame) -> dict[str, dict[str, pd.DataFrame]]:
+    """The three splits of the dated statements on which E1 writes the hold rate and the slip
+    estimate, in the order in which the plan names them for the slip: by form, by statement
+    type (``TYPES``; the cell ``statement_type`` of ``first``) and by revision bucket."""
+    kinds = first.loc[dated.index, "statement_type"].to_numpy()
+    return {
+        "by_form": {form: dated[dated["form"] == form] for form in sorted(set(dated["form"]))},
+        "by_statement_type": {kind: dated[kinds == kind] for kind in TYPES},
+        "by_revision": {bucket: dated[dated["revision"] == bucket] for bucket in P.REVISIONS},
+    }
+
+
 def descriptives(
     rows: pd.DataFrame,
     first: pd.DataFrame,
     draws: int = ev.DRAWS,
     slip_draws: int | None = None,
     seed: int = ev.SEED,
+    *,
+    beside: Mapping[str, pd.Index],
 ) -> dict[str, Any]:
     """The descriptives of E1 (PLAN section 5, E1) on the statements of ``rows`` (the typed
     frame with outcomes; ``first`` holds their first-sight cells as text): the hold rate of the
@@ -3333,24 +4279,40 @@ def descriptives(
     type and company. Intervals: percentile bootstrap, 95%, clustered by episode.
 
     The hold rate and the slip estimate are written on all dated statements and on each cell
-    of two splits of them, by form and by revision bucket. The cells of a split add up to the
-    whole, and a set of cells of one split can hold the statements of a set of cells of the
-    other but for a few (PLAN, standing rules: the same figure on a set that differs from its
-    own by 1 to 4 statements): ``hold_tables`` and ``slip_tables`` withhold and mark the cells
-    that would give a figure back on that few."""
+    of three splits of them: by statement type (the type of the frozen rule reading, the cell
+    ``statement_type`` of ``first``: ``TYPES``), by form and by revision bucket. The plan asks
+    for the hold rate by statement type and for the slip by form, by statement type and by
+    revision bucket; the hold rate by form and by revision bucket stands beside them. The
+    cells of a split add up to the whole, and a set of cells of one split can hold the
+    statements of a set of cells of another but for a few (PLAN, standing rules: the same
+    figure on a set that differs from its own by 1 to 4 statements; section 5, E1: "a further
+    cell is withheld and marked"): ``hold_tables`` and ``slip_tables`` withhold and mark the
+    cells that would give a figure back on that few. Of two splits the later one gives way,
+    and the splits come in one order for both tables, the plan's for the slip (form, statement
+    type, revision bucket): the share recovered by the stated end of a slip estimate is the
+    hold rate where no bracket holds the stated end, so a cell that one table withholds for
+    its statements is withheld by the other.
+
+    ``beside``: the statements of every other set on which the evaluator or another section
+    of this file writes the frequency of a horizon event or the Turnbull share
+    (``sets_beside_the_tables``). It has to be given, so that no caller leaves it out: none
+    (an empty mapping) for the train period, which has no such set. The two tables give way
+    to them (``hold_tables``, ``slip_tables``): theirs is the further cell the plan withholds
+    and marks, and a figure of the evaluator cannot give way. A set of fewer than
+    ``MIN_SHOWN`` statements holds no such figure and is left out."""
     dated = rows[rows["analysis_set"] == "dated"]
     slip_draws = SLIP_DRAWS if slip_draws is None else slip_draws
-    splits = {
-        "by_form": {form: dated[dated["form"] == form] for form in sorted(set(dated["form"]))},
-        "by_revision": {bucket: dated[dated["revision"] == bucket] for bucket in P.REVISIONS},
-    }
+    splits = dated_splits(dated, first)
+    others = [
+        rows.loc[ids.intersection(rows.index)] for ids in beside.values() if len(ids) >= MIN_SHOWN
+    ]
     return {
         "statements": len(rows),
         "episodes": int(rows["episode_id"].nunique()),
         "dated_statements_not_stale": len(dated),
         "counts": count_record(rows, first),
-        "hold_rate": hold_tables(dated, splits, draws, seed),
-        "slip": slip_tables(dated, splits, slip_draws, seed),
+        "hold_rate": hold_tables(dated, splits, draws, seed, others),
+        "slip": slip_tables(dated, splits, slip_draws, seed, others),
         "bracket_widths": width_record(rows, draws, seed),
     }
 
@@ -3588,10 +4550,11 @@ def score(
     }
     sets = fixed_sets(confirmatory, rows, prepared.study)
     definitions = {**outcome_variants, **variants}
+    known = known_sets(prepared.study, rows, sets, prepared.reading_days, more.subsets)
     for name in sections:
         if name == "secondary_models":
             out[name] = secondary_models(
-                prepared, rows, outcome_variants, models, draws, seed, definitions
+                prepared, rows, outcome_variants, models, draws, seed, definitions, known
             )
         elif name == "secondary_lists":
             out[name] = secondary_lists(prepared, everything, more, sets, draws, seed)
@@ -3602,13 +4565,20 @@ def score(
         elif name == "name_date_2x2":
             out[name] = name_date_2x2(prepared, rows, more, sets, draws, seed)
         elif name == "descriptives":
-            out[name] = descriptives(everything, first, draws, slip_draws, seed)
+            out[name] = descriptives(
+                everything, first, draws, slip_draws, seed, beside=sets_beside_the_tables(known)
+            )
         elif name == "selective_prediction":
             out[name] = selective_prediction(prepared, rows, sets, models, draws, seed)
         elif name == "recovery_rule":
             out[name] = recovery_rule(
                 prepared, rows, variants, sets, models, draws, seed, outcome_variants
             )
+        elif name == "by_statement_type":
+            out[name] = by_statement_type(prepared, rows, sets, draws, seed, known)
+        elif name == "beside_the_overconfidence_criterion":
+            turns = SLIP_DRAWS if slip_draws is None else slip_draws
+            out[name] = beside_the_criterion(prepared, rows, sets, turns, seed)
     return out
 
 
@@ -3826,8 +4796,11 @@ def run_score(args: argparse.Namespace) -> int:
 
 def of_the_descriptives(lines: Iterable[str]) -> list[str]:
     """The lines of a list carried in the result files that speak of the descriptives of E1:
-    those that name E1 or a Turnbull estimate."""
-    return [line for line in lines if "E1" in line or "Turnbull" in line]
+    those that name E1, or a Turnbull estimate other than the share that stands beside the
+    overconfidence criterion."""
+    return [
+        line for line in lines if "E1" in line or ("Turnbull" in line and "criterion" not in line)
+    ]
 
 
 def run_train(args: argparse.Namespace) -> int:
@@ -3845,7 +4818,8 @@ def run_train(args: argparse.Namespace) -> int:
         table = ev.table_of(statements, True)
         frame = P.prepare(table)  # stops at an outcome cell of a statement of the test period
         rows = P.fitting_rows(frame[frame["period"] == "train"])
-        result = descriptives(rows, table.set_index("statement_group_id"), ev.DRAWS, SLIP_DRAWS)
+        cells = table.set_index("statement_group_id")
+        result = descriptives(rows, cells, ev.DRAWS, SLIP_DRAWS, beside={})  # no other set
     except Exception as error:
         stopped = type(error).__name__
     if stopped:

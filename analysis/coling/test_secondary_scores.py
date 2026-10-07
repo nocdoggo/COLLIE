@@ -38,6 +38,7 @@ from __future__ import annotations
 import builtins
 import csv
 import io
+import itertools
 import json
 import os
 import re
@@ -1312,7 +1313,7 @@ def test_the_hold_rate_by_revision_bucket_and_the_levels_of_the_widths() -> None
         {"event_date": "2021-05-15", "statement_type": "recovery", "company_name": "Acme"},
         index=rows.index,
     )
-    by_revision = sc.descriptives(rows, first, 100, 0, 1)["hold_rate"]["by_revision"]
+    by_revision = sc.descriptives(rows, first, 100, 0, 1, beside={})["hold_rate"]["by_revision"]
     assert list(by_revision) == list(P.REVISIONS) == ["first", "second", "third or later"]
     assert by_revision["first"]["among_determined"]["mean"] == 1.0
     assert by_revision["second"]["among_determined"]["mean"] == 0.0
@@ -1439,7 +1440,7 @@ def test_a_cell_withheld_cannot_be_worked_out_from_the_total(lone: tuple[str, ..
         {"event_date": "2021-05-15", "statement_type": "recovery", "company_name": "Acme"},
         index=rows.index,
     )
-    hold = written(sc.descriptives(rows, first, 50, 3, 1))["hold_rate"]
+    hold = written(sc.descriptives(rows, first, 50, 3, 1, beside={}))["hold_rate"]
     assert hold["all_dated_forms"]["among_determined"]["mean"] is not None
     for split in ("by_form", "by_revision"):
         cells = hold[split]
@@ -1504,6 +1505,654 @@ def test_a_cell_withheld_cannot_be_worked_out_from_the_total(lone: tuple[str, ..
     assert kept["c"][sc.WITH_ANOTHER] is True and kept["g"] == cells["g"]
 
 
+def dated_by_type(
+    kinds: Sequence[str], held: Sequence[float], forms: Sequence[str] | None = None
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Dated statements of the types ``kinds`` whose stated period held (1), did not (0) or is
+    not determined (missing), in episodes of two, with the first-sight cells the descriptives
+    read. A statement that held recovered 5 to 10 days before the stated end; one that did not,
+    20 to 25 days after it; an undetermined one between 20 days before and 30 days after."""
+    held = np.asarray(held, dtype=float)
+    count = len(held)
+    rows = typed(
+        episode_id=[f"e{k // 2}" for k in range(count)],
+        analysis_set=["dated"] * count,
+        outcome=["recovered"] * count,
+        lower_days=np.where(held == 1.0, 20.0, np.where(held == 0.0, 50.0, 10.0)),
+        upper_days=np.where(held == 1.0, 25.0, np.where(held == 0.0, 55.0, 60.0)),
+        end_days=[30.0] * count,
+        y_a=held,
+    )
+    rows["form"] = list(forms) if forms is not None else ["month_year"] * count
+    rows["revision"] = "first"
+    first = pd.DataFrame(
+        {
+            "event_date": "2021-05-15",
+            "statement_type": list(kinds),
+            "company_name": "Acme",
+        },
+        index=rows.index,
+    )
+    return rows, first
+
+
+def test_the_hold_rate_and_the_slip_by_statement_type_on_a_case_worked_by_hand() -> None:
+    """PLAN section 5, E1: the hold rate "over all dated statements and by statement type";
+    the slip distribution "by form, by statement type and by revision bucket". Six recovery
+    statements of which four held, and eight next-delivery statements of which three held,
+    three did not and two are not determined."""
+    kinds = ["recovery"] * 6 + ["next_delivery"] * 8
+    held = [1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, np.nan, np.nan]
+    rows, first = dated_by_type(kinds, held)
+    got = written(sc.descriptives(rows, first, 200, 3, 1, beside={}))
+    hold, slip = got["hold_rate"], got["slip"]
+    # the two tables hold their splits in one order, the plan's for the slip
+    order = ["all_dated_forms", "by_form", "by_statement_type", "by_revision"]
+    assert list(hold) == order and list(slip) == order
+    assert list(hold["by_statement_type"]) == list(slip["by_statement_type"]) == list(sc.TYPES)
+    back, due = hold["by_statement_type"]["recovery"], hold["by_statement_type"]["next_delivery"]
+    assert (back["statements"], back["determined"], back["undetermined"]) == (6, 6, 0)
+    assert near(back["among_determined"]["mean"], 4 / 6)
+    assert near(back["undetermined_as_no"]["mean"], 4 / 6)
+    assert (due["statements"], due["determined"], due["undetermined"]) == (8, 6, 2)
+    assert near(due["among_determined"]["mean"], 3 / 6)
+    assert near(due["undetermined_as_no"]["mean"], 3 / 8)
+    assert near(due["undetermined_as_yes"]["mean"], 5 / 8)
+    assert near(hold["all_dated_forms"]["among_determined"]["mean"], 7 / 12)
+    assert hold["by_form"]["month_year"] == hold["all_dated_forms"]  # one form: the same set
+    for cell in (back, due):
+        assert set(cell) == HOLD_KEYS and sc.WITH_ANOTHER not in cell and sc.NEAR_SET not in cell
+    # the slip of a type: the share recovered by the stated end is the share that held; an
+    # undetermined statement is shared out as the others of its type fall (3 of 6, so 1/2)
+    by_day = "share_recovered_by_days_after_the_stated_end"
+    shares = {name: cell[by_day] for name, cell in slip["by_statement_type"].items()}
+    assert near(shares["recovery"]["0"], 4 / 6, 1e-4) and near(shares["recovery"]["30"], 1.0, 1e-4)
+    assert near(shares["next_delivery"]["-30"], 0.0, 1e-4)
+    for name, cell in slip["by_statement_type"].items():
+        assert cell["statements"] == (6 if name == "recovery" else 8)
+        assert cell["draws"] == 3 and len(cell["ci95"]) == len(sc.SLIP_DAYS)
+        # the estimate of a cell is the one of ``slip_record`` on its statements
+        part = rows[(first["statement_type"] == name).to_numpy()]
+        alone = written(sc.slip_record(part, 3, 1))
+        assert set(alone) == SLIP_KEYS
+        if name == "recovery":
+            assert cell == alone
+            continue
+        # two of the eight next-delivery statements are not determined: the share by the
+        # stated end, times eight, less the three that held, would be what the estimate
+        # puts before the stated end for those two; it is withheld, and nothing else is
+        assert near(alone[by_day]["0"], 0.5, 1e-4) and alone["ci95"]["0"] is not None
+        assert cell[sc.SHARES_WITHHELD] == ["0"]
+        assert cell[by_day]["0"] is None and cell["ci95"]["0"] is None
+        alone[by_day]["0"] = alone["ci95"]["0"] = None
+        assert cell == alone | {sc.SHARES_WITHHELD: ["0"]}
+    whole = slip["all_dated_forms"]
+    assert whole[by_day]["0"] is None and whole[sc.SHARES_WITHHELD] == ["0"]
+    assert near(sc.slip_record(rows, 3, 1)[by_day]["0"], 7 / 12, 1e-4)
+    # a list of one type: its cell is the whole, and the other type holds no statement
+    alone, cells = dated_by_type(["recovery"] * 14, held)
+    one = written(sc.descriptives(alone, cells, 200, 3, 1, beside={}))
+    assert one["hold_rate"]["by_statement_type"]["recovery"] == one["hold_rate"]["all_dated_forms"]
+    assert one["hold_rate"]["by_statement_type"]["next_delivery"]["statements"] == 0
+    assert one["slip"]["by_statement_type"]["next_delivery"] == {
+        "statements": 0,
+        "episodes": 0,
+        "withheld": False,
+    }
+
+
+@pytest.mark.parametrize("few", [1, 3, 4, 5])
+def test_a_statement_type_of_a_few_statements_in_the_tables_of_the_descriptives(few: int) -> None:
+    """ "In the tables of the hold rate and of the slip, a further cell is withheld and marked
+    where the cells written and the whole would otherwise give back the figure on 1 to 4
+    statements." A type of one to four dated statements: its cell keeps their number alone,
+    and the cell of the other type goes with it, or the whole less that cell would be the
+    few."""
+    kinds = ["recovery"] * 12 + ["next_delivery"] * few
+    held = ([1.0, 0.0, 1.0, 1.0] * 5)[: 12 + few]
+    rows, first = dated_by_type(kinds, held)
+    got = written(sc.descriptives(rows, first, 100, 3, 1, beside={}))
+    hold, slip = got["hold_rate"]["by_statement_type"], got["slip"]["by_statement_type"]
+    assert (hold["recovery"]["statements"], hold["next_delivery"]["statements"]) == (12, few)
+    assert got["hold_rate"]["all_dated_forms"]["among_determined"]["mean"] is not None
+    assert "withheld" not in got["slip"]["all_dated_forms"]
+    if few >= sc.MIN_SHOWN:
+        assert numbers(hold["recovery"]) and numbers(hold["next_delivery"])
+        assert "withheld" not in json.dumps(slip) and sc.WITH_ANOTHER not in json.dumps(hold)
+        return
+    for cell in hold.values():
+        assert cell["determined"] is None and cell["undetermined"] is None
+        assert all(cell[share] == BARE_PART for share in sc.HOLD_SHARES)
+    assert (
+        hold["recovery"][sc.WITH_ANOTHER] is True and sc.WITH_ANOTHER not in hold["next_delivery"]
+    )
+    assert numbers(hold) == [] and numbers(slip) == []
+    assert slip["next_delivery"] == {
+        "statements": few,
+        "episodes": slip["next_delivery"]["episodes"],
+        "withheld": True,
+    }
+    assert slip["recovery"] == {
+        "statements": 12,
+        "episodes": 6,
+        "withheld": True,
+        sc.WITH_ANOTHER: True,
+    }
+
+
+def bare_cells(hold: dict, slip: dict) -> tuple[list[str], list[str]]:
+    """The cells of the splits of the two tables of E1 that keep the number of their statements
+    alone: in the hold table, and in the slip table."""
+    by_day = "share_recovered_by_days_after_the_stated_end"
+    splits = [name for name in hold if name != "all_dated_forms"]
+    assert splits == [name for name in slip if name != "all_dated_forms"]
+    in_hold = [
+        f"{split}/{name}"
+        for split in splits
+        for name, cell in hold[split].items()
+        if cell["statements"] and cell["determined"] is None
+    ]
+    in_slip = [
+        f"{split}/{name}"
+        for split in splits
+        for name, cell in slip[split].items()
+        if cell["statements"] and by_day not in cell
+    ]
+    return in_hold, in_slip
+
+
+@pytest.mark.parametrize("between", [1, 2, 4])
+def test_a_statement_type_that_is_a_form_but_for_a_few_statements(between: int) -> None:
+    """A cell of the split by statement type beside a cell of the split by form (PLAN, standing
+    rules; section 5, E1): the next-delivery statements are those of the quarter form and one
+    to four more. Of two splits the later one gives way, the same in both tables: the share
+    recovered by the stated end of a slip estimate is the hold rate where no bracket holds the
+    stated end, so a type kept by one table and a form kept by the other would give the few
+    back."""
+    kinds = ["recovery"] * 9 + ["next_delivery"] * (11 + between)
+    forms = ["month_year"] * (9 + between) + ["quarter"] * 11
+    held = np.random.default_rng(between).integers(0, 2, len(kinds)).astype(float)
+    rows, first = dated_by_type(kinds, held, forms)
+    got = written(sc.descriptives(rows, first, 100, 3, 1, beside={}))
+    hold, slip = got["hold_rate"], got["slip"]
+    by_day = "share_recovered_by_days_after_the_stated_end"
+    for table in (hold, slip):
+        assert numbers(table["by_form"]["quarter"]) and numbers(table["by_form"]["month_year"])
+        assert numbers(table["by_statement_type"]) == []
+        marks = [
+            mark
+            for cell in table["by_statement_type"].values()
+            for mark in cell
+            if mark in (sc.NEAR_SET, sc.WITH_ANOTHER)
+        ]
+        assert sorted(marks) == sorted([sc.NEAR_SET, sc.WITH_ANOTHER])
+    in_hold, in_slip = bare_cells(hold, slip)
+    assert in_hold == in_slip == ["by_statement_type/recovery", "by_statement_type/next_delivery"]
+    # what the two tables together would have given: the statements of the type that held,
+    # less the share of the form recovered by the stated end times its statements
+    assert by_day in slip["by_form"]["quarter"]
+    assert hold["by_statement_type"]["next_delivery"]["undetermined_as_no"] == BARE_PART
+    # five statements apart: every cell of the three splits is written
+    kinds = ["recovery"] * 5 + ["next_delivery"] * 16
+    forms = ["month_year"] * 10 + ["quarter"] * 11
+    rows, first = dated_by_type(kinds, [1.0, 0.0, 1.0] * 7, forms)
+    got = written(sc.descriptives(rows, first, 100, 3, 1, beside={}))
+    assert '"withheld": true' not in json.dumps(got["hold_rate"]) + json.dumps(got["slip"])
+
+
+def test_the_two_tables_of_the_descriptives_withhold_the_same_cells_for_their_statements() -> None:
+    """A form of three statements keeps their number alone, and a further cell goes with it,
+    or the whole less the cells written would give the three back. The further cell is the
+    one of the fewest statements in the hold table as in the slip table: were it the one of
+    the fewest determined statements in the first, each table would write the cell the other
+    withholds, and the two together would give the three."""
+    forms = ["month"] * 3 + ["quarter"] * 10 + ["year"] * 8
+    held = [1.0, 0.0, 1.0] + [1.0, 0.0, 1.0, 0.0, 1.0, 0.0] + [np.nan] * 4 + [1.0, 0.0] * 4
+    rows, first = dated_by_type(["recovery"] * 21, held, forms)
+    got = written(sc.descriptives(rows, first, 100, 3, 1, beside={}))
+    hold, slip = got["hold_rate"], got["slip"]
+    assert hold["by_form"]["quarter"]["determined"] == 6  # fewer than the eight of the year form
+    in_hold, in_slip = bare_cells(hold, slip)
+    assert in_hold == in_slip == ["by_form/month", "by_form/year"]
+    assert hold["by_form"]["year"][sc.WITH_ANOTHER] is True
+    assert slip["by_form"]["year"][sc.WITH_ANOTHER] is True
+    assert numbers(hold["by_form"]["quarter"]) and numbers(slip["by_form"]["quarter"])
+
+
+def item_set_among_dated(
+    count: int, listed: int, forms: Sequence[str] | None = None
+) -> tuple[SimpleNamespace, pd.DataFrame, pd.DataFrame, pd.DataFrame, dict]:
+    """``count`` dated statements at risk, of which the first ``listed`` are the item set of a
+    primary ``m``: five of every eight held. Condition (a) gives each statement its own
+    probability of the first event and the base rate one half. Returns the prepared study,
+    the statements of the item set, every statement, the first-sight cells and the item
+    sets."""
+    held = ([1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0] * count)[:count]
+    everything, first = dated_by_type(["recovery"] * count, held, forms)
+    rows = everything.iloc[:listed]
+    ids = rows.index
+    study = SimpleNamespace(
+        predictions={
+            "m:a": forecasts(ids, np.linspace(0.6, 0.95, listed), [0.9] * listed),
+            ev.BASE: forecasts(ids, [0.5] * listed, [0.6] * listed),
+        }
+    )
+    sets = {"m": (ids, {"switched": False, "evaluable": True, "items": ev.ALL_ITEMS})}
+    return SimpleNamespace(study=study), rows, everything, first, sets
+
+
+def test_the_mean_probability_less_the_turnbull_share_on_a_case_worked_by_hand() -> None:
+    """PLAN section 13, "Reported beside it, for condition (a) and for the base rate on the same
+    statements: ... the mean of P(E_end) minus the Turnbull share recovered by the stated end".
+    Sixteen statements of an item set, ten of which recovered before the stated end and six
+    after it: with every bracket on one side of the stated end the Turnbull share is the
+    share that held, in the item set and in each draw of its episodes."""
+    prepared, rows, everything, _, sets = item_set_among_dated(24, 16)
+    got = written(sc.beside_the_criterion(prepared, rows, sets, 40, 3))["m"]
+    held = rows["y_a"].to_numpy()
+    assert held.sum() == 10 and len(everything) == 24
+    assert got["item_set_fixed_by_the_probe"]["items"] == ev.ALL_ITEMS
+    assert (got["statements"], got["episodes"], got["draws"]) == (16, 8, 40)
+    assert near(got["turnbull_share_recovered_by_the_stated_end"], 10 / 16, 1e-5)
+    p = prepared.study.predictions["m:a"]["p_a"].to_numpy()
+    assert near(got["condition_a"]["mean_p_E_end"], p.mean())
+    assert near(got["condition_a"]["mean_p_minus_the_turnbull_share"], p.mean() - 10 / 16, 1e-5)
+    assert near(got["base_rate"]["mean_p_E_end"], 0.5)
+    assert near(got["base_rate"]["mean_p_minus_the_turnbull_share"], 0.5 - 10 / 16, 1e-5)
+    assert set(got["condition_a"]) == {"mean_p_E_end", "mean_p_minus_the_turnbull_share", "ci95"}
+    # the interval: the first 40 of the registered draws of the eight episodes, the mean
+    # probability and the share that held taken from the same draw
+    taken = P.cluster_draws(8, ev.DRAWS, 3)[:40].astype(float)
+    weights = np.repeat(taken, 2, axis=1)  # each episode holds two statements
+    share = (weights @ held) / weights.sum(axis=1)
+    for name, values in (("condition_a", p), ("base_rate", np.full(16, 0.5))):
+        drawn = (weights @ values) / weights.sum(axis=1) - share
+        wanted = [float(end) for end in np.quantile(drawn, [0.025, 0.975])]
+        assert near(got[name]["ci95"], wanted, 1e-5), name
+    assert got["base_rate"]["ci95"][0] < 0.5 - 10 / 16 < got["base_rate"]["ci95"][1]
+    # the function behind it: the share, the share in each draw, and how often each statement
+    # is taken; in one episode there is no draw and no interval
+    share_all, drawn, counts = sc.turnbull_shares(rows, 40, 3)
+    assert near(share_all, 10 / 16, 1e-5) and near(list(drawn), list(share), 1e-5)
+    assert counts.shape == (40, 16) and (counts == weights).all()
+    alone = rows.assign(episode_id="e")
+    assert len(sc.turnbull_shares(alone, 40, 3)[1]) == 0
+    one = sc.beside_the_criterion(prepared, alone, sets, 40, 3)["m"]
+    assert one["draws"] == 0 and one["condition_a"]["ci95"] is None
+    assert near(one["condition_a"]["mean_p_minus_the_turnbull_share"], p.mean() - 10 / 16, 1e-5)
+    # a primary without an item set has the record of its item set alone
+    none = {"m": (None, {"switched": True, "evaluable": False, "reason": "too few"})}
+    assert sc.beside_the_criterion(prepared, rows, none, 40, 3) == {
+        "m": {
+            "item_set_fixed_by_the_probe": {
+                "switched": True,
+                "evaluable": False,
+                "reason": "too few",
+            }
+        }
+    }
+
+
+BY_DAY = "share_recovered_by_days_after_the_stated_end"
+
+
+def near_in_a_table(
+    table: dict, dated: pd.DataFrame, first: pd.DataFrame, other: pd.Index, slip: bool
+) -> list[str]:
+    """Every set on which a table of E1 gives its figure (``table``: the hold table, or with
+    ``slip`` the slip table, as written): all dated statements, a union of the cells written
+    of one split and, beside the whole, the rest of the split. Those of them that are the
+    statements ``other`` but for one to four are named. Worked out here, cell by cell."""
+
+    def shown(record: dict) -> bool:
+        if not record["statements"]:
+            return False
+        return BY_DAY in record if slip else record["determined"] is not None
+
+    found = []
+    whole = shown(table["all_dated_forms"])
+    if whole and 0 < len(dated.index.symmetric_difference(other)) < sc.MIN_SHOWN:
+        found.append("all_dated_forms")
+    for split, cells in sc.dated_splits(dated, first).items():
+        groups = {name: set(cells[name].index) for name in cells if shown(table[split][name])}
+        rest = set(dated.index) - set().union(*groups.values())
+        if whole and rest:
+            groups["the rest"] = rest
+        names = list(groups)
+        for size in range(1, len(names) + 1):
+            for chosen in itertools.combinations(names, size):
+                union = set().union(*(groups[name] for name in chosen))
+                if 0 < len(union ^ set(other)) < sc.MIN_SHOWN:
+                    found.append(f"{split}: {' + '.join(chosen)}")
+    return found
+
+
+@pytest.mark.parametrize(
+    ("count", "listed", "forms", "withheld"),
+    [
+        (24, 16, None, []),
+        (16, 16, None, []),  # the item set is every dated statement: the same set
+        # every dated statement but two: the whole, and the cells that are the whole
+        (18, 16, None, ["all", "by_form/month_year", "by_statement_type/recovery", "first"]),
+        (20, 16, None, ["all", "by_form/month_year", "by_statement_type/recovery", "first"]),
+        (21, 16, None, []),  # but five
+        # the item set is the statements of a form and three more: that form, and the other
+        # with it, or the whole less the other would be the form
+        (30, 16, ["quarter"] * 13 + ["month_year"] * 17, ["by_form/month_year", "by_form/quarter"]),
+        (30, 16, ["quarter"] * 11 + ["month_year"] * 19, []),
+        # two forms together are the item set and two statements more: one of the two, and
+        # the third form with it
+        (
+            30,
+            16,
+            ["half"] * 9 + ["quarter"] * 9 + ["month_year"] * 12,
+            ["by_form/half", "by_form/month_year"],
+        ),
+    ],
+)
+def test_the_tables_of_the_descriptives_give_way_to_an_item_set(
+    count: int, listed: int, forms: list[str] | None, withheld: list[str]
+) -> None:
+    """The evaluator writes the frequency of the first event on the item set of a primary, and
+    this file the Turnbull share: the tables of E1 hold the same figures on all dated
+    statements and on the cells of their splits. A cell, the whole, or a set of cells with
+    the whole, that is the item set but for one to four statements is withheld and marked, in
+    the hold table and in the slip table alike (PLAN, standing rules; section 5, E1); the
+    share beside the criterion stays."""
+    prepared, rows, everything, first, sets = item_set_among_dated(count, listed, forms)
+    beside = {"the item set of m": rows.index}
+    got = written(sc.descriptives(everything, first, 100, 3, 3, beside=beside))
+    hold, slip = got["hold_rate"], got["slip"]
+    in_hold, in_slip = bare_cells(hold, slip)
+    whole = ["all"] if hold["all_dated_forms"]["determined"] is None else []
+    assert whole == (["all"] if BY_DAY not in slip["all_dated_forms"] else [])
+    wanted = [name.replace("first", "by_revision/first") for name in withheld]
+    assert whole + in_hold == whole + in_slip == wanted
+    if whole:
+        assert hold["all_dated_forms"][sc.NEAR_SET] is True
+        assert slip["all_dated_forms"] == {
+            "statements": count,
+            "episodes": slip["all_dated_forms"]["episodes"],
+            "withheld": True,
+            sc.NEAR_SET: True,
+        }
+        assert numbers(hold) == [] and numbers(slip) == []
+    # nothing that the tables still give is the item set but for a few statements
+    for table, of_slip in ((hold, False), (slip, True)):
+        assert near_in_a_table(table, everything, first, rows.index, of_slip) == []
+        marks = [
+            mark
+            for cells in (table[split] for split in table if split != "all_dated_forms")
+            for cell in cells.values()
+            for mark in cell
+            if mark in (sc.NEAR_SET, sc.WITH_ANOTHER)
+        ]
+        assert len(marks) == len(wanted) - len(whole)
+    # without the item set beside them the tables are whole, and the item set is near them
+    alone = written(sc.descriptives(everything, first, 100, 3, 3, beside={}))
+    assert '"withheld": true' not in json.dumps(alone["hold_rate"]) + json.dumps(alone["slip"])
+    near_it = near_in_a_table(alone["slip"], everything, first, rows.index, True)
+    assert bool(near_it) == bool(withheld)
+    # the share beside the criterion is written in every case
+    share = written(sc.beside_the_criterion(prepared, rows, sets, 10, 3))["m"]
+    assert "withheld" not in share and "turnbull_share_recovered_by_the_stated_end" in share
+    assert share["condition_a"]["ci95"] is not None
+
+
+def test_the_shares_of_a_hold_rate_beside_a_set_whose_determined_statements_are_near() -> None:
+    """The three shares of a hold rate are one number, how many of the determined statements
+    held, and the frequency on another set is the same number there. A form whose statements
+    are an item set and six more, of which two are determined, would give with it how many
+    of those two held: its shares are withheld and the cell is marked, its counts stay, and
+    the slip table, which holds no such share, keeps the cell."""
+    count, listed = 40, 20
+    held = np.array(([1.0, 0.0, 1.0, 1.0] * 10)[:count])
+    held[[20, 21, 22, 23]] = np.nan  # of the six statements after the item set, two are determined
+    forms = ["quarter"] * 26 + ["month_year"] * 14
+    everything, first = dated_by_type(["recovery"] * count, held, forms)
+    beside = {"the item set of m": everything.index[:listed]}
+    got = written(sc.descriptives(everything, first, 100, 3, 3, beside=beside))
+    cell = got["hold_rate"]["by_form"]["quarter"]
+    assert (cell["statements"], cell["determined"], cell["undetermined"]) == (26, 22, 4)
+    assert cell[sc.NEAR_SET] is True and numbers({k: cell[k] for k in sc.HOLD_SHARES}) == []
+    for share in sc.HOLD_SHARES:
+        assert cell[share]["withheld"] is True and cell[share]["statements"] in (22, 26)
+    other = got["hold_rate"]["by_form"]["month_year"]
+    assert other[sc.WITH_ANOTHER] is True and other["among_determined"]["mean"] is None
+    assert got["hold_rate"]["all_dated_forms"]["among_determined"]["mean"] is not None
+    assert BY_DAY in got["slip"]["by_form"]["quarter"]
+    # with all six determined nothing is withheld
+    held[[20, 21, 22, 23]] = [1.0, 0.0, 1.0, 1.0]
+    everything, first = dated_by_type(["recovery"] * count, held, forms)
+    got = written(sc.descriptives(everything, first, 100, 3, 3, beside=beside))
+    assert sc.NEAR_SET not in json.dumps(got["hold_rate"])
+    assert got["hold_rate"]["by_form"]["quarter"]["among_determined"]["mean"] is not None
+    # all dated statements are the item set and six more, two of them determined: the three
+    # shares of the whole are withheld and marked, and its counts stay
+    held = np.array(([1.0, 0.0, 1.0, 1.0] * 7)[:26])
+    held[[20, 21, 22, 23]] = np.nan
+    everything, first = dated_by_type(["recovery"] * 26, held)
+    got = written(sc.descriptives(everything, first, 100, 3, 3, beside=beside))["hold_rate"]
+    whole = got["all_dated_forms"]
+    assert whole[sc.NEAR_SET] is True and (whole["determined"], whole["undetermined"]) == (22, 4)
+    assert all(whole[share]["mean"] is None for share in sc.HOLD_SHARES)
+
+
+def test_a_set_of_a_few_statements_stands_beside_no_cell_of_the_descriptives() -> None:
+    """A set of one to four statements holds no figure (the floor of five), so no cell of E1
+    gives way to it: a form of six statements beside three of them is written; beside five
+    of them it is withheld and marked, with a second cell."""
+    forms = ["quarter"] * 6 + ["month_year"] * 18
+    held = ([1.0, 1.0, 0.0, 1.0, 0.0, 1.0] * 4)[:24]
+    everything, first = dated_by_type(["recovery"] * 24, held, forms)
+    alone = written(sc.descriptives(everything, first, 100, 3, 3, beside={}))
+    assert '"withheld": true' not in json.dumps(alone["hold_rate"]) + json.dumps(alone["slip"])
+    # the other sets have to be stated, were it that there is none: the call stops without
+    with pytest.raises(TypeError, match="beside"):
+        sc.descriptives(everything, first, 100, 3, 3)
+    few = {"three statements": everything.index[:3], "none": everything.index[:0]}
+    assert written(sc.descriptives(everything, first, 100, 3, 3, beside=few)) == alone
+    five = {"five statements": everything.index[:5]}
+    got = written(sc.descriptives(everything, first, 100, 3, 3, beside=five))
+    for table in (got["hold_rate"], got["slip"]):
+        assert table["by_form"]["quarter"][sc.NEAR_SET] is True
+        assert table["by_form"]["month_year"][sc.WITH_ANOTHER] is True
+        assert numbers(table["by_form"]) == [] and numbers(table["all_dated_forms"])
+
+
+def as_dated(rows: pd.DataFrame, first: pd.DataFrame, forms: Sequence[str] | None = None) -> None:
+    """Gives the statements of ``two_types`` what the descriptives of E1 read, in place: they
+    are dated statements at risk whose first event is yes when they recovered 5 to 10 days
+    before the stated end and no when they recovered 20 to 25 days after it."""
+    held = rows["y_a"].to_numpy()
+    rows["analysis_set"] = "dated"
+    rows["lower_days"] = np.where(held == 1.0, 20.0, np.where(held == 0.0, 50.0, 10.0))
+    rows["upper_days"] = np.where(held == 1.0, 25.0, np.where(held == 0.0, 55.0, 60.0))
+    rows["end_days"] = 30.0
+    rows["form"] = list(forms) if forms is not None else ev.MONTH_YEAR
+    rows["revision"] = "first"
+    first["form"] = rows["form"]
+    first["company_name"] = "Acme"
+
+
+def test_a_type_of_an_item_set_beside_the_same_type_among_the_dated_statements() -> None:
+    """The registered list in small: a dated next-delivery statement at risk that is not
+    eligible. The type of the item set and the cell of the same type of E1 then differ by
+    that one statement, and the frequency of the first event on the one beside the hold rate
+    of the other would give its event. The cell of E1 gives way in both tables, and the cell
+    of the other type with it, or all dated statements less that cell would be the first; the
+    analysis by statement type is written in full."""
+    prepared, everything, sets = two_types(65, 121)
+    first = prepared.study.first
+    as_dated(everything, first)
+    left_out = [*everything.index[:5], everything.index[-1]]  # five recovery, one next delivery
+    rows = everything.drop(index=left_out)
+    sets = {"m": (rows.index, sets["m"][1])}
+    known = sc.known_sets(prepared.study, rows, sets)
+    beside = sc.sets_beside_the_tables(known)
+    assert {"every eligible statement", "the item set of m", "m: next_delivery"} <= set(beside)
+    assert all(
+        name.startswith(("every", "the item set", "the post-cutoff", "m: ")) for name in beside
+    )
+    e1 = written(sc.descriptives(everything, first, 100, 3, 5, beside=beside))
+    hold, slip = e1["hold_rate"], e1["slip"]
+    by_type = written(sc.by_statement_type(prepared, rows, sets, 100, 5))["models"]["m"]
+    assert hold["by_statement_type"]["next_delivery"] == {
+        "statements": 121,
+        "determined": None,
+        "undetermined": None,
+        **dict.fromkeys(sc.HOLD_SHARES, BARE_PART),
+        sc.NEAR_SET: True,
+    }
+    assert hold["by_statement_type"]["recovery"][sc.WITH_ANOTHER] is True
+    assert numbers(hold["by_statement_type"]) == [] and numbers(slip["by_statement_type"]) == []
+    assert slip["by_statement_type"]["next_delivery"][sc.NEAR_SET] is True
+    assert slip["by_statement_type"]["recovery"][sc.WITH_ANOTHER] is True
+    assert (
+        bare_cells(hold, slip)
+        == (["by_statement_type/recovery", "by_statement_type/next_delivery"],) * 2
+    )
+    # all dated statements, the form and the revision bucket, six statements from the list
+    for table in (hold, slip):
+        assert numbers(table["all_dated_forms"]) and numbers(table["by_form"][ev.MONTH_YEAR])
+    for name, ids in beside.items():
+        for table, of_slip in ((hold, False), (slip, True)):
+            assert near_in_a_table(table, everything, first, ids, of_slip) == [], name
+    # the type of the item set keeps every figure: 120 of the 121 dated statements
+    block = by_type["types"]["next_delivery"]
+    assert block["statements"] == 120 and "contrasts" in block and "overconfidence" in block
+    limits = block["scores"][ev.BASE]["calibration_all_statements"]["E_end"]
+    assert limits["smallest_frequency"] == 0.0 and limits["undetermined"] == 0
+    assert by_type["next_delivery_minus_recovery"]
+    # without the other sets beside them the two tables would give the cell, and with the
+    # frequency on the type the event of the one statement
+    alone = written(sc.descriptives(everything, first, 100, 3, 5, beside={}))["hold_rate"]
+    cell = alone["by_statement_type"]["next_delivery"]
+    assert cell["statements"] - block["statements"] == 1 and numbers(cell)
+    # a type of an item set that is a post-cutoff slice, beside a form of the dated statements
+    # that is the type and two more: the form gives way, and the other form with it
+    prepared, everything, sets = two_types(60, 120)
+    first = prepared.study.first
+    as_dated(everything, first, ["quarter"] * 62 + [ev.MONTH_YEAR] * 118)
+    record = {"switched": True, "evaluable": True, "items": ev.SLICE_ITEMS}
+    sets = {"m": (everything.index[:120], record)}
+    beside = sc.sets_beside_the_tables(sc.known_sets(prepared.study, everything, sets))
+    e1 = written(sc.descriptives(everything, first, 100, 3, 5, beside=beside))
+    for table in (e1["hold_rate"], e1["slip"]):
+        assert table["by_form"]["quarter"][sc.NEAR_SET] is True
+        assert table["by_form"][ev.MONTH_YEAR][sc.WITH_ANOTHER] is True
+        assert numbers(table["by_form"]) == [] and numbers(table["by_statement_type"])
+    by_type = written(sc.by_statement_type(prepared, everything, sets, 100, 5))["models"]["m"]
+    assert by_type["types"]["recovery"]["statements"] == 60
+    assert "scores" in by_type["types"]["recovery"]
+
+
+@pytest.mark.parametrize("undetermined", [0, 1, 4, 5])
+def test_a_share_of_a_turnbull_estimate_beside_the_number_of_statements_that_held(
+    undetermined: int,
+) -> None:
+    """The share recovered by the stated end, times the number of statements, less the number
+    that held (the evaluator's limits of calibration in the large on an item set; the hold
+    rate of a cell of E1) is what the estimate puts before the stated end for the statements
+    whose first event is undetermined. Where those are one to four it is a figure on their
+    brackets (with one, it can be the place of the stated end between its two captures): the
+    share is withheld, beside the criterion and in the slip table."""
+    prepared, _, everything, first, sets = item_set_among_dated(40, 40)
+    open_ones = everything.index[5 : 5 + undetermined]
+    everything.loc[open_ones, ["lower_days", "upper_days", "y_a"]] = [27.0, 42.0, np.nan]
+    share = written(sc.beside_the_criterion(prepared, everything, sets, 5, 3))["m"]
+    by_day = "share_recovered_by_days_after_the_stated_end"
+    slip = written(sc.descriptives(everything, first, 100, 5, 3, beside={}))["slip"][
+        "all_dated_forms"
+    ]
+    hold = written(sc.descriptives(everything, first, 100, 5, 3, beside={}))["hold_rate"][
+        "all_dated_forms"
+    ]
+    assert hold["undetermined"] == undetermined and numbers(hold["undetermined_as_no"])
+    if 0 < undetermined < sc.MIN_SHOWN:
+        assert share == {
+            "item_set_fixed_by_the_probe": share["item_set_fixed_by_the_probe"],
+            "statements": 40,
+            "episodes": 20,
+            "withheld": True,
+        }
+        assert slip[by_day]["0"] is None and slip["ci95"]["0"] is None
+        assert slip[sc.SHARES_WITHHELD] == ["0"]
+        assert slip[by_day]["30"] is not None and slip["ci95"]["-30"] is not None
+        assert slip["slip_quantiles_days"]["0.50"] is not None
+        return
+    assert sc.SHARES_WITHHELD not in slip
+    held = hold["undetermined_as_no"]["mean"] * 40
+    # what the two figures give together: nothing with no undetermined statement, and with
+    # five the mass of the five, three days after the lower capture of a bracket of fifteen
+    for found in (share["turnbull_share_recovered_by_the_stated_end"], slip[by_day]["0"]):
+        assert near(found * 40 - held, undetermined * 3 / 15, 1e-3)
+
+
+def test_the_share_by_ninety_days_of_a_cell_that_is_a_set_of_another_section() -> None:
+    """The share recovered by 90 days after the stated end is the frequency of the second
+    event where no bracket holds that day. On a cell of E1 that is itself a set on which
+    another section writes that frequency (here all dated statements are the eligible list),
+    the share of that day is withheld where one to four statements have that event
+    undetermined; on another cell nothing stands beside it."""
+    _, _, everything, first, _ = item_set_among_dated(40, 40)
+    everything["y_b"] = 1.0
+    everything.loc[everything.index[:2], "y_b"] = np.nan
+    by_day = "share_recovered_by_days_after_the_stated_end"
+    alone = written(sc.descriptives(everything, first, 100, 5, 3, beside={}))["slip"]
+    assert sc.SHARES_WITHHELD not in alone["all_dated_forms"]
+    beside = {"every eligible statement": everything.index, "another": everything.index[:20]}
+    slip = written(sc.descriptives(everything, first, 100, 5, 3, beside=beside))["slip"]
+    for cell in (slip["all_dated_forms"], slip["by_form"]["month_year"]):
+        assert cell[sc.SHARES_WITHHELD] == ["90"]
+        assert cell[by_day]["90"] is None and cell["ci95"]["90"] is None
+        assert cell[by_day]["0"] == alone["all_dated_forms"][by_day]["0"]
+    # with five such statements the share of the day is written
+    everything.loc[everything.index[:5], "y_b"] = np.nan
+    slip = written(sc.descriptives(everything, first, 100, 5, 3, beside=beside))["slip"]
+    assert sc.SHARES_WITHHELD not in slip["all_dated_forms"]
+    assert sc.EVENT_DAYS == {"y_a": "0", "y_b": "90"} and "90" in map(str, sc.SLIP_DAYS)
+
+
+def test_the_turnbull_share_of_an_item_set_of_three_statements() -> None:
+    """The floor of five holds for the share by itself: an item set of three statements, far
+    from every other set, keeps their number alone."""
+    prepared, rows, _, _, sets = item_set_among_dated(30, 3)
+    got = written(sc.beside_the_criterion(prepared, rows, sets, 5, 3))["m"]
+    assert got == {
+        "item_set_fixed_by_the_probe": got["item_set_fixed_by_the_probe"],
+        "statements": 3,
+        "episodes": 2,
+        "withheld": True,
+    }
+    prepared, rows, _, _, sets = item_set_among_dated(30, 5)
+    got = written(sc.beside_the_criterion(prepared, rows, sets, 5, 3))["m"]
+    assert "turnbull_share_recovered_by_the_stated_end" in got
+
+
+def test_the_turnbull_share_of_two_item_sets_that_differ_by_a_few_statements() -> None:
+    """Two primaries whose item sets differ by two statements: the two shares, with the open
+    probabilities, would give the brackets of the two. Neither is written."""
+    prepared, rows, _, _, sets = item_set_among_dated(30, 16)
+    predictions = prepared.study.predictions
+    predictions["n:a"] = predictions["m:a"]
+    record = {"switched": True, "evaluable": True, "items": ev.SLICE_ITEMS}
+    both = sets | {"n": (rows.index[2:], record)}
+    got = written(sc.beside_the_criterion(prepared, rows, both, 10, 3))
+    assert got["m"]["withheld"] is True and got["n"]["withheld"] is True
+    assert numbers(got) == [] and got["n"]["statements"] == 14
+    # five apart: both are written, each on its own statements
+    both = sets | {"n": (rows.index[5:], record)}
+    got = written(sc.beside_the_criterion(prepared, rows, both, 10, 3))
+    assert "withheld" not in json.dumps(got)
+    assert got["n"]["statements"] == 11 and got["m"]["statements"] == 16
+    # the same item set for both: one estimate, written for each
+    both = sets | {"n": (rows.index, record)}
+    got = written(sc.beside_the_criterion(prepared, rows, both, 10, 3))
+    for key in ("turnbull_share_recovered_by_the_stated_end", "condition_a", "base_rate", "draws"):
+        assert got["m"][key] == got["n"][key], key
+
+
 def test_a_cell_of_one_split_that_nearly_matches_a_cell_of_the_other() -> None:
     """The hold rate and the slip estimate are written by form and by revision bucket: where
     the statements of a form are those of a bucket and one more, the two hold rates together
@@ -1528,7 +2177,7 @@ def test_a_cell_of_one_split_that_nearly_matches_a_cell_of_the_other() -> None:
 
     def described(forms: list[str], revisions: list[str]) -> tuple[dict, dict]:
         rows["form"], rows["revision"] = forms, revisions
-        got = written(sc.descriptives(rows, first, 100, 3, 1))
+        got = written(sc.descriptives(rows, first, 100, 3, 1, beside={}))
         return got["hold_rate"], got["slip"]
 
     # the month statements are those of the first revision and one more
@@ -2087,7 +2736,7 @@ def study_by_hand(
         not_evaluable={},
         refit={},
     )
-    return SimpleNamespace(study=study), rows
+    return SimpleNamespace(study=study, reading_days={}), rows
 
 
 SLICED = "gpt-4o-mini"
@@ -2240,6 +2889,212 @@ def test_the_counts_of_the_slice_beside_those_of_the_list_where_both_are_withhel
     assert both["withheld"] is True and (both["not_both_parsed"], both["left_out"]) == (5, 3)
 
 
+def test_the_base_rate_beside_the_calibration_in_the_large_of_a_secondary_model() -> None:
+    """PLAN section 7.2, "Calibration in the large": "Beside it stand the same quantities for
+    the base rate by listing age on the same events". On every eligible statement and on the
+    post-cutoff slice of a secondary model, worked out from the base rate's probabilities."""
+    # ten statements are not scoreable, five of them before the cutoff
+    scoreable = [k not in (0, 1, 2, 3, 4, 20, 27, 34, 41, 48) for k in range(70)]
+    prepared, rows = study_by_hand(70, 10, scoreable)
+    study = prepared.study
+    got = written(sc.secondary_models(prepared, rows, {}, [SLICED], 200, 3))
+    base = study.predictions[ev.BASE]
+    every = got["scores_on_every_eligible_statement"][SLICED]
+    sliced = got["models"][SLICED]["scores_on_the_post_cutoff_slice"]
+    for records, frame in ((every, rows), (sliced, rows.iloc[10:])):
+        keep = frame["scoreable"].to_numpy()
+        ids = frame.index
+        for condition in ev.CONDITIONS:
+            record = records[condition]
+            own = study.predictions[f"{SLICED}:{condition}"]
+            for event, p, y in ev.EVENTS:
+                large = record["calibration_in_the_large"][event]
+                gap = (base.loc[ids, p] - frame[y])[keep]
+                assert near(large["base_rate"]["mean_p_minus_frequency"], gap.mean())
+                assert set(large["base_rate"]) == {"mean_p_minus_frequency", "ci95"}
+                assert near(
+                    large["mean_p_minus_frequency"], (own.loc[ids, p] - frame[y])[keep].mean()
+                )
+                # over every statement: the least value counts an undetermined event as yes
+                limits = record["calibration_all_statements"][event]
+                least = (base.loc[ids, p] - frame[y].fillna(1.0)).mean()
+                assert near(limits["base_rate"]["least"], least)
+                assert near(limits["least"], (own.loc[ids, p] - frame[y].fillna(1.0)).mean())
+                assert limits["base_rate"]["undetermined"] == limits["undetermined"]
+    # the base rate's interval on the scoreable statements, by episode
+    keep = rows["scoreable"].to_numpy()
+    gap = (base["p_a"] - rows["y_a"])[keep]
+    wanted = by_hand(gap, rows["episode_id"][keep])
+    found = every["a"]["calibration_in_the_large"]["E_end"]["base_rate"]
+    assert near(
+        found["ci95"],
+        [
+            float(v)
+            for v in np.quantile(
+                P.bootstrap_means(gap.to_numpy(), list(rows["episode_id"][keep]), 200, 3)[:, 0],
+                [0.025, 0.975],
+            )
+        ],
+    )
+    assert near(found["mean_p_minus_frequency"], wanted[0])
+    # where the figures over every statement are withheld (three statements not scoreable),
+    # the block stays as it is: no base rate is put into it
+    prepared, rows = study_by_hand(70, 10, [k not in (20, 30, 40) for k in range(70)])
+    got = written(sc.secondary_models(prepared, rows, {}, [SLICED], 200, 3))
+    record = got["scores_on_every_eligible_statement"][SLICED]["a"]
+    assert record["calibration_in_the_large"]["withheld"] is True
+    assert "base_rate" not in json.dumps(record)
+    # two of the ten statements before the cutoff are not scoreable: the figures over every
+    # statement of the slice, beside those of the list, would give their events, and the
+    # mean probabilities on the scoreable statements would name them (PLAN section 2.5, for
+    # the statements between the two sets). The losses of the slice stay.
+    dim = [k not in (0, 7, 20, 27, 34, 41, 48, 55) for k in range(70)]
+    prepared, rows = study_by_hand(70, 10, dim)
+    got = written(sc.secondary_models(prepared, rows, {}, [SLICED], 200, 3))
+    record = got["models"][SLICED]["scores_on_the_post_cutoff_slice"]["a"]
+    counts = {"statements": 60, "with_a_horizon_event_undetermined": 6, "withheld": True}
+    for key in ("bounds_all_statements", "calibration_all_statements", "calibration_in_the_large"):
+        assert record[key] == counts, key
+    assert record["mean_p_E_end"] is None and record["mean_p_E_end90"] is None
+    assert record["scoreable_statements"] == 54 and "primary_brier" in record
+    assert "base_rate" not in json.dumps(record)
+    whole = got["scores_on_every_eligible_statement"][SLICED]["a"]
+    assert whole["mean_p_E_end"] is not None and "least" in json.dumps(whole)
+
+
+def test_the_figures_of_a_predictor_that_reads_no_text_on_two_slices_a_few_statements_apart() -> (
+    None
+):
+    """Some figures of a slice are the same whichever model it is the slice of: the base
+    rate's calibration in the large, the two parts of the decomposition that compare
+    predictors that read no text and, the predictions being open, the frequencies of the
+    horizon events in the model's own records. Where the slice of a model stands near the
+    slice of another secondary model, what the two would give back is withheld (PLAN,
+    standing rules): everything but the number of statements where the two differ by one to
+    four statements; those figures where their scoreable statements do; the figures that
+    fill the horizon events where only their statements that are not scoreable do."""
+    other = "gpt-oss-20b"
+    assert other in sc.SECONDARY_MODELS and S.CUTOFF_MONTH_ENDS[other].isoformat() == "2024-06-30"
+    blocks = ("bounds_all_statements", "calibration_all_statements", "calibration_in_the_large")
+    slice_keys = ("on_the_post_cutoff_slice", "decomposition_on_the_post_cutoff_slice")
+
+    def scored_with(between: int, dim: Sequence[int] = ()) -> dict:
+        """``between`` statements dated after the cutoff of SLICED and before that of the
+        other secondary model; the rest of the slice after both. The statements at the
+        positions ``dim`` are not scoreable."""
+        prepared, rows = study_by_hand(70, 10, [k not in dim for k in range(70)])
+        first = prepared.study.first
+        first.loc[first.index[10 + between :], "event_date"] = "2024-07-15"
+        return written(sc.secondary_models(prepared, rows, {}, [SLICED], 200, 3))["models"][SLICED]
+
+    # two statements between the cutoffs: the number of statements of the slice alone, or
+    # its counts beside those of the other slice would say how many of the two are scoreable
+    entry = scored_with(2)
+    bare = {"statements": 60, "withheld": True}
+    assert entry["post_cutoff_slice"] == {
+        "cutoff_month_end": "2023-10-31",
+        "slice_inside_the_test_split": True,
+        "slice_statements": 60,
+        "slice_scoreable": None,
+        "slice_scoreable_episodes": None,
+        "slice_analysed": None,
+        "withheld": True,
+    }
+    for key in (*slice_keys, "scores_on_the_post_cutoff_slice"):
+        assert entry[key] == bare, key
+    assert "delta" in entry["on_every_eligible_statement"]["H1"]
+    # six between, two of them scoreable (five more that are not, in both slices): the figures
+    # that are the same whichever model would give the events of the two
+    entry = scored_with(6, (10, 11, 12, 13, *range(30, 35)))
+    assert entry["post_cutoff_slice"]["slice_scoreable"] == 51
+    counts = {"statements": 60, "with_a_horizon_event_undetermined": 9, "withheld": True}
+    for condition in ev.CONDITIONS:
+        record = entry["scores_on_the_post_cutoff_slice"][condition]
+        assert "primary_brier" in record and "withheld" not in record
+        assert record["scoreable_statements"] == 51 and "pinball_all_statements" in record
+        for key in blocks:
+            assert record[key] == counts, key
+        assert record["mean_p_E_end"] is None and record["mean_p_E_end90"] is None
+        assert record["murphy"] == {"withheld": True}
+        assert "base_rate" not in json.dumps(record) and "frequency" not in json.dumps(record)
+        assert "uncertainty" not in json.dumps(record)
+    parts = entry["decomposition_on_the_post_cutoff_slice"]
+    assert tuple(list(parts)[:2]) == sc.MODEL_FREE_PARTS
+    assert parts["content_value_of_the_text"] == {
+        "statements": 51,
+        "episodes": parts["reading_loss"]["episodes"],
+        "minuend": ev.BASE,
+        "subtrahend": ev.RULES,
+        "withheld": True,
+    }
+    assert parts["content_value_against_the_structured_model"]["withheld"] is True
+    assert numbers(parts["content_value_against_the_structured_model"]) == []
+    assert "delta" in parts["reading_loss"] and "delta" in parts["trust_loss"]
+    assert "delta" in entry["on_the_post_cutoff_slice"]["H1"]
+    # eight between, three of them not scoreable: the figures over every statement that fill
+    # the horizon events would give the events of the three, and the mean probabilities
+    # would name them (section 2.5); what is scored on the scoreable statements stays
+    entry = scored_with(8, (10, 11, 12, *range(30, 35)))
+    counts = {"statements": 60, "with_a_horizon_event_undetermined": 8, "withheld": True}
+    for condition in ev.CONDITIONS:
+        record = entry["scores_on_the_post_cutoff_slice"][condition]
+        for key in blocks:
+            assert record[key] == counts, key
+        assert record["mean_p_E_end"] is None and "base_rate" not in json.dumps(record)
+        assert "uncertainty" in record["murphy"]["E_end"] and "primary_brier" in record
+    assert all("delta" in part for part in entry["decomposition_on_the_post_cutoff_slice"].values())
+    assert "delta" in entry["on_the_post_cutoff_slice"]["H1"]
+    assert "undetermined_as_no" in entry["on_the_post_cutoff_slice"]["H1"]["bounds"]
+    # five statements between the two cutoffs, all scoreable: everything is written
+    entry = scored_with(5, tuple(range(30, 35)))
+    record = entry["scores_on_the_post_cutoff_slice"]["a"]
+    assert "ci95" in record["calibration_in_the_large"]["E_end"]["base_rate"]
+    assert "largest_frequency" in record["calibration_all_statements"]["E_end"]
+    assert record["mean_p_E_end"] is not None and "uncertainty" in record["murphy"]["E_end"]
+    assert all("delta" in part for part in entry["decomposition_on_the_post_cutoff_slice"].values())
+    # the slice of a primary that is not its item set holds that primary's tests alone, but
+    # the evaluator writes how many of its statements are scoreable: two statements between
+    # the cutoff of SLICED and that of a primary leave the slice of SLICED its number alone
+    assert S.CUTOFF_MONTH_ENDS[LLAMA].isoformat() == "2023-12-31"
+    prepared, rows = study_by_hand(70, 10)
+    first = prepared.study.first
+    first.loc[first.index[10:12], "event_date"] = "2023-11-15"
+    entry = written(sc.secondary_models(prepared, rows, {}, [SLICED], 200, 3))["models"][SLICED]
+    assert entry["scores_on_the_post_cutoff_slice"] == bare
+    assert entry["post_cutoff_slice"]["slice_scoreable"] is None
+    # with six between, two of them scoreable, the tests of the primary on its slice are no
+    # figure of SLICED, and nothing is withheld; where that slice is the item set of the
+    # primary, the evaluator writes the base rate's figures on it, and those of SLICED go
+    prepared, rows = study_by_hand(
+        70, 10, [k not in (10, 11, 12, 13, *range(30, 35)) for k in range(70)]
+    )
+    first = prepared.study.first
+    first.loc[first.index[10:16], "event_date"] = "2023-11-15"
+    entry = written(sc.secondary_models(prepared, rows, {}, [SLICED], 200, 3))["models"][SLICED]
+    record = entry["scores_on_the_post_cutoff_slice"]["a"]
+    assert "ci95" in record["calibration_in_the_large"]["E_end"]["base_rate"]
+    sets = {LLAMA: (rows.index[16:], {"switched": True, "evaluable": True})}
+    first["statement_type"] = "recovery"
+    known = sc.known_sets(prepared.study, rows, sets)
+    entry = written(sc.secondary_models(prepared, rows, {}, [SLICED], 200, 3, None, known))
+    record = entry["models"][SLICED]["scores_on_the_post_cutoff_slice"]["a"]
+    assert record["calibration_in_the_large"]["withheld"] is True
+    assert record["murphy"] == {"withheld": True} and "primary_brier" in record
+    # a slice that is not analysed (fewer than 50 scoreable statements) keeps no count of its
+    # scoreable statements either where it is another slice but for two statements
+    prepared, rows = study_by_hand(40, 10)
+    first = prepared.study.first
+    first.loc[first.index[12:], "event_date"] = "2024-07-15"
+    entry = written(sc.secondary_models(prepared, rows, {}, [SLICED], 200, 3))["models"][SLICED]
+    assert entry["post_cutoff_slice"]["slice_statements"] == 30
+    assert entry["post_cutoff_slice"]["slice_scoreable"] is None
+    assert entry["post_cutoff_slice"]["slice_analysed"] is None
+    first.loc[first.index[12:15], "event_date"] = "2024-06-15"  # five between
+    entry = written(sc.secondary_models(prepared, rows, {}, [SLICED], 200, 3))["models"][SLICED]
+    assert entry["post_cutoff_slice"]["slice_scoreable"] == 30
+    assert entry["post_cutoff_slice"]["slice_analysed"] is False
+
+
 def test_a_repeat_on_a_part_of_the_statements_beside_the_contrast_on_all() -> None:
     """The contrasts repeated on the statements first captured by the stated end, and H2 on
     the month-and-year form, stand beside the contrasts on every statement: a repeat that
@@ -2282,6 +3137,705 @@ def test_a_repeat_on_a_part_of_the_statements_beside_the_contrast_on_all() -> No
     early, monthly = repeats([0, 1, 2, 3, 4], [0, 1, 2, 3, 4, 5])
     assert "withheld" not in early and early["statements"] == 15
     assert monthly == {"comparator": ev.RULES, "tested": f"{SLICED}:c", "withheld": True}
+
+
+TYPE_LEVELS = {"m:a": 0.5, "m:b": 0.8, "m:c": 0.6, ev.RULES: 0.7, ev.BASE: 0.4, ev.STRUCTURED: 0.3}
+"""The one probability each predictor of ``two_types`` gives to both events of a statement."""
+
+
+def two_types(
+    recovery: int = 60,
+    next_delivery: int = 120,
+    not_scoreable: Sequence[int] = (),
+    dates: Sequence[str] | None = None,
+) -> tuple[SimpleNamespace, pd.DataFrame, dict]:
+    """A primary ``m`` whose item set is every statement of a list of the two types, worked by
+    hand: the recovery statements first, in 60 episodes that each hold statements of both
+    types where both number 60 or more. The second event is yes everywhere; the first is yes
+    on a recovery statement and no on a next-delivery one, and undetermined at the positions
+    of ``not_scoreable``. Every predictor gives one probability to both events
+    (``TYPE_LEVELS``), and condition (b) is the selected one. Returns the prepared study, the
+    statements and the item sets."""
+    count = recovery + next_delivery
+    kinds = ["recovery"] * recovery + ["next_delivery"] * next_delivery
+    y_a = np.array([1.0] * recovery + [0.0] * next_delivery)
+    y_a[list(not_scoreable)] = np.nan
+    rows = typed(
+        episode_id=[f"e{k % 60:02d}" for k in range(count)],
+        y_a=y_a,
+        y_b=[1.0] * count,
+        outcome=["recovered"] * count,
+        ttr_kind=["interval"] * count,
+        ttr_lower=[10.0] * count,
+        ttr_upper=[30.0] * count,
+        ttr_mid=[20.0] * count,
+        end_days=[40.0] * count,
+    )
+    ids = rows.index
+    first = pd.DataFrame(
+        {
+            "statement_type": kinds,
+            "event_date": list(dates) if dates is not None else ["2024-06-15"] * count,
+            "delayed_entry": "False",
+            "form": ev.MONTH_YEAR,
+        },
+        index=ids,
+    )
+    study = SimpleNamespace(
+        predictions={
+            name: forecasts(ids, [p] * count, [p] * count) for name, p in TYPE_LEVELS.items()
+        },
+        parsed={"m:a": pd.Series(True, index=ids)},
+        comparator=ev.BASE,
+        selection={"m": "b"},
+        first=first,
+    )
+    sets = {"m": (ids, {"switched": False, "evaluable": True, "items": ev.ALL_ITEMS})}
+    read = {"m": pd.Series(30.0, index=ids)}  # its literal reading reads every statement
+    return SimpleNamespace(study=study, reading_days=read), rows, sets
+
+
+def test_the_analysis_by_statement_type_on_a_case_worked_by_hand() -> None:
+    """PLAN section 5, E3, "By statement type": on the recovery statements and on the
+    next-delivery statements apart, the H1, H2 and H3 contrasts and Delta_GBM, the primary
+    loss and the calibration in the large of the three conditions and of the base rate, and
+    the overconfidence criterion; each contrast with the difference between the two types."""
+    prepared, rows, sets = two_types()
+    got = written(sc.by_statement_type(prepared, rows, sets, 400, 5))
+    assert got["types"] == ["recovery", "next_delivery"] == list(sc.TYPES)
+    assert got["fewest_scoreable_statements_of_a_type"] == sc.MIN_TYPE == 50
+    assert "registered one on both types together" in got["note"]
+    entry = got["models"]["m"]
+    assert entry["statements"] == 180 and entry["episodes"] == 60
+    assert entry["statements_of_another_type"] == 0
+    assert entry["item_set_fixed_by_the_probe"]["items"] == ev.ALL_ITEMS
+    back, due = entry["types"]["recovery"], entry["types"]["next_delivery"]
+    for block, size in ((back, 60), (due, 120)):
+        assert (block["statements"], block["scoreable_statements"]) == (size, size)
+        assert (block["episodes"], block["scoreable_episodes"]) == (60, 60)
+        assert list(block["contrasts"]) == ["H1", "H2", "H3", sc.DELTA_GBM]
+        assert list(block["scores"]) == [ev.BASE, "a", "b", "c"]
+    # a recovery statement has both events yes: the loss of a probability p is (1 - p)^2;
+    # a next-delivery statement has the first event no: (p^2 + (1 - p)^2) / 2
+    p = TYPE_LEVELS
+    loss = {
+        "recovery": {name: (1 - level) ** 2 for name, level in p.items()},
+        "next_delivery": {name: (level**2 + (1 - level) ** 2) / 2 for name, level in p.items()},
+    }
+    pairs = {
+        "H1": ("m:a", "m:b", 1),
+        "H2": (ev.RULES, "m:c", 2),
+        "H3": (ev.BASE, "m:b", 2),
+        sc.DELTA_GBM: (ev.STRUCTURED, "m:b", 2),
+    }
+    for kind, block in entry["types"].items():
+        for name, (comparator, tested, sides) in pairs.items():
+            record = block["contrasts"][name]
+            delta = loss[kind][comparator] - loss[kind][tested]
+            assert (record["comparator"], record["tested"], record["sides"]) == (
+                comparator,
+                tested,
+                sides,
+            )
+            assert near(record["delta"], delta), (kind, name)
+            # every statement of a type has the same difference: the interval is one point
+            assert (
+                near(record["ci95"], [delta, delta]) and record["interval_method"] == "percentile"
+            )
+            assert record["statements"] == block["statements"] and record["episodes"] == 60
+            # no event is undetermined: each scenario is the contrast itself
+            for fill in sc.FILLS:
+                assert near(record["bounds"][fill]["delta"], delta), (kind, name, fill)
+            assert record["bounds"]["with_a_horizon_event_undetermined"] == 0
+        for name, key in ((ev.BASE, ev.BASE), ("a", "m:a"), ("b", "m:b"), ("c", "m:c")):
+            record = block["scores"][name]
+            assert set(record) == set(sc.TYPE_SCORES) - {"withheld"}
+            assert near(record["primary_brier"], loss[kind][key])
+            assert near(record["ci95"], [loss[kind][key]] * 2)
+            assert near(record["bounds_all_statements"]["undetermined_as_no"], loss[kind][key])
+            # the mean probability less the frequency of the event: 1 or 0 for the first event
+            rate = 1.0 if kind == "recovery" else 0.0
+            large = record["calibration_in_the_large"]
+            assert near(large["E_end"]["mean_p_minus_frequency"], p[key] - rate)
+            assert near(large["E_end90"]["mean_p_minus_frequency"], p[key] - 1.0)
+            assert near(large["E_end"]["ci95"], [p[key] - rate] * 2)
+            limits = record["calibration_all_statements"]["E_end"]
+            assert near(limits["least"], p[key] - rate) and near(limits["greatest"], p[key] - rate)
+    assert near(back["contrasts"]["H1"]["delta"], 0.21) and near(
+        due["contrasts"]["H1"]["delta"], -0.09
+    )
+    # the difference between the two types, next delivery minus recovery; each episode holds
+    # one recovery statement and two next-delivery ones, so no draw is left out
+    apart = entry["next_delivery_minus_recovery"]
+    assert list(apart) == list(pairs)
+    for name, (comparator, tested, _) in pairs.items():
+        wanted = (loss["next_delivery"][comparator] - loss["next_delivery"][tested]) - (
+            loss["recovery"][comparator] - loss["recovery"][tested]
+        )
+        assert near(apart[name]["difference"], wanted) and near(apart[name]["ci95"], [wanted] * 2)
+        assert (apart[name]["draws"], apart[name]["draws_left_out"]) == (400, 0)
+    assert near(apart["H1"]["difference"], -0.30) and near(apart[sc.DELTA_GBM]["difference"], -0.50)
+    assert entry["opposite_signs_in_the_two_types"] == dict.fromkeys(pairs, True)
+    # the criterion of section 13 on each type: condition (a) gives 0.5 to an event that is
+    # always yes on the recovery statements (the greatest value is below zero: reading 1) and
+    # always no on the next-delivery ones (both parts hold: 0.5 above the frequency, 0.1
+    # above the base rate)
+    for block, least, holds in ((back, -0.5, False), (due, 0.5, True)):
+        found = block["overconfidence"]
+        assert set(found) == {
+            *sc.TYPE_CRITERION,
+            "against_outcomes",
+            "against_base_rate",
+            "both_parts_hold",
+        }
+        outcomes, no_text = found["against_outcomes"], found["against_base_rate"]
+        assert near(outcomes["least"], least) and near(outcomes["greatest"], least)
+        assert near(outcomes["least_ci95"], [least, least]) and outcomes["undetermined"] == 0
+        assert near(outcomes["base_rate"]["least"], least - 0.1)
+        assert near(no_text["difference"], 0.1) and no_text["met"] is True
+        assert outcomes["met"] is holds and found["both_parts_hold"] is holds
+        assert found["criterion"] == ev.OVERCONFIDENCE_CRITERION
+        # none of the five sentences of section 13 is read on a type
+        assert "reading" not in found and "reading_in_words" not in found
+    # on the item set a third of the events is yes: 0.5 - 1/3 above the frequency, and the
+    # criterion holds there and not on the recovery statements
+    assert entry["overconfidence_on_the_item_set"] == {"both_parts_hold": True}
+    assert entry["overconfidence_holds_on_the_item_set_and_not_on_its_recovery_statements"] is True
+    whole = ev.overconfidence(
+        rows,
+        prepared.study.predictions["m:a"],
+        prepared.study.predictions[ev.BASE],
+        prepared.study.parsed["m:a"],
+        400,
+        5,
+    )
+    assert near(whole["against_outcomes"]["E_end"]["least"], 0.5 - 1 / 3)
+
+
+def test_the_difference_between_the_two_types_over_draws_of_the_episodes_of_the_item_set() -> None:
+    """ "... the difference between the two types (next delivery minus recovery) and its 95%
+    percentile interval over 10,000 draws of the episodes of the item set, both types taken
+    from each draw; a draw with no scoreable statement of one type is left out." Seven
+    episodes of unequal size, two of them with no next-delivery statement, one with no
+    scoreable statement at all; worked out again from the episode sums."""
+    kinds = ["recovery"] * 9 + ["next_delivery"] * 5
+    episodes = ["a", "a", "b", "b", "b", "c", "d", "d", "g", "a", "b", "e", "e", "f"]
+    rng = np.random.default_rng(4)
+    rows = typed(
+        episode_id=episodes,
+        y_a=[1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, np.nan, 0.0, 1.0, 0.0, 1.0, 0.0],
+        y_b=[1.0] * 14,
+    )
+    ids = rows.index
+    made = {
+        name: forecasts(ids, np.round(rng.random(14), 2), np.round(0.5 + rng.random(14) / 2, 2))
+        for name in ("one", "other")
+    }
+    types = pd.Series(kinds, index=ids)
+    got = sc.type_difference(rows, types, made, "one", "other", 3000, 7)
+    paired = (brier(made["one"], rows) - brier(made["other"], rows)).fillna(0.0)
+    keep = rows["scoreable"].to_numpy()
+    back, due = (
+        keep & (types == "recovery").to_numpy(),
+        keep & (types == "next_delivery").to_numpy(),
+    )
+    assert near(got["difference"], paired[due].mean() - paired[back].mean(), 1e-12)
+    # the registered draws of all seven episodes of the item set, in the order of their names
+    names = sorted(set(episodes))
+    assert len(names) == 7 and not keep[rows["episode_id"] == "g"].any()
+    sums = np.array(
+        [
+            [
+                paired[flags & (rows["episode_id"] == name).to_numpy()].sum(),
+                (flags & (rows["episode_id"] == name).to_numpy()).sum(),
+            ]
+            for name in names
+            for flags in (back, due)
+        ],
+        dtype=float,
+    ).reshape(7, 4)
+    taken = P.cluster_draws(7, 3000, 7).astype(float)
+    totals = taken @ sums
+    kept = (totals[:, 1] > 0) & (totals[:, 3] > 0)
+    drawn = totals[kept, 2] / totals[kept, 3] - totals[kept, 0] / totals[kept, 1]
+    assert 0 < int((~kept).sum()) < 3000  # some draws hold no scoreable statement of a type
+    assert (got["draws"], got["draws_left_out"]) == (int(kept.sum()), int((~kept).sum()))
+    assert near(got["ci95"], [float(v) for v in np.quantile(drawn, [0.025, 0.975])], 1e-12)
+    # another seed, and another number of draws, give another interval
+    assert not near(
+        sc.type_difference(rows, types, made, "one", "other", 3000, 8)["ci95"], got["ci95"], 1e-6
+    )
+    # in one episode there is no interval
+    alone = sc.type_difference(rows.assign(episode_id="e"), types, made, "one", "other", 3000, 7)
+    assert (
+        alone["ci95"] is None
+        and alone["draws"] == 0
+        and near(alone["difference"], got["difference"])
+    )
+
+
+@pytest.mark.parametrize(
+    ("recovery", "next_delivery", "not_scoreable", "kinds"),
+    [
+        (117, 3, (), ("bare", "bare")),  # a type of three statements, and the rest of the set
+        (4, 116, (), ("bare", "bare")),
+        (100, 40, (), ("shown", "under the floor")),  # fewer than 50 scoreable statements
+        (100, 49, (), ("shown", "under the floor")),
+        (100, 50, (), ("shown", "shown")),
+        (100, 60, tuple(range(100, 150)), ("shown", "under the floor")),  # ten scoreable of sixty
+        # two scoreable statements of sixty: the other type's figures, beside those of the
+        # item set, would give the losses of the two
+        (100, 60, tuple(range(100, 158)), ("counts", "under the floor")),
+        # three statements of a type are not scoreable: its own scenarios are withheld, and
+        # those of the item set with them, so the other type gives nothing back
+        (100, 60, (100, 101, 102), ("shown", "shown")),
+        # and ten of the other type as well: the scenarios of the item set are written, and
+        # less those of the other type they would be those of the type with the three; the
+        # other type keeps what is scored on its scoreable statements
+        (100, 60, (*range(10), 100, 101, 102), ("fills", "shown")),
+        (100, 0, (), ("shown", "none")),  # one type alone: it is the item set
+    ],
+)
+def test_a_type_within_its_item_set_is_held_to_the_rules_of_withholding(
+    recovery: int, next_delivery: int, not_scoreable: tuple[int, ...], kinds: tuple[str, str]
+) -> None:
+    """A type within the item set is a set beside its whole (PLAN, standing rules): a type of
+    one to four statements, and a type that is the item set but for so few, hold the number of
+    their statements alone; a type whose figures would give a few scoreable statements back
+    beside those of the item set holds its counts; a type whose statements that are not
+    scoreable are those of the item set but for a few is written without the figures that
+    fill the horizon events (section 2.5); "a type with fewer than 50 scoreable statements in
+    an item set is reported by its counts alone"."""
+    prepared, rows, sets = two_types(recovery, next_delivery, not_scoreable)
+    entry = written(sc.by_statement_type(prepared, rows, sets, 200, 5))["models"]["m"]
+    keep = rows["scoreable"].to_numpy()
+    sizes = {"recovery": (recovery, int(keep[:recovery].sum()))}
+    sizes["next_delivery"] = (next_delivery, int(keep[recovery:].sum()))
+    for name, kind in zip(sc.TYPES, kinds, strict=True):
+        block, (statements, scoreable) = entry["types"][name], sizes[name]
+        counts = {"statements": statements, "scoreable_statements": scoreable}
+        if kind == "none":
+            assert block == {"statements": 0}
+        elif kind == "bare":
+            assert block == {"statements": statements, "withheld": True}
+        elif kind == "shown":
+            assert counts.items() <= block.items() and "withheld" not in block
+            assert {"contrasts", "scores", "overconfidence"} <= set(block)
+            if scoreable == statements:  # nothing of its own to withhold: its scenarios stand
+                assert "undetermined_as_no" in block["contrasts"]["H1"]["bounds"], name
+                assert "least" in block["scores"]["a"]["calibration_all_statements"]["E_end"]
+                assert block["overconfidence"]["both_parts_hold"] is not None, name
+        elif kind == "fills":
+            apart = {
+                "statements": statements,
+                "with_a_horizon_event_undetermined": statements - scoreable,
+                "withheld": True,
+            }
+            assert counts.items() <= block.items() and "withheld" not in block
+            for name, record in block["contrasts"].items():
+                assert "delta" in record and record["ci95"] is not None, name
+                assert record["bounds"] == apart, name
+            for name, record in block["scores"].items():
+                assert record["primary_brier"] is not None and record["ci95"] is not None, name
+                assert record["bounds_all_statements"] == apart, name
+                assert record["calibration_all_statements"] == apart, name
+                assert record["calibration_in_the_large"] == apart, name
+            assert block["overconfidence"]["against_outcomes"] == apart
+            assert block["overconfidence"]["both_parts_hold"] is None
+            assert block["overconfidence"]["against_base_rate"]["met"] is True
+            text = json.dumps(block)
+            assert "_frequency" not in text and "undetermined_as" not in text
+        else:
+            assert counts.items() <= block.items() and numbers(block) == []
+            assert set(block) - {
+                "statements",
+                "episodes",
+                "scoreable_statements",
+                "scoreable_episodes",
+            } == ({"counts_alone"} if kind == "under the floor" else {"withheld"})
+            if kind == "under the floor":
+                assert block["counts_alone"] == "fewer than 50 scoreable statements"
+    both = all(kind in ("shown", "fills") for kind in kinds)
+    assert bool(entry["next_delivery_minus_recovery"]) is both
+    assert bool(entry["opposite_signs_in_the_two_types"]) is both
+    flag = entry["overconfidence_holds_on_the_item_set_and_not_on_its_recovery_statements"]
+    on_all = entry["overconfidence_on_the_item_set"]["both_parts_hold"]
+    # no reading where one to four statements of the item set are not scoreable
+    assert (on_all is None) is (0 < int((~keep).sum()) < sc.MIN_SHOWN)
+    assert (flag is None) is (kinds[0] != "shown" or on_all is None)
+    # three statements that are not scoreable in a type: its own scenarios are withheld
+    if not_scoreable[-3:] == (100, 101, 102):
+        due = entry["types"]["next_delivery"]
+        assert (
+            due["contrasts"]["H1"]["bounds"]["withheld"] is True
+            and "delta" in due["contrasts"]["H1"]
+        )
+        assert due["scores"]["a"]["bounds_all_statements"]["withheld"] is True
+        assert due["overconfidence"]["against_outcomes"]["withheld"] is True
+        assert due["overconfidence"]["both_parts_hold"] is None  # the criterion is not read
+        assert due["overconfidence"]["against_base_rate"]["met"] is True
+
+
+@pytest.mark.parametrize("others", [0, 1, 4, 5])
+def test_the_statements_of_another_type_within_an_item_set(others: int) -> None:
+    """The two types need not make up the item set. Where one to four of its statements are of
+    another type, the figures of the item set less those of the two types would be those of
+    the few, and its counts would say how many of them are scoreable: the type of the fewest
+    statements keeps their number alone and is marked."""
+    prepared, rows, sets = two_types(60, 120)
+    first = prepared.study.first
+    first.loc[rows.index[60 : 60 + others], "statement_type"] = "tbd"
+    entry = written(sc.by_statement_type(prepared, rows, sets, 100, 5))["models"]["m"]
+    assert entry["statements_of_another_type"] == others and entry["statements"] == 180
+    back, due = entry["types"]["recovery"], entry["types"]["next_delivery"]
+    assert due["statements"] == 120 - others and "contrasts" in due
+    if 0 < others < sc.MIN_SHOWN:
+        assert back == {"statements": 60, "withheld": True, sc.WITH_ANOTHER: True}
+        assert entry["next_delivery_minus_recovery"] == {}
+        assert (
+            entry["overconfidence_holds_on_the_item_set_and_not_on_its_recovery_statements"] is None
+        )
+    else:
+        assert "contrasts" in back and sc.WITH_ANOTHER not in json.dumps(entry)
+        assert entry["next_delivery_minus_recovery"]
+    # a type that keeps its number alone already: no second one goes
+    prepared, rows, sets = two_types(3, 120)
+    prepared.study.first.loc[rows.index[3:5], "statement_type"] = "tbd"
+    entry = written(sc.by_statement_type(prepared, rows, sets, 100, 5))["models"]["m"]
+    assert entry["types"]["recovery"] == {"statements": 3, "withheld": True}
+    assert "contrasts" in entry["types"]["next_delivery"]
+    assert entry["statements_of_another_type"] == 2
+
+
+def test_a_type_that_is_another_set_but_for_a_few_statements() -> None:
+    """The same figures are written on other sets than the item set: the post-cutoff slice of a
+    model, the statements first captured by the stated end, those of the month-and-year form
+    (``known_sets``). A type that is one of them but for one to four statements holds the
+    number of its statements alone, like a type within its item set."""
+    cutoff = S.CUTOFF_MONTH_ENDS[LLAMA].isoformat()
+    assert cutoff == "2023-12-31" and S.has_slice(S.CUTOFF_MONTH_ENDS[LLAMA])
+    # the 60 recovery statements and two of the 120 others are dated after the cutoff
+    dates = ["2024-02-10"] * 62 + ["2023-06-15"] * 118
+    prepared, rows, sets = two_types(60, 120, (), dates)
+    known = sc.known_sets(prepared.study, rows, sets)
+    after, fills, of = known[f"the post-cutoff slice of {SLICED}"]
+    # on the slice of a secondary model the base rate's calibration stands beside the model's
+    assert len(after) == 62 and fills is True and of is None
+    assert sc.near_sets(rows.iloc[:60], rows.loc[after]) == "bare"
+    # on the slice of a primary that is not its item set the evaluator repeats its tests:
+    # the contrasts of that primary alone, which stand beside no figure of another model; but
+    # they come with the number of its scoreable statements, so a set that is that slice but
+    # for two statements keeps no count either, whichever model it is of
+    assert known[f"the post-cutoff slice of {LLAMA}"][1:] == (False, LLAMA)
+    assert sc.beside_known(rows.iloc[:60], rows, known, "m: recovery", "m") == "bare"
+    alone = {name: entry for name, entry in known.items() if entry[2] == LLAMA}
+    assert len(alone) == 1 and sc.beside_known(rows.iloc[:60], rows, alone, "", "m") == "bare"
+    assert sc.beside_known(rows.iloc[:60], rows, alone, "", LLAMA) == "bare"
+    # six statements apart, two of them scoreable: the contrasts of that primary would give
+    # the losses of the two beside its own figures, and beside no figure of another model
+    dim = rows.copy()
+    dim.loc[dim.index[[56, 57, 58, 59]], "y_a"] = np.nan
+    dim["scoreable"] = dim["y_a"].notna() & dim["y_b"].notna()
+    assert sc.near_sets(dim.iloc[:56], dim.loc[after], False) == "counts"
+    assert sc.beside_known(dim.iloc[:56], dim, alone, "", LLAMA) == "counts"
+    assert sc.beside_known(dim.iloc[:56], dim, alone, "", "m") is None
+    # a set of no statement holds no figure: a type of three statements is not near it
+    empty = {"none": (rows.index[:0], True, None)}
+    assert sc.near_sets(rows.iloc[:3], rows.iloc[:0]) == "bare"
+    assert sc.beside_known(rows.iloc[:3], rows, empty) is None
+    entry = written(sc.by_statement_type(prepared, rows, sets, 200, 5))["models"]["m"]
+    assert entry["types"]["recovery"] == {"statements": 60, "withheld": True}
+    assert "contrasts" in entry["types"]["next_delivery"]
+    assert entry["next_delivery_minus_recovery"] == {}
+    # with five of the others after the cutoff the type is written
+    prepared, rows, sets = two_types(60, 120, (), ["2024-02-10"] * 65 + ["2023-06-15"] * 115)
+    entry = written(sc.by_statement_type(prepared, rows, sets, 200, 5))["models"]["m"]
+    assert "contrasts" in entry["types"]["recovery"] and entry["next_delivery_minus_recovery"]
+    # the sets known, by name, and the three answers of the pair rule
+    assert list(sc.known_sets(prepared.study, rows, sets))[:1] == ["every eligible statement"]
+    assert {"the item set of m", "m: recovery", "m: next_delivery"} <= set(known)
+    # every statement was first captured by the stated end and is of the month-and-year form:
+    # those two parts are the item set, which has its own entry
+    assert not [name for name in known if "captured" in name or "month" in name]
+    assert (
+        sc.near_sets(rows, rows) is None and sc.near_sets(rows.iloc[:60], rows.iloc[:64]) == "bare"
+    )
+    dim = rows.copy()
+    dim.loc[dim.index[60:63], "y_a"] = np.nan
+    dim["scoreable"] = dim["y_a"].notna() & dim["y_b"].notna()
+    assert sc.near_sets(dim.iloc[:60], dim.iloc[:70]) is None
+    assert sc.near_sets(dim.iloc[:60], dim.iloc[:66]) == "counts"  # three of the six are scoreable
+    # three that are not scoreable in a set whose scenarios are withheld for them: nothing
+    # to take from; with ten more in both sets the scenarios of both are written, and those
+    # alone would give the three back
+    assert sc.near_sets(dim.iloc[:60], dim.iloc[:120]) is None
+    dim.loc[dim.index[:10], "y_a"] = np.nan
+    dim["scoreable"] = dim["y_a"].notna() & dim["y_b"].notna()
+    assert sc.near_sets(dim.iloc[:60], dim.iloc[:120]) == "fills"
+    assert sc.NEAR_STATES == (None, "fills", "counts", "bare")
+    # unless the other set holds contrasts on its scoreable statements alone: the statements
+    # first captured by the stated end, those of the month-and-year form
+    assert sc.near_sets(dim.iloc[:60], dim.iloc[:120], fills=False) is None
+    assert [entry[1:] for name, entry in known.items() if name.startswith("m: ")] == [
+        (True, None),
+        (True, None),
+    ]
+    # the statements first captured by the stated end, and those of the month-and-year form:
+    # the evaluator repeats the tests of the primary on them. A type that is one of them but
+    # for a few statements holds its number alone; a part of the item set that is the item
+    # set but for a few holds no figure and is not among the sets known
+    for column, value, name in (
+        ("delayed_entry", "True", "m: first captured by the stated end"),
+        ("form", "quarter", "m: month-and-year form"),
+    ):
+        for more, state in ((2, "bare"), (4, "bare"), (5, None)):
+            prepared, rows, sets = two_types(60, 120)
+            first = prepared.study.first
+            first.loc[rows.index[60 + more :], column] = value
+            known = sc.known_sets(prepared.study, rows, sets)
+            assert known[name][1:] == (False, "m") and len(known[name][0]) == 60 + more
+            assert sc.beside_known(rows.iloc[:60], rows, known, "m: recovery", "m") == state
+            block = written(sc.by_statement_type(prepared, rows, sets, 100, 5))
+            block = block["models"]["m"]["types"]["recovery"]
+            assert (block == {"statements": 60, "withheld": True}) is (state == "bare"), name
+        first.loc[rows.index[4:], column] = first[column].iloc[0]  # all but four statements
+        first.loc[rows.index[:4], column] = value
+        assert name not in sc.known_sets(prepared.study, rows, sets)
+        assert sc.written_part(np.arange(180) >= 5) and not sc.written_part(np.arange(180) >= 4)
+        assert not sc.written_part(np.arange(180) >= 176) and not sc.written_part(np.ones(9, bool))
+    # a set of a few scoreable statements is under the floor already: two scoreable statements
+    # in one set, the same two and two more in the other, fifty statements apart
+    _, thin, _ = two_types(100, 60, tuple(range(98)))
+    one, other = thin.iloc[:100], thin.iloc[50:102]
+    assert (int(one["scoreable"].sum()), int(other["scoreable"].sum())) == (2, 4)
+    assert sc.near_sets(one, other) is None
+
+
+def test_a_type_beside_the_other_sets_on_which_a_figure_of_its_primary_is_written() -> None:
+    """The loss of condition (c) of a primary is also written on the two parts of its selective
+    prediction; its tests, by the evaluator, on the statements both sides parsed, and both
+    parts of the criterion on the answers of condition (a) that parsed; its loss of condition
+    (b) on the paraphrase subset and on the subset of the 2x2. A type that is one of those
+    sets but for one to four statements holds the number of its statements alone, like a type
+    beside its item set (PLAN, standing rules)."""
+
+    def recovery_block(
+        read: int = 0, parsed: int = 0, chosen: int = 0, key: str = "", side: str = "m:a"
+    ) -> dict:
+        """The recovery type of 60 statements where the literal reading reads its statements
+        and ``read`` more, where the answers of ``side`` parsed on them and ``parsed`` more,
+        and where the subset ``key`` holds them and ``chosen`` more."""
+        prepared, rows, sets = two_types(60, 120)
+        study, ids = prepared.study, rows.index
+        if read:
+            days = np.where(np.arange(180) < 60 + read, 30.0, np.nan)
+            prepared.reading_days["m"] = pd.Series(days, index=ids)
+        if parsed:
+            study.parsed[side] = pd.Series(np.arange(180) < 60 + parsed, index=ids)
+        subsets = {key: list(ids[: 60 + chosen])} if key else None
+        known = sc.known_sets(study, rows, sets, prepared.reading_days, subsets)
+        got = written(sc.by_statement_type(prepared, rows, sets, 100, 5, known))
+        block = got["models"]["m"]["types"]["recovery"]
+        # the same through the sets the function works out itself, where it can
+        if not key:
+            alone = written(sc.by_statement_type(prepared, rows, sets, 100, 5))
+            assert alone["models"]["m"]["types"]["recovery"] == block
+        return {"block": block, "known": known}
+
+    bare = {"statements": 60, "withheld": True}
+    # the statements read by condition (c): the recovery statements and two more
+    found = recovery_block(read=2)
+    assert found["block"] == bare
+    part, fills, of = found["known"]["m: read by condition (c)"]
+    assert (len(part), fills, of) == (62, True, "m")
+    assert len(found["known"]["m: abstained on by condition (c)"][0]) == 118
+    assert "scores" in recovery_block(read=5)["block"]
+    # the answers of condition (a) that parsed, and with them the statements both sides of
+    # H1 parsed: the recovery statements and four more
+    found = recovery_block(parsed=4)
+    assert found["block"] == bare
+    assert found["known"]["m: answers of condition (a) that parsed"][1:] == (True, None)
+    assert found["known"]["m: both sides of H1 parsed"][1:] == (False, "m")
+    assert len(found["known"]["m: both sides of H1 parsed"][0]) == 64
+    assert "m: both sides of H2 parsed" not in found["known"]  # no answer of (c) failed
+    assert "scores" in recovery_block(parsed=5)["block"]
+    # the answers of the other side of H1 alone, and those of condition (c) for H2: every
+    # answer of condition (a) parsed, so the statements both sides parsed stand alone
+    for side, test in (("m:b", "H1"), ("m:c", "H2")):
+        found = recovery_block(parsed=3, side=side)
+        assert found["block"] == bare, side
+        assert "m: answers of condition (a) that parsed" not in found["known"]
+        assert list(found["known"][f"m: both sides of {test} parsed"][0]) == [
+            f"S{k}" for k in range(63)
+        ]
+        assert "scores" in recovery_block(parsed=5, side=side)["block"], side
+    # a subset on which the primary is read again
+    for key in ("paraphrase", "twobytwo", "samples"):
+        found = recovery_block(chosen=3, key=key)
+        assert found["block"] == bare, key
+        assert found["known"][f"m: the {key} subset"][1:] == (key != "samples", "m")
+        assert "scores" in recovery_block(chosen=5, key=key)["block"], key
+    # nothing failed and nothing was read again: the sets known are those of the cells
+    prepared, rows, sets = two_types(60, 120)
+    known = sc.known_sets(prepared.study, rows, sets, prepared.reading_days, {})
+    assert not [name for name in known if "parsed" in name or "subset" in name or "(c)" in name]
+    # the statements of a subset after the cutoff of a primary whose probe beat the base rate
+    cutoff = S.CUTOFF_MONTH_ENDS[LLAMA].isoformat()
+    record = {"switched": True, "evaluable": True, "cutoff_month_end": cutoff}
+    prepared.study.first.loc[rows.index[:30], "event_date"] = "2023-06-15"
+    later = sc.known_sets(
+        prepared.study,
+        rows,
+        {LLAMA: (rows.index[30:], record)},
+        None,
+        {"paraphrase": list(rows.index[20:90]), "tbd": ["x"]},
+    )
+    assert len(later[f"{LLAMA}: the paraphrase subset"][0]) == 70
+    assert list(later[f"{LLAMA}: the paraphrase subset after its cutoff"][0]) == list(
+        rows.index[30:90]
+    )
+    assert not [name for name in later if "tbd" in name]
+    # what stands beside the tables of E1: the sets with a frequency whichever model
+    beside = sc.sets_beside_the_tables(recovery_block(parsed=5)["known"])
+    assert list(beside["m: answers of condition (a) that parsed"]) == [f"S{k}" for k in range(65)]
+    assert not [name for name in beside if "both sides" in name or "captured" in name]
+
+
+def test_the_slice_of_a_secondary_model_beside_the_parts_of_its_selective_prediction() -> None:
+    """The loss of condition (c) of a secondary model is written on its post-cutoff slice and
+    on the two parts of its selective prediction. A slice that is the statements read but
+    for one to four statements keeps its number alone; where their scoreable statements
+    differ by so few, the record of condition (c) keeps its counts; where only those that
+    are not scoreable do, it is written without the figures of section 2.5."""
+
+    def scored_with(read: Sequence[int], dim: Sequence[int] = ()) -> dict:
+        """Eighty statements, twenty of them before the cutoff: the literal reading reads
+        those at the positions ``read``; those at ``dim`` are not scoreable."""
+        prepared, rows = study_by_hand(80, 20, [k not in dim for k in range(80)])
+        days = [30.0 if k in read else np.nan for k in range(80)]
+        prepared.reading_days[SLICED] = pd.Series(days, index=rows.index)
+        return written(sc.secondary_models(prepared, rows, {}, [SLICED], 100, 3))["models"][SLICED]
+
+    after = range(20, 80)
+    bare = {"statements": 60, "withheld": True}
+    # the statements read are the slice and two more
+    entry = scored_with([0, 1, *after])
+    assert entry["scores_on_the_post_cutoff_slice"] == bare
+    assert entry["post_cutoff_slice"]["slice_scoreable"] is None
+    # the statements abstained on are the slice and three more
+    entry = scored_with(range(3, 20))
+    assert entry["on_the_post_cutoff_slice"] == bare
+    # five more are read, two of them scoreable: the loss of (c) on the two
+    entry = scored_with([*range(5), *after], (0, 1, 2, 18, 19, *range(40, 45)))
+    on_the_slice = entry["scores_on_the_post_cutoff_slice"]
+    assert on_the_slice["c"] == {
+        "scoreable_statements": 55,
+        "scoreable_episodes": on_the_slice["a"]["scoreable_episodes"],
+        "statements": 60,
+        "withheld": True,
+    }
+    for condition in ("a", "b"):
+        assert "primary_brier" in on_the_slice[condition]
+        assert "undetermined_as_no" in on_the_slice[condition]["bounds_all_statements"]
+    assert "delta" in entry["on_the_post_cutoff_slice"]["H2"]
+    # eight more are read, three of them not scoreable: the scenarios of (c) on the three
+    entry = scored_with([*range(8), *after], (0, 1, 2, 18, 19, *range(40, 45)))
+    on_the_slice = entry["scores_on_the_post_cutoff_slice"]
+    record = on_the_slice["c"]
+    assert record["bounds_all_statements"] == {
+        "statements": 60,
+        "with_a_horizon_event_undetermined": 5,
+        "withheld": True,
+    }
+    assert record["mean_p_E_end"] is None and "primary_brier" in record
+    assert "undetermined_as_no" in on_the_slice["a"]["bounds_all_statements"]
+    # five more read, all scoreable: everything is written
+    entry = scored_with([*range(5), *after], (15, 16, 17, 18, 19, *range(40, 45)))
+    record = entry["scores_on_the_post_cutoff_slice"]["c"]
+    assert "undetermined_as_no" in record["bounds_all_statements"] and "primary_brier" in record
+    entry = scored_with([*range(16), *after])  # the slice is the statements read but for 16
+    assert "primary_brier" in entry["scores_on_the_post_cutoff_slice"]["c"]
+    # a reading that abstains on three statements: no part of its selective prediction is
+    # written, so the slice, which is the statements read but for three, gives way to nothing
+    prepared, rows = study_by_hand(80, 6)
+    days = [np.nan if k < 3 else 30.0 for k in range(80)]
+    prepared.reading_days[SLICED] = pd.Series(days, index=rows.index)
+    entry = written(sc.secondary_models(prepared, rows, {}, [SLICED], 100, 3))["models"][SLICED]
+    assert entry["post_cutoff_slice"]["slice_statements"] == 74
+    assert "primary_brier" in entry["scores_on_the_post_cutoff_slice"]["c"]
+    # with five abstained on, the statements read are a part that is written, one statement
+    # from the slice
+    days = [np.nan if k < 5 else 30.0 for k in range(80)]
+    prepared.reading_days[SLICED] = pd.Series(days, index=rows.index)
+    entry = written(sc.secondary_models(prepared, rows, {}, [SLICED], 100, 3))["models"][SLICED]
+    assert entry["scores_on_the_post_cutoff_slice"] == {"statements": 74, "withheld": True}
+
+
+def test_a_type_of_three_statements_where_no_other_set_stands_near_it() -> None:
+    """The floor of five holds for a type by itself: here every statement is dated after
+    every cutoff, so no set of the known ones is a set of no statement or of a few, and the
+    type of three statements still keeps their number alone."""
+    prepared, rows, sets = two_types(117, 3, (), ["2025-06-15"] * 120)
+    known = sc.known_sets(prepared.study, rows, sets)
+    assert sorted({len(ids) for ids, _, _ in known.values()}) == [3, 117, 120]
+    frame = rows.iloc[117:]
+    assert sc.beside_known(frame, rows, known, "m: next_delivery", "m") is None
+    bare = {"statements": 3, "withheld": True}
+    assert sc.type_block("m", frame, prepared.study, None, 100, 5) == bare
+    got = written(sc.by_statement_type(prepared, rows, sets, 100, 5))["models"]["m"]["types"]
+    assert got["next_delivery"] == bare
+    assert got["recovery"] == {"statements": 117, "withheld": True}  # the item set but for three
+
+
+def test_the_types_of_two_primaries_whose_item_sets_differ_by_a_few_statements() -> None:
+    """The figures of a predictor that reads no text, and the frequencies of the events, are
+    the same whichever primary a type is of: the recovery statements of two primaries whose
+    item sets differ by two of them are both withheld; their next-delivery statements, one
+    set for both, are written for each."""
+    prepared, rows, sets = two_types(60, 120)
+    record = {"switched": True, "evaluable": True, "items": ev.SLICE_ITEMS}
+    sets["n"] = (rows.index[2:], record)
+    study = prepared.study
+    for condition in ev.CONDITIONS:
+        study.predictions[f"n:{condition}"] = study.predictions[f"m:{condition}"]
+    study.parsed["n:a"] = study.parsed["m:a"]
+    study.selection["n"] = "b"
+    # the sets known need the literal reading of every primary with an item set: without
+    # that of the second one the analysis stops, and nothing is written
+    with pytest.raises(ValueError, match="the literal reading of n is not given"):
+        sc.by_statement_type(prepared, rows, sets, 100, 5)
+    prepared.reading_days["n"] = prepared.reading_days["m"]
+    got = written(sc.by_statement_type(prepared, rows, sets, 100, 5))["models"]
+    assert got["m"]["types"]["recovery"] == {"statements": 60, "withheld": True}
+    assert got["n"]["types"]["recovery"] == {"statements": 58, "withheld": True}
+    for model in ("m", "n"):
+        assert "scores" in got[model]["types"]["next_delivery"]
+        assert got[model]["next_delivery_minus_recovery"] == {}
+    # five apart: the types of both are written
+    sets["n"] = (rows.index[5:], record)
+    got = written(sc.by_statement_type(prepared, rows, sets, 100, 5))["models"]
+    assert "scores" in got["m"]["types"]["recovery"] and "scores" in got["n"]["types"]["recovery"]
+
+
+def test_the_scenarios_of_a_slice_where_those_of_the_list_are_withheld() -> None:
+    """Two statements before the cutoff are not scoreable, and no other: the list's own
+    figures over every statement are withheld for them (section 2.5), so those of the slice,
+    which holds scoreable statements alone, have nothing beside them to give the two back,
+    and are written."""
+    prepared, rows = study_by_hand(70, 10, [k not in (0, 7) for k in range(70)])
+    got = written(sc.secondary_models(prepared, rows, {}, [SLICED], 100, 3))
+    whole = got["scores_on_every_eligible_statement"][SLICED]["a"]
+    assert whole["bounds_all_statements"] == {
+        "statements": 70,
+        "with_a_horizon_event_undetermined": 2,
+        "withheld": True,
+    }
+    assert whole["mean_p_E_end"] is None
+    record = got["models"][SLICED]["scores_on_the_post_cutoff_slice"]["a"]
+    assert "undetermined_as_no" in record["bounds_all_statements"]
+    assert record["mean_p_E_end"] is not None
+    assert "least" in record["calibration_all_statements"]["E_end"]
+    assert "ci95" in record["calibration_in_the_large"]["E_end"]["base_rate"]
 
 
 def after_cutoff_case(
@@ -3220,9 +4774,15 @@ def test_the_records_of_the_descriptives_hold_the_keys_they_are_known_to_hold(
     assert set(sc.slip_record(slip_rows(), 3, 1)) == SLIP_KEYS
     got = base.report["descriptives"]
     hold, slip = got["hold_rate"], got["slip"]
-    holds = [hold["all_dated_forms"], *hold["by_form"].values(), *hold["by_revision"].values()]
-    slips = [slip["all_dated_forms"], *slip["by_form"].values(), *slip["by_revision"].values()]
-    assert len(holds) >= 5 and len(slips) == len(holds)
+    splits = ("by_statement_type", "by_form", "by_revision")
+    assert set(hold) == set(slip) == {"all_dated_forms", *splits}
+    holds = [hold["all_dated_forms"], *(cell for name in splits for cell in hold[name].values())]
+    slips = [slip["all_dated_forms"], *(cell for name in splits for cell in slip[name].values())]
+    assert len(holds) >= 7 and len(slips) == len(holds)
+    # the synthetic study holds recovery statements alone: that type is every dated statement
+    assert hold["by_statement_type"]["recovery"] == hold["all_dated_forms"]
+    assert slip["by_statement_type"]["recovery"] == slip["all_dated_forms"]
+    assert hold["by_statement_type"]["next_delivery"]["statements"] == 0
     for record in holds:
         assert set(record) - {"withheld_with_another_cell"} == HOLD_KEYS
         for share in sc.HOLD_SHARES:
@@ -3230,7 +4790,7 @@ def test_the_records_of_the_descriptives_hold_the_keys_they_are_known_to_hold(
             assert ("withheld" in record[share]) == (record[share]["mean"] is None)
     for record in slips:
         small = {"statements", "episodes", "withheld"}
-        assert set(record) == (small if "withheld" in record else SLIP_KEYS)
+        assert set(record) - {sc.SHARES_WITHHELD} == (small if "withheld" in record else SLIP_KEYS)
     assert set(got["bracket_widths"]) == WIDTH_KEYS
     assert set(got) == {
         "statements",
@@ -3272,7 +4832,7 @@ def test_descriptives_split_the_dated_statements_by_form_and_revision() -> None:
         {"event_date": "2021-05-15", "statement_type": "recovery", "company_name": "Acme"},
         index=rows.index,
     )
-    out = sc.descriptives(rows, first, 200, 5, 1)
+    out = sc.descriptives(rows, first, 200, 5, 1, beside={})
     assert (out["statements"], out["dated_statements_not_stale"]) == (12, 11)
     assert list(out["hold_rate"]["by_form"]) == ["month_year", "quarter"]
     assert out["hold_rate"]["by_form"]["quarter"]["statements"] == 5
@@ -3651,6 +5211,17 @@ def test_every_score_of_section_7_2_for_the_six_secondary_models_and_conditions(
     assert near(got["mean_p_E_end"], pred.loc[keep, "p_a"].mean())
     gap = pred.loc[keep, "p_a"].mean() - y.loc[keep, "y_a"].mean()
     assert near(got["calibration_in_the_large"]["E_end"]["mean_p_minus_frequency"], gap)
+    # beside it, the same quantities for the base rate on the same statements (section 7.2)
+    for model in sc.SECONDARY_MODELS:
+        for condition in ev.CONDITIONS:
+            record = scores[model][condition]
+            beside_it = record["calibration_in_the_large"]["E_end"]["base_rate"]
+            theirs = (fit.base.loc[ids, "p_a"] - y["y_a"])[keep]
+            assert near(beside_it["mean_p_minus_frequency"], theirs.mean()), (model, condition)
+            assert near(beside_it["ci95"], by_hand(theirs, y["episode"][keep])[1])
+            limits = record["calibration_all_statements"]["E_end90"]["base_rate"]
+            least = (fit.base.loc[ids, "p_b"] - y["y_b"].fillna(1.0)).mean()
+            assert near(limits["least"], least) and limits["undetermined"] > sc.MIN_SHOWN
     assert set(got["pinball_all_statements"]) == {"0.50", "0.80", "0.95"}
     assert set(got["murphy"]["E_end90"]) == {"bins", "reliability", "resolution", "uncertainty"}
     # the rule for tied probabilities, which language models give often, stands in the file:
@@ -4098,6 +5669,112 @@ def test_the_descriptives_of_the_test_period(study: SimpleNamespace, base: Simpl
     assert near(widths["share_of_31_days_or_less"]["mean"], (width <= 31).mean())
 
 
+def shortened(
+    monkeypatch: pytest.MonkeyPatch, change: Callable[[str, pd.Index], pd.Index | None]
+) -> None:
+    """Lets ``score`` take, for each primary with an item set, the statements ``change`` makes
+    of it (None: the item set as the probe fixed it) in place of the item set itself: a study
+    in which another set stands near the sets the sections write on."""
+    real = sc.fixed_sets
+
+    def other_sets(*args: Any, **kwargs: Any) -> dict:
+        sets = real(*args, **kwargs)
+        for model, (ids, record) in list(sets.items()):
+            made = None if ids is None else change(model, ids)
+            if made is not None:
+                sets[model] = (made, record)
+        return sets
+
+    monkeypatch.setattr(sc, "fixed_sets", other_sets)
+
+
+def test_the_descriptives_of_the_test_period_give_way_to_the_item_set_of_a_primary(
+    study: SimpleNamespace,
+    base: SimpleNamespace,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Through the ``score`` command: the tables of E1 are told of the sets the other sections
+    and the evaluator write on, whichever section is asked for. Here the dated statements at
+    risk are the eligible list; with a primary whose item set is the list but for two
+    statements, the hold rate and the slip estimate of all dated statements are withheld and
+    marked, and so is a cell of every split."""
+    as_it_is = base.report["descriptives"]
+    assert as_it_is["dated_statements_not_stale"] == base.report["items"]["eligible_statements"]
+    assert sc.NEAR_SET not in json.dumps(as_it_is)
+    model = next(
+        model
+        for model, record in json.loads(study.paths.confirmatory.read_text())["item_sets"].items()
+        if record.get("items") == ev.ALL_ITEMS
+    )
+    shortened(monkeypatch, lambda name, ids: ids[2:] if name == model else None)
+    report, _ = scored(study, tmp_path, capsys, section=["descriptives"])
+    got = report["descriptives"]
+    assert report["sections"] == ["descriptives"]
+    for table in (got["hold_rate"], got["slip"]):
+        assert table["all_dated_forms"][sc.NEAR_SET] is True
+        assert numbers(table["all_dated_forms"]) == []
+        for split in ("by_form", "by_statement_type", "by_revision"):
+            marks = [mark for cell in table[split].values() for mark in cell if "withheld_" in mark]
+            assert marks, split
+    assert got["hold_rate"]["all_dated_forms"]["determined"] is None
+    assert (
+        got["bracket_widths"] == as_it_is["bracket_widths"] and got["counts"] == as_it_is["counts"]
+    )
+
+
+def test_the_sets_of_the_primaries_stand_beside_the_other_sections_through_the_command(
+    study: SimpleNamespace,
+    base: SimpleNamespace,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Through the ``score`` command, the sets known are those of the item sets the probes
+    fixed, of the literal readings and of the subsets, whichever section is asked for. With a
+    primary whose item set is the slice of a secondary model but for two statements, that
+    slice keeps its number alone; with one whose item set is the paraphrase subset and two
+    statements more, its recovery type does."""
+    model = next(
+        model
+        for model, record in json.loads(study.paths.confirmatory.read_text())["item_sets"].items()
+        if record.get("items") == ev.ALL_ITEMS
+    )
+    as_it_is = base.report["secondary_models"]["models"][SLICED]
+    assert as_it_is["post_cutoff_slice"]["slice_analysed"] is True
+    assert "primary_brier" in as_it_is["scores_on_the_post_cutoff_slice"]["a"]
+    cutoff = S.CUTOFF_MONTH_ENDS[SLICED].isoformat()
+
+    def after_the_cutoff(name: str, ids: pd.Index) -> pd.Index | None:
+        later = ids[(study.filled.loc[ids, "event_date"] > cutoff).to_numpy()]
+        return later[2:] if name == model else None
+
+    with monkeypatch.context() as patch:
+        shortened(patch, after_the_cutoff)
+        report, _ = scored(study, tmp_path, capsys, section=["secondary_models"])
+    entry = report["secondary_models"]["models"][SLICED]
+    count = as_it_is["post_cutoff_slice"]["slice_statements"]
+    assert entry["post_cutoff_slice"]["withheld"] is True
+    assert entry["post_cutoff_slice"]["slice_scoreable"] is None
+    assert entry["scores_on_the_post_cutoff_slice"] == {"statements": count, "withheld": True}
+    assert entry["on_every_eligible_statement"] == as_it_is["on_every_eligible_statement"]
+    # the recovery type of an item set that is the paraphrase subset and two statements more
+    chosen = subset_ids(study, "paraphrase")
+    assert base.report["by_statement_type"]["models"][model]["types"]["recovery"]["contrasts"]
+
+    def subset_and_two(name: str, ids: pd.Index) -> pd.Index | None:
+        if name != model:
+            return None
+        return ids[ids.isin([*chosen, *ids[~ids.isin(chosen)][:2]])]
+
+    with monkeypatch.context() as patch:
+        shortened(patch, subset_and_two)
+        report, _ = scored(study, tmp_path, capsys, section=["by_statement_type"])
+    block = report["by_statement_type"]["models"][model]["types"]["recovery"]
+    assert block == {"statements": len(chosen) + 2, "withheld": True}
+
+
 def test_selective_prediction_on_the_eligible_list(
     study: SimpleNamespace, base: SimpleNamespace, fit: SimpleNamespace
 ) -> None:
@@ -4220,6 +5897,221 @@ def test_the_sensitivity_analyses_of_the_recovery_rule(
         mine = got["contrasts"][LLAMA]
         assert {name: mine[name]["tested"] for name in mine} == family
     assert changed_somewhere
+
+
+def test_the_contrasts_by_statement_type_on_the_synthetic_study(
+    study: SimpleNamespace,
+    base: SimpleNamespace,
+    fit: SimpleNamespace,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The analysis by statement type through the ``score`` command, worked out again from the
+    scripted answers. The synthetic study holds recovery statements alone, so that type is the
+    item set and its contrasts are the tests of the family; then a third of the eligible
+    statements is read as next delivery (the cell of the statement table, changed once the
+    predictions are made) and every contrast of the two types is recomputed, with the
+    difference between them over draws of the episodes of the item set."""
+    ids = fit.ids
+    y = fit.y.loc[ids]
+    keep, episodes = y["scoreable"].to_numpy(), y["episode"]
+    family = {
+        (entry["model"], entry["hypothesis"]): entry
+        for entry in json.loads(study.paths.confirmatory.read_text())["family"]
+    }
+    as_it_is = base.report["by_statement_type"]
+    assert list(as_it_is["models"]) == list(ev.PRIMARIES)
+    for model in ev.PRIMARIES:
+        entry = as_it_is["models"][model]
+        assert entry["statements"] == len(ids) and entry["statements_of_another_type"] == 0
+        assert entry["types"]["next_delivery"] == {"statements": 0}
+        block = entry["types"]["recovery"]
+        assert block["scoreable_statements"] == int(keep.sum()) >= sc.MIN_TYPE
+        for name in ("H1", "H2", "H3"):  # the estimate of the registered test itself
+            assert near(block["contrasts"][name]["delta"], family[model, name]["delta"])
+            assert block["contrasts"][name]["tested"] == family[model, name]["tested"]
+        assert entry["next_delivery_minus_recovery"] == {}
+        assert entry["opposite_signs_in_the_two_types"] == {}
+    # a third of the statements read as next delivery
+    moved = sorted(ids[::3])
+    kinds = pd.Series("recovery", index=ids)
+    kinds.loc[moved] = "next_delivery"
+    real = sc.prepare
+
+    def with_two_types(*args: Any, **kwargs: Any) -> Any:
+        prepared = real(*args, **kwargs)
+        prepared.study.first.loc[moved, "statement_type"] = "next_delivery"
+        return prepared
+
+    monkeypatch.setattr(sc, "prepare", with_two_types)
+    monkeypatch.setattr(sc, "MIN_TYPE", 20)
+    report, _ = scored(study, tmp_path, capsys, section=["by_statement_type"])
+    got = report["by_statement_type"]
+    assert got["fewest_scoreable_statements_of_a_type"] == 20
+    names = sorted(set(episodes))
+    taken = P.cluster_draws(len(names), ev.DRAWS, ev.SEED).astype(float)
+    for model in ev.PRIMARIES:
+        entry = got["models"][model]
+        a, parsed = given(study, model, "a", ids, fit.base)
+        made = {
+            f"{model}:a": a,
+            f"{model}:b": given(study, model, "b", ids, fit.base)[0],
+            f"{model}:c": fit.fitted[ev.RULES].predict(
+                fit.frame.loc[ids], read_days(study, model, ids)
+            ),
+            ev.RULES: fit.free[ev.RULES].loc[ids],
+            ev.BASE: fit.free[ev.BASE].loc[ids],
+            ev.STRUCTURED: fit.free[ev.STRUCTURED].loc[ids],
+        }
+        best = family[model, "H3"]["tested"]
+        pairs = {
+            "H1": (f"{model}:a", f"{model}:b"),
+            "H2": (ev.RULES, f"{model}:c"),
+            "H3": (ev.BASE, best),
+            sc.DELTA_GBM: (ev.STRUCTURED, best),
+        }
+        assert family[model, "H3"]["comparator"] == ev.BASE
+        loss = {name: brier(pred, y) for name, pred in made.items()}
+        of_type = {kind: (kinds == kind).to_numpy() for kind in sc.TYPES}
+        for kind, flags in of_type.items():
+            block = entry["types"][kind]
+            assert block["statements"] == int(flags.sum())
+            assert block["scoreable_statements"] == int((flags & keep).sum()) >= 20
+            assert block["episodes"] == episodes[flags].nunique()
+            for name, (comparator, tested) in pairs.items():
+                paired = (loss[comparator] - loss[tested])[flags & keep]
+                delta, interval = by_hand(paired, episodes[flags & keep])
+                record = block["contrasts"][name]
+                assert (record["comparator"], record["tested"]) == (comparator, tested)
+                assert near(record["delta"], delta), (model, kind, name)
+                assert near(record["ci95"], interval), (model, kind, name)
+                assert record["statements"] == int((flags & keep).sum())
+                assert record["bounds"]["statements"] == int(flags.sum())
+            # the primary loss and the calibration in the large of the three conditions and
+            # of the base rate
+            for name, key in ((ev.BASE, ev.BASE), *((c, f"{model}:{c}") for c in ev.CONDITIONS)):
+                record = block["scores"][name]
+                mean, interval = by_hand(loss[key][flags & keep], episodes[flags & keep])
+                assert near(record["primary_brier"], mean) and near(record["ci95"], interval)
+                gap = (made[key]["p_a"] - y["y_a"])[flags & keep]
+                large = record["calibration_in_the_large"]["E_end"]
+                assert near(large["mean_p_minus_frequency"], gap.mean())
+                assert near(large["ci95"], by_hand(gap, episodes[flags & keep])[1])
+            # the criterion over every statement of the type: the mean probability of
+            # condition (a) less the largest frequency the captures allow, and less the
+            # mean probability of the base rate
+            found = block["overconfidence"]
+            least = (a["p_a"] - y["y_a"].fillna(1.0))[flags]
+            outcomes = found["against_outcomes"]
+            assert near(outcomes["least"], least.mean())
+            assert near(outcomes["least_ci95"], by_hand(least, episodes[flags])[1])
+            assert outcomes["undetermined"] == int((flags & y["y_a"].isna().to_numpy()).sum())
+            against = (a["p_a"] - made[ev.BASE]["p_a"])[flags]
+            assert near(found["against_base_rate"]["difference"], against.mean())
+            assert found["statements"] == int(flags.sum())
+            both = outcomes["met"] and found["against_base_rate"]["met"]
+            assert found["both_parts_hold"] is both
+        assert parsed.all() or not parsed.all()  # which answers parsed changes no figure here
+        # next delivery minus recovery, over the registered draws of the episodes of the item
+        # set, both types from each draw
+        back, due = of_type["recovery"] & keep, of_type["next_delivery"] & keep
+        for name, (comparator, tested) in pairs.items():
+            paired = (loss[comparator] - loss[tested]).fillna(0.0)
+            sums = np.array(
+                [
+                    [paired[flags & (episodes == episode).to_numpy()].sum() for episode in names]
+                    for flags in (back, due)
+                ]
+            )
+            sizes = np.array(
+                [
+                    [float((flags & (episodes == episode).to_numpy()).sum()) for episode in names]
+                    for flags in (back, due)
+                ]
+            )
+            totals, counted = taken @ sums.T, taken @ sizes.T
+            kept = (counted > 0).all(axis=1)
+            drawn = totals[kept, 1] / counted[kept, 1] - totals[kept, 0] / counted[kept, 0]
+            apart = entry["next_delivery_minus_recovery"][name]
+            assert near(apart["difference"], paired[due].mean() - paired[back].mean()), name
+            assert near(apart["ci95"], [float(v) for v in np.quantile(drawn, [0.025, 0.975])])
+            assert (apart["draws"], apart["draws_left_out"]) == (
+                int(kept.sum()),
+                int((~kept).sum()),
+            )
+            shown = [entry["types"][kind]["contrasts"][name]["delta"] for kind in sc.TYPES]
+            assert near(apart["difference"], shown[1] - shown[0])
+            assert entry["opposite_signs_in_the_two_types"][name] is bool(shown[0] * shown[1] < 0)
+        flag = entry["overconfidence_holds_on_the_item_set_and_not_on_its_recovery_statements"]
+        on_all = entry["overconfidence_on_the_item_set"]["both_parts_hold"]
+        there = entry["types"]["recovery"]["overconfidence"]["both_parts_hold"]
+        assert flag is (on_all and not there)
+        whole = json.loads(study.paths.confirmatory.read_text())["secondaries"]
+        # the evaluator's own record of the criterion on the item set
+        assert on_all is whole["overconfidence_of_condition_a"][model]["met"]
+    # under the registered floor the smaller type is reported by its counts alone
+    monkeypatch.setattr(sc, "MIN_TYPE", 50)
+    report, _ = scored(study, tmp_path, capsys, section=["by_statement_type"])
+    for model in ev.PRIMARIES:
+        entry = report["by_statement_type"]["models"][model]
+        due = entry["types"]["next_delivery"]
+        assert due["counts_alone"] == "fewer than 50 scoreable statements" and numbers(due) == []
+        assert "contrasts" in entry["types"]["recovery"]
+        assert entry["next_delivery_minus_recovery"] == {}
+
+
+def test_the_turnbull_share_beside_the_criterion_on_the_synthetic_study(
+    study: SimpleNamespace, base: SimpleNamespace, fit: SimpleNamespace
+) -> None:
+    """Section 13, "Reported beside it": for each primary on its item set, the mean of P(E_end)
+    of condition (a) and of the base rate, each less the Turnbull share recovered by the
+    stated end, worked out again from the brackets of the eligible statements."""
+    got = base.report["beside_the_overconfidence_criterion"]
+    assert list(got) == list(ev.PRIMARIES)
+    ids = fit.ids
+    filled = study.filled.loc[ids]
+    end = pd.to_numeric(filled["stated_end"].map(lambda d: D.days_between("2000-01-01", d)))
+    day = pd.to_numeric(filled["event_date"].map(lambda d: D.days_between("2000-01-01", d)))
+    lower, upper = pd.to_numeric(filled["lower_days"]), pd.to_numeric(filled["upper_days"])
+    kind = filled["outcome"].to_numpy()
+    left = np.where(kind == "discontinued", P.NEVER, lower - (end - day))
+    right = np.where(kind == "recovered", upper - (end - day), np.inf)
+    share = float(P.turnbull(left, right).cdf(0.0))
+    # in the synthetic study the eligible list is every dated statement at risk: the share of
+    # the item set is the estimate the descriptives write on all dated statements
+    dated = study.filled[study.filled["analysis_set"] == "dated"]
+    assert set(dated.index) == set(ids)
+    for model in ev.PRIMARIES:
+        entry = got[model]
+        assert entry["item_set_fixed_by_the_probe"]["items"] == ev.ALL_ITEMS
+        assert entry["statements"] == len(ids) and entry["draws"] == SLIP_DRAWS
+        assert entry["episodes"] == filled["episode_id"].nunique()
+        assert near(entry["turnbull_share_recovered_by_the_stated_end"], share, 1e-5)
+        mine = {
+            "condition_a": given(study, model, "a", ids, fit.base)[0]["p_a"],
+            "base_rate": fit.base.loc[ids, "p_a"],
+        }
+        for name, p in mine.items():
+            record = entry[name]
+            assert near(record["mean_p_E_end"], p.mean()), (model, name)
+            assert near(record["mean_p_minus_the_turnbull_share"], p.mean() - share, 1e-5)
+            low, high = record["ci95"]
+            assert (
+                low <= high and low - 0.2 < record["mean_p_minus_the_turnbull_share"] < high + 0.2
+            )
+        # the two primaries share the item set: one estimate, and the base rate's the same
+    one, other = (got[model] for model in ev.PRIMARIES)
+    assert one["base_rate"] == other["base_rate"]
+    assert (
+        one["turnbull_share_recovered_by_the_stated_end"]
+        == (other["turnbull_share_recovered_by_the_stated_end"])
+    )
+    slip = base.report["descriptives"]["slip"]["all_dated_forms"]
+    assert near(
+        one["turnbull_share_recovered_by_the_stated_end"],
+        slip["share_recovered_by_days_after_the_stated_end"]["0"],
+    )
 
 
 REPEATS = (
@@ -4391,7 +6283,7 @@ def test_a_declaration_is_confirmed_by_the_result_file_and_never_granted_by_it(
     said = "its route was withdrawn"
     reason = sc.DECLARATION + said
     alone = "no test of the family can have been computed, and the sealed file is not opened"
-    for section in (["descriptives"], ["secondary_models"], []):
+    for section in (["descriptives"], ["secondary_models"], ["by_statement_type"], []):
         # one field changed: both primaries declared, by the file alone
         declare = dict.fromkeys(ev.PRIMARIES, reason)
         with TE.json_with(path, lambda r, d=declare: r.update(not_evaluable_by_declaration=d)):
@@ -5990,11 +7882,30 @@ def test_two_runs_write_the_same_bytes_and_the_record_of_what_was_read(
         # section 5, E1 and E4
         "a further cell is withheld and marked where the cells written and the whole would "
         "otherwise give back the figure on 1 to 4 statements",
+        "over all dated statements and by statement type",
+        "a turnbull estimate by form, by statement type and by revision bucket",
         "the figures of a probe over 1 to 4 targets are withheld; its verdict is given",
         # section 7.2
         "statements that share a probability count with the frequency of the event among all "
         "of them, so that the figures do not depend on the order of the statements",
         "a forecast of one value has no resolution",
+        # section 5, E3, "By statement type"
+        "the primary loss and the calibration in the large of the three conditions and of the "
+        "base rate",
+        "each quantity comes with its 95% percentile interval by episode and the two scenarios "
+        "of section 7.2",
+        "the difference between the two types (next delivery minus recovery) and its 95% "
+        "percentile interval over 10,000 draws of the episodes of the item set, both types "
+        "taken from each draw; a draw with no scoreable statement of one type is left out",
+        "a type with fewer than 50 scoreable statements in an item set is reported by its "
+        "counts alone",
+        "the verdict of each test is the registered one on both types together",
+        "the two types differ in certainty class and in form, so a difference is not read as "
+        "an effect of the type alone",
+        # section 13, "Reported beside it", and section 7.2, "Calibration in the large"
+        "for condition (a) and for the base rate on the same statements",
+        "minus the turnbull share recovered by the stated end",
+        "stand the same quantities for the base rate by listing age on the same events",
     ):
         assert words in stated.lower(), words
         assert words in registered, words
@@ -6025,9 +7936,8 @@ def test_two_runs_write_the_same_bytes_and_the_record_of_what_was_read(
     assert named == {"literal_scores.py", "audit_reference.py", "power.py"}
     assert all((Path(sc.__file__).parent / name).is_file() for name in named)
     assert not [text for text in nowhere if ".py" in text]
+    assert len(nowhere) == 3
     for analysis in (
-        "the analysis by statement type",
-        "the mean of P(E_end) minus the Turnbull share recovered by the stated end",
         "the fit that leaves out the dominant company",
         "the full-follow-up refit",
         "E7",
@@ -6208,7 +8118,7 @@ def test_the_train_descriptives_command_reads_the_open_table_alone(
     assert "the sealed file" not in sealed_unread and "train period:" in printed
     frame = P.prepare(study.table)
     rows = frame[frame["period"] == "train"]
-    wanted = sc.descriptives(rows, study.table.set_index("statement_group_id"))
+    wanted = sc.descriptives(rows, study.table.set_index("statement_group_id"), beside={})
     assert report["descriptives"] == json.loads(ev.report_text(wanted))
     assert (
         report["about"] == sc.ABOUT_TRAIN
@@ -6243,13 +8153,25 @@ def test_the_train_descriptives_command_reads_the_open_table_alone(
         ("as_the_plan_says", sc.AS_THE_PLAN_SAYS),
         ("where_the_plan_is_silent", sc.WHERE_THE_PLAN_IS_SILENT),
     ):
-        assert report[key] == [line for line in lines if "E1" in line or "Turnbull" in line]
+        assert report[key] == sc.of_the_descriptives(lines)
+        named = [line for line in lines if "E1" in line or "Turnbull" in line]
+        # the Turnbull share beside the overconfidence criterion is no descriptive of E1
+        assert [line for line in named if line not in report[key]] == [
+            line for line in named if "criterion" in line
+        ]
+        assert len([line for line in named if "criterion" in line]) == 1
         assert report[key] and not [
             line
             for line in report[key]
             if "2x2" in line or "paraphrase" in line or "selective prediction" in line
         ]
-    assert len(report["as_the_plan_says"]) == 4 and len(report["where_the_plan_is_silent"]) == 5
+    assert len(report["as_the_plan_says"]) == 5 and len(report["where_the_plan_is_silent"]) == 7
+    # by statement type as well: every dated train statement of the synthetic table is a
+    # recovery statement, so that cell is the whole
+    for table in ("hold_rate", "slip"):
+        cells = got[table]["by_statement_type"]
+        assert list(cells) == list(sc.TYPES) and cells["recovery"] == got[table]["all_dated_forms"]
+        assert cells["next_delivery"]["statements"] == 0
     said = " ".join(report["as_the_plan_says"])
     assert "the first 1,000 of the 10,000 registered draws" in said
     assert "a further cell is withheld and marked where the cells written and the whole" in said
