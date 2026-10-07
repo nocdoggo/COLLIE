@@ -3286,6 +3286,178 @@ def test_a_plan_that_names_a_sealed_file_is_not_followed(
     assert touched == [] and check(study, capsys)[0] == 0
 
 
+@contextmanager
+def linked(path: Path, target: Path) -> Iterator[None]:
+    """A stored file replaced by a symbolic link to ``target``; the link is taken away and the
+    file put back as it was (never written through the link)."""
+    data = path.read_bytes()
+    path.unlink()
+    path.symlink_to(target)
+    try:
+        yield
+    finally:
+        path.unlink()
+        path.write_bytes(data)
+
+
+def test_a_path_is_resolved_part_by_part_without_a_look_at_the_sealed_folder(
+    study: SimpleNamespace, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """``is_sealed``: the sealed file, its folder and any folder named as the registered one,
+    as given or where a link leads, with no look at any of them."""
+    sealed, touched = watched_vault(study, tmp_path, monkeypatch)
+    plain = tmp_path / "plain.csv"
+    plain.write_text("open")
+    named = tmp_path / "open" / "sealed"
+    named.mkdir(parents=True)
+    (tmp_path / "to_file").symlink_to(sealed)
+    (tmp_path / "to_folder").symlink_to(sealed.parent, target_is_directory=True)
+    (tmp_path / "to_named").symlink_to(named, target_is_directory=True)
+    (tmp_path / "second").symlink_to(tmp_path / "to_folder" / sealed.name)
+    (tmp_path / "relative").symlink_to(Path("open") / ".." / "to_file")
+    (tmp_path / "to_plain").symlink_to(plain)
+    (tmp_path / "round").symlink_to(tmp_path / "about")
+    (tmp_path / "about").symlink_to(tmp_path / "round")
+    led = [
+        sealed,
+        sealed.parent,
+        named / "items.jsonl",
+        tmp_path / "to_file",
+        tmp_path / "to_folder",
+        tmp_path / "to_folder" / sealed.name,
+        tmp_path / "to_named" / "items.jsonl",
+        tmp_path / "second",
+        tmp_path / "relative",
+        tmp_path / "open" / ".." / "to_file",
+        tmp_path / "round" / "items.jsonl",  # links in a circle: nothing is read through them
+    ]
+    for path in led:
+        assert ev.is_sealed(path) is True, path
+        assert ev.is_sealed(str(path), sealed) is True, path
+    for path in (
+        plain,
+        tmp_path / "to_plain",
+        tmp_path / "nothing" / "there.json",
+        tmp_path / "open" / "items.jsonl",
+        sealed.parent / "another.csv",  # the folder is not named as the registered one
+        tmp_path / "to_folder" / "another.csv",
+    ):
+        assert ev.is_sealed(path) is False, path
+    assert ev.is_sealed(None) is False and ev.is_sealed(tmp_path / "to_plain", named) is False
+    assert ev.is_sealed(tmp_path / "to_plain", plain) is True
+    assert not [look for look in touched if look not in (str(sealed.parent / "another.csv"),)]
+    assert ev.LINK_HOPS == 40 and S.SEALED_FOLDER == "sealed"
+    # the sealed file reached by another way to its folder: the way is resolved, not the folder
+    (tmp_path / "same").symlink_to(tmp_path, target_is_directory=True)
+    assert ev.is_sealed(sealed, tmp_path / "same" / "vault" / sealed.name) is True
+    assert not [look for look in touched if look not in (str(sealed.parent / "another.csv"),)]
+
+
+def test_a_stored_file_that_leads_into_a_sealed_folder_through_a_link_is_not_read(
+    study: SimpleNamespace,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The plan, an item file, a track record, the readings and the manifest of a run, and a
+    selection file, each in turn a symbolic link to the sealed file (directly, and by way of a
+    second link through its folder): every command refuses before the file is looked at, and
+    no character of the hash of the sealed file is printed, although the selection file is
+    held to a hash that the sealed bytes would not have."""
+    sealed, touched = watched_vault(study, tmp_path, monkeypatch)
+    (tmp_path / "way").symlink_to(sealed.parent, target_is_directory=True)
+    second = tmp_path / "second"
+    second.symlink_to(tmp_path / "way" / sealed.name)
+    run, dev = run_folder(study, LLAMA, "e3-a"), run_folder(study, LLAMA, "dev-a")
+    named = "the plan of the runs names a path in a sealed folder; none of its files is read"
+    of_run = "leads into a sealed folder; none of the files of the run is read"
+    cases = {
+        lp.plan_path(study.paths.runs): "the plan of the runs leads into a sealed folder; it is",
+        Path(study.plan["lists"]["e3"]["path"]): named,
+        Path(study.plan["tracks"]["fit+dev"]["path"]): named,
+        run / "readings.jsonl": f"a stored file of run {run.name} {of_run}",
+        run / "run_manifest.json": f"a stored file of run {run.name} {of_run}",
+        study.paths.selections / ev.SELECTION_NAME.format(model=LLAMA): (
+            f"{LLAMA}: the H3 selection file leads into a sealed folder; it is not read"
+        ),
+    }
+    for path, said in cases.items():
+        for target in (sealed, second):
+            with linked(path, target):
+                code, out = check(study, capsys)
+                why = refused(study, tmp_path, capsys, sealed=None)
+            assert code == 3 and f"missing: {said}" in out and said in why, path
+            assert touched == [], path
+            assert not [n for n in (6, 8, 16) if study.sealed_sha[:n] in out + why]
+    # the dev command: its plan, and a stored file of one of its runs
+    for path, said in (
+        (lp.plan_path(study.paths.runs), "the plan of the runs leads into a sealed folder"),
+        (dev / "readings.jsonl", f"a stored file of run {dev.name} {of_run}"),
+        (dev / "run_manifest.json", f"a stored file of run {dev.name} {of_run}"),
+    ):
+        with linked(path, second), pytest.raises(SystemExit) as stop:
+            run_dev(study, tmp_path / "selection.json")
+        assert said in str(stop.value.code) and touched == []
+    # the same with the sealed file given by its own option, wherever it lies
+    other = tmp_path / "elsewhere" / "outcomes.csv.gz"
+    other.parent.mkdir()
+    other.write_bytes(sealed.read_bytes())
+    touched.clear()
+    for path, said in ((run / "readings.jsonl", of_run), (list(cases)[-1], "it is not read")):
+        with linked(path, other):
+            why = refused(study, tmp_path, capsys, sealed=other, expect_sha256=file_sha(other))
+        assert said in why and study.sealed_sha[:8] not in why
+    # an output that leads into the sealed folder is refused without a look at it either
+    (tmp_path / "out").symlink_to(sealed.parent, target_is_directory=True)
+    with pytest.raises(SystemExit, match="--out lies in a sealed folder"):
+        ev.output_paths(tmp_path / "out" / sealed.name)
+    assert touched == [] and check(study, capsys)[0] == 0
+    # the study is whole again. An open file that fails its hash still shows its own; a file
+    # that leads to a sealed path shows none, and passes with the hash it has
+    good, kept = (hashlib.sha256(data).hexdigest() for data in (b"open", b"kept"))
+    assert ev.hash_required(b"open", good[:16], "an open file", tmp_path / "open.csv") == good
+    with pytest.raises(SystemExit, match=f"its sha256 starts with {good[:16]}"):
+        ev.hash_required(b"open", "0" * 16, "an open file", tmp_path / "open.csv")
+    for wrong in ("0" * 16, kept[:15]):  # another hash, and one that is too short to count
+        with pytest.raises(SystemExit, match="no character of the hash") as stop:
+            ev.hash_required(b"kept", wrong, "a sealed file", second)
+        assert kept[:6] not in str(stop.value.code)
+    assert ev.hash_required(b"kept", kept[:16], "a sealed file", second) == kept
+
+
+def test_no_spelling_of_the_sealed_path_has_its_hash_printed(
+    study: SimpleNamespace, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """The sealed file lies in a folder that is not named as the registered one, and
+    ``--sealed`` reaches it through a link and a step back: as text, the link and the step
+    cancel, and the path names a file that is not there. With a wrong hash the refusal still
+    prints no character of the hash of the file that was read, and the file is no open input
+    under that spelling."""
+    kept = tmp_path / "elsewhere" / "outcomes.csv.gz"
+    (kept.parent / "inner").mkdir(parents=True)
+    kept.write_bytes(study.paths.sealed.read_bytes())
+    (tmp_path / "way").symlink_to(kept.parent / "inner", target_is_directory=True)
+    spelled = tmp_path / "way" / ".." / kept.name
+    assert spelled.read_bytes() == kept.read_bytes() and ".." in str(spelled)
+    assert not Path(os.path.abspath(spelled)).exists()
+    why = refused(study, tmp_path, capsys, sealed=spelled, expect_sha256="0" * 64)
+    assert "the sealed file is not the expected file: its sha256 is not the one given" in why
+    assert not [n for n in (6, 8, 16) if study.sealed_sha[:n] in why]
+    assert ev.is_sealed(spelled, spelled) and ev.is_sealed(str(spelled), spelled)
+    assert ev.is_sealed(spelled, kept) and not ev.is_sealed(kept.parent / "other.csv", spelled)
+    why = refused(study, tmp_path, capsys, sealed=spelled, statements=spelled)
+    assert "--statements would be read from a sealed folder" in why
+    # whatever the path says, the bytes of the sealed file are those of a sealed file
+    with pytest.raises(SystemExit, match="no character of the hash") as stop:
+        ev.hash_required(
+            b"kept", "0" * 16, "the sealed file", tmp_path / "open.csv", of_sealed=True
+        )
+    assert hashlib.sha256(b"kept").hexdigest()[:6] not in str(stop.value.code)
+    # with its own hash the file is read, and the evaluation is the one of the study
+    report, _, _ = confirm(study, tmp_path, capsys, sealed=spelled)
+    assert report["inputs"]["sealed_outcomes_sha256"] == study.sealed_sha
+
+
 def test_check_lists_what_is_missing(
     study: SimpleNamespace, tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
@@ -3350,17 +3522,21 @@ def test_a_wrong_or_missing_hash_is_refused_and_the_sealed_file_is_not_parsed(
     wrong = "0" * 64
     why = refused(study, tmp_path, capsys, expect_sha256=wrong)
     assert "the sealed file is not the expected file" in why
-    assert study.sealed_sha[:16] in why and "expected 0000000000000000" in why
+    # the hash that was expected is the one given; of the hash of the sealed file itself no
+    # character is printed
+    assert "its sha256 is not the one given; no character of the hash of a sealed file" in why
+    assert not [n for n in (6, 8, 16) if study.sealed_sha[:n] in why]
     for value in (None, "", "abc", study.sealed_sha[:15], "z" * 64):
         why = refused(study, tmp_path, capsys, expect_sha256=value)
         assert "--expect-sha256 takes a sha256 or its first 16 or more hex characters" in why
     why = refused(study, tmp_path, capsys, expect_eligible_sha256=wrong)
     assert "the eligible list is not the expected file" in why
+    assert f"its sha256 starts with {study.eligible_sha[:16]}" in why  # an open file's is shown
     why = refused(study, tmp_path, capsys, expect_eligible_sha256=None)
     assert "--expect-eligible-sha256 takes a sha256" in why
     # the hash of another file of the study does not open the sealed one
     why = refused(study, tmp_path, capsys, expect_sha256=study.eligible_sha)
-    assert "the sealed file is not the expected file" in why
+    assert "the sealed file is not the expected file" in why and study.sealed_sha[:8] not in why
     # a file that is not there
     why = refused(study, tmp_path, capsys, sealed=tmp_path / "nothing.csv.gz")
     assert "the sealed file cannot be read (FileNotFoundError)" in why
@@ -4583,7 +4759,12 @@ DECISIONS = (
     "an end on zero does not",
     "except in the base rate's own record",
     "a primary without an item set has no reading",
-    "the horizon events of those few statements",
+    "no count of undetermined events by horizon event",
+    "reading_in_words says that there is no reading and why",
+    "the floor of five statements",
+    "one pair of sets at a time",
+    "that anyone can name",
+    "links in a circle count as sealed",
 )
 """A phrase of every decision in ``evaluate.WHERE_THE_PLAN_IS_SILENT``."""
 STATED_BY_THE_PLAN = (
@@ -4599,6 +4780,13 @@ STATED_BY_THE_PLAN = (
     "at six decimals",  # H3, the selection
     "every primary is declared not evaluable",  # "Confirmatory runs"
     "held to the hashes of the freeze",  # "Evaluator"
+    "the two parts on the answers that parsed",  # section 13, "Reported beside it"
+    "the statements that both of its sides parsed (both_sides_parsed) is withheld",  # section 4
+    "nor does an interval that is withheld",  # section 6, "Reading"
+    "the statements that share it",  # section 7.2, "Brier decomposition"
+    "has a secondary scorer do",  # section 2.5, "Horizon events": said of every script
+    "none of the five sentences",  # section 13, "Against outcomes"
+    "would name the statements that are not",  # section 2.5, "Horizon events"
 )
 """A phrase of every sentence the list held before the plan stated the decision itself."""
 
@@ -4645,25 +4833,102 @@ def test_the_list_of_decisions_holds_what_the_plan_does_not_say() -> None:
         "a primary declared not evaluable, whose runs are not read, has no entry and no line",
     ):
         assert phrase in unread, phrase
-    # the figures on the answers that parsed: when they are withheld, and why
-    (few,) = [sentence for sentence in held if "those few statements" in sentence]
-    for phrase in (
-        "the two parts on the answers that parsed (parsed_only) are withheld",
-        "their three counts apart",
-        "when 1 to 4 answers of condition (a) failed on the item set, or 1 to 4 parsed",
-        "with the figures over every statement they would give the horizon events",
-        "the statements that both of its sides parsed (both_sides_parsed) is withheld",
-        "when it leaves out or rests on 1 to 4 scoreable statements",
-    ):
-        assert phrase in few, phrase
-    assert ev.MIN_SHOWN - 1 == 4 and ev.MIN_SLICE == 50  # the numbers the two sentences give
+    assert ev.MIN_SHOWN - 1 == 4 and ev.MIN_SLICE == 50  # the numbers the sentences give
     # the module's docstring words the same decisions
     described = " ".join((ev.__doc__ or "").split())
-    for sentence in held[-4:]:
+    for sentence in (zero, unread, *(s for s in held if "own record" in s)):
         worded = sentence[1:].replace("base_rate", "``base_rate``")
-        for key in ("parsed_only", "both_sides_parsed"):
-            worded = worded.replace(f"({key})", f"(``{key}``)")
         assert worded in described, sentence
+    # how the plan's rules of withholding are applied in this file: one sentence for each
+    by_phrase = {words: next(s for s in held if words in s) for words in DECISIONS[-6:]}
+    for words, phrases in {
+        "no count of undetermined events by horizon event": (
+            "the figures that section 2.5 withholds where 1 to 4 statements of a set are not",
+            "the bounds beside a contrast",
+            "bounds_all_statements and both blocks of calibration in the large",
+            "the two mean probabilities null",
+            "for the predictor and for the base rate beside it",
+            "the block scoreable",
+            "a record that is withheld holds the two counts of its set",
+        ),
+        "reading_in_words says that there is no reading and why": (
+            "is without a reading because its part against outcomes is withheld (section 13)",
+            "reading is null",
+            "met is false",
+            "the part against the base rate, whose own verdict is given and decides nothing",
+        ),
+        "the floor of five statements": (
+            "a contrast in short over 1 to 4 scoreable statements holds its two counts",
+            "a pinball loss with as few targets",
+            "the coverage counted on as few statements",
+            "a secondary contrast that is not evaluable carries no estimate",
+            "so are its p-value and its two pinball records",
+            "the contrast of each of the six tests is never withheld",
+        ),
+        "one pair of sets at a time": (
+            "the six tests first, then the contrast of each test on the statements both of its",
+            "differ by 1 to 4 statements it is withheld, its two counts apart",
+            "the contrast written first stays",
+            "H2 on the month-and-year form",
+            "the statements first captured by the stated end",
+            "the post-cutoff slice",
+            "the base rate's figures beside those of a primary",
+            "to every definition before it whose contrasts are written",
+            "the number of statements with another horizon event",
+        ),
+        "that anyone can name": (
+            "the two scoreable counts of a post-cutoff slice",
+            "(scoreable_not_parsed, null) where so few of its answers failed or so few parsed",
+            "of both sides where so few answers failed on one side alone or on both",
+            "the counts of the contrast on the statements both sides parsed",
+            "the counts of the six tests themselves stay as they are",
+        ),
+        "links in a circle count as sealed": (
+            "as given or where a symbolic link on its way leads",
+            "the readings and the manifest of a run and a selection file",
+            "nothing is asked about a sealed path",
+            "an output is not written through one",
+            "prints no character of that hash",
+        ),
+    }.items():
+        for phrase in phrases:
+            assert phrase in by_phrase[words], phrase
+    for phrase in (
+        "A record whose figures are withheld holds its counts and ``withheld``: true",
+        "The contrast of each is never withheld.",
+        "A secondary contrast that is not evaluable carries no estimate.",
+        "The pinball losses and the coverage stay.",
+        "Two sets, one pair at a time.",
+        "The counts of the six tests stay.",
+        "asks the file system nothing about a sealed path",
+        "of the sealed file no character of its own hash is printed",
+    ):
+        assert phrase in described, phrase
+    # the plan words the rules themselves; the evaluator's sentences name what it adds
+    plan = " ".join(PLAN.read_text(encoding="utf-8").split())
+    for phrase in (
+        "withhold a secondary figure, its counts apart, where it rests on 1 to 4 statements",
+        "The second check is made on pairs of sets.",
+        "how many of 1 to 4 statements are scoreable or have a determined event",
+        "The pinball losses and the coverage stay.",
+        "reads no stored file that leads into a sealed folder through a link",
+        "or 1 to 4 of those scoreable under either definition",
+        "which name the few that are not, are then withheld too",
+        "The same holds where only 1 to 4 statements of a set are scoreable.",
+        "Where the failed answers of one side, or of both, number 1 to 4",
+        "The figures of a probe over 1 to 4 targets are withheld; its verdict is given.",
+        "(an interval that is withheld does not)",
+        "item sets that differ by 1 to 4 statements",
+        "Statements that share a probability count with the frequency of the event among all",
+        "a forecast of one value has no resolution",
+        "the criterion has no reading either",
+        "or when the answers that parsed and the scoreable statements differ by 1 to 4",
+    ):
+        assert phrase in plan, phrase
+    # the one line of what is computed elsewhere that names the six secondary models
+    (others,) = [item for item in ev.NOT_COMPUTED_HERE if "six secondary models" in item]
+    assert "the decomposition of E3 and every metric of the six secondary models" in others
+    assert others.endswith("(a secondary scorer)")
 
 
 COMMITTED_FAMILY = [
@@ -5302,6 +5567,48 @@ def test_murphy_decomposition_and_coverage_on_small_cases() -> None:
     }
     assert ev.murphy([0.5, 0.5, 0.5], [1, 0, 1])["bins"] == 3
     assert ev.murphy([0.3] * 30, [0, 1, 1] * 10)["resolution"] == pytest.approx(0.0)
+    # Tied probabilities. Six statements in three bins of two: four at 0.2, of which one is yes,
+    # and two at 0.8, both yes. The four cannot be told apart, so each counts with their
+    # frequency of 1/4, whichever two a cut puts in the first bin: the bins have mean
+    # probabilities 0.2, 0.2 and 0.8 against frequencies 0.25, 0.25 and 1, and the event has
+    # happened on 3 of 6.
+    tied = {
+        "bins": 3,
+        "reliability": pytest.approx((2 * 0.05**2 + 2 * 0.05**2 + 2 * 0.2**2) / 6),
+        "resolution": pytest.approx((2 * 0.25**2 + 2 * 0.25**2 + 2 * 0.5**2) / 6),
+        "uncertainty": pytest.approx(0.25),
+    }
+    p, y = np.array([0.2, 0.2, 0.2, 0.2, 0.8, 0.8]), np.array([1.0, 0.0, 0.0, 0.0, 1.0, 1.0])
+    first = ev.murphy(p, y, bins=3)
+    assert first == tied
+    rng = np.random.default_rng(7)
+    for _ in range(20):  # the same numbers, to the last bit, in whatever order they are given
+        order = rng.permutation(6)
+        assert ev.murphy(p[order], y[order], bins=3) == first
+    # the yes first or last among the four, in the order given, decided the two bins before
+    assert ev.murphy(p, y[[1, 2, 3, 0, 4, 5]], bins=3) == first
+    # a forecast of one value has no resolution, in any order, and all of its Brier score is
+    # reliability and uncertainty
+    one_value = ev.murphy([0.3] * 30, [1.0] * 5 + [0.0] * 25)
+    assert one_value == ev.murphy([0.3] * 30, [0.0, 0.0, 0.0, 0.0, 0.0, 1.0] * 5)
+    assert one_value["bins"] == 10 and one_value["resolution"] == pytest.approx(0.0)
+    assert one_value["reliability"] == pytest.approx((0.3 - 5 / 30) ** 2)
+    # where no run of equal probabilities is cut, the bins hold their own frequencies
+    q, z = rng.random(40), (rng.random(40) < 0.4).astype(float)
+    cuts = np.array_split(np.argsort(q), 10)
+    rate = float(z.mean())
+    plain = ev.murphy(q, z)
+    assert plain["reliability"] == pytest.approx(
+        sum(len(k) * (q[k].mean() - z[k].mean()) ** 2 for k in cuts) / 40, abs=1e-15
+    )
+    assert plain["resolution"] == pytest.approx(
+        sum(len(k) * (z[k].mean() - rate) ** 2 for k in cuts) / 40, abs=1e-15
+    )
+    order = rng.permutation(40)
+    assert ev.murphy(q[order], z[order]) == plain
+    # a run of equal probabilities inside one bin leaves that bin with its own frequency
+    inside = ev.murphy([0.1, 0.1, 0.2, 0.9, 0.9, 0.95], [0, 1, 0, 1, 1, 0], bins=2)
+    assert inside["resolution"] == pytest.approx(2 * 3 * (1 / 3 - 0.5) ** 2 / 6)
     rows = pd.DataFrame(
         {
             "ttr_kind": [
@@ -5596,20 +5903,31 @@ def test_a_value_whose_interval_holds_zero_decides_nothing() -> None:
     assert ev.MIN_EPISODES == 2
 
 
+def open_at_one_horizon() -> pd.DataFrame:
+    """Twice over, six statements in three episodes, E_end / E_end90:
+
+    * the first, undetermined / yes (E_end is open and E_end90 is not);
+    * the second, no / undetermined (the reverse);
+    * then yes / yes, no / yes and no / no;
+    * the sixth, undetermined / undetermined.
+
+    Of the 12 statements 6 are scoreable and 6 are not, so that nothing is withheld."""
+    return item_rows(
+        [None, 0, 1, 0, 0, None] * 2, [1, None, 1, 1, 0, None] * 2, episodes=list("gghhkkmmnnpp")
+    )
+
+
 def test_an_undetermined_event_is_counted_at_its_own_horizon_alone() -> None:
-    # Six statements in three episodes, E_end / E_end90:
-    #   s000 undetermined / yes   (E_end is open and E_end90 is not)
-    #   s001 no / undetermined    (the reverse)
-    #   s002 yes / yes   s003 no / yes   s004 no / no   s005 undetermined / undetermined
-    rows = item_rows([None, 0, 1, 0, 0, None], [1, None, 1, 1, 0, None], episodes=list("gghhkk"))
-    assert rows["scoreable"].tolist() == [False, False, True, True, True, False]
+    rows = open_at_one_horizon()
+    assert rows["scoreable"].tolist() == [False, False, True, True, True, False] * 2
     pred, base = stated(rows, 0.7, 0.8), stated(rows, 0.3, 0.5)
     found = ev.overconfidence(rows, pred, base, everyone(rows), 400, ev.SEED)
-    # E_end: 1 yes, 3 no, 2 undetermined. Largest frequency (1 + 2) / 6 = 0.5, smallest 1 / 6.
-    # s001 is not scoreable, and its E_end is still the no that was seen: had the three
-    # statements that are not scoreable been counted as open, the largest would be 4 / 6.
+    # E_end in each six: 1 yes, 3 no, 2 undetermined. Largest frequency (1 + 2) / 6 = 0.5,
+    # smallest 1 / 6. The second statement is not scoreable, and its E_end is still the no that
+    # was seen: had the three statements that are not scoreable been counted as open, the
+    # largest would be 4 / 6.
     outcomes, no_text = events_of(found)
-    assert outcomes["undetermined"] == 2
+    assert outcomes["undetermined"] == 4
     assert outcomes["largest_frequency"] == pytest.approx(3 / 6)
     assert outcomes["smallest_frequency"] == pytest.approx(1 / 6)
     assert outcomes["least"] == pytest.approx(0.7 - 3 / 6)
@@ -5620,7 +5938,7 @@ def test_an_undetermined_event_is_counted_at_its_own_horizon_alone() -> None:
     # E_end90: 3 yes, 1 no, 2 undetermined. Largest (3 + 2) / 6, smallest 3 / 6: the yes of
     # s000 is counted in both, although its E_end is open.
     later, apart = events_of(found, "E_end90")
-    assert later["undetermined"] == 2 and later["mean_p"] == pytest.approx(0.8)
+    assert later["undetermined"] == 4 and later["mean_p"] == pytest.approx(0.8)
     assert later["largest_frequency"] == pytest.approx(5 / 6)
     assert later["smallest_frequency"] == pytest.approx(3 / 6)
     assert later["least"] == pytest.approx(0.8 - 5 / 6)
@@ -5629,11 +5947,11 @@ def test_an_undetermined_event_is_counted_at_its_own_horizon_alone() -> None:
     assert later["base_rate"]["greatest"] == pytest.approx(0.0)
     assert apart["mean_p_base_rate"] == pytest.approx(0.5)
     assert apart["difference"] == pytest.approx(0.8 - 0.5)
-    # beside the criterion, the scoreable statements (s002, s003, s004: E_end 1 of 3, E_end90
-    # 2 of 3), where the two predictors stand against one frequency
+    # beside the criterion, the scoreable statements (the third, fourth and fifth of each six:
+    # E_end 1 of 3, E_end90 2 of 3), where the two predictors stand against one frequency
     scoreable = found["scoreable"]
     assert list(scoreable) == ["statements", "episodes", *EVENT_KEYS]
-    assert (scoreable["statements"], scoreable["episodes"]) == (3, 2)
+    assert (scoreable["statements"], scoreable["episodes"]) == (6, 4)
     assert list(scoreable["E_end"]) == [
         "mean_p_minus_frequency",
         "ci95",
@@ -5648,10 +5966,12 @@ def test_an_undetermined_event_is_counted_at_its_own_horizon_alone() -> None:
     assert scoreable["E_end90"]["mean_p_minus_frequency"] == pytest.approx(0.8 - 2 / 3)
     assert scoreable["E_end90"]["base_rate"]["mean_p_minus_frequency"] == pytest.approx(0.5 - 2 / 3)
     assert scoreable["E_end90"]["against_base_rate"]["difference"] == pytest.approx(0.3)
-    held = ev.calibration(pred.loc[rows["scoreable"], "p_a"], [1, 0, 0], list("hhk"), 400, ev.SEED)
+    held = ev.calibration(
+        pred.loc[rows["scoreable"], "p_a"], [1, 0, 0] * 2, list("hhknnp"), 400, ev.SEED
+    )
     assert {key: scoreable["E_end"][key] for key in held} == held
     # the limits on their own: the same numbers, and nothing without a statement
-    limits = ev.calibration_limits([0.7] * 6, rows["y_a"], list("gghhkk"), 400, ev.SEED)
+    limits = ev.calibration_limits([0.7] * 12, rows["y_a"], list(rows["episode_id"]), 400, ev.SEED)
     assert limits == {key: outcomes[key] for key in LIMIT_KEYS}
     assert ev.calibration_limits([], [], [], 400, ev.SEED) == {
         "undetermined": 0,
@@ -5659,7 +5979,7 @@ def test_an_undetermined_event_is_counted_at_its_own_horizon_alone() -> None:
     }
     assert ev.probability_gap([], [], [], 400, ev.SEED) == dict.fromkeys(GAP_KEYS)
     # no statement is scoreable: the block holds its counts and nothing else
-    open_rows = item_rows([None, 0], [1, None])
+    open_rows = item_rows([None, 0] * 3, [1, None] * 3)
     bare = ev.overconfidence(
         open_rows, stated(open_rows, 0.7), stated(open_rows, 0.3), everyone(open_rows), 400, 5
     )
@@ -5668,30 +5988,29 @@ def test_an_undetermined_event_is_counted_at_its_own_horizon_alone() -> None:
 
 
 def test_failed_answers_are_in_the_criterion_and_out_of_the_parsed_only_figures() -> None:
-    # Three times over, six statements in three episodes of two: E_end yes, no, undetermined,
-    # no, yes, undetermined. 18 statements in nine episodes, so that neither the answers that
-    # failed nor those that parsed are few enough for the parsed-only figures to be withheld.
-    rows = item_rows(
-        [1, 0, None, 0, 1, None] * 3, episodes=[e for e in "ghkmnpqrt" for _ in range(2)]
-    )
-    base = stated(rows, [0.1, 0.2, 0.3, 0.4, 0.5, 0.6] * 3, [0.2, 0.3, 0.4, 0.5, 0.6, 0.7] * 3)
+    # Six times over, six statements in three episodes of two: E_end yes, no, undetermined,
+    # no, yes, undetermined. 36 statements in 18 episodes, so that neither the answers that
+    # failed nor those that parsed are few enough for the parsed-only figures to be withheld,
+    # and the answers that parsed hold six statements that are not scoreable.
+    rows = item_rows([1, 0, None, 0, 1, None] * 6, episodes=[f"e{k // 2:02d}" for k in range(36)])
+    base = stated(rows, [0.1, 0.2, 0.3, 0.4, 0.5, 0.6] * 6, [0.2, 0.3, 0.4, 0.5, 0.6, 0.7] * 6)
     # the model answers 0.8 (0.9 for E_end90) with an 80% interval from 50 to 200 days on the
     # first four of each six; its other two answers failed and are replaced by the base rate's
     # output
-    fourth = [k % 6 < 4 for k in range(18)]
+    fourth = [k % 6 < 4 for k in range(36)]
     answers = {
         item: stored(forecast(0.8, 0.9, 100) if given else None)
         for item, given in zip(rows.index, fourth, strict=True)
     }
     pred, parsed, counts = ev.predictive(answers, rows, base)
-    assert counts["replaced_by_base_rate"] == 6 and parsed.tolist() == fourth
-    assert pred["p_a"].tolist() == [0.8, 0.8, 0.8, 0.8, 0.5, 0.6] * 3
+    assert counts["replaced_by_base_rate"] == 12 and parsed.tolist() == fourth
+    assert pred["p_a"].tolist() == [0.8, 0.8, 0.8, 0.8, 0.5, 0.6] * 6
     found = ev.overconfidence(rows, pred, base, parsed, 400, ev.SEED)
     # The main figures hold every statement. In each six, mean P(E_end) is (4 * 0.8 + 0.5 +
     # 0.6) / 6 = 4.3 / 6 for the model and 2.1 / 6 for the base rate, a difference of 2.2 / 6.
     # E_end is yes on 2 and undetermined on 2 of 6: largest frequency 4 / 6, smallest 2 / 6.
     outcomes, no_text = events_of(found)
-    assert (found["statements"], found["episodes"]) == (18, 9)
+    assert (found["statements"], found["episodes"]) == (36, 18)
     assert outcomes["mean_p"] == pytest.approx(4.3 / 6) == no_text["mean_p_model"]
     assert outcomes["least"] == pytest.approx(4.3 / 6 - 4 / 6)
     assert outcomes["greatest"] == pytest.approx(4.3 / 6 - 2 / 6)
@@ -5703,9 +6022,9 @@ def test_failed_answers_are_in_the_criterion_and_out_of_the_parsed_only_figures(
     # 1 and undetermined on 1 of 4: largest frequency 2 / 4, smallest 1 / 4.
     kept = found["parsed_only"]
     assert list(kept) == ["not_parsed", *PART_KEYS]
-    assert (kept["not_parsed"], kept["statements"], kept["episodes"]) == (6, 12, 6)
+    assert (kept["not_parsed"], kept["statements"], kept["episodes"]) == (12, 24, 12)
     outcomes, no_text = events_of(kept)
-    assert outcomes["undetermined"] == 3 and outcomes["mean_p"] == pytest.approx(0.8)
+    assert outcomes["undetermined"] == 6 and outcomes["mean_p"] == pytest.approx(0.8)
     assert outcomes["least"] == pytest.approx(0.8 - 2 / 4)
     assert outcomes["greatest"] == pytest.approx(0.8 - 1 / 4)
     assert outcomes["base_rate"]["mean_p"] == pytest.approx(0.25)
@@ -5724,20 +6043,20 @@ def test_failed_answers_are_in_the_criterion_and_out_of_the_parsed_only_figures(
     # and with none there is nothing to give
     nobody = ev.overconfidence(rows, pred, base, ~everyone(rows), 400, ev.SEED)["parsed_only"]
     assert list(nobody) == ["not_parsed", *PART_KEYS]
-    assert (nobody["not_parsed"], nobody["statements"], nobody["episodes"]) == (18, 0, 0)
+    assert (nobody["not_parsed"], nobody["statements"], nobody["episodes"]) == (36, 0, 0)
     assert nobody["against_outcomes"]["E_end"]["least"] is None
     assert nobody["against_base_rate"]["E_end"] == {**dict.fromkeys(GAP_KEYS), "met": False}
     assert nobody["against_outcomes"]["E_end"]["met"] is False
     # the coverage of the 80% interval, for both predictors on every statement: the bracket
-    # of 40 to 60 days straddles the lower end of the model's twelve intervals (50 to 200) and
-    # lies inside the base rate's (30 to 200), which the six failed answers took
+    # of 40 to 60 days straddles the lower end of the model's 24 intervals (50 to 200) and
+    # lies inside the base rate's (30 to 200), which the twelve failed answers took
     assert found["coverage_80"] == {
-        "inside": 6,
+        "inside": 12,
         "outside": 0,
-        "bracket_straddles_the_interval": 12,
+        "bracket_straddles_the_interval": 24,
         "coverage": 1.0,
         "base_rate": {
-            "inside": 18,
+            "inside": 36,
             "outside": 0,
             "bracket_straddles_the_interval": 0,
             "coverage": 1.0,
@@ -5796,12 +6115,13 @@ def test_the_parsed_only_figures_are_withheld_when_they_would_give_back_a_few_st
             "episodes": 1,
             "withheld": True,
         }
-    # five parsed, in one episode: given, without an interval
-    kept = with_failed(range(5, 40))["parsed_only"]
+    # five parsed, all of them scoreable (the first three of the first episode and the first
+    # two of the second: E_end yes on two of the five): given
+    kept = with_failed([3, 4, *range(7, 40)])["parsed_only"]
     assert list(kept) == ["not_parsed", *PART_KEYS]
-    assert (kept["not_parsed"], kept["statements"], kept["episodes"]) == (35, 5, 1)
-    assert events_of(kept)[0]["greatest"] == pytest.approx(0.9 - 1 / 5)
-    assert events_of(kept)[0]["greatest_ci95"] is None
+    assert (kept["not_parsed"], kept["statements"], kept["episodes"]) == (35, 5, 2)
+    assert events_of(kept)[0]["greatest"] == pytest.approx(0.9 - 2 / 5)
+    assert events_of(kept)[0]["undetermined"] == 0
     # none failed, or none parsed: no statement lies between the two sets, nothing is withheld
     assert list(with_failed([])["parsed_only"]) == ["not_parsed", *PART_KEYS]
     assert list(with_failed(range(40))["parsed_only"]) == ["not_parsed", *PART_KEYS]
@@ -5983,13 +6303,13 @@ def test_a_draw_that_sums_to_zero_up_to_rounding_is_on_zero() -> None:
 
 
 def test_a_predictors_record_holds_the_limits_over_every_statement() -> None:
-    # the statements of the test of undetermined events: E_end 1 yes, 3 no, 2 undetermined;
-    # E_end90 3 yes, 1 no, 2 undetermined; three of the six are scoreable
-    rows = item_rows([None, 0, 1, 0, 0, None], [1, None, 1, 1, 0, None], episodes=list("gghhkk"))
+    # the statements of the test of undetermined events: in each six, E_end 1 yes, 3 no, 2
+    # undetermined; E_end90 3 yes, 1 no, 2 undetermined; three of the six are scoreable
+    rows = open_at_one_horizon()
     pred, base = stated(rows, 0.7, 0.8), stated(rows, 0.3, 0.5)
     clusters = list(rows["episode_id"])
     record = ev.predictor_record(rows, pred, 300, ev.SEED)
-    assert (record["statements"], record["scoreable_statements"]) == (6, 3)
+    assert (record["statements"], record["scoreable_statements"]) == (12, 6)
     order = list(record)
     assert order.index("calibration_all_statements") == order.index("calibration_in_the_large") + 1
     limits = record["calibration_all_statements"]
@@ -6042,7 +6362,7 @@ def test_a_predictors_record_holds_the_limits_over_every_statement() -> None:
     fewer = ev.beside_base_rate(record, rows, base, 300, ev.SEED)["calibration_all_statements"]
     assert fewer["E_end"]["base_rate"] != registered["calibration_all_statements"]["E_end"]
     # no scoreable statement: the count alone, with nothing to stand beside
-    open_rows = item_rows([None, 0], [1, None])
+    open_rows = item_rows([None, 0] * 3, [1, None] * 3)
     empty = ev.predictor_record(open_rows, stated(open_rows, 0.7), 300, ev.SEED)
     assert empty == {"scoreable_statements": 0}
     assert ev.beside_base_rate(empty, open_rows, stated(open_rows, 0.3), 300, ev.SEED) == empty
@@ -6640,15 +6960,15 @@ def test_a_refused_reading_is_a_failure_with_the_same_fallback(
     )
     assert record["replaced_by_base_rate"] == 1 and record["by_echo"] == {"ok": 319, "refused": 1}
     entry = entry_of(report, "H1", DEEPSEEK)
-    assert entry["both_sides_parsed"]["statements"] == entry["statements"] - 1
     assert entry["delta"] != entry_of(base.report, "H1", DEEPSEEK)["delta"]
     # the contrast without that one statement is withheld: beside the contrast on every
-    # scoreable statement it would give the loss difference, and so the events, of the one
-    assert entry["both_sides_parsed"] == {
-        "statements": entry["statements"] - 1,
-        "episodes": entry["both_sides_parsed"]["episodes"],
-        "withheld": True,
-    }
+    # scoreable statement it would give the loss difference, and so the events, of the one.
+    # Its counts are withheld with it, and so is the number of scoreable statements among the
+    # answers that failed: anyone can name the one answer from the stored runs, and either
+    # count would say that its statement is scoreable.
+    assert entry["both_sides_parsed"] == {"withheld": True}
+    assert entry["scoreable_not_parsed"] == {f"{DEEPSEEK}:a": None, f"{DEEPSEEK}:b": 0}
+    assert entry["statements"] == entry_of(base.report, "H1", DEEPSEEK)["statements"]
     # a contrast that leaves no statement out, or leaves out five or more, is given
     whole = entry_of(base.report, "H1", DEEPSEEK)["both_sides_parsed"]
     assert "withheld" not in whole and whole["delta"] is not None
@@ -7185,6 +7505,75 @@ def test_an_eligible_statement_without_a_cluster_is_found_before_the_sealed_file
     assert ev.CLUSTER_COLUMNS == ("episode_id", "company_name")
 
 
+BOTH_WOULD_GIVE = "statements: the same figures on both would give back the outcomes of those few"
+
+
+@pytest.mark.parametrize(("between", "found"), [(0, False), (1, True), (4, True), (5, False)])
+def test_item_sets_that_differ_by_a_few_statements_are_known_from_the_dates(
+    between: int, found: bool
+) -> None:
+    """The cutoff days of the two primaries are the last days of 2023 and of 2024. The sets a
+    primary can be tested on are the list and its slice; the six tests are never withheld, so
+    two such sets with 1 to 4 statements between them would give those back."""
+    whole, one, other = (
+        "the eligible list",
+        f"the post-cutoff slice of {LLAMA}",
+        f"the post-cutoff slice of {DEEPSEEK}",
+    )
+
+    def dated(*groups: tuple[str, int]) -> pd.DataFrame:
+        days = [day for day, count in groups for _ in range(count)]
+        return pd.DataFrame({"event_date": days}, index=[f"s{k:03d}" for k in range(len(days))])
+
+    # the list and a slice: ``between`` statements dated before the first cutoff day
+    first = dated(("2023-06-01", between), ("2024-06-01", 30))
+    said = [f"{whole} and {one} differ by {between} {BOTH_WOULD_GIVE}"]
+    assert ev.slice_problems(first, rd.PRIMARIES) == (said if found else [])
+    # the two slices: ``between`` statements dated between the two cutoff days
+    first = dated(("2023-06-01", 10), ("2024-06-01", between), ("2025-02-01", 30))
+    said = [f"{one} and {other} differ by {between} {BOTH_WOULD_GIVE}"]
+    assert ev.slice_problems(first, rd.PRIMARIES) == (said if found else [])
+    # a primary whose runs are not read has no slice to stand beside another
+    assert ev.slice_problems(first, [DEEPSEEK]) == [] == ev.slice_problems(first, [LLAMA])
+    assert ev.slice_problems(first, []) == []
+    assert S.CUTOFF_MONTH_ENDS[LLAMA].isoformat() == "2023-12-31"
+    assert S.CUTOFF_MONTH_ENDS[DEEPSEEK].isoformat() == "2024-12-31"
+
+
+def test_the_evaluation_is_refused_for_item_sets_that_differ_by_a_few_statements(
+    study: SimpleNamespace,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    sealed_unread: list[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The completeness check finds such sets from the first-sight dates, with or without a
+    plan of the runs, and the confirmatory command refuses before the sealed file is read."""
+    counts = json.loads(study.paths.counts.read_text())
+    first = study.listed.set_index("statement_group_id")
+    eligible, sha = D.read_table(study.paths.eligible), file_sha(study.paths.statements)
+    moved = first.copy()
+    moved["event_date"] = "2024-06-15"
+    moved.loc[list(first.index)[:3], "event_date"] = "2023-06-15"
+    said = f"the eligible list and the post-cutoff slice of {LLAMA} differ by 3 {BOTH_WOULD_GIVE}"
+    found = ev.gather(tmp_path, eligible, moved, counts, study.paths.selections, sha, {})
+    assert found.problems[0] == said and len(found.problems) == 2
+    assert found.problems[1].startswith("no plan of the runs")
+    # a primary declared not evaluable is tested on no set
+    declared = {LLAMA: "declared on the command line: its route was withdrawn"}
+    found = ev.gather(tmp_path, eligible, moved, counts, study.paths.selections, sha, declared)
+    assert len(found.problems) == 1 and found.problems[0].startswith("no plan of the runs")
+    # the study as it is has no such sets
+    assert ev.slice_problems(first, rd.PRIMARIES) == []
+    # the commands: the check names it, and the evaluation is refused with the sealed file unread
+    monkeypatch.setattr(ev, "slice_problems", lambda first, models: [said])
+    code, out = check(study, capsys)
+    assert code == 3 and f"missing: {said}" in out
+    why = refused(study, tmp_path, capsys)
+    assert why.startswith("refused: no evaluation before every confirmatory run is complete")
+    assert said in why and "the sealed file" not in sealed_unread
+
+
 def test_readings_that_cannot_be_turned_into_predictions_name_no_item(
     study: SimpleNamespace,
     tmp_path: Path,
@@ -7236,6 +7625,1055 @@ def test_the_refit_uses_fit_and_dev_and_is_reproducible(
     # a test-period outcome cannot enter a fit: the predictors refuse the row
     with pytest.raises(ValueError, match="fitted on train-period statements only"):
         G.fit_all(frame[frame["split"].isin(["dev", "test"])])
+
+
+# --------------------------------------------------------------------------------------------
+# Withholding (PLAN, standing rules, and sections 2.5, 4 and 13)
+# --------------------------------------------------------------------------------------------
+
+
+def some_open(scoreable: int, missing: int) -> pd.DataFrame:
+    """``scoreable`` statements with both horizon events determined (``E_end`` yes on every
+    third, ``E_end90`` on those and on every second), then ``missing`` statements that are not
+    scoreable: ``E_end`` no and ``E_end90`` undetermined. Two statements to an episode."""
+    e_end = [float(k % 3 == 0) for k in range(scoreable)] + [0.0] * missing
+    later = [float(k % 3 == 0 or k % 2 == 0) for k in range(scoreable)] + [None] * missing
+    return item_rows(e_end, later, [f"e{k // 2:02d}" for k in range(scoreable + missing)])
+
+
+FEW_OR_NOT = [(0, True), (1, False), (4, False), (5, True)]
+"""A number of statements in the small part of a set, and whether a figure is then given: none
+and five are, one and four are a few."""
+
+
+@pytest.mark.parametrize(("missing", "given"), FEW_OR_NOT)
+def test_the_figures_that_fill_open_events_are_withheld_beside_a_few_statements_not_scoreable(
+    missing: int, given: bool
+) -> None:
+    """PLAN section 2.5: where 1 to 4 statements of a set are not scoreable, the two scenarios
+    and the two limits of calibration in the large are withheld. With one such statement, whose
+    ``E_end`` is no, the scenario that sets its open ``E_end90`` to no would give ``N`` times
+    its mean loss, less ``S`` times the mean loss on the ``S`` scoreable statements, as the
+    loss of that statement: ``(p_a ** 2 + p_b ** 2) / 2``, which says that its ``E_end`` is
+    no. The pinball losses and the coverage stay."""
+    rows = some_open(12, missing)
+    total = 12 + missing
+    pred, base = stated(rows, 0.6, 0.7), stated(rows, 0.2, 0.4)
+    counts = {"statements": total, "with_a_horizon_event_undetermined": missing}
+    held = counts | {"withheld": True}
+    predictions = {"one": pred, "other": base}
+    scenarios = ev.bounds(rows, predictions, "one", "other")
+    record = ev.predictor_record(rows, pred, 200, ev.SEED)
+    both = ev.beside_base_rate(record, rows, base, 200, ev.SEED)
+    filled = ("bounds_all_statements", "calibration_all_statements", "calibration_in_the_large")
+    assert (record["statements"], record["scoreable_statements"]) == (total, 12)
+    assert set(record["pinball_all_statements"]) == {"0.50", "0.80", "0.95"}
+    assert list(record["coverage_80"]) == COVERAGE_KEYS and record["murphy"]["E_end"]["bins"] == 10
+    assert record["primary_brier"] > 0 and record["ci95"] is not None
+    if not given:
+        assert scenarios == held
+        assert [record[key] for key in filled] == [held, held, held]
+        assert record["mean_p_E_end"] is None and record["mean_p_E_end90"] is None
+        assert both == record  # nothing of the base rate stands beside a block that is withheld
+        return
+    assert list(scenarios) == [*counts, "undetermined_as_no", "undetermined_as_yes"]
+    assert {key: scenarios[key] for key in counts} == counts
+    assert scenarios["undetermined_as_no"]["delta"] == pytest.approx(
+        record["bounds_all_statements"]["undetermined_as_no"]
+        - ev.predictor_record(rows, base, 200, ev.SEED)["bounds_all_statements"][
+            "undetermined_as_no"
+        ]
+    )
+    assert record["mean_p_E_end"] == pytest.approx(0.6)
+    for key in filled[1:]:
+        assert list(record[key]) == EVENT_KEYS
+        assert list(both[key]["E_end"])[-1] == "base_rate"
+    assert record["calibration_all_statements"]["E_end"]["undetermined"] == 0
+    assert record["calibration_all_statements"]["E_end90"]["undetermined"] == missing
+    if missing == 5:  # the arithmetic of the docstring, on the five statements it may be done on
+        loss = record["bounds_all_statements"]["undetermined_as_no"] * total
+        assert (loss - record["primary_brier"] * 12) / 5 == pytest.approx((0.36 + 0.49) / 2)
+
+
+@pytest.mark.parametrize(("missing", "given"), FEW_OR_NOT)
+def test_the_criterion_is_not_read_where_its_part_against_outcomes_is_withheld(
+    missing: int, given: bool
+) -> None:
+    """With 1 to 4 statements of the item set not scoreable the part against outcomes holds
+    its counts alone, no reading of the five is given and nothing is met, although the model
+    says 0.9 where the event happened on 4 of 12 statements and the base rate says 0.2; the
+    part against the base rate, which uses no outcome, is given. With none or five such
+    statements the reading is the second, as the figures say."""
+    rows = some_open(12, missing)
+    total = 12 + missing
+    pred, base = stated(rows, 0.9), stated(rows, 0.2)
+    found = ev.overconfidence(rows, pred, base, everyone(rows), 300, ev.SEED)
+    assert list(found) == CRITERION_KEYS and found["statements"] == total
+    second = found["against_base_rate"]["E_end"]
+    assert second["difference"] == pytest.approx(0.7) and second["met"] is True
+    assert list(found["against_base_rate"]) == EVENT_KEYS
+    report = {
+        "item_sets": {LLAMA: {}},
+        "secondaries": {"overconfidence_of_condition_a": {LLAMA: {"items": "these", **found}}},
+    }
+    (line,) = ev.overconfidence_lines(report)
+    if given:
+        first = found["against_outcomes"]["E_end"]
+        assert first["least"] == pytest.approx(0.9 - 4 / total) and first["met"] is True
+        assert (found["reading"], found["met"]) == (2, True)
+        assert found["reading_in_words"] == ev.OVERCONFIDENCE_READINGS[2]
+        assert found["scoreable"]["E_end"]["mean_p_minus_frequency"] == pytest.approx(0.9 - 4 / 12)
+        assert line == criterion_line(
+            LLAMA, report["secondaries"]["overconfidence_of_condition_a"][LLAMA]
+        )
+        return
+    counts = {"statements": total, "with_a_horizon_event_undetermined": missing}
+    assert found["against_outcomes"] == counts | {"withheld": True}
+    assert (found["reading"], found["met"]) == (None, False)
+    assert found["reading_in_words"] == ev.OVERCONFIDENCE_NOT_READ
+    assert found["reading_in_words"] not in ev.OVERCONFIDENCE_READINGS.values()
+    assert found["scoreable"] == {"statements": 12, "episodes": 6, "withheld": True}
+    # every answer parsed: the same figures again, on the same statements, are withheld too
+    assert found["parsed_only"] == {
+        "not_parsed": 0,
+        "statements": total,
+        "episodes": (total + 1) // 2,
+        "withheld": True,
+    }
+    assert line == (
+        f"Overconfidence of condition (a), {LLAMA}: no reading: the part against outcomes is "
+        "withheld, because so few statements of the item set are not scoreable, or are "
+        "scoreable, that its figures would give their horizon events; neither part is read as "
+        f"met. P(E_end) on these ({total} statements in {(total + 1) // 2} episodes, {missing} "
+        "of them not scoreable): mean 0.9000. Against outcomes: withheld. Against the base rate "
+        "(mean P(E_end) 0.2000): difference 0.7000 [0.7000, 0.7000]; part met."
+    )
+    for figure in ("frequency", "least", "greatest", "reading 2", "overconfident relative"):
+        assert figure not in line
+
+
+def contrast_on(count: int, episodes: int = 2) -> dict[str, Any]:
+    """A contrast of two columns of losses on ``count`` statements in ``episodes`` episodes."""
+    comparator = [0.3 + 0.01 * k for k in range(count)]
+    tested = [0.2 + 0.02 * (k % 3) for k in range(count)]
+    return ev.contrast(comparator, tested, [f"e{k % episodes}" for k in range(count)], 200, 5)
+
+
+@pytest.mark.parametrize(("count", "given"), FEW_OR_NOT)
+def test_a_secondary_contrast_over_a_few_statements_is_withheld_with_its_counts(
+    count: int, given: bool
+) -> None:
+    """The floor of the secondaries: a contrast in short over 1 to 4 statements holds its two
+    counts and nothing else. The contrast itself, as a test of the family carries it, keeps
+    its estimate whatever the number of its statements."""
+    result = contrast_on(count)
+    found = ev.short(result, 2, SOURCE)
+    plain = ev.in_short(result, 2, SOURCE)
+    if count == 0:
+        nothing = {"statements": 0, "episodes": 0, "evaluable": False, "p": None}
+        assert found == plain == nothing | {"reason": "no scoreable statement"}
+        return
+    mean = float(np.mean([0.1 + 0.01 * k - 0.02 * (k % 3) for k in range(count)]))
+    assert result["delta"] == pytest.approx(mean) == plain["delta"]
+    if not given:
+        assert found == {"statements": count, "episodes": min(count, 2), "withheld": True}
+        return
+    assert found == plain and found["delta"] == pytest.approx(mean)
+    assert list(found) == [
+        "statements",
+        "episodes",
+        "evaluable",
+        "delta",
+        "ci95",
+        "interval_method",
+        "p",
+    ]
+
+
+def test_a_secondary_contrast_that_is_not_evaluable_carries_no_estimate() -> None:
+    """Six statements in one episode: no test can be made. ``contrast`` gives the difference
+    of the two mean losses all the same, and a test of the family keeps it; a secondary
+    contrast holds its counts and the reason."""
+    result = contrast_on(6, episodes=1)
+    assert result["evaluable"] is False and result["delta"] == pytest.approx(0.105)
+    assert ev.in_short(result, 2, SOURCE)["delta"] == result["delta"]
+    assert ev.short(result, 2, SOURCE) == {
+        "statements": 6,
+        "episodes": 1,
+        "evaluable": False,
+        "reason": "fewer than two episodes",
+        "p": None,
+    }
+
+
+@pytest.mark.parametrize(("scoreable", "given"), FEW_OR_NOT)
+def test_what_is_scored_on_a_few_scoreable_statements_is_withheld(
+    scoreable: int, given: bool
+) -> None:
+    """Seven statements are not scoreable, which is not a few, and 0, 1, 4 or 5 are. On 1 to 4
+    the losses, the calibration in the large and Murphy's decomposition are withheld, and with
+    them the figures over every statement that fill the open events: an event that is yes by
+    the stated end is determined at both horizons, so the smallest frequency of ``E_end`` over
+    all the statements, times their number, is the number of yes among the scoreable ones.
+    The pinball losses and the coverage, which score the time to recovery, stay."""
+    rows = some_open(scoreable, 7)
+    pred, base = stated(rows, 0.6, 0.7), stated(rows, 0.2, 0.4)
+    record = ev.predictor_record(rows, pred, 200, ev.SEED)
+    scenarios = ev.bounds(rows, {"one": pred, "other": base}, "one", "other")
+    found = ev.overconfidence(rows, pred, base, everyone(rows), 200, ev.SEED)
+    counts = {"statements": scoreable + 7, "with_a_horizon_event_undetermined": 7}
+    if scoreable == 0:
+        assert record == {"scoreable_statements": 0} and "undetermined_as_no" in scenarios
+        assert found["scoreable"] == {"statements": 0, "episodes": 0}
+        assert found["against_outcomes"]["E_end"]["smallest_frequency"] == 0.0
+        assert found["reading"] in ev.OVERCONFIDENCE_READINGS
+        return
+    episodes = (scoreable + 1) // 2
+    if given:
+        assert "withheld" not in record and record["primary_brier"] > 0
+        assert list(record["murphy"]) == EVENT_KEYS and "undetermined_as_no" in scenarios
+        yes = sum(k % 3 == 0 for k in range(scoreable))  # the arithmetic of the docstring
+        smallest = found["against_outcomes"]["E_end"]["smallest_frequency"]
+        assert smallest * (scoreable + 7) == pytest.approx(yes)
+        assert found["reading"] in ev.OVERCONFIDENCE_READINGS
+        assert found["scoreable"]["E_end"]["mean_p_minus_frequency"] == pytest.approx(
+            0.6 - yes / scoreable
+        )
+        return
+    assert list(record) == [
+        "scoreable_statements",
+        "scoreable_episodes",
+        "statements",
+        "withheld",
+        "pinball_all_statements",
+        "coverage_80",
+    ]
+    assert (record["scoreable_statements"], record["scoreable_episodes"]) == (scoreable, episodes)
+    assert (record["statements"], record["withheld"]) == (scoreable + 7, True)
+    assert record["pinball_all_statements"]["0.50"]["loss"] == pytest.approx(25.0)
+    assert record["coverage_80"] == ev.coverage80(pred, rows) and record["coverage_80"]["inside"]
+    assert ev.beside_base_rate(record, rows, base, 200, ev.SEED) == record
+    assert scenarios == counts | {"withheld": True} == found["against_outcomes"]
+    assert (found["reading"], found["met"]) == (None, False)
+    assert found["scoreable"] == {"statements": scoreable, "episodes": episodes, "withheld": True}
+
+
+@pytest.mark.parametrize("total", [1, 4])
+def test_a_record_over_a_few_statements_holds_their_number_alone(total: int) -> None:
+    """Over 1 to 4 statements, which anyone can name, not even the number of scoreable ones
+    is given: it would say how many of them have both horizon events determined."""
+    rows = some_open(total - 1, 1)
+    pred, base = stated(rows, 0.6, 0.7), stated(rows, 0.2, 0.4)
+    alone = {"statements": total, "withheld": True}
+    assert ev.predictor_record(rows, pred, 200, ev.SEED) == alone
+    assert ev.beside_base_rate(alone, rows, base, 200, ev.SEED) == alone
+    assert ev.bounds(rows, {"one": pred, "other": base}, "one", "other") == alone
+    found = ev.overconfidence(rows, pred, base, everyone(rows), 200, ev.SEED)
+    assert found["against_outcomes"] == alone and found["scoreable"] == {"withheld": True}
+    assert (found["statements"], found["reading"], found["met"]) == (total, None, False)
+    assert found["coverage_80"]["withheld"] is True
+    # five statements, one of them not scoreable: the counts are given, the figures are not
+    rows = some_open(4, 1)
+    record = ev.predictor_record(rows, stated(rows, 0.6, 0.7), 200, ev.SEED)
+    assert (record["scoreable_statements"], record["statements"], record["withheld"]) == (
+        4,
+        5,
+        True,
+    )
+
+
+@pytest.mark.parametrize(("counted", "given"), FEW_OR_NOT)
+def test_a_pinball_loss_and_the_coverage_have_the_floor_on_what_they_are_counted_on(
+    counted: int, given: bool
+) -> None:
+    """Twelve scoreable statements. All but ``counted`` have a target that is right-censored
+    before the cap, which no pinball loss scores, and a bracket that straddles the lower end
+    of the 80% interval, which the coverage does not count."""
+    rows = some_open(12, 0)
+    left_out = rows.index[counted:]
+    rows.loc[left_out, "ttr_kind"] = "right_censored"
+    rows.loc[left_out, ["ttr_lower", "ttr_upper"]] = [20.0, np.nan]
+    pred = stated(rows, 0.6, 0.7)
+    record = ev.predictor_record(rows, pred, 200, ev.SEED)
+    assert record["primary_brier"] > 0 and "withheld" not in record
+    pinball, coverage = record["pinball_all_statements"]["0.50"], record["coverage_80"]
+    plain = ev.coverage80(pred, rows)
+    assert (plain["inside"], plain["bracket_straddles_the_interval"]) == (counted, 12 - counted)
+    if given:
+        assert coverage == plain and "lower_bound" in pinball
+        assert (pinball["statements"], pinball["left_out_right_censored"]) == (
+            counted,
+            12 - counted,
+        )
+        assert (pinball["loss"] is None) == (counted == 0)
+        return
+    # the coverage is counted on the brackets inside the interval and on those outside it: two
+    # inside and six outside are eight, which is not a few
+    apart = stated(some_open(12, 0), 0.6, 0.7)
+    apart.loc[apart.index[2:8], ["q10", "q90"]] = [70.0, 90.0]  # the bracket lies wholly below
+    apart.loc[apart.index[8:], ["q10", "q90"]] = [50.0, 200.0]  # it straddles the lower end
+    whole = ev.coverage80(apart, some_open(12, 0))
+    assert (whole["inside"], whole["outside"]) == (2, 6)
+    assert ev.coverage_record(apart, some_open(12, 0)) == whole
+    held = {"statements": counted, "left_out_right_censored": 12 - counted, "withheld": True}
+    assert record["pinball_all_statements"] == dict.fromkeys(("0.50", "0.80", "0.95"), held)
+    assert coverage == {"bracket_straddles_the_interval": 12 - counted, "withheld": True}
+    found = ev.overconfidence(rows, pred, stated(rows, 0.2), everyone(rows), 200, ev.SEED)
+    assert found["coverage_80"] == coverage | {"base_rate": coverage}
+
+
+@pytest.mark.parametrize(("targets", "given"), FEW_OR_NOT)
+def test_the_figures_of_a_probe_over_a_few_statements_are_withheld_and_its_verdict_is_not(
+    targets: int, given: bool
+) -> None:
+    """Of the 80 probe statements all but ``targets``, each in an episode of its own, are
+    right-censored before the cap. The verdict fixes the item set and is given as the test
+    gives it; the estimate, the p-value and the two pinball records are not given over 1 to 4
+    statements, and a test that cannot be made carries no estimate."""
+    held, rows = small_study(switched=())
+    scored = [f"s{10 * k:03d}" for k in range(targets)]
+    rows["ttr_kind"] = np.where(rows.index.isin(scored), "interval", "right_censored")
+    found = ev.probe_test(LLAMA, held, rows, 200, ev.SEED, "percentile")
+    counts = {"probe_statements": 80, "left_out_right_censored": 80 - targets}
+    assert {key: found[key] for key in counts} == counts and found["alpha"] == ev.PROBE_ALPHA
+    assert (found["statements"], found["episodes"]) == (targets, targets)
+    scores = {"statements": targets, "left_out_right_censored": 80 - targets}
+    if given and targets:
+        # both medians are 100 days against targets of 50: the same loss, and no difference
+        assert found["evaluable"] is True and found["delta"] == 0.0
+        assert found["p"] == 1.0 and found["beats_base_rate"] is False
+        assert found["pinball_model"]["loss"] == pytest.approx(25.0)
+        return
+    assert "delta" not in found and "loss_tested" not in found and found["p"] is None
+    if targets == 0:
+        assert found["evaluable"] is False and found["beats_base_rate"] is None
+        assert "withheld" not in found and found["pinball_model"]["loss"] is None
+        return
+    assert found["withheld"] is True
+    assert found["pinball_model"] == found["pinball_base_rate"] == scores | {"withheld": True}
+    assert found["beats_base_rate"] is (None if targets == 1 else False)
+    assert f"Probe, {LLAMA}: delta withheld days" in ev.markdown(
+        full_report(ev.evaluate(held, rows, {}, "percentile", draws=200))
+    )
+
+
+@pytest.mark.parametrize(("after", "given"), FEW_OR_NOT)
+def test_the_scoreable_count_of_a_slice_of_a_few_statements_is_withheld(
+    after: int, given: bool
+) -> None:
+    """A slice of 1 to 4 statements can be named from the dates: how many of them are
+    scoreable is not written."""
+    held, rows = small_study(switched=())
+    held.first["event_date"] = np.where(np.arange(160) < after, "2024-06-01", "2023-06-01")
+    ids, record = ev.item_set(LLAMA, False, held.first, rows)
+    assert list(ids) == list(rows.index) and record["slice_statements"] == after
+    assert record["slice_analysed"] is False and record["items"] == ev.ALL_ITEMS
+    counts = (record["slice_scoreable"], record["slice_scoreable_episodes"])
+    assert counts == ((after, min(after, 1)) if given else (None, None))
+    # the floor is on the statements of the slice, not on its scoreable ones: three statements
+    # that are not scoreable have no count either, and six with two scoreable ones have theirs
+    late = ["s088", "s089", "s098", "s099", "s000", "s001"]
+    assert rows.loc[late, "scoreable"].tolist() == [False] * 4 + [True] * 2
+    for chosen, wanted in ((late[:3], (3, None, None)), (late, (6, 2, 1))):
+        held.first["event_date"] = np.where(rows.index.isin(chosen), "2024-06-01", "2023-06-01")
+        _, record = ev.item_set(LLAMA, False, held.first, rows)
+        found = tuple(
+            record[f"slice_{key}"] for key in ("statements", "scoreable", "scoreable_episodes")
+        )
+        assert found == wanted
+
+
+@pytest.mark.parametrize(("scoreable", "given"), FEW_OR_NOT[1:])
+def test_the_six_tests_are_never_withheld_and_what_stands_beside_them_is(
+    scoreable: int, given: bool
+) -> None:
+    """The study built by hand with ``scoreable`` scoreable statements, each in an episode of
+    its own, and every other statement open at the later horizon. Each of the six tests gives
+    its contrast on those statements, with one of them too. The two scenarios beside it, the
+    other contrast beside H3, every secondary contrast, the scores of each predictor and the
+    outcome mix are withheld on 1 to 4 statements, and given on five."""
+    held, rows = small_study(switched=())
+    kept = rows.index.isin([f"s{10 * k:03d}" for k in range(scoreable)])
+    rows = rows.assign(y_b=rows["y_b"].where(kept), scoreable=kept)
+    report = ev.evaluate(held, rows, {}, "percentile", draws=300)
+    counts = {"statements": scoreable, "episodes": scoreable}
+    alone = counts | {"withheld": True}
+    assert report["items"]["scoreable_statements"] == scoreable
+    mix = report["items"]["scoreable_by_E_end_and_E_end90"]
+    assert mix == ({"no/no": 0, "no/yes": 0, "yes/yes": 5} if given else {"withheld": True})
+    assert [entry["hypothesis"] for entry in report["family"]] == ["H1", "H2", "H3"] * 2
+    for entry in report["family"]:
+        assert {key: entry[key] for key in counts} == counts and "withheld" not in entry
+        direct = ev.scored(
+            rows,
+            held.predictions,
+            entry["comparator"],
+            entry["tested"],
+            draws=300,
+            source="percentile",
+            levels=("ci95", "ci90"),
+        )
+        assert {key: entry[key] for key in direct} == direct and "loss_tested" in direct
+        assert entry["delta"] == pytest.approx(entry["loss_comparator"] - entry["loss_tested"])
+        assert entry["evaluable"] is (scoreable > 1) and ("p_values" in entry) is (scoreable > 1)
+        assert {"p", "p_holm", "holds", "reading", "sides", "model"} <= set(entry)
+        if scoreable > 1:  # its own p-value, on however few statements
+            assert entry["p"] == ev.registered_p(entry, entry["sides"], "percentile")
+        # beside the test
+        open_events = {"statements": 160, "with_a_horizon_event_undetermined": 160 - scoreable}
+        assert {key: entry["bounds"][key] for key in open_events} == open_events
+        assert ("undetermined_as_no" in entry["bounds"]) is given
+        assert ("withheld" in entry["bounds"]) is not given
+        if entry["hypothesis"] == "H3":
+            own = entry["beside"][entry["comparator"]]
+            other = entry["beside"]["gbm_structured"]
+            assert own["delta"] == entry["delta"] and "withheld" not in own
+            assert (other == alone) is not given and ("delta" in other) is given
+            if not given:  # an interval that is withheld does not lie above zero
+                assert entry["beats_both_comparators"] is False
+    ps = [entry["p"] for entry in report["family"]]
+    assert [entry["p_holm"] for entry in report["family"]] == ev.holm(ps)
+    assert (min(ps) < 1.0) is (scoreable > 1)
+    second = report["secondaries"]
+    contrasts = [
+        *second["model_free_contrasts"],
+        *second["clusters_by_company"].values(),
+        *second["h3_with_each_condition"].values(),
+        *second["delta_gbm"].values(),
+        *(part for parts in second["decomposition"].values() for part in parts.values()),
+    ]
+    assert len(contrasts) == 5 + 6 + 6 + 2 + 8
+    names = ("comparator", "tested", "minuend", "subtrahend")
+    for record in contrasts:  # (by company the clusters are fewer than the episodes)
+        shown = {key: value for key, value in record.items() if key not in names}
+        assert (shown == alone | {"episodes": shown["episodes"]}) is not given
+        assert shown["statements"] == scoreable and ("delta" in shown) is given
+    for record in report["losses"].values():
+        assert record["scoreable_statements"] == scoreable
+        assert ("withheld" in record) is not given and ("primary_brier" in record) is given
+        assert record["coverage_80"]["inside"] + record["coverage_80"]["outside"] > 5
+    table = ev.markdown(full_report(report))
+    printed = "\n".join(ev.summary_lines(full_report(report)))
+    for text_ in (table, printed):
+        assert ("delta withheld" in text_) is not given
+    tests = [line for line in table.splitlines() if line.startswith("| H")]
+    estimates = [line.strip("|").split("|")[7].strip() for line in tests]
+    assert len(tests) == 6 and "n/a" not in estimates and "withheld" not in estimates
+
+
+def plain_family() -> list[dict[str, Any]]:
+    """The six tests of ``small_study`` with no primary switched, as it is (once per module)."""
+    if "plain family" not in MEMO:
+        held, rows = small_study(switched=())
+        MEMO["plain family"] = ev.evaluate(held, rows, {}, "percentile", draws=300)["family"]
+    return MEMO["plain family"]
+
+
+def flipped(frame: pd.DataFrame, chosen: Sequence[str]) -> pd.DataFrame:
+    """The typed rows under another outcome definition, which gives the statements ``chosen``
+    the other ``E_end``."""
+    out = frame.copy()
+    out.loc[list(chosen), "y_a"] = 1.0 - out.loc[list(chosen), "y_a"]
+    return out
+
+
+@pytest.mark.parametrize(("apart", "given"), FEW_OR_NOT[1:])
+def test_a_secondary_contrast_is_withheld_beside_the_same_contrast_on_all_but_a_few_statements(
+    apart: int, given: bool
+) -> None:
+    """In the study built by hand every statement is of the month-and-year form and was first
+    captured by its stated end. ``apart`` scoreable statements are given another form and as
+    many a delayed entry: H2 on the month-and-year form, and the three tests on the statements
+    first captured by the stated end, are then the tests of the family less the loss
+    differences of those few. With ``d`` the mean difference on the 144 scoreable statements
+    and ``d'`` the one on the ``144 - apart`` that are left, ``144 d - (144 - apart) d'`` is
+    the summed difference on the few, and with one statement its own. Outcome definitions are
+    compared by the statements they give another horizon event: ``one`` moves ten, ``two``
+    moves ``apart`` more than ``one``, ``three`` moves ``apart`` alone. The six tests are as
+    they were in every case."""
+    held, rows = small_study(switched=())
+    ids = list(rows.index)
+    held.first.loc[ids[20 : 20 + apart], "form"] = "quarter"
+    held.first.loc[ids[40 : 40 + apart], "delayed_entry"] = "True"
+    one = flipped(rows, ids[60:70])
+    variants = {
+        "one": one,
+        "two": flipped(one, ids[70 : 70 + apart]),
+        "three": flipped(rows, ids[10 : 10 + apart]),
+    }
+    report = ev.evaluate(held, rows, variants, "percentile", draws=300)
+    assert report["family"] == plain_family()
+    assert [entry["statements"] for entry in report["family"]] == [144] * 6
+    second = report["secondaries"]
+    month, early = (
+        second["h2_on_the_month_and_year_form"],
+        second["first_captured_by_the_stated_end"],
+    )
+    assert list(month) == [f"H2 {LLAMA}", f"H2 {DEEPSEEK}"] and len(early) == 6
+    for key, record in [*month.items(), *early.items()]:
+        if not given:
+            assert record == {"withheld": True}, key
+            continue
+        assert record["statements"] == 144 - apart and record["evaluable"] is True
+        whole = entry_of(report, *key.split(" "))
+        on_the_few = 144 * whole["delta"] - (144 - apart) * record["delta"]
+        assert abs(on_the_few) < apart  # the arithmetic of the docstring, on five statements
+    # clusters by company: the statements of the tests themselves, with nothing between them
+    for key, record in second["clusters_by_company"].items():
+        assert record["delta"] == entry_of(report, *key.split(" "))["delta"]
+    assert all(record["statements"] == 144 for record in second["one"].values())
+    assert all("delta" in record for record in second["one"].values())
+    for name, moved in (("two", 10 + apart), ("three", apart)):
+        assert len(second[name]) == 6
+        for record in second[name].values():
+            if given:
+                assert record["statements"] == 144 and "delta" in record
+            else:
+                held_back = {"statements_with_another_horizon_event": moved, "withheld": True}
+                assert record == held_back
+    assert ev.other_events(rows, variants["two"]) == 10 + apart
+    assert ev.other_events(rows, rows) == 0 == ev.other_events(one, one)
+
+
+def test_a_contrast_keeps_its_counts_where_the_statements_between_two_sets_are_not_a_few() -> None:
+    """Six statements have another form, two of them scoreable: the two sets of scoreable
+    statements differ by two, so the contrast is withheld; the two sets differ by six, which
+    anyone can count, so its counts say nothing of a few statements and stay. An event of a
+    statement that is not scoreable under either definition is still another event."""
+    held, rows = small_study(switched=())
+    other = ["s020", "s021", "s088", "s089", "s098", "s099"]
+    assert rows.loc[other, "scoreable"].tolist() == [True, True, False, False, False, False]
+    held.first.loc[other, "form"] = "quarter"
+    still_open = rows.copy()
+    still_open.loc[other[2:], "y_a"] = 0.0  # E_end is seen; E_end90 stays undetermined
+    report = ev.evaluate(held, rows, {"seen": still_open}, "percentile", draws=300)
+    assert report["family"] == plain_family()
+    counts = {"statements": 142, "episodes": 16, "withheld": True}
+    assert report["secondaries"]["h2_on_the_month_and_year_form"] == {
+        f"H2 {LLAMA}": counts,
+        f"H2 {DEEPSEEK}": counts,
+    }
+    moved = {"statements_with_another_horizon_event": 4, "withheld": True}
+    assert len(report["secondaries"]["seen"]) == 6
+    assert all(record == moved for record in report["secondaries"]["seen"].values())
+
+
+@pytest.mark.parametrize(("in_a_loss", "given"), FEW_OR_NOT[1:])
+def test_a_definition_is_held_to_the_statements_whose_loss_it_changes(
+    in_a_loss: int, given: bool
+) -> None:
+    """An outcome definition gives nine statements another horizon event: four that are open at
+    the later horizon under both definitions (their ``E_end``, undetermined before, is now no)
+    and ``in_a_loss`` scoreable ones, whose ``E_end90`` it turns from yes to no. Nine is not a
+    few, yet no loss of the four enters either contrast: with ``N`` scoreable statements,
+    ``N`` times the contrast under the definition less ``N`` times the test is the summed
+    change of the loss differences of the scoreable ones alone, and with one of them it names
+    the statement and both of its events."""
+    held, rows = small_study(switched=())
+    open_both = ["s088", "s089", "s098", "s099"]
+    turned = ["s005", "s006", "s007", "s015", "s016"][:in_a_loss]
+    assert rows.loc[turned, "y_b"].tolist() == [1.0] * in_a_loss
+    assert not rows.loc[open_both, "scoreable"].any()
+    under = rows.copy()
+    under.loc[open_both, "y_a"] = 0.0
+    under.loc[turned, "y_b"] = 0.0
+    moved = 4 + in_a_loss
+    assert ev.other_events(rows, under) == moved
+    assert ev.other_events(rows, under, scored=True) == in_a_loss
+    report = ev.evaluate(held, rows, {"under": under}, "percentile", draws=300)
+    assert report["family"] == plain_family()
+    found = report["secondaries"]["under"]
+    assert len(found) == 6
+    for key, record in found.items():
+        if not given:
+            assert record == {"statements_with_another_horizon_event": moved, "withheld": True}
+            continue
+        whole = entry_of(report, *key.split(" "))
+        assert record["statements"] == 144 and abs(record["delta"] - whole["delta"]) < 1
+    # the later event alone, on two scoreable statements: another event all the same
+    later = rows.copy()
+    later.loc[["s005", "s006"], "y_b"] = 0.0
+    assert ev.other_events(rows, later) == 2 == ev.other_events(rows, later, scored=True)
+    report = ev.evaluate(held, rows, {"later": later}, "percentile", draws=300)
+    two = {"statements_with_another_horizon_event": 2, "withheld": True}
+    assert all(record == two for record in report["secondaries"]["later"].values())
+    # a statement scoreable under one definition only is counted among those in a loss
+    opened = rows.copy()
+    opened.loc["s005", "y_b"] = np.nan
+    opened.loc["s005", "scoreable"] = False
+    assert ev.other_events(rows, opened, scored=True) == 1 == ev.other_events(opened, rows, True)
+
+
+@pytest.mark.parametrize(("before", "given"), FEW_OR_NOT[1:])
+def test_figures_on_a_slice_that_lacks_a_few_statements_of_the_list_are_withheld(
+    before: int, given: bool
+) -> None:
+    """All statements but ``before`` are dated after the cutoff day of the first primary.
+
+    Not switched, it is tested on every statement and its tests are repeated on its slice,
+    which lacks ``before`` scoreable statements of the list. Switched, its item set is that
+    slice: the two contrasts of the decomposition that read no model then stand beside the
+    model-free contrasts on every eligible statement, and the base rate's figures beside its
+    own stand beside the base rate's record on every eligible statement."""
+    dates = np.where(np.arange(160) < before, "2023-06-01", "2024-06-01")
+    held, rows = small_study(switched=())
+    held.first["event_date"] = dates
+    report = ev.evaluate(held, rows, {}, "percentile", draws=300)
+    assert report["family"] == plain_family()
+    sliced = report["secondaries"]["post_cutoff_slice"]
+    assert list(sliced) == [f"{hypothesis} {LLAMA}" for hypothesis in ("H1", "H2", "H3")]
+    for record in sliced.values():
+        assert (record == {"withheld": True}) is not given
+        assert record.get("statements") == (144 - before if given else None)
+
+    held, rows = small_study(switched=(LLAMA,))
+    held.first["event_date"] = dates
+    report = ev.evaluate(held, rows, {}, "percentile", draws=300)
+    chosen = report["item_sets"]
+    assert (chosen[LLAMA]["items"], chosen[DEEPSEEK]["items"]) == (ev.SLICE_ITEMS, ev.ALL_ITEMS)
+    assert chosen[LLAMA]["slice_statements"] == 160 - before
+    for entry in report["family"]:  # the six tests hold all they held
+        assert entry["statements"] == 144 - before * (entry["model"] == LLAMA)
+        assert entry["evaluable"] is True and "withheld" not in entry and "delta" in entry
+        assert "undetermined_as_no" in entry["bounds"] and "delta" in entry["both_sides_parsed"]
+    parts = report["secondaries"]["decomposition"]
+    for name in ("content_value_of_the_text", "content_value_against_the_structured_model"):
+        mine = parts[LLAMA][name]
+        assert list(mine)[:2] == ["minuend", "subtrahend"]
+        assert (list(mine)[2:] == ["withheld"]) is not given
+        assert mine.get("statements") == (144 - before if given else None)
+        assert parts[DEEPSEEK][name]["statements"] == 144 and "delta" in parts[DEEPSEEK][name]
+    for name in ("reading_loss", "trust_loss"):  # contrasts of its own conditions: written once
+        assert parts[LLAMA][name]["statements"] == 144 - before and "delta" in parts[LLAMA][name]
+    assert all(c["statements"] == 144 for c in report["secondaries"]["model_free_contrasts"])
+    record = report["losses"][f"{LLAMA}:a"]
+    over = report["secondaries"]["overconfidence_of_condition_a"][LLAMA]
+    beside = [
+        record["calibration_in_the_large"]["E_end"]["base_rate"],
+        record["calibration_all_statements"]["E_end90"]["base_rate"],
+        over["against_outcomes"]["E_end"]["base_rate"],
+        over["scoreable"]["E_end90"]["base_rate"],
+        over["coverage_80"]["base_rate"],
+        over["parsed_only"]["against_outcomes"]["E_end"]["base_rate"],
+    ]
+    for block in beside:
+        assert (block == {"withheld": True}) is not given
+    # its own figures stay, and so does the difference of two mean probabilities, which uses
+    # no outcome; the other primary, on every statement, has the base rate's record beside it
+    assert "least" in over["against_outcomes"]["E_end"] and over["reading"] == 2
+    assert over["against_base_rate"]["E_end"]["mean_p_base_rate"] is not None
+    assert record["calibration_in_the_large"]["E_end"]["mean_p_minus_frequency"] is not None
+    whole = report["losses"]["base_rate"]["calibration_in_the_large"]["E_end"]
+    other = report["losses"][f"{DEEPSEEK}:a"]["calibration_in_the_large"]["E_end"]
+    assert other["base_rate"] == whole and "mean_p_minus_frequency" in whole
+    assert ev.without_base_rate({"a": {"base_rate": {"x": 1}, "against_base_rate": 2}}) == {
+        "a": {"base_rate": {"withheld": True}, "against_base_rate": 2}
+    }
+
+
+def test_the_base_rate_is_held_to_the_scoreable_statements_between_two_sets() -> None:
+    """Six statements are dated before the cutoff day of the switched primary, two of them
+    scoreable: its slice lacks six statements of the list, which is not a few, and two
+    scoreable ones, which is. The base rate's figures on the scoreable statements of the two
+    sets would give the events of those two."""
+    held, rows = small_study(switched=(LLAMA,))
+    before = ["s088", "s089", "s098", "s099", "s000", "s001"]
+    assert int(rows.loc[before, "scoreable"].sum()) == 2
+    held.first["event_date"] = np.where(rows.index.isin(before), "2023-06-01", "2024-06-01")
+    assert ev.slice_problems(held.first, rd.PRIMARIES) == []  # six statements are not a few
+    report = ev.evaluate(held, rows, {}, "percentile", draws=300)
+    assert report["item_sets"][LLAMA]["items"] == ev.SLICE_ITEMS
+    assert report["item_sets"][LLAMA]["slice_statements"] == 154
+    record = report["losses"][f"{LLAMA}:a"]
+    assert record["calibration_in_the_large"]["E_end"]["base_rate"] == {"withheld": True}
+    assert record["calibration_in_the_large"]["E_end"]["mean_p_minus_frequency"] is not None
+    parts = report["secondaries"]["decomposition"][LLAMA]
+    counts = {"statements": 142, "episodes": 16, "withheld": True}
+    names = {"minuend": "base_rate", "subtrahend": "rules_plus_slip"}
+    assert parts["content_value_of_the_text"] == names | counts
+    assert [entry["statements"] for entry in report["family"]] == [142] * 3 + [144] * 3
+
+
+def test_the_reading_of_a_test_says_when_the_contrast_beside_it_is_withheld() -> None:
+    """H3 holds in favour of the text on so few statements that the contrast with the other
+    predictor that reads no text is withheld: the reading says so, and does not say that its
+    interval does not lie above zero."""
+    entry = h3_entry(0.03, True, [0.01, 0.05])
+    entry["beside"]["gbm_structured"] = {"statements": 3, "episodes": 3, "withheld": True}
+    assert ev.beats_both(entry) is False
+    entry["beats_both_comparators"] = False
+    assert ev.reading_of(entry) == (
+        "rejected in favour of the tested predictor; the contrast with gbm_structured is withheld"
+    )
+    entry["beside"]["gbm_structured"] = {"delta": 0.02, "ci95": [-0.01, 0.05]}
+    assert ev.reading_of(entry).endswith("does not lie above zero")
+
+
+@pytest.mark.parametrize(("failed", "given"), FEW_OR_NOT[1:])
+def test_no_count_says_how_many_of_a_few_failed_answers_are_on_scoreable_statements(
+    failed: int, given: bool
+) -> None:
+    """``failed`` answers of condition (b) of the first primary were not parsed, all on
+    scoreable statements. Anyone can name them from the stored runs. With 1 to 4 of them,
+    the number of scoreable statements among them, and the counts of the contrast on the
+    statements both sides parsed, would each say that those statements are scoreable: neither
+    is written. The counts of the tests themselves stay as they are."""
+    held, rows = small_study(switched=())
+    held.parsed[f"{LLAMA}:a"] = everyone(rows)
+    parsed = everyone(rows)
+    parsed.iloc[:failed] = False
+    held.parsed[f"{LLAMA}:b"] = parsed
+    report = ev.evaluate(held, rows, {}, "percentile", draws=300)
+    for entry, plain in zip(report["family"], plain_family(), strict=True):
+        own = ("both_sides_parsed", "scoreable_not_parsed", "bounds", "beside", "reading")
+        kept = [key for key in plain if key not in own]
+        assert entry["statements"] == 144
+        if entry["tested"] != f"{LLAMA}:a" and entry["comparator"] != f"{LLAMA}:a":
+            assert {key: entry[key] for key in kept} == {key: plain[key] for key in kept}
+    first, third = entry_of(report, "H1", LLAMA), entry_of(report, "H3", LLAMA)
+    table = ev.markdown(full_report(report))
+    for entry in (first, third):
+        both, lost = entry["both_sides_parsed"], entry["scoreable_not_parsed"]
+        if given:
+            assert both["statements"] == 144 - failed and "delta" in both
+            assert lost == {entry["comparator"]: 0, f"{LLAMA}:b": failed}
+        else:
+            assert both == {"withheld": True}
+            assert lost == {entry["comparator"]: 0, f"{LLAMA}:b": None}
+    said = "withheld" if not given else str(failed)
+    assert f"answers of the tested condition not parsed: {said}." in table
+    # six failed answers, two of them on scoreable statements: six is not a few, so the counts
+    # stay, and the contrast without the two is withheld beside the test
+    parsed = everyone(rows)
+    parsed[["s020", "s021", "s088", "s089", "s098", "s099"]] = False
+    held.parsed[f"{LLAMA}:b"] = parsed
+    entry = entry_of(ev.evaluate(held, rows, {}, "percentile", draws=300), "H1", LLAMA)
+    assert entry["both_sides_parsed"] == {"statements": 142, "episodes": 16, "withheld": True}
+    assert entry["scoreable_not_parsed"] == {f"{LLAMA}:a": 0, f"{LLAMA}:b": 2}
+
+
+def failing(rows: pd.DataFrame, lost: Sequence[str]) -> pd.Series:
+    """Which answers parsed: all but those on the statements ``lost``."""
+    parsed = everyone(rows)
+    parsed[list(lost)] = False
+    return parsed
+
+
+@pytest.mark.parametrize(("elsewhere", "given"), FEW_OR_NOT[1:])
+def test_three_counts_beside_a_test_do_not_give_what_one_of_them_withholds(
+    elsewhere: int, given: bool
+) -> None:
+    """Eight answers of condition (a) failed (seven of them on scoreable statements), and
+    ``elsewhere`` answers of condition (b) on other statements. With the number of scoreable
+    statements among the failed answers of (b) withheld, the three counts that are left would
+    give it back: the statements of H1, less those both sides parsed, less the scoreable ones
+    among the failed answers of (a). With 1 to 4 failed answers on one side alone, or on both,
+    none of the three is written."""
+    held, rows = small_study(switched=())
+    name_a, name_b = f"{LLAMA}:a", f"{LLAMA}:b"
+    lost_a = [f"s{k:03d}" for k in range(7)] + ["s088"]  # seven scoreable, one that is not
+    lost_b = ["s020", "s021", "s022", "s023", "s024"][:elsewhere]
+    held.parsed[name_a], held.parsed[name_b] = failing(rows, lost_a), failing(rows, lost_b)
+    entry = entry_of(ev.evaluate(held, rows, {}, "percentile", draws=300), "H1", LLAMA)
+    assert (entry["statements"], entry["comparator"], entry["tested"]) == (144, name_a, name_b)
+    both, lost = entry["both_sides_parsed"], entry["scoreable_not_parsed"]
+    if given:
+        assert both["statements"] == 144 - 7 - 5 and lost == {name_a: 7, name_b: 5}
+        assert entry["statements"] - both["statements"] - lost[name_a] == elsewhere
+        return
+    assert both == {"withheld": True} and lost == {name_a: None, name_b: None}
+    # a few answers that failed on both sides, among many: the same
+    more = ["s030", "s031", "s032", "s033", "s034"]  # five on one side alone, which is not a few
+    held.parsed[name_b] = failing(rows, [*lost_a[:elsewhere], *more])
+    entry = entry_of(ev.evaluate(held, rows, {}, "percentile", draws=300), "H1", LLAMA)
+    assert entry["both_sides_parsed"] == {"withheld": True}
+    assert entry["scoreable_not_parsed"] == {name_a: None, name_b: None}
+    assert entry["statements"] == 144 and "delta" in entry
+
+
+@pytest.mark.parametrize(("between", "given"), FEW_OR_NOT[1:])
+def test_a_secondary_contrast_is_held_to_the_contrast_on_the_answers_both_sides_parsed(
+    between: int, given: bool
+) -> None:
+    """Ten statements give a quarter and not a month and year, all of them scoreable; the
+    literal reading of the second primary failed on ``10 - between`` of them. H2 on the answers
+    both sides parsed leaves those out, H2 on the month-and-year form leaves out all ten:
+    between the two contrasts stand ``between`` statements, and their difference, each times
+    its number of statements, is the summed loss difference of those. The contrast on the
+    parsed answers is written first, beside the test; the one on the form is held to it."""
+    held, rows = small_study(switched=())
+    quarter = [f"s{k:03d}" for k in range(20, 30)]
+    held.first.loc[quarter, "form"] = "quarter"
+    held.parsed[f"{DEEPSEEK}:c"] = failing(rows, quarter[between:])
+    report = ev.evaluate(held, rows, {}, "percentile", draws=300)
+    assert report["family"][:3] == plain_family()[:3]
+    entry = entry_of(report, "H2", DEEPSEEK)
+    assert entry["statements"] == 144 and entry["tested"] == f"{DEEPSEEK}:c"
+    both = entry["both_sides_parsed"]
+    assert both["statements"] == 144 - (10 - between) and "delta" in both
+    month = report["secondaries"]["h2_on_the_month_and_year_form"]
+    assert month[f"H2 {LLAMA}"]["statements"] == 134  # all its answers parsed: held to the test
+    if given:
+        assert month[f"H2 {DEEPSEEK}"]["statements"] == 134 and "delta" in month[f"H2 {DEEPSEEK}"]
+    else:
+        assert month[f"H2 {DEEPSEEK}"] == {"withheld": True}
+    # the same contrast on every statement of the item set, by company, is as it was
+    assert "delta" in report["secondaries"]["clusters_by_company"][f"H2 {DEEPSEEK}"]
+
+
+@pytest.mark.parametrize(("answered", "given"), FEW_OR_NOT[1:])
+def test_no_count_says_how_many_of_a_few_parsed_answers_are_on_scoreable_statements(
+    answered: int, given: bool
+) -> None:
+    """Only ``answered`` answers of condition (b) of the first primary parsed, all of them on
+    scoreable statements. The statements of H1 less the scoreable ones among its failed
+    answers would be the number of scoreable statements among those few: with 1 to 4 parsed
+    answers neither that count nor the contrast on the parsed answers is written."""
+    held, rows = small_study(switched=())
+    name_a, name_b = f"{LLAMA}:a", f"{LLAMA}:b"
+    held.parsed[name_a] = everyone(rows)
+    parsed = pd.Series(False, index=rows.index)
+    parsed.iloc[:answered] = True
+    held.parsed[name_b] = parsed
+    entry = entry_of(ev.evaluate(held, rows, {}, "percentile", draws=300), "H1", LLAMA)
+    assert entry["statements"] == 144 and "delta" in entry
+    lost = entry["scoreable_not_parsed"]
+    if given:
+        assert lost == {name_a: 0, name_b: 144 - 5}
+        assert entry["both_sides_parsed"]["statements"] == 5
+    else:
+        assert lost == {name_a: 0, name_b: None}
+        assert entry["both_sides_parsed"] == {"withheld": True}
+
+
+@pytest.mark.parametrize(("lost", "given"), FEW_OR_NOT[1:])
+def test_the_parsed_only_figures_are_withheld_beside_the_scoreable_statements_but_a_few(
+    lost: int, given: bool
+) -> None:
+    """The answers that failed are those on the 16 statements that are not scoreable and on
+    ``lost`` scoreable ones: the answers that parsed are the scoreable statements less those
+    few, and the limits of calibration on them, which leave no event open, are the
+    calibration in the large on the scoreable statements less the events of the few."""
+    rows = forty()  # each episode: E_end yes, no, no, undetermined, undetermined
+    base, said = stated(rows, 0.5), stated(rows, 0.9)
+    failed = [k for k in range(40) if k % 5 >= 3] + [0, 5, 10, 15, 20][:lost]
+    parsed = pd.Series([k not in failed for k in range(40)], index=rows.index)
+    pred = said.where(parsed, base, axis=0)
+    found = ev.overconfidence(rows, pred, base, parsed, 300, ev.SEED)
+    assert found["scoreable"]["statements"] == 24 and found["reading"] is not None
+    kept = found["parsed_only"]
+    assert (kept["not_parsed"], kept["statements"], kept["episodes"]) == (16 + lost, 24 - lost, 8)
+    if given:
+        assert list(kept) == ["not_parsed", *PART_KEYS]
+        assert kept["against_outcomes"]["E_end"]["undetermined"] == 0
+    else:
+        assert list(kept) == ["not_parsed", "statements", "episodes", "withheld"]
+
+
+def test_one_statement_that_is_not_scoreable_is_not_given_back_by_the_result_file(
+    study: SimpleNamespace, opened: SimpleNamespace
+) -> None:
+    """On the synthetic study, with every statement scoreable but one, ``X``. Two versions of
+    the sealed outcomes differ in the horizon events of ``X`` alone: in the first its ``E_end``
+    is no and its ``E_end90`` undetermined; in the second its ``E_end`` is undetermined and its
+    ``E_end90`` yes.
+
+    What the result file held before the scenarios were withheld. Beside H1 of the second
+    primary stood the mean loss of condition (a) over all ``N`` = 320 statements with every
+    undetermined event set to no (``predictors.brier_bounds``), and the test itself gives the
+    mean loss on the ``S`` = 319 scoreable ones. ``N`` times the first less ``S`` times the
+    second is the loss of ``X`` with its open event set to no: ``(p_a ** 2 + p_b ** 2) / 2`` in
+    the first version and ``(p_a ** 2 + (1 - p_b) ** 2) / 2`` in the second, with ``p_a`` and
+    ``p_b`` the stored answer for ``X``, which is open. The two numbers differ, so the file
+    said which of the two events of ``X`` was determined, and what it was.
+
+    What it holds now. The scenarios, the limits of calibration in the large and the figures
+    that would name ``X`` are withheld, and the two versions give the same result file, byte
+    for byte. The six tests are the contrasts on the scoreable statements, with everything
+    they carry."""
+    plain = ev.typed_outcomes(study.filled.reset_index(drop=True))
+    open_ids = list(plain.index[~plain["scoreable"]])
+    assert len(open_ids) > 20
+    x = open_ids[0]
+    name = f"{DEEPSEEK}:a"
+    p_a, p_b = opened.study.predictions[name].loc[x, ["p_a", "p_b"]]
+    texts, mine = [], []
+    for e_end, e_end90 in ((0.0, np.nan), (np.nan, 1.0)):
+        rows = plain.copy()
+        rows.loc[open_ids, ["y_a", "y_b"]] = 0.0
+        rows.loc[open_ids, "scoreable"] = True
+        rows.loc[x, ["y_a", "y_b"]] = [e_end, e_end90]
+        rows.loc[x, "scoreable"] = False
+        report = ev.evaluate(opened.study, rows, {}, "percentile", draws=300)
+        texts.append(ev.report_text(report))
+        entry = entry_of(report, "H1", DEEPSEEK)
+        assert (entry["comparator"], entry["statements"]) == (name, 319)
+        # before: the scenario beside the test, and the subtraction
+        pred = opened.study.predictions[name].loc[rows.index]
+        scenario = P.brier_bounds(pred["p_a"], pred["p_b"], rows["y_a"], rows["y_b"])
+        mine.append(320 * scenario["undetermined_as_no"] - 319 * entry["loss_comparator"])
+        # now: the counts, and no scenario; no limit of calibration, no mean that names X
+        held = {"statements": 320, "with_a_horizon_event_undetermined": 1, "withheld": True}
+        for other in report["family"]:
+            assert other["bounds"] == held and other["evaluable"] is True
+            direct = ev.scored(
+                rows,
+                opened.study.predictions,
+                other["comparator"],
+                other["tested"],
+                draws=300,
+                source="percentile",
+                levels=("ci95", "ci90"),
+            )
+            assert {key: other[key] for key in direct} == direct
+            assert {"p", "p_holm", "holds", "reading", "both_sides_parsed"} <= set(other)
+        record = report["losses"][name]
+        assert record["bounds_all_statements"] == held == record["calibration_all_statements"]
+        assert record["calibration_in_the_large"] == held and record["mean_p_E_end"] is None
+        assert record["primary_brier"] == pytest.approx(entry["loss_comparator"])
+        over = report["secondaries"]["overconfidence_of_condition_a"][DEEPSEEK]
+        assert over["against_outcomes"] == held and over["reading"] is None
+        assert over["scoreable"] == {"statements": 319, "episodes": 40, "withheld": True}
+    assert mine[0] == pytest.approx((p_a**2 + p_b**2) / 2)
+    assert mine[1] == pytest.approx((p_a**2 + (1 - p_b) ** 2) / 2)
+    assert abs(mine[0] - mine[1]) > 1e-3  # the subtraction told the two versions apart
+    assert texts[0] == texts[1] and '"withheld": true' in texts[0]
+
+
+COMMITTED_SECTIONS = {
+    "registered": "883ec92a36fd",
+    "refit": "acc8c8a467f5",
+    "not_evaluable_by_declaration": "44136fa355b3",
+    "runs": "61342d18ca57",
+    "items": "6a485d6c981f",
+    "probe": "b601d0f169a1",
+    "item_sets": "aa39b3f49025",
+    "family": "36a785c6f29d",
+    "h3": "7027dfbb2b6d",
+    "secondaries model_free_contrasts": "9ae474e873ae",
+    "secondaries h2_on_the_month_and_year_form": "1bdb8a81a5a5",
+    "secondaries post_cutoff_slice": "7bd17d7bc9ac",
+    "secondaries first_captured_by_the_stated_end": "bc9ddc1c271a",
+    "secondaries clusters_by_company": "8d0934aa99ae",
+    "secondaries delta_gbm": "89068ffba95f",
+    "secondaries h3_with_each_condition": "1d14a8bc7445",
+    "secondaries all_covered_presentations": "bc9ddc1c271a",
+    "secondaries any_covered_presentation": "bc9ddc1c271a",
+    "secondaries recovery_definition_A": "c13402f985f5",
+    "secondaries decomposition": "470144437b0e",
+    "secondaries overconfidence_of_condition_a": "349aad569ad0",
+    "losses base_rate": "104bc2c702c3",
+    "murphy base_rate": "5d5d75bf010d",
+    "losses face_value": "e39eb7ee1029",
+    "murphy face_value": "84e285bc44f4",
+    "losses rules_plus_slip": "2b86adae6983",
+    "murphy rules_plus_slip": "6f76a03e9216",
+    "losses gbm_structured": "099de8bc9088",
+    "murphy gbm_structured": "52fff9232cd7",
+    "losses gbm_text": "ae32202f7210",
+    "murphy gbm_text": "d396bf0c631d",
+    "losses llama-3.3-70b:a": "a0a8e5c5b9b4",
+    "murphy llama-3.3-70b:a": "748e368f3e4e",
+    "losses llama-3.3-70b:b": "5dd15f8771c9",
+    "murphy llama-3.3-70b:b": "d339d7e6712f",
+    "losses llama-3.3-70b:c": "bbc3d3155753",
+    "murphy llama-3.3-70b:c": "e34fcc6b2514",
+    "losses deepseek-v3:a": "233500bada34",
+    "murphy deepseek-v3:a": "9a67ef24095e",
+    "losses deepseek-v3:b": "8fe2792699ac",
+    "murphy deepseek-v3:b": "d6d0de3b8a28",
+    "losses deepseek-v3:c": "2a957f9217f2",
+    "murphy deepseek-v3:c": "75f7e23e4f4f",
+}
+"""The result file of the synthetic study as ``evaluate.py`` at sha256 894b9f1dfa1d42c0 wrote it,
+before anything was withheld: a digest of each part (``result_sections``), under the library
+versions of ``COMMITTED_VERSIONS``. Left out, because they change with the file itself: the
+hashes of the code, of the plan (which names a temporary folder) and of the selection files
+(which record the hash of the code), and the two lists of sentences."""
+COMMITTED_VERSIONS = {"numpy": "2.5.2", "pandas": "2.3.3", "scikit_learn": "1.9.0"}
+RESULT_KEYS = [
+    "about",
+    "command",
+    "registered",
+    "inputs",
+    "refit",
+    "h3",
+    "not_evaluable_by_declaration",
+    "runs",
+    "items",
+    "probe",
+    "item_sets",
+    "family",
+    "secondaries",
+    "losses",
+    "where_the_plan_is_silent",
+    "not_computed_here",
+]
+
+
+def result_sections(report: dict[str, Any]) -> dict[str, str]:
+    """A digest of each part of a result file. Murphy's reliability and resolution of a
+    predictor stand apart from the rest of its record, which keeps the bins and the
+    uncertainty."""
+
+    def digest(value: Any) -> str:
+        held = json.dumps(value, separators=(",", ":"), ensure_ascii=False)
+        return hashlib.sha256(held.encode("utf-8")).hexdigest()[:12]
+
+    whole = ("registered", "refit", "not_evaluable_by_declaration", "runs", "items")
+    out = {key: digest(report[key]) for key in (*whole, "probe", "item_sets", "family")}
+    h3 = json.loads(json.dumps(report["h3"]))
+    for chosen in h3["selections"].values():
+        chosen.pop("sha256")
+    out["h3"] = digest(h3)
+    for key, value in report["secondaries"].items():
+        out[f"secondaries {key}"] = digest(value)
+    for name, record in report["losses"].items():
+        sizes = {
+            event: {key: parts[key] for key in ("bins", "uncertainty")}
+            for event, parts in record["murphy"].items()
+        }
+        rest = {key: value for key, value in record.items() if key != "murphy"}
+        out[f"losses {name}"] = digest(rest | {"murphy": sizes})
+        out[f"murphy {name}"] = digest(record["murphy"])
+    return out
+
+
+def test_where_no_set_is_small_the_result_file_is_the_one_of_before(
+    study: SimpleNamespace, base: SimpleNamespace, opened: SimpleNamespace
+) -> None:
+    """On the synthetic study as it is, where no set is small, nothing is withheld, and the
+    result file is the one the evaluator wrote before it withheld anything, part by part, but
+    for these keys: ``inputs.code_sha256`` (``evaluate.py``), ``inputs.plan_sha256`` and the
+    ``sha256`` of each selection under ``h3``, which follow the file and the temporary folder;
+    ``where_the_plan_is_silent`` and ``not_computed_here``; and Murphy's ``reliability`` and
+    ``resolution`` of a predictor, for a horizon event at which a run of equal probabilities is
+    cut by a bin."""
+    report = base.report
+    assert list(report) == RESULT_KEYS and '"withheld":' not in base.json_text
+    assert not [value for value in walk(report) if isinstance(value, dict) and "withheld" in value]
+    assert report["where_the_plan_is_silent"] == list(ev.WHERE_THE_PLAN_IS_SILENT)
+    assert report["not_computed_here"] == list(ev.NOT_COMPUTED_HERE)
+    versions = {name: report["inputs"]["code_sha256"][name] for name in COMMITTED_VERSIONS}
+    if versions != COMMITTED_VERSIONS:
+        pytest.skip("the digests were taken under other versions of the libraries")
+    found = result_sections(report)
+    assert list(found) == list(COMMITTED_SECTIONS)
+    moved = {key for key, value in found.items() if value != COMMITTED_SECTIONS[key]}
+    # which predictors have a run of equal probabilities that a bin cuts, at either event
+    rows = ev.typed_outcomes(study.filled.reset_index(drop=True))
+    scoreable = rows.index[rows["scoreable"].to_numpy()]
+    edges = np.cumsum([len(k) for k in np.array_split(np.arange(len(scoreable)), 10)])[:-1]
+    cut = set()
+    for name in report["losses"]:
+        for column in ("p_a", "p_b"):
+            p = np.sort(opened.study.predictions[name].loc[scoreable, column].to_numpy())
+            if (p[edges - 1] == p[edges]).any():
+                cut.add(f"murphy {name}")
+    assert moved <= cut and not [key for key in moved if not key.startswith("murphy ")]
+    # (condition (b) of the first primary has such a run too, and its figures are the same at
+    # the six decimals of the file)
+    assert moved == {f"murphy {name}" for name in report["losses"] if name != f"{LLAMA}:b"}
 
 
 # --------------------------------------------------------------------------------------------

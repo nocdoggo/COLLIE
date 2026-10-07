@@ -4,7 +4,9 @@ model selection, and the confirmatory results over the sealed test outcomes (PLA
 
 It is the one program that reads ``external_data/sealed/outcomes_test.csv.gz`` after the
 counts-only code. It never prints or writes anything about a single statement: every output is a
-count, a mean, an interval or a p-value over statements and shortage episodes.
+count, a mean, an interval or a p-value over statements and shortage episodes. A secondary figure
+that would give back the outcomes of 1 to 4 statements is withheld, its counts apart
+("Withholding", below).
 
 What is registered here, as one constant each (set once before registration; every result file
 records which value was in force):
@@ -146,6 +148,11 @@ ready when:
 
 * the plan names no path in a sealed folder (its output root, its item files, its track
   records): the check hashes the files a plan names, so such a plan is not followed at all;
+  nor does the plan itself, a file it names or a stored file of a run lead into one through a
+  symbolic link (``is_sealed``, ``stored_in_sealed``): none of them is read then;
+* no two of the sets a primary can be tested on (the eligible list, and the post-cutoff slice
+  of each primary whose runs are read) differ by 1 to 4 statements (``slice_problems``): the
+  six tests are never withheld, and the same figures on both would give those few back;
 * the plan's two item lists are the registered ones (the ids of the eligible list and of its
   probe subset) and their files are those the counts file of the dataset builder records;
 * the plan holds the registered route (the model id and provider pin that are sent) and the
@@ -254,7 +261,8 @@ without an item set, whose three tests are not evaluable, has no reading.
 * The reading, one of five tried in the plan's order (``OVERCONFIDENCE_READINGS``): 1, the
   greatest value is negative with an interval that excludes zero (underconfident, and nothing
   else is written); 2, both parts are met; 3, only the second; 4, only the first; 5, neither.
-  ``met`` is true for reading 2 alone.
+  ``met`` is true for reading 2 alone. When the part against outcomes is withheld there is no
+  reading: ``reading`` is null and ``reading_in_words`` says so (``OVERCONFIDENCE_NOT_READ``).
 * Beside it, for condition (a) and for the base rate on the same statements: both parts for
   ``E_end90``; both parts on the statements whose answer parsed (withheld when they would give
   the horizon events of a few statements: ``few``); calibration in the large on the scoreable
@@ -264,7 +272,45 @@ without an item set, whose three tests are not evaluable, has no reading.
 
 Wherever a predictor has its calibration in the large (``losses``), it also has the least and
 the greatest value over every statement of its item set (``calibration_all_statements``), and
-the base rate's on the same statements beside both (``beside_base_rate``).
+the base rate's on the same statements beside both (``beside_base_rate``), unless they are
+withheld.
+
+Withholding (PLAN, standing rules, and sections 2.5, 4, 5 (E4), 6 and 13). A record whose
+figures are withheld holds its counts and ``withheld``: true in their place; a count that is
+withheld is null, or is left out of such a record. A few statements are 1 to 4 (``few``,
+``MIN_SHOWN``).
+
+* The six tests. The contrast of each is never withheld. What stands beside it follows the
+  rules below: its two scenarios (``bounds``), the contrast on the statements both sides
+  parsed, the scoreable statements among the failed answers, and the other contrast beside H3.
+* The floor. A secondary figure over a few statements is withheld: a contrast in short
+  (``short``), the scores of a predictor on a few scoreable statements, a pinball loss with a
+  few targets, the coverage counted on a few statements, the outcome mix, and the figures of a
+  probe, whose verdict is given. A secondary contrast that is not evaluable carries no
+  estimate.
+* A few statements that are not scoreable (section 2.5). The figures over every statement that
+  fill the undetermined horizon events are withheld (``fills_withheld``): the two scenarios,
+  the two limits of calibration in the large, and the part against outcomes of the
+  overconfidence criterion, which then has no reading (section 13). The mean probabilities and
+  the calibration in the large on the scoreable statements are withheld with them. The same
+  holds where a few statements are scoreable. The pinball losses and the coverage stay.
+* Two sets, one pair at a time. A secondary contrast is withheld where the same contrast is
+  written already on a set whose scoreable statements differ from its own by a few (``beside``
+  in ``evaluate``): on the item set of its test, or on the statements both sides of that test
+  parsed, which is written beside the test (section 4). So are the base rate's figures beside
+  a primary's; the two parts of the criterion on the answers that parsed, when a few answers
+  failed or parsed, or when the answers that parsed and the scoreable statements differ by a
+  few (section 13); and the contrasts under an outcome definition that gives a few statements
+  another horizon event, or a few of those scoreable under either definition
+  (``other_events``).
+* Item sets. The six tests are never withheld, so two of the sets a primary can be tested on
+  (the eligible list, the post-cutoff slice of each primary) that differ by a few statements
+  are a refusal, before the sealed file is read (``slice_problems``; section 6).
+* Counts. A count that would say, by itself or beside another, how many of a few statements
+  that anyone can name are scoreable is withheld too: the scoreable counts of a slice of a few
+  statements; the scoreable statements among the failed answers of a side of a test, and the
+  counts of the contrast on the statements both sides parsed, where a few answers failed on
+  one side alone, on both or on either, or a few parsed. The counts of the six tests stay.
 
 Where the plan is silent, this file decides as follows, and the result file says so
 (``WHERE_THE_PLAN_IS_SILENT``).
@@ -310,19 +356,21 @@ Where the plan is silent, this file decides as follows, and the result file says
   statements; the criterion is not read on such a slice, although its first part uses no
   scoreable set; a primary declared not evaluable, whose runs are not read, has no entry and
   no line.
-* Beside the overconfidence criterion, the two parts on the answers that parsed
-  (``parsed_only``) are withheld, their three counts apart, when 1 to 4 answers of condition
-  (a) failed on the item set, or 1 to 4 parsed: with the figures over every statement they
-  would give the horizon events of those few statements; the contrast of a test on the
-  statements that both of its sides parsed (``both_sides_parsed``) is withheld in the same
-  way, its two counts apart, when it leaves out or rests on 1 to 4 scoreable statements.
+* How the rules of withholding are applied to the records of this file, how a criterion
+  without a reading is recorded, how the bins of Murphy's decomposition are cut, and when a
+  path leads into a sealed folder have one sentence each in ``WHERE_THE_PLAN_IS_SILENT``.
 
 Refusals (status 1, the reason alone on the error stream, nothing written). A missing or wrong
-hash; an output that exists or lies in a sealed folder; an open input in a sealed folder; files
-of different builds; a declaration ``--not-evaluable`` whose reason is not printable text on
-one line; anything the completeness check finds; a selection file that is missing, not the one
-hashed at the freeze, of another model, of another statement table or of another comparator
-rule, or that contradicts its own dev losses or the rule in force; a plan or stored runs on
+hash (of the sealed file no character of its own hash is printed: ``hash_required``); an output
+that exists or lies in a sealed folder; an open input in a sealed folder; a stored file whose
+path leads into a sealed folder through a symbolic link (the plan, a file it names, the readings
+or the manifest of a run, a selection file: ``is_sealed`` resolves the path part by part and
+asks the file system nothing about a sealed path); item sets that differ by 1 to 4 statements;
+files of different builds; a declaration
+``--not-evaluable`` whose reason is not printable text on one line; anything the completeness
+check finds; a selection file that is missing, not the one hashed at the freeze, of another
+model, of another statement table or of another comparator rule, or that contradicts its own
+dev losses or the rule in force; a plan or stored runs on
 which the check itself stops, and readings that cannot be turned into predictions (the type of
 the error alone is given); predictions that are not the ones hashed at the freeze, or a
 statement left without one; every primary declared not evaluable; a sealed file that is not
@@ -358,13 +406,18 @@ with an item set: ``criterion``, ``items``, ``statements``, ``episodes``;
 ``reading`` (1 to 5), ``reading_in_words`` and ``met``; and, reported beside the criterion,
 ``scoreable``, ``parsed_only`` and ``coverage_80``; the key ``base_rate`` inside a block holds
 the same quantities for the base rate on the same statements; ``parsed_only`` holds
-``not_parsed``, ``statements``, ``episodes`` and ``withheld`` alone when its figures are
-withheld); ``losses`` (every score of section 7.2 per predictor: the model-free ones on every
-eligible statement, the conditions of a primary on its item set;
+``not_parsed``, ``statements``, ``episodes`` and ``withheld`` when it is withheld as a whole;
+when its part against outcomes alone is, because a few of the parsed answers are on statements
+that are not scoreable or a few are on scoreable ones, that part holds the counts of the parsed
+answers and ``withheld``, and the part against the base rate is given); ``losses`` (every
+score of section 7.2 per predictor: the model-free ones on every eligible statement, the
+conditions of a primary on its item set;
 ``calibration_in_the_large`` on the scoreable statements and ``calibration_all_statements``
 with the least and the greatest value over all of them);
 ``where_the_plan_is_silent``; ``not_computed_here`` (what the plan registers and this file
-does not compute: the descriptives of E1, the secondary models and lists, and the rest).
+does not compute: the descriptives of E1, the secondary models and lists, and the rest). Any
+record of a secondary figure may hold its counts and ``withheld`` in place of its figures, and a
+count that is withheld is null ("Withholding", above).
 
 Usage (from the repository root)::
 
@@ -461,11 +514,16 @@ PROBE_LEVEL = 0.5
 MIN_SLICE = 50
 """A post-cutoff slice is analysed only with at least this many scoreable statements."""
 MIN_SHOWN = 5
-"""Fewer statements than this, and at least one, are a few (``few``). Beside the overconfidence
-criterion, the figures on the answers that parsed are withheld when the answers that failed are
-a few, or those that parsed are: next to the figures over every statement they would give the
-horizon events of those statements."""
+"""Fewer statements than this, and at least one, are a few (``few``). A secondary figure that
+rests on a few statements, or that beside the same figure on another set would give back the
+outcomes of a few, is withheld, its counts apart (PLAN, standing rules; "Withholding" in the
+module docstring)."""
 MIN_EPISODES = 2
+LINK_HOPS = 40
+"""How many symbolic links are followed on the way to a file before the path counts as one
+that leads into a sealed folder (``is_sealed``)."""
+STORED_FILES = ("readings.jsonl", "run_manifest.json")
+"""The files of a run that the completeness check reads."""
 EXACT_FLIPS_UP_TO = 13
 """With at most this many episodes the sign-flip test enumerates every sign pattern."""
 PRIMARIES = rd.PRIMARIES
@@ -522,6 +580,13 @@ each in the words the plan gives the paper: (1) the greatest value of calibratio
 (every undetermined ``E_end`` counted as no) is negative with an interval that excludes zero,
 and nothing else of the list is written; (2) both parts hold; (3) only the second; (4) only the
 first; (5) neither."""
+OVERCONFIDENCE_NOT_READ = (
+    "no reading: the part against outcomes is withheld, because so few statements of the item "
+    "set are not scoreable, or are scoreable, that its figures would give their horizon events; "
+    "neither part is read as met"
+)
+"""What the entry of a primary says in place of one of the five readings when its part against
+outcomes is withheld (``fills_withheld``): none of the plan's five sentences is written."""
 MODEL_FREE_PAIRS = (
     ("base_rate", "gbm_text"),
     ("base_rate", "rules_plus_slip"),
@@ -535,8 +600,8 @@ structured-only model, and the structured-only model against the base rate."""
 NOT_COMPUTED_HERE = (
     "the descriptives of E1 (hold rate, slip distribution by form and revision, bracket widths, "
     "counts by year, form, statement type and company)",
-    "the H1 and H2 contrasts, the H3 contrast per condition and every metric of the six "
-    "secondary models",
+    "the H1 and H2 contrasts, the H3 contrast per condition, the decomposition of E3 and every "
+    "metric of the six secondary models (a secondary scorer)",
     "the accuracy of the rule reading on the 100-statement check, reported beside H2",
     "the minimum detectable differences reported beside a null (from the power code at the gate)",
     "the TBD, silent and stale-at-issue lists (stale-value uptake; TBD and silent against the "
@@ -587,8 +652,9 @@ WHERE_THE_PLAN_IS_SILENT = (
     "unbounded lower end does not lie above zero",
     "the bounds beside a contrast set every undetermined horizon event of the item set to no, "
     "then to yes, for both predictors at once",
-    "Murphy's decomposition cuts the statements, ordered by probability and then by id, into "
-    "ten runs of equal length; the coverage of the 80% interval treats a bracket as closed",
+    "Murphy's decomposition cuts the statements, ordered by probability, into ten runs of equal "
+    "length, to within one statement, and into one run for each statement when there are fewer "
+    "than ten; the coverage of the 80% interval treats a bracket as closed",
     "definition A is one of the outcome variants that keep the item set the probe fixed",
     "in the overconfidence criterion an interval excludes zero when both of its ends lie on one "
     "side of zero, and an end on zero does not; a draw whose values sum to zero up to rounding "
@@ -603,13 +669,63 @@ WHERE_THE_PLAN_IS_SILENT = (
     "scoreable statements; the criterion is not read on such a slice, although its first part "
     "uses no scoreable set; a primary declared not evaluable, whose runs are not read, has no "
     "entry and no line",
-    "beside the overconfidence criterion, the two parts on the answers that parsed (parsed_only) "
-    f"are withheld, their three counts apart, when 1 to {MIN_SHOWN - 1} answers of condition (a) "
-    f"failed on the item set, or 1 to {MIN_SHOWN - 1} parsed: with the figures over every "
-    "statement they would give the horizon events of those few statements; the contrast of a "
-    "test on the statements that both of its sides parsed (both_sides_parsed) is withheld in "
-    f"the same way, its two counts apart, when it leaves out or rests on 1 to {MIN_SHOWN - 1} "
-    "scoreable statements",
+    "the figures that section 2.5 withholds where 1 to 4 statements of a set are not scoreable, "
+    "or 1 to 4 are, are in this file: the bounds beside a contrast; in the record of a "
+    "predictor, bounds_all_statements and both blocks of calibration in the large, with the two "
+    "mean probabilities null; in the overconfidence criterion, the part against outcomes, for "
+    "the predictor and for the base rate beside it, and the block scoreable, whose difference "
+    "from the base rate is a difference of two such means; a record that is withheld holds the "
+    "two counts of its set, and no count of undetermined events by horizon event",
+    "where the overconfidence criterion is without a reading because its part against outcomes "
+    "is withheld (section 13), reading is null, reading_in_words says that there is no reading and "
+    "why, met is false, and the line of the table and of the printout gives the counts of the "
+    "item set and the part against the base rate, whose own verdict is given and decides "
+    "nothing alone",
+    "the floor of five statements holds for every secondary figure of this file: a contrast in "
+    f"short over 1 to {MIN_SHOWN - 1} scoreable statements holds its two counts and withheld, "
+    "and so do the scores of a predictor on as few scoreable statements (the losses, the "
+    "calibration in the large and the decomposition of the Brier score), a pinball loss with as "
+    "few targets and the coverage counted on as few statements; the outcome mix of as few "
+    "scoreable statements is withheld; a secondary contrast that is not evaluable carries no "
+    "estimate; where the figures of a probe are withheld (section 5, E4), so are its p-value "
+    "and its two pinball records; the contrast of each of the six tests is never withheld, with "
+    "its counts, losses, intervals and p-values, nor is the contrast beside H3 that is the test "
+    "itself; what stands beside a test (its two scenarios, the contrast on the statements both "
+    "sides parsed, the scoreable statements among the failed answers and the other contrast "
+    "beside H3) follows the rules of withholding",
+    "a secondary contrast is compared, one pair of sets at a time, with the same contrast on "
+    "every set it is written on already: the six tests first, then the contrast of each test on "
+    "the statements both of its sides parsed, then the secondaries in the order of the file; "
+    f"where the scoreable statements of the two sets differ by 1 to {MIN_SHOWN - 1} statements "
+    "it is withheld, its two counts apart, and the contrast written first stays; this holds for "
+    "H2 on the month-and-year form, the statements first captured by the stated end and the "
+    "post-cutoff slice, and for the two contrasts of the decomposition that read no model, on "
+    "the slice of a switched primary, beside the model-free contrasts on every eligible "
+    "statement; the base rate's figures beside those of a primary are withheld where its item "
+    "set differs by so few statements, or by so few scoreable ones, from a set on which they "
+    "are written already; a contrast under another outcome definition is held, as section 2.5 "
+    "holds it to the primary outcome, to every definition before it whose contrasts are "
+    "written, and its record gives the number of statements with another horizon event than "
+    "under the primary outcome",
+    f"a count is withheld where it would say how many of 1 to {MIN_SHOWN - 1} statements that "
+    "anyone can name are scoreable: the two scoreable counts of a post-cutoff slice of so few "
+    "statements (null); the number of scoreable statements among the failed answers of a side "
+    "of a test (scoreable_not_parsed, null) where so few of its answers failed or so few "
+    "parsed, and of both sides where so few answers failed on one side alone or on both; the "
+    "counts of the contrast on the statements both sides parsed, where so few answers failed "
+    "on one side alone, on both or on either, or so few were parsed by both; the counts of a "
+    "secondary contrast on a set of so few statements, or on one that differs by so few "
+    "statements from a set the same contrast is written on; the count of undetermined events "
+    "in a record over so few statements, which holds their number alone; the counts of the six "
+    "tests themselves stay as they are",
+    "a path leads into a sealed folder when, as given or where a symbolic link on its way "
+    "leads, it is the sealed file or lies in a folder named as the sealed one: it is resolved "
+    "part by part, and each part is compared as text before the file system is asked about it, "
+    "so that nothing is asked about a sealed path; links in a circle count as sealed; the plan "
+    "of the runs, the files it names, the readings and the manifest of a run and a selection "
+    "file are not read through such a path, and an output is not written through one; the "
+    "refusal of the sealed file for its hash, or of a file that leads to a sealed path, prints "
+    "no character of that hash",
 )
 """The decisions every result file carries as ``where_the_plan_is_silent`` (see the module
 docstring)."""
@@ -1123,7 +1239,7 @@ def output_paths(path: Path | None, table: bool = False) -> tuple[Path, Path | N
         refuse("--out is required: the file to write, which must not exist yet")
     beside = path.with_suffix(".md") if table else None
     for target in (path, *([beside] if beside is not None else [])):
-        if sealed_counts.in_sealed_folder(target):
+        if is_sealed(target) or sealed_counts.in_sealed_folder(target):
             refuse("--out lies in a sealed folder; results are written outside it")
         if target.exists() or target.is_symlink():
             refuse(f"the output is already there, and nothing is overwritten: {target.as_posix()}")
@@ -1195,18 +1311,109 @@ class Group:
 
 
 def is_sealed(path: Any, sealed: Any = None) -> bool:
-    """Whether a path is the sealed file (``sealed``, or ``SEALED``; compared as text, nothing
-    on disk is looked at for it) or lies in a sealed folder."""
-    same = os.path.abspath(path) == os.path.abspath(sealed or SEALED)
-    return same or sealed_counts.in_sealed_folder(Path(path))
+    """Whether a path is the sealed file (``sealed``, or ``SEALED``), its folder, or anything
+    in a folder named as the sealed one: the path as given, or the one that a symbolic link on
+    its way leads to. The path is resolved here, part by part, and each step is compared as
+    text before the file system is asked whether it is a link: nothing is asked about the
+    sealed file, about its folder, or about a folder named as the sealed one. The sealed file
+    is known by its path as given, as text, and by that path with the way to its folder
+    resolved (a link and a step back on that way are followed in their order, not cancelled
+    as text); a sealed path whose folder is itself reached by a step back is known as text
+    alone. Another file in its folder is sealed only when the folder is named as the
+    registered one. Links that lead in a circle, or that cannot be read, count as sealed:
+    nothing is read through them."""
+    written = os.path.join(os.getcwd(), os.fspath(sealed or SEALED))
+    target = os.path.abspath(written)
+    folder, name = os.path.split(written)
+    above = os.path.dirname(folder)
+    if sealed_counts.SEALED_FOLDER not in above.split(os.sep):
+        above = os.path.realpath(above)  # the way to the folder, never the folder itself
+    targets = {target, os.path.join(above, os.path.basename(folder), name)}
+    folders = {os.path.dirname(one) for one in targets}
+    try:
+        given = os.fspath(path)
+    except TypeError:
+        return False
+    if not isinstance(given, str) or "\0" in given:
+        return False
+    if os.path.abspath(given) == target:  # the same path as text, however it is spelled
+        return True
+    pending = [part for part in os.path.join(os.getcwd(), given).split(os.sep) if part]
+    current, hops = os.sep, 0
+    while pending:
+        part = pending.pop(0)
+        if part == ".":
+            continue
+        if part == "..":
+            current = os.path.dirname(current)
+            continue
+        current = os.path.join(current, part)
+        if current in targets or part == sealed_counts.SEALED_FOLDER:
+            return True
+        if current in folders:  # the folder of the sealed file: nothing is asked about it
+            if not pending:
+                return True
+            continue
+        if os.path.islink(current):
+            hops += 1
+            if hops > LINK_HOPS:
+                return True
+            try:
+                link = os.readlink(current)
+            except OSError:
+                return True
+            current = os.sep if os.path.isabs(link) else os.path.dirname(current)
+            pending = [step for step in link.split(os.sep) if step] + pending
+    return False
+
+
+def stored_in_sealed(
+    plan: Mapping[str, Any], out_root: Path, runs: Iterable[Mapping[str, Any]], sealed: Any = None
+) -> list[str]:
+    """Which stored files of ``runs`` lead into a sealed folder (``is_sealed``): the readings
+    and the manifest of a run, under the output root given and under the one the plan names.
+    Looked at before any of them is read: a file that is a symbolic link to a sealed one would
+    otherwise be read, and hashed, as an open one. The names are those of the runs."""
+    roots = dict.fromkeys((Path(out_root), Path(str(plan["options"]["out_root"]))))
+    found = []
+    for run in runs:
+        files = [root / run["run"] / name for root in roots for name in STORED_FILES]
+        if any(is_sealed(file, sealed) for file in files):
+            found.append(
+                f"a stored file of run {run['run']} leads into a sealed folder; none of the "
+                "files of the run is read"
+            )
+    return found
+
+
+def hash_required(
+    data: bytes, expected: str, what: str, path: Any, sealed: Any = None, of_sealed: bool = False
+) -> str:
+    """``sealed_counts.require_hash`` for the file at ``path``: the sha256 of ``data``, refused
+    unless it starts with ``expected``. The refusal of a file that is, or leads into, a sealed
+    path (``is_sealed``) prints no character of the hash of that file; ``of_sealed`` says that
+    the bytes are those of the sealed file itself, however its path is spelled."""
+    actual = sealed_counts.sha256(data)
+    if (of_sealed or is_sealed(path, sealed)) and not (
+        len(expected) >= sealed_counts.MIN_HASH_CHARS and actual.startswith(expected)
+    ):
+        refuse(
+            f"{what} is not the expected file: its sha256 is not the one given; no character "
+            "of the hash of a sealed file is printed"
+        )
+    return sealed_counts.require_hash(data, expected, what)
 
 
 def read_plan(out_root: Path, sealed: Path | None = None) -> tuple[dict | None, str, list[str]]:
     """The launcher's plan under ``out_root``, its sha256, and what is wrong with it. A plan
     that names a path in a sealed folder (its output root, an item file or a track record) is
     not used at all: the completeness check hashes the files a plan names, and no sealed file
-    is opened for that."""
+    is opened for that. Nor is a plan read whose own file leads into a sealed folder
+    (``is_sealed``: as given, or through a symbolic link)."""
     path = lp.plan_path(out_root)
+    if is_sealed(path, sealed):
+        why = "the plan of the runs leads into a sealed folder; it is not read"
+        return None, "", [why]
     if not path.is_file():
         return None, "", [f"no plan of the runs at {path.as_posix()} (launch.py plan writes it)"]
     data = path.read_bytes()
@@ -1332,6 +1539,10 @@ def read_group(
     if any(run["template"] != template for run in runs) or template not in rd.TEMPLATES:
         why = f"{name}: the plan holds runs under several templates, or one the harness lacks"
         return Group(model, line, template, {}, {"runs": len(runs)}, (why,))
+    in_sealed = stored_in_sealed(plan, out_root, runs)
+    if in_sealed:  # before any stored file of the runs is looked at
+        why = tuple(f"{name}: {reason}" for reason in in_sealed)
+        return Group(model, line, template, {}, {"runs": len(runs)}, why)
     problems, hashes = [], {}
     if sent(plan["routes"][model]) != registered_route(model):
         problems.append(f"{name}: the plan was made for another route than the registered one")
@@ -1539,6 +1750,72 @@ def predictions_text(predictions: Mapping[str, pd.DataFrame]) -> str:
 
 
 # --------------------------------------------------------------------------------------------
+# Withholding (PLAN, standing rules, and sections 2.5, 4 and 13)
+# --------------------------------------------------------------------------------------------
+
+
+def few(count: int) -> bool:
+    """Whether a number of statements is a few: 1 to ``MIN_SHOWN`` - 1. A figure on outcomes
+    that would give the horizon events of so few statements is withheld (over none there is
+    nothing to give)."""
+    return 0 < count < MIN_SHOWN
+
+
+def fills_withheld(rows: pd.DataFrame) -> dict[str, Any] | None:
+    """What stands in place of the figures over every statement of ``rows`` that fill its
+    undetermined horizon events (the two scenarios of a loss, the two limits of calibration in
+    the large), or None where they are given. PLAN section 2.5, "Horizon events": where 1 to
+    ``MIN_SHOWN`` - 1 statements of the set are not scoreable, those figures are withheld,
+    because beside the figures on its scoreable statements they would give the events of those
+    few. They are withheld as well where as few are scoreable: an event that is yes by the
+    stated end is determined at both horizons, so the frequencies over every statement count
+    the yes of the scoreable statements alone, and a scenario less its filled part is the loss
+    on them. The record holds the two counts of the set and ``withheld``; over 1 to
+    ``MIN_SHOWN`` - 1 statements it holds their number alone, because the other count would
+    say how many of them are scoreable."""
+    total, missing = len(rows), int((~rows["scoreable"]).sum())
+    if few(total):
+        return {"statements": total, "withheld": True}
+    if few(missing) or few(total - missing):
+        return {
+            "statements": total,
+            "with_a_horizon_event_undetermined": missing,
+            "withheld": True,
+        }
+    return None
+
+
+def other_events(rows: pd.DataFrame, under: pd.DataFrame, scored: bool = False) -> int:
+    """How many statements of ``rows`` have another horizon event under the outcomes of
+    ``under`` (typed rows of the same statements under another outcome definition): a yes for a
+    no, or an event that is determined under one and not under the other. With ``scored``,
+    how many of those are scoreable under one of the two definitions: the statements whose
+    loss a contrast under one definition holds and the same contrast under the other does not
+    hold, or holds as another."""
+    changed = np.zeros(len(rows), dtype=bool)
+    for _, _, y in EVENTS:
+        one = rows[y].to_numpy(dtype=float)
+        other = under.loc[rows.index, y].to_numpy(dtype=float)
+        changed |= ~((one == other) | (np.isnan(one) & np.isnan(other)))
+    if scored:
+        mine = rows["scoreable"].to_numpy(dtype=bool)
+        changed &= mine | under.loc[rows.index, "scoreable"].to_numpy(dtype=bool)
+    return int(changed.sum())
+
+
+def without_base_rate(value: Any) -> Any:
+    """``value`` with every record it holds under ``base_rate``, at any depth, replaced by one
+    that is withheld: the base rate's figures on a set that differs by a few statements from
+    one on which they are written already (``evaluate``)."""
+    if not isinstance(value, Mapping):
+        return value
+    return {
+        key: {"withheld": True} if key == "base_rate" else without_base_rate(item)
+        for key, item in value.items()
+    }
+
+
+# --------------------------------------------------------------------------------------------
 # Scores of one predictor
 # --------------------------------------------------------------------------------------------
 
@@ -1645,15 +1922,48 @@ def coverage80(pred: pd.DataFrame, rows: pd.DataFrame) -> dict[str, Any]:
     }
 
 
+def coverage_record(pred: pd.DataFrame, rows: pd.DataFrame) -> dict[str, Any]:
+    """``coverage80`` under the floor of the secondaries: counted on 1 to ``MIN_SHOWN`` - 1
+    statements, the record holds the number of brackets that straddle the interval, which
+    with the statements of the set gives the number it was counted on, and ``withheld``."""
+    found = coverage80(pred, rows)
+    if few(found["inside"] + found["outside"]):
+        straddling = found["bracket_straddles_the_interval"]
+        return {"bracket_straddles_the_interval": straddling, "withheld": True}
+    return found
+
+
+def pinball_record(scores: Mapping[str, Any], total: int) -> dict[str, Any]:
+    """A record of ``predictors.pinball_scores`` over ``total`` statements under the floor of
+    the secondaries: where the loss rests on 1 to ``MIN_SHOWN`` - 1 targets, or the set holds
+    as few statements, the record holds its two counts and ``withheld``, and neither the loss
+    nor its bounds."""
+    if few(total) or few(int(scores["statements"])):
+        counts = ("statements", "left_out_right_censored")
+        return {key: scores[key] for key in counts} | {"withheld": True}
+    return dict(scores)
+
+
 def murphy(p: Any, y: Any, bins: int = 10) -> dict[str, Any]:
     """Murphy's decomposition of the Brier score of one horizon event with ``bins`` equal-count
-    bins: the statements are ordered by probability (ties in the order given) and cut into
-    ``bins`` runs of equal length, to within one."""
+    bins: the statements are ordered by probability and cut into ``bins`` runs of equal length,
+    to within one.
+
+    Statements with one probability cannot be told apart by it, so each counts with the
+    frequency of the event among all the statements that share its probability. A run of equal
+    probabilities that a cut divides then gives every bin it reaches that one frequency: the
+    figures are the same in whatever order the statements are given, and a forecast of one
+    value has no resolution. Where no such run is divided, the bins hold the frequencies of
+    their own statements, as without this rule."""
     p, y = np.asarray(p, dtype=float), np.asarray(y, dtype=float)
-    cuts = np.array_split(np.argsort(p, kind="stable"), min(bins, len(p)))
+    order = np.argsort(p, kind="stable")
+    p, y = p[order], y[order]
+    _, first, sizes = np.unique(p, return_index=True, return_counts=True)
+    shared = np.repeat(np.add.reduceat(y, first) / sizes, sizes)
+    cuts = np.array_split(np.arange(len(p)), min(bins, len(p)))
     rate = float(y.mean())
-    reliability = sum(len(k) * (p[k].mean() - y[k].mean()) ** 2 for k in cuts) / len(p)
-    resolution = sum(len(k) * (y[k].mean() - rate) ** 2 for k in cuts) / len(p)
+    reliability = sum(len(k) * (p[k].mean() - shared[k].mean()) ** 2 for k in cuts) / len(p)
+    resolution = sum(len(k) * (shared[k].mean() - rate) ** 2 for k in cuts) / len(p)
     return {
         "bins": len(cuts),
         "reliability": float(reliability),
@@ -1668,7 +1978,16 @@ def calibration_scores(
     """Calibration in the large of one predictor on the statements of ``rows`` (PLAN 7.2), for
     each horizon event: on the scoreable statements (``calibration_in_the_large``), and over
     every statement with its least and its greatest value (``calibration_all_statements``:
-    ``calibration_limits``). ``rows`` must hold a scoreable statement."""
+    ``calibration_limits``). ``rows`` must hold a scoreable statement.
+
+    Where the figures over every statement are withheld (``fills_withheld``), both blocks hold
+    the counts of the set and ``withheld`` in place of their events: the predictions are open,
+    so the mean probability on the scoreable statements would name the few that are not, and
+    the calibration in the large there is that mean less a frequency that Murphy's uncertainty
+    gives."""
+    held = fills_withheld(rows)
+    if held is not None:
+        return {"calibration_in_the_large": dict(held), "calibration_all_statements": dict(held)}
     scoreable = rows[rows["scoreable"]]
     mine, clusters = pred.loc[scoreable.index], list(scoreable["episode_id"])
     whole, every = pred.loc[rows.index], list(rows["episode_id"])
@@ -1692,9 +2011,25 @@ def predictor_record(
     interval, the two horizon events apart, the bounds and the pinball losses over all rows),
     calibration in the large (on the scoreable statements, and its least and greatest value
     over all rows: ``calibration_scores``), Murphy's decomposition and the coverage of the 80%
-    interval. Without a scoreable statement the record holds that count alone."""
+    interval. Without a scoreable statement the record holds that count alone.
+
+    Where 1 to ``MIN_SHOWN`` - 1 statements of ``rows`` are not scoreable (PLAN section 2.5,
+    ``fills_withheld``), ``bounds_all_statements`` and both blocks of calibration in the large
+    hold the counts of the set and ``withheld``, and the two mean probabilities on the
+    scoreable statements are None (``calibration_scores`` says why). The pinball losses and the
+    coverage stay.
+
+    The floor of the secondaries (PLAN, standing rules). Over 1 to ``MIN_SHOWN`` - 1 statements
+    the record holds their number and ``withheld``. With as few scoreable ones it holds its
+    three counts, ``withheld``, the pinball losses and the coverage, which score the time to
+    recovery over every statement: what is scored on the scoreable statements is withheld, and
+    with it the figures over every statement that fill the horizon events. A pinball loss and
+    the coverage have the same floor on the statements they are counted on (``pinball_record``,
+    ``coverage_record``)."""
     pred = pred.loc[rows.index]
     scoreable = rows[rows["scoreable"]]
+    if few(len(rows)):  # not even how many of so few statements are scoreable
+        return {"statements": len(rows), "withheld": True}
     if not len(scoreable):
         return {"scoreable_statements": 0}
     mine, clusters = pred.loc[scoreable.index], list(scoreable["episode_id"])
@@ -1703,16 +2038,32 @@ def predictor_record(
     means = P.bootstrap_means(loss, clusters, draws, seed)[:, 0] if several else np.array(loss)
     record = power.predictor_record(rows, pred, np.asarray(loss), means)
     record["bounds_all_statements"] = record.pop("bounds_all_dated")
-    record["pinball_all_statements"] = record.pop("pinball_all_dated")
-    return {
+    record["pinball_all_statements"] = {
+        level: pinball_record(scores, len(rows))
+        for level, scores in record.pop("pinball_all_dated").items()
+    }
+    counts = {
         "scoreable_statements": len(scoreable),
         "scoreable_episodes": len(set(clusters)),
         "statements": len(rows),
+    }
+    over_all = {
+        "pinball_all_statements": record["pinball_all_statements"],
+        "coverage_80": coverage_record(pred, rows),
+    }
+    if few(len(scoreable)):  # what is scored on them, and the figures that fill the rest
+        return {**counts, "withheld": True, **over_all}
+    held = fills_withheld(rows)
+    if held is not None:
+        record["bounds_all_statements"] = held
+        record["mean_p_E_end"] = record["mean_p_E_end90"] = None
+    return {
+        **counts,
         **record,
         "ci95": record["ci95"] if several else None,
         **calibration_scores(rows, pred, draws, seed),
         "murphy": {event: murphy(mine[p], scoreable[y]) for event, p, y in EVENTS},
-        "coverage_80": coverage80(pred, rows),
+        "coverage_80": over_all["coverage_80"],
     }
 
 
@@ -1728,20 +2079,19 @@ def beside_base_rate(
     listing age on the same events"): every event of ``calibration_in_the_large`` and of
     ``calibration_all_statements`` gains ``base_rate``, what ``calibration_scores`` gives for
     the base rate's predictions ``base`` on the same statements. A record without a scoreable
-    statement holds no calibration in the large and is returned as it is."""
-    if not record["scoreable_statements"]:
+    statement holds no calibration in the large and is returned as it is; a block that is
+    withheld, in the record or for the base rate, stays as the record has it."""
+    if not record.get("scoreable_statements"):
         return dict(record)
     beside = calibration_scores(rows, base, draws, seed)
-    return {
-        **record,
-        **{
-            key: {
-                event: {**record[key][event], "base_rate": theirs}
-                for event, theirs in found.items()
-            }
-            for key, found in beside.items()
-        },
-    }
+    out = dict(record)
+    for key, found in beside.items():
+        if key not in record or "withheld" in found or "withheld" in record[key]:
+            continue
+        out[key] = {
+            event: {**record[key][event], "base_rate": theirs} for event, theirs in found.items()
+        }
+    return out
 
 
 def criterion_parts(
@@ -1756,17 +2106,26 @@ def criterion_parts(
     of the base rate stand under ``base_rate``; no verdict is read from them.
 
     ``against_base_rate``: the mean probability minus the base rate's (``probability_gap``).
-    The part is ``met`` when the difference is positive and its interval excludes zero."""
+    The part is ``met`` when the difference is positive and its interval excludes zero.
+
+    Where the figures over every statement are withheld (``fills_withheld``),
+    ``against_outcomes`` holds the counts of the set and ``withheld`` in place of its events,
+    for the predictor and for the base rate, and no ``met``: nothing is read from a figure that
+    is not written. ``against_base_rate`` uses no outcome and is given as it is."""
     clusters = list(rows["episode_id"])
     mine, theirs = pred.loc[rows.index], base.loc[rows.index]
-    outcomes, no_text = {}, {}
+    held = fills_withheld(rows)
+    outcomes: dict[str, Any] = {} if held is None else held
+    no_text = {}
     for event, p, y in EVENTS:
-        limits = calibration_limits(mine[p], rows[y], clusters, draws, seed)
-        limits["met"] = excludes_zero(limits["least_ci95"]) and limits["least"] > 0
-        limits["base_rate"] = calibration_limits(theirs[p], rows[y], clusters, draws, seed)
+        if held is None:
+            limits = calibration_limits(mine[p], rows[y], clusters, draws, seed)
+            limits["met"] = excludes_zero(limits["least_ci95"]) and limits["least"] > 0
+            limits["base_rate"] = calibration_limits(theirs[p], rows[y], clusters, draws, seed)
+            outcomes[event] = limits
         gap = probability_gap(mine[p], theirs[p], clusters, draws, seed)
         gap["met"] = excludes_zero(gap["ci95"]) and gap["difference"] > 0
-        outcomes[event], no_text[event] = limits, gap
+        no_text[event] = gap
     return {
         "statements": len(rows),
         "episodes": len(set(clusters)),
@@ -1786,13 +2145,6 @@ def overconfidence_reading(outcomes: Mapping[str, Any], no_text: Mapping[str, An
     if no_text["met"]:
         return 2 if outcomes["met"] else 3
     return 4 if outcomes["met"] else 5
-
-
-def few(count: int) -> bool:
-    """Whether a number of statements is a few: 1 to ``MIN_SHOWN`` - 1. A figure on outcomes
-    that would give the horizon events of so few statements is withheld (over none there is
-    nothing to give)."""
-    return 0 < count < MIN_SHOWN
 
 
 def overconfidence(
@@ -1825,16 +2177,37 @@ def overconfidence(
     undetermined events over every statement and over the parsed ones give, by subtraction,
     the horizon events of the statements between them, and the answers that failed can be told
     from the stored runs; over a few parsed answers the figures would give their events
-    outright."""
+    outright. It is withheld in the same way when the answers that parsed and the scoreable
+    statements are the same but for a few statements: the limits on the first, beside the
+    calibration in the large on the second, would give the events of those. Otherwise it holds
+    the two parts on the parsed answers (``criterion_parts``), of which the part against
+    outcomes is withheld on its own where a few of those answers are on statements that are
+    not scoreable, or a few on scoreable ones.
+
+    Where the part against outcomes is withheld (``criterion_parts``: 1 to ``MIN_SHOWN`` - 1
+    statements of the item set are not scoreable, or as few are), the criterion is not read:
+    ``reading`` is None, ``reading_in_words`` says so (``OVERCONFIDENCE_NOT_READ``) and ``met``
+    is false. The part against the base rate is given with its own ``met``, which decides
+    nothing alone. ``scoreable`` then holds its two counts and ``withheld``: its mean
+    probabilities would name the few statements that are not scoreable
+    (``calibration_scores``); over a few statements in all it holds ``withheld`` alone. The
+    coverage has the floor of ``coverage_record``."""
     parts = criterion_parts(rows, pred, base, draws, seed)
-    number = overconfidence_reading(
-        parts["against_outcomes"]["E_end"], parts["against_base_rate"]["E_end"]
-    )
+    number, words = None, OVERCONFIDENCE_NOT_READ
+    if "withheld" not in parts["against_outcomes"]:
+        number = overconfidence_reading(
+            parts["against_outcomes"]["E_end"], parts["against_base_rate"]["E_end"]
+        )
+        words = OVERCONFIDENCE_READINGS[number]
     scoreable = rows[rows["scoreable"]]
     clusters = list(scoreable["episode_id"])
     mine, theirs = pred.loc[scoreable.index], base.loc[scoreable.index]
     on_scoreable: dict[str, Any] = {"statements": len(scoreable), "episodes": len(set(clusters))}
-    if len(scoreable):  # calibration in the large needs a frequency
+    if few(len(rows)):  # not even how many of so few statements are scoreable
+        on_scoreable = {"withheld": True}
+    elif fills_withheld(rows) is not None:
+        on_scoreable["withheld"] = True
+    elif len(scoreable):  # calibration in the large needs a frequency
         for event, p, y in EVENTS:
             on_scoreable[event] = {
                 **calibration(mine[p], scoreable[y], clusters, draws, seed),
@@ -1843,7 +2216,10 @@ def overconfidence(
             }
     kept = rows[parsed.loc[rows.index].to_numpy()]
     failed = len(rows) - len(kept)
-    if few(failed) or few(len(kept)):
+    # the same limits on the answers that parsed and on the scoreable statements, when the two
+    # sets are the same but for a few statements
+    near_scoreable = few(len(kept.index.symmetric_difference(scoreable.index)))
+    if few(failed) or few(len(kept)) or near_scoreable:
         on_parsed: dict[str, Any] = {
             "statements": len(kept),
             "episodes": len(set(kept["episode_id"])),
@@ -1855,13 +2231,13 @@ def overconfidence(
         "criterion": OVERCONFIDENCE_CRITERION,
         **parts,
         "reading": number,
-        "reading_in_words": OVERCONFIDENCE_READINGS[number],
+        "reading_in_words": words,
         "met": number == 2,
         "scoreable": on_scoreable,
         "parsed_only": {"not_parsed": failed, **on_parsed},
         "coverage_80": {
-            **coverage80(pred.loc[rows.index], rows),
-            "base_rate": coverage80(base.loc[rows.index], rows),
+            **coverage_record(pred.loc[rows.index], rows),
+            "base_rate": coverage_record(base.loc[rows.index], rows),
         },
     }
 
@@ -2001,14 +2377,22 @@ class Gathered:
 
 
 def read_selection(
-    path: Path, model: str, statements_sha: str, expected: str | None = None
+    path: Path,
+    model: str,
+    statements_sha: str,
+    expected: str | None = None,
+    sealed: Path | None = None,
 ) -> tuple[dict, list[str]]:
     """The H3 selection the dev command recorded for ``model``, and what is wrong with it: a
     file that is not the one of ``expected`` (the sha256, or its first characters, recorded at
     the freeze; both hashes are then shown at the length of the one given, so that they can be
     compared), of another model, statement table or comparator rule, or one that contradicts
     itself (a selected condition that is not the lowest of its own dev losses, or a comparator
-    that is not the one the rule in force gives on its own dev losses)."""
+    that is not the one the rule in force gives on its own dev losses). A file that leads into
+    a sealed folder (``is_sealed``; ``sealed`` is the sealed file when it is not the default
+    one) is not read, so that no character of its hash is shown either."""
+    if is_sealed(path, sealed):
+        return {}, [f"{model}: the H3 selection file leads into a sealed folder; it is not read"]
     if not path.is_file():
         return {}, [f"{model}: no H3 selection at {path.as_posix()} (the dev command writes it)"]
     data = path.read_bytes()
@@ -2071,6 +2455,29 @@ def cluster_problems(first: pd.DataFrame, ids: Sequence[str]) -> list[str]:
     return []
 
 
+def slice_problems(first: pd.DataFrame, models: Sequence[str]) -> list[str]:
+    """Whether two of the sets a primary can be tested on differ by 1 to ``MIN_SHOWN`` - 1
+    statements (PLAN section 6, "Evaluator"): the eligible list (``first``: its first-sight
+    cells by id) and the post-cutoff slice of each of ``models``, the primaries whose runs are
+    read. The six tests are never withheld, so the same figures on two such sets would give
+    back the outcomes of those few; and the sets are known from the dates alone, before any
+    outcome is read. A problem gives the two sets and the number of statements between them."""
+    sets = {"the eligible list": frozenset(first.index)}
+    for model in models:
+        cutoff = sealed_counts.CUTOFF_MONTH_ENDS[model]
+        if sealed_counts.has_slice(cutoff):
+            after = (first["event_date"] > cutoff.isoformat()).to_numpy()
+            sets[f"the post-cutoff slice of {model}"] = frozenset(first.index[after])
+    names = list(sets)
+    return [
+        f"{one} and {other} differ by {len(sets[one] ^ sets[other])} statements: the same "
+        "figures on both would give back the outcomes of those few"
+        for k, one in enumerate(names)
+        for other in names[k + 1 :]
+        if few(len(sets[one] ^ sets[other]))
+    ]
+
+
 def gather(
     out_root: Path,
     eligible: pd.DataFrame,
@@ -2086,7 +2493,8 @@ def gather(
     the confirmatory runs of every primary that is not declared not evaluable, their item sets
     against the registered lists, the horizons they asked about against those of the statement
     table (``first``: the first-sight cells of the eligible statements by id; None skips this
-    and the next), the cells the clusters are taken from, the item files against the build,
+    and the next two), the cells the clusters are taken from, the item sets that differ by a
+    few statements (``slice_problems``), the item files against the build,
     and the selection files (against ``expected_selections``, the sha256 of each primary's
     file, when given). No outcome is read; ``sealed`` is the sealed file when it is not the
     default one, so that a plan that names it is not followed (``read_plan``)."""
@@ -2095,6 +2503,7 @@ def gather(
     found.probe_ids = sorted(eligible.loc[eligible[PROBE] == "1", "statement_group_id"])
     if first is not None:
         found.problems += cluster_problems(first, ids)
+        found.problems += slice_problems(first, [m for m in PRIMARIES if m not in skipped])
     plan, found.plan_sha256, problems = read_plan(out_root, sealed)
     found.problems += problems
     if plan is None:
@@ -2105,6 +2514,13 @@ def gather(
     )
     found.problems += item_file_problems(plan, counts, (LISTS["e3"], LISTS[PROBE]))
     expected = {**dict.fromkeys(CONDITIONS, ids), PROBE: found.probe_ids}
+    read = [model for model in PRIMARIES if model not in skipped]
+    in_sealed = stored_in_sealed(
+        plan, out_root, lp.select(plan, ["confirmatory"], models=read), sealed
+    )
+    if in_sealed:  # with the sealed file as given: no file of any run is read
+        found.problems += in_sealed
+        return found
     comparators = set()
     for model in PRIMARIES:
         if model in skipped:
@@ -2119,7 +2535,9 @@ def gather(
             found.problems += group.problems
         path = selections / SELECTION_NAME.format(model=model)
         frozen = (expected_selections or {}).get(model)
-        found.selections[model], problems = read_selection(path, model, statements_sha, frozen)
+        found.selections[model], problems = read_selection(
+            path, model, statements_sha, frozen, sealed
+        )
         found.problems += problems
         comparators.add(found.selections[model].get("comparator"))
     if len(comparators) > 1:
@@ -2266,7 +2684,12 @@ def bounds(
     rows: pd.DataFrame, predictions: Mapping[str, pd.DataFrame], comparator: str, tested: str
 ) -> dict[str, Any]:
     """The bounds of PLAN 7.2 beside a contrast: both mean losses and their difference over
-    every statement of ``rows``, with each undetermined horizon event set to no, then to yes."""
+    every statement of ``rows``, with each undetermined horizon event set to no, then to yes.
+    Where those two scenarios are withheld (``fills_withheld``: PLAN section 2.5), the record
+    holds its counts and ``withheld``, and no scenario."""
+    held = fills_withheld(rows)
+    if held is not None:
+        return held
     out: dict[str, Any] = {
         "statements": len(rows),
         "with_a_horizon_event_undetermined": int((~rows["scoreable"]).sum()),
@@ -2325,12 +2748,25 @@ def scored(
     return contrast(*pair, draws, seed, source, levels, margin)
 
 
-def short(result: Mapping[str, Any], sides: int, source: str) -> dict[str, Any]:
-    """A contrast in short, for the secondaries: sizes, the estimate, its 95% interval with the
-    way it was made, and the p-value of the procedure in force."""
+def in_short(result: Mapping[str, Any], sides: int, source: str) -> dict[str, Any]:
+    """A contrast in short: sizes, the estimate, its 95% interval with the way it was made, and
+    the p-value of the procedure in force."""
     keys = ("statements", "episodes", "evaluable", "reason", "delta", "ci95", "interval_method")
     out = {key: result[key] for key in keys if key in result}
     out["p"] = registered_p(result, sides, source) if result["evaluable"] else None
+    return out
+
+
+def short(result: Mapping[str, Any], sides: int, source: str) -> dict[str, Any]:
+    """A contrast in short (``in_short``), for the secondaries, under their floor (PLAN,
+    standing rules): over 1 to ``MIN_SHOWN`` - 1 statements it holds its two counts and
+    ``withheld``; a contrast that is not evaluable carries no estimate (in one episode
+    ``contrast`` gives the difference of the two mean losses all the same)."""
+    if few(int(result["statements"])):
+        return {key: result[key] for key in ("statements", "episodes")} | {"withheld": True}
+    out = in_short(result, sides, source)
+    if not out["evaluable"]:
+        out.pop("delta", None)
     return out
 
 
@@ -2339,7 +2775,13 @@ def probe_test(
 ) -> dict[str, Any]:
     """The probe test of E4 for one model: pinball loss at 0.5 of the probe's median against
     the base rate's, one-sided, on the probe statements whose target is not right-censored
-    before the cap. ``beats_base_rate`` is None when the test cannot be made."""
+    before the cap. ``beats_base_rate`` is None when the test cannot be made.
+
+    The verdict fixes the item set and is always given. The figures of the probe are under the
+    floor of the secondaries: over 1 to ``MIN_SHOWN`` - 1 statements with a target the record
+    holds its counts, ``withheld`` and the verdict, with neither an estimate nor a p-value, and
+    the two pinball records hold their counts (``pinball_record``); a test that cannot be made
+    carries no estimate."""
     shown = rows.loc[study.probe_ids]
     kept = shown[shown["ttr_kind"] != "right_censored"]
     target = kept["ttr_mid"].to_numpy(dtype=float)
@@ -2352,15 +2794,27 @@ def probe_test(
         seed,
     )
     p = registered_p(result, 1, source) if result["evaluable"] else None
+    verdict = None if p is None else bool(p < PROBE_ALPHA)
+    counts = ("statements", "episodes", "evaluable", "reason")
+    if few(len(kept)):
+        result = {key: result[key] for key in counts if key in result} | {"withheld": True}
+        p = None
+    elif not result["evaluable"]:
+        result = {key: result[key] for key in counts if key in result}
+    scores = {
+        name: pinball_record(
+            P.pinball_scores(pred.loc[shown.index, "q50"], shown, PROBE_LEVEL), len(shown)
+        )
+        for name, pred in (("pinball_base_rate", base), ("pinball_model", mine))
+    }
     return {
         "probe_statements": len(shown),
         "left_out_right_censored": len(shown) - len(kept),
         **result,
-        "pinball_base_rate": P.pinball_scores(base.loc[shown.index, "q50"], shown, PROBE_LEVEL),
-        "pinball_model": P.pinball_scores(mine.loc[shown.index, "q50"], shown, PROBE_LEVEL),
+        **scores,
         "p": p,
         "alpha": PROBE_ALPHA,
-        "beats_base_rate": None if p is None else bool(p < PROBE_ALPHA),
+        "beats_base_rate": verdict,
     }
 
 
@@ -2372,18 +2826,23 @@ def item_set(
     base rate. None, with the reason, when the tests are not evaluable: the switch could not
     be decided, the model has no slice, or the slice holds fewer than ``MIN_SLICE`` scoreable
     statements. Nothing that is computed on a primary's item set is then computed for it, the
-    overconfidence criterion included, however many statements the slice holds."""
+    overconfidence criterion included, however many statements the slice holds.
+
+    A slice of 1 to ``MIN_SHOWN`` - 1 statements, which anyone can name from their dates, has
+    its two scoreable counts withheld (None): they would say how many of those few statements
+    are scoreable. Such a slice is never analysed."""
     cutoff = sealed_counts.CUTOFF_MONTH_ENDS[model]
     has_slice = sealed_counts.has_slice(cutoff)
     after = (first.loc[rows.index, "event_date"] > cutoff.isoformat()).to_numpy() & has_slice
     part = rows[after]
     scoreable = int(part["scoreable"].sum())
+    episodes = int(part.loc[part["scoreable"], "episode_id"].nunique())
     record: dict[str, Any] = {
         "cutoff_month_end": cutoff.isoformat(),
         "slice_inside_the_test_split": has_slice,
         "slice_statements": len(part),
-        "slice_scoreable": scoreable,
-        "slice_scoreable_episodes": int(part.loc[part["scoreable"], "episode_id"].nunique()),
+        "slice_scoreable": None if few(len(part)) else scoreable,
+        "slice_scoreable_episodes": None if few(len(part)) else episodes,
         "slice_analysed": scoreable >= MIN_SLICE,
         "switched": bool(beaten),
     }
@@ -2436,6 +2895,9 @@ def reading_of(entry: Mapping[str, Any]) -> str:
     if "beats_both_comparators" not in entry:
         return said
     others = " and ".join(other_comparators(entry["comparator"]))
+    beside = entry.get("beside") or {}
+    if any(beside.get(name, {}).get("withheld") for name in other_comparators(entry["comparator"])):
+        return f"{said}; the contrast with {others} is withheld"
     if entry["beats_both_comparators"]:
         return f"{said}; the 95% interval against {others} also lies above zero"
     return f"{said}; the 95% interval against {others} does not lie above zero"
@@ -2531,6 +2993,44 @@ def evaluate(
                 keep &= study.parsed[name].loc[ids].to_numpy()
         return ids[keep]
 
+    # Each contrast under the primary outcome, by its two predictors: the sets it is written
+    # on, as (every statement, the scoreable ones; None where its figure is withheld).
+    written: dict[frozenset[str], list[tuple[frozenset[str], frozenset[str] | None]]] = {}
+
+    def sets_of(frame: pd.DataFrame) -> tuple[frozenset[str], frozenset[str]]:
+        return frozenset(frame.index), frozenset(frame.index[frame["scoreable"].to_numpy()])
+
+    def beside(pair: tuple[str, str], frame: pd.DataFrame, record: dict[str, Any]) -> dict:
+        """The record of a secondary contrast of ``pair`` on ``frame`` as it may stand beside
+        the same contrast on each set it is written on already, one pair of sets at a time
+        (PLAN, standing rules). Where the scoreable statements of the two differ by 1 to
+        ``MIN_SHOWN`` - 1 statements, the two would give the loss difference of those few: the
+        record keeps its counts and is withheld. Where the two sets themselves differ by so
+        few statements, or ``frame`` holds so few, its counts would say how many of them are
+        scoreable, and the record holds ``withheld`` alone. The contrast written first stays;
+        the six tests are entered before any secondary."""
+        every, counted = sets_of(frame)
+        seen = written.setdefault(frozenset(pair), [])
+        if few(len(every)) or any(few(len(every ^ other)) for other, _ in seen):
+            return {"withheld": True}
+        near = any(scored is not None and few(len(counted ^ scored)) for _, scored in seen)
+        if near and "withheld" not in record:
+            record = {key: record[key] for key in ("statements", "episodes")} | {"withheld": True}
+        seen.append((every, None if "withheld" in record else counted))
+        return record
+
+    def secondary(
+        comparator: str,
+        tested: str,
+        frame: pd.DataFrame,
+        sides: int = 2,
+        cluster: str = "episode_id",
+    ) -> dict[str, Any]:
+        """A secondary contrast in short on the scoreable statements of ``frame``, under the
+        floor (``short``) and beside the sets it is written on already (``beside``)."""
+        result = scored(frame, predictions, comparator, tested, cluster, draws, seed)
+        return beside((comparator, tested), frame, short(result, sides, source))
+
     family = []
     for model in PRIMARIES:
         for hypothesis, comparator, tested, sides in tests_of(model, study):
@@ -2565,42 +3065,54 @@ def evaluate(
                     entry["losses_differ"] = differing(
                         *paired_losses(chosen, predictions, comparator, tested)
                     )
+                written.setdefault(frozenset((comparator, tested)), []).append(sets_of(chosen))
                 entry["bounds"] = bounds(chosen, predictions, comparator, tested)
-                parsed = rows.loc[both_parsed(ids, (comparator, tested))]
+                sides_of = (comparator, tested)
+                parsed = rows.loc[both_parsed(ids, sides_of)]
                 both = short(
                     scored(parsed, predictions, comparator, tested, draws=draws, seed=seed),
                     sides,
                     source,
                 )
-                # beside the contrast on every scoreable statement, the one on those both sides
-                # parsed would give the summed loss difference of the few it leaves out
-                if few(entry["statements"] - both["statements"]) or few(both["statements"]):
-                    both = {key: both[key] for key in ("statements", "episodes")}
-                    both["withheld"] = True
+                # The answers that failed, by side. Anyone can name them from the stored runs.
+                # Where those of one side alone, or of both, are a few, the counts of the two
+                # sides and of the contrast would say between them how many are scoreable.
+                gone = [set(ids.difference(both_parsed(ids, (name,)))) for name in sides_of]
+                parts = (gone[0] - gone[1], gone[1] - gone[0], gone[0] & gone[1])
+                tight = bool(gone[0] and gone[1]) and any(few(len(part)) for part in parts)
+                # Beside the test itself, as any secondary contrast (``beside``): withheld
+                # alone where a few answers failed or parsed, with its counts where it leaves
+                # out a few scoreable statements, and entered among the sets written.
+                both = {"withheld": True} if tight else beside(sides_of, parsed, both)
                 entry["both_sides_parsed"] = both
                 kept = chosen.index[chosen["scoreable"].to_numpy()]
                 entry["scoreable_not_parsed"] = {
-                    name: len(kept) - len(both_parsed(kept, (name,)))
-                    for name in (comparator, tested)
+                    name: None  # how many of a few failed, or parsed, answers are scoreable
+                    if tight
+                    or few(len(gone[k]))
+                    or (name in study.parsed and few(len(ids) - len(gone[k])))
+                    else len(kept) - len(both_parsed(kept, (name,)))
+                    for k, name in enumerate(sides_of)
                 }
                 if hypothesis == "H3":  # the same statements and draws as the test itself
-                    entry["beside"] = {
-                        name: short(
-                            scored(
-                                chosen,
-                                predictions,
-                                name,
-                                tested,
-                                draws=draws,
-                                seed=seed,
-                                source=source,
-                                levels=("ci95",),
-                            ),
-                            sides,
-                            source,
+                    entry["beside"] = {}
+                    for name in COMPARATOR_CANDIDATES:
+                        result = scored(
+                            chosen,
+                            predictions,
+                            name,
+                            tested,
+                            draws=draws,
+                            seed=seed,
+                            source=source,
+                            levels=("ci95",),
                         )
-                        for name in COMPARATOR_CANDIDATES
-                    }
+                        if name == comparator:  # the test itself again, which is never withheld
+                            entry["beside"][name] = in_short(result, sides, source)
+                        else:
+                            entry["beside"][name] = beside(
+                                (name, tested), chosen, short(result, sides, source)
+                            )
             entry["p"] = registered_p(entry, sides, source) if entry["evaluable"] else 1.0
             family.append(entry)
     for entry, adjusted in zip(family, holm([entry["p"] for entry in family]), strict=True):
@@ -2614,22 +3126,57 @@ def evaluate(
         entry["reading"] = reading_of(entry)
 
     def rerun(
-        frame: pd.DataFrame,
         keep: Callable[[str, pd.Index], pd.Index] = lambda model, ids: ids,
         cluster: str = "episode_id",
         only: Sequence[str] = ("H1", "H2", "H3"),
+        among: Sequence[str] = models,
     ) -> dict[str, Any]:
-        """The tests of the family again on other statements, outcomes or clusters."""
+        """The tests of the family again on other statements or clusters, for the primaries
+        ``among``."""
+        out = {}
+        for model in among:
+            ids = sets[model]
+            if ids is None:
+                continue
+            chosen = rows.loc[keep(model, ids)]
+            for hypothesis, comparator, tested, sides in tests_of(model, study):
+                if hypothesis in only:
+                    out[f"{hypothesis} {model}"] = secondary(
+                        comparator, tested, chosen, sides, cluster
+                    )
+        return out
+
+    # the outcome definitions a primary's contrasts are written under, the primary one first
+    definitions: dict[str, list[pd.DataFrame]] = {model: [rows] for model in models}
+
+    def under(frame: pd.DataFrame) -> dict[str, Any]:
+        """The tests of the family again under another outcome definition, on the item sets
+        the probe fixed. PLAN section 2.5, "Sensitivity analyses": where the definition gives
+        1 to ``MIN_SHOWN`` - 1 statements of a primary's item set another horizon event than
+        the primary outcome does, or as few of those scoreable under either definition, its
+        three contrasts are withheld and hold the number of statements that differ from the
+        primary outcome: beside the same contrast they would give the change of the losses of
+        those few. A definition is held in the same way to each definition before it whose
+        contrasts are written."""
         out = {}
         for model in models:
             ids = sets[model]
             if ids is None:
                 continue
-            chosen = frame.loc[keep(model, ids)]
+            chosen = frame.loc[ids]
+            before = [kept.loc[ids] for kept in definitions[model]]
+            moved = [other_events(kept, chosen) for kept in before]
+            in_a_loss = [other_events(kept, chosen, scored=True) for kept in before]
+            near = any(few(count) for count in (*moved, *in_a_loss))
+            if not near:
+                definitions[model].append(frame)
             for hypothesis, comparator, tested, sides in tests_of(model, study):
-                if hypothesis in only:
-                    result = scored(chosen, predictions, comparator, tested, cluster, draws, seed)
-                    out[f"{hypothesis} {model}"] = short(result, sides, source)
+                result = scored(chosen, predictions, comparator, tested, "episode_id", draws, seed)
+                out[f"{hypothesis} {model}"] = (
+                    {"statements_with_another_horizon_event": moved[0], "withheld": True}
+                    if near
+                    else short(result, sides, source)
+                )
         return out
 
     def after_cutoff(model: str, ids: pd.Index) -> pd.Index:
@@ -2641,24 +3188,17 @@ def evaluate(
     scoreable = rows[rows["scoreable"]]
     secondaries: dict[str, Any] = {
         "model_free_contrasts": [
-            {"comparator": comparator, "tested": tested}
-            | short(
-                scored(rows, predictions, comparator, tested, draws=draws, seed=seed), 2, source
-            )
+            {"comparator": comparator, "tested": tested} | secondary(comparator, tested, rows)
             for comparator, tested in MODEL_FREE_PAIRS
         ],
         "h2_on_the_month_and_year_form": rerun(
-            rows, lambda _, ids: ids[(first.loc[ids, "form"] == MONTH_YEAR).to_numpy()], only=["H2"]
+            lambda _, ids: ids[(first.loc[ids, "form"] == MONTH_YEAR).to_numpy()], only=["H2"]
         ),
-        "post_cutoff_slice": {
-            key: value
-            for key, value in rerun(rows, after_cutoff).items()
-            if key.split(" ", 1)[1] in sliced
-        },
+        "post_cutoff_slice": rerun(after_cutoff, among=sliced),
         "first_captured_by_the_stated_end": rerun(
-            rows, lambda _, ids: ids[(first.loc[ids, "delayed_entry"] != "True").to_numpy()]
+            lambda _, ids: ids[(first.loc[ids, "delayed_entry"] != "True").to_numpy()]
         ),
-        "clusters_by_company": rerun(rows, cluster="company"),
+        "clusters_by_company": rerun(cluster="company"),
         "delta_gbm": {
             entry["model"]: {"comparator": STRUCTURED, "tested": entry["tested"]}
             | entry["beside"][STRUCTURED]
@@ -2666,23 +3206,14 @@ def evaluate(
             if entry["hypothesis"] == "H3" and "beside" in entry
         },
         "h3_with_each_condition": {
-            f"{model}:{condition}": short(
-                scored(
-                    rows.loc[sets[model]],
-                    predictions,
-                    study.comparator,
-                    f"{model}:{condition}",
-                    draws=draws,
-                    seed=seed,
-                ),
-                2,
-                source,
+            f"{model}:{condition}": secondary(
+                study.comparator, f"{model}:{condition}", rows.loc[sets[model]]
             )
             for model in models
             if sets[model] is not None
             for condition in CONDITIONS
         },
-        **{name: rerun(frame) for name, frame in variants.items()},
+        **{name: under(frame) for name, frame in variants.items()},
     }
     decomposition = {}
     for model in models:
@@ -2696,20 +3227,35 @@ def evaluate(
             "trust_loss": (f"{model}:a", f"{model}:c"),
         }
         decomposition[model] = {
-            name: {"minuend": pair[0], "subtrahend": pair[1]}
-            | short(scored(rows.loc[ids], predictions, *pair, draws=draws, seed=seed), 2, source)
+            name: {"minuend": pair[0], "subtrahend": pair[1]} | secondary(*pair, rows.loc[ids])
             for name, pair in parts.items()
         }
     secondaries["decomposition"] = decomposition
 
-    def scores(ids: pd.Index, name: str) -> dict[str, Any]:
+    # The sets on which the base rate's figures are written: every eligible statement, then
+    # each item set that differs from none of those before it by a few statements.
+    base_rate_on = [sets_of(rows)]
+
+    def base_rate_near(ids: pd.Index) -> bool:
+        """Whether the base rate's figures on the statements ``ids`` would stand beside the
+        same figures on a set that differs by 1 to ``MIN_SHOWN`` - 1 statements, or by as few
+        scoreable ones; a set of which that is not so is entered among the sets written."""
+        mine = sets_of(rows.loc[ids])
+        near = any(few(len(mine[k] ^ other[k])) for other in base_rate_on for k in (0, 1))
+        if not near:
+            base_rate_on.append(mine)
+        return near
+
+    def scores(ids: pd.Index, name: str, near: bool = False) -> dict[str, Any]:
         """Every score of one predictor on the statements ``ids``, with the base rate's
-        calibration in the large on the same statements beside its own."""
+        calibration in the large on the same statements beside its own (withheld when
+        ``near``: ``without_base_rate``)."""
         chosen = rows.loc[ids]
         record = predictor_record(chosen, predictions[name], draws, seed)
         if name == BASE:
             return record
-        return beside_base_rate(record, chosen, predictions[BASE], draws, seed)
+        both = beside_base_rate(record, chosen, predictions[BASE], draws, seed)
+        return without_base_rate(both) if near else both
 
     losses = {name: scores(rows.index, name) for name in gbm.PREDICTORS}
     overconfident = {}
@@ -2717,20 +3263,22 @@ def evaluate(
         ids = sets[model]
         if ids is None:
             continue
+        near = base_rate_near(ids)
         for condition in CONDITIONS:
-            losses[f"{model}:{condition}"] = scores(ids, f"{model}:{condition}")
+            losses[f"{model}:{condition}"] = scores(ids, f"{model}:{condition}", near)
         # the criterion is read on the item set the probe fixed, for both predictors
         zero_shot = f"{model}:a"
+        criterion = overconfidence(
+            rows.loc[ids],
+            predictions[zero_shot],
+            predictions[BASE],
+            study.parsed[zero_shot],
+            draws,
+            seed,
+        )
         overconfident[model] = {
             "items": set_records[model]["items"],
-            **overconfidence(
-                rows.loc[ids],
-                predictions[zero_shot],
-                predictions[BASE],
-                study.parsed[zero_shot],
-                draws,
-                seed,
-            ),
+            **(without_base_rate(criterion) if near else criterion),
         }
     secondaries["overconfidence_of_condition_a"] = overconfident
 
@@ -2741,7 +3289,9 @@ def evaluate(
             "scoreable_statements": len(scoreable),
             "scoreable_episodes": int(scoreable["episode_id"].nunique()),
             "with_a_horizon_event_undetermined": len(rows) - len(scoreable),
-            "scoreable_by_E_end_and_E_end90": power.outcome_mix(scoreable),
+            "scoreable_by_E_end_and_E_end90": {"withheld": True}
+            if few(len(scoreable))
+            else power.outcome_mix(scoreable),
         },
         "probe": probes,
         "item_sets": set_records,
@@ -2783,6 +3333,11 @@ def _number(value: Any, digits: int = 4) -> str:
     return "n/a" if value is None else f"{value:.{digits}f}"
 
 
+def _estimate(record: Mapping[str, Any]) -> str:
+    """The estimate of a contrast for the printout, or the word for one that is withheld."""
+    return "withheld" if record.get("withheld") else _number(record.get("delta"))
+
+
 def _interval(pair: Any) -> str:
     """An interval for the printout; an end that is None is unbounded on its side."""
     if not pair:
@@ -2816,7 +3371,9 @@ def overconfidence_lines(report: Mapping[str, Any]) -> list[str]:
     set: the least and the greatest value of calibration in the large, each with the frequency
     taken away and its 95% interval, and the difference from the base rate's mean probability
     with its 95% interval; each part is said to be met or not. A primary without an item set
-    has no reading, and its line says why."""
+    has no reading, and its line says why. Nor has one whose part against outcomes is withheld:
+    its line says so in the words of the entry, gives the counts of the item set and the part
+    against the base rate, and no figure on outcomes."""
     lines = []
     found = report["secondaries"]["overconfidence_of_condition_a"]
     met = {True: "part met", False: "part not met"}
@@ -2826,7 +3383,23 @@ def overconfidence_lines(report: Mapping[str, Any]) -> list[str]:
             lines.append(f"{head}: no reading ({chosen['reason']}).")
             continue
         entry = found[model]
-        first, second = entry["against_outcomes"]["E_end"], entry["against_base_rate"]["E_end"]
+        second = entry["against_base_rate"]["E_end"]
+        against_base_rate = (
+            f"Against the base rate (mean P(E_end) {_number(second['mean_p_base_rate'])}): "
+            f"difference {_number(second['difference'])} {_interval(second['ci95'])}; "
+            f"{met[second['met']]}."
+        )
+        if "withheld" in entry["against_outcomes"]:
+            open_events = entry["against_outcomes"].get("with_a_horizon_event_undetermined")
+            counted = "" if open_events is None else f", {open_events} of them not scoreable"
+            lines.append(
+                f"{head}: {entry['reading_in_words']}. P(E_end) on {entry['items']} "
+                f"({entry['statements']} statements in {entry['episodes']} episodes{counted}): "
+                f"mean {_number(second['mean_p_model'])}. Against outcomes: withheld. "
+                f"{against_base_rate}"
+            )
+            continue
+        first = entry["against_outcomes"]["E_end"]
         lines.append(
             f"{head}: reading {entry['reading']} of {len(OVERCONFIDENCE_READINGS)}: "
             f"{entry['reading_in_words']}. P(E_end) on {entry['items']} ({entry['statements']} "
@@ -2836,9 +3409,8 @@ def overconfidence_lines(report: Mapping[str, Any]) -> list[str]:
             f"{_interval(first['least_ci95'])} (every undetermined E_end counted as yes: "
             f"frequency {_number(first['largest_frequency'])}), greatest "
             f"{_number(first['greatest'])} {_interval(first['greatest_ci95'])} (counted as no: "
-            f"frequency {_number(first['smallest_frequency'])}); {met[first['met']]}. Against "
-            f"the base rate (mean P(E_end) {_number(second['mean_p_base_rate'])}): difference "
-            f"{_number(second['difference'])} {_interval(second['ci95'])}; {met[second['met']]}."
+            f"frequency {_number(first['smallest_frequency'])}); {met[first['met']]}. "
+            f"{against_base_rate}"
         )
     return lines
 
@@ -2910,17 +3482,18 @@ def markdown(report: Mapping[str, Any]) -> str:
                 continue  # that one is the row of the table itself
             shown.append(beside.get("ci95"))
             flag = "yes" if entry["beats_both_comparators"] else "no"
+            failed = entry["scoreable_not_parsed"][entry["tested"]]
             lines.append(
                 f"Beside H3, {entry['model']}: {name} minus {entry['tested']}: delta "
-                f"{_number(beside.get('delta'))}, 95% interval {_interval(beside.get('ci95'))}; "
+                f"{_estimate(beside)}, 95% interval {_interval(beside.get('ci95'))}; "
                 f"beats both comparators: {flag}; answers of the tested condition not parsed: "
-                f"{entry['scoreable_not_parsed'][entry['tested']]}."
+                f"{'withheld' if failed is None else failed}."
             )
     for model, probe in report["probe"].items():
         chosen = report["item_sets"][model]
         where = chosen.get("items") or f"not evaluable ({chosen.get('reason')})"
         lines.append(
-            f"Probe, {model}: delta {_number(probe.get('delta'))} days of pinball loss at 0.5 "
+            f"Probe, {model}: delta {_estimate(probe)} days of pinball loss at 0.5 "
             f"(base rate minus probe), p {_number(probe['p'])}; tests on: {where}."
         )
     lines += overconfidence_lines(report)
@@ -2952,7 +3525,7 @@ def summary_lines(report: Mapping[str, Any]) -> list[str]:
             flag = "yes" if entry["beats_both_comparators"] else "no"
             lines.append(
                 f"     beside: {name} minus the tested condition, delta "
-                f"{_number(beside.get('delta'))} {_interval(beside.get('ci95'))}; beats both "
+                f"{_estimate(beside)} {_interval(beside.get('ci95'))}; beats both "
                 f"comparators: {flag}"
             )
     lines += [f"  {line}" for line in overconfidence_lines(report)]
@@ -3070,8 +3643,12 @@ def open_tables(
     }
     hashes = {what: sealed_counts.sha256(raw) for what, raw in data.items()}
     if expected_eligible is not None:
-        sealed_counts.require_hash(
-            data["the eligible list"], expected_eligible, "the eligible list"
+        hash_required(
+            data["the eligible list"],
+            expected_eligible,
+            "the eligible list",
+            args.eligible,
+            getattr(args, "sealed", None),
         )
     same_build(json.loads(data["the counts file"]), hashes)
     return data, hashes
@@ -3273,7 +3850,9 @@ def run_confirmatory(args: argparse.Namespace) -> int:
 
     # the sealed file: hashed as bytes, parsed only when the hash is the expected one
     sealed = sealed_counts.file_bytes(args.sealed, "the sealed file")
-    sealed_sha = sealed_counts.require_hash(sealed, want_sealed, "the sealed file")
+    sealed_sha = hash_required(
+        sealed, want_sealed, "the sealed file", args.sealed, args.sealed, of_sealed=True
+    )
     try:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")  # a warning may quote a cell

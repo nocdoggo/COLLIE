@@ -526,11 +526,11 @@ WHERE_THE_PLAN_IS_SILENT = (
     f"cutoff within a subset); where 1 to {MIN_SHOWN - 1} answers failed the record holds their "
     "number alone; it carries no bounds; the contrasts repeated under another outcome or "
     "recovery rule are given on every scoreable statement only",
-    "Murphy's decomposition is the evaluator's: the statements, ordered by probability and, "
-    "among equal probabilities, in the order of their ids, are cut into ten runs of equal "
-    "length (one run per statement when there are fewer than ten); a run of equal "
-    "probabilities can be cut, and reliability and resolution then depend on the order of the "
-    "ids, so that a forecast of one value can show a resolution above zero",
+    "Murphy's decomposition is the evaluator's: the statements, ordered by probability, are cut "
+    "into ten runs of equal length (one run per statement when there are fewer than ten); "
+    "statements that share a probability count with the frequency of the event among all of "
+    "them, so that the figures do not depend on the order of the statements and a forecast "
+    "of one value has no resolution",
     "a secondary model whose runs cannot be completed (sections 9 and 12) is left out by a "
     "declaration on the command line, as section 6 gives it for a primary; the declaration is "
     "refused when the completeness check finds nothing wrong with the runs this command would "

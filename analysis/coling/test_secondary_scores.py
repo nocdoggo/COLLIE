@@ -3513,18 +3513,17 @@ def test_every_score_of_section_7_2_for_the_six_secondary_models_and_conditions(
     assert set(got["pinball_all_statements"]) == {"0.50", "0.80", "0.95"}
     assert set(got["murphy"]["E_end90"]) == {"bins", "reliability", "resolution", "uncertainty"}
     # the rule for tied probabilities, which language models give often, stands in the file:
-    # a tie can be cut, and the two columns then follow the order of the statements
+    # tied statements count with their common frequency, whatever the order of the statements
     (ties,) = [
         line for line in base.report["where_the_plan_is_silent"] if line.startswith("Murphy's")
     ]
-    assert "depend on the order of the ids" in ties and "resolution above zero" in ties
+    assert "do not depend on the order of the statements" in ties
+    assert "a forecast of one value has no resolution" in ties
     assert "E1" not in ties and "Turnbull" not in ties
     one_value = ev.murphy([0.3] * 30, [1.0] * 5 + [0.0] * 25)
-    assert one_value["bins"] == 10 and one_value["resolution"] > 0
-    assert (
-        one_value["resolution"]
-        != ev.murphy([0.3] * 30, [0.0, 0.0, 0.0, 0.0, 0.0, 1.0] * 5)["resolution"]
-    )
+    assert one_value["bins"] == 10 and abs(one_value["resolution"]) < 1e-12
+    other_order = ev.murphy([0.3] * 30, [0.0, 0.0, 0.0, 0.0, 0.0, 1.0] * 5)
+    assert all(near(one_value[key], other_order[key]) for key in one_value)
     # the failed answers of the run take the base rate, and are counted with its rates
     run = base.report["secondary_models"]["models"][NOISY]["runs"]["b"]
     failed = int((~parsed).sum())
