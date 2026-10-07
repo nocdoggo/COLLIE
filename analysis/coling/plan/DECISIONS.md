@@ -313,3 +313,17 @@ carry the registered text.
     literal task is not handed out, nor any confirmatory call made, before the gate has passed
     (PLAN section 10, task 2; change-list item 43). The tag `coling-registration` was made
     at its deadline, on the owner's decision of the evening before to register on time (decision 40d), before the owner had read the items of 6 October; the plan says so in its status paragraph.
+43. **Check set (7 October, after the registration).** Both sheets are valid (20 items each;
+    sittings of 26 and 36 minutes, which is 78 and 108 seconds an item). Gate: alpha 1.0 on the
+    start and on the end month offsets (threshold 0.6); identical intervals on 20 of 20 items;
+    no item differs in an adjudicated field; not pooled with the pilot. It passes. Submitted
+    sheets `d64360eea5943c98` (A1) and `0558f4bbe7ed0a8d` (A2), labelled under the guide text
+    `449c8e049be6cab1`; the sample manifest is now `7591ba1beffa6b9d`. The result and the
+    estimated load are recorded in amendment F1. The literal task may be handed out.
+44. **Cost trial and caps (7 October).** Trial of 20 items per template: gemini-3.8-flash 80
+    calls, $0.40; grok-4.20 101 calls, $0.17. At the measured prices the planned calls come to
+    $37.84 for gemini-3.8-flash (cap $110) and $18.85 for grok-4.20 (cap $30). Owner, the same
+    day: no limit for gemini-3.8-flash, and $50 for grok-4.20. No cap is changed now, since
+    both projections are inside the registered caps; a raise on the owner's word is made by a
+    dated amendment when a run comes near its cap. The OpenRouter lane (six models, both
+    primaries) has not run: its key was refused as expired on 7 October.
