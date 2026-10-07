@@ -74,7 +74,8 @@ All deadlines in this file are in Anywhere on Earth time (AoE, UTC−12): 23:59 
     reads a sealed file; a scorer changed after it has read one takes a new amendment, which
     gives the reason. The evaluator reads the sealed rows through the checked reader of the
     counts-only code (`_checked_rows` and `_same_build` of `sealed_counts.py`), behind its
-    own hash check; a scorer that reads the test outcomes reads them in the same way, applies
+    own hash check, and reads no stored file that leads into a sealed folder through a link; a
+    scorer that reads the test outcomes reads them in the same way, applies
     the refusals of section 6 to the runs it scores, and writes no value of a single
     statement. The evaluator and every scorer withhold a secondary figure, its counts apart,
     where it rests on 1 to 4 statements, and where the same figure is also written on a set
@@ -496,9 +497,10 @@ train-period event the horizon events are determined within its usable captures 
   the secondary scorers. Where 1 to 4 statements of a set are not scoreable, the figures over
   every statement of the set that fill its undetermined horizon events (the two scenarios, and
   the two limits of calibration in the large) are withheld: beside the figures on its
-  scoreable statements they would give the events of those few. A secondary scorer then also
-  withholds the mean probabilities and the calibration in the large on the scoreable
-  statements, which name the few that are not. The pinball losses and the coverage stay.
+  scoreable statements they would give the events of those few. The mean probabilities and
+  the calibration in the large on the scoreable statements, which name the few that are not,
+  are then withheld too. The same holds where only 1 to 4 statements of a set are scoreable.
+  The pinball losses and the coverage stay.
 - An event is *observable* when its bracket, to recovery or to discontinuation, is finite and no
   wider than 31 days. `corpus.py` records this as `observable31`.
 
@@ -1068,7 +1070,7 @@ Date, but no statement text. It gives the two probabilities and the time-to-reco
   is one-sided at 0.05, not adjusted, with the resampling and the p-value of section 6, on
   the probe statements whose time to recovery is not right-censored before the cap. With
   fewer than two episodes left the switch is undecided, and the model's three tests are not
-  evaluable.
+  evaluable. The figures of a probe over 1 to 4 targets are withheld; its verdict is given.
 - *Rule.* A model that beats the base rate is excluded from outcome claims on events dated before
   its cutoff.
 - *For a primary model,* its three confirmatory tests are then evaluated on its post-cutoff slice
@@ -1350,7 +1352,8 @@ sides share the same frozen calibrator, so only the literal reading differs.
   - H3 holds in favour of the text for `m` when its Holm-adjusted p is below 0.05 and `Δ > 0`.
     The models are shown structured fields that the base rate does not use (section 2.3), so
     the paper then writes that the text carries value beyond the structured fields only if
-    the 95% interval of `Δ_GBM` also lies above zero. This second condition is not a test of
+    the 95% interval of `Δ_GBM` also lies above zero (an interval that is withheld does not).
+    This second condition is not a test of
     the family: it can only withhold a claim. When it fails, the paper says that `m-best` beat
     the base rate by listing age and did not beat the structured-only GBM, and makes no claim
     about the structured fields.
@@ -1661,7 +1664,9 @@ the strata's frame sizes, not estimates of a rate over all statements of the fra
     whatever the two scenarios show. When a scenario has the other sign than the estimate, the
     sentence that states the result says so.
 - **Brier decomposition** into reliability, resolution and uncertainty (Murphy), with 10
-  equal-count bins, for each horizon event.
+  equal-count bins, for each horizon event. Statements that share a probability count with
+  the frequency of the event among all of them, so that the figures do not depend on the
+  order of the statements; a forecast of one value has no resolution.
 - **Calibration in the large:** the mean of `P(E_end)` minus the observed frequency of `E_end`
   on the scoreable events, and the same for `E_end90`, with 95% intervals by episode bootstrap.
   Over every event of an item set it is also given with every undetermined event counted as
@@ -2274,7 +2279,9 @@ plus:
     captures allow (every undetermined `E_end` counted as yes) is positive, with an interval
     that excludes zero. This is the least value that calibration in the large can take on the
     item set (section 7.2). It uses no scoreable set and no assumption about the undetermined
-    events. A primary without an item set has no reading (section 5, E4).
+    events. A primary without an item set has no reading (section 5, E4). Where the figures
+    over every statement are withheld (section 2.5), the criterion has no reading either: the
+    paper gives the part against the base rate and writes none of the five sentences.
   - *Against a predictor that reads no text.* The mean of `P(E_end)` minus the mean `P(E_end)`
     of the base rate by listing age on the same statements is positive, with an interval that
     excludes zero. No outcome enters this part: the observed frequency is the same on both
@@ -2302,8 +2309,9 @@ plus:
     rate and +0.591 for the stated date at face value (`result_rules_check.py`, section 17).
   - *Reported beside it,* for condition (a) and for the base rate on the same statements:
     both parts for `E_end90`; both parts on the answers that parsed (withheld, their counts
-    apart, when 1 to 4 answers failed on the item set or 1 to 4 parsed: beside the figures
-    over every statement they would give the horizon events of those statements);
+    apart, when 1 to 4 answers failed on the item set or 1 to 4 parsed, or when the answers
+    that parsed and the scoreable statements differ by 1 to 4: beside the figures over every
+    statement they would give the horizon events of those statements);
     calibration in the large
     on the scoreable statements with its interval, and the difference of the two predictors
     there; the mean of `P(E_end)` minus the Turnbull share recovered by the stated end
