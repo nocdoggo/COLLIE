@@ -269,6 +269,7 @@ def names(plan: dict, *args, **kwargs) -> list[str]:
 
 
 PRIMARIES = list(rd.PRIMARIES)
+PARAPHRASES = ["predictive-track-p1", "predictive-track-p2", "predictive-track-p3"]
 
 
 def test_no_test_can_reach_a_key_the_network_a_child_process_or_the_real_repository() -> None:
@@ -372,7 +373,8 @@ def test_plan_orders_the_runs_by_phase_lane_and_cost(study) -> None:
         held = sum(r["calls"] for r in plan["reserved"] if r["model"] == model)
         calls = sum(run["calls"] for run in runs if run["model"] == model)
         assert calls + held == sheet["models"][model]["calls"]
-    assert {r["line"] for r in plan["reserved"]} == {"e3-paraphrases"}  # not written yet
+    assert plan["reserved"] == []  # the three paraphrases are in the harness: nothing waits
+    assert {r["model"] for r in rest if r["line"] == "e3-paraphrases"} == set(rd.PRIMARIES)
 
 
 def test_plan_gives_every_run_the_flags_of_its_condition(study) -> None:
@@ -436,6 +438,12 @@ def units(runs: list[dict]) -> int:
     return sum(round(run["cap_usd"] * lp.MICRO) for run in runs)
 
 
+def para_of(plan: dict, model: str) -> list[dict]:
+    """The paraphrase runs of a model, by run name."""
+    runs = [r for r in plan["runs"] if r["line"] == "e3-paraphrases" and r["model"] == model]
+    return sorted(runs, key=lambda run: run["run"])
+
+
 def test_caps_of_a_models_runs_sum_to_its_cap(study, tmp_path: Path, monkeypatch) -> None:
     assert lp.split_units(10, [1, 1, 1]) == [4, 3, 3] and lp.split_units(7, [0, 5, 2]) == [0, 5, 2]
     assert sum(lp.split_units(1_000_003, [2585, 373, 550, 15])) == 1_000_003
@@ -468,20 +476,43 @@ def test_caps_of_a_models_runs_sum_to_its_cap(study, tmp_path: Path, monkeypatch
     assert [parts[k]["calls"] for k in ("tbd", "silent", "stale")] == [2, 2, 1]
     assert parts["tbd"]["cap_usd"] == pytest.approx(2 * parts["stale"]["cap_usd"], abs=2e-6)
     # with the three paraphrases in the harness nothing is held back, and the sum still holds
-    base = rd.TEMPLATES["predictive-track-v1"]
-    more = {
-        f"predictive-track-p{n}-v1": rd.PromptTemplate(
-            f"predictive-track-p{n}-v1", "predictive", base.text, needs_track=True
-        )
-        for n in (1, 2, 3)
-    }
-    monkeypatch.setattr(rd, "TEMPLATES", rd.TEMPLATES | more)
     full = lp.make_plan(options_for(tmp_path, shards={"openrouter": 2, "google": 3}))
     assert not full["reserved"]
     para = [run for run in full["runs"] if run["line"] == "e3-paraphrases"]
-    assert sorted({run["template"] for run in para}) == sorted(more) and len(para) == 6
+    assert sorted({run["template"] for run in para}) == PARAPHRASES and len(para) == 6
     for model in rd.STUDY_MODELS:
         assert units(lp.select(full, models=[model])) == round(rd.MODEL_CAPS_USD[model] * lp.MICRO)
+    # a harness that does not hold exactly three holds their share of the caps back: one too
+    # few, or one too many (a fourth id that starts like theirs)
+    base = rd.TEMPLATES["predictive-track-v1"]
+    fourth = replace(base, id=f"{lp.PARAPHRASE_PREFIX}4")
+    harness = dict(rd.TEMPLATES)
+    for n, templates in (
+        (2, {k: v for k, v in harness.items() if k != PARAPHRASES[-1]}),
+        (4, harness | {fourth.id: fourth}),
+    ):
+        with monkeypatch.context() as patch:
+            patch.setattr(rd, "TEMPLATES", templates)
+            short = lp.make_plan(options_for(tmp_path))
+        assert not [run for run in short["runs"] if run["line"] == "e3-paraphrases"]
+        assert sorted((r["line"], r["model"], r["calls"]) for r in short["reserved"]) == sorted(
+            ("e3-paraphrases", model, 6) for model in rd.PRIMARIES
+        )
+        assert f"read.TEMPLATES holds {n} paraphrase templates" in short["reserved"][0]["why"]
+        # the plan command and the list of what is blocked both say so, once for each primary
+        said = [*lp.summary_lines(short), *lp.blocked_lines(short)]
+        for start in ("not planned: e3-paraphrases for ", "- not planned: e3-paraphrases for "):
+            assert sum(text.startswith(start) and "the plan needs 3" in text for text in said) == 2
+        for model in rd.STUDY_MODELS:
+            mine = lp.select(short, models=[model])
+            held = [r for r in short["reserved"] if r["model"] == model]
+            assert units(mine) + units(held) == round(rd.MODEL_CAPS_USD[model] * lp.MICRO)
+            # every other run is the run of the full plan, with the cap it has there
+            there = {r["run"]: r["cap_usd"] for r in plan["runs"] if r["model"] == model}
+            assert {r["run"]: r["cap_usd"] for r in mine} == {
+                name: cap for name, cap in there.items() if not name.startswith("e3-para")
+            }
+            assert units(held) == units(para_of(plan, model))
     # a sheet whose caps for a model are not its cap less the harness's rounding stops the plan:
     # the remainder is only ever the rounding, under one cent
     sheet_of = rd.run_sheet
@@ -495,6 +526,90 @@ def test_caps_of_a_models_runs_sum_to_its_cap(study, tmp_path: Path, monkeypatch
         monkeypatch.setattr(rd, "run_sheet", other_sheet)
         with pytest.raises(SystemExit, match=rf"grok-4.20 sum to \${shown}\d\d, which is not its"):
             lp.make_plan(options_for(tmp_path))
+
+
+def test_the_three_paraphrases_are_one_run_each_for_both_primaries(
+    study, tmp_path: Path, capsys
+) -> None:
+    # PLAN section 9: a line over the three paraphrases is one run for each
+    assert lp.paraphrase_templates() == PARAPHRASES == sorted(rd.PARAPHRASE_TEXTS)
+    [line] = [line for line in rd.RUN_SHEET if line.name == "e3-paraphrases"]
+    parts, why = lp.parts_of(line)
+    assert why == "" and [
+        (p.name, p.items, p.condition, p.template, p.samples, p.temperature) for p in parts
+    ] == [
+        (f"e3-para{n}", "paraphrase", f"b, paraphrase {n}", PARAPHRASES[n - 1], 1, 0.0)
+        for n in (1, 2, 3)
+    ]
+    assert not any(p.mask_names or p.shift_years for p in parts)
+    plan = study.plan
+    assert not plan["reserved"]
+    assert {r["model"] for r in plan["runs"] if r["line"] == line.name} == set(rd.PRIMARIES)
+    sheet = rd.run_sheet(
+        plan["counts"], track=rd.load_track_record(study.items / "track_fit_dev.json")
+    )
+    listed = item_ids(study.items / "subset_paraphrase.jsonl")
+    for model in rd.PRIMARIES:
+        runs = para_of(plan, model)
+        assert [r["run"] for r in runs] == [f"e3-para{n}-{model}" for n in (1, 2, 3)]
+        assert [r["template"] for r in runs] == PARAPHRASES
+        assert [r["condition"] for r in runs] == [f"b, paraphrase {n}" for n in (1, 2, 3)]
+        for run in runs:
+            # a test-period list with the record of fit and dev, read once, as condition (b) is
+            assert (run["phase"], run["lane"], run["list"]) == ("rest", "openrouter", "paraphrase")
+            assert (run["track"], run["allow_test_items"], run["shard"]) == ("fit+dev", True, None)
+            assert (run["calls"], run["samples"], run["temperature"]) == (len(listed), 1, 0.0)
+            assert (run["mask_names"], run["shift_years"], run["limit"]) == (False, 0, None)
+            assert run["item_ids_sha256"] == rd._ids_sha256(listed)
+            assert plan["templates"][run["template"]] == rd.FROZEN_SHA256[run["template"]]
+            args = lp.harness_args(plan, run, "live")
+            assert args[args.index("--template") + 1] == run["template"]
+            assert args[args.index("--track-record") + 1].endswith("track_fit_dev.json")
+            assert args[args.index("--items") + 1].endswith("subset_paraphrase.jsonl")
+            assert "--allow-test-items" in args and not {"--samples", "--mask-names"} & set(args)
+            assert lp.harness_refusals(run) == []
+        # the cap of the line, which the sheet prices as the original, split evenly over the three
+        entry = sheet["models"][model]["lines"][line.name]
+        assert entry["calls"] == sum(run["calls"] for run in runs) == 3 * len(listed)
+        assert units(runs) == round(entry["cap_usd"] * lp.MICRO)
+        caps = [round(run["cap_usd"] * lp.MICRO) for run in runs]
+        assert max(caps) - min(caps) <= 1 and min(caps) > 0
+    # at the plan's fixed size, with no item file on disk: 3 x 200 calls for each primary
+    counts = {"e3": 2593, "tbd": 376, "silent": 550, "stale": 16, "dev": 644}
+    options = lp.default_options(tmp_path / "no-files") | {"counts": counts}
+    options |= {"out_root": str(tmp_path / "out2"), "local_root": str(tmp_path / "local2")}
+    registered = lp.make_plan(options)
+    assert not registered["reserved"] and registered["counts"]["paraphrase"] == 200
+    for model in rd.PRIMARIES:
+        runs = para_of(registered, model)
+        assert [run["calls"] for run in runs] == [200, 200, 200]
+        assert [run["template"] for run in runs] == PARAPHRASES
+        slot = registered["models"][model]
+        assert slot["calls"] == 8940 + 3 * (2593 + 942 + 644) and slot["reserved_usd"] == 0
+        assert slot["run_caps_usd"] == rd.MODEL_CAPS_USD[model]
+    said = [*lp.summary_lines(registered), *lp.blocked_lines(registered)]
+    assert not [text for text in said if "not planned" in text]
+    # one primary through every phase, live around the scripted client: the three runs are
+    # finished under their own templates, and each item was read once with each paraphrase
+    harness, model = Harness(), "llama-3.3-70b"
+    code = lp.run_lane(
+        plan, "openrouter", phases=lp.PHASES, models=[model], mode="live", runner=harness
+    )
+    assert code == 0 and not lp.unfinished(plan, lp.select(plan, models=[model]))
+    opening = {t: rd.TEMPLATES[t].text.split(". ")[0].split(":")[0] for t in PARAPHRASES}
+    assert len(set(opening.values())) == 3
+    for run in para_of(plan, model):
+        assert run["run"] in harness.runs() and lp.run_state(plan, run) == "finished"
+        manifest = lp.manifest_of(plan, run)
+        assert (manifest["template"], manifest["readings"]) == (run["template"], len(listed))
+        assert manifest["template_sha256"] == rd.FROZEN_SHA256[run["template"]]
+        sent = [
+            prompt for _, prompt in study.sdk.calls if prompt.startswith(opening[run["template"]])
+        ]
+        assert len(sent) == len(set(sent)) == len(listed)
+    conditions = {condition.split("|")[0] for _, condition in rd.collect_readings(study.out)}
+    assert set(PARAPHRASES) < conditions and "predictive-track-v1" in conditions
+    capsys.readouterr()
 
 
 def test_plan_is_deterministic_and_notices_a_changed_input(study, tmp_path: Path, capsys) -> None:
@@ -1391,7 +1506,7 @@ def test_status_prints_counts_and_nothing_of_the_items_or_the_answers(study, cap
     assert not [item_id for item_id in ids if item_id in out]
     assert "Anagrelide" not in out and "statement_type" not in out
     allowed = {run["run"] for run in plan["runs"]} | set(lp.PHASES) | set(lp.LANES)
-    allowed |= {"finished", "pending", "lane", "runs:", "(12", "(9", "(104"}
+    allowed |= {"finished", "pending", "lane", "runs:", "(12", "(9", "(110"}
     words = {w for line in lines[1:] for w in line.replace(",", " ").replace(")", " ").split()}
     assert all(w in allowed or w.replace(".", "").isdigit() for w in words)
     # one phase and one lane can be asked for
@@ -1571,7 +1686,7 @@ def test_blocked_names_every_missing_value(tmp_path: Path, monkeypatch, capsys) 
     assert (
         "list 'trial' is planned at 20 items" in out and "(written by: dataset.py --items)" in out
     )
-    assert "not planned: e3-paraphrases for llama-3.3-70b: read.TEMPLATES holds 0 paraphrase" in out
+    assert "not planned" not in out and not plan["reserved"]  # the paraphrases are written
     assert out.count("ROUTES['gemini-3.8-flash']") == 0  # the two direct routes are set
     # once everything is in place nothing is blocked
     write_files(tmp_path / "items")
@@ -1583,7 +1698,7 @@ def test_blocked_names_every_missing_value(tmp_path: Path, monkeypatch, capsys) 
     assert lp.main(["blocked", "--out-root", str(tmp_path / "out")]) == 0
     out = capsys.readouterr().out.splitlines()
     assert out[0].split(" of ")[0] == out[0].split(" of ")[1].split()[0]
-    assert [line for line in out[1:] if not line.startswith("- not planned: e3-paraphrases")] == []
+    assert out[1:] == []
     # a plan that its inputs no longer give is the first thing a live start is refused for
     assert not lp.plan_is_stale(lp.load_plan(tmp_path / "out"))
     listed = tmp_path / "items" / "e5_pairs.jsonl"

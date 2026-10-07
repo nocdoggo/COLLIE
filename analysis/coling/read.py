@@ -19,6 +19,11 @@ its Date of Update) and answers one of the frozen prompt templates:
   table of Turnbull shares by form and revision bucket, and up to 10 resolved training-period
   examples, both read from a track-record file (:func:`load_track_record`). Anything dated on or
   after the test start (2023-01-01) is refused, so no sealed outcome can reach a prompt.
+* ``predictive-track-p1``, ``-p2`` and ``-p3``: three paraphrases of ``predictive-track-v1``, read
+  on the paraphrase subset to measure prompt variance (PLAN section 5, E3). They show the same
+  entry and the same track record and ask for the same answer in the same form, so the schema
+  and the parser are the same; only the wording, the order, the labels and the place of the
+  track record differ (``PARAPHRASE_TEXTS``).
 * ``probe-v1``: the E4 no-notice probe. It shows the fields of ``PROBE_FIELDS`` only (drug,
   company, presentation, therapeutic category, initial posting date, date of update) and fixed
   horizons of 90 and 180 days. The stated end, the form, the revision bucket and every text field
@@ -865,6 +870,210 @@ Reply with one JSON object and nothing else, in this form, where each P is a pro
 PREDICTIVE_TEXT = PREDICTIVE_INTRO + QUESTIONS
 PREDICTIVE_TRACK_TEXT = PREDICTIVE_INTRO + TRACK_BLOCK + QUESTIONS
 
+# PARAPHRASES OF THE TRACK-RECORD PROMPT ---------------------------------------------------------
+# Three paraphrases of ``predictive-track-v1`` (PLAN section 5, E3: prompt variance on the
+# paraphrase subset). They vary the prompt and nothing else: each shows the same entry fields,
+# the same track record and the same horizon sentence, asks for the same three quantities under
+# the same names, and ends with the reply instruction of the original, so the schema, the parser
+# and the repair prompt are those of ``predictive-track-v1``. What a paraphrase varies is the
+# wording and the order of the instructions, the framing sentence, the section labels and where
+# the track record stands (before or after the entry). None adds a fact, an example or a
+# definition, and none drops one; the entry's form and revision bucket stay under the table.
+# The field lines and the reply instruction are cut from the original's own constants, so they
+# cannot drift apart from it.
+_ENTRY_LABEL, _, ENTRY_FIELD_LINES = ENTRY_BLOCK.partition("\n")
+"""The ten field lines of the entry, without the label line above them."""
+REPLY_BLOCK = QUESTIONS[QUESTIONS.index("Reply with one JSON object") :]
+"""The reply instruction and the JSON form: the output contract every predictive prompt ends
+with, and what the repair prompt means by "the form asked for above"."""
+if _ENTRY_LABEL != "Entry" or not ENTRY_FIELD_LINES.startswith("- Drug: $generic_name\n"):
+    raise RuntimeError("ENTRY_BLOCK no longer starts with its label line and the Drug field")
+
+PARAPHRASE_1_TEXT = (
+    """Below is one entry from the US FDA drug-shortage list. Your task is to forecast when the \
+presentation in this entry will recover. A presentation has recovered when the list shows it as \
+available again, or shows the shortage as resolved for it. A presentation that is discontinued \
+instead has not recovered.
+
+Give your own forecast rather than repeating the entry's own estimate, which may be optimistic, \
+pessimistic or out of date. Make the forecast as if the date of update were today, using only \
+what could have been known on that day.
+
+The entry:
+"""
+    + ENTRY_FIELD_LINES
+    + """
+
+Past record of the list: how the times stated in this list's earlier entries turned out. This \
+is the record of the whole list, with all companies taken together; it is not the record of \
+this entry's company. The entries it covers were updated from $track_since to $track_through.
+
+The table has a row for every form of stated time in every revision bucket. The revision bucket \
+says whether the statement was the first one made for its presentation, the second, or the third \
+or a later one. The two shares are both Turnbull estimates: one is the share of statements whose \
+presentation had recovered by the end of the stated time, the other the share whose presentation \
+had recovered by 90 days after it. A Turnbull estimate allows for recovery dates that are known \
+only to lie between two captures of the list. The basis column says which statements the figures \
+of a row rest on: "cell" is the row's own form and revision bucket; where that had fewer than \
+$min_cell statements, the figures are those of every revision of the form ("form") or of every \
+form with a stated time ("all dated forms"). A median of 365 in the last column means 365 days \
+or more, including never.
+
+$slip_table
+
+Form of this entry: $form
+Revision bucket of this entry: $revision
+
+Earlier entries that have been resolved (their outcomes are known, and none of them is this \
+entry):
+$examples
+
+Now answer the three questions that follow. All times are counted from the date of update, \
+$date_of_update. $horizon_note
+
+1. p_by_horizon_a: the probability that the presentation has recovered on or before $horizon_a.
+2. p_by_horizon_b: the probability that the presentation has recovered on or before $horizon_b.
+3. days_to_recovery: quantiles of how many days pass from the date of update until recovery. \
+Every quantile is a whole number from 0 to 365, and 365 stands for 365 days or more, including \
+never. q10 is the number of days within which you put the chance of recovery at 10%, q50 is the \
+median, and q80, q90 and q95 are set by the same rule. From q10 to q95 they must not decrease.
+
+"""
+    + REPLY_BLOCK
+)
+"""Paraphrase 1: the layout of the original (instructions, entry, track record, questions) in
+other words. The framing sentence names a task, the two instruction sentences of the second
+paragraph change places, and the labels are reworded. The two probability questions are those
+of the original word for word."""
+
+PARAPHRASE_2_TEXT = (
+    """Act as a forecaster. You are shown the track record of the US FDA drug-shortage list and \
+then one entry from that list, and you forecast when the presentation in that entry will recover.
+
+Treat the entry's date of update as today: use only what could have been known on that day. The \
+estimate that the entry itself gives may be optimistic, pessimistic or out of date, so make your \
+own forecast instead of repeating it. "Recovered" means that the list shows the presentation as \
+available again, or the shortage as resolved for it; a presentation that is discontinued instead \
+has not recovered.
+
+### Track record of the list
+
+This section shows how the times stated in earlier entries of this list turned out. The record \
+is of the whole list, all companies together, and not of the company in the entry to forecast. \
+It covers entries updated from $track_since to $track_through.
+
+How to read the table:
+- Rows: one for each form of stated time and each revision bucket, that is, whether the \
+statement was the first one made for its presentation, the second, or the third or a later one.
+- The two shares: Turnbull estimates of the share of statements whose presentation had recovered \
+by the end of the stated time, and by 90 days after it. A Turnbull estimate allows for recovery \
+dates that are known only to lie between two captures of the list.
+- Basis: which statements a row's figures rest on. "cell" is the row's own form and revision \
+bucket; where that had fewer than $min_cell statements, the figures are those of every revision \
+of the form ("form") or of every form with a stated time ("all dated forms").
+- Last column: a median of 365 means 365 days or more, including never.
+
+$slip_table
+
+Form of the entry to forecast: $form
+Revision bucket of the entry to forecast: $revision
+
+Earlier entries with known outcomes (they are resolved; none of them is the entry to forecast):
+$examples
+
+### Entry to forecast
+
+"""
+    + ENTRY_FIELD_LINES
+    + """
+
+### Questions
+
+Answer the three questions below. All times are counted from the date of update, \
+$date_of_update. $horizon_note
+
+1. p_by_horizon_a: the probability that, on or before $horizon_a, the presentation has recovered.
+2. p_by_horizon_b: the probability that, on or before $horizon_b, the presentation has recovered.
+3. days_to_recovery: quantiles of the time, in days, from the date of update to recovery. q10 is \
+the number of days within which you give recovery a 10% chance, q50 is the median, and the same \
+rule holds for q80, q90 and q95; from q10 to q95 they must not decrease. Give each as a whole \
+number from 0 to 365, where 365 means 365 days or more, including never.
+
+"""
+    + REPLY_BLOCK
+)
+"""Paraphrase 2: the track record stands before the entry. The framing sentence names a role,
+the rule on the date of update comes before the definition of recovery, the sections have
+headings, and the notes on the table are a list."""
+
+PARAPHRASE_3_TEXT = (
+    """Here is a forecasting problem about one entry from the US FDA drug-shortage list: when \
+will the presentation in this entry recover?
+
+[Entry]
+"""
+    + ENTRY_FIELD_LINES
+    + """
+
+[Track record]
+The record below covers earlier entries of this list, updated from $track_since to \
+$track_through, and shows how the times stated in them turned out. It is the record of the whole \
+list, all companies together, not of this entry's company.
+
+In the table there is one row for each form of stated time and each revision bucket (whether \
+the statement was the first one made for its presentation, the second, or the third or a later \
+one). The column "basis" shows which statements a row's figures rest on: "cell" is the row's own \
+form and revision bucket; where that had fewer than $min_cell statements, the figures are those \
+of every revision of the form ("form") or of every form with a stated time ("all dated forms"). \
+The two shares are the shares of statements whose presentation had recovered by the end of the \
+stated time and by 90 days after it. They are Turnbull estimates; such an estimate allows for \
+recovery dates that are known only to lie between two captures of the list. Where the last \
+column shows a median of 365, that value means 365 days or more, including never.
+
+$slip_table
+
+This entry has the form: $form
+This entry is in the revision bucket: $revision
+
+Earlier entries that are resolved (their outcomes are known; this entry is not among them):
+$examples
+
+[Rules and definition]
+This entry's own estimate may be optimistic, pessimistic or out of date; rather than repeating \
+it, give your own forecast. Take this entry's date of update as today and use only what could \
+have been known on that day. Recovered means that the list shows the presentation as available \
+again, or the shortage as resolved for it; if the presentation is discontinued instead, it has \
+not recovered.
+
+[Questions]
+Please answer the following three questions. All times are counted from the date of update, \
+$date_of_update. $horizon_note
+
+1. p_by_horizon_a: the probability of the presentation having recovered on or before $horizon_a.
+2. p_by_horizon_b: the probability of the presentation having recovered on or before $horizon_b.
+3. days_to_recovery: quantiles of the number of days between the date of update and recovery. \
+q10 is the number of days within which, in your forecast, recovery has a 10% chance; q50 is the \
+median; q80, q90 and q95 follow the same rule. They must not decrease from q10 to q95, and each \
+is a whole number from 0 to 365, where 365 means 365 days or more, including never.
+
+"""
+    + REPLY_BLOCK
+)
+"""Paraphrase 3: the entry and the track record come first, and the rules and the definition of
+recovery after them, just before the questions (in the order: own forecast, date of update,
+definition). The framing sentence is a question, the sections carry bracketed labels, and the
+notes on the table are in another order (the basis before the shares)."""
+
+PARAPHRASE_OF = "predictive-track-v1"
+PARAPHRASE_TEXTS = {
+    "predictive-track-p1": PARAPHRASE_1_TEXT,
+    "predictive-track-p2": PARAPHRASE_2_TEXT,
+    "predictive-track-p3": PARAPHRASE_3_TEXT,
+}
+"""The paraphrases by template id. The launcher finds them by the start of their ids
+(``launch.PARAPHRASE_PREFIX``) and makes one run of each for a model."""
+# ------------------------------------------------------------------------------------------------
+
 PROBE_TEXT = (
     """A drug presentation was on the US FDA drug-shortage list on $date_of_update. You \
 are shown how the list identifies it, but not what its entry said. Estimate when this \
@@ -1077,6 +1286,12 @@ TEMPLATES: dict[str, PromptTemplate] = {
             needs_track=True,
         ),
         PromptTemplate("probe-v1", "predictive", PROBE_TEXT, ("probe",), probe=True),
+        *(
+            PromptTemplate(
+                template_id, "predictive", text, ("stated_end", "fallback"), needs_track=True
+            )
+            for template_id, text in PARAPHRASE_TEXTS.items()
+        ),
     )
 }
 
@@ -1086,13 +1301,20 @@ FROZEN_SHA256 = {
     "predictive-v1": "c0732a5b2d109c60a94e56cd0820a4aa5851786bd01fd31acd3b12c9d47534ed",
     "predictive-track-v1": "d0384c1f860d734bd26fa197de0a99e1bcdf520392941b399ef9d0f7b3213483",
     "probe-v1": "02e8d4338c3532a22615a43c47c54423250bf13474ef3f556925f5c878e8d08e",
+    "predictive-track-p1": "5b985d6ba619431394ea9521a06e91cfef2cbb73916793b66252cb8cd49a6b67",
+    "predictive-track-p2": "1644f2428c5bd73c2490e4934f2b8197191d78fe838b09b24dff85ee2e1e8e08",
+    "predictive-track-p3": "018f57e81ae8f299418b06c7767fa40dcd690dfe8f53b41575f1ac6e7fec19f9",
 }
 """Pinned template digests, as ``--print-pins`` lists them. Until the freeze amendment F1 a
 prompt edit moves its pin here (no call has been made under any of these ids). The edit of
 1 October 2026 changed the entry fields, the probe fields and the track-record sentence. The edit
 of 5 October 2026, after the pilot, filled the two pilot sentences of the literal prompts (D1 and
 D3) and added to the track-record prompt that a median of 365 means 365 days or more. From F1
-on, changing a prompt means a new template id, not an edit."""
+on, changing a prompt means a new template id, not an edit. The three paraphrases of
+``predictive-track-v1`` are not among the five templates of the registration record (PLAN
+section 17, "Prompts"): their ids and pins are among what F1 records ("At F1"). An edit of the
+original before F1 moves their pins too where it touches the entry fields, the horizon
+sentences or the reply instruction, which they share with it."""
 
 
 def check_frozen() -> None:
@@ -3244,7 +3466,10 @@ TRIAL_NOTE = "cost trial: dev items, once per template a model uses"
 E6_NOTE = "counted in calls and priced as literal-v1; E6's own prompt comes with its amendment"
 SEC_NOTE = "the three secondary lists together: TBD, silent, stale at issue"
 TWO_BY_TWO_NOTE = "the three masked or shifted cells; the fourth cell is e3-b"
-PARA_NOTE = "three paraphrases of (b), priced as predictive-track-v1 until they are written"
+PARA_NOTE = (
+    f"the three paraphrases of (b), one run each ({', '.join(PARAPHRASE_TEXTS)}); priced as "
+    f"{PARAPHRASE_OF}"
+)
 SAMPLES_NOTE = "20 samples at temperature 1 under condition (a)"
 
 
@@ -3491,7 +3716,9 @@ def _parser() -> argparse.ArgumentParser:
     ap.add_argument("--items", type=Path, help="JSON Lines, one statement event per line")
     ap.add_argument("--template", choices=sorted(TEMPLATES), default="literal-v1")
     ap.add_argument("--model", action="append", choices=sorted(LADDER), help="repeatable (dry run)")
-    ap.add_argument("--track-record", type=Path, help="needed by predictive-track-v1")
+    ap.add_argument(
+        "--track-record", type=Path, help="needed by predictive-track-v1 and its paraphrases"
+    )
     ap.add_argument("--samples", type=int, default=1)
     ap.add_argument("--temperature", type=float, default=0.0)
     ap.add_argument("--mask-names", action="store_true")

@@ -12,6 +12,8 @@ Usage (from the repository root)::
 from __future__ import annotations
 
 import dataclasses
+import difflib
+import itertools
 import json
 import os
 import re
@@ -19,6 +21,7 @@ import shutil
 import socket
 import subprocess
 import sys
+from collections import Counter
 from dataclasses import replace
 from datetime import date
 from decimal import Decimal
@@ -364,6 +367,433 @@ def test_track_sentence_says_what_the_table_is() -> None:
     assert "the first one made for its presentation, the second, or the third or a later" in block
     assert "fewer than 100 statements" in block and '"all dated forms"' in block
     assert "issuer" not in text
+
+
+# --- the three paraphrases of the track-record prompt -----------------------------------------
+
+BASE_ID = "predictive-track-v1"
+PARAPHRASE_IDS = ("predictive-track-p1", "predictive-track-p2", "predictive-track-p3")
+ITEMS_DIR = Path(rd.__file__).resolve().parent / "out" / "items"
+"""The study's item lists and track records (statement texts and train-period outcomes only)."""
+KEPT_WORD_FOR_WORD = (
+    "US FDA drug-shortage list",
+    "available again",
+    "resolved for it",
+    "discontinued instead",
+    "has not recovered",
+    "only what could have been known on that day",
+    "optimistic, pessimistic or out of date",
+    "from $track_since to $track_through",
+    "form of stated time",
+    "the first one made for its presentation, the second, or the third or a later one",
+    "Turnbull estimates",
+    "allows for recovery dates that are known only to lie between two captures of the list",
+    "which statements",
+    '"cell" is the row\'s own form and revision bucket; where that had fewer than $min_cell '
+    'statements, the figures are those of every revision of the form ("form") or of every form '
+    'with a stated time ("all dated forms")',
+    "$slip_table\n\n",
+    "outcomes",
+    "):\n$examples\n\n",
+    "three questions",
+    "All times are counted from the date of update, $date_of_update. $horizon_note\n\n1. ",
+    "\n1. p_by_horizon_a: ",
+    " on or before $horizon_a",
+    "\n2. p_by_horizon_b: ",
+    " on or before $horizon_b",
+    "\n3. days_to_recovery: ",
+    "quantiles",
+    "whole number from 0 to 365",
+    "q10 is the number of days within which",
+    "q50 is the median",
+    "q80, q90 and q95",
+    "the same rule",
+)
+"""Words of ``predictive-track-v1`` that every paraphrase keeps as they are: the terms of each
+definition and convention. The sentences around them are reworded and were compared by reading;
+this list and the next keep a later edit from dropping a statement."""
+KEPT_IN_SOME_WORDS = {
+    "the task": (
+        r"\bforecast(ing problem)?\b[^.?]*\bwhen\b[^.?]*\bpresentation\b[^.?]*\brecover\b"
+    ),
+    "what recovered means": r"([Rr]ecovered\"? means that|has recovered when) the list shows",
+    "forecast as of the date of update": (
+        r"as if today were the date of update|as if the date of update were today|"
+        r"(Treat the|Take this) entry's date of update as today"
+    ),
+    "the entry's estimate is not repeated": r"(rather than|instead of) repeating",
+    "an own forecast": r"([Gg]ive|make) your own forecast",
+    "what the record is": (
+        r"how the times stated in (earlier entries of this list|this list's earlier entries|them) "
+        r"turned out"
+    ),
+    "the whole list": r"record (is )?of the whole list, (with )?all companies (taken )?together",
+    "not this entry's company": (
+        r"\bnot (the record )?of (this entry's company|the company in the entry to forecast)"
+    ),
+    "one row per form and bucket": (
+        r"(one row|Rows: one) for each form of stated time and each revision bucket|"
+        r"a row for every form of stated time in every revision bucket"
+    ),
+    "what the two shares are": (
+        r"shares? of statements whose presentation had recovered by the end of the stated time,? "
+        r"and by 90 days after it|share of statements whose presentation had recovered by the end "
+        r"of the stated time, the other the share whose presentation had recovered by 90 days "
+        r"after it"
+    ),
+    "the basis column": r"\b[Bb]asis\b",
+    "a median of 365": (
+        r"[Ll]ast column[^.]*\bmedian of 365\b[^.]* means 365 days or more, including never|"
+        r"median of 365 in the last column means 365 days or more, including never"
+    ),
+    "the examples are resolved": r"\b[Rr]esolved\b",
+    "no example is this entry": (
+        r"none of them is (this entry|the entry to forecast)|this entry is not among them"
+    ),
+    "a probability, twice": r"p_by_horizon_a: the probability .* p_by_horizon_b: the probability ",
+    "365 in the quantiles": r"365 (means|stands for) 365 days or more, including never",
+    "what q10 is": (
+        r"within which(, in your forecast,)? (you give recovery a 10% chance|"
+        r"you put the chance of recovery at 10%|recovery has a 10% chance)"
+    ),
+    "quantiles do not decrease": (
+        r"must not decrease from q10 to q95|[Ff]rom q10 to q95 they must not decrease"
+    ),
+}
+"""What every paraphrase says in words of its own, as patterns that the original matches too."""
+
+
+def numbers(text: str) -> Counter:
+    """Every run of digits in a text with the number of times it occurs."""
+    return Counter(re.findall(r"\d+", text))
+
+
+def placeholders(text: str) -> Counter:
+    return Counter(re.findall(r"\$([a-z_]+)", text))
+
+
+def shown_by_the_original(text: str) -> dict[str, str]:
+    """What a rendering of ``predictive-track-v1`` shows for its item, cut out of the rendering
+    itself: the entry's fields, the track record piece by piece, the horizons and the reply
+    instruction."""
+
+    def between(start: str, end: str) -> str:
+        return text.split(start, 1)[1].split(end, 1)[0]
+
+    pieces = {
+        "entry fields": between("\n\nEntry\n", "\n\nTrack record:"),
+        "dates covered": re.search(r"from \d{4}-\d\d-\d\d to \d{4}-\d\d-\d\d", text).group(0),
+        "smallest cell": re.search(r"where that had fewer than \d+ statements", text).group(0),
+        "table": "\n".join(line for line in text.splitlines() if line.startswith("|")),
+        "form": between("\nThis entry's form: ", "\n"),
+        "revision bucket": between("\nThis entry's revision bucket: ", "\n"),
+        "examples": between("none of them is this entry):\n", "\n\nAnswer these three questions."),
+        "times and horizons": re.search(r"All times are counted from .*", text).group(0),
+        "reply": text[text.index("Reply with one JSON object") :],
+    }
+    for n, day in enumerate(re.findall(r" on or before (\d{4}-\d\d-\d\d)\.", text), start=1):
+        pieces[f"day of question {n}"] = f" on or before {day}"
+    assert len(pieces) == 11 and len(pieces["entry fields"].splitlines()) == 10
+    return pieces
+
+
+def not_shown(text: str, original: str) -> list[str]:
+    """The names of what the original's rendering shows and ``text`` does not (empty when it
+    shows everything): every piece of :func:`shown_by_the_original`, each field value, the
+    entry's form and revision bucket in the two lines under the table, and every number the same
+    number of times. Only names are returned, so a failure prints no text of an item."""
+    pieces = shown_by_the_original(original)
+    form, bucket = pieces.pop("form"), pieces.pop("revision bucket")
+    missing = [name for name, piece in pieces.items() if piece not in text]
+    missing += [
+        f"field value {n}"
+        for n, line in enumerate(pieces["entry fields"].splitlines(), start=1)
+        if line.split(": ", 1)[1] not in text
+    ]
+    under = [*text.split(pieces["table"] + "\n\n", 1)[-1].splitlines()[:2], "", ""]
+    if "form" not in under[0].lower() or not under[0].endswith(f": {form}"):
+        missing.append("form under the table")
+    if "revision bucket" not in under[1].lower() or not under[1].endswith(f": {bucket}"):
+        missing.append("revision bucket under the table")
+    if numbers(text) != numbers(original):
+        missing.append("the same numbers the same number of times")
+    return missing
+
+
+def test_the_three_paraphrases_are_templates_like_the_original_and_pinned() -> None:
+    base = rd.TEMPLATES[BASE_ID]
+    assert rd.PARAPHRASE_OF == BASE_ID and tuple(rd.PARAPHRASE_TEXTS) == PARAPHRASE_IDS
+    rd.check_frozen()
+    for template_id in PARAPHRASE_IDS:
+        template = rd.TEMPLATES[template_id]
+        assert template.text == rd.PARAPHRASE_TEXTS[template_id]
+        assert rd.FROZEN_SHA256[template_id] == template.sha256
+        assert replace(template, text=template.text + " ").sha256 != template.sha256
+        # the same task and the same output contract: kind (so schema and parser), horizon
+        # sentences, track record, no pilot sentence, and nothing of the probe
+        assert replace(template, id=base.id, text=base.text) == base
+        assert rd.SCHEMAS[template.kind] is rd.PREDICTIVE_SCHEMA and not template.pending
+        assert template.text.endswith("\n\n" + rd.REPLY_BLOCK) and base.text.endswith(
+            rd.REPLY_BLOCK
+        )
+        assert template.text.count(rd.ENTRY_FIELD_LINES) == 1
+    assert rd.ENTRY_BLOCK == "Entry\n" + rd.ENTRY_FIELD_LINES
+    assert rd.REPLY_BLOCK.startswith("Reply with one JSON object and nothing else, in this form")
+    assert rd.REPLY_BLOCK.count("\n") == 1 and rd.REPLY_BLOCK.endswith('"q95": D}}')
+    assert "form asked for above" in rd.REPAIR_TEXT
+    # the run sheet reads the paraphrase subset once with each, and prices them as the original
+    [line] = [line for line in rd.RUN_SHEET if line.name == "e3-paraphrases"]
+    assert (line.template, line.count, line.per_item) == (BASE_ID, "paraphrase", 3)
+    assert line.models == rd.PRIMARIES and all(t in line.note for t in PARAPHRASE_IDS)
+    tokens = rd.sheet_prompt_tokens()
+    for template_id in PARAPHRASE_IDS:  # close enough in length for that price to hold
+        assert 0.95 < tokens[template_id] / tokens[BASE_ID] < 1.05
+
+
+def test_paraphrases_differ_from_the_original_and_from_one_another() -> None:
+    ids = (BASE_ID, *PARAPHRASE_IDS)
+    assert len({rd.TEMPLATES[t].sha256 for t in ids}) == 4
+
+    def own_words(template_id: str) -> list[str]:
+        text = rd.TEMPLATES[template_id].text
+        for shared in (rd.ENTRY_FIELD_LINES, rd.REPLY_BLOCK):
+            text = text.replace(shared, "")
+        return text.split()
+
+    for one, other in itertools.combinations(ids, 2):
+        same = difflib.SequenceMatcher(None, own_words(one), own_words(other), autojunk=False)
+        assert same.ratio() < 0.8, (one, other)
+    texts = {t: rd.render_prompt(rd.TEMPLATES[t], make_item(), rd.CANARY_TRACK) for t in ids}
+    assert len(set(texts.values())) == 4
+    # no two open with the same framing sentence, and none uses the section labels of another
+    assert len({re.split(r"(?<=[.?:]) ", text)[0] for text in texts.values()}) == 4
+    labels = {
+        BASE_ID: ("Entry\n", "Track record: "),
+        PARAPHRASE_IDS[0]: ("The entry:\n", "Past record of the list: "),
+        PARAPHRASE_IDS[1]: ("### Entry to forecast\n", "### Track record of the list\n"),
+        PARAPHRASE_IDS[2]: ("[Entry]\n", "[Track record]\n"),
+    }
+    for template_id, text in texts.items():
+        for owner, pair in labels.items():
+            assert all((label in text) == (owner == template_id) for label in pair), template_id
+    # where the track record stands: before the entry in the second paraphrase only
+    before = [t for t, text in texts.items() if text.index("| form |") < text.index("- Drug: ")]
+    assert before == [PARAPHRASE_IDS[1]]
+    # where the instructions stand: after the entry and the record in the third paraphrase only
+    rule = "could have been known"
+    after = [t for t, text in texts.items() if text.index(rule) > text.index("| form |")]
+    assert after == [PARAPHRASE_IDS[2]]
+    # the questions and the reply instruction come last in all four, in the same order
+    for text in texts.values():
+        marks = ["- Drug: ", "| form |", "All times are counted", "\n1. p_by_horizon_a: "]
+        marks += ["\n2. p_by_horizon_b: ", "\n3. days_to_recovery: ", "\n\nReply with one JSON"]
+        found = [text.index(mark) for mark in marks]
+        assert found[2:] == sorted(found[2:]) and max(found[:2]) < found[2]
+
+
+def test_paraphrases_keep_every_statement_and_add_no_placeholder() -> None:
+    base = rd.TEMPLATES[BASE_ID].text
+    for template_id in (BASE_ID, *PARAPHRASE_IDS):
+        text = rd.TEMPLATES[template_id].text
+        assert [words for words in KEPT_WORD_FOR_WORD if words not in text] == [], template_id
+        flat = " ".join(text.split())
+        dropped = [name for name, said in KEPT_IN_SOME_WORDS.items() if not re.search(said, flat)]
+        assert dropped == [], template_id
+        # the two sentences on 365: the median of the table and the quantiles of the answer
+        assert text.count("365 days or more, including never") == 2, template_id
+        # every placeholder of the original, each as often as there: nothing is shown twice,
+        # nothing is left out, and nothing else of the item or the record is shown
+        assert placeholders(text) == placeholders(base), template_id
+        # the numbers in the text are those of the original (90 days, 365, 0 to 365, the levels)
+        assert numbers(text) == numbers(base), template_id
+        assert "issuer" not in text and "Status" not in text
+    for template_id in PARAPHRASE_IDS:  # no name of a drug or a company, and no date
+        own = rd.TEMPLATES[template_id].text
+        assert not re.search(r"\d{4}|\b(19|20)\d\d\b", own.replace("365", ""))
+        for shown in (rd.CANARY_ITEM, make_item()):
+            for name in (shown.generic_name, shown.company_name):
+                assert not [w for w in re.findall(r"[A-Za-z]{4,}", name) if w in own]
+
+
+PARAPHRASE_CASES = {
+    "the canary": ({}, False, 0),
+    "no stated period": ({"stated_end": None}, False, 0),
+    "no form and no bucket": ({"form": None, "revision": None}, False, 0),
+    "blank fields": ({"related_information": "", "therapeutic_category": ""}, False, 0),
+    "names masked": ({}, True, 0),
+    "dates shifted": ({}, False, 4),
+    "masked and shifted": ({}, True, 4),
+}
+
+
+@pytest.mark.parametrize("case", sorted(PARAPHRASE_CASES))
+@pytest.mark.parametrize("template_id", PARAPHRASE_IDS)
+def test_a_paraphrase_shows_everything_the_original_shows(template_id: str, case: str) -> None:
+    changes, mask, shift = PARAPHRASE_CASES[case]
+    item = replace(rd.CANARY_ITEM, **changes)
+
+    def rendered(tid: str) -> str:
+        masker = rd.NameMasker() if mask else None
+        track = rd.transform_track(rd.CANARY_TRACK, masker, shift)
+        return rd.render_for(rd.TEMPLATES[tid], item, track=track, masker=masker, shift_years=shift)
+
+    original, text = rendered(BASE_ID), rendered(template_id)
+    assert "$" not in text and text != original
+    assert not_shown(text, original) == []
+    # the check does see a gap: a field, a table row, an example line, a label line or a number
+    pieces = shown_by_the_original(original)
+    fields, rows = pieces["entry fields"].splitlines(), pieces["table"].splitlines()
+    cut = not_shown(text.replace(fields[1] + "\n", "", 1), original)
+    assert cut[:2] == ["entry fields", "field value 2"]
+    assert not_shown(text.replace(rows[-1] + "\n", "", 1), original)[0] == "table"
+    last = pieces["examples"].splitlines()[-1]
+    assert not_shown(text.replace("\n" + last, "", 1), original) == ["examples"]
+    under = text.split(pieces["table"] + "\n\n", 1)[1].splitlines()[:2]
+    assert not_shown(text.replace(under[0] + "\n", "", 1), original) == [
+        "form under the table",
+        "revision bucket under the table",
+    ]
+    assert not_shown(text.replace("90 days after it", "some days after it", 1), original)
+    assert not_shown(text + " 7", original) == ["the same numbers the same number of times"]
+
+
+@pytest.mark.parametrize(
+    ("items_file", "track_file", "period"),
+    [
+        ("dev_scoreable.jsonl", "track_fit.json", "train"),
+        ("subset_paraphrase.jsonl", "track_fit_dev.json", "test"),
+    ],
+)
+def test_paraphrases_show_everything_for_the_real_items(
+    items_file: str, track_file: str, period: str
+) -> None:
+    """Every scoreable dev statement with the fit record (train period), and the 200 items of
+    the paraphrase subset with the record the test runs show. Only texts are read: the item
+    lists hold no outcome, and nothing of an item is printed."""
+    if not ((ITEMS_DIR / items_file).is_file() and (ITEMS_DIR / track_file).is_file()):
+        pytest.skip("the item list or the track record is not on disk")
+    items = rd.load_items(ITEMS_DIR / items_file)
+    track = rd.load_track_record(ITEMS_DIR / track_file)
+    assert items and {item.period for item in items} == {period}
+    assert len(track.examples) == rd.MAX_EXAMPLES and len(track.slip_table) > 20
+    missing = []
+    for item in items:
+        original = rd.render_for(rd.TEMPLATES[BASE_ID], item, track=track)
+        for template_id in PARAPHRASE_IDS:
+            text = rd.render_for(rd.TEMPLATES[template_id], item, track=track)
+            missing += [(template_id, item.item_id, name) for name in not_shown(text, original)]
+            if text.count("$") != original.count("$"):
+                missing.append((template_id, item.item_id, "a placeholder left in the text"))
+    assert missing == []
+
+
+@pytest.mark.parametrize("template_id", PARAPHRASE_IDS)
+def test_an_answer_to_a_paraphrase_is_read_by_the_parser_of_the_original(
+    tmp_path: Path, template_id: str
+) -> None:
+    item = make_item()
+    inner = FakeInner([PREDICTIVE_OK])
+    reader = make_reader(tmp_path / "v1", inner, template=BASE_ID, track=rd.CANARY_TRACK)
+    first, original = reader.read(item), inner.calls[0][0]
+    inner = FakeInner([PREDICTIVE_OK])
+    reader = make_reader(tmp_path / "p", inner, template=template_id, track=rd.CANARY_TRACK)
+    row = reader.read(item)
+    [(prompt, _, system)] = inner.calls
+    assert prompt == rd.render_for(rd.TEMPLATES[template_id], item, track=rd.CANARY_TRACK)
+    assert system is None and prompt != original and not_shown(prompt, original) == []
+    assert (row["status"], row["fallback"], row["errors"]) == ("ok", None, [])
+    assert row["warnings"] == first["warnings"]  # what the harness says of the item is the same
+    assert row["reading"] == first["reading"] == json.loads(PREDICTIVE_OK)
+    assert row["horizons"] == first["horizons"]
+    assert row["horizons"] == {"a": "2020-04-30", "b": "2020-07-29", "rule": "stated_end"}
+    # the row says which prompt was read: another template, pin and condition than the original
+    assert (row["template"], row["template_sha256"]) == (template_id, rd.FROZEN_SHA256[template_id])
+    assert row["condition"] == first["condition"].replace(BASE_ID, template_id)
+    assert rd.parse_reading(PREDICTIVE_OK, rd.TEMPLATES[template_id].kind).ok
+    # the parser is as strict as for the original: quantiles that decrease earn one repair call,
+    # which shows the paraphrase again, and a second failure is flagged for the base rate
+    down = PREDICTIVE_OK.replace('"q90": 200', '"q90": 100')
+    inner = FakeInner([down, PREDICTIVE_OK])
+    reader = make_reader(tmp_path / "r", inner, template=template_id, track=rd.CANARY_TRACK)
+    row = reader.read(item)
+    assert (row["status"], row["fallback"]) == ("repaired", None) and len(inner.calls) == 2
+    assert inner.calls[1][0].startswith(prompt + "\n\nYour previous reply was:\n<<<\n" + down)
+    assert "quantiles decrease" in inner.calls[1][0]
+    inner = FakeInner([down, "no answer"])
+    reader = make_reader(tmp_path / "f", inner, template=template_id, track=rd.CANARY_TRACK)
+    row = reader.read(item)
+    assert (row["status"], row["fallback"], row["reading"]) == ("failed", "base_rate", None)
+    assert len(inner.calls) == 2
+    with pytest.raises(ValueError, match="needs a track record"):
+        rd.render_prompt(rd.TEMPLATES[template_id], item)
+
+
+def test_a_paraphrase_is_dry_run_from_the_command_line(tmp_path: Path, monkeypatch, capsys) -> None:
+    monkeypatch.setattr(rd, "RouteCheckedClient", _no_live_client)
+    track = write_track(tmp_path)
+    path = write_items(tmp_path, [make_item(item_id="a"), make_item(item_id="b")])
+    roots = ["--out-root", str(tmp_path / "out"), "--local-root", str(tmp_path / "local")]
+    totals = {}
+    for template_id in (BASE_ID, *PARAPHRASE_IDS):
+        args = ["--items", str(path), "--template", template_id, "--track-record", str(track)]
+        assert rd.main([*args, "--model", "deepseek-v3", "--dry-run", *roots]) == 0
+        summary = json.loads(capsys.readouterr().out)
+        assert summary["models"]["deepseek-v3"]["calls"] == 2 and not summary["template_pending"]
+        totals[template_id] = summary["prompt_tokens"]["total"]
+    # a paraphrase is longer than the original by its own words only, whatever the item shows
+    for template_id in PARAPHRASE_IDS:
+        longer = len(rd.TEMPLATES[template_id].text) - len(rd.TEMPLATES[BASE_ID].text)
+        assert 0 < longer < 300
+        assert totals[template_id] - totals[BASE_ID] == pytest.approx(2 * longer / 4, abs=2)
+    assert not (tmp_path / "out").exists() and not (tmp_path / "local").exists()
+    # without the record a paraphrase is refused like the original, and a live run is refused
+    # before the registration tag like every other run
+    bare = ["--items", str(path), "--template", PARAPHRASE_IDS[0], "--model", "deepseek-v3"]
+    with pytest.raises(SystemExit, match="predictive-track-p1 needs --track-record"):
+        rd.main([*bare, "--dry-run", *roots])
+    live = [*bare, "--track-record", str(track), "--run-name", "para", "--spend-cap-usd", "1"]
+    with pytest.raises(SystemExit, match="no paid call before the registration"):
+        rd.main([*live, "--allow-live", *roots])
+    assert not (tmp_path / "out").exists() and not (tmp_path / "local").exists()
+
+
+def test_cli_paraphrase_runs_end_to_end_with_a_scripted_client(
+    tmp_path, monkeypatch, capsys, live_ready
+) -> None:
+    """The three runs of a model, through the command line and the real client around a
+    scripted SDK: each is complete under its own condition, and none is pooled with another or
+    with condition (b)."""
+    sdk = FakeSDK(lambda prompt: PREDICTIVE_OK, model=LLAMA)
+    use_sdk(monkeypatch, sdk)
+    track = write_track(tmp_path)
+    digest = rd._sha256_file(track)
+    items = [
+        make_item(item_id=f"d{n}", date_of_update="2021-05-04", presentation=f"{n + 1} MG")
+        for n in range(2)
+    ]
+    path = write_items(tmp_path, items)
+    for n, template_id in enumerate((BASE_ID, *PARAPHRASE_IDS)):
+        run = f"e3-para{n}-llama" if n else "e3-b-llama"
+        shown = ["--template", template_id, "--track-record", str(track)]
+        assert rd.main(live_args(tmp_path, path, run, *shown)) == 0
+        manifest = json.loads((tmp_path / "out" / run / "run_manifest.json").read_text())
+        assert manifest["complete"] is True and manifest["by_status"] == {"ok": 2}
+        assert manifest["template"] == template_id
+        assert manifest["template_sha256"] == rd.FROZEN_SHA256[template_id]
+        rows = (tmp_path / "out" / run / "readings.jsonl").read_text().splitlines()
+        assert {json.loads(row)["condition"] for row in rows} == {
+            f"{template_id}|det-v1|mask=0|shift=0|track={digest[:16]}"
+        }
+    capsys.readouterr()
+    assert len(sdk.calls) == 8 and len({call["messages"][0]["content"] for call in sdk.calls}) == 8
+    pooled = rd.collect_readings(tmp_path / "out")
+    assert len(pooled) == 4 and {model for model, _ in pooled} == {"llama-3.3-70b"}
+    assert {condition.split("|")[0] for _, condition in pooled} == {BASE_ID, *PARAPHRASE_IDS}
+    assert all(len(group["rows"]) == 2 and group["runs"] for group in pooled.values())
+    # the same template under another run name of the same model is free: the cache answers
+    again = ["--template", PARAPHRASE_IDS[0], "--track-record", str(track)]
+    assert rd.main(live_args(tmp_path, path, "e3-para1-llama-again", *again)) == 0
+    assert len(sdk.calls) == 8
 
 
 # --- the no-notice probe ----------------------------------------------------------------------

@@ -671,5 +671,7 @@ def test_prompts_must_match_their_pins_and_wait_for_nothing(
 def test_the_study_pins_can_be_read(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.chdir(STUDY_PLAN.parents[3])
     pins = P.live_pins()
-    assert len(pins["templates"]) == 5
+    # the five templates of the registration record and the three paraphrases that F1 records
+    assert len(pins["templates"]) == 8
+    assert len([name for name in pins["templates"] if name.startswith("predictive-track-p")]) == 3
     assert all(len(pin["sha256"]) == 64 for pin in pins["templates"].values())

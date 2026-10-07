@@ -69,7 +69,8 @@ INFORMED = "qwen-2.5-7b"
 """The secondary model with planted effects: (b) follows the outcome, (c) is the rule reading."""
 NOISY = "gemma-3-27b"
 """A secondary model some of whose answers fail to parse."""
-PARAPHRASES = tuple(f"predictive-track-p{n}-v1" for n in (1, 2, 3))
+PARAPHRASES = tuple(f"predictive-track-p{n}" for n in (1, 2, 3))
+"""The three paraphrases of ``predictive-track-v1`` that the harness holds."""
 SIZES = {"probe": 120, "samples20": 60, "paraphrase": 50, "twobytwo": 80, "reference_check": 20}
 CELL_OF = {(True, 0): "mask", (False, lp.SHIFT_YEARS): "shift", (True, lp.SHIFT_YEARS): "both"}
 CELL_NAMES = dict(zip(("mask", "shift", "both"), sc.CELLS, strict=True))
@@ -90,24 +91,14 @@ def sealed_off(tmp_path_factory: pytest.TempPathFactory, monkeypatch: pytest.Mon
     TE.guard(monkeypatch, tmp_path_factory.mktemp("nowhere"))
 
 
-@pytest.fixture(scope="module", autouse=True)
-def paraphrase_templates() -> Iterator[None]:
-    """Three paraphrases of ``predictive-track-v1`` in the harness, with their pins, for the
-    length of the module: the launcher plans their runs only when the harness holds them."""
-    patch = pytest.MonkeyPatch()
-    templates, pins = dict(rd.TEMPLATES), dict(rd.FROZEN_SHA256)
-    for n, name in enumerate(PARAPHRASES, start=1):
-        text = f"(Wording {n}.) " + rd.PREDICTIVE_TRACK_TEXT
-        templates[name] = rd.PromptTemplate(
-            name, "predictive", text, ("stated_end", "fallback"), needs_track=True
-        )
-        pins[name] = templates[name].sha256
-    patch.setattr(rd, "TEMPLATES", templates)
-    patch.setattr(rd, "FROZEN_SHA256", pins)
-    try:
-        yield
-    finally:
-        patch.undo()
+def test_the_harness_holds_the_three_paraphrases_this_file_scores() -> None:
+    """The launcher plans the paraphrase runs only when the harness holds exactly three
+    paraphrases of ``predictive-track-v1``, each with its pin."""
+    held = sorted(name for name in rd.TEMPLATES if name.startswith("predictive-track-p"))
+    assert tuple(held) == PARAPHRASES
+    for name in PARAPHRASES:
+        assert rd.TEMPLATES[name].needs_track and rd.TEMPLATES[name].kind == "predictive"
+        assert rd.FROZEN_SHA256[name] == rd.TEMPLATES[name].sha256
 
 
 # --------------------------------------------------------------------------------------------

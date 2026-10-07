@@ -155,9 +155,10 @@ SHARD_MIN_CALLS = 50
 MICRO = 1_000_000
 """Caps are split in whole millionths of a dollar."""
 PARAPHRASE_PREFIX = "predictive-track-p"
-"""The ids of the three paraphrases of ``predictive-track-v1`` start with this (for example
-``predictive-track-p1-v1``); until the harness holds three such templates, their runs are not
-planned and their share of the caps is held back."""
+"""The ids of the three paraphrases of ``predictive-track-v1`` start with this
+(``predictive-track-p1``, ``-p2`` and ``-p3``; ``read.PARAPHRASE_TEXTS``). Each is one run for a
+model. If the harness does not hold exactly three such templates, their runs are not planned and
+their share of the caps is held back."""
 WAIT_S = 20.0
 LOCK_TRIES = 5
 LOCK_PAUSE_S = 0.05
