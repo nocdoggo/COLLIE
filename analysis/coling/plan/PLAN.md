@@ -82,8 +82,9 @@ All deadlines in this file are in Anywhere on Earth time (AoE, UTC−12): 23:59 
     that differs from its own by 1 to 4 statements, so that the two together would give back
     the outcomes of those few (a slice within its whole, the answers that parsed within all,
     one outcome definition beside another). The second check is made on pairs of sets. A count
-    is withheld too where it says by itself how many of 1 to 4 statements are scoreable or
-    have a determined event. Sections 2.5, 4, 5 (E1) and 13 name the cases known at
+    is withheld too where it says, by itself or by subtraction from a count beside it, how
+    many of 1 to 4 statements are scoreable or have a determined event. Sections 2.5, 4, 5
+    (E1) and 13 name the cases known at
     registration. The six confirmatory contrasts, and the same contrasts of the six secondary
     models, are never withheld on the second ground: where the two sides of one differ on 1 to
     4 statements, it gives the loss difference of those few, and for H2 the paper says how
@@ -423,7 +424,8 @@ not listed says nothing.
 - Sensitivity analyses: leaving the list without a resolution counts as recovery at the first
   capture where the row is missing, and limited supply counts as available (BL). A contrast
   under a sensitivity analysis that gives 1 to 4 statements of its item set another horizon
-  event is withheld with its two scenarios, and the number of such statements is given: beside
+  event, or 1 to 4 of those scoreable under either definition, is withheld with its two
+  scenarios, and the number of such statements is given: beside
   the same contrast under the primary outcome it would give the change of the losses of those
   few.
 
@@ -810,7 +812,8 @@ recorded in F1. Reasoning and thinking tokens are billed as output.
     analysis uses only the events that both compared conditions parsed. Its contrast is
     withheld, its counts apart, when it leaves out or rests on 1 to 4 scoreable statements:
     beside the contrast on every scoreable statement it would give the loss difference of
-    those few.
+    those few. Where the failed answers of one side, or of both, number 1 to 4, its counts
+    are withheld as well, since they would say how many of those few are scoreable.
 
 ## 5. Experiments
 
@@ -1580,7 +1583,11 @@ stored in several parts and refuses:
 - a run that showed another track record than the one of its phase;
 - a plan of runs that names a file in a sealed folder;
 - a start without the sha256 of the sealed file, of the eligible list, of the model-free test
-  predictions and of each primary's selection file.
+  predictions and of each primary's selection file;
+- item sets that differ by 1 to 4 statements (the eligible list and a post-cutoff slice, or
+  the slices of the two primaries): the same figures on both would give those few back. On
+  the registered list this cannot arise: the slices hold 1,524 and 591 of its 2,593
+  statements.
 
 It computes the six tests and Holm's rule; the secondaries of this section; the E4 probe rule;
 and, of section 5, the E3 decomposition, the overconfidence criterion, the post-cutoff slices,
