@@ -485,10 +485,12 @@ AS_THE_PLAN_SAYS = (
     "the pattern holds for a model when both parts hold; the paper states the sentence for the "
     "two primary models, for one by name, or not at all; a part that does not hold is not read "
     "as its opposite, and the paper says which condition withheld it; a test of the E5 family "
-    "that holds is reported as that family's result, with its size; a primary whose E2 or E5 "
+    "that holds is reported as that family's result, with its size, also when a floor or the "
+    "other part withholds the sentence; the paper then does not write that no effect was "
+    "detected on the factors of that test's kind, letter or standing; a primary whose E2 or E5 "
     "run is declared not run has no pattern; if E5 is cut (section 12, cut 4) the pattern is "
     "read on those items with the same floors, and if E5 is not scored the sentence is not "
-    'stated (section 13, "The sentence")',
+    'stated (section 13, "The sentence"; section 5, E5, "Negative result")',
     "the standing part reads rejections of the E5 family and adds no test to it; the letter "
     "part adds one one-sided reading for each primary, outside the Holm rule of E2's two "
     "tests; the E5 contrasts of the secondary models are outside the family of twelve, so no "
@@ -512,9 +514,13 @@ AS_THE_PLAN_SAYS = (
     "when the standing part does not hold: if no test of a standing factor holds with the "
     "higher error rate on the edited items, it is withheld by (a); otherwise the paper names "
     "the floor or the condition (c) that each factor with such a test misses; when the "
-    "pattern holds for one primary and the other "
-    "has no pattern, the paper states the sentence for the first by name and says that the "
-    'other has none (section 13, "Small points of the reading")',
+    "pattern holds for one primary and the other has no pattern, the paper states the sentence "
+    "for the first by name and says that the other has none; when neither primary has a "
+    'pattern, the sentence is not stated (section 13, "Small points of the reading")',
+    "a percentile of B draws is taken by linear interpolation between the two order statistics "
+    "around position (B - 1) q, the smallest draw being at position 0: so the ends of every "
+    "percentile interval, and the lower end of the 90% interval that the letter part reads "
+    '(section 6, "Intervals")',
     "a cut of E5 keeps the unedited seed item and every edit of the first 50 seeds of the seed "
     "list in its draw order (the 50 lowest draw_rank of sample_pair_seeds.csv), the same for "
     "every reader, fixed before any E5 call; the cut item file holds the registered rows of "
@@ -594,11 +600,11 @@ WHERE_THE_PLAN_IS_SILENT = (
     "for every model, as a description; the floors stand with the twelve tests alone",
     "the pattern: every decision is taken on whole numbers, before any rounding: a floor on "
     "the counts of its two cells, the direction of a test on the counts of its two sides, and "
-    "the lower end of the letter part, in e2, as an exact fraction: the percentile of the "
-    "ratios of the two sums of each draw at the position of the fifth percentile, by linear "
-    "interpolation between the two order statistics around it, over the draws that hold a "
-    "letter item (with a letter item and no such draw, (a) is not met); a result file holds "
-    "the decisions, and its figures at six decimals decide nothing",
+    "the lower end of the letter part, in e2, as an exact fraction: the fifth percentile of "
+    "the ratios of the two sums of each draw; a draw that holds no letter item is left out, so "
+    "that the draws of that percentile are those that hold one (with a letter item and no such "
+    "draw, (a) is not met); a result file holds the decisions, and its figures at six decimals "
+    "decide nothing",
     "E5, cut (section 12): the seed list is held to a sha256 given on the command line; a seed "
     "among the first 50 with no item in the item file adds none, and the seeds with items are "
     "counted; the item file given stays the registered one and the gold stays whole; the rows "
@@ -607,9 +613,8 @@ WHERE_THE_PLAN_IS_SILENT = (
     "that file; the number of items kept is recorded and held to no figure; a seed list with "
     "50 seeds or fewer, or without a seed of the item file, is refused",
     "the pattern: that E5 is not scored is declared on the command line (--e5-not-scored), "
-    "and no pattern is then read; when neither primary has a pattern the sentence is not "
-    "stated and there is no part to report; the three conditions of every standing factor are "
-    "given whether or not its part holds, and a floor whose rate has no item is named as such",
+    "and no pattern is then read; the three conditions of every standing factor are given "
+    "whether or not its part holds, and a floor whose rate has no item is named as such",
     "the pattern: both results must be written under this scorer's registered record, and each "
     "must score the two primaries on one item set: in E2 the ids of every gold item, each "
     "once; in E5 the ids that the result records, whole or cut; the figures of a result are "
@@ -1646,8 +1651,9 @@ def exact_percentile(numerators: Any, denominators: Any, level: Fraction) -> Fra
     """The percentile at ``level`` of the ratios of two rows of whole numbers, one ratio for
     each place whose denominator is positive, as an exact fraction: the value at the position
     ``(n - 1) * level`` among the ``n`` ratios in their order, by linear interpolation between
-    the two order statistics around that position. It is the percentile of :func:`interval95`
-    without its floating point. None when no denominator is positive."""
+    the two order statistics around that position, the smallest ratio being at position 0
+    (PLAN section 6, "Intervals"). It is the percentile of :func:`interval95` without its
+    floating point. None when no denominator is positive."""
     times: Counter[Fraction] = Counter()
     for (above_line, below_line), n in Counter(zip(numerators, denominators, strict=True)).items():
         if below_line > 0:
@@ -2985,7 +2991,7 @@ def sentence_of(primaries: Mapping[str, Mapping[str, Any]], e5: Mapping[str, Any
         )
     else:
         case = "neither primary"
-        paper = "neither primary has a pattern: the paper does not state the sentence"
+        paper = "neither primary has a pattern: the sentence is not stated"
     beside = []
     for model in PRIMARIES:
         found = primaries[model]
@@ -3002,10 +3008,12 @@ def sentence_of(primaries: Mapping[str, Mapping[str, Any]], e5: Mapping[str, Any
     for model in PRIMARIES:
         for held in primaries[model]["e5_tests_that_hold"]:
             beside.append(
-                f"{model}, {held['factor']}: this test of the E5 family holds, with the higher "
-                f"error rate on {held['higher_error_rate_on']}; it is reported as that "
-                "family's result, with its size, also when a floor or the other part withholds "
-                "the sentence, and the paper then does not write that no effect was detected"
+                f"{model}, {held['factor']}: this test of the E5 family, on a {held['kind']} "
+                f"factor, holds with the higher error rate on {held['higher_error_rate_on']}; "
+                "it is reported as that family's result, with its size, also when a floor or "
+                "the other part withholds the sentence, and the paper then does not write that "
+                "no effect was detected on the factors of that test's kind, letter or standing "
+                '(section 5, E5, "Negative result")'
             )
     for model in PRIMARIES:
         if model in stated:

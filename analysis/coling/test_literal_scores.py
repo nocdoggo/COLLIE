@@ -5227,6 +5227,9 @@ def test_the_list_holds_what_the_plan_leaves_open_and_nothing_it_states(
         "lowest draw_rank",  # section 12, cut 4
         "registered rows of those seeds",
         "every primary with a pattern",  # section 13, Support: each factor that counts
+        "linear interpolation",  # section 6, Intervals: how a percentile is taken
+        "order statistics",
+        "neither primary has a pattern",  # section 13, Small points of the reading
         "no registered procedure",
         "counts as ABSTAIN",  # section 4: a failed literal reading
         "on the items both readers parsed",  # section 4: the sensitivity analysis
@@ -6660,6 +6663,11 @@ SMALL_POINTS = (
     "the floor or the condition (c) that each factor with such a test misses",
     "When the pattern holds for one primary and the other has no pattern, the paper states the "
     "sentence for the first by name and says that the other has none",
+    "When neither primary has a pattern, the sentence is not stated",
+    "a percentile of B draws is taken by linear interpolation between the two order statistics "
+    "around position (B - 1) q, the smallest draw being at position 0",
+    "the paper then does not write that no effect was detected on the factors of that test's "
+    "kind, letter or standing",
     "the same for every reader, fixed before any E5 call",
     "the 50 lowest draw_rank of sample_pair_seeds.csv",
     "the cut item file holds the registered rows of those seeds unchanged",
@@ -6674,13 +6682,15 @@ PLAN_WORDS = (
     "is not read as its opposite, and the paper says which condition withheld it",
     "reported as that family's result, with its size, also when a floor or the other part "
     "withholds the sentence",
-    "does not write that no effect was detected",
+    "does not write that no effect was detected on the factors of that test's kind, letter or "
+    'standing (section 5, E5, "Negative result")',
     "has no pattern, and the paper says so",
     "the pattern is read on those items with the same floors",
     "(section 12, cut 4)",
     "the pattern holds for one primary and the other has no pattern",
     "states the sentence for the first by name",
     "says that the other has none",
+    "neither primary has a pattern",
     "is not scored by the freeze of numbers",
     "the sentence is not stated",
     "whichever way it came out",
@@ -6718,7 +6728,7 @@ def test_the_constants_of_the_pattern_quote_the_plan() -> None:
     assert LS.SENTENCE in flat_text(PLAN.read_text(encoding="utf-8")).lower()
     # what the scorer does because the plan states it names its section, and is no silence
     says = LS.AS_THE_PLAN_SAYS
-    assert len(says) == len(set(says)) == 12 and all("(section " in line for line in says)
+    assert len(says) == len(set(says)) == 13 and all("(section " in line for line in says)
     assert not set(says) & set(LS.WHERE_THE_PLAN_IS_SILENT)
     stated = " ".join(says)
     for words in ("above -0.10", "at least 0.10 above", "the first 50 seeds", "seed 20261001"):
@@ -6727,6 +6737,8 @@ def test_the_constants_of_the_pattern_quote_the_plan() -> None:
     # the small points of the reading and the cut: the plan's own words, in the plan and here
     assert sum('"Small points of the reading")' in line for line in says) == 4
     assert sum("(section 12, cut 4)" in line for line in says) == 2
+    assert sum('(section 6, "Intervals")' in line for line in says) == 1
+    assert sum('section 5, E5, "Negative result")' in line for line in says) == 1
     for words in SMALL_POINTS:
         assert flat_text(words).lower() in plan.lower(), words
         assert flat_text(words).lower() in stated.lower(), words
@@ -7286,11 +7298,13 @@ def one_named(model: str, other: str, *parts: str) -> str:
 
 
 def family_result(model: str, factor: str, side: str = "the edited items") -> str:
+    kind = "letter" if factor in ("surface_form", "granularity") else "standing"
     return (
-        f"{model}, {factor}: this test of the E5 family holds, with the higher error rate on "
-        f"{side}; it is reported as that family's result, with its size, also when a floor or "
-        "the other part withholds the sentence, and the paper then does not write that no "
-        "effect was detected"
+        f"{model}, {factor}: this test of the E5 family, on a {kind} factor, holds with the "
+        f"higher error rate on {side}; it is reported as that family's result, with its size, "
+        "also when a floor or the other part withholds the sentence, and the paper then does "
+        "not write that no effect was detected on the factors of that test's kind, letter or "
+        'standing (section 5, E5, "Negative result")'
     )
 
 
@@ -8198,7 +8212,7 @@ def test_a_primary_declared_not_run_has_no_pattern(
         report["sentence"]["case"] == "neither primary" and report["sentence"]["stated_for"] == []
     )
     assert report["sentence"]["paper"] == (
-        "neither primary has a pattern: the paper does not state the sentence"
+        "neither primary has a pattern: the sentence is not stated"
     )
     assert printed.splitlines()[1:3] == [
         f"{LLAMA}: no pattern (its E2 run under literal-v1, {route}; its E5 run, {cap})",
@@ -8263,6 +8277,7 @@ def test_the_sentence_of_a_pattern_is_written_in_the_words_of_the_plan(
         (e2, made_e5()),
         (e2, made_e5(not_run={DEEPSEEK: "declared on the command line: cap"})),
         (e2, made_e5({(LLAMA, "stale"): STRONG}, not_run={DEEPSEEK: "declared: cap"})),
+        (e2, made_e5(not_run={LLAMA: "declared: cap", DEEPSEEK: "declared: cap"})),
         (e2, None),
     ]
     written = []
