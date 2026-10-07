@@ -2244,8 +2244,9 @@ submitted.
 3. fewer models, 8 down to 6. The two dropped are the secondary models whose runs are least
    complete at the time of the cut; ties go gemma-3-27b first, then gpt-4o-mini;
 4. E5 down to about 400 items: the unedited seed item and every edit of the first 50 seeds of
-   the seed list in its draw order (`draw_rank`), the same for every reader, fixed before any
-   E5 call.
+   the seed list in its draw order (the 50 lowest `draw_rank` of `sample_pair_seeds.csv`), the
+   same for every reader, fixed before any E5 call. The cut item file holds the registered
+   rows of those seeds unchanged.
 
 E1, E2, E3 (with conditions b and c) and E4 are never cut.
 
@@ -2387,6 +2388,22 @@ It reads E2 and E5 for the two primary models only. No outcome and none of H1 to
   described by the same quantities (gemini-3.8-flash by those of E2 alone). Their E5 contrasts
   are outside the family of twelve, so no pattern is computed for them; the paper states the
   sentence for no secondary model and uses no plural that includes one.
+
+- *Small points of the reading.* The E2 run of the pattern is the primary's `literal-v1` run,
+  and the pattern is read from one E2 and one E5 result of the same plan of the runs. The
+  lower end of the interval of the letter part must lie above −0.10: an end of exactly −0.10
+  does not meet (a), and without a gold letter item (a) is not met. A difference or a share
+  of exactly 0.10 meets a floor of the standing part; a floor whose rate has no item is not
+  met. The items on which a factor's own error can occur are: for the certainty marker and
+  for silent, the items whose gold gives no period; for the distractor date, the items whose
+  gold carries a distractor date; for stale, the items whose gold is stale. A factor with no
+  such item does not meet (c). A test of E5 holds by Holm's rule on the p-value of the
+  procedure in force (under the fallback, the centred bootstrap p-value); its direction is
+  the sign of the difference of the two error rates; a test that is not evaluable does not
+  hold. When no test of a standing factor holds, the standing part is withheld by (a);
+  otherwise the paper names the floor or the condition (c) that each such factor misses.
+  When the pattern holds for one primary and the other has no pattern, the paper states the
+  sentence for the first by name and says that the other has none.
 
 **Negative, publishable because registered.**
 
