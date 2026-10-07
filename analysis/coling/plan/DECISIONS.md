@@ -233,7 +233,7 @@ carry the registered text.
     end; the six secondary models' H1 to H3 carry the registered-test interval too. No number
     and no rule changed. An outage of about ten hours (5 Oct 21:56 to 6 Oct 08:20 EDT) stopped
     the fixer of that review partway; it was started again on the files as it left them.
-37. **Result rules (6 Oct; points a and b wait for the owner).** A review of the paper draft
+37. **Result rules (6 Oct; points a and b decided by the owner the same evening, decision 40).** A review of the paper draft
     found five places where the plan did not fix what the paper may write. Three proposals, one
     merged text and two attacks on it gave the wording now in the plan (change-list item 41):
     (a) a registered pattern decides the sentence "models read the letter of a notice but not
@@ -262,7 +262,7 @@ carry the registered text.
     gave back that one statement's loss difference by subtraction. Both that contrast and the
     criterion's parsed-only figures are now withheld when 1 to 4 statements are left out or
     remain (plan sections 4 and 13). The criterion's code follows the recommended option of
-    change-list item 41(b), which still waits for the owner.
+    change-list item 41(b), which the owner chose that evening (decision 40).
 39. **Last read of the plan, and what the review of the secondary scorer asked of it (6 Oct).**
     Three sentences came from the review of `secondary_scores.py` (the rule of the Date
     Discontinued cell analysis; a failed sample is left out of the sampled quantiles; where the
@@ -289,3 +289,21 @@ carry the registered text.
     registered on time without the check-set result: the gate moves to amendment F1 and must
     pass before the literal task is handed out and before any confirmatory call, and the plan
     says so openly.
+41. **After the owner's decisions (6 October, 20:00 to 22:30 EDT).** The scorers were finished
+    and each was checked by an independent reader; what the checks asked of the plan was
+    written in, and a last read of the evening's edits followed. (a) Registered pattern: the
+    bullet "Small points of the reading"; "Condition (a) sets no upper limit and is read on
+    the interval alone" in place of "A model better than the rule reader meets (a)" (the
+    literal reading of the old sentence raised the error rate of the letter part from about
+    6% to about 10% in a simulation); the case of no pattern; a cut of E5 keeps 474 of 800
+    items. (b) Withholding: stated once in the standing rules for secondary figures (a figure
+    on 1 to 4 statements; the same figure on two sets that differ by 1 to 4; counts that would
+    give a few statements away), with the cases named in sections 2.5, 4, 5, 6 and 13; the
+    six confirmatory contrasts are never withheld. The evaluator, the secondary scorer and
+    the scorer of E2 and E5 are committed with it (evaluate.py 361 tests, secondary_scores.py
+    136, literal_scores.py 218). (c) How a percentile of the draws is taken; Murphy's
+    decomposition under tied probabilities. The owner reads these with the registration
+    (change-list items 41 and 42). Open for the scorer before its hash is recorded: four
+    places where `secondary_scores.py` does not yet follow the text (the second clause of the
+    sensitivity rule; the hash printed by the shared reader's refusal; the verdict of a probe
+    over 1 to 4 targets; the counts of the both-parsed contrast).

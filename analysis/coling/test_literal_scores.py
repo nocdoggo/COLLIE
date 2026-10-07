@@ -6655,9 +6655,9 @@ SMALL_POINTS = (
     "A test of E5 holds by Holm's rule on the p-value of the procedure in force (under the "
     "fallback, the centred bootstrap p-value); its direction is the sign of the difference of "
     "the two error rates; a test that is not evaluable does not hold",
-    "When no test of a standing factor holds with the higher error rate on the edited items, "
-    "the standing part is withheld by (a); otherwise the paper names the floor or the condition "
-    "(c) that each such factor misses",
+    "When the standing part does not hold: if no test of a standing factor holds with the "
+    "higher error rate on the edited items, it is withheld by (a); otherwise the paper names "
+    "the floor or the condition (c) that each factor with such a test misses",
     "When the pattern holds for one primary and the other has no pattern, the paper states the "
     "sentence for the first by name and says that the other has none",
     "the same for every reader, fixed before any E5 call",

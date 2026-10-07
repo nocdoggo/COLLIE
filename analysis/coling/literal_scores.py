@@ -509,9 +509,10 @@ AS_THE_PLAN_SAYS = (
     "fallback, the centred bootstrap p-value); its direction is the sign of the difference of "
     "the two error rates; a test that is not evaluable does not hold (section 13, "
     '"Small points of the reading")',
-    "when no test of a standing factor holds with the higher error rate on the edited items, "
-    "the standing part is withheld by (a); otherwise the paper names the floor or the condition "
-    "(c) that each such factor misses; when the pattern holds for one primary and the other "
+    "when the standing part does not hold: if no test of a standing factor holds with the "
+    "higher error rate on the edited items, it is withheld by (a); otherwise the paper names "
+    "the floor or the condition (c) that each factor with such a test misses; when the "
+    "pattern holds for one primary and the other "
     "has no pattern, the paper states the sentence for the first by name and says that the "
     'other has none (section 13, "Small points of the reading")',
     "a cut of E5 keeps the unedited seed item and every edit of the first 50 seeds of the seed "

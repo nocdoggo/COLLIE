@@ -75,21 +75,23 @@ All deadlines in this file are in Anywhere on Earth time (AoE, UTC−12): 23:59 
     gives the reason. The evaluator reads the sealed rows through the checked reader of the
     counts-only code (`_checked_rows` and `_same_build` of `sealed_counts.py`), behind its
     own hash check, reads no stored file that leads into a sealed folder through a link, and
-    prints no character of a sealed file's hash; a
+    prints no character of a sealed file's hash where it refuses the file for its hash; a
     scorer that reads the test outcomes reads them in the same way, applies
     the refusals of section 6 to the runs it scores, and writes no value of a single
     statement. The evaluator and every scorer withhold a secondary figure, its counts apart,
     where it rests on 1 to 4 statements, and where the same figure is also written on a set
     that differs from its own by 1 to 4 statements, so that the two together would give back
     the outcomes of those few (a slice within its whole, the answers that parsed within all,
-    one outcome definition beside another). The second check is made on pairs of sets. A count
+    one outcome definition beside another). The second check is made on pairs of sets. In the
+    tables of E1 it is also made on the cells written with their whole (section 5, E1). A count
     is withheld too where it says, by itself or by subtraction from a count beside it, how
-    many of 1 to 4 statements are scoreable or have a determined event. Sections 2.5, 4, 5
-    (E1) and 13 name the cases known at
-    registration. The six confirmatory contrasts, and the same contrasts of the six secondary
-    models, are never withheld on the second ground: where the two sides of one differ on 1 to
-    4 statements, it gives the loss difference of those few, and for H2 the paper says how
-    many differ (section 6).
+    many of 1 to 4 statements are scoreable or have a determined event. Sections 2.5, 4, 5 (E1
+    and E4), 6 and 13 name the cases known at
+    registration. The six confirmatory contrasts are never withheld. The same contrasts of the
+    six secondary models on every eligible statement are never withheld on the second ground:
+    the figure that stands beside one of them is the one withheld. Where the two sides of such
+    a contrast differ on 1 to 4 statements, it gives the loss difference of those few, and for
+    H2 the paper says how many differ (section 6).
 - *Open train outcomes.* Outcomes of train-period statements (dated before 2023-01-01) are
   followed only to the train horizon, the last capture before 2023-01-01 (2022-10-06), and may
   be examined at any time (section 3, "Calendar overlap").
@@ -424,8 +426,10 @@ not listed says nothing.
   - `absent_generic_unlisted`: the row left the list and its generic is no longer listed.
 - Sensitivity analyses: leaving the list without a resolution counts as recovery at the first
   capture where the row is missing, and limited supply counts as available (BL). A contrast
-  under a sensitivity analysis that gives 1 to 4 statements of its item set another horizon
-  event, or 1 to 4 of those scoreable under either definition, is withheld with its two
+  under a sensitivity analysis or under another outcome definition (definition A; the outcome
+  over all or over any covered presentation) that gives 1 to 4 statements of its item set
+  another horizon event, or 1 to 4 of those scoreable under either definition, is withheld with
+  its two
   scenarios, and the number of statements with another horizon event is given: beside
   the same contrast under the primary outcome it would give the change of the losses of those
   few.
@@ -1488,7 +1492,8 @@ reading is 3.5% to 6.1% on the H2 proxy (percentile: 4.0% to 8.4%). At the dev s
 94.6% to 97.4% (90.3% to 96.2%) and 3.6% to 6.6% (4.5% to 9.7%). The losses of single
 predictors and every other secondary keep 95% percentile intervals from the bootstrap draws
 (a percentile of `B` draws is taken by linear interpolation between the two order statistics
-around position `(B − 1) q`), as descriptions; where such a contrast also carries a p-value,
+around position `(B − 1) q`, the smallest draw being at position 0), as descriptions; where
+such a contrast also carries a p-value,
 it is that of the registered test, and the two can disagree. One secondary reads a verdict
 from such intervals: the overconfidence criterion (section 13); there an end on zero does
 not exclude zero, and with a single episode there is no interval and no part is met. The
@@ -2385,7 +2390,8 @@ It reads E2 and E5 for the two primary models only. No outcome and none of H1 to
   reports each part for each primary. A part that does not hold is not read as its opposite,
   and the paper says which condition withheld it. A test of the E5 family that holds is
   reported as that family's result, with its size, also when a floor or the other part
-  withholds the sentence; the paper then does not write that no effect was detected. A primary
+  withholds the sentence; the paper then does not write that no effect was detected on the
+  factors of that test's kind, letter or standing (section 5, E5, "Negative result"). A primary
   whose E2 or E5 run is declared not run has no pattern, and the paper says so. If E5 is cut
   (section 12, cut 4), the pattern is read on those items with the same floors; if E5 is
   not scored by the freeze of numbers, the sentence is not stated.
@@ -2419,9 +2425,9 @@ It reads E2 and E5 for the two primary models only. No outcome and none of H1 to
   such item does not meet (c). A test of E5 holds by Holm's rule on the p-value of the
   procedure in force (under the fallback, the centred bootstrap p-value); its direction is
   the sign of the difference of the two error rates; a test that is not evaluable does not
-  hold. When no test of a standing factor holds with the higher error rate on the edited
-  items, the standing part is withheld by (a);
-  otherwise the paper names the floor or the condition (c) that each such factor misses.
+  hold. When the standing part does not hold: if no test of a standing factor holds with the
+  higher error rate on the edited items, it is withheld by (a); otherwise the paper names the
+  floor or the condition (c) that each factor with such a test misses.
   When the pattern holds for one primary and the other has no pattern, the paper states the
   sentence for the first by name and says that the other has none. When neither primary has
   a pattern, the sentence is not stated.
@@ -2763,7 +2769,9 @@ depend on the pandas version, so the environment is part of the record.
 
 **Minimal pairs (E5).** The generator, `minimal_pairs.py`: `71a89fab1e618a67`. The item file
 it wrote, `analysis/coling/out/e5/e5_pairs.jsonl` (800 items: the 100 unedited seeds and 700
-edits of them): file `5acc3a0af1fd13af`, ids `10c21484b8c9b9cc`. The generator's rule reading
+edits of them): file `5acc3a0af1fd13af`, ids `10c21484b8c9b9cc` (the generator's digest: the
+ids in file order; the harness and the scorer give `ef7120124b1b671e` for the same ids,
+sorted). The generator's rule reading
 agrees with the gold on all 800. The sample of the minimal-pair audit (100 items and 10
 planted) is drawn from this file by the seeded rule. The freeze script does not run the
 generator, so these hashes are not in the freeze record; the generator's own manifest
@@ -3218,7 +3226,12 @@ quoted here are from the build of 29 September.
     this plan (5 October) found five places where the plan did not fix what the paper may
     write. All five are fixed here, before any model call. Points (a) and (b) were the owner's
     to decide, and the owner decided them on 6 October: the registered pattern, with a margin
-    of 0.10 in its letter part, and the criterion in two parts.
+    of 0.10 in its letter part, and the criterion in two parts. Later that evening the build of
+    the scorers completed both, and the owner reads these points with the registration: the
+    bullet "Small points of the reading", with the cases of a primary without a pattern;
+    "Condition (a) sets no upper limit and is read on the interval alone" in place of "A model
+    better than the rule reader meets (a)"; and the criterion without a reading where its part
+    against outcomes is withheld (item 42).
     (a) *The first sentence of section 13.* Draft and revision of 1 October: the sentence held
     when a rate was "measurably above the rules or above the human ceiling", with no number.
     Now: the registered pattern of section 13, read on E2 and E5 for the two primaries.
@@ -3264,14 +3277,26 @@ quoted here are from the build of 29 September.
 42. **Withholding, and points the scorers had to decide (6 October).** A check of the
     evaluator's criterion and a review of the secondary scorer found points on which the plan
     was silent. Now stated: (a) a figure is withheld, its counts apart, where it would give
-    back the outcomes of 1 to 4 statements: the contrast on the statements both sides parsed
-    (section 4), the two parts of the overconfidence criterion on the answers that parsed
-    (section 13), and the figures over every statement of a set in which 1 to 4 statements
-    are not scoreable (section 2.5); (b) a primary without an item set has no reading of the
-    criterion, an interval end on zero does not exclude zero, and a single episode gives no
-    interval (sections 5, E4, 6 and 13); (c) what the Date Discontinued cell does in its
+    back the outcomes of 1 to 4 statements: the contrast on the statements both sides parsed,
+    and its counts where 1 to 4 answers failed (section 4); the two parts of the overconfidence
+    criterion on the answers that parsed, and the criterion without a reading where its part
+    against outcomes is withheld (section 13); the figures over every statement of a set in
+    which 1 to 4 statements are not scoreable, or only 1 to 4 are, with the mean probabilities
+    and the calibration in the large on its scoreable statements, and a contrast under a
+    sensitivity analysis that gives 1 to 4 statements another horizon event (section 2.5); a
+    further cell in the tables of E1, and the figures of a probe over 1 to 4 targets (section
+    5, E1 and E4); and, with these, a count that would say how many of 1 to 4 statements are
+    scoreable, the check across sets made on pairs, how a withheld interval of `Δ_GBM` is read,
+    and the evaluator's refusal of item sets that differ by 1 to 4 statements (standing rules;
+    section 6); (b) a primary without an item set has no reading of the criterion, an interval
+    end on zero does not exclude zero, and a single episode gives no interval (sections 5, E4,
+    6 and 13); (c) what the Date Discontinued cell does in its
     sensitivity analysis, and where the two scenarios are reported (section 2.5); (d) a sample
-    that fails to parse in the sampled quantiles (section 5, E3); (e) small completions from a
+    that fails to parse in the sampled quantiles (section 5, E3), statements that share a
+    probability in the Brier decomposition (section 7.2), how a percentile of the draws is
+    taken and the declaration that a secondary scorer takes (section 6), and what the evaluator
+    does with a link into a sealed folder and with the hash of a sealed file (standing rules);
+    (e) small completions from a
     last read of this plan against itself, the guide and the frozen files: the general rule
     of withholding in the standing rules, the draws behind the intervals of the slip
     distribution, the primaries' subsets after a cutoff, the freeze run in
@@ -3297,7 +3322,8 @@ percentile p-values with their size disclosed. The owner chose the one of sectio
 confirmed the sealing rule of item 39 as written. Item 40 follows the review of the scorer of
 E2 and E5 of 5 October and is read by the owner with the registration. Item 41 follows a
 review of the paper draft of 5 October; the owner decided its points (a) and (b) on 6 October
-(above), and reads the others with the registration. Item 42
+(above), and reads the others, and what was added to (a) and (b) after that decision, with the
+registration. Item 42
 follows the check of the evaluator and the review of the secondary scorer of 6 October and is
 read by the owner with the registration.
 
