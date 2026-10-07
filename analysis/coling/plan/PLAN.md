@@ -1482,12 +1482,13 @@ the 95% interval covers the true value in 94.1% to 99.1% of data sets (the perce
 of the draft: 91.1% to 98.7%), and the one-sided error at 0.05 that governs the equivalence
 reading is 3.5% to 6.1% on the H2 proxy (percentile: 4.0% to 8.4%). At the dev sizes these are
 94.6% to 97.4% (90.3% to 96.2%) and 3.6% to 6.6% (4.5% to 9.7%). The losses of single
-predictors and every other secondary keep 95% percentile intervals from the bootstrap draws,
-as descriptions; where such a contrast also carries a p-value, it is that of the registered
-test, and the two can disagree. One secondary reads a verdict from such intervals: the
-overconfidence criterion (section 13); there an end on zero does not exclude zero, and with
-a single episode there is no interval and no part is met. The two scenarios of section 7.2
-are reported beside every confirmatory estimate.
+predictors and every other secondary keep 95% percentile intervals from the bootstrap draws
+(a percentile of `B` draws is taken by linear interpolation between the two order statistics
+around position `(B − 1) q`), as descriptions; where such a contrast also carries a p-value,
+it is that of the registered test, and the two can disagree. One secondary reads a verdict
+from such intervals: the overconfidence criterion (section 13); there an end on zero does
+not exclude zero, and with a single episode there is no interval and no part is met. The
+two scenarios of section 7.2 are reported beside every confirmatory estimate.
 
 **Sensitivity.** Reported beside every confirmatory p-value, and never used in Holm's rule:
 
@@ -2413,7 +2414,8 @@ It reads E2 and E5 for the two primary models only. No outcome and none of H1 to
   items, the standing part is withheld by (a);
   otherwise the paper names the floor or the condition (c) that each such factor misses.
   When the pattern holds for one primary and the other has no pattern, the paper states the
-  sentence for the first by name and says that the other has none.
+  sentence for the first by name and says that the other has none. When neither primary has
+  a pattern, the sentence is not stated.
 
 **Negative, publishable because registered.**
 
