@@ -22,7 +22,8 @@ that would say how many of a few statements anyone can name are scoreable, or ha
 event, is withheld as well, and where a few statements of a set are not scoreable so are the mean
 probabilities and the calibration in the large on its scoreable statements, which with the open
 predictions would name them (``scores``). The six confirmatory contrasts are the evaluator's and
-are not touched here.
+are not touched here; the same contrasts of the secondary models on every eligible statement
+are never withheld for a set beside them: the figure beside one of them is the one withheld.
 
 Nothing of the evaluation is defined here. The runs are gathered by the evaluator's own check
 (``evaluate.gather``, ``evaluate.read_group``); readings become predictions by
@@ -141,7 +142,8 @@ Order of the ``score`` command, each step a refusal when it fails:
    on every run the sections asked for score (below);
 6. the refit of the model-free predictors, held to ``--expect-baselines-sha256``, and every
    prediction;
-7. only then the sealed file: read as bytes, hashed, and parsed only behind its hash. With the
+7. only then the sealed file: read as bytes, hashed, and parsed only behind its hash (a file
+   refused for its hash has no character of that hash printed). With the
    outcomes the item set of each primary is worked out again from its probe readings
    (``fixed_sets``), and a result file that records another one stops the scoring.
 
@@ -360,8 +362,11 @@ AS_THE_PLAN_SAYS = (
     "a reading that fails counts by its fallback: the base rate under conditions (a) and (b), "
     "the no-date table under (c) (section 4); the number of answers that put P(E_end90) below "
     "P(E_end) is given for each model and condition; a sensitivity analysis uses only the "
-    "statements that both compared readings parsed, and its contrast is withheld, counts apart, "
-    f"when it leaves out or rests on 1 to {MIN_SHOWN - 1} scoreable statements (section 4)",
+    "statements that both compared readings parsed; its contrast is withheld, its counts "
+    f"apart, when it leaves out or rests on 1 to {MIN_SHOWN - 1} scoreable statements, and "
+    f"where the failed answers of one side, or of both, number 1 to {MIN_SHOWN - 1}, its "
+    "counts are withheld as well, since they would say how many of those few are scoreable "
+    "(section 4)",
     "a TBD or silent statement is scored at the horizons the prompts asked about, 90 and 180 "
     'days after the statement date (section 5, E3, "Reader outputs"); under condition (c) a '
     "reading that gives a period goes through the slip estimate over all dated forms (section "
@@ -384,19 +389,49 @@ AS_THE_PLAN_SAYS = (
     "counts as a discontinuation at that capture: a displayed presentation that is censored, "
     "or whose recovery is first shown at that capture or a later one, is discontinued there, "
     "and one that had recovered at an earlier capture keeps its recovery (section 2.5)",
-    "the two scenarios of section 7.2 stand beside the primary-loss estimates, and where 1 to "
-    f"{MIN_SHOWN - 1} statements of a set are not scoreable the figures over every statement of "
-    'the set are withheld (section 2.5, "Horizon events")',
+    "the two scenarios of section 7.2 stand beside the primary-loss estimates; where 1 to "
+    f"{MIN_SHOWN - 1} statements of a set are not scoreable, the figures over every statement "
+    "of the set that fill its undetermined horizon events (the two scenarios, and the two "
+    "limits of calibration in the large) are withheld, and the mean probabilities and the "
+    "calibration in the large on the scoreable statements, which name the few that are not, "
+    f"are then withheld too; the same holds where only 1 to {MIN_SHOWN - 1} statements of a "
+    'set are scoreable; the pinball losses and the coverage stay (section 2.5, "Horizon '
+    'events")',
     f"a secondary figure is withheld, its counts apart, where it rests on 1 to {MIN_SHOWN - 1} "
     "statements, and where the same figure is also written on a set that differs from its own "
-    "by as few, so that the two together would give back the outcomes of those few: a slice "
-    "within its whole, the answers that parsed within all, one outcome definition beside "
-    "another (standing rules; sections 2.5 and 4 name the cases known at registration)",
-    "a contrast under a sensitivity analysis that gives 1 to "
-    f"{MIN_SHOWN - 1} statements of its item set another horizon event is withheld with its two "
-    "scenarios, and the number of such statements is given: beside the same contrast under the "
-    "primary outcome it would give the change of the losses of those few (section 2.5, "
-    '"Sensitivity analyses")',
+    f"by 1 to {MIN_SHOWN - 1} statements, so that the two together would give back the "
+    "outcomes of those few (a slice within its whole, the answers that parsed within all, one "
+    "outcome definition beside another); the second check is made on pairs of sets, and in "
+    "the tables of E1 also on the cells written with their whole; a count is withheld too "
+    "where it says, by itself or by subtraction from a count beside it, how many of 1 to "
+    f"{MIN_SHOWN - 1} statements are scoreable or have a determined event; the H1, H2 and H3 "
+    "contrasts of the six secondary models on every eligible statement are never withheld on "
+    "the second ground: the figure that stands beside one of them is the one withheld "
+    "(standing rules; sections 2.5, 4, 5 (E1 and E4), 6 and 13 name the cases known at "
+    "registration)",
+    "a contrast under a sensitivity analysis or under another outcome definition (definition "
+    "A; the outcome over all or over any covered presentation) that gives 1 to "
+    f"{MIN_SHOWN - 1} statements of its item set another horizon event, or 1 to "
+    f"{MIN_SHOWN - 1} of those scoreable under either definition, is withheld with its two "
+    "scenarios, and the number of statements with another horizon event is given: beside the "
+    "same contrast under the primary outcome it would give the change of the losses of those "
+    'few (section 2.5, "Sensitivity analyses")',
+    "this command reads the sealed rows through the checked reader of the counts-only code, "
+    "behind its own hash check, reads no stored file that leads into a sealed folder through a "
+    "link, and prints no character of a sealed file's hash where it refuses the file for its "
+    "hash (standing rules; the evaluator reads the sealed outcomes so, and a scorer in the "
+    "same way)",
+    f"the figures of a probe over 1 to {MIN_SHOWN - 1} targets are withheld; its verdict is "
+    "given; with fewer than two episodes left there is no verdict (section 5, E4, "
+    '"Test": for the probe of a secondary model as for that of a primary)',
+    "the Brier decomposition into reliability, resolution and uncertainty is the evaluator's, "
+    "with 10 equal-count bins for each horizon event: statements that share a probability "
+    "count with the frequency of the event among all of them, so that the figures do not "
+    "depend on the order of the statements, and a forecast of one value has no resolution "
+    '(section 7.2, "Brier decomposition")',
+    "in the tables of the hold rate and of the slip of E1, a further cell is withheld and "
+    "marked where the cells written and the whole would otherwise give back the figure on 1 "
+    f"to {MIN_SHOWN - 1} statements (section 5, E1)",
     f"the intervals of a Turnbull estimate use the first {SLIP_DRAWS:,} of the {ev.DRAWS:,} "
     "registered draws, since every draw needs a fit of its own (section 5, E1); the number is a "
     "constant of the code and no option of a command, the result file records it, and every "
@@ -415,7 +450,7 @@ code. Every result file carries the list."""
 WHERE_THE_PLAN_IS_SILENT = (
     "the probe test of a secondary model is reported beside its numbers without changing the "
     "item set: the exclusion of E4 for a model that beats the base rate is applied from that "
-    "probe result when its numbers are read",
+    "verdict when its numbers are read",
     "the descriptive decomposition of E3 is given for a secondary model on every eligible "
     "statement and again on its post-cutoff slice when that slice is analysed, each part "
     "two-sided with a 95% percentile interval, as the evaluator gives it for a primary; its "
@@ -425,11 +460,11 @@ WHERE_THE_PLAN_IS_SILENT = (
     "covered presentation), on the statements first captured by the stated end, with the "
     "episodes resampled by company, and H2 on the month-and-year form, as the evaluator "
     "repeats the tests of a primary; they are given on every eligible statement, because a "
-    "secondary model has no item set fixed by a probe; under the standing rule of withholding "
-    "a repeat on a part of the statements is withheld when the part leaves out 1 to "
-    f"{MIN_SHOWN - 1} scoreable statements, and a repeat under an outcome variant when the "
-    "variant gives so few statements another horizon event than the primary outcome, or than "
-    "another definition whose contrasts are written on the same statements",
+    "secondary model has no item set fixed by a probe; a repeat on a part of the statements "
+    "stands beside the contrast on all of them, and under the standing rule it is the one "
+    f"withheld when the part leaves out 1 to {MIN_SHOWN - 1} scoreable statements; a repeat "
+    "under an outcome definition is held to the rule of section 2.5 against the primary "
+    "outcome and against each definition written before it",
     "a primary is read on every statement of the 20-sample subset, the paraphrase subset, the "
     "subset of the 2x2 and the TBD, silent and stale lists, with the evaluator's record of its "
     "item set beside each; where its figures are given again on the statements dated after its "
@@ -480,36 +515,34 @@ WHERE_THE_PLAN_IS_SILENT = (
     "beside it; a corner counts as standing at the level when it is within 0.001 of it and at "
     "most a third as far in a second fit under a tolerance a hundred times tighter, which "
     "tells what the iteration left over from a corner that stands off the level",
-    "the standing rule of withholding in the descriptives of E1: a slip estimate or the bracket "
-    f"widths over 1 to {MIN_SHOWN - 1} statements, and the three shares of a hold rate with so "
-    "few determined statements, are withheld, counts apart; a hold rate over so few statements "
-    "keeps their number alone, since how many of them have a determined event is a fact of "
-    "their outcomes; the cells of a split by form or by revision add up to all dated "
-    "statements, and a set of cells of one split can hold the statements of a set of cells of "
-    "the other but for a few, so a further cell is withheld and marked (the one with the fewest "
-    "determined statements, for a slip estimate the fewest statements; the first by name among "
-    "equals) until the cells written, with the whole, give back no hold rate, no count of "
-    "determined statements and no slip estimate on so few",
+    "how the standing rule is applied in the descriptives of E1: a slip estimate or the "
+    f"bracket widths over 1 to {MIN_SHOWN - 1} statements, and the three shares of a hold rate "
+    "with so few determined statements, are the figures that rest on a few; a hold rate over "
+    "so few statements keeps their number alone; the further cell withheld in a table is the "
+    "one with the fewest determined statements (for a slip estimate the fewest statements; "
+    "the first by name among equals), one cell after another until the cells written, with "
+    "the whole, give back no hold rate, no count of determined statements and no slip "
+    "estimate on so few, and a set of cells of one split beside a set of cells of the other "
+    "counts among the cells written",
     "the standing rule of withholding on the losses: the loss of a part of selective prediction "
     f"over 1 to {MIN_SHOWN - 1} scoreable statements is withheld with its bounds, and the other "
     "part with it (the loss on all, which is given, less the part shown would give it back); "
     "the mean losses, their changes, the effects and the spread of the mean loss in the 2x2 and "
     "across the paraphrases over so few, while the mean absolute changes, which use no outcome, "
     "stay; the floor of five statements holds for every figure written here, whichever "
-    "function computed it: a contrast, a score of section 7.2, a pinball loss or a probe test "
-    f"over 1 to {MIN_SHOWN - 1} statements is withheld, counts apart; a contrast that is not "
-    "evaluable (fewer than two shortage episodes) carries no estimate; and where the loss on "
-    "the scoreable statements of a set is withheld, so are its two scenarios, which less their "
-    "filled part are the same sum",
-    "a count is withheld (null) where it would say how many of 1 to "
-    f"{MIN_SHOWN - 1} statements that anyone can name are scoreable: the scoreable statements "
-    "among so few failed answers, a part of selective prediction of so few statements (and the "
-    "other part with it), a score, a scenario or a repeat over so few statements; and where 1 "
-    f"to {MIN_SHOWN - 1} statements of a set are not scoreable, the mean probabilities on its "
-    "scoreable statements and the calibration in the large on them are withheld with the "
-    "figures over every statement: the predictions being open, their mean on the scoreable "
-    "statements would name the few that are not, and the calibration in the large is that mean "
-    "less a frequency that Murphy's uncertainty gives",
+    "function computed it: a contrast, a score of section 7.2 or a pinball loss over 1 to "
+    f"{MIN_SHOWN - 1} statements is withheld, counts apart; a contrast that is not evaluable "
+    "(fewer than two shortage episodes: section 6) carries no estimate",
+    "the counts that the standing rule withholds here, each written as null or left out: the "
+    f"scoreable statements among 1 to {MIN_SHOWN - 1} failed answers, or among as few that "
+    "parsed; the scoreable statements of a part of selective prediction of so few statements "
+    "(and those of the other part, which the whole would give); every count but the number of "
+    "statements in a score, a scenario or a repeat over so few statements; every count of a "
+    "post-cutoff slice of a secondary model, or of a repeat on a part of the statements, that "
+    "is the list but for so few statements (such a slice is not said to be analysed or not, "
+    "which would tell as much); and every count of a contrast under an outcome definition "
+    "that is withheld by section 2.5, with the two counts of a recovery variant over the "
+    "eligible list where it moves so few statements of the list",
     "a secondary model's contrast against the structured-only model, which the plan asks for "
     "the primaries alone, carries the 95% interval of the registered source with the percentile "
     "intervals beside it, as the plan gives them to the H1, H2 and H3 contrasts of the secondary "
@@ -523,14 +556,13 @@ WHERE_THE_PLAN_IS_SILENT = (
     "was, and at least one sample of the statement), under one rule of withholding for all of "
     "them, the plan's (section 4), applied as well between a set and a part of it on which the "
     "same contrast is written (the post-cutoff slice within the list, the statements after a "
-    f"cutoff within a subset); where 1 to {MIN_SHOWN - 1} answers failed the record holds their "
-    "number alone; it carries no bounds; the contrasts repeated under another outcome or "
-    "recovery rule are given on every scoreable statement only",
-    "Murphy's decomposition is the evaluator's: the statements, ordered by probability, are cut "
-    "into ten runs of equal length (one run per statement when there are fewer than ten); "
-    "statements that share a probability count with the frequency of the event among all of "
-    "them, so that the figures do not depend on the order of the statements and a forecast "
-    "of one value has no resolution",
+    "cutoff within a subset); the failed answers of one side are those that failed on it "
+    "alone, and of both those that failed on both; a record whose counts are withheld keeps "
+    "the number of answers that failed, which anyone can count; it carries no bounds; the "
+    "contrasts repeated under another outcome or recovery rule are given on every scoreable "
+    "statement only",
+    "with fewer than ten scoreable statements the Brier decomposition, which is the "
+    "evaluator's, has one bin for each statement",
     "a secondary model whose runs cannot be completed (sections 9 and 12) is left out by a "
     "declaration on the command line, as section 6 gives it for a primary; the declaration is "
     "refused when the completeness check finds nothing wrong with the runs this command would "
@@ -541,11 +573,9 @@ WHERE_THE_PLAN_IS_SILENT = (
     "scenario means that gives the effect) and each spread across prompts (the range and the "
     "standard deviation of the prompts' scenario means), each part of selective prediction, "
     "and each contrast under a variant of the recovery rule (there over the statements at risk "
-    "under the variant); where they are withheld for a few statements that are not scoreable, "
-    "the least and greatest calibration in the large over every statement is withheld with "
-    "them; in selective prediction the scenarios of both parts are withheld when either part "
-    "holds so few statements that are not scoreable; the stale list, whose statements have no "
-    "horizon event, has an abstention rate and no loss",
+    "under the variant); in selective prediction the scenarios of both parts are withheld when "
+    f"either part holds 1 to {MIN_SHOWN - 1} statements that are not scoreable; the stale "
+    "list, whose statements have no horizon event, has an abstention rate and no loss",
     "selective prediction is one point per reader: the share of statements on which the reading "
     "gives no stated period (ABSTAIN, a failed reading, or a period of another statement type), "
     "and the primary loss on the statements read, on the others (the no-date table) and on all; "
@@ -560,8 +590,9 @@ WHERE_THE_PLAN_IS_SILENT = (
     "the horizon events and the capped time target only (no bracket width is read from it); "
     "the rule of section 2.5 on a variant that gives a few statements another horizon event "
     "is applied as well between any two outcome definitions whose contrasts are written on the "
-    "same statements, pair by pair, and the models withheld for it are named; a variant whose "
-    "column the outcome rows do not hold is recorded as not computed",
+    "same statements, pair by pair as the standing rule has it, and the models withheld for it "
+    "are named; a variant whose column the outcome rows do not hold is recorded as not "
+    "computed",
 )
 """The choices of this file where the plan gives no rule, and how it applies the standing rule
 of withholding where the plan names no case. Every result file carries the list."""
@@ -1463,12 +1494,15 @@ def near_definitions(
 
     PLAN, standing rules ("one outcome definition beside another"), and section 2.5,
     "Sensitivity analyses": a contrast under a definition that gives 1 to ``MIN_SHOWN`` - 1
-    statements of the item set another horizon event is withheld with its two scenarios,
-    because beside the same contrast under the primary outcome it would give the change of
-    the losses of those few. The same holds between two definitions: a definition is also
-    withheld when it differs by so few statements from one before it whose contrasts are
-    written. Every definition is looked at whichever section is computed, so that two result
-    files of one study withhold the same."""
+    statements of the item set another horizon event, or as few of those scoreable under
+    either definition, is withheld with its two scenarios, because beside the same contrast
+    under the primary outcome it would give the change of the losses of those few. A
+    statement that is scoreable under neither definition is in no loss, so a definition that
+    moves many statements can still change the losses of a few (``evaluate.other_events``
+    with ``scored``, as the evaluator holds the tests of a primary to it). The same holds
+    between two definitions: a definition is also withheld when it differs by so few
+    statements from one before it whose contrasts are written. Every definition is looked at
+    whichever section is computed, so that two result files of one study withhold the same."""
     primary = rows.loc[ids]
     written = [primary]
     out: dict[str, tuple[int, bool]] = {}
@@ -1476,7 +1510,10 @@ def near_definitions(
         if frame is None:
             continue
         under = frame.loc[ids]
-        near = any(small(int(other_events(kept, under).sum())) for kept in written)
+        near = any(
+            small(ev.other_events(kept, under)) or small(ev.other_events(kept, under, scored=True))
+            for kept in written
+        )
         out[label] = (int(other_events(primary, under).sum()), near)
         if not near:
             written.append(under)
@@ -1566,44 +1603,60 @@ def few_open(rows: pd.DataFrame) -> bool:
     return small(int((~rows["scoreable"]).sum()))
 
 
+def few_failed(sides: Sequence[np.ndarray]) -> bool:
+    """PLAN section 4: whether the answers that failed on one side alone, on the other alone
+    or on both number 1 to ``MIN_SHOWN`` - 1, or the answers that parsed on both do.
+    ``sides`` flags, for each compared reading that can fail (one or two), the statements it
+    parsed. Which answers failed is open: the counts of a contrast on the parsed answers, by
+    themselves or taken from one another, would say how many of those few are scoreable."""
+    one = np.asarray(sides[0], dtype=bool)
+    other = np.asarray(sides[1], dtype=bool) if len(sides) > 1 else np.ones(len(one), dtype=bool)
+    groups = (~one & other, one & ~other, ~one & ~other, one & other)
+    return any(small(int(group.sum())) for group in groups)
+
+
 def parsed_only(
     both: Mapping[str, Any],
     counted: np.ndarray,
-    unparsed: np.ndarray,
-    outside: tuple[np.ndarray, np.ndarray] | None = None,
+    sides: Sequence[np.ndarray],
+    outside: tuple[np.ndarray, Sequence[np.ndarray]] | None = None,
 ) -> dict[str, Any]:
     """The sensitivity analysis of PLAN section 4 ("only the events that both compared
     conditions parsed") as it stands beside a contrast on every statement that a set counts.
     ``both`` is the contrast on the statements every compared reading parsed; ``counted``
     flags the statements of the set that the contrast counts (the scoreable ones; for a
-    pinball loss those with a target), ``unparsed`` those on which a compared reading was not
-    parsed. The record carries, before its own, the two counts it rests on:
-    ``not_both_parsed`` (which readings failed is open) and ``left_out``, the counted
-    statements among them.
+    pinball loss those with a target), ``sides`` the statements each compared reading parsed
+    (one array for each reading that can fail). The record carries, before its own, the two
+    counts it rests on: ``not_both_parsed`` (which readings failed is open) and ``left_out``,
+    the counted statements among them.
 
     * It is withheld, counts apart, when it leaves out or rests on 1 to ``MIN_SHOWN`` - 1
       counted statements (section 4, and the evaluator's record of a test of the family):
       beside the contrast on all of them it would give the summed difference on the few.
-    * It is withheld with its counts, ``not_both_parsed`` apart, when 1 to ``MIN_SHOWN`` - 1
-      readings of the set were not parsed: its counts would say how many of those few known
-      statements are counted, which is a fact of their outcomes.
-    * ``outside`` gives the same two flags for the statements of a set that holds this one
-      and on which the same contrast is written, less this one's (a list less its statements
-      after a cutoff). Both rules hold for those statements too: the figures and the counts
-      of the two sets, taken from one another, are those of the statements between them.
+    * It is withheld with its counts, ``not_both_parsed`` apart, where the failed answers of
+      one side, or of both, number 1 to ``MIN_SHOWN`` - 1, or the answers both parsed do
+      (section 4; ``few_failed``): its counts would say how many of those few known
+      statements are counted, which is a fact of their outcomes. Three answers that failed on
+      one side are a few, however many failed on the other.
+    * ``outside`` gives the same flags for the statements of a set that holds this one and on
+      which the same contrast is written, less this one's (a list less its statements after
+      a cutoff). Both rules hold for those statements too: the figures and the counts of the
+      two sets, taken from one another, are those of the statements between them.
 
     One rule for every contrast of this file."""
-    not_parsed, left_out = int(unparsed.sum()), int((counted & unparsed).sum())
+    parsed = np.logical_and.reduce([np.asarray(side, dtype=bool) for side in sides])
+    not_parsed, left_out = int((~parsed).sum()), int((counted & ~parsed).sum())
     record = {"not_both_parsed": not_parsed, "left_out": left_out} | dict(both)
-    few_known = small(not_parsed)
+    few_known = few_failed(sides)
     few_counted = small(left_out) or small(int(both["statements"]))
     if outside is not None:
-        counted_there, unparsed_there = outside
-        few_known = few_known or small(int(unparsed_there.sum()))
+        counted_there, sides_there = outside
+        parsed_there = np.logical_and.reduce([np.asarray(s, dtype=bool) for s in sides_there])
+        few_known = few_known or few_failed(sides_there)
         few_counted = (
             few_counted
-            or small(int((counted_there & unparsed_there).sum()))
-            or small(int((counted_there & ~unparsed_there).sum()))
+            or small(int((counted_there & ~parsed_there).sum()))
+            or small(int((counted_there & parsed_there).sum()))
         )
     if few_known:
         return {"not_both_parsed": not_parsed, "withheld": True}
@@ -1675,12 +1728,12 @@ def scores(rows: pd.DataFrame, pred: pd.DataFrame, draws: int, seed: int) -> dic
       recovery over every statement, stay.
     * where a few of the statements are not scoreable (``few_open``), the figures over every
       statement that fill the horizon events (the two scenarios of the loss, and the least
-      and greatest calibration in the large) are withheld, counts apart (PLAN section 2.5);
-      and so are the two mean probabilities over the scoreable statements (None): the
-      predictions being open, their sum over every statement less that mean times its count
-      is the sum over the few that are not scoreable, and names them. The calibration in the
-      large on the scoreable statements is withheld with them: it is that mean less the
-      frequency of the event, which Murphy's uncertainty gives."""
+      and greatest calibration in the large) are withheld, counts apart, and so are the two
+      mean probabilities over the scoreable statements (None) and the calibration in the
+      large on them (PLAN section 2.5, "Horizon events"): the predictions being open, their
+      sum over every statement less that mean times its count is the sum over the few that
+      are not scoreable, and names them, and the calibration in the large is that mean less
+      the frequency of the event, which the uncertainty of the Brier decomposition gives."""
     record = ev.predictor_record(rows, pred, draws, seed)
     counts = {
         "statements": len(rows),
@@ -1719,20 +1772,12 @@ def brief(result: Mapping[str, Any], sides: int) -> dict[str, Any]:
 
 
 def probe_of(model: str, study: ev.Study, rows: pd.DataFrame, draws: int, seed: int) -> dict:
-    """The probe test of E4 for one secondary model (``evaluate.probe_test``), under the floor
-    of this file: over 1 to ``MIN_SHOWN`` - 1 probe statements with a target nothing but the
-    counts is written, and no verdict; a test that cannot be made carries no estimate."""
-    record = ev.probe_test(model, study, rows, draws, seed, ev.P_VALUE_SOURCE)
-    counts = ("probe_statements", "left_out_right_censored", "alpha", "beats_base_rate")
-    shown = floored(record, *counts)
-    if "withheld" in shown:
-        return shown | {"beats_base_rate": None}
-    if record["evaluable"]:
-        return shown
-    return shown | {
-        key: withheld(record[key]) if small(int(record[key]["statements"])) else record[key]
-        for key in ("pinball_base_rate", "pinball_model")
-    }
+    """The probe test of E4 for one secondary model: the evaluator's record
+    (``evaluate.probe_test``), as it is. PLAN section 5, E4, "Test": the figures of a probe
+    over 1 to ``MIN_SHOWN`` - 1 targets are withheld (the estimate, the p-value and the two
+    pinball losses; the counts stay) and its verdict is given; a test that cannot be made
+    carries no estimate and no verdict."""
+    return ev.probe_test(model, study, rows, draws, seed, ev.P_VALUE_SOURCE)
 
 
 def paired(
@@ -1747,28 +1792,31 @@ def where_both_parsed(
     predictions: Mapping[str, pd.DataFrame],
     comparator: str,
     tested: str,
-    parsed: pd.Series,
+    parsed: pd.Series | Sequence[pd.Series],
     draws: int,
     seed: int,
     within: pd.DataFrame | None = None,
 ) -> tuple[dict[str, Any], int | None]:
     """PLAN section 4 ("A sensitivity analysis uses only the events that both compared
     conditions parsed"), for a two-sided contrast in short: the contrast again on the
-    statements of ``rows`` that ``parsed`` flags (those on which every reading compared was
-    parsed), under the rules of ``parsed_only``, and how many scoreable statements it leaves
-    out (None where the record withholds that count). ``within``: a set that holds ``rows``
-    and on which the same is written."""
-    flags = parsed.loc[rows.index].to_numpy(dtype=bool)
+    statements of ``rows`` that every reading compared parsed, under the rules of
+    ``parsed_only``, and how many scoreable statements it leaves out (None where the record
+    withholds that count). ``parsed`` flags the statements a reading parsed: one series, or
+    one for each of the two readings when both can fail. ``within``: a set that holds
+    ``rows`` and on which the same is written."""
+    series = [parsed] if isinstance(parsed, pd.Series) else list(parsed)
+
+    def sides(frame: pd.DataFrame) -> list[np.ndarray]:
+        return [flags.loc[frame.index].to_numpy(dtype=bool) for flags in series]
+
+    flags = np.logical_and.reduce(sides(rows))
     scoreable = rows["scoreable"].to_numpy(dtype=bool)
     outside = None
     if within is not None:
         others = within.loc[within.index.difference(rows.index)]
-        outside = (
-            others["scoreable"].to_numpy(dtype=bool),
-            ~parsed.loc[others.index].to_numpy(dtype=bool),
-        )
+        outside = (others["scoreable"].to_numpy(dtype=bool), sides(others))
     both = brief(ev.scored(rows[flags], predictions, comparator, tested, draws=draws, seed=seed), 2)
-    record = parsed_only(both, scoreable, ~flags, outside)
+    record = parsed_only(both, scoreable, sides(rows), outside)
     return record, record.get("left_out")
 
 
@@ -1792,9 +1840,11 @@ def contrast_entry(
     ``evaluate.equivalence`` and on how many statements and episodes the two losses differ.
     The record is under the floor of this file (``floored``).
 
-    The counts of each side are withheld (None) when the readings that failed on one side
-    alone, on the other alone or on both number 1 to ``MIN_SHOWN`` - 1 (which readings failed
-    is open, so the counts would say how many of those few known statements are scoreable).
+    The counts of each side are withheld (None), and with them those of the contrast on the
+    statements both sides parsed, when the readings that failed on one side alone, on the
+    other alone or on both number 1 to ``MIN_SHOWN`` - 1, or those that both parsed do
+    (``few_failed``; PLAN section 4: which readings failed is open, so the counts would say
+    how many of those few known statements are scoreable).
     ``within``: a set that holds ``rows`` and on which the same contrast is written; the rules
     of the counts and of ``parsed_only`` then hold for its other statements as well."""
     predictions = study.predictions
@@ -1809,13 +1859,6 @@ def contrast_entry(
             for name in (comparator, tested)
         }
         return frame["scoreable"].to_numpy(dtype=bool), parsed
-
-    def few_known(parsed: Mapping[str, np.ndarray]) -> bool:
-        """Whether the readings that failed on one side alone, on the other alone or on both
-        number 1 to ``MIN_SHOWN`` - 1."""
-        one, other = parsed[comparator], parsed[tested]
-        groups = (~one & other, one & ~other, ~one & ~other)
-        return any(small(int(group.sum())) for group in groups)
 
     result = ev.scored(
         rows,
@@ -1834,11 +1877,11 @@ def contrast_entry(
     missed: dict[str, int | None] = {
         name: int((scoreable & ~flags).sum()) for name, flags in parsed.items()
     }
-    hidden, outside = few_known(parsed), None
+    hidden, outside = few_failed(list(parsed.values())), None
     if within is not None:
         there, parsed_there = flagged(within.loc[within.index.difference(rows.index)])
-        hidden = hidden or few_known(parsed_there)
-        outside = (there, ~(parsed_there[comparator] & parsed_there[tested]))
+        hidden = hidden or few_failed(list(parsed_there.values()))
+        outside = (there, list(parsed_there.values()))
     both = ev.scored(rows[keep], predictions, comparator, tested, draws=draws, seed=seed)
     shown = floored(result)
     entry = {
@@ -1848,7 +1891,9 @@ def contrast_entry(
         **shown,
         "p": ev.registered_p(result, sides, ev.P_VALUE_SOURCE) if evaluable else None,
         "bounds": contrast_bounds(rows, predictions, comparator, tested, shown),
-        "both_sides_parsed": parsed_only(brief(both, sides), scoreable, ~keep, outside),
+        "both_sides_parsed": parsed_only(
+            brief(both, sides), scoreable, list(parsed.values()), outside
+        ),
         "scoreable_not_parsed": dict.fromkeys(missed) if hidden else missed,
     }
     if equivalence and evaluable:
@@ -1950,9 +1995,14 @@ def repeats_of(
     A repeat on a part of the statements stands beside the contrast on all of them: it is
     withheld, counts apart, when the part leaves out 1 to ``MIN_SHOWN`` - 1 scoreable
     statements, and H2 on the month-and-year form also when its scoreable statements and those
-    first captured by the stated end differ by so few (PLAN, standing rules). A repeat under an
+    first captured by the stated end differ by so few (PLAN, standing rules). Where the part
+    itself is the list but for so few statements (or the two parts differ by so few), which
+    anyone can name from the open cells, the record holds its names and ``withheld`` alone:
+    its counts, beside those of the other, would say how many of the few are scoreable. A
+    repeat under an
     outcome variant is withheld when the variant gives so few statements another horizon event
-    than the primary outcome, or than another definition whose contrasts are written
+    than the primary outcome, or so few of those scoreable under either (PLAN section 2.5), or
+    as few against another definition whose contrasts are written
     (``near_definitions``; ``definitions``: every outcome definition of the result file, those
     of ``outcome_variants`` when none is given)."""
     first = study.first.loc[rows.index]
@@ -1977,10 +2027,17 @@ def repeats_of(
     near[on_a_part[0]] = near[on_a_part[0]] or small(
         len(counted[on_a_part[0]] ^ counted[on_a_part[1]])
     )
+    # a part that is the list but for a few statements, which the open cells name (or the two
+    # parts but for a few): its counts beside the others would say how many are scoreable
+    held = {label: set(frames[label][0].index) for label in on_a_part}
+    bare = {label: small(len(rows) - len(held[label])) for label in on_a_part}
+    bare[on_a_part[0]] = bare[on_a_part[0]] or small(len(held[on_a_part[0]] ^ held[on_a_part[1]]))
     moved = near_definitions(
         rows, outcome_variants if definitions is None else definitions, rows.index
     )
-    near |= {label: moved[label][1] for label in outcome_variants}
+    # under a definition that moves a few statements the counts would say, beside those under
+    # the primary outcome, how many of the few are scoreable: the number moved is given
+    bare |= {label: moved[label][1] for label in outcome_variants}
     out: dict[str, Any] = {}
     for label, (frame, cluster, only) in frames.items():
         out[label] = {}
@@ -1991,7 +2048,7 @@ def repeats_of(
                 ev.scored(frame, study.predictions, comparator, tested, cluster, draws, seed),
                 sides,
             )
-            if small(len(frame)):  # how many of a few known statements are scoreable
+            if small(len(frame)) or bare.get(label):  # how many of a few are scoreable
                 record = {"withheld": True}
             out[label][name] = {"comparator": comparator, "tested": tested} | (
                 withheld(record) if near.get(label) and "withheld" not in record else record
@@ -2023,8 +2080,13 @@ def secondary_models(
 
     What is given on the post-cutoff slice stands beside the same on every eligible statement
     (``beside``, and ``contrast_entry`` for the statements both sides parsed): a figure of the
-    slice is withheld, counts apart, where the statements before the cutoff that it leaves out
-    number 1 to ``MIN_SHOWN`` - 1. Beside the repeats under the outcome variants stands how
+    slice is withheld, counts apart, where it leaves out 1 to ``MIN_SHOWN`` - 1 of the
+    statements the figure on the list counts. Where the slice is the list but for so few
+    statements, which anyone can name from their dates, nothing of it is written but the
+    number of its statements: its counts, taken from those of the list, would say how many
+    of the few are scoreable (PLAN, standing rules), and whether it holds the 50 scoreable
+    statements of an analysed slice would say the same. Beside the repeats under the outcome
+    variants stands how
     many statements each variant gives another horizon event (``near_definitions``;
     ``definitions``: every outcome definition of the result file)."""
     study = prepared.study
@@ -2064,7 +2126,18 @@ def secondary_models(
         entry["post_cutoff_slice"] = {
             key: record[key] for key in record if key.startswith(("cutoff", "slice"))
         }
-        if sliced is not None:
+        if small(len(rows) - int(record["slice_statements"])):  # the list but for a few
+            entry["post_cutoff_slice"] |= {
+                "slice_scoreable": None,
+                "slice_scoreable_episodes": None,
+                "slice_analysed": None,
+                "withheld": True,
+            }
+            bare = {"statements": int(record["slice_statements"]), "withheld": True}
+            entry["on_the_post_cutoff_slice"] = dict(bare)
+            entry["decomposition_on_the_post_cutoff_slice"] = dict(bare)
+            entry["scores_on_the_post_cutoff_slice"] = dict(bare)
+        elif sliced is not None:
             part = rows.loc[sliced]
             entry["on_the_post_cutoff_slice"] = beside(
                 whole, contrasts_of(model, part, study, draws, seed, within=rows)
@@ -2358,8 +2431,8 @@ def sampled_quantiles(
         verbal = prepared.study.predictions[f"{model}:a"]
         # both parsed: the verbalised answer was, and at least one sample of the statement
         parsed = (
-            prepared.study.parsed[f"{model}:a"].loc[part.index]
-            & (prepared.sampled_parsed[model].loc[part.index])
+            prepared.study.parsed[f"{model}:a"].loc[part.index],
+            prepared.sampled_parsed[model].loc[part.index],
         )
 
         def figures(
@@ -2367,7 +2440,7 @@ def sampled_quantiles(
             within: pd.DataFrame | None = None,
             sampled: pd.DataFrame = sampled,
             verbal: pd.DataFrame = verbal,
-            parsed: pd.Series = parsed,
+            parsed: Sequence[pd.Series] = parsed,
         ) -> dict[str, Any]:
             return sampled_scores(chosen, sampled, verbal, parsed, draws, seed, within)
 
@@ -2390,7 +2463,7 @@ def sampled_scores(
     part: pd.DataFrame,
     sampled: pd.DataFrame,
     verbal: pd.DataFrame,
-    parsed: pd.Series,
+    parsed: pd.Series | Sequence[pd.Series],
     draws: int,
     seed: int,
     within: pd.DataFrame | None = None,
@@ -2399,29 +2472,31 @@ def sampled_scores(
     loss of each at the levels of section 7.2 with their difference (verbalised minus sampled,
     on the statements whose time to recovery is not right-censored before the cap), the same
     difference on the statements that ``parsed`` flags (section 4: the verbalised answer was
-    parsed and at least one sample was; ``parsed_only``, which counts the statements with a
-    target), and the coverage of the 80% interval of each. ``within``: a set that holds
-    ``part`` and on which the same is written."""
+    parsed and at least one sample was; one series, or one for each of the two;
+    ``parsed_only``, which counts the statements with a target), and the coverage of the 80%
+    interval of each. ``within``: a set that holds ``part`` and on which the same is
+    written."""
     targeted = (part["ttr_kind"] != "right_censored").to_numpy(dtype=bool)
     kept = part[targeted]
     target = kept["ttr_mid"].to_numpy(dtype=float)
     sampled, verbal = sampled.loc[part.index], verbal.loc[part.index]
-    unparsed = ~parsed.loc[part.index].to_numpy(dtype=bool)
+    series = [parsed] if isinstance(parsed, pd.Series) else list(parsed)
+
+    def sides(frame: pd.DataFrame) -> list[np.ndarray]:
+        return [flags.loc[frame.index].to_numpy(dtype=bool) for flags in series]
+
     outside = None
     if within is not None:
         others = within.loc[within.index.difference(part.index)]
-        outside = (
-            (others["ttr_kind"] != "right_censored").to_numpy(dtype=bool),
-            ~parsed.loc[others.index].to_numpy(dtype=bool),
-        )
-    flags = ~unparsed[targeted]
+        outside = ((others["ttr_kind"] != "right_censored").to_numpy(dtype=bool), sides(others))
+    flags = np.logical_and.reduce(sides(part))[targeted]
     clusters = kept["episode_id"].to_numpy()
     out: dict[str, Any] = {"pinball": {}}
     for level, key in power.PINBALL_KEYS.items():
         spoken = P.pinball(verbal.loc[kept.index, key], target, level)
         drawn = P.pinball(sampled.loc[kept.index, key], target, level)
         both = paired(spoken[flags], drawn[flags], clusters[flags], 2, draws, seed)
-        record = parsed_only(both, targeted, unparsed, outside)
+        record = parsed_only(both, targeted, sides(part), outside)
         out["pinball"][f"{level:.2f}"] = {
             "sampled": pinball_record(sampled[key], part, level),
             "verbalised": pinball_record(verbal[key], part, level),
@@ -2488,7 +2563,14 @@ def changes(
         one, other = predictions[name].loc[rows.index], predictions[reference].loc[rows.index]
         change = paired(losses[name], losses[reference], clusters, 2, draws, seed)
         on_both, missed = where_both_parsed(
-            rows, predictions, name, reference, both, draws, seed, within
+            rows,
+            predictions,
+            name,
+            reference,
+            (parsed[name].loc[known], parsed[reference].loc[known]),
+            draws,
+            seed,
+            within,
         )
         moved[name] = {
             "primary_loss": change
@@ -2768,9 +2850,14 @@ def recovery_rule(
 
     A variant can move few statements. Beside the same contrast under the primary outcome, a
     contrast under a variant that gives 1 to ``MIN_SHOWN`` - 1 statements of the item set
-    another horizon event would give the change of the losses on those few: it is withheld
-    with its bounds, counts apart, and the number of such statements is given for each model
-    (section 2.5). The same holds between two outcome definitions (``near_definitions``;
+    another horizon event, or as few of those scoreable under either definition, would give
+    the change of the losses on those few: it is withheld with its bounds, and the number of
+    statements with another horizon event is given for each model (section 2.5). Its counts
+    are withheld with it, as the evaluator withholds those of a primary's tests: beside the
+    counts under the primary outcome they would say how many of the few are scoreable (PLAN,
+    standing rules), and so would the two counts of the variant over the eligible list where
+    it moves so few of the list. The same holds between two outcome definitions
+    (``near_definitions``;
     ``before``: the outcome variants of the evaluator, which stand before these three): the
     models whose contrasts under a variant are withheld are named. A variant whose column the
     outcome rows do not hold is recorded as not computed."""
@@ -2784,6 +2871,7 @@ def recovery_rule(
         sets[model] = (rows.index, model_tests(model, study.comparator))
     definitions = {**(before or {}), **variants}
     near = {model: near_definitions(rows, definitions, ids) for model, (ids, _) in sets.items()}
+    on_the_list = near_definitions(rows, definitions, rows.index)
     out: dict[str, Any] = {}
     for label, frame in variants.items():
         if frame is None:
@@ -2811,17 +2899,17 @@ def recovery_rule(
                     tested,
                     result,
                 )
-                if near[model][label][1]:
-                    result = withheld(result)
-                    bounds = bounds if "withheld" in bounds else withheld(bounds)
+                if near[model][label][1]:  # no count either: the number moved is given
+                    result, bounds = {"withheld": True}, {"withheld": True}
                 contrasts[model][name] = (
                     {"comparator": comparator, "tested": tested} | result | {"bounds": bounds}
                 )
+        few_moved = on_the_list[label][1]
         out[label] = {
             "computed": True,
             "eligible_statements": len(typed),
-            "not_at_risk_under_the_variant": int((~at_risk).sum()),
-            "scoreable_statements": int(typed["scoreable"].sum()),
+            "not_at_risk_under_the_variant": None if few_moved else int((~at_risk).sum()),
+            "scoreable_statements": None if few_moved else int(typed["scoreable"].sum()),
             "statements_with_another_horizon_event": {
                 model: near[model][label][0] for model in sets
             },
@@ -3654,9 +3742,12 @@ def run_score(args: argparse.Namespace) -> int:
             f"starts with {prepared.baselines_sha256[:16]}, expected {want_baselines[:16]}"
         )
 
-    # the sealed file: hashed as bytes, parsed only when the hash is the expected one
+    # the sealed file: hashed as bytes, parsed only when the hash is the expected one; a file
+    # refused for its hash has no character of that hash printed (PLAN, standing rules)
     sealed = sealed_counts.file_bytes(args.sealed, "the sealed file")
-    sealed_sha = sealed_counts.require_hash(sealed, want_sealed, "the sealed file")
+    sealed_sha = ev.hash_required(
+        sealed, want_sealed, "the sealed file", args.sealed, args.sealed, of_sealed=True
+    )
     try:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")  # a warning may quote a cell

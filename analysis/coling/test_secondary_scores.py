@@ -754,12 +754,12 @@ def as_parsed_only(
     got: dict, count: Any, counted: np.ndarray, unparsed: np.ndarray, delta: float | None = None
 ) -> None:
     """Hold the record of a contrast on the statements both readings parsed, and the count
-    beside it, to the rules: with one to four readings not parsed nothing but their number is
-    written; with a few counted statements left out or left, the counts alone; else the
-    contrast, whose estimate is ``delta``."""
+    beside it, to the rules: with one to four readings not parsed, or as few parsed, nothing
+    but the number not parsed is written; with a few counted statements left out or left,
+    the counts alone; else the contrast, whose estimate is ``delta``."""
     not_parsed, left_out = int(unparsed.sum()), int((counted & unparsed).sum())
     kept = int((counted & ~unparsed).sum())
-    if 0 < not_parsed < sc.MIN_SHOWN:
+    if 0 < not_parsed < sc.MIN_SHOWN or 0 < len(unparsed) - not_parsed < sc.MIN_SHOWN:
         assert got == {"not_both_parsed": not_parsed, "withheld": True} and count is None
         return
     assert (got["not_both_parsed"], got["left_out"], got["statements"]) == (
@@ -1727,10 +1727,14 @@ def test_the_statements_a_variant_moves_are_counted_on_the_item_set_of_each_mode
     assert got["withheld_beside_another_outcome"] == ["m"]
     assert list(got["contrasts"]["m"]) == ["H1", "H2", "H3"]
     for entry in got["contrasts"]["m"].values():
-        assert entry["withheld"] is True and entry["statements"] == 8 and numbers(entry) == []
-        assert entry["bounds"]["withheld"] is True
+        # no count either: beside the counts under the primary outcome it would say how many
+        # of the two are scoreable under the variant
+        assert set(entry) == {"comparator", "tested", "withheld", "bounds"}
+        assert entry["withheld"] is True and entry["bounds"] == {"withheld": True}
     shown = got["contrasts"]["s"]["H1"]
     assert shown["statements"] == 12 and "withheld" not in shown and "delta" in shown
+    # the two counts over the eligible list are those of a variant that moves six of the list
+    assert (got["scoreable_statements"], got["not_at_risk_under_the_variant"]) == (12, 0)
     # six statements moved in the slice as well: given for both
     under.loc[under.index[:10], "y_a"] = 0.0
     got = written(sc.recovery_rule(prepared, rows, {label: under}, fixed, ["s"], 200, 3))[label]
@@ -1771,11 +1775,21 @@ def test_a_variant_that_moves_a_few_statements_gives_no_contrast(moved: int) -> 
     assert got["statements_with_another_horizon_event"] == {"m": moved}
     entry = got["contrasts"]["m"]["H1"]
     assert (entry["comparator"], entry["tested"]) == ("m:a", "m:b")
-    assert entry["statements"] == 12 and entry["bounds"]["statements"] == 12
     if 0 < moved < sc.MIN_SHOWN:
-        assert entry["withheld"] is True and "delta" not in entry and "p" not in entry
-        assert entry["bounds"]["withheld"] is True and "undetermined_as_no" not in entry["bounds"]
+        # the number of statements with another horizon event is given, and nothing else:
+        # a count under the variant, beside the same under the primary outcome, would say
+        # how many of those few are scoreable (PLAN, standing rules)
+        assert entry == {
+            "comparator": "m:a",
+            "tested": "m:b",
+            "withheld": True,
+            "bounds": {"withheld": True},
+        }
+        assert got["scoreable_statements"] is None
+        assert got["not_at_risk_under_the_variant"] is None
     else:
+        assert entry["statements"] == 12 and entry["bounds"]["statements"] == 12
+        assert (got["scoreable_statements"], got["not_at_risk_under_the_variant"]) == (12, 0)
         # the loss of a statement is (p - y_a)^2 / 2 + (1 - p)^2 / 2: H1 is a less b
         loss = {p: ((p - 0.0) ** 2 * moved + (1 - p) ** 2 * (24 - moved)) / 24 for p in (0.5, 0.8)}
         assert near(entry["delta"], loss[0.5] - loss[0.8]) and "withheld" not in entry
@@ -1881,9 +1895,11 @@ def test_a_contrast_that_is_not_evaluable_holds_no_interval() -> None:
 def test_the_contrast_on_the_statements_both_readings_parsed() -> None:
     """PLAN section 4: beside a contrast on every scoreable statement, the same on the
     statements both compared readings parsed. Which readings failed is open. With one to four
-    of them the record holds their number and nothing else, since its counts would say which
-    of those few statements are scoreable; with five or more it is withheld, counts apart,
-    when it leaves out or rests on one to four scoreable statements."""
+    of them, or with as few that parsed, the record holds the number that failed and nothing
+    else, since its counts would say which of those few statements are scoreable; otherwise
+    it is withheld, counts apart, when it leaves out or rests on one to four scoreable
+    statements. "Where the failed answers of one side, or of both, number 1 to 4, its counts
+    are withheld as well": a few on one side are a few, however many failed on the other."""
     prepared, rows, _ = variant_case(0)
     rows.loc[rows.index[0], "y_a"] = np.nan  # one statement is not scoreable
     rows["scoreable"] = rows["y_a"].notna() & rows["y_b"].notna()
@@ -1907,7 +1923,7 @@ def test_the_contrast_on_the_statements_both_readings_parsed() -> None:
         assert entry["both_sides_parsed"].get("delta") == both.get("delta")
         assert set(entry["both_sides_parsed"]) == set(both)
         left_out = int((scoreable & ~flags.to_numpy()).sum())
-        if 0 < failed < sc.MIN_SHOWN:
+        if 0 < failed < sc.MIN_SHOWN or 0 < 12 - failed < sc.MIN_SHOWN:
             assert entry["scoreable_not_parsed"] == {"m:a": None, "m:b": None}
         else:
             assert entry["scoreable_not_parsed"] == {"m:a": 0, "m:b": left_out}
@@ -1915,33 +1931,104 @@ def test_the_contrast_on_the_statements_both_readings_parsed() -> None:
             entry["delta"], (loss_a - loss_b)[scoreable].mean()
         )
     # shown: no reading failed, or six failed (five scoreable ones left out, six left);
-    # counts alone: five failed (four scoreable left out), eight (four left); nothing: 1 to 4
+    # counts alone: five failed (four scoreable left out), all twelve (none left);
+    # nothing but the number that failed: 1 to 4 failed, or 1 to 4 parsed (eight failed)
     assert kinds == {
         0: (True, True),
         1: (False, False),
         4: (False, False),
         5: (False, True),
         6: (True, True),
-        8: (False, True),
+        8: (False, False),
         12: (False, True),
     }
     assert sc.MIN_SHOWN == ev.MIN_SHOWN == 5
     # one side fails on six statements and the other on two more: the readings that failed on
-    # the second alone are a few known statements, and the counts of each side would say how
-    # many of them are scoreable
+    # the second alone are a few known statements, and the counts of each side, or those of
+    # the contrast on the parsed answers beside another record, would say how many of them
+    # are scoreable
     study.parsed = {
         "m:a": pd.Series(np.arange(12) >= 6, index=rows.index),
         "m:b": pd.Series(np.arange(12) < 10, index=rows.index),
     }
     entry = sc.contrast_entry(rows, study, "m:a", "m:b", 1, 200, 3)
     assert entry["scoreable_not_parsed"] == {"m:a": None, "m:b": None}
-    assert (
-        entry["both_sides_parsed"]["not_both_parsed"],
-        entry["both_sides_parsed"]["left_out"],
-    ) == (
-        8,
-        7,
+    assert entry["both_sides_parsed"] == {"not_both_parsed": 8, "withheld": True}
+
+
+SIDES = ("gpt-4o-mini:a", "gpt-4o-mini:b")
+"""Two readings of the model of ``study_by_hand``, each of which can fail to parse."""
+
+
+@pytest.mark.parametrize(
+    ("failed_a", "failed_b", "strict"),
+    [
+        (range(3), range(10, 60), True),  # three on one side, fifty on the other
+        (range(10, 60), range(3), True),
+        (range(3), range(53), True),  # three on both sides, fifty more on one
+        (range(50), range(3, 53), True),  # fifty each, three on either side alone
+        (range(5), range(10, 60), False),  # five and fifty
+        (range(5), range(55), False),  # five on both sides
+        (range(64), range(64), False),  # six parsed by both
+        (range(66), range(66), True),  # four parsed by both
+        (range(0), range(0), False),
+    ],
+)
+def test_the_counts_on_the_parsed_answers_where_the_failed_answers_of_one_side_are_a_few(
+    failed_a: range, failed_b: range, strict: bool
+) -> None:
+    """PLAN section 4: "Where the failed answers of one side, or of both, number 1 to 4, its
+    counts are withheld as well, since they would say how many of those few are scoreable."
+    Anyone can name the answers that failed on each side: the count of scoreable statements
+    left out by one record, less that of a record beside it, is a count over the few."""
+    ids = [f"S{k}" for k in range(70)]
+    flags = {
+        name: pd.Series([k not in failed for k in range(70)], index=ids)
+        for name, failed in zip(SIDES, (failed_a, failed_b), strict=True)
+    }
+    prepared, rows = study_by_hand(70, parsed=flags)
+    study = prepared.study
+    failed = len(set(failed_a) | set(failed_b))
+    bare = {"not_both_parsed": failed, "withheld": True}
+    entry = written(sc.contrast_entry(rows, study, *SIDES, 1, 200, 3))
+    both, each = entry["both_sides_parsed"], entry["scoreable_not_parsed"]
+    record, count = sc.where_both_parsed(
+        rows, study.predictions, *SIDES, [flags[name] for name in SIDES], 200, 3
     )
+    record = written(record)
+    assert "delta" in entry  # the contrast on every scoreable statement is always written
+    if strict:
+        assert both == bare and each == dict.fromkeys(SIDES) and numbers(both) == []
+        assert record == bare and count is None
+    else:
+        assert (both["not_both_parsed"], both["left_out"]) == (failed, failed)
+        assert both["statements"] == 70 - failed and "delta" in both
+        assert each == {SIDES[0]: len(failed_a), SIDES[1]: len(failed_b)}
+        assert record["statements"] == 70 - failed and count == failed
+    # the change of a loss from one prompt to another, and the sampled against the
+    # verbalised quantiles, are held to the same rule
+    two = {name: study.predictions[name] for name in SIDES}
+    _, _, _, moved = sc.changes(rows, two, flags, SIDES[1], 200, 3)
+    changed = written(moved[SIDES[0]])
+    drawn = written(
+        sc.sampled_scores(
+            rows,
+            study.predictions[SIDES[0]],
+            study.predictions[SIDES[1]],
+            [flags[name] for name in SIDES],
+            200,
+            3,
+        )
+    )["pinball"]["0.50"]
+    if strict:
+        assert changed["primary_loss_both_parsed"] == bare
+        assert changed["scoreable_not_parsed_by_both"] is None
+        assert drawn["verbalised_minus_sampled_both_parsed"] == bare
+        assert drawn["not_parsed_by_both"] is None
+    else:
+        assert changed["primary_loss_both_parsed"]["left_out"] == failed
+        assert changed["scoreable_not_parsed_by_both"] == failed
+        assert drawn["verbalised_minus_sampled_both_parsed"]["left_out"] == failed
 
 
 def study_by_hand(
@@ -2031,8 +2118,10 @@ def test_a_figure_on_the_slice_is_withheld_where_a_few_statements_lie_before_the
 ) -> None:
     """The same figure on every eligible statement and on the post-cutoff slice: where one to
     four statements lie before the cutoff, the two together would give their losses, and the
-    predictions being open, their events. The figures of the slice are then withheld, counts
-    apart: the contrasts, the decomposition and the scores."""
+    predictions being open, their events. Nothing of the slice is then written but the number
+    of its statements (PLAN, standing rules: "A count is withheld too where it says, by
+    itself or by subtraction from a count beside it, how many of 1 to 4 statements are
+    scoreable"): its counts, taken from those of the list, are counts over the few."""
     prepared, rows = study_by_hand(60, before)
     got = written(sc.secondary_models(prepared, rows, {}, [SLICED], 200, 3))
     entry = got["models"][SLICED]
@@ -2046,19 +2135,27 @@ def test_a_figure_on_the_slice_is_withheld_where_a_few_statements_lie_before_the
     }
     assert numbers(whole) and numbers(every)
     if 0 < before < sc.MIN_SHOWN:
-        for name, block in blocks.items():
-            assert numbers(block) == [], name
-            for record in block.values():
-                assert record["withheld"] is True and record["statements"] == 60 - before
-        assert part["H1"] == {
-            "statements": 60 - before,
-            "episodes": 30 - before // 2,
-            "comparator": f"{SLICED}:a",
-            "tested": f"{SLICED}:b",
-            "sides": 1,
+        bare = {"statements": 60 - before, "withheld": True}
+        assert blocks == dict.fromkeys(blocks, bare)
+        assert entry["post_cutoff_slice"] == {
+            "cutoff_month_end": "2023-10-31",
+            "slice_inside_the_test_split": True,
+            "slice_statements": 60 - before,
+            "slice_scoreable": None,
+            "slice_scoreable_episodes": None,
+            "slice_analysed": None,
             "withheld": True,
         }
-        assert blocks["scores"]["a"]["scoreable_statements"] == 60 - before
+        # the record is the same whatever the outcomes: here the statements before the
+        # cutoff are not scoreable, and the slice holds fewer than 50 scoreable statements
+        dim = [k >= before and k < 45 for k in range(60)]
+        other, dim_rows = study_by_hand(60, before, dim)
+        again = written(sc.secondary_models(other, dim_rows, {}, [SLICED], 200, 3))
+        again = again["models"][SLICED]
+        for key in entry:
+            if "slice" in key:
+                assert again[key] == entry[key], key
+        assert again["on_every_eligible_statement"]["H1"]["statements"] == 45 - before
         return
     a, b = (prepared.study.predictions[f"{SLICED}:{c}"] for c in "ab")
     after = rows.iloc[before:]
@@ -2081,7 +2178,9 @@ def test_a_figure_on_the_slice_is_withheld_where_a_few_statements_lie_before_the
         ([0], [True] * 10, "number alone"),  # one failed reading before the cutoff
         ([0, 1, 2], [True] * 10, "number alone"),
         ([0, 1, 2, 3, 4], [True] * 10, "shown"),
-        ([0, 1, 2, 3, 4, 5], [False] * 4 + [True] * 6, "counts alone"),  # two of them scoreable
+        # six failed before the cutoff: the four that parsed there are a few, and the counts
+        # of the list less those of the slice would say how many of them are scoreable
+        ([0, 1, 2, 3, 4, 5], [False] * 4 + [True] * 6, "number alone"),
         ([0, 1, 2, 3, 4], [True] * 6 + [False] * 4, "counts alone"),  # one parsed and scoreable
     ],
 )
@@ -2153,23 +2252,33 @@ def test_the_counts_of_the_slice_beside_those_of_the_list_where_both_are_withhel
 def test_a_repeat_on_a_part_of_the_statements_beside_the_contrast_on_all() -> None:
     """The contrasts repeated on the statements first captured by the stated end, and H2 on
     the month-and-year form, stand beside the contrasts on every statement: a repeat that
-    leaves out one to four scoreable statements is withheld, counts apart."""
+    leaves out one to four scoreable statements is withheld, counts apart; one that leaves
+    out one to four statements, which the open cells name, holds no count either (PLAN,
+    standing rules: a count that says by subtraction how many of 1 to 4 statements are
+    scoreable)."""
     names = ("first_captured_by_the_stated_end", "h2_on_the_month_and_year_form")
 
-    def repeats(delayed: Sequence[int], other_form: Sequence[int]) -> tuple[dict, dict]:
-        prepared, rows = study_by_hand(20, delayed=delayed, other_form=other_form)
+    def repeats(
+        delayed: Sequence[int], other_form: Sequence[int], scoreable: Sequence[bool] | None = None
+    ) -> tuple[dict, dict]:
+        prepared, rows = study_by_hand(20, 0, scoreable, delayed=delayed, other_form=other_form)
         got = written(sc.repeats_of(SLICED, rows, {}, prepared.study, 200, 3))
         return got[names[0]]["H1"], got[names[1]]["H2"]
 
-    # one statement captured late, one of another form: both repeats would give its loss
+    # one statement captured late, one of another form: both repeats would give its loss,
+    # and their counts whether it is scoreable
     early, monthly = repeats([5], [7])
-    for record, kept in ((early, 19), (monthly, 19)):
-        assert record["withheld"] is True and record["statements"] == kept
-        assert numbers(record) == [] and "delta" not in record
-    assert (early["comparator"], early["tested"]) == (f"{SLICED}:a", f"{SLICED}:b")
+    assert early == {"comparator": f"{SLICED}:a", "tested": f"{SLICED}:b", "withheld": True}
+    assert monthly == {"comparator": ev.RULES, "tested": f"{SLICED}:c", "withheld": True}
     # four of each: still a few
     early, monthly = repeats([0, 1, 2, 3], [4, 5, 6, 7])
-    assert early["withheld"] is True and monthly["withheld"] is True
+    assert set(early) == set(monthly) == {"comparator", "tested", "withheld"}
+    # six of each, of which two are scoreable: the counts stay, over six statements
+    few_scoreable = [k not in (2, 3, 4, 5, 12, 13, 14, 15) for k in range(20)]
+    early, monthly = repeats(range(6), range(10, 16), few_scoreable)
+    for record in (early, monthly):
+        assert record["withheld"] is True and record["statements"] == 10
+        assert numbers(record) == [] and "delta" not in record
     # five of each, and no statement in both groups: given
     early, monthly = repeats([0, 1, 2, 3, 4], [10, 11, 12, 13, 14])
     assert "withheld" not in early and "withheld" not in monthly
@@ -2178,10 +2287,10 @@ def test_a_repeat_on_a_part_of_the_statements_beside_the_contrast_on_all() -> No
     early, monthly = repeats([], [])
     assert early["statements"] == monthly["statements"] == 20 and "delta" in early
     # the two parts differ from one another by one statement: H2 is written on both, and the
-    # one on the month-and-year form is withheld
+    # one on the month-and-year form is withheld, with its counts
     early, monthly = repeats([0, 1, 2, 3, 4], [0, 1, 2, 3, 4, 5])
     assert "withheld" not in early and early["statements"] == 15
-    assert monthly["withheld"] is True and monthly["statements"] == 14
+    assert monthly == {"comparator": ev.RULES, "tested": f"{SLICED}:c", "withheld": True}
 
 
 def after_cutoff_case(
@@ -2444,15 +2553,32 @@ def test_every_figure_has_the_floor_of_five_statements_whichever_function_made_i
     )
     rows["ttr_kind"] = ["interval"] * 4 + ["right_censored"] * 5
     probe = written(sc.probe_of("m", study, rows, 200, 3))
+    # PLAN section 5, E4: "The figures of a probe over 1 to 4 targets are withheld; its
+    # verdict is given." The verdict is the one of the test on those four
+    target = rows["ttr_mid"].to_numpy(dtype=float)[:4]
+    test = ev.contrast(
+        P.pinball(made[ev.BASE]["q50"].iloc[:4], target, ev.PROBE_LEVEL),
+        P.pinball(made["a"]["q50"].iloc[:4], target, ev.PROBE_LEVEL),
+        list(rows["episode_id"].iloc[:4]),
+        200,
+        3,
+    )
+    verdict = bool(ev.registered_p(test, 1, ev.P_VALUE_SOURCE) < ev.PROBE_ALPHA)
+    few_targets = {"statements": 4, "left_out_right_censored": 5, "withheld": True}
     assert probe == {
         "probe_statements": 9,
         "left_out_right_censored": 5,
         "statements": 4,
         "episodes": 2,
-        "alpha": ev.PROBE_ALPHA,
-        "beats_base_rate": None,
+        "evaluable": True,
         "withheld": True,
+        "pinball_base_rate": few_targets,
+        "pinball_model": few_targets,
+        "p": None,
+        "alpha": ev.PROBE_ALPHA,
+        "beats_base_rate": verdict,
     }
+    assert numbers(probe) == [ev.PROBE_ALPHA]
     rows["ttr_kind"] = "interval"
     probe = sc.probe_of("m", study, rows, 200, 3)
     assert probe["statements"] == 9 and "delta" in probe and "withheld" not in probe
@@ -2493,6 +2619,28 @@ def test_one_outcome_definition_beside_another() -> None:
         "a": (1, True),
         "d": (2, True),
     }
+    # PLAN section 2.5: "or 1 to 4 of those scoreable under either definition". A definition
+    # gives eight statements another event, six of them scoreable under neither definition:
+    # the contrast holds the losses of the two others, and beside the one under the primary
+    # outcome it would give their change
+    dim = rows.copy()
+    dim.loc[rows.index[:6], "y_b"] = np.nan
+    dim["scoreable"] = dim["y_a"].notna() & dim["y_b"].notna()
+    lit = moved_frame(dim, range(8))
+    lit.loc[rows.index[:6], "y_b"] = np.nan
+    lit["scoreable"] = lit["y_a"].notna() & lit["y_b"].notna()
+    assert ev.other_events(dim, lit) == 8 and ev.other_events(dim, lit, scored=True) == 2
+    assert sc.near_definitions(dim, {"a": lit}, rows.index) == {"a": (8, True)}
+    limited = sc.RECOVERY_VARIANTS[0]
+    got = written(sc.recovery_rule(prepared, dim, {limited: lit}, {}, [SLICED], 200, 3))[limited]
+    assert got["statements_with_another_horizon_event"] == {SLICED: 8}
+    assert got["withheld_beside_another_outcome"] == [SLICED]
+    assert numbers(got["contrasts"]) == []
+    # with five of the eight scoreable under one of the two, the contrasts are written
+    lit.loc[rows.index[3:6], "y_b"] = 1.0
+    lit["scoreable"] = lit["y_a"].notna() & lit["y_b"].notna()
+    assert ev.other_events(dim, lit) == 8 and ev.other_events(dim, lit, scored=True) == 5
+    assert sc.near_definitions(dim, {"a": lit}, rows.index) == {"a": (8, False)}
     # the recovery rule: two variants that move five and six statements and differ on one
     limited, left, cell = sc.RECOVERY_VARIANTS
     got = written(sc.recovery_rule(prepared, rows, {left: one, cell: other}, {}, [SLICED], 200, 3))
@@ -2502,8 +2650,9 @@ def test_one_outcome_definition_beside_another() -> None:
     assert got[cell]["withheld_beside_another_outcome"] == [SLICED]
     assert "delta" in got[left]["contrasts"][SLICED]["H1"]
     for record in got[cell]["contrasts"][SLICED].values():
-        assert record["withheld"] is True and record["bounds"]["withheld"] is True
-        assert numbers(record) == []
+        assert set(record) == {"comparator", "tested", "withheld", "bounds"}
+        assert record["withheld"] is True and record["bounds"] == {"withheld": True}
+    assert got[left]["scoreable_statements"] == 24 and got[cell]["scoreable_statements"] is None
     # an outcome variant of the evaluator stands before the recovery rule: a variant of the
     # rule that is one statement apart from it is withheld, although it moves six
     got = written(
@@ -2544,7 +2693,8 @@ def test_one_outcome_definition_beside_another() -> None:
     ):
         for name, record in repeated[label].items():
             assert ("delta" in record) is shown, (label, name)
-            assert shown or (record["withheld"] is True and numbers(record) == [])
+            # withheld with its counts: the number moved stands in ``outcome_variants``
+            assert shown or set(record) == {"comparator", "tested", "withheld"}, (label, name)
     a, b = (prepared.study.predictions[f"{SLICED}:{c}"] for c in "ab")
     assert near(
         repeated["any_covered_presentation"]["H1"]["delta"], (brier(a, one) - brier(b, one)).mean()
@@ -3514,12 +3664,12 @@ def test_every_score_of_section_7_2_for_the_six_secondary_models_and_conditions(
     assert set(got["murphy"]["E_end90"]) == {"bins", "reliability", "resolution", "uncertainty"}
     # the rule for tied probabilities, which language models give often, stands in the file:
     # tied statements count with their common frequency, whatever the order of the statements
-    (ties,) = [
-        line for line in base.report["where_the_plan_is_silent"] if line.startswith("Murphy's")
-    ]
+    # (PLAN section 7.2 gives the rule, so the file carries it among what the plan says)
+    (ties,) = [line for line in base.report["as_the_plan_says"] if "Brier decomposition" in line]
     assert "do not depend on the order of the statements" in ties
     assert "a forecast of one value has no resolution" in ties
     assert "E1" not in ties and "Turnbull" not in ties
+    assert not [line for line in base.report["where_the_plan_is_silent"] if "share a prob" in line]
     one_value = ev.murphy([0.3] * 30, [1.0] * 5 + [0.0] * 25)
     assert one_value["bins"] == 10 and abs(one_value["resolution"]) < 1e-12
     other_order = ev.murphy([0.3] * 30, [0.0, 0.0, 0.0, 0.0, 0.0, 1.0] * 5)
@@ -4176,8 +4326,12 @@ def test_a_sealed_file_with_another_hash_is_not_parsed(
 
     monkeypatch.setattr(ev, "table_of", table_of)
     why = refused(study, tmp_path, capsys, sealed=other)
-    assert "the sealed file is not the expected file" in why
-    assert f"expected {study.sealed_sha[:16]}" in why
+    # PLAN, standing rules: no character of a sealed file's hash where it is refused for it
+    assert why == (
+        "refused: the sealed file is not the expected file: its sha256 is not the one given; "
+        "no character of the hash of a sealed file is printed"
+    )
+    assert TE.file_sha(other)[:6] not in why and not re.search(r"[0-9a-f]{8}", why)
     why = refused(study, tmp_path, capsys, sealed=tmp_path / "nothing.csv.gz")
     assert "the sealed file cannot be read (FileNotFoundError)" in why
 
@@ -5811,20 +5965,60 @@ def test_two_runs_write_the_same_bytes_and_the_record_of_what_was_read(
         "the fourth cell of the 2x2 is the run of condition (b)",
         "a primary keeps the item set its probe fixed",
         "is discontinued there",
-        "the figures over every statement of the set are withheld",
-        # what the plan has come to state: the general rule of withholding, the small moves
-        # of a sensitivity analysis, the draws of a slip interval, the subsets of a primary
-        # after its cutoff, and the declaration repeated on this command line
-        "where the same figure is also written on a set that differs from its own by as few",
-        "is withheld with its two scenarios, and the number of such statements is given",
         "use the first 1,000 of the 10,000 registered draws",
         "are given again on the statements dated after its cutoff",
         "a declaration that the evaluator's result file does not record is refused",
     ):
         assert words in stated, words
+    # where the list quotes the plan, it quotes it as the plan reads: these words stand in
+    # both, letter for letter (the case of a first letter and the line breaks apart)
+    plan = Path(sc.__file__).with_name("plan") / "PLAN.md"
+    registered = " ".join(plan.read_text(encoding="utf-8").split()).lower()
+    for words in (
+        # standing rules
+        "where the same figure is also written on a set that differs from its own by 1 to 4 "
+        "statements, so that the two together would give back the outcomes of those few (a "
+        "slice within its whole, the answers that parsed within all, one outcome definition "
+        "beside another)",
+        "the second check is made on pairs of sets",
+        "how many of 1 to 4 statements are scoreable or have a determined event",
+        "are never withheld on the second ground: the figure that stands beside one of them is "
+        "the one withheld",
+        "reads no stored file that leads into a sealed folder through a link",
+        "prints no character of a sealed file's hash where it refuses the file for its hash",
+        # section 2.5
+        "the mean probabilities and the calibration in the large on the scoreable statements, "
+        "which name the few that are not, are then withheld too",
+        "the same holds where only 1 to 4 statements of a set are scoreable",
+        "the pinball losses and the coverage stay",
+        "or 1 to 4 of those scoreable under either definition",
+        "the number of statements with another horizon event is given",
+        # section 4
+        "where the failed answers of one side, or of both, number 1 to 4, its counts are "
+        "withheld as well, since they would say how many of those few are scoreable",
+        # section 5, E1 and E4
+        "a further cell is withheld and marked where the cells written and the whole would "
+        "otherwise give back the figure on 1 to 4 statements",
+        "the figures of a probe over 1 to 4 targets are withheld; its verdict is given",
+        # section 7.2
+        "statements that share a probability count with the frequency of the event among all "
+        "of them, so that the figures do not depend on the order of the statements",
+        "a forecast of one value has no resolution",
+    ):
+        assert words in stated.lower(), words
+        assert words in registered, words
     chosen = " ".join(sc.WHERE_THE_PLAN_IS_SILENT)
     assert "not a silence" not in chosen and "departure" not in chosen
     assert "registered draws" not in chosen and "floor (two shortage episodes" not in chosen
+    # and what the plan states is no longer called a choice of the code
+    for words in (
+        "would name the few that are not",
+        "share a probability",
+        "a count is withheld (null) where it would say",
+        "the least and greatest calibration in the large over every statement is withheld",
+        "so a further cell is withheld and marked",
+    ):
+        assert words not in chosen, words
     assert (ev.DRAWS, sc.MIN_SHOWN) == (10000, 5)  # the draws of a slip interval are fewer here
     # what is not computed here: by another script of the study, or by no script yet
     elsewhere, nowhere = sc.COMPUTED_BY_ANOTHER_SCRIPT, sc.COMPUTED_BY_NO_SCRIPT
@@ -6064,8 +6258,11 @@ def test_the_train_descriptives_command_reads_the_open_table_alone(
             for line in report[key]
             if "2x2" in line or "paraphrase" in line or "selective prediction" in line
         ]
-    assert len(report["as_the_plan_says"]) == 2 and len(report["where_the_plan_is_silent"]) == 5
-    assert "the first 1,000 of the 10,000 registered draws" in report["as_the_plan_says"][1]
+    assert len(report["as_the_plan_says"]) == 4 and len(report["where_the_plan_is_silent"]) == 5
+    said = " ".join(report["as_the_plan_says"])
+    assert "the first 1,000 of the 10,000 registered draws" in said
+    assert "a further cell is withheld and marked where the cells written and the whole" in said
+    assert "in the tables of E1 also on the cells written with their whole" in said
     with pytest.raises(SystemExit, match="unrecognized arguments: --slip-draws"):
         sc.main(["train-descriptives", "--out", str(tmp_path / "x.json"), "--slip-draws", "6"])
     # the command takes no sealed path, and refuses what is not the open table of this build
