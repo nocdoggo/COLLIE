@@ -1,15 +1,17 @@
 """The scorer of two registered secondary experiments of the COLING 2027 study: E2 and E5.
 
 E2 is the literal reading of the labelled statements against the adjudicated labels and against
-the rule reader; E5 is the minimal pairs. PLAN.md sections 4 ("Parse failures"), 5 (E2 and E5),
-7.1, 8, 9 and 13 (what its registered pattern reads of E2 and E5); AUDIT_GUIDE.md sections 3, 5
-and 7.
+the rule reader; E5 is the minimal pairs. A third command, ``pattern``, reads the two result
+files by the registered pattern of section 13, which decides one sentence of the paper. PLAN.md
+sections 4 ("Parse failures"), 5 (E2 and E5), 7.1, 8, 9, 12 (cut 4) and 13 ("The registered
+pattern"); AUDIT_GUIDE.md sections 3, 5 and 7.
 
-Neither command reads an outcome of any period. The inputs are stored readings of the reading
-harness, the gold of the task, the item file, and, for E2, the open events table (first-sight
-fields) and the guide. Every output is a count, a share, an interval or a p-value; per item the
-result file holds an id and flags (correct or not, parsed or not), never a text and never a
-reading.
+No command reads an outcome of any period. The inputs of ``e2`` and ``e5`` are stored readings
+of the reading harness, the gold of the task, the item file, and, for E2, the open events table
+(first-sight fields) and the guide; for a cut of E5, also the seed list. ``pattern`` reads the
+two result files and nothing else: no reading, no gold and no outcome. Every output is a count,
+a share, an interval, a p-value or a decision the plan registers; per item the result file
+holds an id and flags (correct or not, parsed or not), never a text and never a reading.
 
 What is scored
 --------------
@@ -91,8 +93,12 @@ false-commitment rates and distractor uptake with their counts and their exact b
 interval (``exact``) beside the percentile one, and the stale-flag scores. Beside them, the
 difference of a model's false-commitment rates and distractor uptake from the rule reader's
 (``margins``) and from each annotator's (``versus_ceiling``) is given with its 95% interval
-over the same draws. Neither command applies the floors of the registered pattern of section
-13 or decides its sentence: the two result files hold the quantities it reads.
+over the same draws. For each primary the letter reading also stands by itself
+(``letter_reading``, on each item set), with what the letter part of the registered pattern
+reads of it: whether the lower end of the 90% interval lies above minus the margin of 0.10
+(``lower_end_above_minus_margin``). That is decided here, on the end as an exact fraction of
+the whole numbers of the draws and not on the figure the file shows, so that an end of exactly
+-0.10 does not lie above it however it arises; ``e2`` decides nothing else of the pattern.
 
 Item sets. Everything is reported three times: on every gold item, which is the registered
 family; without the items adjudicated as ``gap`` (AUDIT_GUIDE section 5); and without the
@@ -145,11 +151,58 @@ test-period seeds are scored like the others, and counted.
 For a standing factor (certainty marker, stale, distractor date, silent; PLAN section 13) a
 contrast also holds what the standing part of the registered pattern reads beside the test:
 the error rate on the items of the two letter factors (surface form, granularity) taken
-together, under the criterion of the factor (``letter_factors``); the rate of the factor's own
-error on the items of the factor on which it can occur (``own_error``: a period given where
-the gold gives none, the distractor's period taken, a period given without the stale flag);
-and the errors on the items of the factor that are of another kind
-(``errors_of_another_kind``).
+together, under the criterion of the factor, and how far the error rate on the items of the
+factor stands above it (``above_letter_items``, with ``difference``); the rate of the factor's
+own error on the items of the factor on which it can occur (``own_error``: a period given where
+the gold gives none, for the certainty marker and for silent; the distractor's period taken; a
+period given without the stale flag on an item whose gold is stale); and the errors on the
+items of the factor that are of another kind (``errors_of_another_kind``). These are given
+for every model. Each of the twelve tests on a standing factor also holds the floors of the
+standing part (``floors``): ``above_seed`` (the error rate on the items of the factor is at
+least 0.10 above the error rate on the unedited seed items), ``above_letter`` (and at least
+0.10 above the one on the items of the two letter factors), ``own_error`` (the own error
+occurs on at least 0.10 of the items on which it can occur) and ``met`` (all three). They are
+read on the counts, in whole numbers, before any rounding. A contrast of another model has no
+floors: no pattern is computed for it.
+
+A cut of E5 (PLAN section 12, cut 4) is scored with ``--cut-seed-list``, the seed list of the
+minimal pairs with its ``draw_rank``, held to ``--expect-seed-list-sha256``, and
+``--cut-items``, the cut item file that the runs read. The items scored are the unedited seed
+item and every edit of the first 50 seeds of the list in its draw order. ``--items`` stays the
+registered item file and ``--gold`` its whole gold; the cut item file must hold the row of
+every item kept, unchanged (its line byte for byte, in any order of the rows), and no other
+row; and the runs must be complete on exactly those items. ``item_set`` records the cut, or
+that there is none.
+
+The registered pattern (``pattern``)
+------------------------------------
+PLAN section 13, "The registered pattern": it decides the sentence "models read the letter of
+a notice but not its pragmatics" for the two primary models and nothing else. The command
+reads the result file of ``e2`` and the result file of ``e5`` and computes nothing from a
+reading. For each primary:
+
+* ``letter.e2``, condition (a): the letter reading of the E2 result on every gold item (the
+  letter accuracy of the model, ``first``, and of the rule reader, ``second``, their
+  difference, its 90% interval, the margin), ``met`` when the lower end lies above -0.10;
+* ``letter.e5``, condition (b): the model's two tests on a letter factor, ``met`` when neither
+  holds with the higher error rate on the edited items;
+* ``standing.<factor>`` for the four standing factors: ``a`` (the test of the factor holds
+  with the higher error rate on the edited items), ``b`` (the two floors of ``e5``), ``c`` (the
+  floor on the own error), and ``counts`` when all three are met;
+* ``letter.holds`` (both conditions), ``standing.holds`` (a factor counts) and ``holds`` (both
+  parts), with ``withheld_by`` on each part: the conditions that withheld it.
+
+``sentence`` says what the paper states: the sentence for the two primary models, for one by
+name, or not at all, in the plan's words (``paper``), and what the paper must say beside it
+(``beside``): which condition withheld a part, which is not read as its opposite; every test
+of the E5 family that holds, which is reported as that family's result (``e5_tests_that_hold``
+of each primary); a primary without a pattern. A primary whose E2 run under ``literal-v1`` or
+whose E5 run is declared not run has no pattern. ``--e5-not-scored`` in the place of ``--e5``
+declares that E5 is not scored by the freeze of numbers: the sentence is then not stated. A
+cut E5 is read with the same floors. No secondary model has a pattern. For each standing
+factor that counts, ``beside`` asks for the rate of its own error, for every primary with a
+pattern. What the command does because the plan states it is listed with its sections in
+``as_the_plan_says``.
 
 Refusals (status 1, the reason alone, nothing written)
 ------------------------------------------------------
@@ -164,7 +217,17 @@ that cannot be read as the launcher and the harness write them (named by the typ
 error alone); a line planned under another template than the registered one; an item file
 that is not the file the runs read; a gold that is not of the item file, or a table with a row
 of more or fewer cells than its header; items that are not of the events table, or not in the
-stratum of the key; no list of convention items; an input named in a sealed folder.
+stratum of the key; no list of convention items; an input named in a sealed folder. For a cut
+of E5: one of its three options without the others; a seed list that is not the file of its
+hash, that repeats a seed or a rank, that lacks a seed of the item file, or that holds no
+more seeds than the cut keeps; a cut item file that is not the registered item file cut to
+those seeds. ``pattern`` refuses a file that is not the result of ``e2`` or of ``e5`` as this
+scorer writes it; a result written under another registered record than this scorer's (a
+margin, a floor, the factors, the primaries, the seed, a pin); two results of different plans
+of the runs; a result that does not score the two primaries on one item set; a result that
+cannot be read whole (a part missing, a number that cannot be printed, a file nested too deep
+to parse), named by the type of the error alone; neither or both of ``--e5`` and
+``--e5-not-scored``; and an output that exists.
 ``--not-run MODEL=REASON`` (for ``e2`` also ``MODEL/TEMPLATE=REASON``) declares that a model's
 runs, or its run under one template, could not be completed. They are checked like the others
 and not scored, and what the check found is recorded (``not_run_checked``); a declaration for
@@ -179,17 +242,23 @@ every file read and of the code); ``runs`` (rows, statuses, failure and refusal 
 and template); ``not_run`` and ``not_run_checked``; ``where_the_plan_is_silent``; ``per_item``
 (ids and flags). For E2 also ``gold``, ``frame``, ``literal_ceiling_on_every_labelled_item``
 and ``item_sets``, each set with ``readers`` (per reader: ``n``, ``exact``, ``sample``,
-``weighted_by_event``, ``weighted_by_template``, ``by_stratum``), ``tests``, ``versus_rules``
+``weighted_by_event``, ``weighted_by_template``, ``by_stratum``), ``tests``,
+``letter_reading`` (one entry for each primary), ``versus_rules``
 (with ``letter_accuracy`` and ``margins``), ``literal_v1_versus_literal_free_v1``,
-``positive_result``, ``literal_ceiling`` and ``versus_ceiling``. For E5 also ``errors``,
+``positive_result``, ``literal_ceiling`` and ``versus_ceiling``. For E5 also ``item_set``,
+``errors``,
 ``rule_reader``, ``seed_items`` (per model, the parts of the error on the unedited items and
 their error rate in each of the three seed ``cells``), ``metrics``, ``gee``, ``tests`` (the
 twelve, each with the seed rows it is ``against``, with both p-values of its ``bootstrap``,
-and, for a standing factor, with ``letter_factors``, ``own_error`` and
-``errors_of_another_kind``) and ``other_models``. A float has
+and, for a standing factor, with ``above_letter_items``, ``own_error``,
+``errors_of_another_kind`` and ``floors``) and ``other_models`` (the same without
+``floors``). The result of ``pattern`` holds ``about``, ``registered``, ``inputs`` (the two
+files, their sha256, the plan of the runs and the code), ``e2`` and ``e5`` (the item sets
+read), ``primaries``, ``sentence``, ``as_the_plan_says`` and ``where_the_plan_is_silent``. A
+float has
 six decimals; ``p``, ``p_holm`` and ``p_percentile``, wherever they stand, have six
-significant digits, so that a small p-value does not read 0; ``holds`` is decided before any
-rounding.
+significant digits, so that a small p-value does not read 0; ``holds``, the floors and the
+reading of the margin are decided before any rounding.
 
 Usage (from the repository root)::
 
@@ -204,12 +273,18 @@ Usage (from the repository root)::
         --expect-gold-sha256 <sha256 of external_data/annotation/keys/e5_gold.csv> \\
         [--gold FILE] [--items analysis/coling/out/e5/e5_pairs.jsonl] \\
         [--out-root analysis/coling/out/read] [--not-run MODEL=REASON ...] \\
+        [--cut-seed-list analysis/coling/out/audit/samples_later/sample_pair_seeds.csv \\
+         --expect-seed-list-sha256 <sha256 of the seed list> --cut-items FILE] \\
         --out analysis/coling/out/e5_scores.json
+    PYTHONPATH=. python -m analysis.coling.literal_scores pattern \\
+        --e2 analysis/coling/out/e2_scores.json \\
+        (--e5 analysis/coling/out/e5_scores.json | --e5-not-scored) \\
+        --out analysis/coling/out/pattern.json
 
 ``--items`` is the registered item file (for E2, ``literal_items.jsonl`` under the folder of the
 task): the runs must have read a file with exactly its bytes (the sha256 the launcher's plan
-holds for the list), whatever its path. Each command writes its result file, which must not
-exist, and prints a short table.
+holds for the list), whatever its path; for a cut of E5 they must have read the cut item file.
+Each command writes its result file, which must not exist, and prints a short table.
     PYTHONPATH=. python -m pytest analysis/coling/test_literal_scores.py -q -p no:cacheprovider
 """
 
@@ -224,6 +299,7 @@ from collections import Counter
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date
+from fractions import Fraction
 from pathlib import Path
 from typing import Any
 
@@ -297,18 +373,45 @@ SEED_CELLS = (SEED_FACTOR, *SEED_ROWS.values())
 """The three cells of the unedited seed items of a reader: under the E2 rule, and under each
 of those two criteria."""
 LETTER_FACTORS = ("surface_form", "granularity")
-"""The two letter factors of E5: the edit rewrites the period or changes the period itself
-(PLAN section 13, "Terms"). The four other factors are the standing factors."""
-STANDING_FACTORS = tuple(factor for factor in FACTORS if factor not in LETTER_FACTORS)
+"""The *letter factors* of E5 (PLAN section 13, "The registered pattern", "Terms"): "In E5,
+surface form and granularity are the *letter factors*: the edit rewrites the period or changes
+the period itself." """
+STANDING_FACTORS = ("certainty", "stale", "distractor", "silent")
+"""The *standing factors* of E5 (the same bullet): "Certainty marker, stale, distractor date and
+silent are the *standing factors*: the edit leaves the words of the period as they are, or
+takes them away." """
+LETTER_MARGIN = 0.10
+"""The margin of the letter part of the registered pattern (PLAN section 13, "The letter part",
+(a)): "the model's letter accuracy (section 7.1) is not more than 0.10 below the rule reader's:
+the lower end of the 90% percentile interval of the difference, model minus rule reader, lies
+above -0.10 (10,000 draws of shortage episodes, seed 20261001). Condition (a) sets no upper
+limit and is read on the interval alone." """
+STANDING_FLOOR = 0.10
+"""The floor of the standing part (PLAN section 13, "The standing part", (b)): "The model's
+error rate on the items of the factor is at least 0.10 above its error rate on the unedited
+seed items, and at least 0.10 above its error rate on the items of the two letter factors
+taken together, every rate under the criterion of the factor"."""
+OWN_ERROR_FLOOR = 0.10
+"""The floor of the own error (PLAN section 13, "The standing part", (c)): "The factor's own
+error occurs on at least 0.10 of the items of the factor on which it can occur." """
 OWN_ERROR = {
     "certainty": ("false_commitment", "gold_abstains"),
     "silent": ("false_commitment", "gold_abstains"),
     "distractor": ("uptake", "has_distractor"),
     "stale": ("unflagged", "gold_stale"),
 }
-"""The own error of each standing factor (PLAN section 13, the standing part, (c)) as two
-columns of :func:`columns`: where it occurs, and where it can occur. A period given where the
-gold gives none; the distractor's period taken; a period given without the stale flag."""
+"""The own error of each standing factor (PLAN section 13, "The standing part", (c)) as two
+columns of :func:`columns`: where it occurs, and where it can occur. "The own error is a period
+given where the gold gives none (certainty marker and silent: the false-commitment rate of
+section 7.1), the distractor's period taken (distractor date: distractor uptake, section 7.1),
+or a period given without the stale flag on an item whose gold is stale (stale)." """
+E5_CUT_SEEDS = 50
+"""The seeds that a cut of E5 keeps (PLAN section 12, cut 4): "E5 down to 474 of its 800 items:
+the unedited seed item and every edit of the first 50 seeds of the seed list in its draw order
+(the 50 lowest ``draw_rank`` of ``sample_pair_seeds.csv``), the same for every reader, fixed
+before any E5 call. The cut item file holds the registered rows of those seeds unchanged." """
+SEED_LIST_COLUMNS = ("statement_group_id", "draw_rank")
+"""The two columns of the seed list that a cut reads: the seed, and its place in the draw."""
 STATEMENT_TYPES = rd.STATEMENT_TYPES
 CERTAINTY = rd.CERTAINTY_CLASSES
 ABSTAIN = "ABSTAIN"
@@ -341,6 +444,83 @@ ABOUT_E5 = (
     "E5 of PLAN.md: errors of literal readings on the minimal pairs, the GEE of error on factor "
     "and model, and twelve tests under Holm. No outcome is read; per item, ids and flags only."
 )
+ABOUT_PATTERN = (
+    "The registered pattern of PLAN.md section 13, read on the result files of E2 and E5 for "
+    "the two primary models. It decides one sentence of the paper and nothing else. No reading, "
+    "no gold and no outcome is read."
+)
+SENTENCE = "models read the letter of a notice but not its pragmatics"
+"""The sentence the registered pattern decides (PLAN section 13, the first bullet of "Positive,
+in the order the paper would state it")."""
+PARTS = ("letter", "standing")
+"""The two parts of the registered pattern: it holds for a model when both hold."""
+AS_THE_PLAN_SAYS = (
+    'the registered pattern decides the sentence "models read the letter of a notice but not '
+    'its pragmatics" and nothing else; it reads E2 and E5 for the two primary models only, and '
+    'no outcome and none of H1 to H3 enters it (section 13, "The registered pattern")',
+    "in E5, surface form and granularity are the letter factors, and certainty marker, stale, "
+    "distractor date and silent are the standing factors; in E2, the letter items are the gold "
+    "items whose gold gives an interval and carries no distractor date, and letter accuracy is "
+    'the share of them read correctly by the E2 rule (section 13, "Terms"; section 7.1)',
+    "the letter part: (a) under literal-v1, over all gold letter items pooled without weights "
+    "(the item set of every gold item), the lower end of the 90% percentile interval of the "
+    "difference in letter accuracy, model minus rule reader, lies above -0.10 (10,000 draws of "
+    "shortage episodes, seed 20261001); condition (a) sets no upper limit and is read on the "
+    "interval alone; (b) neither of the model's E5 tests on a letter factor holds with the "
+    "higher error rate on the edited items; (b) can only withhold (section 13, "
+    '"The letter part"; section 5, E2, "Test")',
+    "the standing part: for at least one standing factor, (a) the model's E5 test of the factor "
+    "holds, under Holm over the twelve tests, with the higher error rate on the edited items; "
+    "(b) the model's error rate on the items of the factor is at least 0.10 above its error "
+    "rate on the unedited seed items, and at least 0.10 above its error rate on the items of "
+    "the two letter factors taken together, every rate under the criterion of the factor; (c) "
+    "the factor's own error occurs on at least 0.10 of the items of the factor on which it can "
+    'occur; (b) and (c) can only withhold (section 13, "The standing part"; section 5, E5, '
+    '"Target")',
+    "the own error is a period given where the gold gives none (certainty marker and silent), "
+    "the distractor's period taken (distractor date), or a period given without the stale flag "
+    "on an item whose gold is stale (stale); a wrong statement type, a wrong interval or a "
+    "wrong certainty class does not make a factor count by itself, and each is reported "
+    '(section 13, "The standing part"; section 7.1)',
+    "the pattern holds for a model when both parts hold; the paper states the sentence for the "
+    "two primary models, for one by name, or not at all; a part that does not hold is not read "
+    "as its opposite, and the paper says which condition withheld it; a test of the E5 family "
+    "that holds is reported as that family's result, with its size; a primary whose E2 or E5 "
+    "run is declared not run has no pattern; if E5 is cut (section 12, cut 4) the pattern is "
+    "read on those items with the same floors, and if E5 is not scored the sentence is not "
+    'stated (section 13, "The sentence")',
+    "the standing part reads rejections of the E5 family and adds no test to it; the letter "
+    "part adds one one-sided reading for each primary, outside the Holm rule of E2's two "
+    "tests; the E5 contrasts of the secondary models are outside the family of twelve, so no "
+    "pattern is computed for them; for each standing factor that counts, the paper gives the "
+    "rate of its own error and the share of the factor's errors that are of another kind "
+    '(section 13, "Error control" and "Support, not the rule")',
+    "the E2 run of the pattern is the primary's literal-v1 run, and the pattern is read from "
+    "one E2 and one E5 result of the same plan of the runs; the lower end of the interval of "
+    "the letter part must lie above -0.10: an end of exactly -0.10 does not meet (a), and "
+    'without a gold letter item (a) is not met (section 13, "Small points of the reading")',
+    "a difference or a share of exactly 0.10 meets a floor of the standing part, and a floor "
+    "whose rate has no item is not met; the items on which a factor's own error can occur are, "
+    "for the certainty marker and for silent, the items whose gold gives no period, for the "
+    "distractor date, the items whose gold carries a distractor date, and for stale, the items "
+    "whose gold is stale; a factor with no such item does not meet (c) (section 13, "
+    '"Small points of the reading")',
+    "a test of E5 holds by Holm's rule on the p-value of the procedure in force (under the "
+    "fallback, the centred bootstrap p-value); its direction is the sign of the difference of "
+    "the two error rates; a test that is not evaluable does not hold (section 13, "
+    '"Small points of the reading")',
+    "when no test of a standing factor holds with the higher error rate on the edited items, "
+    "the standing part is withheld by (a); otherwise the paper names the floor or the condition "
+    "(c) that each such factor misses; when the pattern holds for one primary and the other "
+    "has no pattern, the paper states the sentence for the first by name and says that the "
+    'other has none (section 13, "Small points of the reading")',
+    "a cut of E5 keeps the unedited seed item and every edit of the first 50 seeds of the seed "
+    "list in its draw order (the 50 lowest draw_rank of sample_pair_seeds.csv), the same for "
+    "every reader, fixed before any E5 call; the cut item file holds the registered rows of "
+    "those seeds unchanged (section 12, cut 4)",
+)
+"""What the scorer does about the registered pattern because the plan states it, each point
+with its section. The result file of ``pattern`` carries the list."""
 WHERE_THE_PLAN_IS_SILENT = (
     "a reading that failed or was refused, an abstention by section 4, has the stale flag "
     "false, no statement type and no certainty class: it is wrong on both and never correct "
@@ -408,10 +588,31 @@ WHERE_THE_PLAN_IS_SILENT = (
     "two counts stand with the test",
     "E5: the metrics of section 7.1 are given per model, with intervals from draws of seeds, "
     "and per model and factor without, all unweighted; the pairs have no frame to weigh by",
-    "E5: the own error of the stale factor (section 13) is a reading that gives a period "
-    "without the stale flag, counted over the items of the factor whose gold is stale; the "
-    "own errors, and the error rate on the items of the two letter factors together under "
-    "the criterion of a standing factor, are given for every model, outside the family",
+    "E5: beside the own error of a standing factor and its errors of another kind, the error "
+    "rate on the items of the two letter factors under the criterion of the factor is given "
+    "for every model, as a description; the floors stand with the twelve tests alone",
+    "the pattern: every decision is taken on whole numbers, before any rounding: a floor on "
+    "the counts of its two cells, the direction of a test on the counts of its two sides, and "
+    "the lower end of the letter part, in e2, as an exact fraction: the percentile of the "
+    "ratios of the two sums of each draw at the position of the fifth percentile, by linear "
+    "interpolation between the two order statistics around it, over the draws that hold a "
+    "letter item (with a letter item and no such draw, (a) is not met); a result file holds "
+    "the decisions, and its figures at six decimals decide nothing",
+    "E5, cut (section 12): the seed list is held to a sha256 given on the command line; a seed "
+    "among the first 50 with no item in the item file adds none, and the seeds with items are "
+    "counted; the item file given stays the registered one and the gold stays whole; the rows "
+    "of the cut item file may stand in any order, and each is compared with the registered "
+    "row as written, byte for byte, without its line end; the runs must have read "
+    "that file; the number of items kept is recorded and held to no figure; a seed list with "
+    "50 seeds or fewer, or without a seed of the item file, is refused",
+    "the pattern: that E5 is not scored is declared on the command line (--e5-not-scored), "
+    "and no pattern is then read; when neither primary has a pattern the sentence is not "
+    "stated and there is no part to report; the three conditions of every standing factor are "
+    "given whether or not its part holds, and a floor whose rate has no item is named as such",
+    "the pattern: both results must be written under this scorer's registered record, and each "
+    "must score the two primaries on one item set: in E2 the ids of every gold item, each "
+    "once; in E5 the ids that the result records, whole or cut; the figures of a result are "
+    "taken as its file holds them, and a file that cannot be read whole is refused",
     "E5: the gold of the minimal pairs is held to the sha256 given on the command line and, "
     "row by row, to the seed, the factor and the level of the item file; the manifest of the "
     "generator is not read",
@@ -1135,7 +1336,19 @@ def registered_record() -> dict[str, Any]:
         },
         "primaries": list(PRIMARIES),
         "e2": {"lines": dict(E2_LINES), "models": list(E2_MODELS), "test_template": E2_TEMPLATE},
-        "e5": {"line": E5_LINE, "template": E5_TEMPLATE, "models": list(E5_MODELS)},
+        "e5": {
+            "line": E5_LINE,
+            "template": E5_TEMPLATE,
+            "models": list(E5_MODELS),
+            "cut_seeds": E5_CUT_SEEDS,
+        },
+        "pattern": {
+            "letter_factors": list(LETTER_FACTORS),
+            "standing_factors": list(STANDING_FACTORS),
+            "letter_margin": LETTER_MARGIN,
+            "standing_floor": STANDING_FLOOR,
+            "own_error_floor": OWN_ERROR_FLOOR,
+        },
         "templates_sha256": {t: rd.FROZEN_SHA256[t] for t in E2_LINES},
     }
 
@@ -1428,6 +1641,62 @@ def letter_gap(
     return out
 
 
+def exact_percentile(numerators: Any, denominators: Any, level: Fraction) -> Fraction | None:
+    """The percentile at ``level`` of the ratios of two rows of whole numbers, one ratio for
+    each place whose denominator is positive, as an exact fraction: the value at the position
+    ``(n - 1) * level`` among the ``n`` ratios in their order, by linear interpolation between
+    the two order statistics around that position. It is the percentile of :func:`interval95`
+    without its floating point. None when no denominator is positive."""
+    times: Counter[Fraction] = Counter()
+    for (above_line, below_line), n in Counter(zip(numerators, denominators, strict=True)).items():
+        if below_line > 0:
+            times[Fraction(int(above_line), int(below_line))] += n
+    total = sum(times.values())
+    if not total:
+        return None
+    position = (total - 1) * level
+    place = position.numerator // position.denominator
+    ends: list[Fraction] = []
+    seen = 0
+    for value in sorted(times):
+        seen += times[value]
+        while len(ends) < 2 and seen > min(place + len(ends), total - 1):
+            ends.append(value)
+    return ends[0] + (position - place) * (ends[1] - ends[0])
+
+
+def letter_lower_end(
+    scope: Scope, first: Mapping[str, np.ndarray], second: Mapping[str, np.ndarray]
+) -> Fraction | None:
+    """The lower end of the 90% percentile interval of the difference in letter accuracy, first
+    minus second, pooled without weights, as an exact fraction: the fifth percentile, over the
+    draws of the scope that hold a letter item, of the difference of the two readers' correct
+    letter items over the letter items of the draw, both whole numbers. None without such a
+    draw. The interval of :func:`letter_gap` shows the same end in floating point; this one
+    decides, so that an end of exactly minus the margin is that, whichever way it arises."""
+    taken = np.rint(scope.taken).astype(np.int64)
+    letter = np.rint(first["letter"]).astype(np.int64)
+    gap = np.rint(first["letter_correct"] - second["letter_correct"]).astype(np.int64)
+    return exact_percentile((taken @ gap).tolist(), (taken @ letter).tolist(), Fraction(5, 100))
+
+
+def letter_reading(found: Mapping[str, Any], lower_end: Fraction | None) -> dict[str, Any]:
+    """The letter reading of one model (PLAN section 5, E2, "Test") from what :func:`letter_gap`
+    gives for the model and the rule reader: the figures pooled without weights, and what the
+    letter part of the registered pattern reads of them (PLAN section 13, "The letter part",
+    (a)): whether the lower end of the 90% interval of the difference, model minus rule reader,
+    lies above minus ``LETTER_MARGIN``. ``lower_end`` is that end as an exact fraction
+    (:func:`letter_lower_end`): an end of exactly minus the margin does not lie above it, and
+    without an interval there is no reading."""
+    above_margin = None if lower_end is None else lower_end > -Fraction(str(LETTER_MARGIN))
+    return {
+        "items": found["items"],
+        **found["sample"],
+        "margin": LETTER_MARGIN,
+        "lower_end_above_minus_margin": above_margin,
+    }
+
+
 def versus(
     scope: Scope, first: Mapping[str, np.ndarray], second: Mapping[str, np.ndarray]
 ) -> dict[str, Any]:
@@ -1506,16 +1775,23 @@ def score_e2(
             first, second = (held[model, template] for template in E2_LINES)
             templates[model] = versus(scope, first, second)
     tests = []
+    letter_readings = []
     for model in PRIMARIES:
         entry: dict[str, Any] = {"model": model, "template": E2_TEMPLATE, "against": RULES}
         why = why_not_read(skipped, model, E2_TEMPLATE)
         if why:
             tests.append(entry | {"evaluable": False, "why": why, "p": 1.0})
+            letter_readings.append(entry | {"evaluable": False, "why": why})
             continue
         found = against[model][E2_TEMPLATE]["outside_month_year"]
         more = found["only_first_correct"] - found["only_second_correct"]
         favours = "the model" if more > 0 else "the rule reader" if more < 0 else "neither"
         tests.append(entry | {"evaluable": True, **found, "favours": favours})
+        pooled = letter_reading(
+            against[model][E2_TEMPLATE]["letter_accuracy"],
+            letter_lower_end(scope, held[model, E2_TEMPLATE], rules),
+        )
+        letter_readings.append(entry | {"evaluable": True, **pooled})
     out = {
         "items": len(scope.ids),
         "episodes": len({frame.episode[i] for i in scope.ids}),
@@ -1524,6 +1800,7 @@ def score_e2(
         },
         "readers": readers,
         "tests": family(tests),
+        "letter_reading": letter_readings,
         "versus_rules": against,
         "literal_v1_versus_literal_free_v1": templates,
         "positive_result": positive_result(readers, against),
@@ -2026,26 +2303,78 @@ def error_table(
     return out
 
 
+def exact_rate(cell: Mapping[str, Any]) -> Fraction | None:
+    """The rate of a cell of :func:`rate` as a fraction of its two whole numbers; None when the
+    cell has no item."""
+    return Fraction(cell["errors"], cell["items"]) if cell["items"] else None
+
+
+def above(first: Mapping[str, Any], second: Mapping[str, Any]) -> Fraction | None:
+    """How far the rate of one cell stands above the rate of another, as a fraction of whole
+    numbers; None when one of the two has no item."""
+    mine, theirs = exact_rate(first), exact_rate(second)
+    return None if mine is None or theirs is None else mine - theirs
+
+
+def reaches(share: Fraction | None, floor: float) -> bool:
+    """Whether a share, or a difference of two shares, is at least a floor of the registered
+    pattern. Both sides are fractions of whole numbers, so that a share of exactly 0.10 is at
+    least 0.10 (in floating point 0.3 - 0.2 is below 0.1). A share that is not defined reaches
+    no floor: a floor can only withhold."""
+    return share is not None and share >= Fraction(str(floor))
+
+
 def standing(
-    cols: Mapping[str, np.ndarray], error: np.ndarray, factor: np.ndarray, name: str
+    cols: Mapping[str, np.ndarray],
+    error: np.ndarray,
+    factor: np.ndarray,
+    name: str,
+    edited: Mapping[str, Any],
 ) -> dict[str, Any]:
     """What the standing part of the registered pattern reads of one reader and one standing
-    factor beside its test (PLAN section 13): the error rate on the items of the two letter
-    factors taken together, under the criterion of the factor (``error`` is the error of every
-    reading under it); the rate of the factor's own error on the items of the factor on which
-    it can occur (``OWN_ERROR``); and how many of the errors on the items of the factor are of
-    another kind, with their share. The own error is always an error under the criterion of
-    its factor."""
+    factor beside its test (PLAN section 13, "The standing part"). ``error`` is the error of
+    every reading under the criterion of the factor, and ``edited`` the errors on the items of
+    the factor under it.
+
+    ``above_letter_items``: the items of the two letter factors taken together, their errors
+    and their error rate under the criterion of the factor, and how far the error rate of the
+    items of the factor stands above that rate (``difference``). ``own_error``: the factor's
+    own error (``OWN_ERROR``) on the items of the factor on which it can occur. And how many
+    of the errors on the items of the factor are of another kind, with their share. The own
+    error is always an error under the criterion of its factor."""
     here = factor == name
     occurs, can_occur = (cols[column] > 0 for column in OWN_ERROR[name])
     own = rate(occurs, here & can_occur)
-    errors = int(error[here].sum())
+    letter = rate(error, np.isin(factor, LETTER_FACTORS))
+    gap = above(edited, letter)
+    errors = edited["errors"]
     other = errors - own["errors"]
     return {
-        "letter_factors": rate(error, np.isin(factor, LETTER_FACTORS)),
+        "above_letter_items": letter | {"difference": None if gap is None else float(gap)},
         "own_error": own,
         "errors_of_another_kind": {"errors": other, "share": other / errors if errors else None},
     }
+
+
+def floors(
+    edited: Mapping[str, Any],
+    unedited: Mapping[str, Any],
+    letter: Mapping[str, Any],
+    own: Mapping[str, Any],
+) -> dict[str, bool]:
+    """The floors of the standing part of the registered pattern for one test of the twelve
+    (PLAN section 13, "The standing part", (b) and (c)), each read on the counts. ``above_seed``:
+    the error rate on the items of the factor is at least ``STANDING_FLOOR`` above the error
+    rate on the unedited seed items. ``above_letter``: it is at least ``STANDING_FLOOR`` above
+    the error rate on the items of the two letter factors taken together. Every rate is under
+    the criterion of the factor. ``own_error``: the factor's own error occurs on at least
+    ``OWN_ERROR_FLOOR`` of the items of the factor on which it can occur. ``met``: all three."""
+    found = {
+        "above_seed": reaches(above(edited, unedited), STANDING_FLOOR),
+        "above_letter": reaches(above(edited, letter), STANDING_FLOOR),
+        "own_error": reaches(exact_rate(own), OWN_ERROR_FLOOR),
+    }
+    return found | {"met": all(found.values())}
 
 
 def score_e5(
@@ -2166,7 +2495,12 @@ def score_e5(
                 "bootstrap": drawn_contrast(error, edited, plain, taken),
             }
             if f in STANDING_FACTORS:
-                entry |= standing(cols[m], error, factor, f)
+                entry |= standing(cols[m], error, factor, f, here)
+                # no pattern is computed for a model outside the family of twelve
+                if entry["primary"]:
+                    entry["floors"] = floors(
+                        here, there, entry["above_letter_items"], entry["own_error"]
+                    )
             entries.append(entry)
 
     # the procedure of the twelve: the cells and the fits of the primaries decide it, and no
@@ -2229,8 +2563,11 @@ def score_e5(
 def e5_lines(report: Mapping[str, Any]) -> list[str]:
     """The short table of an E5 result: error rates by factor and model, and the twelve tests."""
     names = [f for f in (SEED_FACTOR, *FACTORS) if f in report["items_by_factor"]]
+    kept = report["item_set"]
+    cut = f", cut to the first {kept['first_seeds']} of the seed list" if kept["cut"] else ""
     lines = [
-        f"E5: {report['items']} items of {report['seeds']} seeds; {report['gee']['method_in_force']}",
+        f"E5: {report['items']} items of {report['seeds']} seeds{cut}; "
+        f"{report['gee']['method_in_force']}",
         f"{'error rate':18s} " + " ".join(f"{name[:9]:>9s}" for name in names),
     ]
     for model, table in report["errors"].items():
@@ -2246,6 +2583,111 @@ def e5_lines(report: Mapping[str, Any]) -> list[str]:
             f"{test['p_holm']:.4f}{' *' if test['holds'] else ''}"
         )
     return lines
+
+
+@dataclass
+class Cut:
+    """E5 cut to its first seeds (PLAN section 12, cut 4): the ids of the items that are kept,
+    in the order of the item file; the bytes of the cut item file, which the runs read; and
+    what the result file records of the cut and of its two inputs."""
+
+    ids: list[str]
+    data: bytes
+    record: dict[str, Any]
+    inputs: dict[str, Any]
+
+
+def seeds_in_draw_order(data: bytes) -> list[str]:
+    """The seeds of the seed list in its draw order: the statements of its rows, by their
+    ``draw_rank``. Refused: a rank that is not a whole number, a rank or a seed twice, a row
+    with no seed."""
+    rows = read_table(data, SEED_LIST_COLUMNS, "the seed list")
+    seeds = [row["statement_group_id"].strip() for row in rows]
+    ranks: list[int] = []
+    try:
+        ranks = [int(row["draw_rank"]) for row in rows]
+    except ValueError:
+        ranks = []
+    if len(ranks) != len(rows):
+        refuse("the seed list holds a draw_rank that is not a whole number")
+    if len(set(ranks)) != len(ranks) or len(set(seeds)) != len(seeds) or "" in seeds:
+        refuse("the seed list repeats a draw_rank or a seed, or holds a row with no seed")
+    return [seed for _, seed in sorted(zip(ranks, seeds, strict=True))]
+
+
+def rows_as_written(data: bytes) -> dict[str, str]:
+    """The row of each item of an item file that :func:`read_jsonl` has read, by item id, as
+    it is written: the text of its line, without the line end."""
+    lines = [line for line in data.decode("utf-8").splitlines() if line.strip()]
+    return {json.loads(line)["item_id"]: line for line in lines}
+
+
+def cut_of(
+    args: argparse.Namespace, items: Mapping[str, Mapping[str, Any]], item_data: bytes
+) -> Cut | None:
+    """The cut of E5 that the command line asks for, or None when it asks for none. ``items``
+    holds the rows of the registered item file, each with the seed its gold row names, and
+    ``item_data`` the bytes of that file.
+
+    The seeds kept are the first ``E5_CUT_SEEDS`` of the seed list in its draw order, the list
+    being held to the sha256 given; the items kept are the unedited seed item and every edit
+    of those seeds. The cut item file is the file the runs read: it must hold the row of every
+    item kept, unchanged, and no other row. A row is unchanged when its line is the line of
+    the item file byte for byte: a value written in another way, a cell written twice or
+    cells in another order make another row. Refused: one of the three options
+    without the others; a seed list that is not the file of its hash, cannot be read, does not
+    hold every seed of the item file, or holds no more seeds than the cut keeps; a cut item
+    file that is not that cut (counts only)."""
+    given = (args.cut_seed_list, args.expect_seed_list_sha256, args.cut_items)
+    if all(value is None for value in given):
+        return None
+    if any(value is None for value in given):
+        refuse(
+            "a cut of E5 takes --cut-seed-list, --expect-seed-list-sha256 and --cut-items together"
+        )
+    wanted = sealed_counts.expected_hash(args.expect_seed_list_sha256, "--expect-seed-list-sha256")
+    listed = sealed_counts.file_bytes(args.cut_seed_list, "the seed list")
+    listed_sha = sealed_counts.require_hash(listed, wanted, "the seed list")
+    order = seeds_in_draw_order(listed)
+    unlisted = len({str(row["seed_id"]) for row in items.values()} - set(order))
+    if unlisted:
+        refuse(f"{unlisted} seeds of the item file are not on the seed list")
+    if len(order) <= E5_CUT_SEEDS:
+        refuse(f"the seed list holds {len(order)} seeds: its first {E5_CUT_SEEDS} are no cut")
+    first = set(order[:E5_CUT_SEEDS])
+    kept = [i for i, row in items.items() if str(row["seed_id"]) in first]
+    data = sealed_counts.file_bytes(args.cut_items, "the cut item file")
+    read = {row["item_id"] for row in read_jsonl(data, "the cut item file")}
+    written, registered = rows_as_written(data), rows_as_written(item_data)
+    faults = {
+        "items of the first seeds are missing": len(set(kept) - read),
+        "items are of other seeds or of no item of the item file": len(read - set(kept)),
+        "items are not as the item file has them, byte for byte": sum(
+            1 for i in kept if i in read and written[i] != registered[i]
+        ),
+    }
+    if any(faults.values()):
+        found = "; ".join(f"{n} {fault}" for fault, n in faults.items() if n)
+        refuse(
+            f"the cut item file is not the item file cut to the first {E5_CUT_SEEDS} seeds of "
+            f"the seed list: {found}"
+        )
+    record = {
+        "cut": True,
+        "first_seeds": E5_CUT_SEEDS,
+        "seeds_on_the_list": len(order),
+        "first_seeds_with_items": len({str(items[i]["seed_id"]) for i in kept}),
+        "items_in_the_item_file": len(items),
+        "items": len(kept),
+        "item_ids_sha256": lp.ids_sha256(kept),
+    }
+    inputs = {
+        "seed_list": args.cut_seed_list.as_posix(),
+        "seed_list_sha256": listed_sha,
+        "cut_items": args.cut_items.as_posix(),
+        "cut_items_sha256": sealed_counts.sha256(data),
+    }
+    return Cut(kept, data, record, inputs)
 
 
 def run_e5(args: argparse.Namespace) -> int:
@@ -2284,21 +2726,29 @@ def run_e5(args: argparse.Namespace) -> int:
     if any(faults.values()):
         found = "; ".join(f"{n} {fault}" for fault, n in faults.items() if n)
         refuse(f"the gold is not the gold of the item file: {found}")
+    cut = cut_of(args, items, item_data)
+    ids = list(items) if cut is None else cut.ids
     runs = gather(
         args.out_root,
         {E5_TEMPLATE: E5_LINE},
         E5_MODELS,
         skipped,
         "e5",
-        list(items),
-        "the minimal pairs",
-        item_data,
+        ids,
+        "the minimal pairs" if cut is None else "the minimal pairs of the cut",
+        item_data if cut is None else cut.data,
     )
     readings = {model: given for (model, _), given in runs.readings.items()}
-    rules = {i: rule_reading(item) for i, item in items.items()}
-    scored = score_e5(list(items), golds, items, readings, skipped, rules)
+    rules = {i: rule_reading(items[i]) for i in ids}
+    scored = score_e5(ids, golds, items, readings, skipped, rules)
     flags = scored.pop("flags")
-    late = sum(1 for item in items.values() if item.get("seed_period") == "test")
+    late = sum(1 for i in ids if items[i].get("seed_period") == "test")
+    item_set = {
+        "cut": False,
+        "items_in_the_item_file": len(items),
+        "items": len(ids),
+        "item_ids_sha256": lp.ids_sha256(ids),
+    }
     report = {
         "about": ABOUT_E5,
         "registered": registered_record(),
@@ -2308,9 +2758,11 @@ def run_e5(args: argparse.Namespace) -> int:
             "items": args.items.as_posix(),
             "items_sha256": sealed_counts.sha256(item_data),
             "item_ids_sha256": lp.ids_sha256(items),
+            **({} if cut is None else cut.inputs),
             "plan_sha256": runs.plan_sha256,
             "code": code_record(),
         },
+        "item_set": item_set if cut is None else cut.record,
         "items_of_test_period_seeds": late,
         "runs": {model: found[E5_TEMPLATE] for model, found in runs.records.items()},
         "not_run": dict(skipped),
@@ -2326,6 +2778,499 @@ def run_e5(args: argparse.Namespace) -> int:
     }
     ev.write_new(out, report_text(report))
     print("\n".join(e5_lines(report)))
+    print(f"wrote {out.as_posix()}")
+    return 0
+
+
+# --------------------------------------------------------------------------------------------
+# The registered pattern of section 13
+# --------------------------------------------------------------------------------------------
+
+
+def shown_test(test: Mapping[str, Any]) -> dict[str, Any]:
+    """What the pattern shows of one test of the twelve, as the result file of E5 holds it: its
+    decision under Holm, and whether the error rate of its edited items is the higher one,
+    read on the counts of its two sides. A test that is not evaluable has no rates, and does
+    not hold."""
+    if not test["evaluable"]:
+        return {
+            "evaluable": False,
+            "why": test["why"],
+            "holds": bool(test["holds"]),
+            "higher_on_edited": False,
+        }
+    gap = above(test["edited"], test["unedited"])
+    return {
+        "evaluable": True,
+        "holds": bool(test["holds"]),
+        "p_holm": test["p_holm"],
+        "p_from": test["p_from"],
+        "edited": test["edited"],
+        "unedited": test["unedited"],
+        "difference": test["difference"],
+        "higher_on_edited": gap is not None and gap > 0,
+    }
+
+
+def letter_part(
+    reading: Mapping[str, Any], tests: Mapping[str, Mapping[str, Any]]
+) -> dict[str, Any]:
+    """The letter part of the registered pattern for one primary (PLAN section 13, "The letter
+    part"). ``e2``, condition (a): the letter reading of the E2 result on every gold item, met
+    when the lower end of its 90% interval lies above minus the margin. ``e5``, condition (b):
+    the model's two tests on a letter factor, met when neither holds with the higher error
+    rate on the edited items. The part holds when both are met; ``withheld_by`` names the
+    conditions that are not."""
+    met = reading["lower_end_above_minus_margin"] is True
+    described = ("model", "template", "against", "evaluable")
+    e2 = {name: value for name, value in reading.items() if name not in described} | {"met": met}
+    e5: dict[str, Any] = {}
+    for factor in LETTER_FACTORS:
+        shown = shown_test(tests[factor])
+        e5[factor] = shown | {"withholds": shown["holds"] and shown["higher_on_edited"]}
+    withholding = [factor for factor in LETTER_FACTORS if e5[factor]["withholds"]]
+    e5["met"] = not withholding
+    withheld = []
+    if reading["lower_end_above_minus_margin"] is None:
+        withheld.append(
+            "(a): the difference in letter accuracy has no 90% interval (no gold letter item, "
+            "or no draw that holds one)"
+        )
+    elif not met:
+        withheld.append(
+            "(a): the lower end of the 90% interval of the difference in letter accuracy, "
+            f"model minus rule reader, does not lie above {-LETTER_MARGIN:.2f}"
+        )
+    withheld += [
+        f"(b): the E5 test on {factor} holds with the higher error rate on the edited items"
+        for factor in withholding
+    ]
+    return {"e2": e2, "e5": e5, "holds": met and not withholding, "withheld_by": withheld}
+
+
+def standing_factor(test: Mapping[str, Any]) -> dict[str, Any]:
+    """The three conditions of the standing part for one standing factor of one primary (PLAN
+    section 13, "The standing part"), from its test of the twelve. ``a``: the test holds with
+    the higher error rate on the edited items. ``b``: the two floors on the error rate of the
+    items of the factor, as ``e5`` read them on the counts. ``c``: the floor on the factor's
+    own error. The factor counts when all three are met. A test that is not evaluable has
+    neither rates nor floors."""
+    a = shown_test(test)
+    a["met"] = a["holds"] and a["higher_on_edited"]
+    if not test["evaluable"]:
+        return {"a": a, "b": None, "c": None, "counts": False}
+    read = test["floors"]
+    b = {
+        "floor": STANDING_FLOOR,
+        "above_seed": {"difference": test["difference"], "met": bool(read["above_seed"])},
+        "above_letter": test["above_letter_items"] | {"met": bool(read["above_letter"])},
+        "met": bool(read["above_seed"] and read["above_letter"]),
+    }
+    c = {"floor": OWN_ERROR_FLOOR, **test["own_error"], "met": bool(read["own_error"])}
+    return {
+        "a": a,
+        "b": b,
+        "c": c,
+        "errors_of_another_kind": test["errors_of_another_kind"],
+        "counts": bool(a["met"] and read["met"]),
+    }
+
+
+def standing_part(tests: Mapping[str, Mapping[str, Any]]) -> dict[str, Any]:
+    """The standing part of the registered pattern for one primary: the four standing factors,
+    those that count, and whether one does. When none does, ``withheld_by`` names what
+    withheld the part: condition (a) when no test of a standing factor holds with the higher
+    error rate on the edited items; otherwise, for each factor with such a test, the floors
+    of (b) and the condition (c) that it misses."""
+    out: dict[str, Any] = {factor: standing_factor(tests[factor]) for factor in STANDING_FACTORS}
+    counting = [factor for factor in STANDING_FACTORS if out[factor]["counts"]]
+    tested = [factor for factor in STANDING_FACTORS if out[factor]["a"]["met"]]
+    withheld = []
+    if not tested:
+        withheld.append(
+            "(a): no E5 test of a standing factor holds, under Holm over the twelve tests, "
+            "with the higher error rate on the edited items"
+        )
+    for factor in [] if counting else tested:
+        a, b, c = (out[factor][name] for name in ("a", "b", "c"))
+        floors_of_b = {
+            "the unedited seed items": (b["above_seed"]["met"], a["unedited"]["items"]),
+            "the items of the two letter factors taken together": (
+                b["above_letter"]["met"],
+                b["above_letter"]["items"],
+            ),
+        }
+        for what, (met, items) in floors_of_b.items():
+            if not met and not items:
+                withheld.append(f"(b) on {factor}: the error rate on {what} has no item")
+            elif not met:
+                withheld.append(
+                    f"(b) on {factor}: the error rate on the items of the factor is not at "
+                    f"least {STANDING_FLOOR:.2f} above the error rate on {what}"
+                )
+        if not c["met"] and not c["items"]:
+            withheld.append(
+                f"(c) on {factor}: the factor has no item on which its own error can occur"
+            )
+        elif not c["met"]:
+            withheld.append(
+                f"(c) on {factor}: the factor's own error does not occur on at least "
+                f"{OWN_ERROR_FLOOR:.2f} of the items of the factor on which it can occur"
+            )
+    return out | {"factors_that_count": counting, "holds": bool(counting), "withheld_by": withheld}
+
+
+def tests_that_hold(tests: Mapping[str, Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """The tests of one primary in the E5 family that hold, each with its size: such a test is
+    reported as that family's result, whichever way it points and whatever the pattern says
+    (PLAN section 13, "The sentence"; section 5, E5, "Negative result")."""
+    out = []
+    for factor in FACTORS:
+        test = tests[factor]
+        if test["evaluable"] and test["holds"]:
+            shown = shown_test(test)
+            where = "the edited items" if shown["higher_on_edited"] else "the unedited seed items"
+            out.append(
+                {
+                    "factor": factor,
+                    "kind": "letter" if factor in LETTER_FACTORS else "standing",
+                    "higher_error_rate_on": where,
+                    "edited": test["edited"],
+                    "unedited": test["unedited"],
+                    "difference": test["difference"],
+                    "log_odds_difference": test["log_odds_difference"],
+                    "p_holm": test["p_holm"],
+                    "p_from": test["p_from"],
+                }
+            )
+    return out
+
+
+def sentence_of(primaries: Mapping[str, Mapping[str, Any]], e5: Mapping[str, Any]) -> dict:
+    """What the paper states (PLAN section 13, "The sentence"): the sentence for the two
+    primary models, for one by name, or not at all, and what it must say beside it."""
+    stated = [model for model in PRIMARIES if primaries[model]["holds"]]
+    others = [model for model in PRIMARIES if model not in stated]
+    if not e5["scored"]:
+        case = "E5 is not scored"
+        paper = "E5 is not scored by the freeze of numbers: the sentence is not stated"
+    elif not others:
+        case = "both primaries"
+        paper = (
+            "the pattern holds for both primaries: the paper states the sentence for the two "
+            "primary models"
+        )
+    elif stated:
+        case = "one primary"
+        other = primaries[others[0]]
+        missed = [part for part in PARTS if other["has_pattern"] and not other[part]["holds"]]
+        if missed:
+            paper = (
+                "the pattern holds for one primary: the paper states the sentence for that "
+                f"model by name ({stated[0]}) and says in the same place which part did not "
+                f"hold for the other ({others[0]}: the {' part and the '.join(missed)} part)"
+            )
+        else:
+            paper = (
+                "the pattern holds for one primary and the other has no pattern: the paper "
+                f"states the sentence for the first by name ({stated[0]}) and says that the "
+                f"other has none ({others[0]})"
+            )
+    elif any(primaries[model]["has_pattern"] for model in PRIMARIES):
+        case = "neither primary"
+        paper = (
+            "the pattern holds for neither primary: the paper does not state the sentence and "
+            "reports each part for each primary"
+        )
+    else:
+        case = "neither primary"
+        paper = "neither primary has a pattern: the paper does not state the sentence"
+    beside = []
+    for model in PRIMARIES:
+        found = primaries[model]
+        if found["declared_not_run"]:
+            runs = "; ".join(found["declared_not_run"])
+            beside.append(f"{model} has no pattern, and the paper says so: {runs}")
+        for part in PARTS if found["has_pattern"] else ():
+            if not found[part]["holds"]:
+                withheld = "; ".join(found[part]["withheld_by"])
+                beside.append(
+                    f"{model}: the {part} part does not hold; it is not read as its opposite, "
+                    f"and the paper says which condition withheld it: {withheld}"
+                )
+    for model in PRIMARIES:
+        for held in primaries[model]["e5_tests_that_hold"]:
+            beside.append(
+                f"{model}, {held['factor']}: this test of the E5 family holds, with the higher "
+                f"error rate on {held['higher_error_rate_on']}; it is reported as that "
+                "family's result, with its size, also when a floor or the other part withholds "
+                "the sentence, and the paper then does not write that no effect was detected"
+            )
+    for model in PRIMARIES:
+        if model in stated:
+            beside.append(
+                f"{model}: the paragraph that states the sentence gives the outcome of the "
+                "overconfidence criterion of section 13 for the model, whichever way it came out"
+            )
+        # a factor that counts is named with its own error whether or not the sentence is
+        # stated for the model: the letter part may withhold a pattern whose standing part holds
+        beside += [
+            f"{model}, {factor}: the paper gives the rate of its own error in the sentence that "
+            "names it, and the share of the factor's errors that are of another kind"
+            for factor in (primaries[model]["standing"] or {}).get("factors_that_count", ())
+        ]
+    if e5["scored"] and e5["item_set"]["cut"]:
+        beside.append(
+            f"E5 is cut to {e5['item_set']['items']} items (section 12, cut 4): the pattern is "
+            "read on those items with the same floors"
+        )
+    beside.append(
+        "the paper states the sentence for no secondary model and uses no plural that includes one"
+    )
+    return {
+        "sentence": SENTENCE,
+        "case": case,
+        "stated_for": stated,
+        "paper": paper,
+        "beside": beside,
+    }
+
+
+def pattern_of(e2: Mapping[str, Any], e5: Mapping[str, Any] | None) -> dict[str, Any]:
+    """The registered pattern (PLAN section 13) from the two results as their files hold them:
+    for each primary its letter part, its standing part and whether both hold, and the
+    sentence. ``e5`` is None when E5 is not scored. A primary whose E2 run under ``literal-v1``
+    or whose E5 run is declared not run has no pattern; without E5 none is read."""
+    readings = {entry["model"]: entry for entry in e2["item_sets"]["all"]["letter_reading"]}
+    family: dict[str, dict[str, Any]] = {model: {} for model in PRIMARIES}
+    for test in [] if e5 is None else e5["tests"]:
+        family[test["model"]][test["factor"]] = test
+    primaries: dict[str, Any] = {}
+    for model in PRIMARIES:
+        reading, tests = readings[model], family[model]
+        declared_not_run = []
+        if not reading["evaluable"]:
+            declared_not_run.append(f"its E2 run under {E2_TEMPLATE}, {reading['why']}")
+        if e5 is not None and model in e5["not_run"]:
+            declared_not_run.append(f"its E5 run, {e5['not_run'][model]}")
+        found: dict[str, Any] = {
+            "has_pattern": e5 is not None and not declared_not_run,
+            "declared_not_run": declared_not_run,
+            "letter": None,
+            "standing": None,
+            "holds": None,
+            "e5_tests_that_hold": [] if e5 is None else tests_that_hold(tests),
+        }
+        if found["has_pattern"]:
+            found["letter"] = letter_part(reading, tests)
+            found["standing"] = standing_part(tests)
+            found["holds"] = found["letter"]["holds"] and found["standing"]["holds"]
+        primaries[model] = found
+    described = {"scored": e5 is not None}
+    if e5 is not None:
+        described |= {
+            "item_set": e5["item_set"],
+            "items": e5["items"],
+            "seeds": e5["seeds"],
+            "method_in_force": e5["gee"]["method_in_force"],
+        }
+    return {
+        "e2": {"item_set": "all", "items": e2["item_sets"]["all"]["items"]},
+        "e5": described,
+        "primaries": primaries,
+        "sentence": sentence_of(primaries, described),
+    }
+
+
+def read_result(path: Path | None, flag: str, about: str, what: str) -> tuple[dict, str]:
+    """A result file of this scorer and its sha256. Refused: no path; a file that cannot be
+    read, is no JSON object, or is not the result named (``about``); a result whose registered
+    record is not the one this scorer writes today (other constants, or a scorer from before
+    the registered pattern)."""
+    if path is None:
+        refuse(f"{flag} names {what}")
+    data = sealed_counts.file_bytes(path, what)
+    report: Any = None
+    try:
+        report = json.loads(data.decode("utf-8"))
+    except (ValueError, RecursionError):  # no JSON, or nested deeper than the parser reads
+        report = None
+    if not isinstance(report, dict) or report.get("about") != about:
+        refuse(f"{flag}: the file is not {what} as this scorer writes it")
+    if report.get("registered") != json.loads(report_text(registered_record())):
+        refuse(
+            f"{flag}: {what} was written under another registered record than this scorer's "
+            "(another constant, primary, line or template pin)"
+        )
+    return report, sealed_counts.sha256(data)
+
+
+def scored_ids(report: Mapping[str, Any], names: Mapping[str, str]) -> dict[str, list[str]]:
+    """The ids of the items each primary is scored on in a result, from its per-item flags; a
+    primary that was not scored has none. ``names`` gives each primary its reader's name."""
+    readers = report["per_item"]["readers"]
+    return {
+        model: [str(row[0]) for row in readers[name]]
+        for model, name in names.items()
+        if name in readers
+    }
+
+
+def same_items(e2: Mapping[str, Any], e5: Mapping[str, Any] | None) -> str | None:
+    """Why the two results cannot be read together, or None: they are of different plans of
+    the runs, or the two primaries are not scored on one item set (in E2 every gold item; in
+    E5 the item set the result records, whole or cut)."""
+    literal = scored_ids(e2, {model: f"{model} {E2_TEMPLATE}" for model in PRIMARIES})
+    gold_items = e2["item_sets"]["all"]["items"]
+    alike = len({frozenset(ids) for ids in literal.values()}) <= 1
+    whole = all(len(ids) == gold_items == len(set(ids)) for ids in literal.values())
+    if e2["per_item"]["item_set"] != "all" or not alike or not whole:
+        return "the E2 result does not score the two primaries on one set of gold items"
+    if e5 is None:
+        return None
+    if e2["inputs"]["plan_sha256"] != e5["inputs"]["plan_sha256"]:
+        return "the two results are of different plans of the runs"
+    pairs = scored_ids(e5, {model: model for model in PRIMARIES})
+    recorded = e5["item_set"]
+    counted = all(len(ids) == recorded["items"] == e5["items"] for ids in pairs.values())
+    if not counted or any(
+        lp.ids_sha256(ids) != recorded["item_ids_sha256"] for ids in pairs.values()
+    ):
+        return (
+            "the E5 result does not score the two primaries on the item set it records: the "
+            "pattern is read on one item set, whole or cut"
+        )
+    return None
+
+
+def _number(value: Any, form: str = ".3f") -> str:
+    return "-" if value is None else format(value, form)
+
+
+def pattern_lines(report: Mapping[str, Any]) -> list[str]:
+    """The short summary of a pattern result: for each primary one line for each part with the
+    numbers it rests on, then the sentence and what stands beside it."""
+    e5 = report["e5"]
+    head = f"pattern of PLAN section 13: E2 on {report['e2']['items']} gold items; E5 "
+    if e5["scored"]:
+        kept = e5["item_set"]
+        cut = f", cut to the first {kept['first_seeds']} of the seed list" if kept["cut"] else ""
+        head += f"on {e5['items']} items of {e5['seeds']} seeds{cut} ({e5['method_in_force']})"
+    lines = [head if e5["scored"] else head + "not scored"]
+    for model, found in report["primaries"].items():
+        if not found["has_pattern"]:
+            why = "; ".join(found["declared_not_run"]) or "E5 is not scored"
+            lines.append(f"{model}: no pattern ({why})")
+            continue
+        letter, part = found["letter"], found["standing"]
+        a, ends = letter["e2"], letter["e2"]["ci90"] or {"low": None, "high": None}
+        cells = [
+            f"(a) letter accuracy {_number(a['first'])} against {_number(a['second'])} of the "
+            f"rule reader on {a['items']} letter items, difference "
+            f"{_number(a['difference'], '+.3f')}, 90% interval {_number(ends['low'], '+.3f')} "
+            f"to {_number(ends['high'], '+.3f')}, lower end "
+            f"{'above' if a['met'] else 'not above'} {-a['margin']:.2f}"
+        ]
+        cells += [f"(b) {factor}: {_test_cell(letter['e5'][factor])}" for factor in LETTER_FACTORS]
+        state = "holds" if letter["holds"] else "does not hold"
+        lines.append(f"{model} letter: {state}; " + "; ".join(cells))
+        cells = [f"{factor}: {_factor_cell(part[factor])}" for factor in STANDING_FACTORS]
+        counting = ", ".join(part["factors_that_count"])
+        state = f"holds by {counting}" if part["holds"] else "does not hold"
+        lines.append(f"{model} standing: {state}; " + "; ".join(cells))
+    lines.append(f"sentence: {report['sentence']['paper']}")
+    lines += [f"beside it: {text}" for text in report["sentence"]["beside"]]
+    return lines
+
+
+def _test_cell(shown: Mapping[str, Any]) -> str:
+    """One test of the twelve in a line of the summary: its two error rates, its p-value under
+    Holm and its decision."""
+    if not shown["evaluable"]:
+        return "not evaluable"
+    side = "higher" if shown["higher_on_edited"] else "lower"
+    state = f"holds with the {side} rate on the edited items" if shown["holds"] else "does not hold"
+    return (
+        f"{_number(shown['edited']['rate'])} against {_number(shown['unedited']['rate'])} "
+        f"unedited ({_number(shown['difference'], '+.3f')}), Holm {shown['p_holm']:.4f}, {state}"
+    )
+
+
+def _factor_cell(one: Mapping[str, Any]) -> str:
+    """One standing factor in a line of the summary: its test, the error rate on the items of
+    the letter factors with the distance to it, its own error, and what it misses."""
+    cell = _test_cell(one["a"])
+    if one["b"] is None:
+        return cell
+    others, own = one["b"]["above_letter"], one["c"]
+    cell += (
+        f", {_number(others['rate'])} on the letter-factor items "
+        f"({_number(others['difference'], '+.3f')}), own error {own['errors']} of {own['items']}"
+    )
+    missed = ", ".join(name for name in ("a", "b", "c") if not one[name]["met"])
+    return cell + (", counts" if one["counts"] else f", ({missed}) not met")
+
+
+def run_pattern(args: argparse.Namespace) -> int:
+    """The command ``pattern``: the two result files, read by the registered pattern. Nothing
+    is written unless both can be read whole, summary included."""
+    out, _ = ev.output_paths(args.out)
+    if (args.e5 is None) != bool(args.e5_not_scored):
+        refuse(
+            "--e5 names the result file of e5, or --e5-not-scored declares that E5 is not "
+            "scored by the freeze of numbers: one of the two, and not both"
+        )
+    e2, e2_sha = read_result(args.e2, "--e2", ABOUT_E2, "the result file of e2")
+    e5, e5_sha = None, None
+    if args.e5 is not None:
+        e5, e5_sha = read_result(args.e5, "--e5", ABOUT_E5, "the result file of e5")
+    stopped, apart = "", None
+    report: dict[str, Any] = {}
+    lines: list[str] = []
+    try:
+        apart = same_items(e2, e5)
+        if apart is None:
+            inputs = {
+                "e2": args.e2.as_posix(),
+                "e2_sha256": e2_sha,
+                "e5": None if args.e5 is None else args.e5.as_posix(),
+                "e5_sha256": e5_sha,
+                "plan_sha256": e2["inputs"]["plan_sha256"],
+                "gold_sha256": {
+                    "e2": e2["inputs"]["gold_sha256"],
+                    "e5": None if e5 is None else e5["inputs"]["gold_sha256"],
+                },
+                "code_of_the_results": {
+                    "e2": e2["inputs"]["code"]["literal_scores.py"],
+                    "e5": None if e5 is None else e5["inputs"]["code"]["literal_scores.py"],
+                },
+                "code": code_record(),
+            }
+            report = {
+                "about": ABOUT_PATTERN,
+                "registered": registered_record(),
+                "inputs": inputs,
+                **pattern_of(e2, e5),
+                "as_the_plan_says": list(AS_THE_PLAN_SAYS),
+                "where_the_plan_is_silent": list(WHERE_THE_PLAN_IS_SILENT),
+            }
+            lines = pattern_lines(report)
+    except (
+        KeyError,
+        TypeError,
+        ValueError,
+        AttributeError,
+        IndexError,
+        ArithmeticError,  # a number too large for a float, where a share is printed
+        RecursionError,
+    ) as error:
+        stopped = type(error).__name__
+    if stopped:
+        refuse(f"the two results cannot be read as this scorer writes them ({stopped})")
+    if apart is not None:
+        refuse(apart)
+    ev.write_new(out, report_text(report))
+    print("\n".join(lines))
     print(f"wrote {out.as_posix()}")
     return 0
 
@@ -2365,7 +3310,17 @@ def arguments(argv: Sequence[str] | None) -> argparse.Namespace:
 
     e5 = commands.add_parser("e5", allow_abbrev=False, help="minimal pairs")
     common(e5, E5_GOLD, E5_ITEMS, "MODEL=REASON")
+    e5.add_argument("--cut-seed-list", type=Path, default=None, help="E5 cut: the seed list")
+    e5.add_argument("--expect-seed-list-sha256", default=None, help="sha256 of the seed list")
+    e5.add_argument("--cut-items", type=Path, default=None, help="E5 cut: the file the runs read")
     e5.set_defaults(run=run_e5)
+
+    pattern = commands.add_parser("pattern", allow_abbrev=False, help="the registered pattern")
+    pattern.add_argument("--e2", type=Path, default=None, help="the result file of e2")
+    pattern.add_argument("--e5", type=Path, default=None, help="the result file of e5")
+    pattern.add_argument("--e5-not-scored", action="store_true", help="E5 is not scored")
+    pattern.add_argument("--out", type=Path, help="the result file to write; it must not exist")
+    pattern.set_defaults(run=run_pattern)
     args = ap.parse_args(None if argv is None else list(argv))
     if args.command == "e2":  # the files of the literal task lie under its folder
         args.gold = args.gold or args.audit_dir / A.GOLD

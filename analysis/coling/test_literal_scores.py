@@ -1,7 +1,9 @@
-"""Tests for the scorer of E2 and E5 (``literal_scores.py``).
+"""Tests for the scorer of E2 and E5 and of the registered pattern (``literal_scores.py``).
 
 No test reads an outcome, a sealed folder, a key folder of the study, a network connection or
-an API key. Everything runs on made-up files in temporary folders:
+an API key. One test reads the committed plan, to hold the constants of the pattern and the
+words of its sentence to the plan's own. Everything else runs on made-up files in temporary
+folders:
 
 * E2: a made-up events table (one statement per row, wordings chosen so that the frozen form
   classifier puts them in known strata) and a short guide; the blank sheets, the item file and
@@ -13,7 +15,10 @@ an API key. Everything runs on made-up files in temporary folders:
 * a plan made by ``launch.make_plan`` and every run read by the harness's own reader
   (``read.Reader``, ``read.write_run``) around a scripted client, so that rows and manifests
   are in the harness's format. The scripted answers are a fixed function of the model, the
-  template and the item.
+  template and the item;
+* the pattern: the two result files of the made-up study, and result files written out by
+  hand that hold what the pattern reads of a result and nothing else;
+* a cut of E5: a made-up seed list, the cut item file, and a second plan with its own runs.
 
 Covered: every metric on cases worked by hand, letter accuracy among them; the letter reading
 with its two intervals; the exact intervals of the rates; the ceiling on every labelled item;
@@ -31,7 +36,19 @@ procedure; the margins over the rule reader and over the annotators against a lo
 same draws; the pins of the rule reader and of the item file; plans, manifests and stored rows
 that are not as they are written; what a declaration of runs not run is held to; and that a
 refused input in a sealed folder is neither opened nor listed (an audit hook of the
-interpreter records both).
+interpreter records both). For the registered pattern of PLAN section 13: the floors at
+exactly 0.10 and just below, on counts and through the scorer of E5 on readings worked by
+hand, with the own error of each standing factor; the margin of the letter part at exactly
+-0.10, read on the lower end as an exact fraction, with ends that are -1/10 by interpolation
+and a model above the rule reader whose interval starts below; the letter reading of each
+primary; every outcome that the
+bullet "The sentence" tells apart, on result files written by hand (both primaries; one by
+name; the letter part withheld by its margin or by a test on a letter factor; a standing test
+that a floor or the own error withholds; a secondary model alone; a primary declared not run;
+E5 not scored); the pattern end to end on the made-up study; E5 cut to the first seeds of
+the seed list, with the rows of the cut item file held to the registered ones byte for byte,
+and the pattern on it; and every refusal of the cut and of ``pattern``, a result that cannot
+be read whole among them.
 
 Run::
 
@@ -43,6 +60,7 @@ from __future__ import annotations
 import csv
 import gzip
 import hashlib
+import io
 import json
 import os
 import re
@@ -51,7 +69,7 @@ import socket
 import subprocess
 import sys
 from collections.abc import Callable, Iterator, Mapping, Sequence
-from contextlib import contextmanager
+from contextlib import contextmanager, redirect_stdout
 from datetime import date
 from fractions import Fraction
 from pathlib import Path
@@ -1979,7 +1997,19 @@ def test_e2_result_file_holds_the_registered_record(
             "models": list(rd.STUDY_MODELS),
             "test_template": V1,
         },
-        "e5": {"line": "e5", "template": V1, "models": [m for m in rd.STUDY_MODELS if m != GEMINI]},
+        "e5": {
+            "line": "e5",
+            "template": V1,
+            "models": [m for m in rd.STUDY_MODELS if m != GEMINI],
+            "cut_seeds": 50,
+        },
+        "pattern": {
+            "letter_factors": ["surface_form", "granularity"],
+            "standing_factors": ["certainty", "stale", "distractor", "silent"],
+            "letter_margin": 0.1,
+            "standing_floor": 0.1,
+            "own_error_floor": 0.1,
+        },
         "templates_sha256": {V1: rd.FROZEN_SHA256[V1], FREE: rd.FROZEN_SHA256[FREE]},
     }
     inputs = report["inputs"]
@@ -3094,6 +3124,12 @@ def test_e5_result_file_and_error_rates(study: SimpleNamespace, e5: SimpleNamesp
     assert report["inputs"]["gold_sha256"] == sha(study.e5_gold)
     assert report["inputs"]["items_sha256"] == sha(study.e5_items)
     assert report["inputs"]["item_ids_sha256"] == lp.ids_sha256(i.item_id for i in study.pairs)
+    assert report["item_set"] == {
+        "cut": False,
+        "items_in_the_item_file": 84,
+        "items": 84,
+        "item_ids_sha256": report["inputs"]["item_ids_sha256"],
+    }
     assert report["registered"]["e5"]["models"] == list(ERRS)
     assert report["where_the_plan_is_silent"] == list(LS.WHERE_THE_PLAN_IS_SILENT)
     assert list(report["errors"]) == list(ERRS)
@@ -4429,34 +4465,54 @@ def standing_case() -> tuple[dict, dict, dict[str, LS.Reading]]:
 def test_e5_what_the_standing_part_of_the_pattern_reads_beside_a_test() -> None:
     """PLAN section 13, the standing part: beside its test, a standing factor has the error
     rate on the items of the two letter factors together under the criterion of the factor,
-    and the rate of its own error on the items on which it can occur. A letter factor has
-    neither."""
+    with how far its own rate stands above it, and the rate of its own error on the items on
+    which it can occur. A letter factor has neither. The floors stand with the twelve tests
+    and with no contrast of another model."""
     assert LS.LETTER_FACTORS == ("surface_form", "granularity")
     assert LS.STANDING_FACTORS == ("certainty", "stale", "distractor", "silent")
     assert set(LS.OWN_ERROR) == set(LS.STANDING_FACTORS)
+    assert sorted(LS.LETTER_FACTORS + LS.STANDING_FACTORS) == sorted(MP.FACTORS)
     golds, info, given = standing_case()
     found = LS.score_e5(list(golds), golds, info, {LLAMA: given, QWEN: given}, {})
     expected = {
         # factor: errors on its four items; on the eight letter-factor items; own error (of the
-        # items on which it can occur)
-        "certainty": (2, 4, (1, 2)),
-        "stale": (3, 3, (1, 4)),
-        "distractor": (2, 2, (1, 4)),
-        "silent": (1, 2, (1, 4)),
+        # items on which it can occur); the floors: above the unedited items (one error in
+        # four under every criterion), above the letter-factor items, the own error
+        "certainty": (2, 4, (1, 2), (True, False, True)),
+        "stale": (3, 3, (1, 4), (True, True, True)),
+        "distractor": (2, 2, (1, 4), (True, True, True)),
+        "silent": (1, 2, (1, 4), (False, False, True)),
     }
     entries = [t for t in (*found["tests"], *found["other_models"]) if t["evaluable"]]
     assert {t["model"] for t in entries} == {LLAMA, QWEN} and len(entries) == 12
+    beside = {"above_letter_items", "own_error", "errors_of_another_kind", "floors"}
     for test in entries:
         if test["factor"] in LS.LETTER_FACTORS:
-            assert not {"letter_factors", "own_error", "errors_of_another_kind"} & set(test)
+            assert not (beside | {"letter_factors"}) & set(test)
             continue
-        errors, letter, (own, can) = expected[test["factor"]]
+        errors, letter, (own, can), (seed, letters, own_floor) = expected[test["factor"]]
         assert test["edited"] == {"items": 4, "errors": errors, "rate": errors / 4}
-        assert test["letter_factors"] == {"items": 8, "errors": letter, "rate": letter / 8}
+        assert test["unedited"] == {"items": 4, "errors": 1, "rate": 0.25}
+        assert test["above_letter_items"] == {
+            "items": 8,
+            "errors": letter,
+            "rate": letter / 8,
+            "difference": errors / 4 - letter / 8,
+        }
         assert test["own_error"] == {"items": can, "errors": own, "rate": own / can}
         assert test["errors_of_another_kind"] == {
             "errors": errors - own,
             "share": (errors - own) / errors,
+        }
+        assert "letter_factors" not in test
+        if test["model"] == QWEN:  # outside the family of twelve: no pattern, and no floor
+            assert "floors" not in test and test["primary"] is False
+            continue
+        assert test["floors"] == {
+            "above_seed": seed,
+            "above_letter": letters,
+            "own_error": own_floor,
+            "met": seed and letters and own_floor,
         }
     # the stale flag: a period given without it is the own error; an abstention without it is
     # an error of the stale criterion and not the own one; so is a flagged period elsewhere
@@ -4486,7 +4542,8 @@ def test_e5_the_standing_quantities_on_the_made_up_study(e5: SimpleNamespace) ->
     for test in (*e5.report["tests"], *e5.report["other_models"]):
         model, factor = test["model"], test["factor"]
         if factor in LS.LETTER_FACTORS:
-            assert "letter_factors" not in test and "own_error" not in test
+            assert "above_letter_items" not in test and "own_error" not in test
+            assert "floors" not in test
             continue
         seen += 1
         errors = ERRS[model][PAIR_FACTORS.index(factor)]
@@ -4498,7 +4555,12 @@ def test_e5_the_standing_quantities_on_the_made_up_study(e5: SimpleNamespace) ->
             for name, off in (("surface_form", s % 2 == 1), ("granularity", s % 3 == 0)):
                 counts = {"surface_form": "certainty", "granularity": "stale"}[name] == factor
                 letter += pair_errs(model, s, name) or (off and counts)
-        assert test["letter_factors"] == {"items": 24, "errors": letter, "rate": near(letter / 24)}
+        assert test["above_letter_items"] == {
+            "items": 24,
+            "errors": letter,
+            "rate": near(letter / 24),
+            "difference": near(errors / 12 - letter / 24),
+        }
         own = {"stale": errors, "distractor": errors}.get(factor, 0)
         can = 0 if factor == "certainty" else 12
         assert test["own_error"] == {
@@ -4510,12 +4572,26 @@ def test_e5_the_standing_quantities_on_the_made_up_study(e5: SimpleNamespace) ->
             "errors": errors - own,
             "share": near((errors - own) / errors),
         }
+        # the floors, for the twelve alone: tenths of the counts, in whole numbers
+        assert ("floors" in test) == (model in (LLAMA, DEEPSEEK))
+        if "floors" in test:
+            plain = sum(seed_errs(model, s, factor) for s in range(12))
+            wanted = {
+                "above_seed": 10 * (errors - plain) >= 12,
+                "above_letter": 10 * (2 * errors - letter) >= 24,
+                "own_error": bool(can) and 10 * own >= can,
+            }
+            assert test["floors"] == wanted | {"met": all(wanted.values())}
     assert seen == 7 * 4
+    met = {(t["model"], t["factor"]) for t in e5.report["tests"] if t.get("floors", {}).get("met")}
+    # llama: stale 9 of 12 against 4 unedited, distractor 5 against 2, with 7 errors on the 24
+    # letter-factor items by the E2 rule; deepseek: distractor 11 against 1
+    assert met == {(LLAMA, "stale"), (LLAMA, "distractor"), (DEEPSEEK, "distractor")}
     # the criterion matters: llama's letter-factor items hold 7 errors by the E2 rule
     llama = {
-        t["factor"]: t["letter_factors"]["errors"]
+        t["factor"]: t["above_letter_items"]["errors"]
         for t in e5.report["tests"][:6]
-        if "letter_factors" in t
+        if "above_letter_items" in t
     }
     assert llama["distractor"] == llama["silent"] == 7
     assert llama["certainty"] > 7 and llama["stale"] > 7
@@ -5119,7 +5195,7 @@ def test_the_list_holds_what_the_plan_leaves_open_and_nothing_it_states(
     silent = LS.WHERE_THE_PLAN_IS_SILENT
     assert e2.report["where_the_plan_is_silent"] == list(silent)
     assert e5.report["where_the_plan_is_silent"] == list(silent)
-    assert len(silent) == len(set(silent)) == 20
+    assert len(silent) == len(set(silent)) == 24
     text = " | ".join(silent)
     stated = (
         "results by form",  # sections 2.6 and 5, E2: by stratum of the guide's table
@@ -5140,6 +5216,17 @@ def test_the_list_holds_what_the_plan_leaves_open_and_nothing_it_states(
         "sections 9 or 12",  # E2, Readers: a dropped model is still scored
         "guard of form",  # E5, Fallback: fewer than two seeds
         "measurably",  # section 13 holds a registered pattern, and no such word
+        "of exactly 0.10",  # section 13, Small points of the reading: each of these
+        "exactly -0.10",
+        "whose gold gives no period",
+        "E2 run of the pattern",
+        "plan of the runs",
+        "procedure in force",
+        "withheld by",
+        "the other has none",
+        "lowest draw_rank",  # section 12, cut 4
+        "registered rows of those seeds",
+        "every primary with a pattern",  # section 13, Support: each factor that counts
         "no registered procedure",
         "counts as ABSTAIN",  # section 4: a failed literal reading
         "on the items both readers parsed",  # section 4: the sensitivity analysis
@@ -5165,7 +5252,11 @@ def test_the_list_holds_what_the_plan_leaves_open_and_nothing_it_states(
         "the rule reading of an item is made here": "the two text fields of the item file",
         "with two annotators the leave-one-out ceiling": "on every item both labelled",
         "the letter reading of E2": "from the 5th to the 95th percentile",
-        "E5: the own error of the stale factor": "whose gold is stale",
+        "E5: beside the own error of a standing factor": "the twelve tests alone",
+        "the pattern: every decision is taken on whole numbers": "as an exact fraction",
+        "E5, cut (section 12)": "byte for byte",
+        "the pattern: that E5 is not scored is declared": "--e5-not-scored",
+        "the pattern: both results must be written": "a file that cannot be read whole",
         "E5: the gold of the minimal pairs": "the manifest of the generator is not read",
         "beside the rates that section 13 lists as support": "paired by the draw alone",
     }
@@ -5182,7 +5273,10 @@ def test_the_list_holds_what_the_plan_leaves_open_and_nothing_it_states(
     assert "like_for_like" not in document and "same error on both" not in document
     assert "measurably" not in document and "no-convention-items" not in document
     assert "lie on fewer than two seeds" in document
-    assert "Neither command applies the floors of the registered pattern" in document
+    assert "Neither command applies the floors" not in document
+    assert "``e2`` decides nothing else of the pattern" in document
+    assert "A contrast of another model has no floors" in document
+    assert "No secondary model has a pattern" in document
     # two items of one stratum weigh the same, whatever their template or their period
     weights, _ = LS.stratum_weights(["silent"] * 4, {"silent": 1000}, "statement")
     assert weights.tolist() == [250.0] * 4
@@ -5581,6 +5675,8 @@ def test_one_template_of_a_model_can_be_declared_not_run(
         )
     found = report["item_sets"]["all"]
     assert found["tests"] == whole["tests"]
+    # the letter part of the pattern reads literal-v1 alone: the letter reading stands
+    assert found["letter_reading"] == whole["letter_reading"]
     assert found["positive_result"] == whole["positive_result"]
     assert found["versus_rules"][LLAMA] == {V1: whole["versus_rules"][LLAMA][V1]}
     assert found["readers"][LLAMA] == {V1: whole["readers"][LLAMA][V1]}
@@ -5617,6 +5713,16 @@ def test_one_template_of_a_model_can_be_declared_not_run(
         "p_holm": 1.0,
         "holds": False,
     }
+    assert found["letter_reading"] == [
+        whole["letter_reading"][0],
+        {
+            "model": DEEPSEEK,
+            "template": V1,
+            "against": "rules",
+            "evaluable": False,
+            "why": "declared on the command line: no route",
+        },
+    ]
     assert found["readers"][DEEPSEEK] == {FREE: whole["readers"][DEEPSEEK][FREE]}
     assert DEEPSEEK not in found["positive_result"]
     assert f"all: {DEEPSEEK} against the rules: not run, p = 1" in printed
@@ -6504,3 +6610,2626 @@ def test_a_refusal_of_the_command_run_as_a_process(
     assert done.returncode == 1 and done.stdout == ""
     assert done.stderr == "refused: --gold lies in a sealed folder; no sealed file is read\n"
     assert not out.exists() and [path.name for path in vault.iterdir()] == ["file"]
+
+
+# --------------------------------------------------------------------------------------------
+# The registered pattern of section 13: its constants, the floors, the margin
+# --------------------------------------------------------------------------------------------
+
+PLAN = Path(LS.__file__).resolve().parent / "plan" / "PLAN.md"
+QUOTED = (
+    "In E5, surface form and granularity are the *letter factors*: the edit rewrites the period "
+    "or changes the period itself.",
+    "Certainty marker, stale, distractor date and silent are the *standing factors*: the edit "
+    "leaves the words of the period as they are, or takes them away.",
+    "the model's letter accuracy (section 7.1) is not more than 0.10 below the rule reader's: "
+    "the lower end of the 90% percentile interval of the difference, model minus rule reader, "
+    "lies above -0.10 (10,000 draws of shortage episodes, seed 20261001). Condition (a) sets no "
+    "upper limit and is read on the interval alone.",
+    "The model's error rate on the items of the factor is at least 0.10 above its error rate on "
+    "the unedited seed items, and at least 0.10 above its error rate on the items of the two "
+    "letter factors taken together, every rate under the criterion of the factor",
+    "The factor's own error occurs on at least 0.10 of the items of the factor on which it can "
+    "occur.",
+    "The own error is a period given where the gold gives none (certainty marker and silent: "
+    "the false-commitment rate of section 7.1), the distractor's period taken (distractor date: "
+    "distractor uptake, section 7.1), or a period given without the stale flag on an item whose "
+    "gold is stale (stale).",
+    "E5 down to 474 of its 800 items: the unedited seed item and every edit of the first 50 "
+    "seeds of the seed list in its draw order (the 50 lowest draw_rank of "
+    "sample_pair_seeds.csv), the same for every reader, fixed before any E5 call. The cut item "
+    "file holds the registered rows of those seeds unchanged.",
+)
+"""What the constants of the pattern quote of the plan, word for word."""
+SMALL_POINTS = (
+    "Condition (a) sets no upper limit and is read on the interval alone",
+    "The E2 run of the pattern is the primary's literal-v1 run, and the pattern is read from "
+    "one E2 and one E5 result of the same plan of the runs",
+    "an end of exactly -0.10 does not meet (a), and without a gold letter item (a) is not met",
+    "A difference or a share of exactly 0.10 meets a floor of the standing part",
+    "a floor whose rate has no item is not met",
+    "for the certainty marker and for silent, the items whose gold gives no period",
+    "the items whose gold carries a distractor date",
+    "for stale, the items whose gold is stale",
+    "A factor with no such item does not meet (c)",
+    "A test of E5 holds by Holm's rule on the p-value of the procedure in force (under the "
+    "fallback, the centred bootstrap p-value); its direction is the sign of the difference of "
+    "the two error rates; a test that is not evaluable does not hold",
+    "When no test of a standing factor holds with the higher error rate on the edited items, "
+    "the standing part is withheld by (a); otherwise the paper names the floor or the condition "
+    "(c) that each such factor misses",
+    "When the pattern holds for one primary and the other has no pattern, the paper states the "
+    "sentence for the first by name and says that the other has none",
+    "the same for every reader, fixed before any E5 call",
+    "the 50 lowest draw_rank of sample_pair_seeds.csv",
+    "the cut item file holds the registered rows of those seeds unchanged",
+)
+"""What the plan states of the reading, in its own words: each stands in the plan, and in what
+the scorer lists as done because the plan says so."""
+PLAN_WORDS = (
+    "the paper states the sentence for the two primary models",
+    "for that model by name",
+    "says in the same place which part did not hold for the other",
+    "the paper does not state the sentence and reports each part for each primary",
+    "is not read as its opposite, and the paper says which condition withheld it",
+    "reported as that family's result, with its size, also when a floor or the other part "
+    "withholds the sentence",
+    "does not write that no effect was detected",
+    "has no pattern, and the paper says so",
+    "the pattern is read on those items with the same floors",
+    "(section 12, cut 4)",
+    "the pattern holds for one primary and the other has no pattern",
+    "states the sentence for the first by name",
+    "says that the other has none",
+    "is not scored by the freeze of numbers",
+    "the sentence is not stated",
+    "whichever way it came out",
+    "the paper gives the rate of its own error in the sentence that names it, and the share of "
+    "the factor's errors that are of another kind",
+    "the paper states the sentence for no secondary model and uses no plural that includes one",
+)
+"""The words of the plan that the sentence of a pattern result is written in."""
+
+
+def flat_text(text: str) -> str:
+    """A text without its line breaks, its backticks and the typeset minus sign."""
+    return " ".join(text.replace("−", "-").replace("`", "").split())
+
+
+def test_the_constants_of_the_pattern_quote_the_plan() -> None:
+    """PLAN section 13, "The registered pattern", and section 12, cut 4: each constant stands
+    in the module with the sentence of the plan that fixes it, and the sentence is the plan's."""
+    plan = flat_text(PLAN.read_text(encoding="utf-8"))
+    source = flat_text(Path(LS.__file__).read_text(encoding="utf-8"))
+    for words in QUOTED:
+        assert flat_text(words) in plan, words
+        assert flat_text(words) in source, words
+    assert all(flat_text(words) in plan for words in PLAN_WORDS)
+    assert (LS.LETTER_MARGIN, LS.STANDING_FLOOR, LS.OWN_ERROR_FLOOR) == (0.10, 0.10, 0.10)
+    assert LS.E5_CUT_SEEDS == 50
+    assert LS.LETTER_FACTORS == ("surface_form", "granularity")
+    assert LS.STANDING_FACTORS == ("certainty", "stale", "distractor", "silent")
+    assert LS.OWN_ERROR == {
+        "certainty": ("false_commitment", "gold_abstains"),
+        "silent": ("false_commitment", "gold_abstains"),
+        "distractor": ("uptake", "has_distractor"),
+        "stale": ("unflagged", "gold_stale"),
+    }
+    assert LS.SENTENCE in flat_text(PLAN.read_text(encoding="utf-8")).lower()
+    # what the scorer does because the plan states it names its section, and is no silence
+    says = LS.AS_THE_PLAN_SAYS
+    assert len(says) == len(set(says)) == 12 and all("(section " in line for line in says)
+    assert not set(says) & set(LS.WHERE_THE_PLAN_IS_SILENT)
+    stated = " ".join(says)
+    for words in ("above -0.10", "at least 0.10 above", "the first 50 seeds", "seed 20261001"):
+        assert words in stated, words
+    assert "Holm over the twelve tests" in stated
+    # the small points of the reading and the cut: the plan's own words, in the plan and here
+    assert sum('"Small points of the reading")' in line for line in says) == 4
+    assert sum("(section 12, cut 4)" in line for line in says) == 2
+    for words in SMALL_POINTS:
+        assert flat_text(words).lower() in plan.lower(), words
+        assert flat_text(words).lower() in stated.lower(), words
+
+
+def counted(errors: int, items: int) -> dict[str, Any]:
+    """A cell of error counts as a result file holds it."""
+    return {"items": items, "errors": errors, "rate": errors / items if items else None}
+
+
+ALL_MET = {"above_seed": True, "above_letter": True, "own_error": True, "met": True}
+
+
+def test_a_floor_is_met_at_exactly_one_tenth_and_not_just_below(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """PLAN section 13, the standing part, (b) and (c): "at least 0.10". The floors are read on
+    the counts, in whole numbers: three tenths less two tenths is one tenth, which it is not
+    in floating point."""
+    assert 0.3 - 0.2 < 0.1 and 0.7 - 0.6 < 0.1
+    # every floor exactly at 0.10: 3 of 10 against 2 of 10 and 4 of 20; the own error 1 of 10
+    assert LS.floors(counted(3, 10), counted(2, 10), counted(4, 20), counted(1, 10)) == ALL_MET
+    for k in range(9):
+        found = LS.floors(counted(k + 1, 10), counted(k, 10), counted(2 * k, 20), counted(3, 30))
+        assert found == ALL_MET, k
+    # one error in a thousand short of the floor above the unedited seed items
+    short = LS.floors(counted(300, 1000), counted(201, 1000), counted(4, 20), counted(1, 10))
+    assert short == ALL_MET | {"above_seed": False, "met": False}
+    assert LS.floors(counted(300, 1000), counted(200, 1000), counted(4, 20), counted(1, 10)) == (
+        ALL_MET
+    )
+    # one error in two thousand short of the floor above the letter-factor items
+    short = LS.floors(counted(300, 1000), counted(200, 1000), counted(401, 2000), counted(1, 10))
+    assert short == ALL_MET | {"above_letter": False, "met": False}
+    assert LS.floors(counted(300, 1000), counted(200, 1000), counted(400, 2000), counted(1, 10))[
+        "met"
+    ]
+    # the own error on 99 of 1,000 items on which it can occur, and on 100
+    short = LS.floors(counted(3, 10), counted(2, 10), counted(4, 20), counted(99, 1000))
+    assert short == ALL_MET | {"own_error": False, "met": False}
+    assert LS.floors(counted(3, 10), counted(2, 10), counted(4, 20), counted(100, 1000)) == ALL_MET
+    # the lower error rate on the edited items is no floor met
+    below = LS.floors(counted(2, 10), counted(3, 10), counted(8, 20), counted(2, 10))
+    assert below == {"above_seed": False, "above_letter": False, "own_error": True, "met": False}
+    # a rate with no item meets no floor: a floor can only withhold
+    none = LS.floors(counted(3, 10), counted(2, 10), counted(0, 0), counted(0, 0))
+    assert none == {"above_seed": True, "above_letter": False, "own_error": False, "met": False}
+    assert LS.floors(counted(3, 10), counted(0, 0), counted(4, 20), counted(1, 10)) == (
+        ALL_MET | {"above_seed": False, "met": False}
+    )
+    assert LS.reaches(Fraction(1, 10), 0.10) and not LS.reaches(Fraction(999, 10000), 0.10)
+    assert not LS.reaches(None, 0.10) and LS.reaches(Fraction(1, 5), 0.2)
+    assert LS.above(counted(3, 10), counted(2, 10)) == Fraction(1, 10)
+    assert LS.above(counted(3, 10), counted(0, 0)) is None
+    assert LS.exact_rate(counted(0, 0)) is None and LS.exact_rate(counted(2, 8)) == Fraction(1, 4)
+    # each floor is its own constant
+    cells = (counted(3, 10), counted(2, 10), counted(4, 20), counted(1, 10))
+    monkeypatch.setattr(LS, "OWN_ERROR_FLOOR", 0.11)
+    assert LS.floors(*cells) == ALL_MET | {"own_error": False, "met": False}
+    monkeypatch.setattr(LS, "OWN_ERROR_FLOOR", 0.10)
+    monkeypatch.setattr(LS, "STANDING_FLOOR", 0.11)
+    assert LS.floors(*cells) == {
+        "above_seed": False,
+        "above_letter": False,
+        "own_error": True,
+        "met": False,
+    }
+
+
+def tie_case() -> tuple[dict, dict, dict[str, LS.Reading]]:
+    """Ten seeds with one item of every factor, and the readings of one reader. On the ten
+    items of each standing factor it errs three times, once by the factor's own error and
+    twice in another way; on the ten unedited items twice, under every criterion; on the
+    twenty letter-factor items four times, under every criterion. So each floor stands at
+    exactly 0.10: 0.3 against 0.2, 0.3 against 0.2, and 1 item in 10."""
+    dated = gold("recovery", *APRIL, "estimated")
+    away = ("2022-01-01", "2022-01-31")
+    right = reading("recovery", *APRIL, "estimated")
+    elsewhere = reading("recovery", "2020-06-01", "2020-06-30", "estimated")
+    by_factor = {
+        "seed": ([dated] * 10, [elsewhere] * 2 + [right] * 8),
+        "surface_form": ([dated] * 10, [right] * 8 + [elsewhere] * 2),
+        "granularity": ([dated] * 10, [right] * 4 + [elsewhere] * 2 + [right] * 4),
+        # a period where the gold gives none (the own error); twice the wrong class
+        "certainty": (
+            [gold("recovery", certainty="undetermined")] * 10,
+            [right]
+            + [reading("recovery", certainty="estimated")] * 2
+            + [reading("recovery", certainty="undetermined")] * 7,
+        ),
+        # a period without the stale flag (the own error); twice a flagged period elsewhere
+        "stale": (
+            [gold("recovery", *APRIL, "estimated", stale=True)] * 10,
+            [right]
+            + [reading("recovery", "2020-06-01", "2020-06-30", "estimated", stale=True)] * 2
+            + [reading("recovery", *APRIL, "estimated", stale=True)] * 7,
+        ),
+        # the distractor's period taken (the own error); twice the wrong statement type
+        "distractor": (
+            [gold("recovery", *APRIL, "estimated", distractors=[away])] * 10,
+            [reading("recovery", *away, "estimated")]
+            + [reading("depletion", *APRIL, "estimated")] * 2
+            + [right] * 7,
+        ),
+        # a period where the entry is silent (the own error); twice an abstention of a type
+        "silent": (
+            [gold("none", certainty="no_statement")] * 10,
+            [right]
+            + [reading("recovery", certainty="no_statement")] * 2
+            + [reading("none", certainty="no_statement")] * 7,
+        ),
+    }
+    golds, info, given = {}, {}, {}
+    for factor, (theirs, mine) in by_factor.items():
+        for k in range(10):
+            item = f"P{k}{factor}"
+            golds[item], given[item] = theirs[k], mine[k]
+            info[item] = {"seed_id": f"S{k}", "factor": factor, "level": "x"}
+    return golds, info, given
+
+
+def standing_tests(found: Mapping[str, Any], model: str = LLAMA) -> dict[str, dict[str, Any]]:
+    tests = (*found["tests"], *found["other_models"])
+    return {
+        t["factor"]: t for t in tests if t["model"] == model and t["factor"] in LS.STANDING_FACTORS
+    }
+
+
+def test_e5_the_own_error_and_the_floors_of_each_standing_factor_worked_by_hand() -> None:
+    """Through the scorer of E5, on readings written out by hand: the own error of each of the
+    four standing factors on the items on which it can occur, and the three floors at exactly
+    0.10; then each floor missed alone."""
+    golds, info, given = tie_case()
+    found = LS.score_e5(list(golds), golds, info, {LLAMA: given, GROK: given}, {})
+    tests = standing_tests(found)
+    assert list(tests) == ["certainty", "stale", "distractor", "silent"]
+    for factor, test in tests.items():
+        assert test["evaluable"] and test["against"] == LS.seed_cell(factor)
+        assert test["edited"] == counted(3, 10) and test["unedited"] == counted(2, 10)
+        assert test["above_letter_items"] == counted(4, 20) | {"difference": 0.1}
+        assert test["own_error"] == counted(1, 10), factor
+        assert test["errors_of_another_kind"] == {"errors": 2, "share": 2 / 3}
+        assert test["floors"] == ALL_MET, factor
+    # another model has the same quantities and no floors: no pattern is computed for it
+    others = standing_tests(found, GROK)
+    assert len(others) == 4 and all("floors" not in t for t in others.values())
+    assert all(others[f]["own_error"] == tests[f]["own_error"] for f in tests)
+    assert all(others[f]["above_letter_items"] == tests[f]["above_letter_items"] for f in tests)
+    # a letter factor has none of them
+    letters = [t for t in found["tests"] if t["factor"] in LS.LETTER_FACTORS]
+    assert len(letters) == 4 and all("floors" not in t and "own_error" not in t for t in letters)
+
+    def again(change: Mapping[str, LS.Reading]) -> dict[str, dict[str, Any]]:
+        return standing_tests(LS.score_e5(list(golds), golds, info, {LLAMA: given | change}, {}))
+
+    wrong = reading("recovery", "2020-06-01", "2020-06-30", "estimated")
+    # one more error on an unedited item: 0.3 against 0.3
+    for factor, test in again({"P5seed": wrong}).items():
+        assert test["unedited"] == counted(3, 10)
+        assert test["floors"] == ALL_MET | {"above_seed": False, "met": False}, factor
+    # one more error on a letter-factor item: 0.3 against 5 of 20
+    for factor, test in again({"P0surface_form": wrong}).items():
+        assert test["above_letter_items"] == counted(5, 20) | {"difference": near(0.05)}
+        assert test["floors"] == ALL_MET | {"above_letter": False, "met": False}, factor
+    # the own error in another way: the same three errors, and none of them the factor's own
+    other_kind = {
+        "P0certainty": reading("recovery", certainty="estimated"),
+        "P0stale": reading("recovery", "2020-06-01", "2020-06-30", "estimated", stale=True),
+        "P0distractor": reading("depletion", *APRIL, "estimated"),
+        "P0silent": reading("recovery", certainty="no_statement"),
+    }
+    for factor, test in again(other_kind).items():
+        assert test["edited"] == counted(3, 10) and test["own_error"] == counted(0, 10)
+        assert test["errors_of_another_kind"] == {"errors": 3, "share": 1.0}
+        assert test["floors"] == ALL_MET | {"own_error": False, "met": False}, factor
+    # where the own error can occur: a certainty item whose gold gives a period, a stale-factor
+    # item whose gold is not stale and a distractor item whose quote gives no date are items
+    # of their factor on which it cannot
+    dated = gold("recovery", *APRIL, "estimated")
+    less = dict(golds) | {"P9certainty": dated, "P9stale": dated, "P9distractor": dated}
+    right = reading("recovery", *APRIL, "estimated")
+    readings = given | {"P9certainty": right, "P9stale": right, "P9distractor": right}
+    found = standing_tests(LS.score_e5(list(less), less, info, {LLAMA: readings}, {}))
+    assert [found[f]["own_error"] for f in found] == [
+        counted(1, 9),
+        counted(1, 9),
+        counted(1, 9),
+        counted(1, 10),
+    ]
+    assert all(found[f]["edited"] == counted(3, 10) for f in found)
+    # the wrong class of a letter-factor item counts under the criterion of the certainty
+    # marker alone, its wrong stale flag under that of stale alone
+    marked = given | {
+        "P0surface_form": reading("recovery", *APRIL, "asserted"),
+        "P1granularity": reading("recovery", *APRIL, "estimated", stale=True),
+    }
+    found = standing_tests(LS.score_e5(list(golds), golds, info, {LLAMA: marked}, {}))
+    assert [found[f]["above_letter_items"]["errors"] for f in found] == [5, 5, 4, 4]
+    assert [found[f]["floors"]["above_letter"] for f in found] == [False, False, True, True]
+
+
+def test_e5_the_own_error_of_the_silent_factor_through_the_command(
+    study: SimpleNamespace, tmp_path: Path, capsys: pytest.CaptureFixture[str], e5: SimpleNamespace
+) -> None:
+    """The own error of silent through the command, on stored readings: llama's reading of the
+    silent item of three seeds is given a period, where the gold gives none. The scripted
+    error on a silent item is an abstention under another type, which is no own error."""
+    silent = {study.pair_ids[s, "silent"]: s for s in range(PAIR_SEEDS)}
+    dated = pair_answer(LLAMA, 0, "seed")
+    given = [s for s in range(PAIR_SEEDS) if not pair_errs(LLAMA, s, "silent")][:3]
+    assert dated["interval"] != "ABSTAIN" and len(given) == 3
+
+    def commits(row: dict) -> dict:
+        return row | {"reading": dated} if silent.get(row["item_id"]) in given else row
+
+    before = next(t for t in e5.report["tests"][:6] if t["factor"] == "silent")
+    assert before["own_error"] == counted(0, 12) | {"rate": 0.0}
+    assert before["edited"]["errors"] == 1 and before["errors_of_another_kind"]["errors"] == 1
+    with rewritten(study, run_of("e5", LLAMA), commits):
+        report, _ = scored("e5", study, tmp_path, capsys)
+    test = next(t for t in report["tests"][:6] if t["factor"] == "silent")
+    assert test["model"] == LLAMA and test["edited"] == counted(4, 12) | {"rate": near(4 / 12)}
+    assert test["own_error"] == counted(3, 12) | {"rate": 0.25}
+    assert test["errors_of_another_kind"] == {"errors": 1, "share": 0.25}
+    # 4 of 12 against 2 unedited and 7 of the 24 letter-factor items: 0.167 and 0.042 above
+    assert test["unedited"]["errors"] == 2 and test["above_letter_items"]["errors"] == 7
+    assert test["above_letter_items"]["difference"] == near(4 / 12 - 7 / 24)
+    assert test["floors"] == {
+        "above_seed": True,
+        "above_letter": False,
+        "own_error": True,
+        "met": False,
+    }
+    # no other contrast moves: the own error of the other factors is what it was
+    for name in ("certainty", "stale", "distractor"):
+        mine = next(t for t in report["tests"][:6] if t["factor"] == name)
+        theirs = next(t for t in e5.report["tests"][:6] if t["factor"] == name)
+        assert mine["own_error"] == theirs["own_error"] and mine["floors"] == theirs["floors"]
+    for mine, theirs in zip(report["tests"][6:], e5.report["tests"][6:], strict=True):
+        assert mine.get("own_error") == theirs.get("own_error")
+        assert mine.get("floors") == theirs.get("floors")
+
+
+def letter_scope(items: int) -> LS.Scope:
+    return LS.Scope(
+        ids=[f"I{k:03d}" for k in range(items)],
+        golds=[gold("recovery", *APRIL)] * items,
+        strata=["x"] * items,
+        marked=[False] * items,
+        bases={"sample": np.ones(items)},
+        taken=np.ones((5, items)),
+    )
+
+
+def letter_cols(right: int, items: int) -> dict[str, np.ndarray]:
+    mine, off = reading("recovery", *APRIL), reading("recovery", "2020-06-01", "2020-06-30")
+    return LS.columns([mine] * right + [off] * (items - right), [gold("recovery", *APRIL)] * items)
+
+
+def read_letter(
+    scope: LS.Scope, first: Mapping[str, np.ndarray], second: Mapping[str, np.ndarray]
+) -> dict[str, Any]:
+    """The letter reading of two readers on a scope, as the scorer of E2 makes it: the figures
+    of their letter accuracy, and the margin read on the exact lower end."""
+    return LS.letter_reading(
+        LS.letter_gap(scope, first, second), LS.letter_lower_end(scope, first, second)
+    )
+
+
+def test_the_margin_of_the_letter_part_is_read_on_the_exact_lower_end(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """PLAN section 13, the letter part, (a), and "Small points of the reading": the lower end
+    of the 90% interval must lie above -0.10, and an end of exactly -0.10 does not meet (a).
+    The end is read as a fraction of whole numbers; the figure of the interval, which the
+    result file shows at six decimals, decides nothing."""
+
+    def found(low: float | None) -> dict[str, Any]:
+        """A letter reading whose 90% interval is shown as starting at ``low``; its 95%
+        interval starts 0.05 further down, as a wider interval does."""
+        ci = None if low is None else {"low": low, "high": 0.0, "draws": 5}
+        wider = None if low is None else {"low": low - 0.05, "high": 0.05, "draws": 5}
+        pooled = {"first": 0.8, "second": 0.9, "difference": -0.1, "ci90": ci, "ci95": wider}
+        return {"items": 10, "sample": pooled, "weighted_by_event": {"ci90": {"low": 0.5}}}
+
+    def above(end: Fraction | None, shown: float | None = -0.5) -> bool | None:
+        return LS.letter_reading(found(shown), end)["lower_end_above_minus_margin"]
+
+    tenth, speck = Fraction(1, 10), Fraction(1, 10**9)
+    assert above(-tenth) is False and above(-tenth - speck) is False
+    assert above(Fraction(-1, 4)) is False
+    assert above(-tenth + speck) is True and above(Fraction(0)) is True
+    assert above(Fraction(3, 10)) is True
+    assert round(float(-tenth + speck), 6) == -0.1  # six decimals would not tell the two apart
+    # the figure shown decides nothing, neither that of the 90% interval nor that of the 95%
+    assert above(-tenth, shown=0.25) is False and above(Fraction(-2, 25), shown=-0.5) is True
+    assert above(Fraction(-2, 25), shown=-0.08) is True and found(-0.08)["sample"]["ci95"][
+        "low"
+    ] == pytest.approx(-0.13)
+    assert above(None, shown=None) is None
+    assert LS.letter_reading(found(-0.05), Fraction(-1, 20)) == {
+        "items": 10,
+        "first": 0.8,
+        "second": 0.9,
+        "difference": -0.1,
+        "ci90": {"low": -0.05, "high": 0.0, "draws": 5},
+        "ci95": {"low": -0.1, "high": 0.05, "draws": 5},
+        "margin": 0.1,
+        "lower_end_above_minus_margin": True,
+    }
+    # through the letter reading of two readers: 100 letter items, the rule reader right on
+    # 99; a model right on 89 stands exactly 0.10 below in every draw, one right on 90 does not
+    scope = letter_scope(100)
+    rules = letter_cols(99, 100)
+    exact = read_letter(scope, letter_cols(89, 100), rules)
+    assert exact["difference"] == -0.1 and exact["ci90"] == {"low": -0.1, "high": -0.1, "draws": 5}
+    assert LS.letter_lower_end(scope, letter_cols(89, 100), rules) == -tenth
+    assert exact["lower_end_above_minus_margin"] is False and exact["items"] == 100
+    closer = read_letter(scope, letter_cols(90, 100), rules)
+    assert closer["ci90"]["low"] == -0.09 and closer["lower_end_above_minus_margin"] is True
+    further = read_letter(scope, letter_cols(88, 100), rules)
+    assert further["ci90"]["low"] == -0.11 and further["lower_end_above_minus_margin"] is False
+    better = read_letter(scope, letter_cols(100, 100), rules)
+    assert better["difference"] == 0.01 and better["lower_end_above_minus_margin"] is True
+    # the two intervals on either side of the margin, from draws: a model wrong on 5 of 100
+    # letter items that the rule reader has right stands 0.05 below in a draw that takes each
+    # item once, and 15 of 110 below in a draw that takes its five wrong items three times.
+    # With 4 such draws in 100 the 90% interval starts at -0.05 and the 95% one at -15/110
+    spread = letter_scope(100)
+    spread.taken = np.ones((100, 100))
+    spread.taken[:4, 95:] = 3
+    all_right, model = letter_cols(100, 100), letter_cols(95, 100)
+    straddling = read_letter(spread, model, all_right)
+    assert straddling["ci90"]["low"] == -0.05 and straddling["ci90"]["draws"] == 100
+    assert straddling["ci95"]["low"] == pytest.approx(-15 / 110) and -15 / 110 < -0.1
+    assert LS.letter_lower_end(spread, model, all_right) == Fraction(-1, 20)
+    assert straddling["lower_end_above_minus_margin"] is True
+    # with 5 such draws the end lies between the two values, 19 twentieths of the way up
+    spread.taken[:5, 95:] = 3
+    between = Fraction(-15, 110) + Fraction(19, 20) * (Fraction(-1, 20) - Fraction(-15, 110))
+    assert LS.letter_lower_end(spread, model, all_right) == between == Fraction(-239, 4400)
+    assert read_letter(spread, model, all_right)["ci90"]["low"] == pytest.approx(float(between))
+    assert read_letter(spread, model, all_right)["lower_end_above_minus_margin"] is True
+    # with 6 such draws in 100 the 90% interval starts at -15/110 too
+    spread.taken[:6, 95:] = 3
+    below = read_letter(spread, model, all_right)
+    assert below["ci90"]["low"] == pytest.approx(-15 / 110)
+    assert LS.letter_lower_end(spread, model, all_right) == Fraction(-3, 22)
+    assert below["lower_end_above_minus_margin"] is False
+    # without a letter item there is no interval, and no reading of the margin
+    empty = LS.Scope(
+        ["a"], [gold("recovery")], ["x"], [False], {"sample": np.ones(1)}, np.ones((2, 1))
+    )
+    cols = LS.columns([reading("recovery")], [gold("recovery")])
+    none = read_letter(empty, cols, cols)
+    assert none["items"] == 0 and none["ci90"] is None
+    assert LS.letter_lower_end(empty, cols, cols) is None
+    assert none["lower_end_above_minus_margin"] is None and none["margin"] == 0.1
+    # a draw that holds no letter item is left out, as in the interval that is shown
+    some = letter_scope(100)
+    some.taken = np.ones((40, 100))
+    some.taken[:30] = 0
+    kept = read_letter(some, letter_cols(89, 100), rules)
+    assert kept["ci90"] == {"low": -0.1, "high": -0.1, "draws": 10}
+    assert kept["lower_end_above_minus_margin"] is False
+    # the margin is the constant
+    monkeypatch.setattr(LS, "LETTER_MARGIN", 0.11)
+    assert above(-tenth) is True and above(Fraction(-11, 100)) is False
+    assert LS.letter_reading(found(-0.1), -tenth)["margin"] == 0.11
+
+
+INTERPOLATED = (
+    (-29, 100, -9, 100),
+    (-48, 100, -8, 100),
+    (-10, 100, -10, 100),
+    (-2, 20, -1, 10),
+    (-67, 100, -7, 100),
+    (-86, 100, -6, 100),
+    (-105, 100, -5, 100),
+    (-33, 110, -17, 190),
+)
+"""Pairs of values ``a`` and ``b`` with ``a + 19 b = -2``: where ``a`` and ``b`` are the two
+order statistics around the fifth percentile of 10,000 draws, the percentile is ``a`` plus 19
+twentieths of the way to ``b``, which is exactly -1/10."""
+
+
+def test_the_lower_end_is_an_exact_fraction_at_the_position_of_the_percentile() -> None:
+    """The percentile that decides the letter part, in exact fractions: linear interpolation
+    between the two order statistics around the position, as the interval shown has it in
+    floating point. An end that is -1/10 by interpolation between two other values is exactly
+    -1/10, and does not lie above it; in floating point it reads as just above in some cases."""
+    # the definition, against the percentile of the interval that is shown
+    rows = (
+        [Fraction(1, 3), Fraction(-1, 2), Fraction(2, 7), Fraction(0), Fraction(5, 9)],
+        [Fraction(k * k - 40, 7 + k % 5) for k in range(23)],
+        [Fraction(-1, 10)] * 4 + [Fraction(1, 10)],
+    )
+    for values in rows:
+        above, below = [v.numerator for v in values], [v.denominator for v in values]
+        for level in (
+            Fraction(0),
+            Fraction(5, 100),
+            Fraction(1, 2),
+            Fraction(95, 100),
+            Fraction(1),
+        ):
+            exact = LS.exact_percentile(above, below, level)
+            assert isinstance(exact, Fraction)
+            shown = np.quantile([float(v) for v in values], float(level))
+            assert float(exact) == pytest.approx(shown, abs=1e-12), (values, level)
+    # by hand: 0, 1/2 and 1 at a quarter of the way stand at 1/4; in thirds, 1/3 of the way
+    assert LS.exact_percentile([0, 1, 1], [1, 2, 1], Fraction(1, 4)) == Fraction(1, 4)
+    assert LS.exact_percentile([1, 0, 1], [1, 1, 2], Fraction(1, 6)) == Fraction(1, 6)
+    assert LS.exact_percentile([2, 1, 0, 4], [4, 2, 5, 8], Fraction(1, 2)) == Fraction(1, 2)
+    # a place without a denominator is left out; with none left there is no percentile
+    assert LS.exact_percentile([5, 0, 1, 7], [0, 1, 2, 0], Fraction(1, 2)) == Fraction(1, 4)
+    assert LS.exact_percentile([5, 7], [0, 0], Fraction(1, 2)) is None
+    assert LS.exact_percentile([], [], Fraction(1, 2)) is None
+    assert LS.exact_percentile([-3], [4], Fraction(1, 20)) == Fraction(-3, 4)
+    # the made-up sets of 10,000 draws: 499 below a, then a and b, then 9,499 above b
+    shown_above = 0
+    for a_num, a_den, b_num, b_den in INTERPOLATED:
+        a, b = Fraction(a_num, a_den), Fraction(b_num, b_den)
+        assert a + 19 * b == -2
+        values = [b + Fraction(1, 20)] * 9499 + [a - Fraction(1, 50)] * 499 + [b, a]
+        above, below = [v.numerator for v in values], [v.denominator for v in values]
+        assert LS.exact_percentile(above, below, Fraction(5, 100)) == Fraction(-1, 10), (a, b)
+        shown = LS.interval90(np.array(above) / np.array(below))
+        assert shown["low"] == pytest.approx(-0.1, abs=1e-12) and shown["draws"] == 10_000
+        shown_above += bool(shown["low"] > -0.1)
+        if a - Fraction(1, 50) < -1:
+            continue
+        # the same draws as the letter reading of two readers on two letter items: the model
+        # has the first wrong and the rule reader has both right, and a draw of value -p/q
+        # takes the first item p times and the second q - p times
+        golds = [gold("recovery", *APRIL)] * 2
+        right, off = reading("recovery", *APRIL), reading("depletion", *APRIL)
+        model, rules = LS.columns([off, right], golds), LS.columns([right, right], golds)
+        scope = LS.Scope(["a", "b"], golds, ["x"] * 2, [False] * 2, {"sample": np.ones(2)}, None)
+
+        def taken(row: Sequence[Fraction]) -> np.ndarray:
+            return np.array([[-v.numerator, v.denominator + v.numerator] for v in row], float)
+
+        scope.taken = taken(values)
+        assert LS.letter_lower_end(scope, model, rules) == Fraction(-1, 10)
+        found = read_letter(scope, model, rules)
+        assert found["ci90"]["low"] == pytest.approx(-0.1, abs=1e-12)
+        assert found["lower_end_above_minus_margin"] is False, (a, b)
+        # one thousandth up or down at the upper of the two values, and the end is not -1/10
+        for step, met in ((Fraction(1, 1000), True), (Fraction(-1, 1000), False)):
+            scope.taken = taken([*values[:-2], b + step, a])
+            lower, upper = sorted((a, b + step))
+            moved = lower + Fraction(19, 20) * (upper - lower)
+            assert moved != Fraction(-1, 10) and (moved > Fraction(-1, 10)) is met
+            assert LS.letter_lower_end(scope, model, rules) == moved
+            assert read_letter(scope, model, rules)["lower_end_above_minus_margin"] is met
+    # read in floating point, some of these ends lie above -0.10
+    assert shown_above >= 1
+
+
+def test_a_model_better_than_the_rule_reader_meets_a_by_its_interval_alone() -> None:
+    """PLAN section 13, the letter part: "Condition (a) sets no upper limit and is read on the
+    interval alone." Three letter items in three episodes, the model right on two and the rule
+    reader on the third alone: the model is one third above the rule reader, and a draw that
+    takes the third item twice puts it one third below. More than a twentieth of the
+    registered draws do, so the lower end is -1/3 and (a) is not met."""
+    golds = [gold("recovery", *APRIL)] * 3
+    right, off = reading("recovery", *APRIL), reading("depletion", *APRIL)
+    scope = LS.Scope(
+        ids=["a", "b", "c"],
+        golds=golds,
+        strata=["x"] * 3,
+        marked=[False] * 3,
+        bases={"sample": np.ones(3)},
+        taken=LS.item_draws(["E1", "E2", "E3"]),
+    )
+    assert scope.taken.shape == (10_000, 3) and (scope.taken.sum(axis=1) == 3).all()
+    model, rules = LS.columns([right, right, off], golds), LS.columns([off, off, right], golds)
+    found = read_letter(scope, model, rules)
+    assert found["items"] == 3 and found["first"] == pytest.approx(2 / 3)
+    assert found["second"] == pytest.approx(1 / 3) and found["difference"] == pytest.approx(1 / 3)
+    # the third item is taken three times in about one draw in 27, twice in about six in 27
+    thrice = int((scope.taken[:, 2] == 3).sum())
+    twice = int((scope.taken[:, 2] == 2).sum())
+    assert thrice < 500 < thrice + twice
+    assert LS.letter_lower_end(scope, model, rules) == Fraction(-1, 3)
+    assert found["ci90"]["low"] == pytest.approx(-1 / 3) and found["ci90"]["draws"] == 10_000
+    assert found["lower_end_above_minus_margin"] is False
+    # a model as far above the rule reader that no draw puts below it meets (a): here the
+    # rule reader is right on the second item alone, which the model has right too
+    rules = LS.columns([off, right, off], golds)
+    found = read_letter(scope, model, rules)
+    assert found["difference"] == pytest.approx(1 / 3)
+    assert LS.letter_lower_end(scope, model, rules) == Fraction(0)
+    assert found["lower_end_above_minus_margin"] is True
+
+
+def test_e2_the_letter_reading_of_each_primary(e2: SimpleNamespace) -> None:
+    """PLAN section 5, E2, "Letter reading": one entry for each primary on every item set, the
+    figures those of the model against the rule reader pooled without weights."""
+    for name, scored_set in e2.report["item_sets"].items():
+        entries = scored_set["letter_reading"]
+        assert [entry["model"] for entry in entries] == [LLAMA, DEEPSEEK], name
+        for entry in entries:
+            versus = scored_set["versus_rules"][entry["model"]][V1]["letter_accuracy"]
+            assert entry == {
+                "model": entry["model"],
+                "template": V1,
+                "against": "rules",
+                "evaluable": True,
+                "items": versus["items"],
+                **versus["sample"],
+                "margin": 0.1,
+                "lower_end_above_minus_margin": True,
+            }
+            assert entry["ci90"]["low"] > -0.1
+    whole = e2.report["item_sets"]["all"]["letter_reading"]
+    assert [entry["items"] for entry in whole] == [14, 14]
+    assert whole[0]["first"] == near(13 / 14) and whole[0]["second"] == near(8 / 14)
+    assert whole[1]["difference"] == near(6 / 14)
+
+
+# --------------------------------------------------------------------------------------------
+# The command `pattern` on result files written out by hand
+# --------------------------------------------------------------------------------------------
+
+STRONG = {"edited": (40, 100), "unedited": (10, 100), "holds": True, "own": (20, 100)}
+"""A test of a standing factor that counts: it holds, 0.40 against 0.10 on the unedited items
+and 0.20 on the letter-factor items, the own error on 20 of 100 items."""
+NO_STANDING_TEST = (
+    "(a): no E5 test of a standing factor holds, under Holm over the twelve tests, with the "
+    "higher error rate on the edited items"
+)
+LOWER_END = (
+    "(a): the lower end of the 90% interval of the difference in letter accuracy, model minus "
+    "rule reader, does not lie above -0.10"
+)
+NO_SECONDARY = (
+    "the paper states the sentence for no secondary model and uses no plural that includes one"
+)
+BOTH = (
+    "the pattern holds for both primaries: the paper states the sentence for the two primary models"
+)
+NEITHER = (
+    "the pattern holds for neither primary: the paper does not state the sentence and reports "
+    "each part for each primary"
+)
+
+
+def one_named(model: str, other: str, *parts: str) -> str:
+    missed = " part and the ".join(parts)
+    return (
+        "the pattern holds for one primary: the paper states the sentence for that model by "
+        f"name ({model}) and says in the same place which part did not hold for the other "
+        f"({other}: the {missed} part)"
+    )
+
+
+def family_result(model: str, factor: str, side: str = "the edited items") -> str:
+    return (
+        f"{model}, {factor}: this test of the E5 family holds, with the higher error rate on "
+        f"{side}; it is reported as that family's result, with its size, also when a floor or "
+        "the other part withholds the sentence, and the paper then does not write that no "
+        "effect was detected"
+    )
+
+
+def criterion_beside(model: str) -> str:
+    return (
+        f"{model}: the paragraph that states the sentence gives the outcome of the "
+        "overconfidence criterion of section 13 for the model, whichever way it came out"
+    )
+
+
+def own_error_beside(model: str, factor: str) -> str:
+    return (
+        f"{model}, {factor}: the paper gives the rate of its own error in the sentence that "
+        "names it, and the share of the factor's errors that are of another kind"
+    )
+
+
+def not_held(model: str, part: str, *withheld: str) -> str:
+    return (
+        f"{model}: the {part} part does not hold; it is not read as its opposite, and the paper "
+        f"says which condition withheld it: {'; '.join(withheld)}"
+    )
+
+
+def below_floor(factor: str, what: str) -> str:
+    return (
+        f"(b) on {factor}: the error rate on the items of the factor is not at least 0.10 above "
+        f"the error rate on {what}"
+    )
+
+
+def registered() -> dict[str, Any]:
+    """The registered record as a result file holds it."""
+    return json.loads(LS.report_text(LS.registered_record()))
+
+
+def letter_of(model: str, low: float = 0.02, **change: Any) -> dict[str, Any]:
+    """The letter reading of a primary in a hand-built E2 result: 72 letter items, the model
+    right on 63 and the rule reader on 54, and the lower end of the 90% interval as given."""
+    entry = {
+        "model": model,
+        "template": V1,
+        "against": "rules",
+        "evaluable": True,
+        "items": 72,
+        "first": 0.875,
+        "second": 0.75,
+        "difference": 0.125,
+        "ci90": {"low": low, "high": 0.25, "draws": 10000},
+        "ci95": {"low": low - 0.03, "high": 0.28, "draws": 10000},
+        "margin": 0.1,
+        "lower_end_above_minus_margin": low > -0.1,
+    }
+    return entry | change
+
+
+def no_letter(model: str, why: str = "declared on the command line: no route") -> dict[str, Any]:
+    return {"model": model, "template": V1, "against": "rules", "evaluable": False, "why": why}
+
+
+def made_e2(*entries: dict[str, Any], items: int = 120, plan: str = "a" * 64) -> dict[str, Any]:
+    """An E2 result with what the pattern reads of one, and nothing else."""
+    ids = [f"L{k:03d}" for k in range(items)]
+    scored_as = {f"{e['model']} {V1}": [[i, 1, 1] for i in ids] for e in entries if e["evaluable"]}
+    return {
+        "about": LS.ABOUT_E2,
+        "registered": registered(),
+        "inputs": {
+            "plan_sha256": plan,
+            "gold_sha256": "b" * 64,
+            "code": {"literal_scores.py": "c" * 64},
+        },
+        "not_run": dict(LS.NORMALISERS_NOT_RUN),
+        "item_sets": {"all": {"items": items, "letter_reading": list(entries)}},
+        "per_item": {
+            "columns": ["item_id", "correct", "parsed"],
+            "item_set": "all",
+            "readers": scored_as,
+        },
+    }
+
+
+def pair_test(
+    model: str,
+    factor: str,
+    edited: tuple[int, int] = (20, 100),
+    unedited: tuple[int, int] = (20, 100),
+    holds: bool = False,
+    letter: tuple[int, int] = (40, 200),
+    own: tuple[int, int] = (0, 100),
+    evaluable: bool = True,
+    why: str = FEW_SEEDS,
+) -> dict[str, Any]:
+    """One test of the twelve in a hand-built E5 result, from the errors and the items of its
+    edited and of its unedited side; for a standing factor also from those of the letter-factor
+    items and of its own error, with the floors as fractions of whole numbers give them."""
+    entry: dict[str, Any] = {"model": model, "factor": factor, "primary": True}
+    if not evaluable:
+        return entry | {"evaluable": False, "why": why, "p": 1.0, "p_holm": 1.0, "holds": False}
+    here, there, tenth = Fraction(*edited), Fraction(*unedited), Fraction(1, 10)
+    entry |= {
+        "evaluable": True,
+        "against": LS.seed_cell(factor),
+        "edited": counted(*edited),
+        "unedited": counted(*unedited),
+        "difference": float(here - there),
+        "log_odds_difference": 0.5,
+        "p_from": "gee",
+        "p": 0.0004 if holds else 0.4,
+        "p_holm": 0.0048 if holds else 1.0,
+        "holds": holds,
+    }
+    if factor in LS.STANDING_FACTORS:
+        others = Fraction(*letter) if letter[1] else None
+        met = {
+            "above_seed": here - there >= tenth,
+            "above_letter": others is not None and here - others >= tenth,
+            "own_error": bool(own[1]) and Fraction(*own) >= tenth,
+        }
+        gap = None if others is None else float(here - others)
+        entry |= {
+            "above_letter_items": counted(*letter) | {"difference": gap},
+            "own_error": counted(*own),
+            "errors_of_another_kind": {
+                "errors": edited[0] - own[0],
+                "share": (edited[0] - own[0]) / edited[0] if edited[0] else None,
+            },
+            "floors": met | {"met": all(met.values())},
+        }
+    return entry
+
+
+def made_e5(
+    tests: Mapping[tuple[str, str], Mapping[str, Any]] | None = None,
+    not_run: Mapping[str, str] | None = None,
+    items: int = 800,
+    plan: str = "a" * 64,
+    cut: Mapping[str, Any] | None = None,
+    others: Sequence[dict[str, Any]] = (),
+) -> dict[str, Any]:
+    """An E5 result with what the pattern reads of one. ``tests`` gives what a test of the
+    twelve is made of, by model and factor; every other test holds nothing, with 0.20 on each
+    side. A primary declared not run has six tests that are not evaluable, and no flags."""
+    tests, not_run = dict(tests or {}), dict(not_run or {})
+    ids = [f"P{k:04d}" for k in range(items)]
+    family = [
+        pair_test(model, factor, evaluable=False, why=not_run[model])
+        if model in not_run
+        else pair_test(model, factor, **tests.get((model, factor), {}))
+        for model in (LLAMA, DEEPSEEK)
+        for factor in MP.FACTORS
+    ]
+    whole = {
+        "cut": False,
+        "items_in_the_item_file": items,
+        "items": items,
+        "item_ids_sha256": lp.ids_sha256(ids),
+    }
+    return {
+        "about": LS.ABOUT_E5,
+        "registered": registered(),
+        "inputs": {
+            "plan_sha256": plan,
+            "gold_sha256": "d" * 64,
+            "code": {"literal_scores.py": "c" * 64},
+        },
+        "item_set": whole | dict(cut or {}),
+        "items": items,
+        "seeds": items // 8,
+        "not_run": not_run,
+        "gee": {"method_in_force": "the GEE with its robust variance"},
+        "tests": family,
+        "other_models": list(others),
+        "per_item": {
+            "columns": ["item_id", "error", "parsed"],
+            "readers": {
+                model: [[i, 0, 1] for i in ids]
+                for model in (LLAMA, DEEPSEEK)
+                if model not in not_run
+            },
+        },
+    }
+
+
+def pattern_argv(folder: Path, e2: Any, e5: Any, out: Path) -> list[str]:
+    """The arguments of ``pattern`` on two results written to ``folder``; ``e5`` None declares
+    that E5 is not scored. A result is written as JSON unless it is already a path."""
+    argv = ["pattern", "--out", str(out)]
+    for name, result in (("e2", e2), ("e5", e5)):
+        if result is None:
+            argv += ["--e5-not-scored"] if name == "e5" else []
+            continue
+        path = result if isinstance(result, Path) else folder / f"{name}.json"
+        if not isinstance(result, Path):
+            path.write_text(json.dumps(result), encoding="utf-8")
+        argv += [f"--{name}", str(path)]
+    return argv
+
+
+def patterned(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str], e2: Any, e5: Any
+) -> tuple[dict[str, Any], str]:
+    """Run ``pattern`` on two results: its result file and its printout."""
+    folder = tmp_path / f"pattern_{len(list(tmp_path.iterdir()))}"
+    folder.mkdir()
+    out = folder / "pattern.json"
+    capsys.readouterr()
+    assert LS.main(pattern_argv(folder, e2, e5, out)) == 0
+    printed = capsys.readouterr()
+    assert printed.err == "" and printed.out.endswith(f"wrote {out.as_posix()}\n")
+    return json.loads(out.read_text()), printed.out
+
+
+def pattern_refused(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str], e2: Any, e5: Any, *extra: str
+) -> str:
+    """The reason ``pattern`` refuses two results for: nothing printed, nothing written."""
+    folder = tmp_path / f"refused_{len(list(tmp_path.iterdir()))}"
+    folder.mkdir()
+    out = folder / "pattern.json"
+    capsys.readouterr()
+    with pytest.raises(SystemExit) as stop:
+        LS.main([*pattern_argv(folder, e2, e5, out), *extra])
+    assert isinstance(stop.value.code, str) and stop.value.code.startswith("refused: ")
+    printed = capsys.readouterr()
+    assert printed.out == "" and printed.err == "" and not out.exists()
+    return stop.value.code
+
+
+def test_the_pattern_holds_for_both_primaries(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Both parts hold for each primary: the sentence is stated for the two primary models."""
+    e2 = made_e2(letter_of(LLAMA), letter_of(DEEPSEEK, low=-0.0999))
+    e5 = made_e5(
+        {(LLAMA, "certainty"): STRONG, (DEEPSEEK, "stale"): STRONG, (DEEPSEEK, "silent"): STRONG}
+    )
+    report, printed = patterned(tmp_path, capsys, e2, e5)
+    assert list(report) == [
+        "about",
+        "registered",
+        "inputs",
+        "e2",
+        "e5",
+        "primaries",
+        "sentence",
+        "as_the_plan_says",
+        "where_the_plan_is_silent",
+    ]
+    assert report["about"] == LS.ABOUT_PATTERN and report["registered"] == registered()
+    assert report["as_the_plan_says"] == list(LS.AS_THE_PLAN_SAYS)
+    assert report["where_the_plan_is_silent"] == list(LS.WHERE_THE_PLAN_IS_SILENT)
+    assert report["e2"] == {"item_set": "all", "items": 120}
+    assert report["e5"] == {
+        "scored": True,
+        "item_set": e5["item_set"],
+        "items": 800,
+        "seeds": 100,
+        "method_in_force": "the GEE with its robust variance",
+    }
+    folder = tmp_path / "pattern_0"
+    assert report["inputs"] == {
+        "e2": (folder / "e2.json").as_posix(),
+        "e2_sha256": sha(folder / "e2.json"),
+        "e5": (folder / "e5.json").as_posix(),
+        "e5_sha256": sha(folder / "e5.json"),
+        "plan_sha256": "a" * 64,
+        "gold_sha256": {"e2": "b" * 64, "e5": "d" * 64},
+        "code_of_the_results": {"e2": "c" * 64, "e5": "c" * 64},
+        "code": report["inputs"]["code"],
+    }
+    assert report["inputs"]["code"]["literal_scores.py"] == sha(Path(LS.__file__))
+    assert list(report["primaries"]) == [LLAMA, DEEPSEEK]
+    llama = report["primaries"][LLAMA]
+    assert list(llama) == [
+        "has_pattern",
+        "declared_not_run",
+        "letter",
+        "standing",
+        "holds",
+        "e5_tests_that_hold",
+    ]
+    assert llama["has_pattern"] is True and llama["declared_not_run"] == []
+    assert llama["holds"] is True
+    plain_test = {
+        "evaluable": True,
+        "holds": False,
+        "p_holm": 1.0,
+        "p_from": "gee",
+        "edited": counted(20, 100),
+        "unedited": counted(20, 100),
+        "difference": 0.0,
+        "higher_on_edited": False,
+    }
+    assert llama["letter"] == {
+        "e2": {
+            "items": 72,
+            "first": 0.875,
+            "second": 0.75,
+            "difference": 0.125,
+            "ci90": {"low": 0.02, "high": 0.25, "draws": 10000},
+            "ci95": {"low": -0.01, "high": 0.28, "draws": 10000},
+            "margin": 0.1,
+            "lower_end_above_minus_margin": True,
+            "met": True,
+        },
+        "e5": {
+            "surface_form": plain_test | {"withholds": False},
+            "granularity": plain_test | {"withholds": False},
+            "met": True,
+        },
+        "holds": True,
+        "withheld_by": [],
+    }
+    standing = llama["standing"]
+    assert list(standing) == [*LS.STANDING_FACTORS, "factors_that_count", "holds", "withheld_by"]
+    assert standing["certainty"] == {
+        "a": {
+            "evaluable": True,
+            "holds": True,
+            "p_holm": 0.0048,
+            "p_from": "gee",
+            "edited": counted(40, 100),
+            "unedited": counted(10, 100),
+            "difference": near(0.3),
+            "higher_on_edited": True,
+            "met": True,
+        },
+        "b": {
+            "floor": 0.1,
+            "above_seed": {"difference": near(0.3), "met": True},
+            "above_letter": counted(40, 200) | {"difference": near(0.2), "met": True},
+            "met": True,
+        },
+        "c": {"floor": 0.1, **counted(20, 100), "met": True},
+        "errors_of_another_kind": {"errors": 20, "share": 0.5},
+        "counts": True,
+    }
+    # a factor without a test: every condition is given, and none is met
+    assert standing["stale"] == {
+        "a": plain_test | {"met": False},
+        "b": {
+            "floor": 0.1,
+            "above_seed": {"difference": 0.0, "met": False},
+            "above_letter": counted(40, 200) | {"difference": 0.0, "met": False},
+            "met": False,
+        },
+        "c": {"floor": 0.1, **counted(0, 100), "met": False},
+        "errors_of_another_kind": {"errors": 20, "share": 1.0},
+        "counts": False,
+    }
+    assert standing["factors_that_count"] == ["certainty"] and standing["holds"] is True
+    assert standing["withheld_by"] == []
+    assert llama["e5_tests_that_hold"] == [
+        {
+            "factor": "certainty",
+            "kind": "standing",
+            "higher_error_rate_on": "the edited items",
+            "edited": counted(40, 100),
+            "unedited": counted(10, 100),
+            "difference": near(0.3),
+            "log_odds_difference": 0.5,
+            "p_holm": 0.0048,
+            "p_from": "gee",
+        }
+    ]
+    deepseek = report["primaries"][DEEPSEEK]
+    assert deepseek["holds"] is True and deepseek["letter"]["e2"]["met"] is True
+    assert deepseek["letter"]["e2"]["ci90"]["low"] == -0.0999
+    assert deepseek["standing"]["factors_that_count"] == ["stale", "silent"]
+    assert [held["factor"] for held in deepseek["e5_tests_that_hold"]] == ["stale", "silent"]
+    assert report["sentence"] == {
+        "sentence": "models read the letter of a notice but not its pragmatics",
+        "case": "both primaries",
+        "stated_for": [LLAMA, DEEPSEEK],
+        "paper": BOTH,
+        "beside": [
+            family_result(LLAMA, "certainty"),
+            family_result(DEEPSEEK, "stale"),
+            family_result(DEEPSEEK, "silent"),
+            criterion_beside(LLAMA),
+            own_error_beside(LLAMA, "certainty"),
+            criterion_beside(DEEPSEEK),
+            own_error_beside(DEEPSEEK, "stale"),
+            own_error_beside(DEEPSEEK, "silent"),
+            NO_SECONDARY,
+        ],
+    }
+    # the printout: one line for each part of each primary with its numbers, then the sentence
+    lines = printed.splitlines()
+    assert len(lines) == 1 + 2 * 2 + 1 + 9 + 1
+    assert lines[0] == (
+        "pattern of PLAN section 13: E2 on 120 gold items; E5 on 800 items of 100 seeds (the "
+        "GEE with its robust variance)"
+    )
+    flat = "0.200 against 0.200 unedited (+0.000), Holm 1.0000, does not hold"
+    assert lines[1] == (
+        f"{LLAMA} letter: holds; (a) letter accuracy 0.875 against 0.750 of the rule reader on "
+        "72 letter items, difference +0.125, 90% interval +0.020 to +0.250, lower end above "
+        f"-0.10; (b) surface_form: {flat}; (b) granularity: {flat}"
+    )
+    none = (
+        f"{flat}, 0.200 on the letter-factor items (+0.000), own error 0 of 100, (a, b, c) not met"
+    )
+    assert lines[2] == (
+        f"{LLAMA} standing: holds by certainty; certainty: 0.400 against 0.100 unedited "
+        "(+0.300), Holm 0.0048, holds with the higher rate on the edited items, 0.200 on the "
+        "letter-factor items (+0.200), own error 20 of 100, counts; "
+        f"stale: {none}; distractor: {none}; silent: {none}"
+    )
+    assert lines[3].startswith(f"{DEEPSEEK} letter: holds; (a) letter accuracy 0.875 against")
+    assert "90% interval -0.100 to +0.250, lower end above -0.10" in lines[3]
+    assert lines[4].startswith(f"{DEEPSEEK} standing: holds by stale, silent; certainty: {none}; ")
+    assert lines[5] == f"sentence: {BOTH}"
+    assert lines[6:15] == [f"beside it: {text}" for text in report["sentence"]["beside"]]
+    # the result file is the scorer's own text of the report, and the command reads the two
+    # result files and its own code, and nothing else
+    out = folder / "pattern.json"
+    assert out.read_text() == LS.report_text(report)
+    out.unlink()
+    with watching() as touched:
+        assert LS.main(pattern_argv(folder, folder / "e2.json", folder / "e5.json", out)) == 0
+    opened = {entry.split(" ", 1)[1] for entry in touched if entry.startswith("open ")}
+    here = Path(LS.__file__).resolve().parent
+    assert {str(folder / "e2.json"), str(folder / "e5.json"), str(out)} <= opened
+    assert all(Path(path).parent in (folder, here) for path in opened), sorted(opened)
+    assert not any(entry.startswith("os.") for entry in touched)
+    capsys.readouterr()
+
+
+def test_the_pattern_holds_for_one_primary_and_the_paper_names_it(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """One primary has both parts; for the other a test of a standing factor holds and a floor
+    withholds it: 0.25 on its items against 0.10 on the unedited ones and 0.16 on the
+    letter-factor items, which is less than 0.10 above."""
+    e2 = made_e2(letter_of(LLAMA), letter_of(DEEPSEEK))
+    near_letter = {"edited": (25, 100), "unedited": (10, 100), "holds": True, "letter": (32, 200)}
+    tests = {(LLAMA, "distractor"): STRONG, (DEEPSEEK, "stale"): near_letter | {"own": (25, 100)}}
+    report, printed = patterned(tmp_path, capsys, e2, made_e5(tests))
+    llama, deepseek = report["primaries"][LLAMA], report["primaries"][DEEPSEEK]
+    assert llama["holds"] is True and deepseek["holds"] is False
+    assert deepseek["letter"]["holds"] is True and deepseek["standing"]["holds"] is False
+    stale = deepseek["standing"]["stale"]
+    assert stale["a"]["met"] is True and stale["c"]["met"] is True and stale["counts"] is False
+    assert stale["b"] == {
+        "floor": 0.1,
+        "above_seed": {"difference": near(0.15), "met": True},
+        "above_letter": counted(32, 200) | {"difference": near(0.09), "met": False},
+        "met": False,
+    }
+    withheld = below_floor("stale", "the items of the two letter factors taken together")
+    assert deepseek["standing"]["withheld_by"] == [withheld]
+    assert deepseek["standing"]["factors_that_count"] == []
+    assert report["sentence"] == {
+        "sentence": LS.SENTENCE,
+        "case": "one primary",
+        "stated_for": [LLAMA],
+        "paper": one_named(LLAMA, DEEPSEEK, "standing"),
+        "beside": [
+            not_held(DEEPSEEK, "standing", withheld),
+            family_result(LLAMA, "distractor"),
+            family_result(DEEPSEEK, "stale"),
+            criterion_beside(LLAMA),
+            own_error_beside(LLAMA, "distractor"),
+            NO_SECONDARY,
+        ],
+    }
+    assert f"{DEEPSEEK} standing: does not hold; " in printed
+    assert (
+        "stale: 0.250 against 0.100 unedited (+0.150), Holm 0.0048, holds with the higher rate "
+        "on the edited items, 0.160 on the letter-factor items (+0.090), own error 25 of 100, "
+        "(b) not met"
+    ) in printed
+    # the other way round, and with both parts missed by the other primary
+    tests = {
+        (DEEPSEEK, "silent"): STRONG,
+        (LLAMA, "granularity"): {"edited": (30, 100), "holds": True},
+    }
+    e2 = made_e2(letter_of(LLAMA), letter_of(DEEPSEEK, low=0.3))
+    report, _ = patterned(tmp_path, capsys, e2, made_e5(tests))
+    assert report["sentence"]["stated_for"] == [DEEPSEEK]
+    assert report["sentence"]["paper"] == one_named(DEEPSEEK, LLAMA, "letter", "standing")
+    assert report["sentence"]["paper"].endswith(f"({LLAMA}: the letter part and the standing part)")
+    assert report["sentence"]["beside"][:2] == [
+        not_held(
+            LLAMA,
+            "letter",
+            "(b): the E5 test on granularity holds with the higher error rate on the edited items",
+        ),
+        not_held(LLAMA, "standing", NO_STANDING_TEST),
+    ]
+
+
+def test_the_letter_part_is_withheld_by_the_margin_or_by_a_test_on_a_letter_factor(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Neither primary has the pattern though the standing part holds for both. Condition (a):
+    a lower end of exactly -0.10, or below it. Condition (b): a test on a letter factor that
+    holds with the higher error rate on the edited items."""
+    counting = {(LLAMA, "stale"): STRONG, (DEEPSEEK, "stale"): STRONG}
+    e2 = made_e2(letter_of(LLAMA, low=-0.1), letter_of(DEEPSEEK, low=-0.25))
+    report, printed = patterned(tmp_path, capsys, e2, made_e5(counting))
+    for model in (LLAMA, DEEPSEEK):
+        found = report["primaries"][model]
+        assert found["holds"] is False and found["standing"]["holds"] is True
+        assert found["letter"]["e2"]["met"] is False and found["letter"]["e5"]["met"] is True
+        assert found["letter"]["e2"]["lower_end_above_minus_margin"] is False
+        assert found["letter"]["holds"] is False and found["letter"]["withheld_by"] == [LOWER_END]
+    assert report["primaries"][LLAMA]["letter"]["e2"]["ci90"]["low"] == -0.1
+    assert report["sentence"] == {
+        "sentence": LS.SENTENCE,
+        "case": "neither primary",
+        "stated_for": [],
+        "paper": NEITHER,
+        "beside": [
+            not_held(LLAMA, "letter", LOWER_END),
+            not_held(DEEPSEEK, "letter", LOWER_END),
+            family_result(LLAMA, "stale"),
+            family_result(DEEPSEEK, "stale"),
+            # the factor counts for each, and is named with its own error though the letter
+            # part withholds the sentence; the overconfidence criterion goes with a sentence
+            own_error_beside(LLAMA, "stale"),
+            own_error_beside(DEEPSEEK, "stale"),
+            NO_SECONDARY,
+        ],
+    }
+    assert not any("overconfidence" in text for text in report["sentence"]["beside"])
+    assert "90% interval -0.100 to +0.250, lower end not above -0.10" in printed
+    assert f"{LLAMA} letter: does not hold; " in printed and f"sentence: {NEITHER}\n" in printed
+    # an end just above -0.10 meets (a), as the E2 result read it before rounding
+    e2 = made_e2(letter_of(LLAMA, low=-0.099999), letter_of(DEEPSEEK, low=-0.25))
+    report, _ = patterned(tmp_path, capsys, e2, made_e5(counting))
+    assert report["primaries"][LLAMA]["holds"] is True
+    assert report["sentence"]["stated_for"] == [LLAMA]
+    # the decision is the one of the E2 result, which read the end before rounding: -0.1 in the
+    # file, above the margin in the scorer
+    rounded = letter_of(LLAMA, low=-0.1, lower_end_above_minus_margin=True)
+    report, printed = patterned(
+        tmp_path, capsys, made_e2(rounded, letter_of(DEEPSEEK)), made_e5(counting)
+    )
+    assert report["primaries"][LLAMA]["letter"]["e2"]["met"] is True
+    assert "90% interval -0.100 to +0.250, lower end above -0.10" in printed
+    # no interval at all: no gold letter item
+    empty = letter_of(
+        LLAMA, items=0, first=None, second=None, difference=None, ci90=None, ci95=None
+    )
+    empty["lower_end_above_minus_margin"] = None
+    report, printed = patterned(
+        tmp_path, capsys, made_e2(empty, letter_of(DEEPSEEK)), made_e5(counting)
+    )
+    assert report["primaries"][LLAMA]["letter"]["withheld_by"] == [
+        "(a): the difference in letter accuracy has no 90% interval (no gold letter item, or no "
+        "draw that holds one)"
+    ]
+    assert report["primaries"][LLAMA]["holds"] is False
+    assert "(a) letter accuracy - against - of the rule reader on 0 letter items" in printed
+    assert "difference -, 90% interval - to -, lower end not above -0.10" in printed
+    # condition (b): a letter-factor test that holds with the higher rate on the edited items
+    e2 = made_e2(letter_of(LLAMA), letter_of(DEEPSEEK))
+    higher = {"edited": (35, 100), "unedited": (20, 100), "holds": True}
+    lower = {"edited": (5, 100), "unedited": (20, 100), "holds": True}
+    tests = counting | {(LLAMA, "surface_form"): higher, (DEEPSEEK, "granularity"): higher}
+    report, printed = patterned(tmp_path, capsys, e2, made_e5(tests))
+    surface = (
+        "(b): the E5 test on surface_form holds with the higher error rate on the edited items"
+    )
+    granular = (
+        "(b): the E5 test on granularity holds with the higher error rate on the edited items"
+    )
+    llama = report["primaries"][LLAMA]["letter"]
+    assert llama["e2"]["met"] is True and llama["holds"] is False
+    assert llama["e5"]["met"] is False and llama["withheld_by"] == [surface]
+    assert llama["e5"]["surface_form"]["withholds"] is True
+    assert llama["e5"]["granularity"]["withholds"] is False
+    assert report["primaries"][DEEPSEEK]["letter"]["withheld_by"] == [granular]
+    assert report["sentence"]["case"] == "neither primary"
+    assert report["sentence"]["beside"] == [
+        not_held(LLAMA, "letter", surface),
+        not_held(DEEPSEEK, "letter", granular),
+        family_result(LLAMA, "surface_form"),
+        family_result(LLAMA, "stale"),
+        family_result(DEEPSEEK, "granularity"),
+        family_result(DEEPSEEK, "stale"),
+        own_error_beside(LLAMA, "stale"),
+        own_error_beside(DEEPSEEK, "stale"),
+        NO_SECONDARY,
+    ]
+    assert report["primaries"][LLAMA]["e5_tests_that_hold"][0]["kind"] == "letter"
+    assert (
+        "(b) surface_form: 0.350 against 0.200 unedited (+0.150), Holm 0.0048, holds with the "
+        "higher rate on the edited items"
+    ) in printed
+    # condition (a) sets no upper limit and is read on the interval alone: a model one third
+    # above the rule reader on three letter items, with an interval that starts one third below
+    above_rules = letter_of(LLAMA, low=-0.333333, items=3, first=0.666667, second=0.333333)
+    above_rules |= {"difference": 0.333333}
+    assert above_rules["lower_end_above_minus_margin"] is False
+    e2 = made_e2(above_rules, letter_of(DEEPSEEK))
+    report, printed = patterned(tmp_path, capsys, e2, made_e5(counting))
+    llama = report["primaries"][LLAMA]
+    assert llama["letter"]["e2"]["difference"] > 0 and llama["letter"]["e2"]["met"] is False
+    assert llama["letter"]["withheld_by"] == [LOWER_END] and llama["holds"] is False
+    assert report["sentence"]["stated_for"] == [DEEPSEEK]
+    assert (
+        "(a) letter accuracy 0.667 against 0.333 of the rule reader on 3 letter items, "
+        "difference +0.333, 90% interval -0.333 to +0.250, lower end not above -0.10"
+    ) in printed
+    # both conditions at once are both named
+    e2 = made_e2(letter_of(LLAMA, low=-0.2), letter_of(DEEPSEEK))
+    report, _ = patterned(tmp_path, capsys, e2, made_e5(tests))
+    assert report["primaries"][LLAMA]["letter"]["withheld_by"] == [LOWER_END, surface]
+    # a letter-factor test that holds with the lower error rate on the edited items withholds
+    # nothing, and neither does one that is not evaluable; each test that holds is reported
+    tests = counting | {
+        (LLAMA, "surface_form"): lower,
+        (LLAMA, "granularity"): {"evaluable": False},
+    }
+    report, printed = patterned(
+        tmp_path, capsys, made_e2(letter_of(LLAMA), letter_of(DEEPSEEK)), made_e5(tests)
+    )
+    llama = report["primaries"][LLAMA]
+    assert llama["holds"] is True and llama["letter"]["e5"]["met"] is True
+    assert llama["letter"]["e5"]["surface_form"]["holds"] is True
+    assert llama["letter"]["e5"]["surface_form"]["higher_on_edited"] is False
+    assert llama["letter"]["e5"]["granularity"] == {
+        "evaluable": False,
+        "why": FEW_SEEDS,
+        "holds": False,
+        "higher_on_edited": False,
+        "withholds": False,
+    }
+    assert report["sentence"]["case"] == "both primaries"
+    assert (
+        family_result(LLAMA, "surface_form", "the unedited seed items")
+        in report["sentence"]["beside"]
+    )
+    assert (
+        "holds with the lower rate on the edited items; (b) granularity: not evaluable" in printed
+    )
+
+
+def test_a_standing_test_that_holds_is_withheld_by_a_floor_or_by_the_own_error(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Conditions (b) and (c) can only withhold: a test of a standing factor holds with the
+    higher error rate on the edited items, and the factor does not count. The test is still
+    the result of its family."""
+    e2 = made_e2(letter_of(LLAMA), letter_of(DEEPSEEK))
+    tests = {
+        # 0.19 against 0.10 unedited: 0.09 above; the letter-factor items at 0.02
+        (LLAMA, "stale"): {
+            "edited": (19, 100),
+            "unedited": (10, 100),
+            "holds": True,
+            "letter": (4, 200),
+            "own": (19, 100),
+        },
+        # every floor of (b) met, and the own error on 9 of 100 items
+        (LLAMA, "certainty"): STRONG | {"own": (9, 100)},
+        # every floor missed
+        (DEEPSEEK, "silent"): {
+            "edited": (24, 100),
+            "unedited": (15, 100),
+            "holds": True,
+            "letter": (30, 200),
+            "own": (2, 100),
+        },
+        # the test holds with the lower error rate on the edited items
+        (DEEPSEEK, "distractor"): {
+            "edited": (2, 100),
+            "unedited": (30, 100),
+            "holds": True,
+            "letter": (2, 200),
+            "own": (2, 10),
+        },
+    }
+    report, printed = patterned(tmp_path, capsys, e2, made_e5(tests))
+    llama, deepseek = report["primaries"][LLAMA], report["primaries"][DEEPSEEK]
+    unedited, letters = (
+        "the unedited seed items",
+        "the items of the two letter factors taken together",
+    )
+    own = "the factor's own error does not occur on at least 0.10 of the items of the factor on which it can occur"
+    for found in (llama, deepseek):
+        assert found["holds"] is False and found["letter"]["holds"] is True
+        assert found["standing"]["holds"] is False and found["standing"]["factors_that_count"] == []
+    stale, certainty = llama["standing"]["stale"], llama["standing"]["certainty"]
+    assert stale["a"]["met"] is True and stale["counts"] is False
+    assert stale["b"]["above_seed"] == {"difference": near(0.09), "met": False}
+    assert stale["b"]["above_letter"]["met"] is True and stale["b"]["met"] is False
+    assert stale["c"] == {"floor": 0.1, **counted(19, 100), "met": True}
+    assert certainty["a"]["met"] is True and certainty["b"]["met"] is True
+    assert certainty["c"] == {"floor": 0.1, **counted(9, 100), "met": False}
+    assert certainty["counts"] is False
+    assert certainty["errors_of_another_kind"] == {"errors": 31, "share": near(31 / 40)}
+    # the factors in the plan's order, each with the conditions it misses
+    assert llama["standing"]["withheld_by"] == [
+        f"(c) on certainty: {own}",
+        below_floor("stale", unedited),
+    ]
+    silent, distractor = deepseek["standing"]["silent"], deepseek["standing"]["distractor"]
+    assert (
+        silent["a"]["met"] is True and silent["b"]["met"] is False and silent["c"]["met"] is False
+    )
+    assert distractor["a"]["holds"] is True and distractor["a"]["higher_on_edited"] is False
+    assert distractor["a"]["met"] is False and distractor["c"]["met"] is True
+    assert deepseek["standing"]["withheld_by"] == [
+        below_floor("silent", unedited),
+        below_floor("silent", letters),
+        f"(c) on silent: {own}",
+    ]
+    assert report["sentence"] == {
+        "sentence": LS.SENTENCE,
+        "case": "neither primary",
+        "stated_for": [],
+        "paper": NEITHER,
+        "beside": [
+            not_held(LLAMA, "standing", *llama["standing"]["withheld_by"]),
+            not_held(DEEPSEEK, "standing", *deepseek["standing"]["withheld_by"]),
+            family_result(LLAMA, "certainty"),
+            family_result(LLAMA, "stale"),
+            family_result(DEEPSEEK, "distractor", "the unedited seed items"),
+            family_result(DEEPSEEK, "silent"),
+            NO_SECONDARY,
+        ],
+    }
+    assert "own error 9 of 100, (c) not met" in printed
+    assert "own error 19 of 100, (b) not met" in printed
+    assert "own error 2 of 100, (b, c) not met" in printed
+    assert (
+        "distractor: 0.020 against 0.300 unedited (-0.280), Holm 0.0048, holds with the lower "
+        "rate on the edited items, 0.010 on the letter-factor items (+0.010), own error 2 of "
+        "10, (a, b) not met"
+    ) in printed
+    # with no test of a standing factor that holds with the higher rate, (a) withholds, also
+    # where every floor is met; a test that is not evaluable has no floors to read
+    tests = {
+        (LLAMA, "stale"): STRONG | {"holds": False},
+        (LLAMA, "silent"): {"evaluable": False},
+        (DEEPSEEK, "distractor"): tests[DEEPSEEK, "distractor"],
+    }
+    report, printed = patterned(tmp_path, capsys, e2, made_e5(tests))
+    llama = report["primaries"][LLAMA]["standing"]
+    assert llama["stale"]["b"]["met"] is True and llama["stale"]["c"]["met"] is True
+    assert llama["stale"]["a"]["met"] is False and llama["stale"]["counts"] is False
+    assert llama["silent"] == {
+        "a": {
+            "evaluable": False,
+            "why": FEW_SEEDS,
+            "holds": False,
+            "higher_on_edited": False,
+            "met": False,
+        },
+        "b": None,
+        "c": None,
+        "counts": False,
+    }
+    assert llama["withheld_by"] == [NO_STANDING_TEST]
+    assert report["primaries"][DEEPSEEK]["standing"]["withheld_by"] == [NO_STANDING_TEST]
+    assert report["primaries"][LLAMA]["e5_tests_that_hold"] == []
+    assert "own error 20 of 100, (a) not met; distractor" in printed
+    assert "silent: not evaluable\n" in printed
+    # a factor that counts beside one that a floor withholds: the part holds, nothing withheld
+    tests = {(LLAMA, "stale"): STRONG, (LLAMA, "certainty"): STRONG | {"own": (9, 100)}}
+    report, _ = patterned(tmp_path, capsys, e2, made_e5(tests))
+    llama = report["primaries"][LLAMA]["standing"]
+    assert llama["holds"] is True and llama["factors_that_count"] == ["stale"]
+    assert llama["withheld_by"] == [] and llama["certainty"]["counts"] is False
+    # a floor whose rate has no item is not met, and is named as that: an item set without an
+    # item of the two letter factors, and a factor without an item on which its own error can
+    # occur (PLAN section 13, "Small points of the reading")
+    tests = {
+        (LLAMA, "certainty"): STRONG | {"own": (0, 0)},
+        (LLAMA, "stale"): STRONG | {"letter": (0, 0)},
+        (DEEPSEEK, "silent"): STRONG | {"letter": (0, 0), "own": (0, 0), "unedited": (35, 100)},
+    }
+    report, printed = patterned(tmp_path, capsys, e2, made_e5(tests))
+    llama, deepseek = (
+        report["primaries"][LLAMA]["standing"],
+        report["primaries"][DEEPSEEK]["standing"],
+    )
+    no_letter_items = (
+        "the error rate on the items of the two letter factors taken together has no item"
+    )
+    assert llama["certainty"]["c"] == {"floor": 0.1, **counted(0, 0), "met": False}
+    assert llama["stale"]["b"]["above_letter"] == counted(0, 0) | {"difference": None, "met": False}
+    assert llama["stale"]["b"]["above_seed"]["met"] is True and llama["stale"]["c"]["met"] is True
+    assert llama["holds"] is False and llama["withheld_by"] == [
+        "(c) on certainty: the factor has no item on which its own error can occur",
+        f"(b) on stale: {no_letter_items}",
+    ]
+    # beside a floor that is missed by its figures: 0.40 against 0.35 on the unedited items
+    assert deepseek["withheld_by"] == [
+        below_floor("silent", "the unedited seed items"),
+        f"(b) on silent: {no_letter_items}",
+        "(c) on silent: the factor has no item on which its own error can occur",
+    ]
+    assert not any("at least 0.10" in text for text in llama["withheld_by"])
+    assert "- on the letter-factor items (-), own error 20 of 100, (b) not met" in printed
+    assert "own error 0 of 0, (c) not met" in printed
+
+
+def test_a_secondary_model_has_no_pattern_whatever_its_contrasts_show(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """PLAN section 13, "Support, not the rule": the contrasts of the secondary models are
+    outside the family of twelve, so no pattern is computed for them, and the sentence is
+    stated for none."""
+    shows = pair_test(QWEN, "stale", **STRONG) | {"primary": False}
+    del shows["floors"], shows["p_holm"], shows["holds"]
+    e2, e5 = made_e2(letter_of(LLAMA), letter_of(DEEPSEEK)), made_e5(others=[shows])
+    report, printed = patterned(tmp_path, capsys, e2, e5)
+    assert list(report["primaries"]) == [LLAMA, DEEPSEEK]
+    assert QWEN not in json.dumps([report["primaries"], report["sentence"], report["e5"]])
+    assert QWEN not in printed
+    for model in (LLAMA, DEEPSEEK):
+        found = report["primaries"][model]
+        assert found["holds"] is False and found["letter"]["holds"] is True
+        assert found["standing"]["withheld_by"] == [NO_STANDING_TEST]
+        assert found["e5_tests_that_hold"] == []
+    assert report["sentence"] == {
+        "sentence": LS.SENTENCE,
+        "case": "neither primary",
+        "stated_for": [],
+        "paper": NEITHER,
+        "beside": [
+            not_held(LLAMA, "standing", NO_STANDING_TEST),
+            not_held(DEEPSEEK, "standing", NO_STANDING_TEST),
+            NO_SECONDARY,
+        ],
+    }
+    # a primary's own contrast of that size would have counted
+    counted_for = made_e5({(LLAMA, "stale"): STRONG}, others=[shows])
+    report, _ = patterned(tmp_path, capsys, e2, counted_for)
+    assert report["sentence"]["stated_for"] == [LLAMA]
+
+
+def test_a_primary_declared_not_run_has_no_pattern(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """PLAN section 13, "The sentence": a primary whose E2 or E5 run is declared not run has no
+    pattern, and the paper says so."""
+    cap = "declared on the command line: cap"
+    e2 = made_e2(letter_of(LLAMA), letter_of(DEEPSEEK))
+    e5 = made_e5({(LLAMA, "stale"): STRONG}, not_run={DEEPSEEK: cap})
+    report, printed = patterned(tmp_path, capsys, e2, e5)
+    assert report["primaries"][DEEPSEEK] == {
+        "has_pattern": False,
+        "declared_not_run": [f"its E5 run, {cap}"],
+        "letter": None,
+        "standing": None,
+        "holds": None,
+        "e5_tests_that_hold": [],
+    }
+    assert report["primaries"][LLAMA]["holds"] is True
+    without = f"{DEEPSEEK} has no pattern, and the paper says so: its E5 run, {cap}"
+    assert report["sentence"] == {
+        "sentence": LS.SENTENCE,
+        "case": "one primary",
+        "stated_for": [LLAMA],
+        "paper": (
+            "the pattern holds for one primary and the other has no pattern: the paper states "
+            f"the sentence for the first by name ({LLAMA}) and says that the other has none "
+            f"({DEEPSEEK})"
+        ),
+        "beside": [
+            without,
+            family_result(LLAMA, "stale"),
+            criterion_beside(LLAMA),
+            own_error_beside(LLAMA, "stale"),
+            NO_SECONDARY,
+        ],
+    }
+    assert f"{DEEPSEEK}: no pattern (its E5 run, {cap})\n" in printed
+    assert len(printed.splitlines()) == 1 + 2 + 1 + 1 + 5 + 1
+    # the E2 run under literal-v1 declared: no pattern, though the E5 tests of the model stand
+    # and one of them holds; the other primary misses its standing part
+    route = "declared on the command line: no route"
+    e2 = made_e2(no_letter(LLAMA), letter_of(DEEPSEEK))
+    report, printed = patterned(tmp_path, capsys, e2, made_e5({(LLAMA, "stale"): STRONG}))
+    llama = report["primaries"][LLAMA]
+    assert llama["has_pattern"] is False and llama["holds"] is None
+    assert llama["letter"] is None and llama["standing"] is None
+    assert llama["declared_not_run"] == [f"its E2 run under literal-v1, {route}"]
+    assert [held["factor"] for held in llama["e5_tests_that_hold"]] == ["stale"]
+    assert (
+        report["sentence"]["case"] == "neither primary" and report["sentence"]["paper"] == NEITHER
+    )
+    assert report["sentence"]["beside"] == [
+        f"{LLAMA} has no pattern, and the paper says so: its E2 run under literal-v1, {route}",
+        not_held(DEEPSEEK, "standing", NO_STANDING_TEST),
+        family_result(LLAMA, "stale"),
+        NO_SECONDARY,
+    ]
+    # both runs of one primary, and a run of the other: neither has a pattern
+    e2 = made_e2(no_letter(LLAMA), letter_of(DEEPSEEK))
+    e5 = made_e5(not_run={LLAMA: cap, DEEPSEEK: cap})
+    report, printed = patterned(tmp_path, capsys, e2, e5)
+    assert report["primaries"][LLAMA]["declared_not_run"] == [
+        f"its E2 run under literal-v1, {route}",
+        f"its E5 run, {cap}",
+    ]
+    assert (
+        report["sentence"]["case"] == "neither primary" and report["sentence"]["stated_for"] == []
+    )
+    assert report["sentence"]["paper"] == (
+        "neither primary has a pattern: the paper does not state the sentence"
+    )
+    assert printed.splitlines()[1:3] == [
+        f"{LLAMA}: no pattern (its E2 run under literal-v1, {route}; its E5 run, {cap})",
+        f"{DEEPSEEK}: no pattern (its E5 run, {cap})",
+    ]
+
+
+def test_without_e5_the_sentence_is_not_stated(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """PLAN section 13, "The sentence": if E5 is not scored by the freeze of numbers, the
+    sentence is not stated. That is declared, and no pattern is read."""
+    e2 = made_e2(letter_of(LLAMA), no_letter(DEEPSEEK))
+    report, printed = patterned(tmp_path, capsys, e2, None)
+    route = "declared on the command line: no route"
+    assert report["e5"] == {"scored": False}
+    assert report["inputs"]["e5"] is None and report["inputs"]["e5_sha256"] is None
+    assert report["inputs"]["gold_sha256"] == {"e2": "b" * 64, "e5": None}
+    assert report["inputs"]["code_of_the_results"] == {"e2": "c" * 64, "e5": None}
+    assert report["primaries"][LLAMA] == {
+        "has_pattern": False,
+        "declared_not_run": [],
+        "letter": None,
+        "standing": None,
+        "holds": None,
+        "e5_tests_that_hold": [],
+    }
+    assert report["primaries"][DEEPSEEK]["declared_not_run"] == [
+        f"its E2 run under literal-v1, {route}"
+    ]
+    assert report["sentence"] == {
+        "sentence": LS.SENTENCE,
+        "case": "E5 is not scored",
+        "stated_for": [],
+        "paper": "E5 is not scored by the freeze of numbers: the sentence is not stated",
+        "beside": [
+            f"{DEEPSEEK} has no pattern, and the paper says so: its E2 run under literal-v1, {route}",
+            NO_SECONDARY,
+        ],
+    }
+    assert printed.splitlines()[:-1] == [
+        "pattern of PLAN section 13: E2 on 120 gold items; E5 not scored",
+        f"{LLAMA}: no pattern (E5 is not scored)",
+        f"{DEEPSEEK}: no pattern (its E2 run under literal-v1, {route})",
+        "sentence: E5 is not scored by the freeze of numbers: the sentence is not stated",
+        *(f"beside it: {text}" for text in report["sentence"]["beside"]),
+    ]
+
+
+def test_the_sentence_of_a_pattern_is_written_in_the_words_of_the_plan(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Every phrase of ``PLAN_WORDS``, which stands in the plan, is in the sentence of the case
+    it belongs to."""
+    plan = flat_text(PLAN.read_text(encoding="utf-8"))
+    assert all(flat_text(words) in plan for words in PLAN_WORDS)
+    e2 = made_e2(letter_of(LLAMA), letter_of(DEEPSEEK))
+    cut = {"cut": True, "first_seeds": 50, "seeds_on_the_list": 100, "first_seeds_with_items": 50}
+    cases = [
+        (e2, made_e5({(LLAMA, "stale"): STRONG, (DEEPSEEK, "stale"): STRONG}, cut=cut)),
+        (e2, made_e5({(LLAMA, "stale"): STRONG, (DEEPSEEK, "stale"): STRONG | {"own": (1, 100)}})),
+        (e2, made_e5()),
+        (e2, made_e5(not_run={DEEPSEEK: "declared on the command line: cap"})),
+        (e2, made_e5({(LLAMA, "stale"): STRONG}, not_run={DEEPSEEK: "declared: cap"})),
+        (e2, None),
+    ]
+    written = []
+    for first, second in cases:
+        report, printed = patterned(tmp_path, capsys, first, second)
+        written.append(" ".join([report["sentence"]["paper"], *report["sentence"]["beside"]]))
+        assert all(text in printed for text in report["sentence"]["beside"])
+    for words in PLAN_WORDS:
+        assert any(words in text for text in written), words
+    # a cut E5 is named beside the sentence, with its items
+    assert (
+        "E5 is cut to 800 items (section 12, cut 4): the pattern is read on those items with "
+        "the same floors"
+    ) in written[0]
+    assert "E5 is cut" not in written[1]
+    report, printed = patterned(tmp_path, capsys, *cases[0])
+    assert report["e5"]["item_set"]["cut"] is True
+    assert "E5 on 800 items of 100 seeds, cut to the first 50 of the seed list (the GEE" in printed
+
+
+def test_pattern_refuses_what_is_not_two_results_of_this_scorer_on_one_item_set(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    e2, e5 = made_e2(letter_of(LLAMA), letter_of(DEEPSEEK)), made_e5({(LLAMA, "stale"): STRONG})
+
+    def why(first: Any = e2, second: Any = e5, *extra: str) -> str:
+        return pattern_refused(tmp_path, capsys, first, second, *extra)
+
+    def altered(result: dict[str, Any], change: Callable[[dict[str, Any]], Any]) -> dict[str, Any]:
+        copy = json.loads(json.dumps(result))
+        change(copy)
+        return copy
+
+    # the two results, and the declaration that there is no second
+    assert why(None, e5) == "refused: --e2 names the result file of e2"
+    one_of_two = (
+        "refused: --e5 names the result file of e5, or --e5-not-scored declares that E5 is not "
+        "scored by the freeze of numbers: one of the two, and not both"
+    )
+    assert why(e2, e5, "--e5-not-scored") == one_of_two
+    folder = tmp_path / "bare"
+    folder.mkdir()
+    (folder / "e2.json").write_text(json.dumps(e2))
+    with pytest.raises(SystemExit) as stop:
+        LS.main(["pattern", "--e2", str(folder / "e2.json"), "--out", str(folder / "out.json")])
+    assert stop.value.code == one_of_two and not (folder / "out.json").exists()
+    # a file that is not there, is not JSON, is no object, or is another result
+    absent = why(tmp_path / "absent.json", e5)
+    assert absent.startswith("refused: the result file of e2 cannot be read (FileNotFoundError)")
+    not_e2 = "refused: --e2: the file is not the result file of e2 as this scorer writes it"
+    not_e5 = "refused: --e5: the file is not the result file of e5 as this scorer writes it"
+    text = tmp_path / "text.json"
+    text.write_text("{ not JSON")
+    assert why(text, e5) == not_e2 and why(e2, text) == not_e5
+    text.write_bytes(b"\xff\xfe\x00")
+    assert why(text, e5) == not_e2
+    assert why([e2], e5) == not_e2 and why(e2, [1, 2]) == not_e5
+    assert why(e5, e5) == not_e2 and why(e2, e2) == not_e5
+    assert why(altered(e2, lambda r: r.pop("about")), e5) == not_e2
+    assert why(e2, altered(e5, lambda r: r.update(about=LS.ABOUT_PATTERN))) == not_e5
+    # a result under another registered record: a margin, a floor, the factors, the seed, or a
+    # result from before the pattern was registered
+    other_e2 = (
+        "refused: --e2: the result file of e2 was written under another registered record than "
+        "this scorer's (another constant, primary, line or template pin)"
+    )
+    other_e5 = other_e2.replace("e2", "e5")
+    assert why(
+        altered(e2, lambda r: r["registered"]["pattern"].update(letter_margin=0.15)), e5
+    ) == (other_e2)
+    for name in ("standing_floor", "own_error_floor"):
+        moved = altered(e5, lambda r, name=name: r["registered"]["pattern"].update({name: 0.05}))
+        assert why(e2, moved) == other_e5, name
+    moved = altered(e5, lambda r: r["registered"]["pattern"]["standing_factors"].remove("silent"))
+    assert why(e2, moved) == other_e5
+    assert why(e2, altered(e5, lambda r: r["registered"]["e5"].update(cut_seeds=40))) == other_e5
+    assert why(altered(e2, lambda r: r["registered"].update(seed=1)), e5) == other_e2
+    assert why(altered(e2, lambda r: r["registered"].pop("pattern")), e5) == other_e2
+    assert why(e2, altered(e5, lambda r: r.pop("registered"))) == other_e5
+    # the same two files under a scorer with another margin
+    monkeypatch.setattr(LS, "LETTER_MARGIN", 0.15)
+    assert why() == other_e2
+    monkeypatch.setattr(LS, "LETTER_MARGIN", 0.10)
+    # two results of different plans of the runs
+    apart = "refused: the two results are of different plans of the runs"
+    assert why(e2, made_e5(plan="e" * 64)) == apart
+    assert why(made_e2(letter_of(LLAMA), letter_of(DEEPSEEK), plan="e" * 64), e5) == apart
+    # the two primaries on different items, in either result
+    literal = "refused: the E2 result does not score the two primaries on one set of gold items"
+    pairs = (
+        "refused: the E5 result does not score the two primaries on the item set it records: the "
+        "pattern is read on one item set, whole or cut"
+    )
+    rows = f"{DEEPSEEK} {V1}"
+    assert why(altered(e2, lambda r: r["per_item"]["readers"][rows].pop()), e5) == literal
+    assert why(
+        altered(e2, lambda r: r["per_item"]["readers"][rows][0].__setitem__(0, "L999")), e5
+    ) == (literal)
+    assert why(altered(e2, lambda r: r["per_item"].update(item_set="without_gap")), e5) == literal
+    assert why(altered(e2, lambda r: r["item_sets"]["all"].update(items=119)), e5) == literal
+
+    def first_twice(result: dict[str, Any]) -> None:
+        """Each primary's rows with the first item twice, in the place of the second: as many
+        rows as gold items, the same for both primaries, and one item short."""
+        for rows in result["per_item"]["readers"].values():
+            rows[1] = list(rows[0])
+
+    doubled = altered(e2, first_twice)
+    assert all(len(rows) == 120 for rows in doubled["per_item"]["readers"].values())
+    assert why(doubled, e5) == literal
+    for model in (LLAMA, DEEPSEEK):
+        fewer = altered(e5, lambda r, model=model: r["per_item"]["readers"][model].pop())
+        assert why(e2, fewer) == pairs, model
+    other = altered(e5, lambda r: r["per_item"]["readers"][LLAMA][0].__setitem__(0, "P9999"))
+    assert why(e2, other) == pairs
+    # one primary on the whole item set and the result recording the cut, or the other way
+    half = lp.ids_sha256(f"P{k:04d}" for k in range(400))
+    assert why(
+        e2, altered(e5, lambda r: r["item_set"].update(items=400, item_ids_sha256=half))
+    ) == (pairs)
+    assert why(e2, altered(e5, lambda r: r["item_set"].update(item_ids_sha256=half))) == pairs
+    assert why(e2, altered(e5, lambda r: r.update(items=799))) == pairs
+    # a cut that the result does not describe is no result to print: nothing is written
+    undescribed = altered(e5, lambda r: r["item_set"].update(cut=True))
+    assert why(e2, undescribed) == (
+        "refused: the two results cannot be read as this scorer writes them (KeyError)"
+    )
+    # a result that lacks what the pattern reads, named by the type of the error alone
+    unreadable = "refused: the two results cannot be read as this scorer writes them "
+    assert why(altered(e2, lambda r: r["item_sets"].pop("all")), e5) == unreadable + "(KeyError)"
+    assert why(e2, altered(e5, lambda r: r["tests"].pop())) == unreadable + "(KeyError)"
+    assert why(e2, altered(e5, lambda r: r["tests"][3].pop("floors"))) == unreadable + "(KeyError)"
+    assert (
+        why(e2, altered(e5, lambda r: r["tests"][0].update(model=QWEN)))
+        == unreadable + "(KeyError)"
+    )
+    assert why(e2, altered(e5, lambda r: r.update(tests=5))) == unreadable + "(TypeError)"
+    assert why(altered(e2, lambda r: r["item_sets"]["all"].update(letter_reading=[])), e5) == (
+        unreadable + "(KeyError)"
+    )
+    # a figure that cannot be printed: a whole number too large for a float, where a letter
+    # accuracy or an error rate stands. One sentence, and no traceback
+    huge = 10**400
+    too_large = altered(e2, lambda r: r["item_sets"]["all"]["letter_reading"][0].update(first=huge))
+    assert why(too_large, e5) == unreadable + "(OverflowError)"
+    too_large = altered(e5, lambda r: r["tests"][0]["edited"].update(rate=huge))
+    assert why(e2, too_large) == unreadable + "(OverflowError)"
+    too_large = altered(e5, lambda r: r["tests"][3]["above_letter_items"].update(rate=huge))
+    assert why(e2, too_large) == unreadable + "(OverflowError)"
+    # a file nested deeper than the parser reads is no result of this scorer
+    deep = tmp_path / "deep.json"
+    deep.write_text("[" * 200_000 + "]" * 200_000)
+    assert why(deep, e5) == not_e2 and why(e2, deep) == not_e5
+    deep.write_text('{"about": ' + "[" * 200_000 + "]" * 200_000 + "}")
+    assert why(deep, e5) == not_e2 and why(e2, deep) == not_e5
+    # the output: named, new, and in a folder that is there
+    assert why(e2, e5, "--out", str(tmp_path / "none" / "out.json")).startswith(
+        "refused: the folder of the output does not exist"
+    )
+    there = tmp_path / "there.json"
+    there.write_text("kept")
+    assert why(e2, e5, "--out", str(there)) == (
+        f"refused: the output is already there, and nothing is overwritten: {there.as_posix()}"
+    )
+    assert there.read_text() == "kept"
+    folder = tmp_path / "no_out"
+    folder.mkdir()
+    argv = pattern_argv(folder, e2, e5, folder / "unused.json")
+    with pytest.raises(SystemExit) as stop:
+        LS.main([arg for arg in argv if arg not in ("--out", str(folder / "unused.json"))])
+    assert (
+        stop.value.code == "refused: --out is required: the file to write, which must not exist yet"
+    )
+    # no refusal quotes an item id
+    assert "L000" not in literal and "P0000" not in pairs
+
+
+def test_pattern_refuses_a_result_named_in_a_sealed_folder_unopened(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    vault = tmp_path / "sealed"
+    vault.mkdir()
+    (vault / "file").write_bytes(b"sealed\n")
+    link = tmp_path / "link.json"
+    link.symlink_to(vault / "file")
+    folder = tmp_path / "open"
+    folder.mkdir()
+    e2, e5 = made_e2(letter_of(LLAMA), letter_of(DEEPSEEK)), made_e5()
+    for name in ("e2", "e5"):
+        for target in (vault / "file", vault / "absent", link):
+            results = {"e2": e2, "e5": e5} | {name: target}
+            argv = pattern_argv(folder, results["e2"], results["e5"], folder / "out.json")
+            capsys.readouterr()
+            with watching() as touched, pytest.raises(SystemExit) as stop:
+                LS.main(argv)
+            assert stop.value.code == (
+                f"refused: --{name} lies in a sealed folder; no sealed file is read"
+            ), (name, target)
+            assert touched == [] and not (folder / "out.json").exists()
+    with pytest.raises(SystemExit) as stop:
+        LS.main(pattern_argv(folder, e2, e5, vault / "out.json"))
+    assert (
+        stop.value.code == "refused: --out lies in a sealed folder; results are written outside it"
+    )
+    assert [path.name for path in vault.iterdir()] == ["file"]
+    assert (vault / "file").read_bytes() == b"sealed\n"
+
+
+def test_pattern_run_as_a_process(tmp_path: Path) -> None:
+    """Status 0 and the summary on a pair of results; status 1 and the reason alone when the
+    output is there already."""
+    e2 = made_e2(letter_of(LLAMA), letter_of(DEEPSEEK))
+    out = tmp_path / "pattern.json"
+    argv = pattern_argv(tmp_path, e2, made_e5({(LLAMA, "stale"): STRONG}), out)
+    root = Path(LS.__file__).resolve().parents[2]
+    env = {name: value for name, value in os.environ.items() if not name.endswith("_API_KEY")}
+
+    def run() -> subprocess.CompletedProcess[str]:
+        return subprocess.run(
+            [sys.executable, "-m", "analysis.coling.literal_scores", *argv],
+            cwd=root,
+            env=env | {"PYTHONPATH": str(root)},
+            capture_output=True,
+            text=True,
+            timeout=600,
+            check=False,
+        )
+
+    done = run()
+    assert done.returncode == 0 and done.stderr == ""
+    assert done.stdout.startswith("pattern of PLAN section 13: E2 on 120 gold items; E5 on 800")
+    assert f"\nsentence: {one_named(LLAMA, DEEPSEEK, 'standing')}\n" in done.stdout
+    written = out.read_text()
+    assert json.loads(written)["sentence"]["stated_for"] == [LLAMA]
+    again = run()
+    assert again.returncode == 1 and again.stdout == ""
+    assert again.stderr == (
+        f"refused: the output is already there, and nothing is overwritten: {out.as_posix()}\n"
+    )
+    assert out.read_text() == written
+
+
+# --------------------------------------------------------------------------------------------
+# The pattern end to end on the made-up study
+# --------------------------------------------------------------------------------------------
+
+
+def pattern_of_files(folder: Path, e2_text: str, e5_text: str) -> SimpleNamespace:
+    """``pattern`` on the texts of two result files: its result and its printout."""
+    (folder / "e2.json").write_text(e2_text)
+    (folder / "e5.json").write_text(e5_text)
+    out, printed = folder / "pattern.json", io.StringIO()
+    with redirect_stdout(printed):
+        assert LS.main(pattern_argv(folder, folder / "e2.json", folder / "e5.json", out)) == 0
+    return SimpleNamespace(
+        report=json.loads(out.read_text()), text=out.read_text(), printed=printed.getvalue()
+    )
+
+
+@pytest.fixture(scope="module")
+def pattern(
+    e2: SimpleNamespace, e5: SimpleNamespace, tmp_path_factory: pytest.TempPathFactory
+) -> SimpleNamespace:
+    """The pattern of the two results of the untouched study."""
+    return pattern_of_files(tmp_path_factory.mktemp("pattern"), e2.text, e5.text)
+
+
+def pair_floors(model: str, factor: str, seeds: Sequence[int]) -> dict[str, Any]:
+    """What the scripted readings of the minimal pairs give for one standing factor over some
+    seeds, counted here: the errors on the items of the factor, on the unedited items and on
+    the letter-factor items under the criterion of the factor, the own error, and the floors
+    in tenths of whole numbers."""
+    n = len(seeds)
+    errors = sum(pair_errs(model, s, factor) for s in seeds)
+    unedited = sum(seed_errs(model, s, factor) for s in seeds)
+    letter = 0
+    for s in seeds:
+        for name, off in (("surface_form", s % 2 == 1), ("granularity", s % 3 == 0)):
+            counts = {"surface_form": "certainty", "granularity": "stale"}[name] == factor
+            letter += pair_errs(model, s, name) or (off and counts)
+    # the scripted error of a stale or a distractor item is the factor's own; the certainty
+    # items are dated, and an erring silent item abstains under another type
+    own = (errors if factor in ("stale", "distractor") else 0, 0 if factor == "certainty" else n)
+    met = {
+        "above_seed": 10 * (errors - unedited) >= n,
+        "above_letter": 10 * (2 * errors - letter) >= 2 * n,
+        "own_error": bool(own[1]) and 10 * own[0] >= own[1],
+    }
+    return {
+        "edited": errors,
+        "unedited": unedited,
+        "letter": letter,
+        "own": own,
+        "floors": met | {"met": all(met.values())},
+    }
+
+
+def check_pattern_against_the_script(
+    found: Mapping[str, Any], tests: Sequence[Mapping[str, Any]], model: str, seeds: Sequence[int]
+) -> list[str]:
+    """One primary's pattern against the scripted readings over ``seeds`` and against its
+    tests of the twelve; gives the standing factors that count."""
+    n = len(seeds)
+    mine = {t["factor"]: t for t in tests if t["model"] == model}
+    for factor in LS.LETTER_FACTORS:
+        errors = sum(pair_errs(model, s, factor) for s in seeds)
+        unedited = sum(seed_errs(model, s, factor) for s in seeds)
+        shown = found["letter"]["e5"][factor]
+        assert shown["edited"] == counted(errors, n) | {"rate": near(errors / n)}
+        assert shown["unedited"] == counted(unedited, n) | {"rate": near(unedited / n)}
+        assert shown["holds"] is mine[factor]["holds"] and shown["p_holm"] == mine[factor]["p_holm"]
+        assert shown["higher_on_edited"] is (errors > unedited)
+        assert shown["withholds"] is (shown["holds"] and errors > unedited)
+    counting = []
+    for factor in LS.STANDING_FACTORS:
+        want, one = pair_floors(model, factor, seeds), found["standing"][factor]
+        test = mine[factor]
+        assert one["a"]["edited"]["errors"] == want["edited"] and one["a"]["edited"]["items"] == n
+        assert one["a"]["unedited"]["errors"] == want["unedited"]
+        assert one["a"]["holds"] is test["holds"] and one["a"]["p_from"] == test["p_from"]
+        assert one["a"]["higher_on_edited"] is (want["edited"] > want["unedited"])
+        assert one["a"]["met"] is (test["holds"] and want["edited"] > want["unedited"])
+        assert one["b"]["floor"] == 0.1 and one["c"]["floor"] == 0.1
+        assert one["b"]["above_seed"] == {
+            "difference": near((want["edited"] - want["unedited"]) / n),
+            "met": want["floors"]["above_seed"],
+        }
+        assert one["b"]["above_letter"] == {
+            "items": 2 * n,
+            "errors": want["letter"],
+            "rate": near(want["letter"] / (2 * n)),
+            "difference": near(want["edited"] / n - want["letter"] / (2 * n)),
+            "met": want["floors"]["above_letter"],
+        }
+        assert one["b"]["met"] is (want["floors"]["above_seed"] and want["floors"]["above_letter"])
+        errors, items = want["own"]
+        assert one["c"] == {
+            "floor": 0.1,
+            "items": items,
+            "errors": errors,
+            "rate": near(errors / items) if items else None,
+            "met": want["floors"]["own_error"],
+        }
+        assert one["errors_of_another_kind"] == test["errors_of_another_kind"]
+        assert one["counts"] is (one["a"]["met"] and want["floors"]["met"])
+        counting += [factor] if one["counts"] else []
+    assert found["standing"]["factors_that_count"] == counting
+    assert found["standing"]["holds"] is bool(counting)
+    return counting
+
+
+def test_pattern_end_to_end_on_the_made_up_study(
+    study: SimpleNamespace, e2: SimpleNamespace, e5: SimpleNamespace, pattern: SimpleNamespace
+) -> None:
+    """The two result files of the made-up study, read by the pattern. Llama reads the letter
+    (13 of 14 letter items against 8 for the rule reader) and no test of a standing factor
+    holds for it. Deepseek reads the letter (14 of 14) and errs on 11 of its 12 distractor
+    items, each time by taking the expiry date, against 1 of 12 unedited items and 5 of 24
+    letter-factor items: its test holds, and the factor counts."""
+    report = pattern.report
+    assert report["about"] == LS.ABOUT_PATTERN and pattern.text == LS.report_text(report)
+    assert report["registered"] == e2.report["registered"] == e5.report["registered"]
+    assert report["e2"] == {"item_set": "all", "items": 23}
+    assert report["e5"] == {
+        "scored": True,
+        "item_set": {
+            "cut": False,
+            "items_in_the_item_file": 84,
+            "items": 84,
+            "item_ids_sha256": lp.ids_sha256(i.item_id for i in study.pairs),
+        },
+        "items": 84,
+        "seeds": 12,
+        "method_in_force": "the GEE with its robust variance",
+    }
+    assert e5.report["item_set"] == report["e5"]["item_set"]
+    inputs = report["inputs"]
+    assert inputs["plan_sha256"] == sha(lp.plan_path(study.runs))
+    assert inputs["gold_sha256"] == {"e2": sha(study.gold), "e5": sha(study.e5_gold)}
+    assert inputs["code_of_the_results"] == dict.fromkeys(("e2", "e5"), sha(Path(LS.__file__)))
+    assert inputs["e2_sha256"] == hashlib.sha256(e2.text.encode()).hexdigest()
+    assert inputs["e5_sha256"] == hashlib.sha256(e5.text.encode()).hexdigest()
+    readings = e2.report["item_sets"]["all"]["letter_reading"]
+    described = ("model", "template", "against", "evaluable")
+    whole = range(PAIR_SEEDS)
+    counting = {}
+    for entry, model in zip(readings, (LLAMA, DEEPSEEK), strict=True):
+        found = report["primaries"][model]
+        assert found["has_pattern"] is True and found["declared_not_run"] == []
+        assert found["letter"]["e2"] == {k: v for k, v in entry.items() if k not in described} | {
+            "met": True
+        }
+        assert found["letter"]["e5"]["met"] is True and found["letter"]["holds"] is True
+        assert found["letter"]["withheld_by"] == []
+        counting[model] = check_pattern_against_the_script(found, e5.report["tests"], model, whole)
+        assert found["holds"] is bool(counting[model])
+    assert counting == {LLAMA: [], DEEPSEEK: ["distractor"]}
+    llama, deepseek = report["primaries"][LLAMA], report["primaries"][DEEPSEEK]
+    assert llama["letter"]["e2"]["first"] == near(13 / 14)
+    assert llama["letter"]["e2"]["second"] == near(8 / 14) and llama["letter"]["e2"]["items"] == 14
+    assert (
+        llama["standing"]["withheld_by"] == [NO_STANDING_TEST] and llama["e5_tests_that_hold"] == []
+    )
+    # llama's floors are met on two factors whose tests do not hold: they do not count
+    assert [f for f in LS.STANDING_FACTORS if llama["standing"][f]["b"]["met"]] == [
+        "stale",
+        "distractor",
+    ]
+    assert deepseek["letter"]["e2"]["first"] == 1.0
+    distractor = deepseek["standing"]["distractor"]
+    assert distractor["a"]["edited"] == counted(11, 12) | {"rate": near(11 / 12)}
+    assert distractor["a"]["unedited"] == counted(1, 12) | {"rate": near(1 / 12)}
+    assert distractor["a"]["holds"] is True and distractor["a"]["p_holm"] < 0.05
+    assert distractor["b"]["above_letter"]["errors"] == 5
+    assert distractor["b"]["above_letter"]["difference"] == near(17 / 24)
+    assert distractor["c"] == {"floor": 0.1, **counted(11, 12), "rate": near(11 / 12), "met": True}
+    assert distractor["errors_of_another_kind"] == {"errors": 0, "share": 0.0}
+    assert deepseek["standing"]["withheld_by"] == []
+    (held,) = deepseek["e5_tests_that_hold"]
+    test = e5.report["tests"][6 + MP.FACTORS.index("distractor")]
+    assert held == {
+        "factor": "distractor",
+        "kind": "standing",
+        "higher_error_rate_on": "the edited items",
+        "edited": test["edited"],
+        "unedited": test["unedited"],
+        "difference": test["difference"],
+        "log_odds_difference": test["log_odds_difference"],
+        "p_holm": test["p_holm"],
+        "p_from": "gee",
+    }
+    assert report["sentence"] == {
+        "sentence": LS.SENTENCE,
+        "case": "one primary",
+        "stated_for": [DEEPSEEK],
+        "paper": one_named(DEEPSEEK, LLAMA, "standing"),
+        "beside": [
+            not_held(LLAMA, "standing", NO_STANDING_TEST),
+            family_result(DEEPSEEK, "distractor"),
+            criterion_beside(DEEPSEEK),
+            own_error_beside(DEEPSEEK, "distractor"),
+            NO_SECONDARY,
+        ],
+    }
+    lines = pattern.printed.splitlines()
+    assert len(lines) == 1 + 4 + 1 + 5 + 1
+    assert lines[0] == (
+        "pattern of PLAN section 13: E2 on 23 gold items; E5 on 84 items of 12 seeds (the GEE "
+        "with its robust variance)"
+    )
+    assert lines[1].startswith(
+        f"{LLAMA} letter: holds; (a) letter accuracy 0.929 against 0.571 of the rule reader on "
+        "14 letter items, difference +0.357, 90% interval "
+    )
+    assert lines[2].startswith(f"{LLAMA} standing: does not hold; certainty: 0.500 against 0.333")
+    assert lines[4].startswith(f"{DEEPSEEK} standing: holds by distractor; certainty: ")
+    assert (
+        "distractor: 0.917 against 0.083 unedited (+0.833), Holm 0.0079, holds with the higher "
+        "rate on the edited items, 0.208 on the letter-factor items (+0.708), own error 11 of "
+        "12, counts; silent: "
+    ) in lines[4]
+    assert lines[5] == f"sentence: {one_named(DEEPSEEK, LLAMA, 'standing')}"
+    # nothing of an item reaches the pattern: no wording, no reading, and no item id
+    for text in (pattern.text, pattern.printed):
+        no_text_in(study, text)
+        assert not any(item in text for item in study.items)
+        assert not any(item.item_id in text for item in study.pairs)
+    assert "per_item" not in report and "other_models" not in pattern.text
+    assert not any(model in json.dumps(report["primaries"]) for model in (QWEN, GEMMA, GROK))
+
+
+def test_pattern_end_to_end_when_a_primary_reads_the_letter_worse_than_the_rules(
+    study: SimpleNamespace,
+    e5: SimpleNamespace,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Condition (a) through both commands. Llama's stored readings are given a wrong statement
+    type on seven letter items that the rule reader has right: it is then right on 6 of the 14
+    letter items against 8, the lower end of the 90% interval of the difference lies below
+    -0.10, and the pattern does not hold for it."""
+    numbers = {item: n for n, item in study.ids.items()}
+    spoiled = (1, 2, 3, 4, 6, 9, 20)
+
+    def worse(row: dict) -> dict:
+        if numbers[row["item_id"]] not in spoiled:
+            return row
+        row = json.loads(json.dumps(row))
+        row["reading"]["statement_type"] = "discontinuation"
+        return row
+
+    with rewritten(study, run_of("e2-literal", LLAMA), worse):
+        report, _ = scored("e2", study, tmp_path, capsys)
+    entry = report["item_sets"]["all"]["letter_reading"][0]
+    assert entry["model"] == LLAMA and entry["items"] == 14
+    assert entry["first"] == near(6 / 14) and entry["second"] == near(8 / 14)
+    assert entry["difference"] == near(-2 / 14)
+    # the interval of the difference, from the registered draws of episodes
+    episodes = sorted({EPISODES.get(n, n) for n in GOLD})
+    drawn = P.cluster_draws(len(episodes), 10_000, 20261001).astype(float)
+    members = {k: [n for n in GOLD if EPISODES.get(n, n) == e] for k, e in enumerate(episodes)}
+    wrong = {*spoiled, 5}  # the scripted reading of item 5 has the type wrong already
+    rules_wrong = set(RULES_WRONG) & set(LETTER)
+    gain = np.array(
+        [
+            sum((n in rules_wrong) - (n in wrong) for n in members[k] if n in LETTER)
+            for k in members
+        ],
+        dtype=float,
+    )
+    size = np.array([sum(n in LETTER for n in members[k]) for k in members], dtype=float)
+    low, high = np.quantile((drawn @ gain) / (drawn @ size), [0.05, 0.95])
+    assert entry["ci90"] == {"low": near(low), "high": near(high), "draws": 10_000}
+    assert low < -0.1 < high and entry["lower_end_above_minus_margin"] is False
+    assert report["item_sets"]["all"]["letter_reading"][1]["lower_end_above_minus_margin"] is True
+    found = pattern_of_files(
+        tmp_path, (tmp_path / "results" / "scores_0.json").read_text(), e5.text
+    )
+    llama = found.report["primaries"][LLAMA]
+    assert llama["letter"]["e2"]["met"] is False and llama["letter"]["e5"]["met"] is True
+    assert llama["letter"]["withheld_by"] == [LOWER_END] and llama["holds"] is False
+    assert found.report["sentence"]["stated_for"] == [DEEPSEEK]
+    assert found.report["sentence"]["paper"] == one_named(DEEPSEEK, LLAMA, "letter", "standing")
+    assert (
+        f"{LLAMA} letter: does not hold; (a) letter accuracy 0.429 against 0.571" in found.printed
+    )
+    assert "lower end not above -0.10" in found.printed
+
+
+# --------------------------------------------------------------------------------------------
+# E5 cut to the first seeds of the seed list (PLAN section 12, cut 4)
+# --------------------------------------------------------------------------------------------
+
+CUT_SEEDS = 6
+"""How many seeds the cut keeps in these tests, in the place of the registered 50."""
+CUT_RANK = {s: 10 * ((7 * s + 3) % PAIR_SEEDS + 1) for s in range(PAIR_SEEDS)}
+"""The draw rank of each of the twelve seeds: 10 to 120. In the order of the draw the seeds are
+3, 10, 5, 0, 7, 2, 9, 4, 11, 6, 1 and 8; read as text, rank 100 would come before rank 20."""
+NO_ITEM = "S99"
+"""A seed of the list that gave no item, third in the order of the draw."""
+CUT_KEPT = (3, 10, 5, 0, 7)
+"""The seeds of the first six of the list that have items."""
+
+
+def seed_list(ranks: Mapping[str, Any]) -> str:
+    """A seed list as the sampler writes one, in the order of the seed ids."""
+    rows = [
+        {
+            "event_id": f"E{seed[1:]}",
+            "statement_group_id": seed,
+            "thread_id": f"T{seed[1:]}",
+            "draw_rank": rank,
+            "period": "fit",
+        }
+        for seed, rank in sorted(ranks.items())
+    ]
+    return MP.plain_csv(S.LATER_COLUMNS, rows)
+
+
+def listed_ranks() -> dict[str, Any]:
+    return {f"S{s:02d}": rank for s, rank in CUT_RANK.items()} | {NO_ITEM: 25}
+
+
+def cut_lines(study: SimpleNamespace, seeds: Sequence[int]) -> list[str]:
+    """The lines of the item file of the minimal pairs for some seeds."""
+    kept = {f"S{s:02d}" for s in seeds}
+    lines = study.e5_items.read_text().splitlines(keepends=True)
+    return [line for line in lines if json.loads(line)["seed_id"] in kept]
+
+
+def build_cut(study: SimpleNamespace, root: Path) -> SimpleNamespace:
+    """The made-up study with its minimal pairs cut before any call: the seed list, the cut
+    item file (the lines of the kept seeds, last line first), a plan whose list of minimal
+    pairs is that file, and the runs of E2 and of E5 under that plan."""
+    runs, local = root / "read", root / "local"
+    for folder in (runs, local):
+        folder.mkdir()
+    seeds, items = root / "sample_pair_seeds.csv", root / "e5_cut.jsonl"
+    seeds.write_text(seed_list(listed_ranks()), encoding="utf-8")
+    items.write_text("".join(reversed(cut_lines(study, CUT_KEPT))))
+    options = lp.default_options(study.root / "items")
+    options |= {"out_root": str(runs), "local_root": str(local)}
+    options["items_files"] = {"e5": str(items)}
+    options["counts"] = dict.fromkeys(("e3", "tbd", "silent", "stale", "dev"), 50)
+    plan = lp.make_plan(options)
+    lp.plan_path(runs).parent.mkdir(parents=True, exist_ok=True)
+    lp.plan_path(runs).write_text(lp.plan_text(plan), encoding="utf-8")
+    for run in plan["runs"]:
+        if run["list"] in ("e2", "e5"):
+            make_run(plan, run, reply_for(run["model"], run["template"]), local)
+    ids = [study.pair_ids[s, factor] for s in CUT_KEPT for factor in PAIR_FACTORS]
+    return SimpleNamespace(root=root, runs=runs, seeds=seeds, items=items, ids=ids)
+
+
+@pytest.fixture(scope="module")
+def cut(
+    study: SimpleNamespace, tmp_path_factory: pytest.TempPathFactory
+) -> Iterator[SimpleNamespace]:
+    patch = pytest.MonkeyPatch()
+    guard(patch, tmp_path_factory.mktemp("nowhere"))
+    try:
+        yield build_cut(study, tmp_path_factory.mktemp("cut"))
+    finally:
+        patch.undo()
+
+
+def cut_args(
+    study: SimpleNamespace, cut: SimpleNamespace, out: Path, *extra: str, **replace: Any
+) -> list[str]:
+    """The arguments of ``e5`` for the cut; the hash of the seed list is its own unless one is
+    given."""
+    options = {
+        "--gold": study.e5_gold,
+        "--items": study.e5_items,
+        "--out-root": cut.runs,
+        "--out": out,
+        "--cut-seed-list": cut.seeds,
+        "--cut-items": cut.items,
+    }
+    if "expect_seed_list_sha256" not in replace:
+        named = Path(replace.get("cut_seed_list") or cut.seeds)
+        options["--expect-seed-list-sha256"] = sha(named) if named.is_file() else "0" * 64
+    return [*listed("e5", options, study.e5_gold, replace), *extra]
+
+
+def cut_scored(
+    study: SimpleNamespace,
+    cut: SimpleNamespace,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    **replace: Any,
+) -> tuple[dict[str, Any], str, Path]:
+    out = fresh(tmp_path)
+    capsys.readouterr()
+    assert LS.main(cut_args(study, cut, out, **replace)) == 0
+    printed = capsys.readouterr()
+    assert printed.err == ""
+    return json.loads(out.read_text()), printed.out, out
+
+
+def cut_refused(
+    study: SimpleNamespace,
+    cut: SimpleNamespace,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    **replace: Any,
+) -> str:
+    out = fresh(tmp_path, "refused")
+    capsys.readouterr()
+    with pytest.raises(SystemExit) as stop:
+        LS.main(cut_args(study, cut, out, **replace))
+    assert isinstance(stop.value.code, str) and stop.value.code.startswith("refused: ")
+    printed = capsys.readouterr()
+    assert printed.out == "" and printed.err == "" and list(out.parent.iterdir()) == []
+    return stop.value.code
+
+
+def test_e5_cut_to_the_first_seeds_of_the_seed_list_in_its_draw_order(
+    study: SimpleNamespace,
+    cut: SimpleNamespace,
+    e5: SimpleNamespace,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """PLAN section 12, cut 4: the unedited seed item and every edit of the first seeds of the
+    seed list in its draw order. Here the cut keeps six seeds of thirteen; one of the six gave
+    no item, so 35 items of five seeds are scored, on the runs that read the cut item file."""
+    monkeypatch.setattr(LS, "E5_CUT_SEEDS", CUT_SEEDS)
+    order = sorted(listed_ranks(), key=lambda seed: listed_ranks()[seed])
+    assert order[:CUT_SEEDS] == ["S03", "S10", NO_ITEM, "S05", "S00", "S07"]
+    assert (
+        sorted(listed_ranks(), key=lambda seed: str(listed_ranks()[seed]))[:CUT_SEEDS]
+        != (order[:CUT_SEEDS])
+    )
+    report, printed, _ = cut_scored(study, cut, tmp_path, capsys)
+    assert report["item_set"] == {
+        "cut": True,
+        "first_seeds": 6,
+        "seeds_on_the_list": 13,
+        "first_seeds_with_items": 5,
+        "items_in_the_item_file": 84,
+        "items": 35,
+        "item_ids_sha256": lp.ids_sha256(cut.ids),
+    }
+    assert report["registered"]["e5"]["cut_seeds"] == 6
+    inputs = report["inputs"]
+    assert inputs["items"] == study.e5_items.as_posix() == e5.report["inputs"]["items"]
+    assert inputs["items_sha256"] == sha(study.e5_items)
+    assert inputs["item_ids_sha256"] == e5.report["inputs"]["item_ids_sha256"]
+    assert inputs["gold_sha256"] == sha(study.e5_gold)
+    assert inputs["seed_list"] == cut.seeds.as_posix() and inputs["seed_list_sha256"] == sha(
+        cut.seeds
+    )
+    assert inputs["cut_items"] == cut.items.as_posix() and inputs["cut_items_sha256"] == sha(
+        cut.items
+    )
+    assert (
+        inputs["plan_sha256"] == sha(lp.plan_path(cut.runs)) != e5.report["inputs"]["plan_sha256"]
+    )
+    assert list(inputs)[:9] == [
+        "gold",
+        "gold_sha256",
+        "items",
+        "items_sha256",
+        "item_ids_sha256",
+        "seed_list",
+        "seed_list_sha256",
+        "cut_items",
+        "cut_items_sha256",
+    ]
+    assert report["items"] == 35 and report["seeds"] == 5
+    assert report["items_by_factor"] == dict.fromkeys(PAIR_FACTORS, 5)
+    assert report["items_of_test_period_seeds"] == 7  # seed 10 is dated 2023 or later
+    assert all(found["rows"] == 35 for found in report["runs"].values())
+    for model, rows in report["per_item"]["readers"].items():
+        assert sorted(row[0] for row in rows) == sorted(cut.ids), model
+    # the errors are those of the scripted readings on the five seeds, and on no other
+    for model in ERRS:
+        table = report["errors"][model]["by_factor"]
+        for factor in PAIR_FACTORS:
+            errors = sum(pair_errs(model, s, factor) for s in CUT_KEPT)
+            assert table[factor]["items"] == 5, (model, factor)
+            assert table[factor]["errors"] == errors, (model, factor)
+    assert all(v["errors"] == 0 for v in report["rule_reader"]["by_factor"].values())
+    assert all(v["items"] == 5 for v in report["rule_reader"]["by_factor"].values())
+    for test in report["tests"]:
+        if not test["evaluable"] or test["factor"] in LS.LETTER_FACTORS:
+            continue
+        want = pair_floors(test["model"], test["factor"], CUT_KEPT)
+        assert test["edited"]["errors"] == want["edited"] and test["edited"]["items"] == 5
+        assert test["unedited"]["errors"] == want["unedited"]
+        assert test["above_letter_items"]["errors"] == want["letter"]
+        assert test["above_letter_items"]["items"] == 10
+        assert (test["own_error"]["errors"], test["own_error"]["items"]) == want["own"]
+        assert test["floors"] == want["floors"], (test["model"], test["factor"])
+    assert sum(t["evaluable"] for t in report["tests"]) == 12
+    assert printed.startswith("E5: 35 items of 5 seeds, cut to the first 6 of the seed list; ")
+    # the whole item set says that it is whole
+    assert e5.report["item_set"] == {
+        "cut": False,
+        "items_in_the_item_file": 84,
+        "items": 84,
+        "item_ids_sha256": e5.report["inputs"]["item_ids_sha256"],
+    }
+    assert e5.text.startswith('{\n "about"') and ", cut to the first" not in e5.text
+    assert not any(name.startswith(("seed_list", "cut_items")) for name in e5.report["inputs"])
+    # the seed list in another order of its rows, and the cut item file in the order of the
+    # item file, give the same result under other hashes
+    again = tmp_path / "again"
+    again.mkdir()
+    rows = seed_list(listed_ranks()).splitlines(keepends=True)
+    (again / "seeds.csv").write_text(rows[0] + "".join(reversed(rows[1:])))
+    (again / "cut.jsonl").write_text("".join(cut_lines(study, CUT_KEPT)))
+    assert sha(again / "cut.jsonl") != sha(cut.items)
+    why = cut_refused(study, cut, tmp_path, capsys, cut_items=again / "cut.jsonl")
+    assert "the item file given is not the file of the plan's item list 'e5'" in why
+    other, _, _ = cut_scored(study, cut, tmp_path, capsys, cut_seed_list=again / "seeds.csv")
+    assert other["inputs"]["seed_list_sha256"] == sha(again / "seeds.csv") != sha(cut.seeds)
+    assert other["item_set"] == report["item_set"] and other["tests"] == report["tests"]
+
+
+def test_the_pattern_is_read_on_a_cut_e5_with_the_same_floors(
+    study: SimpleNamespace,
+    cut: SimpleNamespace,
+    e2: SimpleNamespace,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """PLAN section 13, "The sentence": if E5 is cut, the pattern is read on those items with
+    the same floors. The E2 result is of the same plan of the runs as the cut E5."""
+    monkeypatch.setattr(LS, "E5_CUT_SEEDS", CUT_SEEDS)
+    scored_cut, _, e5_path = cut_scored(study, cut, tmp_path, capsys)
+    e2_path = fresh(tmp_path)
+    assert LS.main(e2_args(study, e2_path, out_root=cut.runs)) == 0
+    capsys.readouterr()
+    report, printed = patterned(tmp_path, capsys, e2_path, e5_path)
+    assert report["e5"]["item_set"] == scored_cut["item_set"]
+    assert report["e5"]["items"] == 35 and report["e5"]["seeds"] == 5
+    assert report["registered"]["pattern"]["standing_floor"] == 0.1
+    assert report["inputs"]["plan_sha256"] == sha(lp.plan_path(cut.runs))
+    counting = {}
+    for model in (LLAMA, DEEPSEEK):
+        found = report["primaries"][model]
+        assert found["has_pattern"] is True and found["letter"]["e2"]["met"] is True
+        counting[model] = check_pattern_against_the_script(
+            found, scored_cut["tests"], model, CUT_KEPT
+        )
+        assert found["holds"] is bool(counting[model])
+    stated = [model for model in (LLAMA, DEEPSEEK) if counting[model]]
+    assert report["sentence"]["stated_for"] == stated
+    assert report["sentence"]["beside"][-2:] == [
+        "E5 is cut to 35 items (section 12, cut 4): the pattern is read on those items with the "
+        "same floors",
+        NO_SECONDARY,
+    ]
+    assert printed.startswith(
+        "pattern of PLAN section 13: E2 on 23 gold items; E5 on 35 items of 5 seeds, cut to the "
+        "first 6 of the seed list ("
+    )
+    # the E2 result of the whole study is of another plan of the runs
+    whole = fresh(tmp_path)
+    assert LS.main(e2_args(study, whole)) == 0
+    capsys.readouterr()
+    assert json.loads(whole.read_text())["item_sets"] == e2.report["item_sets"]
+    assert pattern_refused(tmp_path, capsys, whole, e5_path) == (
+        "refused: the two results are of different plans of the runs"
+    )
+    # a result of a cut to six seeds is not read by a scorer that registers fifty
+    monkeypatch.setattr(LS, "E5_CUT_SEEDS", 50)
+    assert pattern_refused(tmp_path, capsys, e2_path, e5_path) == (
+        "refused: --e2: the result file of e2 was written under another registered record than "
+        "this scorer's (another constant, primary, line or template pin)"
+    )
+
+
+def test_e5_cut_refusals(
+    study: SimpleNamespace,
+    cut: SimpleNamespace,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(LS, "E5_CUT_SEEDS", CUT_SEEDS)
+
+    def why(**replace: Any) -> str:
+        return cut_refused(study, cut, tmp_path, capsys, **replace)
+
+    # the three options of a cut go together
+    together = (
+        "refused: a cut of E5 takes --cut-seed-list, --expect-seed-list-sha256 and --cut-items "
+        "together"
+    )
+    assert why(cut_seed_list=None) == together and why(cut_items=None) == together
+    assert why(expect_seed_list_sha256=None) == together
+    assert why(cut_seed_list=None, cut_items=None) == together
+    # the seed list behind its hash
+    assert "--expect-seed-list-sha256 takes a sha256" in why(expect_seed_list_sha256="abc")
+    assert why(expect_seed_list_sha256="1" * 64).startswith(
+        "refused: the seed list is not the expected file: its sha256 starts with "
+    )
+    assert why(cut_seed_list=tmp_path / "none.csv").startswith(
+        "refused: the seed list cannot be read (FileNotFoundError)"
+    )
+    made = tmp_path / "lists"
+    made.mkdir()
+
+    def with_list(text: str) -> str:
+        path = made / f"seeds_{len(list(made.iterdir()))}.csv"
+        path.write_text(text, encoding="utf-8")
+        return why(cut_seed_list=path)
+
+    def with_ranks(change: Mapping[str, Any], drop: Sequence[str] = ()) -> str:
+        ranks = listed_ranks() | dict(change)
+        return with_list(seed_list({seed: r for seed, r in ranks.items() if seed not in drop}))
+
+    assert with_list("statement_group_id,rank\nS00,1\n") == (
+        "refused: the seed list has no rows or lacks the columns ['draw_rank']"
+    )
+    not_whole = "refused: the seed list holds a draw_rank that is not a whole number"
+    assert with_ranks({"S04": "first"}) == not_whole and with_ranks({"S04": "2.5"}) == not_whole
+    assert with_ranks({"S04": ""}) == not_whole
+    twice = "refused: the seed list repeats a draw_rank or a seed, or holds a row with no seed"
+    assert with_ranks({"S04": CUT_RANK[5]}) == twice
+    text = seed_list(listed_ranks())
+    assert with_list(text + "E77,S04,T77,500,fit\n") == twice
+    assert with_list(text + "E77,,T77,500,fit\n") == twice
+    assert (
+        with_ranks({}, drop=["S04"]) == "refused: 1 seeds of the item file are not on the seed list"
+    )
+    assert with_ranks({}, drop=["S04", "S03", NO_ITEM]) == (
+        "refused: 2 seeds of the item file are not on the seed list"
+    )
+    # a list that holds no more seeds than the cut keeps is no cut
+    monkeypatch.setattr(LS, "E5_CUT_SEEDS", 13)
+    assert why() == "refused: the seed list holds 13 seeds: its first 13 are no cut"
+    monkeypatch.setattr(LS, "E5_CUT_SEEDS", 14)
+    assert why() == "refused: the seed list holds 13 seeds: its first 14 are no cut"
+    monkeypatch.setattr(LS, "E5_CUT_SEEDS", CUT_SEEDS)
+    # the cut item file: the rows of the items kept, as the item file has them, and no other
+    not_the_cut = (
+        "refused: the cut item file is not the item file cut to the first 6 seeds of the seed "
+        "list: "
+    )
+    kept, others = cut_lines(study, CUT_KEPT), cut_lines(study, [2])
+
+    def with_items(lines: Sequence[str]) -> str:
+        path = made / f"cut_{len(list(made.iterdir()))}.jsonl"
+        path.write_text("".join(lines))
+        return why(cut_items=path)
+
+    assert with_items(kept[:-2]) == not_the_cut + "2 items of the first seeds are missing"
+    assert with_items([*kept, others[0]]) == (
+        not_the_cut + "1 items are of other seeds or of no item of the item file"
+    )
+    changed_row = not_the_cut + "1 items are not as the item file has them, byte for byte"
+    moved = json.loads(kept[4]) | {"availability_information": "Backordered."}
+    assert with_items([*kept[:4], json.dumps(moved) + "\n", *kept[5:]]) == changed_row
+    # a row that reads as the same values and is not the registered row as written: a value
+    # written in another way, a cell written twice, the cells in another order, another
+    # spacing. Each is another row than the one registered
+    row = json.loads(kept[4])
+    assert isinstance(row["is_seed"], bool) and kept[4].endswith("}\n")
+    as_number = (
+        kept[4]
+        .replace('"is_seed": true', '"is_seed": 1')
+        .replace('"is_seed": false', '"is_seed": 0')
+    )
+    twice = kept[4][:-2] + f', "seed_id": {json.dumps(row["seed_id"])}' + "}\n"
+    reordered = json.dumps(dict(reversed(list(row.items()))), ensure_ascii=False) + "\n"
+    spaced = json.dumps(row, ensure_ascii=False, separators=(",", ":")) + "\n"
+    padded = kept[4][:-1] + " \n"
+    for other in (as_number, twice, reordered, spaced, padded):
+        assert other != kept[4] and json.loads(other) == row
+        assert with_items([*kept[:4], other, *kept[5:]]) == changed_row
+    two = with_items([as_number, *kept[:4], *kept[5:-1], kept[-1].replace("{", "{ ", 1)])
+    assert two == not_the_cut + "2 items are not as the item file has them, byte for byte"
+    # the line end is no part of a row: the registered rows under other line ends, or without
+    # the last one, are the rows unchanged. Such a file is then not the file the runs read
+    for ends in ("".join(kept).replace("\n", "\r\n"), "".join(kept)[:-1]):
+        same_rows = with_items([ends])
+        assert "not as the item file has them" not in same_rows
+        assert "the item file given is not the file of the plan's item list 'e5'" in same_rows
+    renamed = json.loads(kept[0]) | {"item_id": "P0000000000"}
+    assert with_items([json.dumps(renamed) + "\n", *kept[2:], *others]) == (
+        not_the_cut
+        + "2 items of the first seeds are missing; 8 items are of other seeds or of no item of "
+        "the item file"
+    )
+    assert json.loads(kept[4])["item_id"] not in with_items([*kept[:4], *kept[5:]])
+    # the first six of the draw and not the first six of the file: the cut of seeds 0 to 5
+    assert with_items(cut_lines(study, range(6))).startswith(
+        not_the_cut + "14 items of the first seeds are missing; 21 items are of other seeds"
+    )
+    assert with_items([]) == "refused: the cut item file is empty or holds an item twice"
+    assert with_items([*kept, kept[0]]) == (
+        "refused: the cut item file is empty or holds an item twice"
+    )
+    assert why(cut_items=tmp_path / "none.jsonl").startswith(
+        "refused: the cut item file cannot be read (FileNotFoundError)"
+    )
+    # the runs must be those of the cut: here the runs of the whole study
+    apart = why(out_root=study.runs)
+    assert apart.startswith(GENERAL)
+    assert "the plan's item list 'e5' is not the minimal pairs of the cut" in apart
+    assert "the item file given is not the file of the plan's item list 'e5'" in apart
+    # and the runs of the cut are not scored as the whole
+    out = fresh(tmp_path, "refused")
+    with pytest.raises(SystemExit) as stop:
+        LS.main(e5_args(study, out, out_root=cut.runs))
+    assert "the plan's item list 'e5' is not the minimal pairs;" in stop.value.code
+    assert "which the runs read" in stop.value.code and not out.exists()
+    # under the registered fifty, a list of thirteen seeds is no cut
+    monkeypatch.setattr(LS, "E5_CUT_SEEDS", 50)
+    assert why() == "refused: the seed list holds 13 seeds: its first 50 are no cut"
+    # a file of the cut named in a sealed folder is refused unopened
+    vault = tmp_path / "sealed"
+    vault.mkdir()
+    (vault / "file").write_bytes(b"sealed\n")
+    for name in ("cut_seed_list", "cut_items"):
+        hashed = {"expect_seed_list_sha256": "0" * 64}
+        argv = cut_args(study, cut, tmp_path / "out.json", **{name: vault / "file"}, **hashed)
+        capsys.readouterr()
+        with watching() as touched, pytest.raises(SystemExit) as stop:
+            LS.main(argv)
+        assert stop.value.code == (
+            f"refused: --{name.replace('_', '-')} lies in a sealed folder; no sealed file is read"
+        )
+        assert touched == [] and not (tmp_path / "out.json").exists()
