@@ -307,3 +307,9 @@ carry the registered text.
     places where `secondary_scores.py` does not yet follow the text (the second clause of the
     sensitivity rule; the hash printed by the shared reader's refusal; the verdict of a probe
     over 1 to 4 targets; the counts of the both-parsed contrast).
+42. **Registered (7 October, before 11:59 UTC, which is 6 October anywhere on Earth).** The
+    check sheets were not back. The plan was registered without the check-set result, as
+    decision 40(d) has it: the gate and the estimated load are values of amendment F1, and the
+    literal task is not handed out, nor any confirmatory call made, before the gate has passed
+    (PLAN section 10, task 2; change-list item 43). The tag `coling-registration` was made
+    at its deadline, on the owner's decision of the evening before to register on time (decision 40d), before the owner had read the items of 6 October; the plan says so in its status paragraph.

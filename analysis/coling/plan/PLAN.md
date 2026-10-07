@@ -1,27 +1,29 @@
 # Estimated Recovery: TBD. Study plan
 
-**DRAFT (2026-10-01). Not registered.** This file becomes the study's registration when all of
-the following hold, before any language-model call of this study:
+**Registered on 6 October 2026 (anywhere on Earth; 7 October in UTC).**
+This file is the registration of the study. It was completed, pushed and tagged
+(`coling-registration`; section 17, "Identity") before any language-model call of this study,
+and while the outcomes of every test-period statement were sealed:
 
-- every **TBD-at-gate** and **TBD-at-registration** marker is replaced by its value, by the rule
-  written next to it;
-- every **[owner to confirm]** tag is resolved (the rule confirmed or changed, and the tag
-  removed);
-- the registration record (section 17) is complete;
-- this paragraph is replaced by the registration statement, and the commit is pushed and tagged
-  (section 17, "Identity").
+- every value that depended on the frozen corpus, the samples, the pilot or the model-free
+  predictors is filled in, by the rule written next to it; the result of the check set and
+  the estimated load that follows from it were not available and belong to amendment F1
+  (section 10, task 2);
+- every fact about a model was confirmed at its source;
+- every provisional rule was confirmed by the owner;
+- the registration record (section 17) is complete.
 
 The first target was Saturday 3 October 2026, 23:59 AoE. It was missed: the annotators returned
 the pilot and the train-half outcome audit on 5 October. The owner moved the target to Tuesday
 6 October 2026, 23:59 AoE, and kept the submission to the October cycle (section 12, "The
-schedule from 5 October"). This file is registered before any language-model call. Until then
-anything here may change. What changed since the draft of 29 September, and what had
-been seen when it changed, is listed in "Changes from the 29 September draft" near the end of
-this file. After registration every change is a dated amendment at the end of this file (A1, A2,
-...), and the freeze of prompts, parsers, harness and the one registered model selection is
-amendment F1, pushed before the first call on any test-period item.
+schedule from 5 October"). What changed since the draft of 29 September, and what had been seen
+when it changed, is listed in "Changes from the 29 September draft" near the end of this file.
+From here on every change is a dated amendment at the end of this file (A1, A2, ...), and the
+freeze of prompts, parsers, harness and the one registered model selection is amendment F1,
+pushed before the first call on any test-period item.
 
-Four markers are used:
+While this file was a draft it used four markers. The first, the second and the fourth are
+resolved everywhere; only the third is left, where a value belongs to amendment F1:
 
 - **TBD-at-gate**: depends on the frozen corpus build, the form classifier, the dataset builder,
   the samples, the pilot or the model-free predictors. It is filled in before registration by the
@@ -2007,8 +2009,8 @@ that thread carried at any date, with all its presentations.
 
 1. **Availability-string check** (the adjudicator, before the freeze run): done on 1 October
    (section 2.2).
-2. **Pilot and check set** (before registration; the pilot on 3 to 5 October, the check set on
-   5 to 6 October).
+2. **Pilot and check set** (the pilot before registration, on 3 to 5 October; the check set
+   from 6 October, its gate recorded in amendment F1).
    - 20 train-period items are labelled by A1 and A2 independently under the guide's draft of
      1 October. A meeting of A1, A2 and the adjudicator was to settle every disagreement. The
      pilot left one disagreement and no convention in dispute, so no meeting was held: the
@@ -2023,6 +2025,12 @@ that thread carried at any date, with all its presentations.
      alpha to be defined, the pilot items are pooled with the check items.
    - One further revision is allowed, with the 20 reserve items that are drawn with the check
      set. A second failure is a hold trigger (section 12).
+   - *At registration.* The check sheets went to A1 and A2 on 6 October and were not back when
+     the registration was due. By the owner's decision of that day the registration was made
+     on time without them. The gate is computed as written here as soon as both sheets are
+     in, and its result is recorded in amendment F1. It must pass before the literal task is
+     handed out and before any confirmatory call; the cost trials and the dev runs do not
+     wait for it. Nothing else in this plan depends on the check set.
    - The pilot may change the guide and the prompt text. It does not change `rules.py`; a
      difference that remains is disclosed.
    - Pilot, check and reserve items stay out of the gold and out of every other sample.
@@ -2085,8 +2093,9 @@ that thread carried at any date, with all its presentations.
 
 The draft's E5 predictive readings are cut.
 
-**Estimated load.** **TBD-at-gate**: minutes per person at the rate measured on the check
-set. The guide's hours table gives the planning rates written before the pilot: 400 minutes for
+**Estimated load.** **TBD-at-F1**: minutes per person at the rate measured on the check
+set, which was not back at registration (task 2 above). The guide's hours table gives the
+planning rates written before the pilot: 400 minutes for
 each annotator (175 before registration and 225 after) and 190 for the adjudicator, with a
 range of 250 to 550 minutes per annotator. The sitting times on the pilot sheets (120 and 300
 minutes) and on the train-half audit sheets (300 minutes each) include reading the guide, so
@@ -2232,6 +2241,11 @@ pilot (both sheets valid; one disagreement in 20 notices) and the train-half out
 | **Fri 9 Oct** | Registered evaluator. **Gate 2: submit or hold. All numbers frozen by 23:59 AoE.** |
 | 10 to 11 Oct | Write the 8 pages. Limitations, ethics, datasheet, Responsible NLP checklist. Overlap check against the UV text. Independent check of every number and claim. Anonymised supplement. |
 | Mon 12 Oct | ARR submission (23:59 AoE). |
+
+*As it fell on 6 October.* The check sheets went out that day and were not back when the
+registration was due. The registration was pushed and tagged on time without the check-set
+result; the gate is recorded in amendment F1, and the literal task starts when it has passed
+(section 10, task 2; change-list item 43).
 
 *Hold triggers from 5 October.* Any one of these moves the paper to ARR January 2027:
 
@@ -2686,7 +2700,7 @@ To our knowledge, no test-period outcome has been derived, printed or tabulated 
 sealed folder, apart from the counts of events with an observable outcome, the counts that the
 counts-only code printed at the freeze run (above), and the one deduction recorded above.
 
-## 17. Registration record (to complete before pushing)
+## 17. Registration record
 
 Hashes are the first 16 hex characters of sha256.
 
@@ -2819,7 +2833,8 @@ other periods, and no sealed file.
   counts, are in the registration commit. The submitted sheets and the adjudication sheet
   named in this section are fixed by their hashes and are not in it.
 - The check-set result, which is the gate (both alphas, the share of identical intervals),
-  with the hashes of the two submitted sheets. **TBD-at-gate.**
+  with the hashes of the two submitted sheets. **TBD-at-F1**: the check sheets were not back at
+  registration (section 10, task 2).
 - The availability-string check (section 2.2): done on 1 October 2026; 910 strings read, none
   rejected; the list as read has hash `da0bde1baac48473`, re-read at the freeze run.
 
@@ -2862,6 +2877,8 @@ gate result and what section 5 lists.
   `evaluate.py baselines` prints it, with the environment;
 - the provider pin as sent, the provider that served the cost-trial calls, and the reasoning
   setting each model served;
+- the check-set result and the estimated load (section 10), which were not available at
+  registration;
 - the registration's commit id, tag, push time and file hashes ("Identity"), with the sha256 of the
   anonymised copies of the plan and the guide, of the script that makes them and of its list
   of strings (section 14).
@@ -3227,7 +3244,7 @@ quoted here are from the build of 29 September.
     write. All five are fixed here, before any model call. Points (a) and (b) were the owner's
     to decide, and the owner decided them on 6 October: the registered pattern, with a margin
     of 0.10 in its letter part, and the criterion in two parts. Later that evening the build of
-    the scorers completed both, and the owner reads these points with the registration: the
+    the scorers completed both, and the owner reads these points after the registration: the
     bullet "Small points of the reading", with the cases of a primary without a pattern;
     "Condition (a) sets no upper limit and is read on the interval alone" in place of "A model
     better than the rule reader meets (a)"; and the criterion without a reading where its part
@@ -3308,6 +3325,15 @@ quoted here are from the build of 29 September.
     these before it is frozen, and a figure on a few statements beside the same figure on all
     of them gives their outcomes back. No hypothesis, sample or test changes.
 
+43. **The check-set gate at registration.** Draft and revisions: the check set is labelled and
+    its gate passed before registration. Now: the registration was made on time without the
+    check-set result; the gate is recorded in amendment F1 and must pass before the literal
+    task is handed out and before any confirmatory call (section 10, task 2). *Seen:* the
+    pilot (alpha 1.0 on both offsets; one statement type to adjudication); nothing of the
+    check set, no model output and no test-period outcome. *Why:* the check sheets went out on
+    6 October and were not back when the registration was due. The owner decided on 6 October
+    to register on time and not to move the later dates.
+
 **Status of these changes.** The owner confirmed on 1 October the scope (item 1), the deadlines
 and their one relaxation (item 2), the availability rule, the capture freeze and the result of
 the availability check (items 9 and 26), the roles (item 24), the public repository with
@@ -3320,12 +3346,15 @@ and the review of the evaluator of 5 October. The owner decided both that evenin
 tests were put to the owner: the one of section 6; the same with H1 two-sided; and the draft's
 percentile p-values with their size disclosed. The owner chose the one of section 6, and
 confirmed the sealing rule of item 39 as written. Item 40 follows the review of the scorer of
-E2 and E5 of 5 October and is read by the owner with the registration. Item 41 follows a
+E2 and E5 of 5 October and is read by the owner after the registration. Item 41 follows a
 review of the paper draft of 5 October; the owner decided its points (a) and (b) on 6 October
-(above), and reads the others, and what was added to (a) and (b) after that decision, with the
-registration. Item 42
+(above), and reads the others, and what was added to (a) and (b) after that decision, after
+the registration. Item 42
 follows the check of the evaluator and the review of the secondary scorer of 6 October and is
-read by the owner with the registration.
+read by the owner after the registration. Item 43 is the owner's decision of 6 October. The
+registration was tagged at its deadline on that decision, before the owner had read items 40
+and 42 and the later points of item 41; a change that follows from the owner's reading is a
+dated amendment.
 
 **Corrections of the text to the code as it stood on 29 September** (the builder did not change
 for these; the draft described it wrongly). *Seen:* train outcomes; the builder had been tested
