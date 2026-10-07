@@ -74,7 +74,8 @@ All deadlines in this file are in Anywhere on Earth time (AoE, UTC−12): 23:59 
     reads a sealed file; a scorer changed after it has read one takes a new amendment, which
     gives the reason. The evaluator reads the sealed rows through the checked reader of the
     counts-only code (`_checked_rows` and `_same_build` of `sealed_counts.py`), behind its
-    own hash check, and reads no stored file that leads into a sealed folder through a link; a
+    own hash check, reads no stored file that leads into a sealed folder through a link, and
+    prints no character of a sealed file's hash; a
     scorer that reads the test outcomes reads them in the same way, applies
     the refusals of section 6 to the runs it scores, and writes no value of a single
     statement. The evaluator and every scorer withhold a secondary figure, its counts apart,
@@ -425,7 +426,7 @@ not listed says nothing.
   capture where the row is missing, and limited supply counts as available (BL). A contrast
   under a sensitivity analysis that gives 1 to 4 statements of its item set another horizon
   event, or 1 to 4 of those scoreable under either definition, is withheld with its two
-  scenarios, and the number of such statements is given: beside
+  scenarios, and the number of statements with another horizon event is given: beside
   the same contrast under the primary outcome it would give the change of the losses of those
   few.
 
@@ -1587,7 +1588,8 @@ stored in several parts and refuses:
 - item sets that differ by 1 to 4 statements (the eligible list and a post-cutoff slice, or
   the slices of the two primaries): the same figures on both would give those few back. On
   the registered list this cannot arise: the slices hold 1,524 and 591 of its 2,593
-  statements.
+  statements, and 1,121 and 411 of its 1,903 scoreable ones. The refusal counts statements,
+  which are known from their dates before the sealed file is read.
 
 It computes the six tests and Holm's rule; the secondaries of this section; the E4 probe rule;
 and, of section 5, the E3 decomposition, the overconfidence criterion, the post-cutoff slices,
