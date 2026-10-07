@@ -2248,10 +2248,10 @@ submitted.
 2. E7;
 3. fewer models, 8 down to 6. The two dropped are the secondary models whose runs are least
    complete at the time of the cut; ties go gemma-3-27b first, then gpt-4o-mini;
-4. E5 down to about 400 items: the unedited seed item and every edit of the first 50 seeds of
-   the seed list in its draw order (the 50 lowest `draw_rank` of `sample_pair_seeds.csv`), the
-   same for every reader, fixed before any E5 call. The cut item file holds the registered
-   rows of those seeds unchanged.
+4. E5 down to 474 of its 800 items: the unedited seed item and every edit of the first 50
+   seeds of the seed list in its draw order (the 50 lowest `draw_rank` of
+   `sample_pair_seeds.csv`), the same for every reader, fixed before any E5 call. The cut
+   item file holds the registered rows of those seeds unchanged.
 
 E1, E2, E3 (with conditions b and c) and E4 are never cut.
 
@@ -2347,7 +2347,8 @@ It reads E2 and E5 for the two primary models only. No outcome and none of H1 to
   (the item set of every gold item), the model's letter accuracy (section 7.1) is not more
   than 0.10 below the rule reader's: the lower end of the 90% percentile interval of the
   difference, model minus rule reader, lies above −0.10 (10,000 draws of shortage episodes,
-  seed 20261001). A model better than the rule reader meets (a). This is a one-sided reading
+  seed 20261001). Condition (a) sets no upper limit and is read on the interval alone. This
+  is a one-sided reading
   at a nominal 0.05, the level of H2's equivalence: in a simulation on the clusters of the 72
   items (a run that is not in the committed output) a model 0.10 below the rule reader met it
   in 4% to 7% of data sets. (b) Neither of the model's E5 tests on a letter factor holds with
@@ -2375,8 +2376,8 @@ It reads E2 and E5 for the two primary models only. No outcome and none of H1 to
   and the paper says which condition withheld it. A test of the E5 family that holds is
   reported as that family's result, with its size, also when a floor or the other part
   withholds the sentence; the paper then does not write that no effect was detected. A primary
-  whose E2 or E5 run is declared not run has no pattern, and the paper says so. If E5 is cut to
-  400 items (section 12), the pattern is read on those items with the same floors; if E5 is
+  whose E2 or E5 run is declared not run has no pattern, and the paper says so. If E5 is cut
+  (section 12, cut 4), the pattern is read on those items with the same floors; if E5 is
   not scored by the freeze of numbers, the sentence is not stated.
 - *Error control.* The standing part reads rejections of the E5 family (Holm at 0.05 over its
   twelve tests) and adds no test to it. The letter part adds one one-sided reading for each
@@ -2408,7 +2409,8 @@ It reads E2 and E5 for the two primary models only. No outcome and none of H1 to
   such item does not meet (c). A test of E5 holds by Holm's rule on the p-value of the
   procedure in force (under the fallback, the centred bootstrap p-value); its direction is
   the sign of the difference of the two error rates; a test that is not evaluable does not
-  hold. When no test of a standing factor holds, the standing part is withheld by (a);
+  hold. When no test of a standing factor holds with the higher error rate on the edited
+  items, the standing part is withheld by (a);
   otherwise the paper names the floor or the condition (c) that each such factor misses.
   When the pattern holds for one primary and the other has no pattern, the paper states the
   sentence for the first by name and says that the other has none.
