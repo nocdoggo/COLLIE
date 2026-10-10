@@ -1,0 +1,98 @@
+{
+  "by_echo": {
+    "ok": 85
+  },
+  "by_status": {
+    "ok": 85
+  },
+  "complete": true,
+  "condition": "literal-v1|det-v1|mask=0|shift=0|track=-",
+  "expected_rows": 85,
+  "fallbacks": 0,
+  "git": {
+    "branch": "followup/coling-2027",
+    "f1": null,
+    "read_py_modified": false,
+    "registration": "0c2579a6eb98d1ed844bea4f45cdb159283bb25f",
+    "sha": "a7da30627dcdeda4304a0e2136c1fd18d9afa1f1"
+  },
+  "guard": {
+    "max_physical_calls": 20000,
+    "physical_calls_this_invocation": 84,
+    "physical_calls_total": 84,
+    "refusals_this_invocation": 0,
+    "retries_this_invocation": 1,
+    "spend_cap_usd": 0.02096,
+    "usd_this_invocation": 0.01108052,
+    "usd_total": 0.01108052
+  },
+  "item_ids_sha256": "2c46b5543f8c5268f108684c24ecf5443a9d1a4e9af49d1718d7efd3ef25e507",
+  "items": 85,
+  "items_in_file": 644,
+  "items_sha256": "130cf7b0e6593536a163b5514f20e9fb0e41e509f390a5095abdb65658553191",
+  "ladder_rung": {
+    "model_id": "meta-llama/llama-3.3-70b-instruct",
+    "name": "llama-3.3-70b",
+    "price_input_per_mtok": 0.1,
+    "price_output_per_mtok": 0.32,
+    "provider": "openrouter",
+    "released": "2024-12",
+    "served_as": [
+      "meta-llama/llama-3.3-70b-instruct"
+    ],
+    "tier": "70B"
+  },
+  "limit": null,
+  "mask_names": false,
+  "model": "llama-3.3-70b",
+  "model_id": "meta-llama/llama-3.3-70b-instruct",
+  "price_date": "2026-10-01",
+  "provider_object": {
+    "allow_fallbacks": false,
+    "order": [
+      "deepinfra/turbo"
+    ],
+    "quantizations": [
+      "fp8"
+    ]
+  },
+  "python": "3.12.11",
+  "read_py_sha256": "54d171783601e72994f960cbe7b5adba157f6061ba3c9a1da30fd23e23be244f",
+  "readings": 85,
+  "readings_sha256": "50926b8d448b0bed7ca0ff4a2e4189228f02e14221d772fb5db0b2f3a32ce5a6",
+  "roots": {
+    "local_root": "/home/noctis/GitHub/COLLIE-coling/results/coling/read",
+    "out_root": "/home/noctis/GitHub/COLLIE-coling/analysis/coling/out/read"
+  },
+  "route": {
+    "also_served_as": [],
+    "also_served_by": [],
+    "model_id": "meta-llama/llama-3.3-70b-instruct",
+    "price": [
+      0.1,
+      0.32,
+      "2026-10-01"
+    ],
+    "provider": "deepinfra/turbo",
+    "quantization": "fp8"
+  },
+  "run_name": "dev-c-llama-3.3-70b.s5",
+  "samples": 1,
+  "served_as": [
+    "meta-llama/llama-3.3-70b-instruct"
+  ],
+  "shard": "5/8",
+  "shift_years": 0,
+  "spend_cap_usd": 0.02096,
+  "status": "complete",
+  "temperature": 0.0,
+  "template": "literal-v1",
+  "template_sha256": "855244013a7614501ebdd6fbb45c8998f102a877e1299a6d86f81e1359934b27",
+  "track_record": null,
+  "track_record_sha256": null,
+  "track_record_split": null,
+  "usd_per_mtok": [
+    0.1,
+    0.32
+  ]
+}

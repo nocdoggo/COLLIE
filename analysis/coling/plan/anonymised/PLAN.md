@@ -3392,3 +3392,282 @@ on the train period.
 ## Amendments
 
 None yet.
+
+The line "None yet." above stood at registration. Everything above this paragraph is the
+registered text, byte for byte: the first 241,581 bytes of this file have the sha256 that F1
+records under "Registration". Amendments are appended below it and change nothing above.
+
+### F1. Freeze of prompts, parsers, harness and model selection (10 October 2026)
+
+Written after the cost trials and the dev runs, and before any call on a test-period or
+late-period item. Since the registration no sealed file has been opened and no outcome of a
+statement dated 2023-01-01 or later has been read. F1 is identified by the commit that holds
+this text and the annotated tag `[TAG]` on it (section 17, "Identity"). Hashes are sha256;
+where 16 characters are given they are the first 16.
+
+**F1.1 Registration.**
+
+- Commit `[COMMIT]` of the study branch; annotated tag
+  `[TAG]` (tag object `[COMMIT]`). The branch
+  was pushed on 2026-10-07 at 11:18:04 UTC, which is 23:18 on 6 October anywhere on Earth
+  (UTC−12); the tag object bears the same second, and the tag was pushed right after it.
+- `PLAN.md` at that commit: `806443831e4748f8f421d83661ffd063dc355dfb0fa2cb82e96fbaf6dfa00953`.
+  `AUDIT_GUIDE.md`: `ce58129993b31d33944a9aa54195a9aa91fb60f09446631925a9b6eda468d8fb`.
+- Anonymised copies (section 14). The script, `analysis/coling/anonymise.py`:
+  `f986cc88002a3e49cfe058d802e96d9eab204e20e86cbd3fd5d868d6a22c5378`. The copies of the two
+  registered files, under `analysis/coling/plan/anonymised/registered/`: `PLAN.md`
+  `1a5f95e5ad1c01cf5fdd239d1c66d00de7204dfcb30e3bae725b8bf7ac071972`; `AUDIT_GUIDE.md`
+  `ce58129993b31d33944a9aa54195a9aa91fb60f09446631925a9b6eda468d8fb` (the guide holds none of
+  the listed strings, so its copy is the guide). The list of strings they were made with (23
+  strings, 8 tokens), kept as `analysis/coling/plan/ANON_STRINGS.registered.tsv`:
+  `391f3b5b0f9282abc22603a00bea163071a62334b8d7150e276728c766c77d57`. The `HASHES.txt` beside
+  those copies names the list `ANON_STRINGS.tsv`, its name when they were made; given to the
+  script under that name, it builds the two copies and that `HASHES.txt` again, byte for byte.
+- This amendment gives the registration's commit id and the id of its tag object, which the
+  supplement does not show (section 17). The list as committed with F1,
+  `analysis/coling/plan/ANON_STRINGS.tsv`, adds those two strings (25 strings, 8 tokens):
+  `e7149182f27c0c19e24ab62a641d17aff285822839ee860f3972be4c6686e3d9`. The script
+  refuses a list with a string that occurs in neither file, so the registered copies are made
+  with the first list, and the copies of the files as amended with the second. Those are under
+  `analysis/coling/plan/anonymised/`; their hashes stand in `HASHES.txt` beside them, since a
+  file cannot hold its own hash, and in the next amendment if there is one. In that
+  `HASHES.txt` the script marks its two source files "registered", as in every build: there
+  they are the plan as amended and the guide. The copy of the registered plan is the
+  beginning, byte for byte, of the copy of the plan as amended.
+- The registration was tagged before the owner had read change-list items 40 and 42 and the
+  later points of item 41 (change list, "Status of these changes").
+  When this amendment was written the owner had not reported on that reading; a change that
+  follows from it is a dated amendment.
+
+**F1.2 Check set and estimated load (section 10, task 2; section 17, "Annotation").**
+
+- Both check sheets came back on 7 October, after the registration, and both are valid (20
+  items each). Krippendorff's alpha (interval metric) is 1.0 on the month offset of the start
+  and 1.0 on the month offset of the end; the threshold is 0.6. **The gate is passed.** The two
+  annotators gave identical intervals on 20 of 20 items; no item differs in an adjudicated
+  field; the check items were not pooled with the pilot's. The reserve check set is not used.
+- Submitted sheets: `d64360eea5943c98` (A1) and `0558f4bbe7ed0a8d` (A2), labelled under the
+  guide text `449c8e049be6cab1` that the sheets name. The sample manifest
+  (`analysis/coling/out/audit/manifest.json`) took their hashes on 7 October
+  (`7591ba1beffa6b9d`); at F1, with the later sheets of the literal task, it is
+  `840cc3686e25cccd`.
+- When the gate passed, the literal task had not been handed out and no confirmatory call had
+  been made.
+  The literal task went to A1 and A2 on 8 October, and both sheets came back on
+  10 October (decision 47).
+- *Estimated load.* The sittings on the check sheets were 26 minutes (A1) and 36 minutes (A2)
+  for 20 items: 78 and 108 seconds an item, against the planning rate of 45 (30 to 60). At the
+  measured rates the literal task (120 items) takes 156 minutes for A1 and 216 for A2, where
+  the guide's table has 90. The check set measures no rate for the three later tasks (the
+  reference readings, the minimal pairs, the test-half outcome audit), which the table puts at
+  135 minutes together. The four tasks of the table's block "After registration" therefore
+  come to 291 minutes for A1 and 351 for A2 if those three run at their planning rates, and to
+  390 and 540 if they run slower in the proportion that the literal rate did; the table has
+  225.
+  When this amendment was written the owner had not yet confirmed that this fits the hours
+  A1 and A2 can give.
+
+**F1.3 Templates, pins and parsers.** From F1 on a changed prompt takes a new template id.
+
+| Template | Used for | sha256 of the template |
+|---|---|---|
+| `literal-v1` | E2, E5, condition (c) | `855244013a7614501ebdd6fbb45c8998f102a877e1299a6d86f81e1359934b27` |
+| `literal-free-v1` | E2, secondary | `ab87cd7525a49965763f78f55d6f8c47f4ca1476f49216a525635f97d6ef2555` |
+| `predictive-v1` | condition (a) | `c0732a5b2d109c60a94e56cd0820a4aa5851786bd01fd31acd3b12c9d47534ed` |
+| `predictive-track-v1` | condition (b) | `d0384c1f860d734bd26fa197de0a99e1bcdf520392941b399ef9d0f7b3213483` |
+| `probe-v1` | the no-notice probe | `02e8d4338c3532a22615a43c47c54423250bf13474ef3f556925f5c878e8d08e` |
+| `predictive-track-p1` | paraphrase 1 of (b) | `5b985d6ba619431394ea9521a06e91cfef2cbb73916793b66252cb8cd49a6b67` |
+| `predictive-track-p2` | paraphrase 2 of (b) | `1644f2428c5bd73c2490e4934f2b8197191d78fe838b09b24dff85ee2e1e8e08` |
+| `predictive-track-p3` | paraphrase 3 of (b) | `018f57e81ae8f299418b06c7767fa40dcd690dfe8f53b41575f1ac6e7fec19f9` |
+
+- The five registered templates are unchanged since registration: each pin is the one of
+  section 17.
+- The three paraphrases were written on 5 October, before the registration, and were kept out
+  of the harness until after it: they were committed unchanged on 7 October, after the tag. No
+  model has been shown any of them. Each keeps word for word the entry fields, the
+  track-record table, the ten examples and the answer format, and each says in other words
+  that a median of 365 means 365 days or more, including never. Paraphrase 1 rewords the
+  instructions as a task, gives two of its three rules in the other order and uses other
+  labels. Paraphrase 2 opens with a role, puts the track record before the entry and uses
+  headings. Paraphrase 3 opens with a question and puts the entry and the track record before
+  the rules, so it varies where the instructions stand as well as their wording.
+- The parsers and the answer schemas are part of the harness, `read.py` (F1.4). The schemas,
+  as it prints them (`--print-pins`):
+  `04705846e804d9a24541fdc16619c2e31e12539386829558da7edc4118294bb8`.
+
+**F1.4 Code.**
+
+| File | sha256 |
+|---|---|
+| `read.py` (the harness) | `54d171783601e72994f960cbe7b5adba157f6061ba3c9a1da30fd23e23be244f` |
+| `launch.py` (the launcher of the runs) | `db06bf2900f149e90c97155c7d4060d40cf21b5aa8ca92c234768022181298d5` |
+| `evaluate.py` (the registered evaluator) | `efa033ae67dff7fb8bc9c13dd4a5e047c4c42e9cda92f9d373b09eb9c868cb93` |
+| `literal_scores.py` (the scorer of E2 and E5) | `18c51c79e90627ce8061d729ca4c88dd896771c9798accef419fa8ee85403fe2` |
+| `secondary_scores.py` (the secondary scorer) | `95448fa35e23e4ef66708db977d51b1ffd398aca6ced41f0884678851cf1acb9` |
+
+- The launch plan the launcher wrote at the registered counts
+  (`analysis/coling/out/read/_launch/plan.json`):
+  `2bf32748015d21d891b661da1149aef5dd7aa7dce7af61b83a70b30d4da7ffd4`. It holds the 131
+  runs of the run sheet (section 9) as 406 runs of the harness, because a run may be read
+  in parts and each part is then a run of the harness under its own name. A run of
+  gemini-3.8-flash with at least 200 calls is read in 4 parts, and a run of one of the six
+  models on OpenRouter with at least 400 calls in 8 parts, side by side; the runs of grok-4.20
+  are read whole. The cap of a run is split over its parts in proportion to their items, and
+  the parts of a run are fixed by a hash of the item id. The cost trial was read whole.
+- Environment: Python 3.12.11; `uv.lock` `3308eeb43cb51580`; numpy 2.5.2, pandas 2.3.3,
+  scikit-learn 1.9.0.
+- `secondary_scores.py` is named here with its hash, before its first read of a sealed
+  file (standing rules). Of the analyses that section 6, "Evaluator", gives to secondary
+  scorers it computes all but three: the fit that leaves out the dominant company, the
+  full-follow-up refit and E7 (F1.11) are computed by no script at F1. A script that
+  computes one of them is named, with its hash, in a dated amendment pushed before it
+  first reads a sealed file; one not computed by the freeze of numbers is named in the
+  paper as not run. The ways in which a few statements' outcomes could still be worked
+  out from the scorer's figures, known and left, are listed in decision 45 of
+  `DECISIONS.md`.
+
+**F1.5 Item files and the track record.**
+
+- No sample list of steps 3 and 4 (section 3) was drawn after registration: each is hashed in
+  section 17.
+- Four item files are named here by their file hash, as committed under
+  `analysis/coling/out/items/`: the literal items `literal_items.jsonl` (120)
+  `9c6639a463231979`; the minimal pairs `e5_pairs.jsonl` (800) `5acc3a0af1fd13af`, the file
+  of section 17; the dev statements `dev_scoreable.jsonl` (644) `130cf7b0e6593536`; the dev
+  prompt items `dev_prompt.jsonl` (20) `779c1f1f7eecdfaa`. The eight other item files that the
+  runs read are those of the registration commit, unchanged; the launch plan (F1.4) names the
+  sha256 of each.
+- The track record of condition (b), written by `track_record.py` (`53873bade0dd0e4b`) on
+  5 October: the record of the fit split, `track_fit.json`,
+  `093edae80f73b71ec3603dc10fff4eac6650a55991d041971dcf979761aff52c`, shown in the cost trial
+  and the dev runs; the record of fit and dev, `track_fit_dev.json`,
+  `41648e5a49e7d296a3ca2c49b61d7df3607eb8fe43f9f01daa136d9b0c3dc098`, shown in the runs of
+  condition (b) and of its paraphrases on test-period items; their manifest,
+  `track_manifest.json`, `f4e24bd5182ef26e4856496e3064867ac7de241c6bda471de6c54d2567c9b2a1`.
+- *A sentence of section 17 that could not hold as written.* It says that the two record files
+  are hashed in F1 "before any call that shows them". The cost trial and the dev runs of
+  condition (b) come before F1 by sections 6 and 9, and they show the record of the fit split.
+  Each of those runs stored in its run manifest the sha256 of the record file it showed, and
+  each equals the hash above; no run manifest holds the hash of the record of fit and dev. The
+  run folders are committed with F1 under `analysis/coling/out/read/`.
+
+**F1.6 Model-free test predictions (sections 8 and 17).** After the refit on fit and dev
+(2,497 dated statements, 23 stale at issue, 250 TBD and 306 silent), `evaluate.py baselines`
+prints, for the test predictions of the five model-free predictors on the 2,593 eligible
+statements and of the base rate at the probe horizons on the 300 probe statements:
+`20347a6ba004d6753d01ed8683b68c0d8f936c5d6aef2e247e5329f39a8727ea`. Its record,
+`analysis/coling/out/baseline_predictions.json`, is committed with F1 and names the hash of
+each code file and input, in the environment of F1.4. It was made from open data only.
+
+- *The order of section 3.* Section 3 puts this refit after the H3 selection. The record was
+  written on 7 October, after the registration and before any dev run. The command reads the
+  open tables and no answer of any model, and the dev command fits on the fit split alone, so
+  neither step can move the other.
+  Run again after the two selection files were written, the command
+  printed the same hash.
+
+**F1.7 Dev prompt variants tried.** None: no prompt variant was tried on dev items.
+
+**F1.8 Cost trial, projection and caps (section 9).** Each model ran 20 dev prompt items under
+each template it uses. The projection is the trial's cost per item under a template, times
+the registered calls of every later run under that template (a paraphrase is priced as
+`predictive-track-v1`), plus the trial itself.
+
+| Model | Trial calls | Trial, $ | Later calls | Projection with the trial, $ | Cap, $ |
+|---|---|---|---|---|---|
+| llama-3.3-70b | 100 | 0.0128 | 21377 | 3.03 | 5.00 |
+| deepseek-v3 | 100 | 0.0404 | 21377 | 9.57 | 12.00 |
+| qwen-2.5-7b | 111 | 0.0156 | 9119 | 1.69 | 3.00 |
+| gemma-3-27b | 105 | 0.0118 | 9119 | 1.26 | 3.00 |
+| gpt-oss-20b | 106 | 0.0453 | 9119 | 5.25 | 3.00 |
+| gpt-4o-mini | 106 | 0.0209 | 9119 | 2.30 | 3.00 |
+| gemini-3.8-flash | 80 | 0.3990 | 8019 | 37.84 | 110.00 |
+| grok-4.20 | 101 | 0.1748 | 9119 | 18.98 | 30.00 |
+| **All** | | | | **79.93** | **169.00** (study cap 200.00) |
+
+- The projections sum to $79.93, against the registered caps of $169 and the study cap of $200.
+- A trial count above 20 calls a template holds repair calls (section 4): 11 for qwen-2.5-7b, 5
+  for gemma-3-27b, 6 for gpt-oss-20b, 6 for gpt-4o-mini, 1 for grok-4.20.
+- gpt-oss-20b: its projection, $5.25, passes its registered cap of $3.00, and the projection of
+  each of the 8 parts of its run `e3-b` passes the part's own cap by up to 4.5 times. The model
+  reasons at length: under `predictive-track-v1` the median call of its trial gave 3,541 output
+  tokens and one gave 115,802. Section 9, rule 1, applies: its cap is raised within the reserve
+  to $6.00, by a note in the study ledger of 10 October; the caps of all models then sum to
+  $172.00, inside the study cap of $200.00. Its trial run under `predictive-track-v1` stopped
+  twice at its own cap, after 11 and after 13 of its 20 items, and was resumed from its cache
+  each time with a larger cap, to its end. A later run of gpt-oss-20b that stops at its own cap
+  is resumed in the same way, within the model's $6.00; if that cap is reached first, the runs
+  left are reported as incomplete (section 9).
+- No other projection passes its model's cap, and no other run's projection passes the run's
+  own cap. No other cap is raised.
+
+**F1.9 Routes as sent and as served; reasoning (section 4).**
+
+| Model | Model id sent | Provider pin sent | Served, as echoed | Reasoning tokens per call |
+|---|---|---|---|---|
+| llama-3.3-70b | `meta-llama/llama-3.3-70b-instruct` | `deepinfra/turbo`, fp8, fallbacks off | `meta-llama/llama-3.3-70b-instruct`; DeepInfra | not counted apart; output, reasoning included: median 65, largest 82 (2023 calls) |
+| deepseek-v3 | `deepseek/deepseek-chat` | `deepinfra/fp4`, fp4, fallbacks off | `deepseek/deepseek-chat`; DeepInfra | not counted apart; output, reasoning included: median 68, largest 75 (2023 calls) |
+| qwen-2.5-7b | `qwen/qwen-2.5-7b-instruct` | `phala`, fallbacks off | `qwen/qwen-2.5-7b-instruct`; Phala | not counted apart; output, reasoning included: median 79, largest 89 (111 calls) |
+| gemma-3-27b | `google/gemma-3-27b-it` | `deepinfra/fp8`, fp8, fallbacks off | `google/gemma-3-27b-it`; DeepInfra | not counted apart; output, reasoning included: median 89, largest 112 (105 calls) |
+| gpt-oss-20b | `openai/gpt-oss-20b` | `deepinfra/bf16`, bf16, fallbacks off | `openai/gpt-oss-20b`; DeepInfra | not counted apart; output, reasoning included: median 929, largest 115802 (106 calls) |
+| gpt-4o-mini | `openai/gpt-4o-mini` | `openai`, fallbacks off | `openai/gpt-4o-mini`; OpenAI | not counted apart; output, reasoning included: median 51, largest 68 (106 calls) |
+| gemini-3.8-flash | `gemini-3.8-flash` | none: the maker's own API | `gemini-3.8-flash`; the maker's own API | median 766, largest 7892 (80 calls) |
+| grok-4.20 | `grok-4.20-0309-non-reasoning` | none: the maker's own API | `grok-4.20-0309-non-reasoning`; the maker's own API | none (101 calls) |
+
+- Temperature 0 on every run but `e3-samples`. No request sets a reasoning or thinking
+  parameter: each model runs at its provider's default. Reasoning is billed as output and is
+  counted in the costs above.
+- Every call of the cost trial and the dev runs was served by the model and the provider
+  that the request named; a response from another model or provider stops a run (section
+  4), and none came.
+
+**F1.10 The H3 selection (section 6).** `m-best` is the condition with the lowest primary loss
+on the 644 scoreable dev statements, compared at six decimals, a tie going to the earlier of
+(a), (b), (c). The dev runs read those 644 statements only; the 690 dated dev statements that
+are not scoreable were not read. The dev outcome mix of the 644 on the two horizon events is
+486 no/no, 82 no/yes and 76 yes/yes, in both selection files: a split dominated by "no",
+which favours the condition that gives the lowest probabilities (section 6).
+
+| Primary | Loss (a) | Loss (b) | Loss (c) | `m-best` | Selection file, sha256 |
+|---|---|---|---|---|---|
+| llama-3.3-70b | 0.366776 | 0.213937 | 0.231222 | (b) | `2090421d0fbc7543cecabfdd16e701726665f611c625f2eaba36128fb784715f` |
+| deepseek-v3 | 0.489614 | 0.214133 | 0.234120 | (b) | `8f84c929ce339cc96893a689d50d86bef9b7f309beb46cff1abd02bc7330126b` |
+
+- The model-free predictors on the same 644 statements, fitted on the fit split, as both
+  selection files give them (primary loss): the base rate by listing age 0.195; the stated date
+  at face value 0.818; the rule reading through the calibrator 0.213; the structured-only GBM
+  0.240; the text-trained GBM 0.216.
+- llama-3.3-70b: answers still invalid after the repair call (replaced by the base rate under (a)
+  and (b), read as ABSTAIN under (c)): (a) 0, (b) 0, (c) 0; under (c), 1 interval given under a
+  statement type that carries no stated period.
+- deepseek-v3: answers still invalid after the repair call (replaced by the base rate under (a)
+  and (b), read as ABSTAIN under (c)): (a) 0, (b) 0, (c) 0; under (c), 2 intervals given under a
+  statement type that carries no stated period.
+- The comparator of H3 is the base rate, fixed at registration (section 6); the selection does
+  not choose it again.
+
+**F1.11 The error classes of E7 (section 5).** No scorer of E7 exists, so the classes are fixed
+here. The calibrator takes two things from a literal reading: whether it gives a stated
+period (it does not when the answer is ABSTAIN, when the answer failed, or when its interval
+stands under a statement type that carries no stated period: section 4), and the end of that
+period. E7 is computed on eligible statements, and on every one of them the reference reading
+gives a stated period (section 3). A reading error that can move a loss is therefore one of
+four, by the model's reading against the reference reading of the same statement; the classes
+are disjoint and cover every statement on which the calibrator is given something else than
+under the reference:
+
+1. *no answer*: the model's answer failed;
+2. *no stated period*: the model answered, and its reading gives no stated period (an ABSTAIN,
+   or an interval under a statement type that carries none);
+3. *end too late*: the model's reading gives a stated period that ends later;
+4. *end too early*: the model's reading gives a stated period that ends earlier.
+
+For each class, the reference reading is swapped in on the statements of that class alone.
+E7 stays second in the cut order (section 12): if it is not computed by the freeze of
+numbers, the paper names it as not run.
+
+**F1.12 From here.** The tag `[TAG]` on the commit of this amendment opens the calls on
+test-period and late-period items (section 9). The confirmatory runs come first. A cap raised,
+a scorer hashed later, and any other change is a dated amendment below this one. The freeze of
+numbers of 9 October could not be met, so the paper goes to the ARR cycle of January 2027
+(section 12, Plan B; decision 46 of `DECISIONS.md`); what Plan B adds enters by amendments.

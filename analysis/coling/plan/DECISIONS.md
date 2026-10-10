@@ -375,3 +375,24 @@ carry the registered text.
     class and 0.96 on the statement type. Six items differ in an adjudicated field and go to the
     adjudicator. Submitted sheets `ac54c00dbc1a6e1f` (A1) and `765d79207ec13446` (A2), labelled
     under the guide `ce58129993b31d33`; the sample manifest is now `5f40db5edd1b5814`.
+48. **Amendment F1 (10 October).** Appended to the registered plan; the registered text
+    above it is unchanged, byte for byte. It records the registration's identity, the check-set
+    gate and the estimated load, the eight template pins, the code hashes, the track-record
+    files, the model-free test predictions, the cost trial with its projection, the routes as
+    served, and the H3 selection for each primary. Points to note:
+    (a) the projection is taken per item, not per call, so grok-4.20 stands at $18.98 where
+    decision 44 has $18.85, a figure this record does not reproduce (priced per call the same
+    trial gives $18.84; one of its 101 calls was a repair call);
+    (b) a run of at least 200 calls of gemini-3.8-flash is read in 4 parts, and one of at least
+    400 calls of a model on OpenRouter in 8, side by side, which the run sheet allows, so that
+    the confirmatory runs finish sooner; the runs of grok-4.20 are read whole;
+    (c) the record of the fit split was shown in the cost trial and the dev runs before F1, as
+    the plan's own order requires, against one sentence of section 17 (F1.5); the run folders
+    of the cost trial and the dev runs are committed with F1;
+    (d) the refit on fit and dev was run before the H3 selection, where section 3 has it after;
+    neither step reads the other (F1.6);
+    (e) the paraphrases were written on 5 October and first committed after the tag (F1.3);
+    (f) the four error classes of E7 are fixed in the text of F1, as section 5 requires where
+    no scorer exists.
+    The owner asked on 10 October for every step to go ahead; F1 was tagged after notice to
+    the owner, who did not ask to wait.

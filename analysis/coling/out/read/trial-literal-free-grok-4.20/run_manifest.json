@@ -1,0 +1,90 @@
+{
+  "by_echo": {
+    "ok": 20
+  },
+  "by_status": {
+    "ok": 20
+  },
+  "complete": true,
+  "condition": "literal-free-v1|det-v1|mask=0|shift=0|track=-",
+  "expected_rows": 20,
+  "fallbacks": 0,
+  "git": {
+    "branch": "followup/coling-2027",
+    "f1": null,
+    "read_py_modified": false,
+    "registration": "0c2579a6eb98d1ed844bea4f45cdb159283bb25f",
+    "sha": "e1dd32d56b5a05603b24394de747d45f92942caa"
+  },
+  "guard": {
+    "max_physical_calls": 20000,
+    "physical_calls_this_invocation": 20,
+    "physical_calls_total": 20,
+    "refusals_this_invocation": 0,
+    "retries_this_invocation": 0,
+    "spend_cap_usd": 0.0488,
+    "usd_this_invocation": 0.02607,
+    "usd_total": 0.02607
+  },
+  "item_ids_sha256": "26933b5cf7026dbee01c646d3f6b72920593191a2a0a73451e4c084051de3408",
+  "items": 20,
+  "items_in_file": 20,
+  "items_sha256": "779c1f1f7eecdfaa0a6d6257ffe05d64f4898b608dd049583211d55263d198c0",
+  "ladder_rung": {
+    "model_id": "grok-4.20-0309-non-reasoning",
+    "name": "grok-4.20",
+    "price_input_per_mtok": 1.25,
+    "price_output_per_mtok": 2.5,
+    "provider": "grok",
+    "released": "2026-03",
+    "served_as": [
+      "grok-4.20-0309-non-reasoning"
+    ],
+    "tier": "mid"
+  },
+  "limit": null,
+  "mask_names": false,
+  "model": "grok-4.20",
+  "model_id": "grok-4.20-0309-non-reasoning",
+  "price_date": "2026-10-01",
+  "provider_object": null,
+  "python": "3.12.11",
+  "read_py_sha256": "54d171783601e72994f960cbe7b5adba157f6061ba3c9a1da30fd23e23be244f",
+  "readings": 20,
+  "readings_sha256": "aa732f171e694dfd99e7c31a2e737226d9ed5a6d5dd0facc3910fe0db2e650d0",
+  "roots": {
+    "local_root": "/home/noctis/GitHub/COLLIE-coling/results/coling/read",
+    "out_root": "/home/noctis/GitHub/COLLIE-coling/analysis/coling/out/read"
+  },
+  "route": {
+    "also_served_as": [],
+    "also_served_by": [],
+    "model_id": "grok-4.20-0309-non-reasoning",
+    "price": [
+      1.25,
+      2.5,
+      "2026-10-01"
+    ],
+    "provider": "direct",
+    "quantization": null
+  },
+  "run_name": "trial-literal-free-grok-4.20",
+  "samples": 1,
+  "served_as": [
+    "grok-4.20-0309-non-reasoning"
+  ],
+  "shard": null,
+  "shift_years": 0,
+  "spend_cap_usd": 0.0488,
+  "status": "complete",
+  "temperature": 0.0,
+  "template": "literal-free-v1",
+  "template_sha256": "ab87cd7525a49965763f78f55d6f8c47f4ca1476f49216a525635f97d6ef2555",
+  "track_record": null,
+  "track_record_sha256": null,
+  "track_record_split": null,
+  "usd_per_mtok": [
+    1.25,
+    2.5
+  ]
+}

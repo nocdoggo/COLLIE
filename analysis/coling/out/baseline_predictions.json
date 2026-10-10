@@ -1,0 +1,41 @@
+{
+ "about": "The test predictions of the model-free predictors after the refit on fit and dev (PLAN.md sections 6 and 8), as a hash. Open data only.",
+ "command": "PYTHONPATH=. python -m analysis.coling.evaluate baselines --out <file>",
+ "inputs": {
+  "statements_sha256": "bcadc718f4e4e6c05330483196fd63bb8696ecf600e50d1cee8de0b0dc79cdbb",
+  "eligible_sha256": "8c12fc3e940f250e0a3426ef74355177431273db02736357a946dabb97ef7482",
+  "code_sha256": {
+   "evaluate.py": "efa033ae67dff7fb8bc9c13dd4a5e047c4c42e9cda92f9d373b09eb9c868cb93",
+   "dataset.py": "2fe95d355d3d5c773310e4cc38de5988c3e19af9bfd63356b4db3cb088f9e3c0",
+   "forms.py": "b99502d348ea82bece639ef2da62ebc90914b6d04dc185d6bfcb805b6bab69fd",
+   "gbm.py": "1e5eb3791e90b587cd9d7d4d78d101e71ea59dea061b730b6527cf85c54bfce3",
+   "power.py": "6948ee5f2f27e111d3b611b414b51a5c2216eb776f2b42bc3e19c9cacc7087fc",
+   "predictors.py": "452254cac0cb7817327ec82f9f555c81ba8c13e7c327dae8c5e55fe3245b3438",
+   "read.py": "54d171783601e72994f960cbe7b5adba157f6061ba3c9a1da30fd23e23be244f",
+   "launch.py": "db06bf2900f149e90c97155c7d4060d40cf21b5aa8ca92c234768022181298d5",
+   "sealed_counts.py": "22d592e0b65b339b1c25669fbf7b93d6089f6f7c5677213773a4c42709cd61b4",
+   "numpy": "2.5.2",
+   "pandas": "2.3.3",
+   "scikit_learn": "1.9.0"
+  }
+ },
+ "refit": {
+  "splits": "fit and dev",
+  "statements_by_analysis_set": {
+   "dated": 2497,
+   "stale": 23,
+   "tbd": 250,
+   "silent": 306
+  }
+ },
+ "predictors": [
+  "base_rate",
+  "face_value",
+  "rules_plus_slip",
+  "gbm_structured",
+  "gbm_text"
+ ],
+ "eligible_statements": 2593,
+ "probe_statements": 300,
+ "predictions_sha256": "20347a6ba004d6753d01ed8683b68c0d8f936c5d6aef2e247e5329f39a8727ea"
+}
