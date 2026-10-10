@@ -396,3 +396,9 @@ carry the registered text.
     no scorer exists.
     The owner asked on 10 October for every step to go ahead; F1 was tagged after notice to
     the owner, who did not ask to wait.
+49. **Amendment A1 (10 October).** The two gaps of the guide that the adjudication of the
+    literal task found are settled by two conventions, recorded in amendment A1 of the plan:
+    "this week" is the ISO-8601 week that holds the Date of update, and a phrase with several
+    distinct dates gives one distractor for each. They are not written into the guide, whose
+    hash the blank sheets of tasks C and E and the manifest of the minimal pairs carry. Each
+    touches one item of the literal sample; no frame, sample, weight or prompt changes.

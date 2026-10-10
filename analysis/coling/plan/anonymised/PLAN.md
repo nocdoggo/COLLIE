@@ -3671,3 +3671,26 @@ test-period and late-period items (section 9). The confirmatory runs come first.
 a scorer hashed later, and any other change is a dated amendment below this one. The freeze of
 numbers of 9 October could not be met, so the paper goes to the ARR cycle of January 2027
 (section 12, Plan B; decision 46 of `DECISIONS.md`); what Plan B adds enters by amendments.
+
+### A1. Two conventions from the adjudication of the literal task (10 October 2026)
+
+The adjudicator settled the six disagreements of the literal task (decision 47; the gold and the
+list of items that rest on conventions the prompt does not state were committed together, before
+any reader's output on those items existed). Four were slips. Two were gaps of the guide, and
+for a gap the guide's procedure (section 5, rule 3) has the adjudicator word a convention, apply
+it to every item it touches and add it to the changelog as a dated clarification:
+
+- *Weeks.* "This week" is the ISO-8601 week, Monday to Sunday, that holds the Date of update,
+  and "end of this week" is that Sunday.
+- *Distractors.* A phrase that names several distinct dates gives one distractor for each date,
+  each with its role and its quote.
+
+Each touches one item of the 120 (`I6ad29cd936` and `I77c86a393e`); the adjudicator checked the
+others. Both items are gap items, without which every E2 result is also given (section 5, E2).
+The two conventions are recorded here and not in the guide's changelog: the guide is fixed by
+its hash, `ce58129993b31d33`, which the blank sheets of the minimal-pair audit and the
+reference-reading check and the manifest of the minimal pairs carry, and those were made under
+it. They apply as if they stood in the guide's changelog, from the adjudication of the literal
+task on. No frame, sample, weight or prompt changes. The anonymised copy of the plan as amended
+is made by the script of F1.1 with the list of F1; its hash stands in
+`analysis/coling/plan/anonymised/HASHES.txt`.
