@@ -354,3 +354,16 @@ carry the registered text.
       depends on their outcomes and cannot be known before the scorer runs.
     - The scorer is named with its hash in F1 if F1 is later than this commit, and otherwise
       by its own amendment, before it first reads a sealed file.
+46. **The freeze of numbers cannot be met; the paper moves to ARR January 2027 (10 October).**
+    Section 12 ("Hold triggers from 5 October") moves the paper to ARR January 2027 if the numbers
+    are not frozen by Friday 9 October, 23:59 AoE (10 October, 11:59 UTC), and allows no
+    relaxation of that date. On 10 October at 04:00 UTC no test-period item had been sent to a
+    model: the OpenRouter key, through which both primary models run, was refused as expired from
+    7 October, 16:43 UTC, until the owner gave a new one on 10 October at about 04:00 UTC. At the
+    pace then measured (about 7 seconds a call for llama-3.3-70b), the confirmatory runs alone end
+    after the freeze, and the test-half outcome audit and the evaluator come after them. The owner
+    accepted the hold the same day. Under Plan B (section 12) the paper goes to the ARR cycle of
+    January 2027, for ACL 2027 or another ARR venue, not COLING. The registration, the samples,
+    the sealed outcomes and the confirmatory family are unchanged, and the runs go on under
+    amendment F1. What Plan B adds is decided by the owner and enters by dated amendments, each
+    pushed before the first call it concerns.
