@@ -17,6 +17,33 @@
    "pilot_labels.csv": "bc3c1bb24d96ce29359c8b2fd3d1f8e919c848d31779469cc7b015803c11b63d"
   }
  },
+ "gold": {
+  "adjudication_sha256": "e0569dd6687dacec9aff915011c23f8d4e6aace89742a3db2b243461581e5bed",
+  "agree": 114,
+  "decisions_by_field": {
+   "gap": {
+    "distractor_roles": 1,
+    "end": 1,
+    "start": 1
+   },
+   "slip": {
+    "abstain": 1,
+    "abstain_reason": 1,
+    "certainty": 1,
+    "distractor_roles": 1,
+    "end": 2,
+    "start": 2,
+    "statement_type": 3
+   }
+  },
+  "file": "literal_gold.csv",
+  "gap": 2,
+  "gold_rows": 120,
+  "items": 120,
+  "left_out": 0,
+  "sha256": "dba50d884c20b13842dd40cc29f6e1654f22c3c614074e7e8859568106847be4",
+  "slip": 4
+ },
  "samples": {
   "caps": {
    "per_episode": 3,
