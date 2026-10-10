@@ -6,6 +6,11 @@
    "check_disagreements.csv": "091979ccc1a3897a9ff4e3c2c6eb71cf1588f015e18eae431842918a3311ccac",
    "check_labels.csv": "9949be6c89f05cd1f54df4310ef405b70dd715209d61170691de1a4caae17fa7"
   },
+  "literal": {
+   "literal_adjudication.csv": "325e8dfd527d42ae075a88c78530f17ad93bd35fba970dd2dbddf689f1bdaa89",
+   "literal_agreement.json": "b4de78514b57c99e719eafd08879d7b86528802ef2efcfb8cc11ed363327deb4",
+   "literal_labels.csv": "42bc7043d2a3e1cbf40413b8979395a2344ff026fe2b66f41c19637bab067791"
+  },
   "pilot": {
    "pilot_agreement.json": "fe415220eecbfe3f536c1710df12991955b3068eaf2180c9d56374e171ae67f4",
    "pilot_disagreements.csv": "71310ca109e28b26d711510b6772de7ae679683982d91f8b0c5068a54c061ab9",
@@ -389,6 +394,8 @@
  "submitted": {
   "submitted/check_A1.csv": "d64360eea5943c98a2ed0f8d3035b9e547eed74486d2b6b132bd1059ec6e40f3",
   "submitted/check_A2.csv": "0558f4bbe7ed0a8d2e216db180c4c3fecf2c5f30e535eb3cd8dd6bbcd6e08f97",
+  "submitted/literal_A1.csv": "ac54c00dbc1a6e1fab911d4a3e4bc26618bb34523c2b3ac152a8cfa1da3e15a7",
+  "submitted/literal_A2.csv": "765d79207ec13446db0cca9e7367a25c461c0d9d030ae16c0d380eb53c1ee9d6",
   "submitted/pilot_A1.csv": "efea7ec22465b9537363566a7413c65f1db6272383ae5cfbc81325134f4788ad",
   "submitted/pilot_A2.csv": "66da9e436ff06bc3002ae1bc88b4f4ff6f0121bd53bf6005595c1a33cb2a399b"
  }

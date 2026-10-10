@@ -367,3 +367,11 @@ carry the registered text.
     the sealed outcomes and the confirmatory family are unchanged, and the runs go on under
     amendment F1. What Plan B adds is decided by the owner and enters by dated amendments, each
     pushed before the first call it concerns.
+47. **The literal task (10 October).** Both sheets came back on 10 October and are valid (120
+    items each; sittings of 195 and 190 minutes, which is 97.5 and 95 seconds an item). Agreement
+    before adjudication (guide section 8.1): Krippendorff's alpha 0.961 on the start and 0.960 on
+    the end month offset, over the 78 items with an interval from both (0.961 and 0.961 on day
+    offsets); identical intervals 97.5%; Cohen's kappa 0.98 on abstention, 0.99 on the certainty
+    class and 0.96 on the statement type. Six items differ in an adjudicated field and go to the
+    adjudicator. Submitted sheets `ac54c00dbc1a6e1f` (A1) and `765d79207ec13446` (A2), labelled
+    under the guide `ce58129993b31d33`; the sample manifest is now `5f40db5edd1b5814`.
