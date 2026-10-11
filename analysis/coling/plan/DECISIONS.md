@@ -413,3 +413,10 @@ carry the registered text.
     run before it, on the gold of the literal task: `e2_scores.json`
     `8169a95640413807f3b58bbc2adcbb93a00b985cd3614d5e437c83d7ef1c2402`. The score of the
     test-half audit, under the sealed folder: `2fc1e371585e5158`.
+51. **E5 and the registered pattern (11 October).** The minimal-pair audit (task C) passed: all
+    100 real items free of confirmed errors (95 needed), and both annotators caught their 5
+    planted items; nothing went to adjudication. Every E5 run then being complete, the scorer of
+    E5 and the pattern of section 13 ran. Result files, fixed by their hashes here and not in this
+    commit: `e5_scores.json` `af0d8c232148b701d396ec2b999b34bbcb1f1965abad49322932864735aa02d3`,
+    `pattern.json` `a89523473a2e980d485d49d730c6134c64da8e600b336913489a1dceaded29c2`, and the
+    score of the audit, `pairs_score.json` `1281bb22bc783483`.
