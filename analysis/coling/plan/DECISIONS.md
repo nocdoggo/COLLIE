@@ -402,3 +402,14 @@ carry the registered text.
     distinct dates gives one distractor for each. They are not written into the guide, whose
     hash the blank sheets of tasks C and E and the manifest of the minimal pairs carry. Each
     touches one item of the literal sample; no frame, sample, weight or prompt changes.
+50. **The registered evaluator has run (11 October, 02:04 UTC).** Every confirmatory run was
+    finished with its registered item set on 10 October at 10:11 UTC. The test-half outcome
+    audit then passed (50 real and 4 planted items; no confirmed error under B or under A; both
+    auditors caught their planted items; the same verdict on all 10 shared items). The
+    evaluator read the sealed test outcomes after both, as section 6 orders. Its result files,
+    fixed by their hashes here and not in this commit: `confirmatory.json`
+    `e70343e6857fadfe426561397bd61db71acb1dbc85106aab8e3d908228bde35a` and `confirmatory.md`
+    `596a90b945f9dddf07be959b88d118e1e70a037923d33a5a7ca689d98a9a10d8`. The scorer of E2 had
+    run before it, on the gold of the literal task: `e2_scores.json`
+    `8169a95640413807f3b58bbc2adcbb93a00b985cd3614d5e437c83d7ef1c2402`. The score of the
+    test-half audit, under the sealed folder: `2fc1e371585e5158`.
