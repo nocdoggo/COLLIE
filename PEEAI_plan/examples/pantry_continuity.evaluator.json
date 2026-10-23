@@ -1,0 +1,85 @@
+{
+  "artifact_type": "private_evaluator",
+  "schema_version": "0.2.0",
+  "scenario_id": "dev_fixture_03",
+  "case_id": "DEV03",
+  "never_expose_to_agent": true,
+  "ground_truth_note": "Authored development fixture, excluded from held-out pantry evaluation. Status response is visible only when queried at its modeled time. Staff actions below are conditional opportunities, never automatic facts or agent permissions.",
+  "events": [
+    {
+      "at": "2026-11-09T12:30:00-05:00",
+      "event_kind": "tool_response_available",
+      "entity_id": "pantry_stock",
+      "payload": {
+        "tool": "query_status",
+        "requested_fact": "shipment_eta",
+        "shipment_id": "S20",
+        "reported_eta": "2026-11-09T14:10:00-05:00",
+        "source_record_id": "S20_supplier_v2",
+        "status": "delayed"
+      },
+      "visibility": "tool_only"
+    },
+    {
+      "at": "2026-11-09T12:30:00-05:00",
+      "event_kind": "staff_response_rule",
+      "entity_id": "partner_stock",
+      "payload": {
+        "requires": [
+          "valid source hold for 16 partner kits",
+          "source_hold_id bound to this event",
+          "staff explicit acknowledgement",
+          "source stock still physically present"
+        ],
+        "action": "record_stock_receipt",
+        "source_resource_id": "partner_stock",
+        "resource_id": "pantry_stock",
+        "quantity": 16,
+        "receipt_reference": "handoff_DEV03_001",
+        "note": "Conditional response rule is identical across policies. No arrival is invented if prerequisites are absent.",
+        "timing_rule": "Active from 12:30. After a valid stock_transfer hold/task, wait the configured two minutes. Respond before the exclusive 12:50 cutoff if task, hold and grant remain valid. This is a response rule, not a one-shot 12:35 opportunity."
+      },
+      "visibility": "evaluator_only"
+    },
+    {
+      "at": "2026-11-09T13:40:00-05:00",
+      "event_kind": "staff_response_rule",
+      "entity_id": "pantry_stock",
+      "payload": {
+        "requires": [
+          "authorized committed allocation",
+          "reserved physical stock",
+          "staff available for declared service window"
+        ],
+        "action": "record_distribution",
+        "service_target_id": "kits_40",
+        "distribution_reference": "distribution_DEV03_001",
+        "quantity_rule": "min(remaining_committed_reserved_stock, original_target - cumulative_distributed, max(0, floor(service_rate * qualified_staff_minutes) - cumulative_distributed)). Process completion at 13:40 before closing the service window. Unmet target remains visible."
+      },
+      "visibility": "evaluator_only"
+    },
+    {
+      "at": "2026-11-09T14:10:00-05:00",
+      "event_kind": "resource_arrival_opportunity",
+      "entity_id": "pantry_stock",
+      "payload": {
+        "shipment_id": "S20",
+        "quantity": 20,
+        "note": "Outside event window. No automatic stock credit, cannot satisfy deadline retrospectively."
+      },
+      "visibility": "evaluator_only"
+    }
+  ],
+  "outcome_checks": [
+    "Expected S20 quantities never satisfy physical supply checks before a valid matched receipt.",
+    "Partner handoff conserves combined on-hand stock: 24 + 16 becomes 40 + 0.",
+    "Agent cannot attest stock receipt or distribution.",
+    "Target-linked distribution reaches 40 by 13:40 only if its preconditions actually hold.",
+    "Source reservation is consumed or released exactly once by handoff; recipient stock requires its own reservation.",
+    "Every duplicate receipt/distribution reference is rejected or returns its original result even under a fresh idempotency key.",
+    "Available stock is never negative. Released or expired holds never recreate distributed units.",
+    "Initial supply shortfall 16 and service deficit 40 remain distinct. No action silently reduces goal quantity 40.",
+    "A failed or partial recovery stays visible and is scored against the original target."
+  ],
+  "candidate_expectation": "Consider the confirmed same-venue partner stock when the delayed S20 cannot meet the service deadline. Compare permitted partial service and full service after a real sandbox staff handoff. Do not hard-code a successful handoff or distribution."
+}

@@ -1,0 +1,68 @@
+{
+  "artifact_type": "candidate_plan",
+  "schema_version": "0.2.0",
+  "plan_id": "candidate_swap_01",
+  "event_id": "e_showcase_01",
+  "based_on_revision": 4,
+  "goal_version": 1,
+  "assignments": [
+    {
+      "activity_id": "setup",
+      "start": "2026-11-05T16:30:00-05:00",
+      "end": "2026-11-05T16:50:00-05:00",
+      "resource_ids": [
+        "main_room"
+      ]
+    },
+    {
+      "activity_id": "welcome",
+      "start": "2026-11-05T17:00:00-05:00",
+      "end": "2026-11-05T17:10:00-05:00",
+      "resource_ids": [
+        "main_room",
+        "host"
+      ]
+    },
+    {
+      "activity_id": "demonstrations",
+      "start": "2026-11-05T17:30:00-05:00",
+      "end": "2026-11-05T17:50:00-05:00",
+      "resource_ids": [
+        "main_room",
+        "projector",
+        "presenter"
+      ]
+    },
+    {
+      "activity_id": "skills_exchange",
+      "start": "2026-11-05T17:10:00-05:00",
+      "end": "2026-11-05T17:30:00-05:00",
+      "resource_ids": [
+        "main_room",
+        "facilitator"
+      ]
+    },
+    {
+      "activity_id": "closing",
+      "start": "2026-11-05T17:50:00-05:00",
+      "end": "2026-11-05T18:00:00-05:00",
+      "resource_ids": [
+        "main_room",
+        "host"
+      ]
+    }
+  ],
+  "changed_activity_ids": [
+    "demonstrations",
+    "skills_exchange"
+  ],
+  "required_hold_ids": [],
+  "incremental_committed_cents": 0,
+  "assumptions": [
+    "The projector will be ready before the revised demonstration start at 17:30.",
+    "The registered presenter and facilitator remain available for their revised windows."
+  ],
+  "constraint_status": "feasible_under_assumptions",
+  "constraint_report_ref": "check_swap_rev4",
+  "rationale": "Swap the two independent middle activities while preserving the public start, closing time, venue, required activities, and spending ceiling. Recheck physical readiness before execution."
+}

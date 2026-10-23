@@ -1,0 +1,521 @@
+{
+  "artifact_type": "public_scenario",
+  "schema_version": "0.2.0",
+  "scenario_id": "dev_fixture_03",
+  "profile_id": "pantry_continuity",
+  "fictional": true,
+  "timezone": "America/New_York",
+  "goal": {
+    "goal_id": "g_pantry_01",
+    "description": "Record distribution of 40 standardized fictional kits by 13:40 without exceeding physical stock or changing the target.",
+    "required_activity_ids": [
+      "setup",
+      "briefing",
+      "distribution",
+      "reconciliation"
+    ],
+    "public_start": "2026-11-09T13:00:00-05:00",
+    "hard_end": "2026-11-09T14:00:00-05:00",
+    "budget_cents": 0,
+    "attendance_target": 12,
+    "fixed_venue_id": "pantry_room",
+    "priorities": [
+      "preserve_stock_and_authority_constraints",
+      "minimize_unfulfilled_kits",
+      "preserve_service_deadline",
+      "minimize_unnecessary_changes_and_queries"
+    ],
+    "version": 1,
+    "service_targets": [
+      {
+        "target_id": "kits_40",
+        "unit": "standard_kit",
+        "quantity": 40,
+        "deadline": "2026-11-09T13:40:00-05:00",
+        "activity_id": "distribution"
+      }
+    ]
+  },
+  "initial_state": {
+    "event_id": "e_pantry_01",
+    "revision": 3,
+    "clock": "2026-11-09T12:30:00-05:00",
+    "committed_cents": 0,
+    "reserved_cents": 0,
+    "activities": [
+      {
+        "activity_id": "setup",
+        "label": "Prepare a fictional distribution station",
+        "duration_minutes": 10,
+        "window": {
+          "start": "2026-11-09T12:40:00-05:00",
+          "end": "2026-11-09T12:50:00-05:00"
+        },
+        "predecessors": [],
+        "required_resources": [
+          "pantry_room",
+          "staff"
+        ],
+        "required": true,
+        "started": false
+      },
+      {
+        "activity_id": "briefing",
+        "label": "Confirm stock and volunteer roles",
+        "duration_minutes": 10,
+        "window": {
+          "start": "2026-11-09T12:50:00-05:00",
+          "end": "2026-11-09T13:00:00-05:00"
+        },
+        "predecessors": [
+          "setup"
+        ],
+        "required_resources": [
+          "pantry_room",
+          "staff"
+        ],
+        "required": true,
+        "started": false
+      },
+      {
+        "activity_id": "distribution",
+        "label": "Record aggregate kit distribution",
+        "duration_minutes": 40,
+        "window": {
+          "start": "2026-11-09T13:00:00-05:00",
+          "end": "2026-11-09T13:40:00-05:00"
+        },
+        "predecessors": [
+          "briefing"
+        ],
+        "required_resources": [
+          "pantry_room",
+          "staff",
+          "pantry_stock"
+        ],
+        "required": true,
+        "started": false
+      },
+      {
+        "activity_id": "reconciliation",
+        "label": "Reconcile receipts and remaining stock",
+        "duration_minutes": 20,
+        "window": {
+          "start": "2026-11-09T13:40:00-05:00",
+          "end": "2026-11-09T14:00:00-05:00"
+        },
+        "predecessors": [
+          "distribution"
+        ],
+        "required_resources": [
+          "pantry_room",
+          "staff"
+        ],
+        "required": true,
+        "started": false
+      }
+    ],
+    "resources": [
+      {
+        "resource_id": "pantry_room",
+        "label": "Fictional venue, shared location for both stocks",
+        "kind": "space",
+        "capacity": 12,
+        "status": "available",
+        "window": {
+          "start": "2026-11-09T12:30:00-05:00",
+          "end": "2026-11-09T14:00:00-05:00"
+        },
+        "booking_cost_cents": 0,
+        "source_ref": "obs_pantry_room",
+        "capabilities": [
+          "distribution_station"
+        ],
+        "approved_substitute_ids": []
+      },
+      {
+        "resource_id": "staff",
+        "label": "Predefined pantry staff team",
+        "kind": "person",
+        "capacity": 1,
+        "status": "available",
+        "window": {
+          "start": "2026-11-09T12:30:00-05:00",
+          "end": "2026-11-09T14:00:00-05:00"
+        },
+        "booking_cost_cents": 0,
+        "source_ref": "obs_staff",
+        "capabilities": [
+          "receipt_attestation",
+          "aggregate_distribution",
+          "40_kits_per_40_minutes"
+        ],
+        "approved_substitute_ids": []
+      },
+      {
+        "resource_id": "pantry_stock",
+        "label": "Pantry-controlled standardized kits",
+        "kind": "supply",
+        "capacity": 100,
+        "status": "available",
+        "window": {
+          "start": "2026-11-09T12:30:00-05:00",
+          "end": "2026-11-09T14:00:00-05:00"
+        },
+        "booking_cost_cents": 0,
+        "source_ref": "obs_pantry_stock",
+        "capabilities": [
+          "standard_kit"
+        ],
+        "approved_substitute_ids": [],
+        "consumable_stock": {
+          "unit": "standard_kit",
+          "on_hand_quantity": 24,
+          "reserved_quantity": 0,
+          "distributed_quantity": 0,
+          "expected_quantity": 20
+        }
+      },
+      {
+        "resource_id": "partner_stock",
+        "label": "Partner-controlled kits at the same venue",
+        "kind": "supply",
+        "capacity": 100,
+        "status": "available",
+        "window": {
+          "start": "2026-11-09T12:30:00-05:00",
+          "end": "2026-11-09T14:00:00-05:00"
+        },
+        "booking_cost_cents": 0,
+        "source_ref": "obs_partner_stock",
+        "capabilities": [
+          "standard_kit"
+        ],
+        "approved_substitute_ids": [],
+        "consumable_stock": {
+          "unit": "standard_kit",
+          "on_hand_quantity": 16,
+          "reserved_quantity": 0,
+          "distributed_quantity": 0,
+          "expected_quantity": 0
+        }
+      }
+    ],
+    "assignments": [
+      {
+        "activity_id": "setup",
+        "start": "2026-11-09T12:40:00-05:00",
+        "end": "2026-11-09T12:50:00-05:00",
+        "resource_ids": [
+          "pantry_room",
+          "staff"
+        ]
+      },
+      {
+        "activity_id": "briefing",
+        "start": "2026-11-09T12:50:00-05:00",
+        "end": "2026-11-09T13:00:00-05:00",
+        "resource_ids": [
+          "pantry_room",
+          "staff"
+        ]
+      },
+      {
+        "activity_id": "distribution",
+        "start": "2026-11-09T13:00:00-05:00",
+        "end": "2026-11-09T13:40:00-05:00",
+        "resource_ids": [
+          "pantry_room",
+          "staff",
+          "pantry_stock"
+        ],
+        "consumable_allocations": [
+          {
+            "resource_id": "pantry_stock",
+            "quantity": 24,
+            "service_target_id": "kits_40"
+          }
+        ]
+      },
+      {
+        "activity_id": "reconciliation",
+        "start": "2026-11-09T13:40:00-05:00",
+        "end": "2026-11-09T14:00:00-05:00",
+        "resource_ids": [
+          "pantry_room",
+          "staff"
+        ]
+      }
+    ],
+    "holds": [],
+    "checked_in_roles": [
+      "staff"
+    ],
+    "service_progress": [
+      {
+        "target_id": "kits_40",
+        "distributed_quantity": 0
+      }
+    ],
+    "expected_shipments": [
+      {
+        "shipment_id": "S20",
+        "destination_resource_id": "pantry_stock",
+        "quantity": 20,
+        "received_quantity": 0,
+        "expected_at": "2026-11-09T12:55:00-05:00",
+        "source_ref": "obs_pantry_stock"
+      }
+    ]
+  },
+  "visible_observations": [
+    {
+      "observation_id": "obs_pantry_room",
+      "event_id": "e_pantry_01",
+      "entity_id": "pantry_room",
+      "kind": "status",
+      "source_id": "fictional_staff",
+      "source_record_id": "obs_pantry_room_v1",
+      "correlation_group": "obs_pantry_room",
+      "observed_at": "2026-11-09T12:30:00-05:00",
+      "received_at": "2026-11-09T12:30:00-05:00",
+      "valid_window": {
+        "start": "2026-11-09T12:30:00-05:00",
+        "end": "2026-11-09T14:00:00-05:00"
+      },
+      "authority_scope": "resource_status",
+      "text": "Fictional venue confirmed. Both stock locations are inside this venue. Capacity 12 is simultaneous occupancy, not unique recipients.",
+      "supersedes": []
+    },
+    {
+      "observation_id": "obs_staff",
+      "event_id": "e_pantry_01",
+      "entity_id": "staff",
+      "kind": "status",
+      "source_id": "fictional_staff",
+      "source_record_id": "obs_staff_v1",
+      "correlation_group": "obs_staff",
+      "observed_at": "2026-11-09T12:30:00-05:00",
+      "received_at": "2026-11-09T12:30:00-05:00",
+      "valid_window": {
+        "start": "2026-11-09T12:30:00-05:00",
+        "end": "2026-11-09T14:00:00-05:00"
+      },
+      "authority_scope": "resource_status",
+      "text": "Fictional staff team checked in. The scenario assumes it can distribute up to 40 standardized kits during the 40-minute session.",
+      "supersedes": []
+    },
+    {
+      "observation_id": "obs_pantry_stock",
+      "event_id": "e_pantry_01",
+      "entity_id": "pantry_stock",
+      "kind": "status",
+      "source_id": "fictional_staff",
+      "source_record_id": "obs_pantry_stock_v1",
+      "correlation_group": "obs_pantry_stock",
+      "observed_at": "2026-11-09T12:30:00-05:00",
+      "received_at": "2026-11-09T12:30:00-05:00",
+      "valid_window": {
+        "start": "2026-11-09T12:30:00-05:00",
+        "end": "2026-11-09T14:00:00-05:00"
+      },
+      "authority_scope": "resource_status",
+      "text": "Staff counted 24 pantry-controlled kits. Shipment S20 promises 20 more, previously expected at 12:55. The supplier now warns of delay; query its current status. None of S20 has been received.",
+      "supersedes": []
+    },
+    {
+      "observation_id": "obs_partner_stock",
+      "event_id": "e_pantry_01",
+      "entity_id": "partner_stock",
+      "kind": "status",
+      "source_id": "fictional_partner_steward",
+      "source_record_id": "obs_partner_stock_v1",
+      "correlation_group": "obs_partner_stock",
+      "observed_at": "2026-11-09T12:30:00-05:00",
+      "received_at": "2026-11-09T12:30:00-05:00",
+      "valid_window": {
+        "start": "2026-11-09T12:30:00-05:00",
+        "end": "2026-11-09T14:00:00-05:00"
+      },
+      "authority_scope": "resource_status",
+      "text": "Registered partner steward confirms 16 standardized kits physically present at the same venue. A free hold until 12:50 is permitted. Staff must attest the handoff before pantry use.",
+      "supersedes": []
+    }
+  ],
+  "authority_grants": [
+    {
+      "grant_id": "grant_pantry_agent",
+      "event_id": "e_pantry_01",
+      "principal_id": "agent_demo",
+      "principal_role": "coordinator_agent",
+      "allowed_tools": [
+        "get_event_state",
+        "list_resources",
+        "query_status",
+        "evaluate_candidates",
+        "hold_resource",
+        "release_hold",
+        "apply_plan",
+        "get_action_receipt"
+      ],
+      "resource_ids": [
+        "pantry_room",
+        "staff",
+        "pantry_stock",
+        "partner_stock"
+      ],
+      "activity_ids": [
+        "setup",
+        "briefing",
+        "distribution",
+        "reconciliation"
+      ],
+      "max_total_committed_cents": 0,
+      "max_total_reserved_cents": 0,
+      "expires_at": "2026-11-09T14:00:00-05:00",
+      "review_required_for": []
+    },
+    {
+      "grant_id": "grant_pantry_staff",
+      "event_id": "e_pantry_01",
+      "principal_id": "fictional_staff",
+      "principal_role": "organizer",
+      "allowed_tools": [
+        "get_event_state",
+        "query_status",
+        "hold_resource",
+        "release_hold",
+        "apply_plan",
+        "record_stock_receipt",
+        "record_distribution",
+        "submit_observation",
+        "get_action_receipt"
+      ],
+      "resource_ids": [
+        "pantry_room",
+        "staff",
+        "pantry_stock",
+        "partner_stock"
+      ],
+      "activity_ids": [
+        "setup",
+        "briefing",
+        "distribution",
+        "reconciliation"
+      ],
+      "max_total_committed_cents": 0,
+      "max_total_reserved_cents": 0,
+      "expires_at": "2026-11-09T14:00:00-05:00",
+      "review_required_for": []
+    },
+    {
+      "grant_id": "grant_partner_steward",
+      "event_id": "e_pantry_01",
+      "principal_id": "fictional_partner_steward",
+      "principal_role": "participant",
+      "allowed_tools": [
+        "get_event_state",
+        "submit_observation",
+        "get_action_receipt"
+      ],
+      "resource_ids": [
+        "partner_stock"
+      ],
+      "activity_ids": [],
+      "max_total_committed_cents": 0,
+      "max_total_reserved_cents": 0,
+      "expires_at": "2026-11-09T14:00:00-05:00",
+      "review_required_for": []
+    }
+  ],
+  "declared_assumptions": [
+    {
+      "assumption_id": "a_fiction",
+      "description": "All stock, people, targets, timings and events are synthetic. This is not U-ACCESS operating data.",
+      "basis": "scenario_design",
+      "source_ref": "fictional_fixture_spec"
+    },
+    {
+      "assumption_id": "a_unit",
+      "description": "Every unit is a preassembled, identical shelf-stable kit. No recipes, allergies, perishability or recipient decisions are modeled.",
+      "basis": "scenario_design",
+      "source_ref": "fictional_fixture_spec"
+    },
+    {
+      "assumption_id": "a_capacity",
+      "description": "attendance_target 12 is a fixture occupancy planning bound, not a people-served count. Forty kits do not imply forty recipients. Stock Resource.capacity 100 is the storage bound, not available supply.",
+      "basis": "scenario_design",
+      "source_ref": "fictional_fixture_spec"
+    },
+    {
+      "assumption_id": "a_initial_plan",
+      "description": "The initial schedule has a feasible 24-unit partial allocation proposal and no inventory reservation. Its 40-unit target is unresolved. It is not a full-success or execution-ready plan until quantities are reserved and staff readiness checks pass.",
+      "basis": "scenario_design",
+      "source_ref": "fictional_fixture_spec"
+    },
+    {
+      "assumption_id": "a_throughput",
+      "description": "The registered staff team can distribute up to 40 kits during the 40-minute distribution window. This is an authored capacity assumption, not observed pantry throughput.",
+      "basis": "scenario_design",
+      "source_ref": "fictional_fixture_spec"
+    },
+    {
+      "assumption_id": "a_handoff",
+      "description": "Partner stock is at the same venue. A source hold does not transfer it. Staff-confirmed receipt atomically debits source and credits destination, then destination stock is separately reserved and committed.",
+      "basis": "scenario_design",
+      "source_ref": "fictional_fixture_spec"
+    },
+    {
+      "assumption_id": "a_expected",
+      "description": "Expected S20 supply is excluded from usable stock until a unique staff receipt matches the shipment. Internal partner handoff does not decrement S20.",
+      "basis": "scenario_design",
+      "source_ref": "fictional_fixture_spec"
+    },
+    {
+      "assumption_id": "a_counters",
+      "description": "Initial pantry supply shortfall is 16. Initial service deficit is 40 because distributed quantity is zero. Partner stock is potential cover until authorized handoff, not already pantry-controlled supply.",
+      "basis": "scenario_design",
+      "source_ref": "fictional_fixture_spec"
+    },
+    {
+      "assumption_id": "a_authority",
+      "description": "The agent can reserve and plan but cannot attest receipt or distribution. Human demo staff use separate scoped credentials. All physical actions are simulated.",
+      "basis": "scenario_design",
+      "source_ref": "fictional_fixture_spec"
+    },
+    {
+      "assumption_id": "a_budget",
+      "description": "Both holdings and internal transfers have zero configured cost. No purchases or external bookings are permitted.",
+      "basis": "scenario_design",
+      "source_ref": "fictional_fixture_spec"
+    },
+    {
+      "assumption_id": "a_service_clock",
+      "description": "The runner records actual staffed execution start only after the plan is committed and stock reserved. Capacity at time t is floor(1 kit per minute times elapsed qualified staffed execution minutes), minus previously distributed units. A late commitment cannot backdate this clock. A completion at 13:40 counts before the service deadline-close event at that same time. Later physical distribution may be recorded within staff authority, but misses the original target deadline.",
+      "basis": "scenario_design",
+      "source_ref": "fictional_fixture_spec"
+    },
+    {
+      "assumption_id": "a_staff_response",
+      "description": "A valid source hold with purpose stock_transfer and destination_resource_id pantry_stock creates a local staff handoff task. A two-minute modeled response begins after that task is valid. Staff may attest at completion only while the hold and handoff window remain valid. 12:50 is exclusive for hold/transfer acceptance. Staff response conditions are fixed across policies; the model cannot assume acceptance.",
+      "basis": "scenario_design",
+      "source_ref": "fictional_fixture_spec"
+    },
+    {
+      "assumption_id": "a_handoff_workload",
+      "description": "handoff_duration_minutes is modeled response latency. In this bounded fixture staff may confirm the same-venue stock handoff as part of setup, so it is not an additional exclusive staffing activity. The handoff window ends before briefing starts. A domain requiring separate lifting, transport or active staff time needs an explicit scheduled activity and capacity check before use.",
+      "basis": "scenario_design",
+      "source_ref": "fictional_fixture_spec"
+    }
+  ],
+  "pantry_parameters": {
+    "service_activity_id": "distribution",
+    "staff_resource_id": "staff",
+    "service_rate_units_per_minute": 1,
+    "handoff_duration_minutes": 2,
+    "handoff_window": {
+      "start": "2026-11-09T12:30:00-05:00",
+      "end": "2026-11-09T12:50:00-05:00"
+    }
+  }
+}

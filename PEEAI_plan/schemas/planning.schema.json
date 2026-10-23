@@ -1,0 +1,1597 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:plan-b:planning:0.2.0",
+  "title": "Plan B planning artifact contracts",
+  "description": "Illustrative design contracts, not a runtime authorization or feasibility engine. Private evaluator artifacts must be isolated from agent-facing data.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/ScenarioDefinition"
+    },
+    {
+      "$ref": "#/$defs/ChangeSpec"
+    },
+    {
+      "$ref": "#/$defs/MutationRequest"
+    },
+    {
+      "$ref": "#/$defs/ActionReceipt"
+    },
+    {
+      "$ref": "#/$defs/EvaluatorFixture"
+    },
+    {
+      "$ref": "#/$defs/CandidatePlan"
+    },
+    {
+      "$ref": "#/$defs/ConstraintReport"
+    },
+    {
+      "$ref": "#/$defs/ObservationRecord"
+    }
+  ],
+  "$defs": {
+    "TimeWindow": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ]
+    },
+    "Activity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "activity_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "duration_minutes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "window": {
+          "$ref": "#/$defs/TimeWindow"
+        },
+        "predecessors": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "required_resources": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "started": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "activity_id",
+        "label",
+        "duration_minutes",
+        "window",
+        "predecessors",
+        "required_resources",
+        "required",
+        "started"
+      ]
+    },
+    "Resource": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "resource_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "space",
+            "equipment",
+            "person",
+            "supply"
+          ]
+        },
+        "capacity": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "available",
+            "expected",
+            "unavailable",
+            "unknown"
+          ]
+        },
+        "window": {
+          "$ref": "#/$defs/TimeWindow"
+        },
+        "booking_cost_cents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "source_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "approved_substitute_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "consumable_stock": {
+          "$ref": "#/$defs/ConsumableStock"
+        }
+      },
+      "required": [
+        "resource_id",
+        "label",
+        "kind",
+        "capacity",
+        "status",
+        "window",
+        "booking_cost_cents",
+        "source_ref",
+        "capabilities",
+        "approved_substitute_ids"
+      ]
+    },
+    "Assignment": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "activity_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "start": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "resource_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "consumable_allocations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ConsumableAllocation"
+          }
+        }
+      },
+      "required": [
+        "activity_id",
+        "start",
+        "end",
+        "resource_ids"
+      ]
+    },
+    "EventGoal": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "goal_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "required_activity_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "public_start": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "hard_end": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "budget_cents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "attendance_target": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "fixed_venue_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "priorities": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "service_targets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ServiceTarget"
+          }
+        }
+      },
+      "required": [
+        "goal_id",
+        "description",
+        "required_activity_ids",
+        "public_start",
+        "hard_end",
+        "budget_cents",
+        "attendance_target",
+        "fixed_venue_id",
+        "priorities",
+        "version"
+      ]
+    },
+    "Observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "observation_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "event_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "entity_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "notice",
+            "status",
+            "check_in",
+            "resource_offer",
+            "policy"
+          ]
+        },
+        "source_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_record_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "correlation_group": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "received_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "valid_window": {
+          "$ref": "#/$defs/TimeWindow"
+        },
+        "authority_scope": {
+          "type": "string",
+          "enum": [
+            "self_report",
+            "resource_status",
+            "organizer_instruction",
+            "public_policy"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "supersedes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "observation_id",
+        "event_id",
+        "entity_id",
+        "kind",
+        "source_id",
+        "source_record_id",
+        "correlation_group",
+        "observed_at",
+        "received_at",
+        "valid_window",
+        "authority_scope",
+        "text",
+        "supersedes"
+      ]
+    },
+    "AuthorityGrant": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "grant_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "event_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "principal_role": {
+          "type": "string",
+          "enum": [
+            "organizer",
+            "coordinator_agent",
+            "participant"
+          ]
+        },
+        "allowed_tools": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "resource_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "activity_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "max_total_committed_cents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max_total_reserved_cents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "review_required_for": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "principal_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "grant_id",
+        "event_id",
+        "principal_role",
+        "allowed_tools",
+        "resource_ids",
+        "activity_ids",
+        "max_total_committed_cents",
+        "max_total_reserved_cents",
+        "expires_at",
+        "review_required_for",
+        "principal_id"
+      ]
+    },
+    "Hold": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hold_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "resource_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "quantity": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "reserved_cents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "active",
+            "committed",
+            "released",
+            "expired",
+            "fulfilled"
+          ]
+        },
+        "window": {
+          "$ref": "#/$defs/TimeWindow"
+        },
+        "remaining_quantity": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "purpose": {
+          "enum": [
+            "activity",
+            "stock_transfer"
+          ]
+        },
+        "destination_resource_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "hold_id",
+        "resource_id",
+        "quantity",
+        "expires_at",
+        "reserved_cents",
+        "status",
+        "window"
+      ]
+    },
+    "EventState": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "event_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "clock": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "committed_cents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "reserved_cents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "activities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Activity"
+          },
+          "minItems": 1
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Resource"
+          },
+          "minItems": 1
+        },
+        "assignments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Assignment"
+          }
+        },
+        "holds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Hold"
+          }
+        },
+        "checked_in_roles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "service_progress": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ServiceProgress"
+          }
+        },
+        "expected_shipments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ExpectedShipment"
+          }
+        }
+      },
+      "required": [
+        "event_id",
+        "revision",
+        "clock",
+        "committed_cents",
+        "reserved_cents",
+        "activities",
+        "resources",
+        "assignments",
+        "holds",
+        "checked_in_roles"
+      ]
+    },
+    "Assumption": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "assumption_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "basis": {
+          "type": "string",
+          "enum": [
+            "scenario_design",
+            "operator_input",
+            "public_source"
+          ]
+        },
+        "source_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "assumption_id",
+        "description",
+        "basis",
+        "source_ref"
+      ]
+    },
+    "ScenarioDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "artifact_type": {
+          "const": "public_scenario"
+        },
+        "schema_version": {
+          "const": "0.2.0"
+        },
+        "scenario_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "profile_id": {
+          "type": "string",
+          "enum": [
+            "campus_showcase",
+            "community_skills_exchange",
+            "pantry_continuity"
+          ]
+        },
+        "fictional": {
+          "const": true
+        },
+        "timezone": {
+          "const": "America/New_York"
+        },
+        "goal": {
+          "$ref": "#/$defs/EventGoal"
+        },
+        "initial_state": {
+          "$ref": "#/$defs/EventState"
+        },
+        "visible_observations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Observation"
+          }
+        },
+        "authority_grants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AuthorityGrant"
+          },
+          "minItems": 1
+        },
+        "declared_assumptions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Assumption"
+          }
+        },
+        "pantry_parameters": {
+          "$ref": "#/$defs/PantryParameters"
+        }
+      },
+      "required": [
+        "artifact_type",
+        "schema_version",
+        "scenario_id",
+        "profile_id",
+        "fictional",
+        "timezone",
+        "goal",
+        "initial_state",
+        "visible_observations",
+        "authority_grants",
+        "declared_assumptions"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "profile_id": {
+                "const": "pantry_continuity"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "goal": {
+                "required": [
+                  "service_targets"
+                ],
+                "properties": {
+                  "service_targets": {
+                    "minItems": 1
+                  }
+                }
+              },
+              "initial_state": {
+                "required": [
+                  "service_progress",
+                  "expected_shipments"
+                ],
+                "properties": {
+                  "resources": {
+                    "contains": {
+                      "required": [
+                        "consumable_stock"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "required": [
+              "pantry_parameters"
+            ]
+          }
+        }
+      ]
+    },
+    "ChangeSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "artifact_type": {
+          "const": "change_spec"
+        },
+        "schema_version": {
+          "const": "0.2.0"
+        },
+        "change_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "event_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "based_on_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "subject_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "change_kind": {
+          "type": "string",
+          "enum": [
+            "delay",
+            "unavailability",
+            "availability",
+            "attendance_change",
+            "priority_change",
+            "no_change",
+            "unresolved"
+          ]
+        },
+        "valid_window": {
+          "$ref": "#/$defs/TimeWindow"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "interpretation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "unresolved_fields": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "proposed_checks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "artifact_type",
+        "schema_version",
+        "change_id",
+        "event_id",
+        "based_on_revision",
+        "subject_id",
+        "change_kind",
+        "valid_window",
+        "evidence_refs",
+        "interpretation",
+        "unresolved_fields",
+        "proposed_checks"
+      ]
+    },
+    "CandidatePlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "plan_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "event_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "based_on_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "assignments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Assignment"
+          },
+          "minItems": 1
+        },
+        "changed_activity_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "required_hold_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "incremental_committed_cents": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "constraint_status": {
+          "type": "string",
+          "enum": [
+            "feasible_under_assumptions",
+            "infeasible",
+            "unknown"
+          ]
+        },
+        "constraint_report_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 1
+        },
+        "goal_version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "artifact_type": {
+          "const": "candidate_plan"
+        },
+        "schema_version": {
+          "const": "0.2.0"
+        }
+      },
+      "required": [
+        "plan_id",
+        "event_id",
+        "based_on_revision",
+        "assignments",
+        "changed_activity_ids",
+        "required_hold_ids",
+        "incremental_committed_cents",
+        "assumptions",
+        "constraint_status",
+        "constraint_report_ref",
+        "rationale",
+        "goal_version",
+        "artifact_type",
+        "schema_version"
+      ]
+    },
+    "MutationRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "artifact_type": {
+          "const": "mutation_request"
+        },
+        "schema_version": {
+          "const": "0.2.0"
+        },
+        "tool": {
+          "const": "apply_plan"
+        },
+        "event_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "idempotency_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "grant_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "arguments": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "candidate_plan_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "constraint_report_ref": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "candidate_plan_id",
+            "constraint_report_ref"
+          ]
+        },
+        "expected_goal_version": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "artifact_type",
+        "schema_version",
+        "tool",
+        "event_id",
+        "expected_revision",
+        "idempotency_key",
+        "grant_id",
+        "arguments",
+        "expected_goal_version"
+      ]
+    },
+    "ActionReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "artifact_type": {
+          "const": "action_receipt"
+        },
+        "schema_version": {
+          "const": "0.2.0"
+        },
+        "receipt_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "event_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tool": {
+          "type": "string",
+          "minLength": 1
+        },
+        "request_idempotency_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "grant_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "applied",
+            "rejected",
+            "unknown"
+          ]
+        },
+        "revision_before": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "revision_after": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "executed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "simulation": {
+          "const": true
+        },
+        "state_changes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "entity_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "field": {
+                "type": "string",
+                "minLength": 1
+              },
+              "before": {},
+              "after": {}
+            },
+            "required": [
+              "entity_id",
+              "field",
+              "before",
+              "after"
+            ]
+          }
+        },
+        "committed_delta_cents": {
+          "type": "integer"
+        },
+        "reserved_delta_cents": {
+          "type": "integer"
+        },
+        "related_plan_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "constraint_report_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "error_code": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "actor_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "request_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "artifact_type",
+        "schema_version",
+        "receipt_id",
+        "event_id",
+        "tool",
+        "request_idempotency_key",
+        "grant_id",
+        "status",
+        "revision_before",
+        "revision_after",
+        "executed_at",
+        "simulation",
+        "state_changes",
+        "committed_delta_cents",
+        "reserved_delta_cents",
+        "related_plan_id",
+        "constraint_report_ref",
+        "error_code",
+        "actor_id",
+        "request_digest"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "applied"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "error_code": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "rejected"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "state_changes": {
+                "maxItems": 0
+              },
+              "committed_delta_cents": {
+                "const": 0
+              },
+              "reserved_delta_cents": {
+                "const": 0
+              },
+              "error_code": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "PrivateEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "event_kind": {
+          "type": "string",
+          "enum": [
+            "tool_response_available",
+            "resource_arrival",
+            "message_delivery",
+            "state_change",
+            "staff_response_rule",
+            "resource_arrival_opportunity"
+          ]
+        },
+        "entity_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "payload": {
+          "type": "object"
+        },
+        "visibility": {
+          "type": "string",
+          "enum": [
+            "tool_only",
+            "observation_on_delivery",
+            "evaluator_only"
+          ]
+        }
+      },
+      "required": [
+        "at",
+        "event_kind",
+        "entity_id",
+        "payload",
+        "visibility"
+      ]
+    },
+    "EvaluatorFixture": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "artifact_type": {
+          "const": "private_evaluator"
+        },
+        "schema_version": {
+          "const": "0.2.0"
+        },
+        "scenario_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "case_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "never_expose_to_agent": {
+          "const": true
+        },
+        "ground_truth_note": {
+          "type": "string",
+          "minLength": 1
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PrivateEvent"
+          },
+          "minItems": 1
+        },
+        "outcome_checks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "candidate_expectation": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "artifact_type",
+        "schema_version",
+        "scenario_id",
+        "case_id",
+        "never_expose_to_agent",
+        "ground_truth_note",
+        "events",
+        "outcome_checks",
+        "candidate_expectation"
+      ]
+    },
+    "ConstraintReport": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "artifact_type": {
+          "const": "constraint_report"
+        },
+        "schema_version": {
+          "const": "0.2.0"
+        },
+        "report_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "event_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "candidate_plan_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "state_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "goal_version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "checked_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "result": {
+          "enum": [
+            "feasible_under_assumptions",
+            "infeasible",
+            "unknown"
+          ]
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "constraint_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "passed": {
+                "type": "boolean"
+              },
+              "detail": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "constraint_id",
+              "passed",
+              "detail"
+            ]
+          },
+          "minItems": 1
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "execution_preconditions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "artifact_type",
+        "schema_version",
+        "report_id",
+        "event_id",
+        "candidate_plan_id",
+        "state_revision",
+        "goal_version",
+        "checked_at",
+        "result",
+        "checks",
+        "assumptions",
+        "execution_preconditions"
+      ]
+    },
+    "ObservationRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "artifact_type": {
+          "const": "observation_record"
+        },
+        "schema_version": {
+          "const": "0.2.0"
+        },
+        "event_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision_before": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "revision_after": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ingested_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "observation": {
+          "$ref": "#/$defs/Observation"
+        }
+      },
+      "required": [
+        "artifact_type",
+        "schema_version",
+        "event_id",
+        "revision_before",
+        "revision_after",
+        "ingested_at",
+        "observation"
+      ]
+    },
+    "ServiceTarget": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "target_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "quantity": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "deadline": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "activity_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "target_id",
+        "unit",
+        "quantity",
+        "deadline",
+        "activity_id"
+      ]
+    },
+    "ConsumableStock": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "on_hand_quantity": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "reserved_quantity": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "distributed_quantity": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "expected_quantity": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "unit",
+        "on_hand_quantity",
+        "reserved_quantity",
+        "distributed_quantity",
+        "expected_quantity"
+      ]
+    },
+    "ConsumableAllocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "resource_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "quantity": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "service_target_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "resource_id",
+        "quantity",
+        "service_target_id"
+      ]
+    },
+    "ServiceProgress": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "target_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "distributed_quantity": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "target_id",
+        "distributed_quantity"
+      ]
+    },
+    "ExpectedShipment": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "shipment_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "destination_resource_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "quantity": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "received_quantity": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "expected_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "source_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "shipment_id",
+        "destination_resource_id",
+        "quantity",
+        "received_quantity",
+        "expected_at",
+        "source_ref"
+      ]
+    },
+    "PantryParameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "service_activity_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "staff_resource_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "service_rate_units_per_minute": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "handoff_duration_minutes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "handoff_window": {
+          "$ref": "#/$defs/TimeWindow"
+        }
+      },
+      "required": [
+        "service_activity_id",
+        "staff_resource_id",
+        "service_rate_units_per_minute",
+        "handoff_duration_minutes",
+        "handoff_window"
+      ]
+    }
+  }
+}

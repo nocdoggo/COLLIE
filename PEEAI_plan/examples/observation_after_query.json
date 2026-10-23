@@ -1,0 +1,26 @@
+{
+  "artifact_type": "observation_record",
+  "schema_version": "0.2.0",
+  "event_id": "e_showcase_01",
+  "revision_before": 3,
+  "revision_after": 4,
+  "ingested_at": "2026-11-05T16:42:00-05:00",
+  "observation": {
+    "observation_id": "obs_status_02",
+    "event_id": "e_showcase_01",
+    "entity_id": "projector",
+    "kind": "status",
+    "source_id": "supplier_status_adapter",
+    "source_record_id": "order_P17_revision_4",
+    "correlation_group": "projector_delivery_01",
+    "observed_at": "2026-11-05T16:40:00-05:00",
+    "received_at": "2026-11-05T16:42:00-05:00",
+    "valid_window": {
+      "start": "2026-11-05T16:40:00-05:00",
+      "end": "2026-11-05T18:00:00-05:00"
+    },
+    "authority_scope": "resource_status",
+    "text": "Order P17 currently reports a delayed projector delivery with estimated arrival at 17:25. This is a reported ETA, not confirmation that the equipment has arrived.",
+    "supersedes": []
+  }
+}
