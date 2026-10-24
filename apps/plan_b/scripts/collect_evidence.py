@@ -14,11 +14,13 @@ Runs the checks and the development cases, and writes into <evidence-dir>:
 * ``reports/fixture_hashes.json``, ``reports/environment.json``;
 * ``traces/``: sanitized traces (successful dev01, paid-booking dev02, impossible dev05, and the
   rejected-actions run);
-* ``screenshots/``: walkthrough screenshots and its JSON report;
+* ``screenshots/``: walkthrough screenshots (re-encoded as 256-colour PNGs to keep the packet
+  small; the walkthrough's checks read the live page, not the images) and its JSON report;
 * ``runner_private/``: runner-side outcome reports *with* predicates and expectations. These
   are evaluator outputs, kept apart from every public artifact.
 
-Nothing here reads credentials or makes network calls.
+Absolute local paths are written as ``<repo>``, ``<evidence>``, ``<work>`` or ``~``. Nothing here
+reads credentials or makes network calls.
 """
 
 from __future__ import annotations
@@ -39,10 +41,28 @@ from typing import Any
 APP = Path(__file__).resolve().parents[1]
 REPO = APP.parents[1]
 TRACES_KEPT = ("dev01", "dev02", "dev05")
+_PLACEHOLDERS: list[tuple[str, str]] = []
+
+
+def redact(text: str) -> str:
+    for path, label in _PLACEHOLDERS:
+        text = text.replace(path, label)
+    return text
 
 
 def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def quantize_png(src: Path, dst: Path) -> None:
+    """Re-encode a screenshot as a 256-colour PNG (median cut, no dithering)."""
+    from PIL import Image
+
+    with Image.open(src) as image:
+        palette = image.convert("RGB").quantize(
+            colors=256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE
+        )
+        palette.save(dst, optimize=True)
 
 
 def run(
@@ -54,11 +74,11 @@ def run(
     checks.append(
         {
             "name": name,
-            "command": " ".join(cmd),
+            "command": redact(" ".join(cmd)),
             "cwd": str(cwd.relative_to(REPO)) if cwd.is_relative_to(REPO) else str(cwd),
             "exit_code": proc.returncode,
             "seconds": round(time.monotonic() - t0, 1),
-            "summary": [line for line in out if line.strip()][-6:],
+            "summary": [redact(line) for line in out if line.strip()][-6:],
         }
     )
     print(f"[{'ok' if proc.returncode == 0 else 'FAIL'}] {name}")
@@ -76,10 +96,20 @@ def main() -> int:
     checks: list[dict[str, Any]] = []
     uv = ["uv", "run"]
     web = APP / "web"
+    work = Path(tempfile.mkdtemp(prefix="planb_evidence_"))
+    # Longest first, so a path inside another is replaced by its own label.
+    _PLACEHOLDERS[:] = sorted(
+        [(str(out), "<evidence>"), (str(work), "<work>"), (str(REPO), "<repo>")]
+        + [(str(Path.home()), "~")],
+        key=lambda pair: -len(pair[0]),
+    )
 
     run(uv + ["ruff", "check", "."], APP, checks, "ruff check")
     run(uv + ["ruff", "format", "--check", "."], APP, checks, "ruff format --check")
     run(uv + ["mypy"], APP, checks, "mypy (strict defs)")
+    run(["npm", "run", "typecheck"], web, checks, "web typecheck")
+    run(["npm", "run", "build"], web, checks, "web build")
+    # pytest runs after the build so the bundle-privacy test has a bundle to scan.
     junit = out / "reports" / "pytest_junit.xml"
     run(
         uv + ["pytest", "-o", "addopts=", "-q", "-p", "no:cacheprovider", f"--junitxml={junit}"],
@@ -87,12 +117,11 @@ def main() -> int:
         checks,
         "pytest",
     )
-    run(["npm", "run", "typecheck"], web, checks, "web typecheck")
-    run(["npm", "run", "build"], web, checks, "web build")
+    if junit.exists():
+        junit.write_text(redact(junit.read_text()))
     run(["npm", "test"], web, checks, "web tests")
     run(["npm", "run", "lint"], web, checks, "web boundary lint")
 
-    work = Path(tempfile.mkdtemp(prefix="planb_evidence_"))
     runs_out = work / "out"
     run(
         uv
@@ -128,8 +157,11 @@ def main() -> int:
             checks,
             "browser walkthrough (Playwright, Chromium)",
         )
-        for png in sorted(shots.glob("*")):
-            shutil.copy2(png, out / "screenshots" / png.name)
+        for shot in sorted(shots.glob("*")):
+            if shot.suffix == ".png":
+                quantize_png(shot, out / "screenshots" / shot.name)
+            else:
+                shutil.copy2(shot, out / "screenshots" / shot.name)
 
     junit_text = junit.read_text() if junit.exists() else ""
     counts = {}
@@ -175,7 +207,8 @@ def main() -> int:
         "playwright": version(uv + ["playwright", "--version"]),
         "sqlite": version(uv + ["python", "-c", "import sqlite3; print(sqlite3.sqlite_version)"]),
         "git_head": version(["git", "rev-parse", "HEAD"], REPO),
-        "git_branch": version(["git", "branch", "--show-current"], REPO),
+        "git_branch": version(["git", "branch", "--show-current"], REPO) or "(detached HEAD)",
+        "app_tree_clean": not version(["git", "status", "--porcelain", "--", "apps/plan_b"], REPO),
     }
     (out / "reports" / "environment.json").write_text(json.dumps(env, indent=2) + "\n")
     (out / "reports" / "checks.json").write_text(
