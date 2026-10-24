@@ -15,7 +15,7 @@ delivery, or message is made.
 | Planning artifacts | 0.2.0 | `PEEAI_plan/schemas/planning.schema.json` (unchanged by Wave 1) |
 | Runtime contract | 1.0.0 | `models.RUNTIME_VERSION`, this file |
 | Trace format | 1.0.0 | `models.TRACE_VERSION`, section 13 |
-| Store schema | migration `0001_initial.sql` | `plan_b/store/migrations/` |
+| Store schema | migrations `0001_initial.sql`, `0002_scheduled_actions.sql`, `0003_history_guards.sql` | `plan_b/store/migrations/` |
 
 Planning objects set `additionalProperties: false`, so runtime records never add fields to them.
 Each runtime record *contains* the planning fields unchanged and adds runtime fields beside them.
@@ -199,10 +199,12 @@ BEGIN IMMEDIATE
     different digest  -> reject IDEMPOTENCY_CONFLICT (no receipt; attempt logged), no time
   static prechecks; grant revoked or expired at arrival -> rejected receipt, no time consumed
   advance the clock by the tool duration, processing events (including scheduled actor actions)
-  re-check grant validity at the new time
-  validate expected_revision, expected_goal_version, grant validity/scope/limits, expiry,
-    resource terms, budget and domain constraints at the new time
-  on failure: store a rejected receipt + idempotency record; operational state unchanged
+  SAVEPOINT handler_<call_id>
+    re-check grant validity at the new time
+    validate expected_revision, expected_goal_version, grant validity/scope/limits, expiry,
+      resource terms, budget and domain constraints at the new time, and apply effects
+  on failure: ROLLBACK TO the handler savepoint (every handler write), then store a rejected
+    receipt + idempotency record; operational state unchanged
   on success: apply state, ledger, revision+1, transition, snapshot, receipt, idempotency
 COMMIT
 ```
@@ -215,9 +217,51 @@ COMMIT
   rather than mistaken for a stale request.
 * **Rejected receipts** have no state changes and zero deltas, and do not advance the revision.
   An identical retry of a rejected request returns the same rejection.
-* **Attempts without receipts** (authentication, scope, validation, idempotency conflicts) are
-  recorded in `tool_calls` and surface as `EventStateView.attempts`. The log stores the
-  validated request; for a body that failed validation it stores field names only, never values.
+* **Handler rollback.** The execution-time grant check and the handler run inside their own
+  savepoint. A domain rejection raised at any point rolls back every row the handler wrote: a
+  plan version, `plan_version`, holds, commitments, ledger rows and id counters. This holds even
+  when the rejection comes after the handler has written. The rejected receipt, idempotency
+  record and call log are written after the rollback. The tool duration's clock advance (with
+  the events it processed) and the allocated call and receipt ids lie outside the savepoint, so
+  they are kept. An unexpected error still rolls back the whole call as `INTERNAL_ERROR`.
+* **Attempts without receipts** are failures after the session is resolved but before a receipt
+  exists. They are recorded in `tool_calls` and surface as `EventStateView.attempts`. The log
+  stores the validated request; for a body that failed validation it stores field names only,
+  never values. The failures are:
+  * episode closed, validation, unknown tool, event or grant mismatch;
+  * a tool outside the grant, and an idempotency conflict;
+  * any rejection of a tool that has no receipts (the read tools).
+* **Not persisted.** Authentication failures (missing, unknown, revoked or expired token) and
+  tool calls made with a moderator session. No actor and episode are resolved for them.
+
+**Failure vocabulary** (`models.ErrorCode`). "Receipt tools" are `hold_resource`, `release_hold`,
+`apply_plan`, `check_in`, `submit_observation`, `update_goal` and `update_grant`. The other tools
+are reads.
+
+| Code | Raised for | Recorded as | HTTP |
+| --- | --- | --- | --- |
+| `AUTH_REQUIRED`, `SESSION_INVALID` | missing, unknown, revoked or expired token (also an unusable join code) | not persisted | 401 |
+| `GRANT_REQUIRED` (moderator session) | a moderator session calling an event tool | not persisted | 403 |
+| `EPISODE_CLOSED` | a session of an episode closed by reset | attempt | 401 |
+| `INVALID_REQUEST` (request shape) | body fails validation, the body's tool differs from the endpoint, a required field is missing | attempt | 400 |
+| `UNKNOWN_TOOL`, `EVENT_MISMATCH`, `GRANT_MISMATCH` | unknown tool name; another event's id; a `grant_id` that is not the session's | attempt | 200 |
+| `GRANT_REQUIRED` | the session has no grant, its grant is gone, or the tool is not in `allowed_tools` | attempt | 200 |
+| `IDEMPOTENCY_CONFLICT` | the same key with a different request body | attempt | 200 |
+| `SCOPE_VIOLATION`, `STATUS_SOURCE_NOT_REGISTERED` (precheck) | `query_status` outside the grant's scope or without a registered source | attempt | 200 |
+| `GRANT_REVOKED`, `GRANT_EXPIRED` | the grant is revoked or expired at arrival, or at execution after the tool duration | rejected receipt (receipt tools) or attempt (reads) | 200 |
+| `REVISION_CONFLICT`, `GOAL_VERSION_CONFLICT` | a stale `expected_revision` or `expected_goal_version` | rejected receipt (receipt tools) or attempt (`evaluate_candidates`) | 200 |
+| `SCOPE_VIOLATION` (handler) | a resource, activity, receipt or grant outside the caller's scope | rejected receipt (receipt tools) or attempt (`get_action_receipt`) | 200 |
+| `REVIEW_REQUIRED`, `BUDGET_EXCEEDED` | an apply or hold beyond the grant's authority, limits or the event budget | rejected receipt | 200 |
+| `UNKNOWN_ENTITY`, `INVALID_REQUEST` (domain) | an unregistered resource, activity, hold, grant or evidence target; a domain-invalid argument | rejected receipt (receipt tools) or attempt (reads) | 200 |
+| `HOLD_NOT_SUPPORTED`, `HOLD_NOT_ACTIVE`, `HOLD_CONVERTED`, `HOLD_EXPIRED` | hold terms missing; releasing a terminal or converted hold; a candidate's bound hold expired | rejected receipt | 200 |
+| `RESOURCE_CONFLICT`, `RESOURCE_UNAVAILABLE`, `COMMITMENT_CUTOFF_PASSED`, `CONSTRAINT_VIOLATION` | hold checks (section 8); a candidate that fails a hard check at apply | rejected receipt | 200 |
+| `CANDIDATE_NOT_FOUND`, `CANDIDATE_STALE`, `CANDIDATE_REPORT_MISMATCH`, `CANDIDATE_HYPOTHETICAL`, `CANDIDATE_NOT_APPLICABLE` | `apply_plan` revalidation (section 10) | rejected receipt | 200 |
+| `UNSUPPORTED_ACTION` | applying a candidate that keeps the plan; releasing a hold whose terms are not refundable | rejected receipt | 200 |
+| `DUPLICATE_CHECK_IN` | a check-in repeating the caller's latest one with the same availability | rejected receipt | 200 |
+| `INVALID_EVIDENCE_REFERENCE` | `supersedes` names an observation that does not exist; a source record id reused for different text | rejected receipt | 200 |
+| `STATUS_UNKNOWN`, `STATUS_UNAVAILABLE` | `query_status` without an answer (envelope `unknown` / `unavailable`); `STATUS_UNAVAILABLE` also for a hold whose steward cannot be reached | attempt (query) or rejected receipt (hold) | 200 |
+| `INTERNAL_ERROR` | an unexpected server error; every effect of the call is rolled back | attempt | 500 |
+| `EVENT_CLOSED` | reserved; not raised in Wave 1 (a call after the hard end fails `GRANT_EXPIRED`) | — | — |
 
 ## 6. Clock, revisions and event ordering
 
@@ -255,9 +299,15 @@ execution time (`executed_at`), and scenario time are distinct fields.
 ## 7. Activity lifecycle and readiness
 
 States: `planned`, `ready`, `started`, `completed`, `failed`, `canceled` (no Wave 1 operation
-cancels an activity; the state exists for later waves). `activity_events` is append-only and a
-DB trigger forbids leaving `started` except to `completed`/`failed`, and leaving
-`completed`/`failed`/`canceled` at all. Setup is loaded as `started` at 16:30.
+cancels an activity; the state exists for later waves). `activity_events` is append-only. DB
+triggers (migrations 0001 and 0003) allow only these lifecycle moves: `planned`↔`ready`,
+`planned`/`ready` → `started`/`failed`/`canceled`, and `started` → `completed`/`failed`. So
+`completed` comes only from `started`, `started` only from `planned` or `ready`, and nothing
+leaves `completed`, `failed` or `canceled`. Setting a planned or ready activity to its own state
+is accepted and changes nothing. Activities are never deleted and their definitions are fixed;
+`plans` and `goals` rows are never updated or deleted, so a new version is a new row. Every
+store connection sets `recursive_triggers`, so REPLACE cannot rewrite a guarded row. Setup is
+loaded as `started` at 16:30.
 
 Readiness (`domain/readiness.py`) uses visible evidence only. Execution mode at the scheduled
 start requires: predecessors `completed`; space `available`; equipment `available` (an
@@ -269,17 +319,34 @@ start.
 
 ## 8. Resources, holds, commitments and money
 
-* **Holds** apply only to resources with `terms.booking_required` (`HOLD_NOT_SUPPORTED`
-  otherwise). Validation: resource registered and in grant scope; activity uses a compatible
-  resource; window within the resource window; resource status not `unavailable`; capacity over
-  the window counting the active plan's other assignments, active holds and active commitments
-  (`RESOURCE_CONFLICT`); `now < commitment cutoff` (`COMMITMENT_CUTOFF_PASSED`); hold lifetime
-  `min(requested, terms.hold_max_minutes)`; the resource's steward (its registered status
-  source in the private world) confirms the hold: if the steward reports the resource
-  unavailable the hold is `RESOURCE_UNAVAILABLE`, if the steward cannot be reached it is
-  `STATUS_UNAVAILABLE` (the refusal discloses no private record); grant reserved usage + exposure `<=`
-  `max_total_reserved_cents`; event committed + reserved + exposure `<=` budget
-  (`BUDGET_EXCEEDED`); hold fee within the committed limit.
+* **Holds** apply only to resources with `terms.booking_required`. `hold_resource` checks the
+  following in this order, and the first failing check is the answer:
+  1. `expected_revision` is current (`REVISION_CONFLICT`);
+  2. the resource and the activity are registered (`UNKNOWN_ENTITY`), and both are in the grant's
+     scope (`SCOPE_VIOLATION`);
+  3. the resource has booking terms (`HOLD_NOT_SUPPORTED`);
+  4. the resource is a required resource of the activity or an approved substitute
+     (`CONSTRAINT_VIOLATION`);
+  5. the quantity is at most the resource capacity (`RESOURCE_CONFLICT`);
+  6. the window lies within the resource and activity windows and starts after now
+     (`CONSTRAINT_VIOLATION`);
+  7. the visible resource status is not `unavailable` (`RESOURCE_UNAVAILABLE`);
+  8. `now < commitment cutoff` (`COMMITMENT_CUTOFF_PASSED`);
+  9. capacity over the window, counting the active plan's other assignments, active holds and
+     active commitments (`RESOURCE_CONFLICT`);
+  10. grant reserved usage + exposure `<=` `max_total_reserved_cents` (`BUDGET_EXCEEDED`);
+  11. grant committed usage + hold fee `<=` `max_total_committed_cents` (`BUDGET_EXCEEDED`);
+  12. event committed + reserved + exposure + hold fee `<=` budget (`BUDGET_EXCEEDED`);
+  13. last, immediately before the hold is written, the resource's steward confirms the hold.
+      The steward is its registered status source in the private world, answering at execution
+      time. If it reports the resource unavailable the hold is `RESOURCE_UNAVAILABLE`; if it
+      cannot be reached the hold is `STATUS_UNAVAILABLE`. The refusal discloses no private
+      record.
+
+  Because the steward is consulted only after every public check passes, a hold that fails for a
+  public reason is refused for that reason. The hold lifetime is `min(requested,
+  terms.hold_max_minutes)` (10 minutes when the terms set none); it shortens a hold but never
+  refuses one.
 * **Accounting** is an append-only ledger: `reserve`, `release_reserve`, `expire_reserve`,
   `convert_reserve`, `commit_charge`, `hold_fee`. Unique indexes allow one reservation and one
   return per hold, so release/expiry/conversion can never refund twice. Committed (incurred)
@@ -316,9 +383,15 @@ deduplicated; reusing a record id for different text is rejected.
 `status_model` record whose `available_from <= request time`:
 
 * `ok` → `succeeded` with the observation (kind `status`, scope `resource_status`,
-  `observed_at` = the source record's time, `received_at` = after the 2-minute duration). A
-  record already ingested returns the existing observation (`deduplicated: true`, no revision
-  change). Resource status/ETA update from the typed `structured` facts.
+  `observed_at` = the source record's time, `received_at` = after the 2-minute duration). Its
+  `correlation_group` is the lineage the private status record names
+  (`response.correlation_group`, optional), or `<entity_id>_status` when it names none. The
+  campus fixtures name `projector_delivery_01` for order P17, the same group as the delivery
+  notice and the arrival. The dev01 status observation therefore reproduces
+  `PEEAI_plan/examples/observation_after_query.json` field for field, except the store-assigned
+  `observation_id`. A record already ingested returns the existing observation
+  (`deduplicated: true`, no revision change). Resource status/ETA update from the typed
+  `structured` facts.
 * `unknown` or no record → `unknown` with `STATUS_UNKNOWN`. `unavailable` → `unavailable` with
   `STATUS_UNAVAILABLE`. Neither ingests anything nor changes resource status; both consume the
   duration.
@@ -332,6 +405,44 @@ visible only when the clock reaches it (observation channel `arrival_record`).
 
 `evaluate_candidates` builds a `PlanningSnapshot` from public state and calls
 `CampusAdapter.evaluate`. Evaluation has no side effects on holds, money or the plan.
+
+**Loading a scenario.** `create_episode` refuses a public scenario unless
+`CampusAdapter.validate_config` reports no problem. Every reference must resolve:
+
+* ids of activities, resources, principals, grants and status sources are unique;
+* `initial_state.event_id`, every grant's `event_id` and every visible observation's `event_id`
+  equal the scenario's event id;
+* initial lifecycle records name defined activities, one each;
+* an initial check-in names a registered person resource. If it names a principal, that
+  principal is registered and speaks for the resource;
+* a visible observation concerns a registered resource, an activity, or the event;
+* every grant's principal is registered, and each principal's grant was issued to that
+  principal with that role;
+* `speaks_for_resource_ids` are registered resources;
+* a resource's `terms.status_source_id` is a registered source that lists the resource and
+  answers each of its `queryable_facts`, and queryable facts require a source;
+* there is exactly one `coordinator_agent`.
+
+The keep candidate of the initial plan is then assessed with the planner's own hard checks.
+Any failed check other than `resource_status` and `arrival_assumptions` refuses the load; those
+two depend on status and arrival evidence that the episode is designed to change. A required
+activity without an assignment, or a not-started assignment outside its window, therefore
+refuses the load.
+
+A private case is checked against its public scenario by
+`plan_b/world/validate.py:validate_case`, in both `create_episode` and `run_case`, before
+anything is written:
+
+* the case's `scenario_id` matches;
+* each `status_model` record names a registered resource and one of its queryable facts;
+* a `resource_arrival` names a registered resource, and a `message_delivery` names a
+  registered resource, an activity or the event;
+* actor scripts name registered principals; check-in scripts name a registered resource;
+  observation scripts name a registered entity or none; organizer rules name a registered
+  grant and registered resources.
+
+A refusal raises `ValueError`. The moderator reset route then answers a generic 500 with no
+detail.
 
 **Single edits** from `planning.edit_templates`, in configuration order:
 
@@ -565,7 +676,12 @@ time to the hard end. It wakes the policy when the public revision changed, when
 `wait_until` passed, and on the next tick after a run that exhausted its tool budget, ended
 `incomplete` (for example a lost state read), or saw any revision it did not produce itself
 (an actor action, a world event or an engine transition during its own tool durations). It
-stops if the episode is reset meanwhile: a closed episode's clock never moves, no session is
+never wakes the policy at or after the event close (the engine's `event_closed` record, or the
+clock at `goal.hard_end`), or once the coordinator's current grant has expired. A clean run
+therefore does not end with a rejected `get_event_state` (`GRANT_EXPIRED`), and
+`rejected_attempts_without_receipt` counts only real rejections. The tool budget
+(`max_tool_calls`, 16) bounds one policy run; a run that exhausts it is woken again with a fresh
+budget, so Wave 1 has no per-episode cap. It stops if the episode is reset meanwhile: a closed episode's clock never moves, no session is
 issued for it, a policy run that loses its episode returns `stopped`, and its decisions are not
 written into the closed episode. Moderator controls that race a reset answer 409
 `EPISODE_CLOSED`, and run responses carry `episode_id` and `episode_status`.
@@ -580,6 +696,18 @@ scheduled organizer action is validated against the state at that instant (as if
 before acting). Scheduled tools must have zero duration. Scripted actors are identical for every
 policy. The runner never writes check-ins, observations or grants directly and never tells the
 policy what to do. In the browser, scripted actors are off: people act through role tabs.
+
+**Scoring.** `evaluation/scoring.py:score_episode(final, history, case)` scores from persisted,
+visible records only. It dispatches on `final.profile_id` to
+`DomainAdapter.score_outcome(final, history) -> DomainOutcome(activities, goal_attained, unmet,
+violations)`, then appends the domain-independent spend-limit violations (`budget`,
+`reserved_negative`, `grant_limit`). The goal is complete when the adapter finds it attained and
+no violation was executed. The campus adapter's part is `domain/adapters/campus_outcome.py`.
+Readiness goes through `DomainAdapter.check_readiness(..., mode=)`: the clock engine uses
+`execution`, and the projection uses `preview` for the episode's own profile. Still
+campus-specific in the core are `scoring.HARD_CHECK_IDS` (used by the `infeasibility_reported`
+predicate) and the `equipment_before_arrival` category named by the
+`no_equipment_start_before_arrival` predicate.
 
 ## 13. Trace export and replay
 
@@ -608,6 +736,53 @@ status model, world events or predicates. The browser replay shows a persistent 
 replay** label, labels each tool result with its recorded scenario time, and issues no tool or
 moderator calls.
 
+`source.policy_id` names the policy that actually ran. It is read from the distinct `policy_id`
+values of the episode's recorded decisions: `null` when none were recorded (clock moves and
+participant actions only), the id when one policy decided, and the distinct ids sorted and
+joined with `,` when several did. `POST /api/moderator/export` derives it this way, and
+`plan-b run-case` records the id of the policy its runner ran.
+
+**Verification.** `plan-b verify-trace` (`export_trace.verify_trace_bytes`) and the browser
+replay (`web/src/replay/integrity.ts`) make the same checks and accept and reject the same
+traces. Both read the file's exact bytes; the browser decodes them itself (TextDecoder, fatal,
+`ignoreBOM`), because `Response.text()` and `Blob.text()` drop a byte order mark. The checks are:
+
+* the bytes are UTF-8 without a byte order mark, and the text is one JSON object;
+* no string or key holds a lone UTF-16 surrogate;
+* objects and arrays nest at most 256 levels, and no integer is longer than 4300 digits;
+* `integrity.algorithm` is `sha256`, `kind` is `plan_b_sanitized_trace`, and `trace_version` is
+  `1.0.0`;
+* `integrity.frame_hashes` is a list, and it, `chain_sha256` and `content_sha256` match their
+  recomputation;
+* the last frame's `state.revision` is an integer equal to `final_state.revision` (vacuous with
+  no frames).
+
+Every failure is a reported problem, never a traceback. The CLI prints "intact" or the problems
+and exits 0 or 1. The browser distinguishes a hash mismatch ("not consistent with its own
+hashes") from a structural failure ("consistent with its own hashes, but it fails a structural
+check: …"), and marks the board when any check fails. It reports a verifier that throws as a
+failed check ("could not be checked"), never leaving the banner at "checking". A byte order mark
+or invalid UTF-8 is refused when the file loads, so such a file never renders. The shared
+`trace_cases` in `web/tests/fixtures/canonical_vectors.json` (generated by
+`web/tests/make_vectors.py`) run through both suites (`web/tests/integrity.test.ts`,
+`tests/test_trace_verifier.py`), and each must fail exactly its named check in both.
+
+The hashes are not signed. "Intact" means a trace is consistent with its own hashes; it detects
+corruption, not deliberate edits.
+
+**Replay loading and rendering.** The replay loader (`web/src/replay/loader.ts`) calls fetch only
+as `fetch(url, GET_ONLY)`. `GET_ONLY` is a frozen object with no prototype whose own keys are
+exactly `method: "GET"`, `cache: "no-store"` and `credentials: "omit"`; it has no headers and no
+body. The browser reads every RequestInit member through the prototype chain, so options with a
+prototype could pick up a key that some module put on `Object.prototype`. With no prototype, no
+inherited key reaches the request. The boundary lint (`web/scripts/check-boundaries.mjs`)
+requires this construction.
+
+A trace the replay cannot render never blanks the page. If a frame, the summary or the board
+throws, the banner shows the integrity check as failed whatever the hashes say, and a notice
+("This trace could not be rendered.") takes the board's place. A frame state without
+`latest_evaluation` shows no evaluation.
+
 ## 14. Public/private boundary
 
 Private runner input (`scenarios/private/*.json`, `PrivateCase`) is loaded only by
@@ -618,3 +793,10 @@ must not contain `PrivateCase` fields or values that are not yet public (future 
 future status records, case labels, predicates, `never_expose_to_agent`, `ground_truth`).
 Tests check this by scanning every payload. Case files use opaque names (`dev01`, …).
 Runner-side outcome reports with predicates are written to the private evidence location only.
+Besides `world/` and the runner, `evaluation/export_trace.py` loads the case, and only to refuse an
+export that would leak it. A status record's optional `correlation_group` becomes public with the
+observation made from it. Before that it is a private marker, unless an observation received by
+that scenario time already carries the same lineage. That includes the episode's own
+observations and the public scenario's visible observations, which every episode holds from its
+start (the shipped fixtures use `projector_delivery_01`, public from 16:40 through
+`obs_notice_01`). `plan_b/world/leakcheck.py:private_markers` implements this.

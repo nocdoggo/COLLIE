@@ -994,6 +994,11 @@ textarea {
   border-left: 5px solid var(--ok-line);
 }
 
+/* An applied receipt that changed nothing (a duplicate): neutral, not the green applied. */
+.receipt-no-change {
+  border-left: 5px solid var(--neutral-line);
+}
+
 .receipt-rejected,
 .receipt-attempt {
   border-left: 5px solid var(--bad-line);
@@ -1096,6 +1101,31 @@ textarea {
 
 .replay-banner :focus-visible {
   outline-color: #fbbf24;
+}
+
+.replay-integrity .badge {
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* A trace that failed its integrity check: still readable (text keeps AA contrast at this
+   opacity), but outlined, desaturated and dimmed so its values do not read as recorded fact. */
+.board-untrusted {
+  outline: 3px dashed var(--bad-line);
+  outline-offset: 0.4rem;
+  border-radius: var(--radius);
+  margin-top: var(--gap);
+}
+
+.board-untrusted .board-header,
+.board-untrusted .board-grid,
+.board-untrusted .board-wide {
+  opacity: 0.8;
+  filter: grayscale(0.7);
+}
+
+.board-untrusted-notice {
+  font-size: 1.1rem;
 }
 
 .replay-source {

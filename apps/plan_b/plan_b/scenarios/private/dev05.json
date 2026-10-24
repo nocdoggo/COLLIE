@@ -18,6 +18,7 @@
         "domain_status": "unavailable",
         "reported_eta": null,
         "source_record_id": "order_P17_revision_6",
+        "correlation_group": "projector_delivery_01",
         "observed_at": "2026-11-05T16:40:00-05:00",
         "text": "Order P17 was cancelled by the carrier. No replacement delivery is possible today."
       }

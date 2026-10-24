@@ -2,7 +2,7 @@
 // and does not import src/api.ts: a replay can never call a tool or a moderator control.
 
 import type { SanitizedTrace } from "../types";
-import { traceShapeProblems } from "./integrity";
+import { decodeTraceBytes, traceShapeProblems } from "./integrity";
 
 export interface LoadedTrace {
   /** Where the trace came from, for the banner ("server: name" or "file: name"). */
@@ -12,28 +12,42 @@ export interface LoadedTrace {
   readonly trace: SanitizedTrace;
 }
 
-async function getText(path: string): Promise<string> {
+/**
+ * The loader's only fetch options: a GET with no body, no headers and no credentials. The browser
+ * reads every RequestInit key from the options, inherited ones included, so a `body` or `headers`
+ * key, or a getter that rewrites `method` while the keys are read, that any module put on
+ * Object.prototype would otherwise reach the request. With no prototype the options have only
+ * these own keys, and frozen, nothing can add or change one. The boundary lint requires this
+ * construction and holds the keys to an allowlist, with the method stated: an explicit "GET" also
+ * overrides the method of a Request input.
+ */
+const GET_ONLY: RequestInit = Object.freeze(
+  Object.assign(Object.create(null) as RequestInit, {
+    method: "GET",
+    cache: "no-store",
+    credentials: "omit",
+  } satisfies RequestInit),
+);
+
+/** The response body's exact bytes: response.text() would drop a leading byte order mark. */
+async function getBytes(path: string): Promise<Uint8Array> {
   let response: Response;
   try {
-    response = await fetch(path, {
-      method: "GET",
-      headers: { Accept: "application/json" },
-      cache: "no-store",
-      credentials: "omit",
-    });
+    response = await fetch(path, GET_ONLY);
   } catch {
     throw new Error("The server could not be reached.");
   }
-  const text = await response.text();
+  const bytes = new Uint8Array(await response.arrayBuffer());
   if (!response.ok) {
+    const text = new TextDecoder().decode(bytes);
     throw new Error(`HTTP ${response.status}: ${text.slice(0, 300) || response.statusText}`);
   }
-  return text;
+  return bytes;
 }
 
 /** Names of the traces the server offers. Accepts a list of names or of {name} objects. */
 export async function listReplays(): Promise<string[]> {
-  const text = await getText("/api/replays");
+  const text = new TextDecoder().decode(await getBytes("/api/replays"));
   let body: unknown;
   try {
     body = JSON.parse(text);
@@ -67,12 +81,19 @@ export function parseTrace(text: string, origin: string): LoadedTrace {
   return { origin, text, trace: value as SanitizedTrace };
 }
 
+/**
+ * Decode a trace file's exact bytes, then parse it. A byte order mark or bytes that are not
+ * UTF-8 are rejected here, as `plan-b verify-trace` rejects them, so such a file never renders.
+ */
+export function parseTraceBytes(bytes: Uint8Array, origin: string): LoadedTrace {
+  return parseTrace(decodeTraceBytes(bytes), origin);
+}
+
 export async function loadServerReplay(name: string): Promise<LoadedTrace> {
-  const text = await getText(`/api/replays/${encodeURIComponent(name)}`);
-  return parseTrace(text, `server: ${name}`);
+  return parseTraceBytes(await getBytes(`/api/replays/${encodeURIComponent(name)}`), `server: ${name}`);
 }
 
 export async function loadLocalReplay(file: File): Promise<LoadedTrace> {
-  const text = await file.text();
-  return parseTrace(text, `file: ${file.name}`);
+  // file.text() would drop a leading byte order mark as well.
+  return parseTraceBytes(new Uint8Array(await file.arrayBuffer()), `file: ${file.name}`);
 }

@@ -1,6 +1,6 @@
 // What a panel may claim about its own submissions. Kept free of React so tests can check it.
 
-import { APPLIED_UNCONFIRMED_LABEL, RECEIPT_STATUS_LABEL } from "../format";
+import { APPLIED_UNCONFIRMED_LABEL, appliedWithoutChange, receiptLabel } from "../format";
 import type { StatusLabel } from "../format";
 import type { ActionReceipt, EventStateView, JsonObject } from "../types";
 import type { PanelName, Submission } from "./useMutations";
@@ -13,10 +13,28 @@ export function receiptConfirmed(receipt: ActionReceipt, view: EventStateView): 
   );
 }
 
-/** The badge for a submission's receipt: green "Applied" only after that confirmation. */
+/**
+ * The badge for a submission's receipt: green "Applied" only after that confirmation, and never
+ * for an applied receipt that changed nothing (a duplicate).
+ */
 export function receiptBadge(receipt: ActionReceipt, view: EventStateView): StatusLabel {
   if (receipt.status === "applied" && !receiptConfirmed(receipt, view)) return APPLIED_UNCONFIRMED_LABEL;
-  return RECEIPT_STATUS_LABEL[receipt.status];
+  return receiptLabel(receipt);
+}
+
+/** The live-region announcement once a receipt is in hand and a fresh state read was tried. */
+export function receiptAnnouncement(label: string, receipt: ActionReceipt, fresh: EventStateView | null): string {
+  if (receipt.status === "rejected") {
+    return `${label}: rejected. ${receipt.error_code ?? ""} ${receipt.error_message ?? ""}`.trim();
+  }
+  if (receipt.status === "unknown") return `${label}: unresolved. The outcome is not established.`;
+  if (fresh === null || !receiptConfirmed(receipt, fresh)) {
+    return `${label}: the receipt says applied, but a fresh state read does not show it yet.`;
+  }
+  if (appliedWithoutChange(receipt)) {
+    return `${label}: applied, no change (duplicate). Nothing new was recorded; the state stays at revision ${receipt.revision_after}.`;
+  }
+  return `${label}: applied and confirmed in state revision ${fresh.revision}.`;
 }
 
 /**

@@ -8,8 +8,10 @@ from __future__ import annotations
 
 from collections import Counter
 from datetime import datetime
-from typing import Any
 
+from plan_b.domain.adapters.base import ReadinessBasis, ReadinessMode
+from plan_b.domain.adapters.campus_outcome import score_campus_outcome
+from plan_b.domain.adapters.outcome import DomainOutcome
 from plan_b.domain.candidates import (
     apply_edits,
     candidate_ids,
@@ -32,6 +34,7 @@ from plan_b.domain.models import (
     Assignment,
     CandidateResult,
     Edit,
+    EpisodeHistory,
     EvaluationRequest,
     EvaluationResult,
     EventStateView,
@@ -50,11 +53,16 @@ from plan_b.domain.objective import (
     rank_candidates,
     unsupported_tie_breaks,
 )
+from plan_b.domain.projection import initial_snapshot
 from plan_b.domain.readiness import check_readiness
-from plan_b.domain.timeutil import DISPLAY_TIMEZONE, fmt_ts, minutes_between
+from plan_b.domain.timeutil import DISPLAY_TIMEZONE, minutes_between
 
 ADAPTER_ID = "campus/1.0.0"
 PROFILE_IDS = ("campus_showcase", "community_skills_exchange")
+# Hard checks the initial plan may fail at load: they depend on status and arrival evidence
+# that the episode is designed to change (a resource awaiting delivery, or already reported
+# unavailable, is a scenario rather than a configuration error).
+EVIDENCE_DEPENDENT_CHECKS = frozenset({"resource_status", "arrival_assumptions"})
 
 
 def _sentence_part(detail: str) -> str:
@@ -138,6 +146,11 @@ class CampusAdapter:
     # -- configuration -----------------------------------------------------
 
     def validate_config(self, scenario: PublicScenario) -> list[str]:
+        """Every reference resolves, and the initial plan passes the planner's hard checks.
+
+        The initial plan is checked last, once everything else is valid (the planner assumes
+        resolved references). Its keep candidate may fail only the evidence-dependent checks
+        (``EVIDENCE_DEPENDENT_CHECKS``)."""
         problems: list[str] = []
         if scenario.profile_id not in self.profile_ids:
             problems.append(f"profile {scenario.profile_id} is not served by {self.adapter_id}")
@@ -147,7 +160,13 @@ class CampusAdapter:
         resource_ids = [r.resource_id for r in scenario.resources]
         activities = {a.activity_id: a for a in scenario.activities}
         resources = {r.resource_id: r for r in scenario.resources}
-        for kind, ids in (("activity", activity_ids), ("resource", resource_ids)):
+        for kind, ids in (
+            ("activity", activity_ids),
+            ("resource", resource_ids),
+            ("principal", [p.principal_id for p in scenario.principals]),
+            ("grant", [g.grant_id for g in scenario.authority_grants]),
+            ("status source", [s.source_id for s in scenario.status_sources]),
+        ):
             for dup in sorted({i for i in ids if ids.count(i) > 1}):
                 problems.append(f"duplicate {kind} id {dup}")
         goal = scenario.goal
@@ -188,6 +207,8 @@ class CampusAdapter:
             for rid in assignment.resource_ids:
                 if rid not in resources:
                     problems.append(f"initial assignment {aid} uses unregistered resource {rid}")
+        problems.extend(self._initial_state_problems(scenario, activities, resources))
+        problems.extend(self._status_term_problems(scenario))
         problems.extend(self._template_problems(scenario, activities, resources))
         for name in unsupported_tie_breaks(scenario.planning.tie_breaks):
             problems.append(f"tie-break {name} is not supported")
@@ -208,8 +229,13 @@ class CampusAdapter:
             for eid in source.entity_ids:
                 if eid not in resources:
                     problems.append(f"status source {source.source_id}: unknown entity {eid}")
-        grant_ids = {g.grant_id for g in scenario.authority_grants}
+        principals = {p.principal_id for p in scenario.principals}
+        grants = {g.grant_id: g for g in scenario.authority_grants}
         for grant in scenario.authority_grants:
+            if grant.event_id != scenario.event_id:
+                problems.append(f"grant {grant.grant_id} is for event {grant.event_id}")
+            if grant.principal_id not in principals:
+                problems.append(f"grant {grant.grant_id}: unknown principal {grant.principal_id}")
             for rid in grant.resource_ids:
                 if rid not in resources:
                     problems.append(f"grant {grant.grant_id}: unknown resource {rid}")
@@ -217,9 +243,115 @@ class CampusAdapter:
                 if aid not in activities:
                     problems.append(f"grant {grant.grant_id}: unknown activity {aid}")
         for principal in scenario.principals:
-            if principal.grant_id not in grant_ids:
-                problems.append(f"principal {principal.principal_id}: unknown grant")
+            pid = principal.principal_id
+            held = grants.get(principal.grant_id)
+            if held is None:
+                problems.append(f"principal {pid}: unknown grant")
+            elif (held.principal_id, held.principal_role) != (pid, principal.role):
+                problems.append(
+                    f"principal {pid} ({principal.role}) holds grant {held.grant_id}, issued to "
+                    f"{held.principal_id} ({held.principal_role})"
+                )
+            for rid in principal.speaks_for_resource_ids:
+                if rid not in resources:
+                    problems.append(f"principal {pid} speaks for unknown resource {rid}")
+        coordinators = sum(1 for p in scenario.principals if p.role == "coordinator_agent")
+        if coordinators != 1:
+            problems.append(f"{coordinators} coordinator_agent principals; exactly one is required")
+        if not problems:
+            problems.extend(self._initial_plan_problems(scenario))
         return problems
+
+    @staticmethod
+    def _initial_state_problems(
+        scenario: PublicScenario,
+        activities: dict[str, ActivityDef],
+        resources: dict[str, ResourceDef],
+    ) -> list[str]:
+        """Lifecycle, check-in and observation references of the loaded state."""
+        problems: list[str] = []
+        st = scenario.initial_state
+        if st.event_id != scenario.event_id:
+            problems.append(f"initial state is for event {st.event_id}, not {scenario.event_id}")
+        recorded: set[str] = set()
+        for lc in st.lifecycle:
+            if lc.activity_id not in activities:
+                problems.append(f"initial lifecycle record for unknown activity {lc.activity_id}")
+            if lc.activity_id in recorded:
+                problems.append(f"activity {lc.activity_id} has more than one lifecycle record")
+            recorded.add(lc.activity_id)
+        principals = {p.principal_id: p for p in scenario.principals}
+        for c in st.checked_in:
+            resource = resources.get(c.resource_id)
+            if resource is None:
+                problems.append(f"initial check-in for unregistered resource {c.resource_id}")
+            elif resource.kind != "person":
+                problems.append(f"initial check-in for {c.resource_id}, which is not a person")
+            if c.principal_id is None:
+                continue
+            principal = principals.get(c.principal_id)
+            if principal is None:
+                problems.append(f"initial check-in by unknown principal {c.principal_id}")
+            elif c.resource_id not in principal.speaks_for_resource_ids:
+                problems.append(
+                    f"initial check-in: {c.principal_id} does not speak for {c.resource_id}"
+                )
+        # The entities an observation may concern, as in submit_observation.
+        entities = set(activities) | set(resources) | {scenario.event_id}
+        for obs in scenario.visible_observations:
+            if obs.event_id != scenario.event_id:
+                problems.append(f"observation {obs.observation_id} is for event {obs.event_id}")
+            if obs.entity_id not in entities:
+                problems.append(f"observation {obs.observation_id}: unknown entity {obs.entity_id}")
+        return problems
+
+    @staticmethod
+    def _status_term_problems(scenario: PublicScenario) -> list[str]:
+        """A resource's status source must be registered and answer its queryable facts for it,
+        as ``query_status`` requires."""
+        problems: list[str] = []
+        sources = {s.source_id: s for s in scenario.status_sources}
+        for resource in scenario.resources:
+            rid = resource.resource_id
+            sid = resource.terms.status_source_id
+            if sid is None:
+                if resource.terms.queryable_facts:
+                    problems.append(f"{rid} lists queryable facts but no status source")
+                continue
+            source = sources.get(sid)
+            if source is None:
+                problems.append(f"{rid} status source {sid} is not registered")
+                continue
+            if rid not in source.entity_ids:
+                problems.append(f"status source {sid} does not cover {rid}")
+            for fact in resource.terms.queryable_facts:
+                if fact not in source.facts:
+                    problems.append(f"status source {sid} does not answer {fact} for {rid}")
+        return problems
+
+    @staticmethod
+    def _initial_plan_problems(scenario: PublicScenario) -> list[str]:
+        """The keep candidate at load, assessed by the planner's own hard checks."""
+        snapshot = initial_snapshot(scenario)
+        agent = next(p for p in scenario.principals if p.role == "coordinator_agent")
+        grant = next(g for g in scenario.authority_grants if g.grant_id == agent.grant_id)
+        actor = ActorContext(
+            principal_id=agent.principal_id,
+            role="coordinator_agent",
+            grant=grant,
+            grant_version=1,
+            grant_valid=snapshot.clock < grant.expires_at,
+            committed_used_cents=0,
+            reserved_used_cents=0,
+        )
+        assessment = assess_candidate(
+            build_context(snapshot), actor, snapshot.plan.assignments, (), hypothetical=False
+        )
+        return [
+            f"initial plan fails {c.constraint_id}: {_sentence_part(c.detail)}"
+            for c in assessment.checks
+            if c.status == "failed" and c.constraint_id not in EVIDENCE_DEPENDENT_CHECKS
+        ]
 
     @staticmethod
     def _template_problems(
@@ -408,7 +540,12 @@ class CampusAdapter:
     # -- execution and outcome --------------------------------------------
 
     def check_readiness(
-        self, snapshot: PlanningSnapshot, activity_id: str, at: datetime
+        self,
+        snapshot: ReadinessBasis,
+        activity_id: str,
+        at: datetime,
+        *,
+        mode: ReadinessMode = "execution",
     ) -> ReadinessReport:
         definitions = {v.definition.activity_id: v.definition for v in snapshot.activities}
         if activity_id not in definitions:
@@ -418,7 +555,7 @@ class CampusAdapter:
             activity=definitions[activity_id],
             assignment=assignments.get(activity_id),
             at=at,
-            mode="execution",
+            mode=mode,
             lifecycles={v.definition.activity_id: v.lifecycle for v in snapshot.activities},
             assignments=assignments,
             resources={r.definition.resource_id: r for r in snapshot.resources},
@@ -427,79 +564,7 @@ class CampusAdapter:
             program_activity_ids={aid for aid, d in definitions.items() if d.program},
         )
 
-    def score_outcome(self, view: EventStateView) -> dict[str, Any]:
-        """Goal attainment computed only from the visible state."""
-        goal = view.goal
-        rows: list[dict[str, Any]] = []
-        by_id: dict[str, dict[str, Any]] = {}
-        started_at: dict[str, datetime] = {}
-        for activity in view.activities:
-            history = sorted(activity.history, key=lambda e: e.seq)
-            started = next((e for e in history if e.state == "started"), None)
-            completed = next((e for e in history if e.state == "completed"), None)
-            failed = next((e for e in history if e.state == "failed"), None)
-            aid = activity.definition.activity_id
-            if started is not None:
-                started_at[aid] = started.at
-            assignment = activity.assignment
-            row: dict[str, Any] = {
-                "activity_id": aid,
-                "required": aid in goal.required_activity_ids,
-                "lifecycle": activity.lifecycle,
-                "assigned_start": fmt_ts(assignment.start) if assignment else None,
-                "assigned_end": fmt_ts(assignment.end) if assignment else None,
-                "started_at": fmt_ts(started.at) if started else None,
-                "completed_at": fmt_ts(completed.at) if completed else None,
-                "completed_by_deadline": (
-                    activity.lifecycle == "completed"
-                    and completed is not None
-                    and completed.at <= goal.hard_end
-                ),
-                "failure_reasons": list(failed.reasons) if failed else [],
-            }
-            rows.append(row)
-            by_id[aid] = row
-        required = list(goal.required_activity_ids)
-        on_time = [aid for aid in required if aid in by_id and by_id[aid]["completed_by_deadline"]]
-        opening = self._opening_activity(view)
-        opening_started = started_at.get(opening) if opening else None
-        delay = (
-            minutes_between(goal.public_start, opening_started)
-            if opening_started is not None
-            else None
-        )
-        budget = view.budget
-        return {
-            "adapter_id": self.adapter_id,
-            "event_id": view.event_id,
-            "evaluated_at": fmt_ts(view.clock),
-            "goal_version": goal.version,
-            "hard_end": fmt_ts(goal.hard_end),
-            "activities": rows,
-            "required_total": len(required),
-            "required_completed_by_deadline": len(on_time),
-            "missing_required_activity_ids": [aid for aid in required if aid not in on_time],
-            "all_required_completed_by_deadline": len(on_time) == len(required),
-            "public_start": fmt_ts(goal.public_start),
-            "opening_activity_id": opening,
-            "opening_started_at": fmt_ts(opening_started) if opening_started else None,
-            "opening_start_delay_minutes": delay,
-            "opened_on_time": delay is not None and delay <= 0,
-            "budget_cents": budget.budget_cents,
-            "committed_cents": budget.committed_cents,
-            "reserved_cents": budget.reserved_cents,
-            "within_budget": budget.committed_cents + budget.reserved_cents <= budget.budget_cents,
-        }
-
-    @staticmethod
-    def _opening_activity(view: EventStateView) -> str | None:
-        """The required activity whose assignment starts first at or after the public start."""
-        public_start = view.goal.public_start
-        assigned = [
-            (a.assignment.start, a.definition.activity_id)
-            for a in view.activities
-            if a.assignment is not None
-            and a.definition.activity_id in view.goal.required_activity_ids
-            and a.assignment.start >= public_start
-        ]
-        return min(assigned)[1] if assigned else None
+    def score_outcome(self, final: EventStateView, history: EpisodeHistory) -> DomainOutcome:
+        """Required activities completed by the hard end, and the executed-rule violations
+        (program overlap, resource capacity, starts without their evidence, late completion)."""
+        return score_campus_outcome(final, history)

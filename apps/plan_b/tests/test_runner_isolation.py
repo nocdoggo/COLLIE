@@ -40,7 +40,11 @@ ISOLATED_MODULES = (
     "domain/candidates.py",
     "domain/constraints.py",
     "domain/objective.py",
+    "domain/adapters/base.py",
     "domain/adapters/campus.py",
+    "domain/adapters/campus_outcome.py",
+    "domain/adapters/outcome.py",
+    "domain/adapters/registry.py",
     "domain/projection.py",
     "domain/readiness.py",
 )

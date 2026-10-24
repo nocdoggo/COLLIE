@@ -242,7 +242,9 @@ def query_status(ctx: Ctx) -> Outcome:
             kind="status",
             source_id=source.source_id,
             source_record_id=resp.source_record_id,
-            correlation_group=f"{resource.resource_id}_status",
+            # The source names the lineage its record belongs to (the order's delivery, the
+            # same group as its notices and arrival); a record that names none is its own.
+            correlation_group=resp.correlation_group or f"{resource.resource_id}_status",
             observed_at=resp.observed_at,
             received_at=ctx.now,
             valid_window=validity_window(resp.observed_at, goal.hard_end),
@@ -409,29 +411,6 @@ def hold_resource(ctx: Ctx) -> Outcome:
             f"{resource.resource_id} is reported unavailable",
             {"status_observation_id": res_view.status_observation_id},
         )
-    # A hold is a request to the resource's steward, who knows whether the resource is really
-    # free. The answer is what a real booking refusal would say; the private record itself (its
-    # id and text) is not disclosed.
-    if terms.status_source_id is not None and terms.queryable_facts:
-        steward = world_for_episode(ctx.conn, ctx.episode_id).status_answer(
-            resource.resource_id, terms.queryable_facts[0], ctx.now
-        )
-        if steward is not None and steward.outcome == "unavailable":
-            raise Rejection(
-                "STATUS_UNAVAILABLE",
-                f"the steward of {resource.resource_id} could not be reached to confirm a hold",
-            )
-        if (
-            steward is not None
-            and steward.outcome == "ok"
-            and steward.response is not None
-            and steward.response.domain_status == "unavailable"
-        ):
-            raise Rejection(
-                "RESOURCE_UNAVAILABLE",
-                f"the steward of {resource.resource_id} declined the hold: it is not available"
-                " for that window",
-            )
     cutoff = None
     if terms.commitment_cutoff_minutes_before_use is not None:
         cutoff = window.start - timedelta(minutes=terms.commitment_cutoff_minutes_before_use)
@@ -478,6 +457,31 @@ def hold_resource(ctx: Ctx) -> Outcome:
     max_minutes = terms.hold_max_minutes or 10
     minutes = min(args.hold_minutes or max_minutes, max_minutes)
     expires = ctx.now + timedelta(minutes=minutes)
+    # A hold is a request to the resource's steward, who knows whether the resource is really
+    # free. The steward is asked last, so a hold that fails for a public reason (cutoff,
+    # capacity, authority, budget) is refused for that reason without consulting it. The answer
+    # is what a real booking refusal would say; the private record itself (its id and text) is
+    # not disclosed.
+    if terms.status_source_id is not None and terms.queryable_facts:
+        steward = world_for_episode(ctx.conn, ctx.episode_id).status_answer(
+            resource.resource_id, terms.queryable_facts[0], ctx.now
+        )
+        if steward is not None and steward.outcome == "unavailable":
+            raise Rejection(
+                "STATUS_UNAVAILABLE",
+                f"the steward of {resource.resource_id} could not be reached to confirm a hold",
+            )
+        if (
+            steward is not None
+            and steward.outcome == "ok"
+            and steward.response is not None
+            and steward.response.domain_status == "unavailable"
+        ):
+            raise Rejection(
+                "RESOURCE_UNAVAILABLE",
+                f"the steward of {resource.resource_id} declined the hold: it is not available"
+                " for that window",
+            )
     hold_id = f"hold_{repo.next_seq(ctx.conn, ctx.episode_id, 'hold'):04d}"
     ctx.conn.execute(
         "INSERT INTO holds (episode_id, hold_id, resource_id, activity_id, quantity, window_start,"

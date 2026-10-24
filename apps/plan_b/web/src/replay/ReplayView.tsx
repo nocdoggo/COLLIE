@@ -2,33 +2,155 @@
 // the browser, and steps through its frames rendering the same board read-only. Nothing here
 // imports src/api.ts or the role panels: a replay cannot issue a tool or moderator call.
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import type { ChangeEvent } from "react";
+import { Component, useCallback, useEffect, useRef, useState } from "react";
+import type { ChangeEvent, ReactNode } from "react";
 
 import { BoardView } from "../board/BoardView";
 import { PRODUCT_NAME, SANDBOX_NOTICE } from "../components/BoardHeader";
 import { EvidenceCard } from "../components/EvidenceCard";
-import { Code, Empty, Section, Tag, When } from "../components/ui";
+import { Code, Empty, Section, StatusBadge, Tag, When } from "../components/ui";
 import { fmtTime } from "../format";
-import type { CompactedStateView, EventStateView, SanitizedTrace, ToolCallRecord } from "../types";
-
-/** Restore a frame's latest_evaluation from the trace's evaluations map (traces store each
- * evaluation once). A missing reference shows no evaluation rather than a guessed one. */
-function rehydrateState(trace: SanitizedTrace, state: CompactedStateView): EventStateView {
-  const latest = state.latest_evaluation;
-  if (latest !== null && "evaluation_ref" in latest) {
-    return { ...state, latest_evaluation: trace.evaluations?.[latest.evaluation_ref] ?? null };
-  }
-  return { ...state, latest_evaluation: latest };
-}
-import { CHAIN_FOLD_DESCRIPTION, verifyTraceText } from "./integrity";
-import type { IntegrityReport } from "./integrity";
+import type { StatusLabel } from "../format";
+import type { CompactedStateView, EvaluationResult, EventStateView, SanitizedTrace, ToolCallRecord } from "../types";
+import {
+  CHAIN_FOLD_DESCRIPTION,
+  checkTraceIntegrity,
+  describeError,
+  failedStructuralChecks,
+  hashesFailed,
+  integrityState,
+} from "./integrity";
+import type { IntegrityReport, IntegrityState } from "./integrity";
 import { listReplays, loadLocalReplay, loadServerReplay } from "./loader";
 import type { LoadedTrace } from "./loader";
 
+/**
+ * Restore a frame's latest_evaluation from the trace's evaluations map (traces store each
+ * evaluation once). A missing reference shows no evaluation rather than a guessed one, and so does
+ * a frame state that lacks the field or holds something other than an object there (a hand-made
+ * or synthetic trace can): rehydration never throws. The reference is looked up as an own key, so
+ * "constructor" or "toString" finds nothing.
+ */
+export function rehydrateState(trace: SanitizedTrace, state: CompactedStateView): EventStateView {
+  const latest: unknown = state.latest_evaluation;
+  if (typeof latest !== "object" || latest === null) return { ...state, latest_evaluation: null };
+  if (!("evaluation_ref" in latest)) return { ...state, latest_evaluation: latest as EvaluationResult };
+  const ref: unknown = latest.evaluation_ref;
+  const evaluations: unknown = trace.evaluations;
+  const found =
+    typeof ref === "string" && typeof evaluations === "object" && evaluations !== null && Object.hasOwn(evaluations, ref)
+      ? (evaluations as Record<string, EvaluationResult>)[ref]
+      : undefined;
+  return { ...state, latest_evaluation: found ?? null };
+}
+
+export const UNRENDERABLE_NOTICE = "This trace could not be rendered.";
+
+/**
+ * The banner's report for a trace the replay could not render: a failed check, whatever its
+ * hashes say, as for a verifier that throws.
+ */
+export const renderFailureReport = (message: string): IntegrityReport => ({
+  status: "malformed",
+  reason: `${UNRENDERABLE_NOTICE} ${message}`,
+});
+
+/** What the replay shows in place of the board when rendering the trace failed. */
+export function UnrenderableNotice({ message }: { message: string }) {
+  return (
+    <div className="notice tone-bad" role="alert" data-replay-render="failed">
+      <p>
+        <span aria-hidden="true">✖ </span>
+        <strong>{UNRENDERABLE_NOTICE}</strong> Rendering it failed with: {message}
+      </p>
+      <p className="small">
+        The board is not shown, and the replay counts the trace as failed, whatever its hashes say. The
+        Trace card above still lists its hash checks; open another trace to continue.
+      </p>
+    </div>
+  );
+}
+
+/** Calls its render function, so that what the function throws is thrown inside the guard. */
+function Deferred({ render }: { render: () => ReactNode }) {
+  return <>{render()}</>;
+}
+
+interface RenderGuardProps {
+  /** Called once with the error's message when rendering the guarded part fails. */
+  readonly onError: (message: string) => void;
+  /** Shown in place of the guarded part after a failure. */
+  readonly fallback: (message: string) => ReactNode;
+  /** Renders the guarded part. It runs inside the guard, so what it throws is caught too. */
+  readonly children: () => ReactNode;
+}
+
+interface RenderGuardState {
+  /** The message of the error that stopped rendering, or null. */
+  readonly error: string | null;
+}
+
+/**
+ * An error boundary for the parts of the replay that render trace data. A trace whose shape the
+ * board does not expect would otherwise unmount the whole page, leaving it blank with no
+ * integrity banner; the guard shows its fallback instead and reports the failure, so the replay
+ * marks the trace as failed. React calls the boundary methods only in a browser, not in
+ * server rendering.
+ */
+export class ReplayRenderGuard extends Component<RenderGuardProps, RenderGuardState> {
+  override state: RenderGuardState = { error: null };
+
+  static getDerivedStateFromError(error: unknown): RenderGuardState {
+    return { error: describeError(error) };
+  }
+
+  override componentDidCatch(error: unknown): void {
+    this.props.onError(describeError(error));
+  }
+
+  override render(): ReactNode {
+    const { error } = this.state;
+    return error !== null ? this.props.fallback(error) : <Deferred render={this.props.children} />;
+  }
+}
+
 const PLAY_MS = 1500;
 
-function IntegrityPanel({ report }: { report: IntegrityReport | "checking" }) {
+/** What a passing check can and cannot show (review WEB-2). */
+export const UNSIGNED_NOTE =
+  "The hashes are not signed, so this check detects corruption, not deliberate edits: whoever " +
+  "edits a trace can recompute them.";
+
+export const UNTRUSTED_BOARD_NOTICE = "Integrity check failed: the values below may not be what was recorded.";
+
+const BANNER_INTEGRITY: Record<IntegrityState, StatusLabel> = {
+  checking: { text: "Integrity: checking…", icon: "⧗", tone: "info" },
+  passed: { text: "Integrity check passed (hashes not signed)", icon: "✔", tone: "ok" },
+  failed: { text: "Integrity check failed: values may not be what was recorded", icon: "✖", tone: "bad" },
+  not_checked: { text: "Integrity not checked", icon: "?", tone: "warn" },
+};
+
+const RECOMPUTED = "recomputed in this browser (SHA-256 of canonical JSON)";
+
+/**
+ * The sentence after "Integrity check passed." or "Integrity check failed.". A failure names
+ * what failed: the trace's own hashes, or a structural check (the algorithm label, kind, trace
+ * version, or the final state's revision against the last frame's), which a trace can fail even
+ * when every hash matches.
+ */
+export function integrityHeadline(report: Extract<IntegrityReport, { status: "checked" }>): string {
+  if (report.ok) return `The trace is consistent with its own hashes, ${RECOMPUTED}.`;
+  const hashes = hashesFailed(report);
+  const structural = failedStructuralChecks(report);
+  const verdict = hashes
+    ? `The trace is not consistent with its own hashes, ${RECOMPUTED}`
+    : "The trace is consistent with its own hashes";
+  const checks =
+    structural.length > 0 ? `, ${hashes ? "and" : "but"} it fails a structural check: ${structural.join(", ")}` : "";
+  return `${verdict}${checks}. The values on the board may not be what was recorded.`;
+}
+
+export function IntegrityPanel({ report }: { report: IntegrityReport | "checking" }) {
   if (report === "checking") return <p className="notice tone-info">Checking integrity hashes…</p>;
   if (report.status === "unavailable") {
     return (
@@ -40,30 +162,43 @@ function IntegrityPanel({ report }: { report: IntegrityReport | "checking" }) {
   }
   if (report.status === "malformed") {
     return (
-      <p className="notice tone-bad">
-        <span aria-hidden="true">✖ </span>
-        <strong>Integrity check failed:</strong> {report.reason}
-      </p>
+      <div className="notice tone-bad">
+        <p>
+          <span aria-hidden="true">✖ </span>
+          <strong>Integrity check failed:</strong> {report.reason}
+        </p>
+        <p className="small">The values on the board may not be what was recorded.</p>
+      </div>
     );
   }
   const failedFrames = report.frames.filter((f) => !f.ok);
+  const revision = report.finalRevision;
   return (
     <div className={`notice ${report.ok ? "tone-ok" : "tone-bad"}`}>
       <p>
         <span aria-hidden="true">{report.ok ? "✔ " : "✖ "}</span>
-        <strong>{report.ok ? "Integrity check passed." : "Integrity check failed."}</strong> Hashes were
-        recomputed in this browser (SHA-256 of canonical JSON).
+        <strong>{report.ok ? "Integrity check passed." : "Integrity check failed."}</strong>{" "}
+        {integrityHeadline(report)}
       </p>
+      <p className="small">{UNSIGNED_NOTE}</p>
       <ul className="small">
         <li>
           {report.algorithmOk ? "✓" : "✖"} Algorithm: {report.algorithm ?? "missing"}
         </li>
         <li>
+          {report.kindOk ? "✓" : "✖"} Kind: {report.kind ?? "missing"}
+        </li>
+        <li>
+          {report.traceVersionOk ? "✓" : "✖"} Trace version: {report.traceVersion ?? "missing"}
+        </li>
+        <li>
           {report.framesOk ? "✓" : "✖"} Frame hashes: {report.frameCount - failedFrames.length} of {report.frameCount}{" "}
           match
-          {report.listedFrameHashes !== report.frameCount
-            ? ` (the trace lists ${report.listedFrameHashes} hashes for ${report.frameCount} frames)`
-            : ""}
+          {report.listedFrameHashes === null
+            ? " (the trace's integrity.frame_hashes is missing or not a list)"
+            : report.listedFrameHashes !== report.frameCount
+              ? ` (the trace lists ${report.listedFrameHashes} hashes for ${report.frameCount} frames)`
+              : ""}
           {failedFrames.length > 0 ? `; mismatched frames: ${failedFrames.map((f) => f.index + 1).join(", ")}` : ""}
         </li>
         <li>
@@ -72,7 +207,54 @@ function IntegrityPanel({ report }: { report: IntegrityReport | "checking" }) {
         <li>
           {report.content.ok ? "✓" : "✖"} Content hash (everything except the integrity block)
         </li>
+        <li>
+          {revision.ok ? "✓" : "✖"}{" "}
+          {report.frameCount === 0
+            ? "Final state: no frames to compare it with"
+            : `Final state revision ${revision.finalState ?? "missing"} ${revision.ok ? "matches" : "differs from"} the last frame's (${revision.lastFrame ?? "missing"})`}
+        </li>
       </ul>
+    </div>
+  );
+}
+
+/** The sticky replay banner, with the integrity state once a trace is loaded. */
+export function ReplayBanner({ integrity }: { integrity: IntegrityReport | "checking" | null }) {
+  const state = integrity !== null ? integrityState(integrity) : null;
+  return (
+    <div className="replay-banner" role="status">
+      <span className="replay-banner-title">
+        <span aria-hidden="true">▸ </span>Recorded replay
+      </span>
+      <span>
+        Not live. This page plays back a saved trace and never calls tools. {PRODUCT_NAME} · {SANDBOX_NOTICE}
+      </span>
+      {state !== null ? (
+        <span className="replay-integrity" data-integrity={state}>
+          <StatusBadge label={BANNER_INTEGRITY[state]} />
+        </span>
+      ) : null}
+      <a className="button secondary small" href="#/">
+        Leave replay
+      </a>
+    </div>
+  );
+}
+
+/**
+ * The board of a trace that failed its integrity check stays viewable but is marked: a notice
+ * above it, a dashed outline, and dimmed sections (the frame controls stay at full strength).
+ */
+export function ReplayBoardFrame({ failed, children }: { failed: boolean; children: ReactNode }) {
+  if (!failed) return <>{children}</>;
+  return (
+    <div className="board-untrusted" data-integrity="failed">
+      <p className="notice tone-bad board-untrusted-notice">
+        <span aria-hidden="true">✖ </span>
+        <strong>{UNTRUSTED_BOARD_NOTICE}</strong> They stay viewable so the trace can be inspected;
+        the Trace card lists the checks that failed.
+      </p>
+      {children}
     </div>
   );
 }
@@ -133,21 +315,30 @@ export function ReplayView({ initialName }: { initialName: string | null }) {
   const [index, setIndex] = useState(0);
   const [showFinal, setShowFinal] = useState(false);
   const [playing, setPlaying] = useState(false);
+  /** The first render failure of the loaded trace, if any (see ReplayRenderGuard). */
+  const [renderError, setRenderError] = useState<string | null>(null);
+  /** Counts loads, so that each trace gets fresh render guards. */
+  const [loadId, setLoadId] = useState(0);
   const loadSeq = useRef(0);
 
   const accept = useCallback((trace: LoadedTrace) => {
     loadSeq.current += 1;
     const seq = loadSeq.current;
     setLoaded(trace);
+    setLoadId(seq);
+    setRenderError(null);
     setLoadError(null);
     setIndex(0);
     setShowFinal(false);
     setPlaying(false);
     setIntegrity("checking");
-    void verifyTraceText(trace.text).then((report) => {
+    // checkTraceIntegrity always settles with a report: a verifier that throws is a failed check.
+    void checkTraceIntegrity(trace.text).then((report) => {
       if (loadSeq.current === seq) setIntegrity(report);
     });
   }, []);
+
+  const renderFailed = useCallback((message: string) => setRenderError((first) => first ?? message), []);
 
   const loadName = useCallback(
     async (name: string) => {
@@ -242,19 +433,20 @@ export function ReplayView({ initialName }: { initialName: string | null }) {
     return () => window.clearTimeout(timer);
   }, [playing, index, last]);
 
-  const frame = trace !== null && frameCount > 0 ? trace.frames[Math.min(index, last)] ?? null : null;
-  const state =
-    trace === null ? null : showFinal ? trace.final_state : frame !== null ? rehydrateState(trace, frame.state) : null;
-  const tz = state?.timezone ?? "UTC";
-  const callsSoFar =
-    trace === null
-      ? []
-      : showFinal || frame === null
-        ? trace.tool_calls
-        : trace.tool_calls.filter((c) => c.revision_after === null || c.revision_after <= frame.revision);
-
-  const controls =
-    trace !== null ? (
+  /**
+   * The frame controls and the board for the current frame. It reads the trace's frames, states and
+   * tool calls, so it runs inside a ReplayRenderGuard: what it throws on a trace of an unexpected
+   * shape is caught there (see the render below).
+   */
+  const renderBoard = (current: SanitizedTrace): ReactNode => {
+    const frame = frameCount > 0 ? (current.frames[Math.min(index, last)] ?? null) : null;
+    const state = showFinal ? current.final_state : frame !== null ? rehydrateState(current, frame.state) : null;
+    const tz = state?.timezone ?? "UTC";
+    const callsSoFar =
+      showFinal || frame === null
+        ? current.tool_calls
+        : current.tool_calls.filter((c) => c.revision_after === null || c.revision_after <= frame.revision);
+    const controls = (
       <Section id="replay-controls" title="Frames" className="replay-controls">
         <div className="button-row">
           <button type="button" className="button" onClick={() => step(-1)} disabled={!showFinal && index === 0}>
@@ -311,7 +503,7 @@ export function ReplayView({ initialName }: { initialName: string | null }) {
         <p className="small muted">Keyboard: ← and → step, Home and End jump.</p>
         {showFinal ? (
           <p className="frame-info" aria-live="polite">
-            Showing the final recorded state (revision {trace.final_state.revision}).
+            Showing the final recorded state (revision {current.final_state.revision}).
           </p>
         ) : frame !== null ? (
           <p className="frame-info" aria-live="polite">
@@ -325,21 +517,20 @@ export function ReplayView({ initialName }: { initialName: string | null }) {
           <RecordedToolCalls calls={callsSoFar} tz={tz} />
         </details>
       </Section>
-    ) : null;
+    );
+    if (state === null) return controls;
+    return (
+      <ReplayBoardFrame failed={integrity !== null && integrityState(integrity) === "failed"}>
+        <BoardView view={state} mode="replay" beforeGrid={controls} />
+      </ReplayBoardFrame>
+    );
+  };
 
+  // A render failure counts as a failed check: the banner says so, and a notice replaces the board.
+  const bannerIntegrity = loaded === null ? null : renderError !== null ? renderFailureReport(renderError) : integrity;
   return (
     <main id="main" className="page replay">
-      <div className="replay-banner" role="status">
-        <span className="replay-banner-title">
-          <span aria-hidden="true">▸ </span>Recorded replay
-        </span>
-        <span>
-          Not live. This page plays back a saved trace and never calls tools. {PRODUCT_NAME} · {SANDBOX_NOTICE}
-        </span>
-        <a className="button secondary small" href="#/">
-          Leave replay
-        </a>
-      </div>
+      <ReplayBanner integrity={bannerIntegrity} />
       <Section id="replay-source" title="Trace">
         <div className="replay-source">
           <div>
@@ -386,21 +577,31 @@ export function ReplayView({ initialName }: { initialName: string | null }) {
         ) : null}
         {loaded !== null && trace !== null ? (
           <>
-            <p className="small">
-              Loaded <strong>{loaded.origin}</strong> · trace {trace.trace_version}, runtime {trace.runtime_version} ·
-              episode <Code>{trace.source.episode_id}</Code> · scenario <Code>{trace.source.scenario_id}</Code> ·
-              policy <Code>{trace.source.policy_id ?? "none recorded"}</Code> · {frameCount} frames,{" "}
-              {trace.tool_calls.length} tool calls, {trace.receipts.length} receipts
-            </p>
+            <ReplayRenderGuard key={`summary-${loadId}`} onError={renderFailed} fallback={() => null}>
+              {() => (
+                <p className="small">
+                  Loaded <strong>{loaded.origin}</strong> · trace {trace.trace_version}, runtime {trace.runtime_version}{" "}
+                  · episode <Code>{trace.source.episode_id}</Code> · scenario <Code>{trace.source.scenario_id}</Code> ·
+                  policy <Code>{trace.source.policy_id ?? "none recorded"}</Code> · {frameCount} frames,{" "}
+                  {trace.tool_calls.length} tool calls, {trace.receipts.length} receipts
+                </p>
+              )}
+            </ReplayRenderGuard>
             {integrity !== null ? <IntegrityPanel report={integrity} /> : null}
           </>
         ) : null}
       </Section>
-      {state !== null ? (
-        <BoardView view={state} mode="replay" beforeGrid={controls} />
-      ) : trace !== null ? (
-        controls
-      ) : null}
+      {trace === null ? null : renderError !== null ? (
+        <UnrenderableNotice message={renderError} />
+      ) : (
+        <ReplayRenderGuard
+          key={`board-${loadId}`}
+          onError={renderFailed}
+          fallback={(message) => <UnrenderableNotice message={message} />}
+        >
+          {() => renderBoard(trace)}
+        </ReplayRenderGuard>
+      )}
     </main>
   );
 }

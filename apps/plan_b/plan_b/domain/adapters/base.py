@@ -3,12 +3,16 @@
 The shared core (store, authority, clock, revisions, idempotency, receipts, tools, replay)
 is domain-independent. A domain adapter owns only:
 
-* ``validate_config``: profile-specific checks on a public scenario;
+* ``validate_config``: profile-specific checks on a public scenario, including that its
+  initial plan passes the adapter's own hard checks;
 * ``evaluate``: enumerate the configured finite candidate menu, check constraints, rank;
 * ``revalidate``: re-run every check on a stored candidate against a fresh snapshot
   (``apply_plan`` calls this inside its write transaction);
-* ``check_readiness``: execution prerequisites for one activity at a scenario time;
-* ``score_outcome``: domain goal attainment computed from a visible final state.
+* ``check_readiness``: prerequisites for one activity at a scenario time, strictly at its
+  start (the clock engine) or as a preview of current evidence (the projection);
+* ``score_outcome``: domain goal attainment and the executed domain-rule violations, computed
+  from the visible final state and episode history (``score_episode`` adds counters, spend
+  limits and predicates).
 
 Adapters are pure: no database handles, no clock mutation, no private runner input. The
 executor applies the transitions an adapter's results justify. Wave 2's pantry adapter adds
@@ -18,18 +22,47 @@ consumable semantics behind this same interface.
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any, Protocol
+from typing import Literal, Protocol
 
+from plan_b.domain.adapters.outcome import DomainOutcome
 from plan_b.domain.models import (
+    ActivityView,
     ActorContext,
     CandidateResult,
+    CheckInView,
+    CommitmentView,
+    EpisodeHistory,
     EvaluationRequest,
     EvaluationResult,
     EventStateView,
     PlanningSnapshot,
+    PlanView,
     PublicScenario,
     ReadinessReport,
+    ResourceView,
 )
+
+ReadinessMode = Literal["preview", "execution"]
+
+
+class ReadinessBasis(Protocol):
+    """What readiness reads. A ``PlanningSnapshot`` is one; the projection passes the parts it
+    has assembled before the snapshot exists (activity views without readiness)."""
+
+    @property
+    def activities(self) -> tuple[ActivityView, ...]: ...
+
+    @property
+    def plan(self) -> PlanView: ...
+
+    @property
+    def resources(self) -> tuple[ResourceView, ...]: ...
+
+    @property
+    def checkins(self) -> tuple[CheckInView, ...]: ...
+
+    @property
+    def commitments(self) -> tuple[CommitmentView, ...]: ...
 
 
 class DomainAdapter(Protocol):
@@ -61,7 +94,14 @@ class DomainAdapter(Protocol):
         ...
 
     def check_readiness(
-        self, snapshot: PlanningSnapshot, activity_id: str, at: datetime
+        self,
+        snapshot: ReadinessBasis,
+        activity_id: str,
+        at: datetime,
+        *,
+        mode: ReadinessMode = "execution",
     ) -> ReadinessReport: ...
 
-    def score_outcome(self, view: EventStateView) -> dict[str, Any]: ...
+    def score_outcome(self, final: EventStateView, history: EpisodeHistory) -> DomainOutcome:
+        """Goal attainment and executed domain-rule violations from visible records only."""
+        ...

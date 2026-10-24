@@ -21,6 +21,7 @@ from plan_b.domain.models import (
     CandidateResult,
     CheckInView,
     CommitmentView,
+    EpisodeHistory,
     EvaluationRequest,
     EvaluationResult,
     EventStateView,
@@ -707,25 +708,24 @@ def _final_view(*, closing_completed: bool) -> EventStateView:
 
 
 def test_score_outcome_from_visible_state() -> None:
-    complete = ADAPTER.score_outcome(_final_view(closing_completed=True))
-    assert complete["all_required_completed_by_deadline"] is True
-    assert complete["required_completed_by_deadline"] == 5
-    assert complete["opening_activity_id"] == "welcome"
-    assert complete["opening_started_at"] == "2026-11-05T22:00:00Z"
-    assert complete["opening_start_delay_minutes"] == 0
-    assert complete["opened_on_time"] is True
-    assert complete["committed_cents"] == 3500
-    assert complete["within_budget"] is True
-    closing = next(r for r in complete["activities"] if r["activity_id"] == "closing")
-    assert closing["completed_at"] == "2026-11-05T23:00:00Z"
-    assert closing["completed_by_deadline"] is True
+    history = EpisodeHistory(tool_calls=(), transitions=(), decisions=(), receipts=())
+    complete = ADAPTER.score_outcome(_final_view(closing_completed=True), history)
+    assert complete.goal_attained is True and complete.unmet == ()
+    assert tuple(a.activity_id for a in complete.activities) == SCENARIO.goal.required_activity_ids
+    closing = next(a for a in complete.activities if a.activity_id == "closing")
+    assert closing.lifecycle == "completed" and closing.completed_at == at("18:00")
+    # Attainment is not success: starts made without their evidence are executed violations.
+    assert sorted({v.category for v in complete.violations}) == [
+        "equipment_before_arrival",
+        "role_not_checked_in",
+    ]
 
-    incomplete = ADAPTER.score_outcome(_final_view(closing_completed=False))
-    assert incomplete["all_required_completed_by_deadline"] is False
-    assert incomplete["missing_required_activity_ids"] == ["closing"]
-    closing = next(r for r in incomplete["activities"] if r["activity_id"] == "closing")
-    assert closing["lifecycle"] == "failed"
-    assert closing["failure_reasons"] == ["host has not checked in for 17:50"]
+    incomplete = ADAPTER.score_outcome(_final_view(closing_completed=False), history)
+    assert incomplete.goal_attained is False
+    assert incomplete.unmet == ("closing is failed",)
+    closing = next(a for a in incomplete.activities if a.activity_id == "closing")
+    assert closing.lifecycle == "failed"
+    assert closing.failure_reasons == ("host has not checked in for 17:50",)
 
 
 def test_failed_predecessor_blocks_dependents() -> None:

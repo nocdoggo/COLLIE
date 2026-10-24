@@ -2,9 +2,9 @@ import type { ReactNode } from "react";
 
 import {
   DECISION_LABEL,
-  RECEIPT_STATUS_LABEL,
   compareIso,
   fmtTime,
+  receiptLabel,
 } from "../format";
 import type { EventStateView, PolicyDecision } from "../types";
 import { authorizationRequests } from "./authorization";
@@ -81,7 +81,7 @@ export function ChangeSummary({ view }: { view: EventStateView }) {
           <Tag tone="neutral" icon="▣">
             Receipt
           </Tag>{" "}
-          <StatusBadge label={RECEIPT_STATUS_LABEL[r.status]} /> <strong>{r.tool}</strong>{" "}
+          <StatusBadge label={receiptLabel(r)} /> <strong>{r.tool}</strong>{" "}
           <span>{r.summary}</span>{" "}
           <JumpButton targetId={domId("rcpt", r.receipt_id)}>evidence</JumpButton>
         </>

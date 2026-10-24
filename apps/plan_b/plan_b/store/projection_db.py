@@ -71,6 +71,7 @@ def build_snapshot(
         checkins=checkins,
         commitments=commitments,
         clock=ep.clock,
+        profile_id=ep.profile_id,
     )
     return PlanningSnapshot(
         event_id=ep.event_id,

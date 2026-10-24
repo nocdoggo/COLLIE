@@ -8,12 +8,14 @@ exporter refuses to write a trace in which the leak checker finds private marker
 
 from __future__ import annotations
 
+import codecs
 import json
+import re
 from pathlib import Path
 from typing import Any
 
 from plan_b.domain.digest import canonical_json, sha256_hex
-from plan_b.domain.models import RUNTIME_VERSION, TRACE_VERSION, EventStateView
+from plan_b.domain.models import RUNTIME_VERSION, TRACE_VERSION
 from plan_b.store import repo
 from plan_b.store.database import Database
 from plan_b.store.projection_db import TRACE_VIEWER, build_view
@@ -21,6 +23,25 @@ from plan_b.world.leakcheck import find_leaks
 from plan_b.world.world import NO_CASE, load_case
 
 GENERATOR = "plan_b.evaluation.export_trace"
+TRACE_KIND = "plan_b_sanitized_trace"
+ALGORITHM = "sha256"
+
+# Limits the browser verifier (web/src/replay/integrity.ts) applies with the same values: the
+# deepest nesting of objects and arrays (the trace object is level 1), and the longest integer
+# in digits without the sign (Python's default int_max_str_digits, fixed here so a different
+# interpreter setting cannot change the verdict).
+MAX_NESTING = 256
+MAX_INT_DIGITS = 4300
+_INT_LIMIT = 10**MAX_INT_DIGITS
+_LONE_SURROGATE = re.compile("[\ud800-\udfff]")
+
+BOM_PROBLEM = "trace starts with a UTF-8 byte order mark"
+UTF8_PROBLEM = "trace is not valid UTF-8"
+NOT_OBJECT_PROBLEM = "trace is not a JSON object"
+NESTING_PROBLEM = f"trace nests deeper than {MAX_NESTING} levels"
+SURROGATE_PROBLEM = "trace has a string that is not well-formed Unicode (a lone surrogate)"
+INT_PROBLEM = f"trace has an integer longer than {MAX_INT_DIGITS} digits"
+FRAME_HASHES_PROBLEM = "frame_hashes is missing or not a list"
 
 
 class TraceLeakError(Exception):
@@ -97,7 +118,7 @@ def build_trace(db: Database, episode_id: str, *, policy_id: str | None = None) 
     trace: dict[str, Any] = {
         "trace_version": TRACE_VERSION,
         "runtime_version": RUNTIME_VERSION,
-        "kind": "plan_b_sanitized_trace",
+        "kind": TRACE_KIND,
         "mode_label": "Recorded replay",
         "source": {
             "episode_id": ep.episode_id,
@@ -138,27 +159,117 @@ def integrity(trace: dict[str, Any]) -> dict[str, Any]:
         chain = sha256_hex(chain + h)
     body = {k: v for k, v in trace.items() if k != "integrity"}
     return {
-        "algorithm": "sha256",
+        "algorithm": ALGORITHM,
         "frame_hashes": frame_hashes,
         "chain_sha256": chain,
         "content_sha256": sha256_hex(canonical_json(body)),
     }
 
 
+def _revision(state: Any) -> int | None:
+    """A state's integer revision; anything else (missing, float, bool, string) is None."""
+    value = state.get("revision") if isinstance(state, dict) else None
+    return value if isinstance(value, int) and not isinstance(value, bool) else None
+
+
+def _value_problem(trace: Any) -> str | None:
+    """The first value the hashes cannot be computed over, walking without recursion: nesting
+    deeper than MAX_NESTING, a string (or key) with a lone surrogate, which UTF-8 cannot
+    encode, or an integer longer than MAX_INT_DIGITS digits."""
+    stack: list[tuple[Any, int]] = [(trace, 1)]
+    while stack:
+        value, depth = stack.pop()
+        if isinstance(value, dict):
+            if depth > MAX_NESTING:
+                return NESTING_PROBLEM
+            for key, item in value.items():
+                if isinstance(key, str) and _LONE_SURROGATE.search(key):
+                    return SURROGATE_PROBLEM
+                stack.append((item, depth + 1))
+        elif isinstance(value, list | tuple):
+            if depth > MAX_NESTING:
+                return NESTING_PROBLEM
+            stack.extend((item, depth + 1) for item in value)
+        elif isinstance(value, str):
+            if _LONE_SURROGATE.search(value):
+                return SURROGATE_PROBLEM
+        elif isinstance(value, int) and not isinstance(value, bool) and abs(value) >= _INT_LIMIT:
+            return INT_PROBLEM
+    return None
+
+
+def _bounded_int(text: str) -> int:
+    if len(text.lstrip("-")) > MAX_INT_DIGITS:
+        raise ValueError(INT_PROBLEM)
+    return int(text)
+
+
+def verify_trace_bytes(data: bytes) -> list[str]:
+    """Return the problems of a trace file's exact bytes; empty when the trace is intact.
+
+    Before ``verify_trace`` it rejects what the browser replay also rejects when it decodes the
+    bytes itself: a UTF-8 byte order mark, bytes that are not UTF-8 (encoded surrogates
+    included), and text that is not one JSON object. Every problem is reported, never raised.
+    """
+    if data.startswith(codecs.BOM_UTF8):
+        return [BOM_PROBLEM]
+    try:
+        text = data.decode("utf-8")
+    except UnicodeDecodeError:
+        return [UTF8_PROBLEM]
+    try:
+        value = json.loads(text, parse_int=_bounded_int)
+    except RecursionError:
+        return [NESTING_PROBLEM]
+    except json.JSONDecodeError as exc:
+        # Some messages already end in "at" ("Invalid control character at").
+        msg = exc.msg.removesuffix(" at")
+        return [f"trace is not valid JSON: {msg} at line {exc.lineno} column {exc.colno}"]
+    except ValueError as exc:
+        # Raised by _bounded_int.
+        return [str(exc)]
+    if not isinstance(value, dict):
+        return [NOT_OBJECT_PROBLEM]
+    return verify_trace(value)
+
+
 def verify_trace(trace: dict[str, Any]) -> list[str]:
-    """Return integrity problems; empty when the trace is intact."""
+    """Return integrity problems; empty when the trace is intact.
+
+    It makes the same checks as the browser replay's ``verifyTraceText``
+    (web/src/replay/integrity.ts), so both accept and reject the same traces; the shared vectors
+    in web/tests/fixtures/canonical_vectors.json check that in both test suites. A value the
+    hashes cannot be computed over (see ``_value_problem``) is reported as the only problem. The
+    hashes are not signed: an intact trace is consistent with its own hashes, which detects
+    corruption, not deliberate edits. For a file, use ``verify_trace_bytes``.
+    """
+    value_problem = _value_problem(trace)
+    if value_problem is not None:
+        return [value_problem]
+    frames = trace.get("frames")
+    got = trace.get("integrity")
+    if not isinstance(frames, list):
+        return ["trace has no frames array"]
+    if not isinstance(got, dict):
+        return ["trace has no integrity block"]
     problems = []
     expected = integrity(trace)
-    got = trace.get("integrity", {})
     for key in ("frame_hashes", "chain_sha256", "content_sha256"):
-        if got.get(key) != expected[key]:
+        if key == "frame_hashes" and not isinstance(got.get(key), list):
+            # Even with no frames: the exporter writes an empty list, never nothing.
+            problems.append(FRAME_HASHES_PROBLEM)
+        elif got.get(key) != expected[key]:
             problems.append(f"{key} mismatch")
+    if got.get("algorithm") != ALGORITHM:
+        problems.append("unsupported integrity algorithm")
+    if trace.get("kind") != TRACE_KIND:
+        problems.append("unexpected trace kind")
     if trace.get("trace_version") != TRACE_VERSION:
         problems.append("unsupported trace version")
-    if trace["frames"]:
-        last = EventStateView.model_validate(rehydrate_state(trace, trace["frames"][-1]["state"]))
-        final = EventStateView.model_validate(trace["final_state"])
-        if last.revision != final.revision:
+    if frames:
+        last = frames[-1].get("state") if isinstance(frames[-1], dict) else None
+        last_revision = _revision(last)
+        if last_revision is None or last_revision != _revision(trace.get("final_state")):
             problems.append("last frame revision differs from final state")
     return problems
 

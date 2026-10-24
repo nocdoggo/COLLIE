@@ -10,6 +10,7 @@ import json
 import os
 import re
 import secrets
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
@@ -72,6 +73,14 @@ class PolicyBody(_Body):
 class RunBody(_Body):
     minutes: int = Field(ge=1, le=240)
     policy: bool = True
+
+
+def policies_that_ran(policy_ids: Iterable[str]) -> str | None:
+    """The trace's ``source.policy_id``: what the episode's recorded decisions name. None when
+    no policy decided anything (clock moves and participants only), the id when one policy ran,
+    and the distinct ids sorted and comma-joined when several did."""
+    distinct = sorted(set(policy_ids))
+    return ",".join(distinct) if distinct else None
 
 
 def _bearer(authorization: str | None) -> str | None:
@@ -360,7 +369,13 @@ def create_app(
     def export(authorization: str | None = Header(default=None)) -> Any:
         moderator(authorization)
         episode_id = current_episode()
-        trace = build_trace(db, episode_id, policy_id="rules/1.0.0")
+        with db.read() as conn:
+            policy_id = policies_that_ran(d.policy_id for d in repo.decisions(conn, episode_id))
+        trace = build_trace(db, episode_id, policy_id=policy_id)
+        ran = policies_that_ran(str(d["policy_id"]) for d in trace["decisions"])
+        if ran != policy_id:
+            # A policy run recorded decisions between the two reads: name what the trace holds.
+            trace = build_trace(db, episode_id, policy_id=ran)
         name = f"{episode_id}_rev{trace['final_state']['revision']}.json"
         write_trace(trace, traces_dir / name)
         return JSONResponse({"name": name, "trace": trace})

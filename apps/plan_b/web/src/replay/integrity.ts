@@ -8,6 +8,12 @@
 // therefore parses the trace text itself, keeps every number's lexical type, and writes the
 // canonical form exactly as Python would.
 //
+// Both verifiers also reject the same byte-level input (review item 4): a UTF-8 byte order
+// mark, bytes that are not UTF-8, a string that is not well-formed Unicode (a lone UTF-16
+// surrogate, which Python cannot encode), nesting deeper than MAX_NESTING, and an integer longer
+// than MAX_INT_DIGITS (Python's default int conversion limit). The nesting limit also keeps the
+// recursive parser far from the JavaScript stack limit.
+//
 // This file performs no network calls and imports only types.
 
 import type { SanitizedTrace } from "../types";
@@ -32,9 +38,19 @@ export class JsonSyntaxError extends Error {
 
 const NUMBER_RE = /-?(?:0|[1-9]\d*)(\.\d+)?([eE][-+]?\d+)?/y;
 
+/** Deepest nesting of objects and arrays a trace may have; the trace object itself is level 1. */
+export const MAX_NESTING = 256;
+
+/** Longest integer a trace may hold, in digits without the sign (Python's int_max_str_digits). */
+export const MAX_INT_DIGITS = 4300;
+
+/** Matches a UTF-16 surrogate that is not half of a pair (the u flag reads pairs as one code point). */
+const LONE_SURROGATE = /[\uD800-\uDFFF]/u;
+
 /** Parse JSON text the way Python's json.loads does, keeping each number's int/float type. */
 export function parseJsonLossless(text: string): JsonNode {
   let pos = 0;
+  let depth = 0;
 
   function fail(message: string): never {
     throw new JsonSyntaxError(message, pos);
@@ -57,6 +73,7 @@ export function parseJsonLossless(text: string): JsonNode {
       const c = text.charCodeAt(pos);
       if (c === 0x22) {
         out += text.slice(chunkStart, pos);
+        if (LONE_SURROGATE.test(out)) fail("String is not well-formed Unicode (a lone UTF-16 surrogate)");
         pos += 1;
         return out;
       }
@@ -108,16 +125,23 @@ export function parseJsonLossless(text: string): JsonNode {
     }
   };
 
+  const enter = (): void => {
+    depth += 1;
+    if (depth > MAX_NESTING) fail(`Nesting deeper than ${MAX_NESTING} levels`);
+    pos += 1;
+  };
+
   const parseValue = (): JsonNode => {
     skipWhitespace();
     if (pos >= text.length) fail("Unexpected end of input");
     const ch = text[pos];
     if (ch === "{") {
-      pos += 1;
+      enter();
       const entries = new Map<string, JsonNode>();
       skipWhitespace();
       if (text[pos] === "}") {
         pos += 1;
+        depth -= 1;
         return { kind: "object", entries };
       }
       while (true) {
@@ -137,17 +161,19 @@ export function parseJsonLossless(text: string): JsonNode {
         }
         if (text[pos] === "}") {
           pos += 1;
+          depth -= 1;
           return { kind: "object", entries };
         }
         fail("Expected ',' or '}'");
       }
     }
     if (ch === "[") {
-      pos += 1;
+      enter();
       const items: JsonNode[] = [];
       skipWhitespace();
       if (text[pos] === "]") {
         pos += 1;
+        depth -= 1;
         return { kind: "array", items };
       }
       while (true) {
@@ -159,6 +185,7 @@ export function parseJsonLossless(text: string): JsonNode {
         }
         if (text[pos] === "]") {
           pos += 1;
+          depth -= 1;
           return { kind: "array", items };
         }
         fail("Expected ',' or ']'");
@@ -197,8 +224,11 @@ export function parseJsonLossless(text: string): JsonNode {
     const m = NUMBER_RE.exec(text);
     if (m === null) return fail("Unexpected character");
     const lexeme = m[0];
-    pos += lexeme.length;
     const isFloat = m[1] !== undefined || m[2] !== undefined;
+    if (!isFloat && lexeme.replace("-", "").length > MAX_INT_DIGITS) {
+      fail(`Integer longer than ${MAX_INT_DIGITS} digits`);
+    }
+    pos += lexeme.length;
     return isFloat ? { kind: "float", value: Number(lexeme) } : { kind: "int", value: BigInt(lexeme) };
   };
 
@@ -254,49 +284,74 @@ export function compareCodePoints(a: string, b: string): number {
 // other character, including U+2028/U+2029 and non-BMP characters, unescaped.
 const encodeString = (value: string): string => JSON.stringify(value);
 
-/** Python canonical_json of a parsed node: sorted keys, "," and ":" separators. */
+/**
+ * Python canonical_json of a parsed node: sorted keys, "," and ":" separators. The walk keeps an
+ * explicit stack instead of recursing, so no nesting depth can overflow the call stack.
+ */
 export function canonicalJson(node: JsonNode): string {
   const out: string[] = [];
-  const write = (n: JsonNode): void => {
+  // Pending work, last item first: a node to write or literal text to emit.
+  const stack: (JsonNode | string)[] = [node];
+  while (stack.length > 0) {
+    const n = stack.pop() as JsonNode | string;
+    if (typeof n === "string") {
+      out.push(n);
+      continue;
+    }
     switch (n.kind) {
       case "object": {
         const keys = [...n.entries.keys()].sort(compareCodePoints);
-        out.push("{");
-        keys.forEach((key, index) => {
-          if (index > 0) out.push(",");
-          out.push(encodeString(key), ":");
-          write(n.entries.get(key) as JsonNode);
-        });
-        out.push("}");
-        return;
+        stack.push("}");
+        for (let index = keys.length - 1; index >= 0; index -= 1) {
+          const key = keys[index] as string;
+          stack.push(n.entries.get(key) as JsonNode, `${encodeString(key)}:`);
+          if (index > 0) stack.push(",");
+        }
+        stack.push("{");
+        break;
       }
       case "array":
-        out.push("[");
-        n.items.forEach((item, index) => {
-          if (index > 0) out.push(",");
-          write(item);
-        });
-        out.push("]");
-        return;
+        stack.push("]");
+        for (let index = n.items.length - 1; index >= 0; index -= 1) {
+          stack.push(n.items[index] as JsonNode);
+          if (index > 0) stack.push(",");
+        }
+        stack.push("[");
+        break;
       case "string":
         out.push(encodeString(n.value));
-        return;
+        break;
       case "int":
         out.push(n.value.toString());
-        return;
+        break;
       case "float":
         out.push(pythonFloatRepr(n.value));
-        return;
+        break;
       case "bool":
         out.push(n.value ? "true" : "false");
-        return;
+        break;
       case "null":
         out.push("null");
-        return;
+        break;
     }
-  };
-  write(node);
+  }
   return out.join("");
+}
+
+/**
+ * A trace file's text from its exact bytes. The browser decodes the bytes itself because
+ * Response.text() and Blob.text() silently drop a leading byte order mark; `plan-b verify-trace`
+ * rejects one, and so does this. Bytes that are not UTF-8 are rejected too, never replaced.
+ */
+export function decodeTraceBytes(bytes: Uint8Array): string {
+  if (bytes[0] === 0xef && bytes[1] === 0xbb && bytes[2] === 0xbf) {
+    throw new Error("The trace starts with a UTF-8 byte order mark (EF BB BF); a trace has none.");
+  }
+  try {
+    return new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(bytes);
+  } catch {
+    throw new Error("The trace is not valid UTF-8.");
+  }
 }
 
 export function subtleCryptoAvailable(): boolean {
@@ -334,6 +389,16 @@ export interface FrameHashResult extends HashComparison {
   readonly index: number;
 }
 
+export interface RevisionComparison {
+  readonly lastFrame: number | null;
+  readonly finalState: number | null;
+  readonly ok: boolean;
+}
+
+/** The trace kind and version both verifiers accept (plan_b/evaluation/export_trace.py). */
+export const TRACE_KIND = "plan_b_sanitized_trace";
+export const TRACE_VERSION = "1.0.0";
+
 export type IntegrityReport =
   | { readonly status: "unavailable"; readonly reason: string }
   | { readonly status: "malformed"; readonly reason: string }
@@ -342,8 +407,15 @@ export type IntegrityReport =
       readonly ok: boolean;
       readonly algorithm: string | null;
       readonly algorithmOk: boolean;
+      readonly kind: string | null;
+      readonly kindOk: boolean;
+      readonly traceVersion: string | null;
+      readonly traceVersionOk: boolean;
+      /** The last frame's state revision against final_state's (vacuous with no frames). */
+      readonly finalRevision: RevisionComparison;
       readonly frameCount: number;
-      readonly listedFrameHashes: number;
+      /** How many hashes integrity.frame_hashes lists; null when it is missing or not a list. */
+      readonly listedFrameHashes: number | null;
       readonly frames: readonly FrameHashResult[];
       readonly framesOk: boolean;
       readonly chain: HashComparison;
@@ -356,8 +428,33 @@ const getEntry = (node: JsonNode, key: string): JsonNode | undefined =>
 const stringOf = (node: JsonNode | undefined): string | null =>
   node !== undefined && node.kind === "string" ? node.value : null;
 
-/** Recompute every documented hash of a trace from its exact text. */
+/** A state's integer revision; anything else (missing, float, string) is null. */
+const revisionOf = (state: JsonNode | undefined): bigint | null => {
+  const node = state !== undefined ? getEntry(state, "revision") : undefined;
+  return node !== undefined && node.kind === "int" ? node.value : null;
+};
+
+/**
+ * Recompute every documented hash of a trace from its exact text, and make the same checks as
+ * the server's `plan-b verify-trace` (verify_trace in plan_b/evaluation/export_trace.py): the
+ * algorithm label, the trace kind and version, and that the last frame's revision is the final
+ * state's. The two verifiers must accept and reject the same traces; the shared vectors in
+ * tests/fixtures/canonical_vectors.json check that in both test suites.
+ *
+ * The hashes are not signed. A passing check shows the trace is consistent with its own hashes,
+ * which detects corruption, not deliberate edits: whoever edits a trace can recompute them.
+ */
 export async function verifyTraceText(text: string): Promise<IntegrityReport> {
+  if (text.charCodeAt(0) === 0xfeff) {
+    return { status: "malformed", reason: "The trace starts with a byte order mark (U+FEFF); a trace has none." };
+  }
+  let root: JsonNode;
+  try {
+    root = parseJsonLossless(text);
+  } catch (error) {
+    return { status: "malformed", reason: describeError(error) };
+  }
+  if (root.kind !== "object") return { status: "malformed", reason: "The trace is not an object." };
   if (!subtleCryptoAvailable()) {
     return {
       status: "unavailable",
@@ -366,13 +463,6 @@ export async function verifyTraceText(text: string): Promise<IntegrityReport> {
         "so the hashes were not checked.",
     };
   }
-  let root: JsonNode;
-  try {
-    root = parseJsonLossless(text);
-  } catch (error) {
-    return { status: "malformed", reason: error instanceof Error ? error.message : String(error) };
-  }
-  if (root.kind !== "object") return { status: "malformed", reason: "The trace is not an object." };
   const frames = getEntry(root, "frames");
   const integrity = getEntry(root, "integrity");
   if (frames === undefined || frames.kind !== "array") {
@@ -381,11 +471,11 @@ export async function verifyTraceText(text: string): Promise<IntegrityReport> {
   if (integrity === undefined || integrity.kind !== "object") {
     return { status: "malformed", reason: "The trace has no integrity block." };
   }
+  // A missing or non-list frame_hashes fails the frame check even with no frames, as in
+  // verify_trace: it is not the empty list the exporter writes for a trace without frames.
   const listedNode = getEntry(integrity, "frame_hashes");
-  const listed: (string | null)[] =
-    listedNode !== undefined && listedNode.kind === "array"
-      ? listedNode.items.map((item) => stringOf(item))
-      : [];
+  const listedIsList = listedNode !== undefined && listedNode.kind === "array";
+  const listed: (string | null)[] = listedIsList ? listedNode.items.map((item) => stringOf(item)) : [];
 
   const frameResults: FrameHashResult[] = [];
   for (let index = 0; index < frames.items.length; index += 1) {
@@ -394,7 +484,7 @@ export async function verifyTraceText(text: string): Promise<IntegrityReport> {
     frameResults.push({ index, expected, actual, ok: expected === actual });
   }
   const framesOk =
-    listed.length === frames.items.length && frameResults.every((result) => result.ok);
+    listedIsList && listed.length === frames.items.length && frameResults.every((result) => result.ok);
 
   const listedStrings = listed.filter((h): h is string => h !== null);
   const chainActual =
@@ -410,6 +500,18 @@ export async function verifyTraceText(text: string): Promise<IntegrityReport> {
 
   const algorithm = stringOf(getEntry(integrity, "algorithm"));
   const algorithmOk = algorithm === "sha256";
+  const kind = stringOf(getEntry(root, "kind"));
+  const kindOk = kind === TRACE_KIND;
+  const traceVersion = stringOf(getEntry(root, "trace_version"));
+  const traceVersionOk = traceVersion === TRACE_VERSION;
+  const lastFrame = frames.items[frames.items.length - 1];
+  const lastRevision = lastFrame !== undefined ? revisionOf(getEntry(lastFrame, "state")) : null;
+  const finalRevision = revisionOf(getEntry(root, "final_state"));
+  const revision: RevisionComparison = {
+    lastFrame: lastRevision !== null ? Number(lastRevision) : null,
+    finalState: finalRevision !== null ? Number(finalRevision) : null,
+    ok: lastFrame === undefined || (lastRevision !== null && lastRevision === finalRevision),
+  };
   const chain = { expected: chainExpected, actual: chainActual, ok: chainExpected === chainActual };
   const content = {
     expected: contentExpected,
@@ -418,16 +520,82 @@ export async function verifyTraceText(text: string): Promise<IntegrityReport> {
   };
   return {
     status: "checked",
-    ok: algorithmOk && framesOk && chain.ok && content.ok,
+    ok: algorithmOk && kindOk && traceVersionOk && revision.ok && framesOk && chain.ok && content.ok,
     algorithm,
     algorithmOk,
+    kind,
+    kindOk,
+    traceVersion,
+    traceVersionOk,
+    finalRevision: revision,
     frameCount: frames.items.length,
-    listedFrameHashes: listed.length,
+    listedFrameHashes: listedIsList ? listed.length : null,
     frames: frameResults,
     framesOk,
     chain,
     content,
   };
+}
+
+/** verifyTraceText on a trace file's exact bytes: decoding problems are reported, not thrown. */
+export async function verifyTraceBytes(bytes: Uint8Array): Promise<IntegrityReport> {
+  let text: string;
+  try {
+    text = decodeTraceBytes(bytes);
+  } catch (error) {
+    return { status: "malformed", reason: describeError(error) };
+  }
+  return verifyTraceText(text);
+}
+
+/** An error's message for a report; never throws, whatever was thrown. */
+export function describeError(error: unknown): string {
+  try {
+    return error instanceof Error ? error.message : String(error);
+  } catch {
+    return "an error that cannot be described";
+  }
+}
+
+export const NOT_CHECKED_PREFIX = "The trace could not be checked:";
+
+/**
+ * The replay's integrity check. It always settles with a report: if the verifier throws or
+ * rejects (a stack overflow, a SubtleCrypto failure), the trace is reported as failed, so the
+ * banner never stays at "checking" and the board is marked exactly as for a failed check.
+ */
+export async function checkTraceIntegrity(
+  text: string,
+  verify: (text: string) => Promise<IntegrityReport> = verifyTraceText,
+): Promise<IntegrityReport> {
+  try {
+    return await verify(text);
+  } catch (error) {
+    return { status: "malformed", reason: `${NOT_CHECKED_PREFIX} ${describeError(error)}` };
+  }
+}
+
+/** The names of the structural checks a checked report failed, for the panel's headline. */
+export function failedStructuralChecks(report: Extract<IntegrityReport, { status: "checked" }>): string[] {
+  const names: string[] = [];
+  if (!report.algorithmOk) names.push("algorithm label");
+  if (!report.kindOk) names.push("kind");
+  if (!report.traceVersionOk) names.push("trace version");
+  if (!report.finalRevision.ok) names.push("final-state revision against the last frame");
+  return names;
+}
+
+/** Whether a checked report failed a recomputed hash (frames, chain or content). */
+export const hashesFailed = (report: Extract<IntegrityReport, { status: "checked" }>): boolean =>
+  !report.framesOk || !report.chain.ok || !report.content.ok;
+
+export type IntegrityState = "checking" | "passed" | "failed" | "not_checked";
+
+/** The replay banner's word for a report; a failed one also marks the board as untrusted. */
+export function integrityState(report: IntegrityReport | "checking"): IntegrityState {
+  if (report === "checking") return "checking";
+  if (report.status === "unavailable") return "not_checked";
+  return report.status === "checked" && report.ok ? "passed" : "failed";
 }
 
 /** Structural checks before the board renders a trace's frames. */
@@ -437,11 +605,11 @@ export function traceShapeProblems(value: unknown): string[] {
     return ["The file is not a JSON object."];
   }
   const trace = value as Partial<SanitizedTrace>;
-  if (trace.kind !== "plan_b_sanitized_trace") {
-    problems.push(`kind is ${JSON.stringify(trace.kind)}, expected "plan_b_sanitized_trace".`);
+  if (trace.kind !== TRACE_KIND) {
+    problems.push(`kind is ${JSON.stringify(trace.kind)}, expected "${TRACE_KIND}".`);
   }
-  if (trace.trace_version !== "1.0.0") {
-    problems.push(`trace_version is ${JSON.stringify(trace.trace_version)}, expected "1.0.0".`);
+  if (trace.trace_version !== TRACE_VERSION) {
+    problems.push(`trace_version is ${JSON.stringify(trace.trace_version)}, expected "${TRACE_VERSION}".`);
   }
   if (!Array.isArray(trace.frames)) {
     problems.push("frames is missing.");

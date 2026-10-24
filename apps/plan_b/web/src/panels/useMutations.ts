@@ -15,6 +15,7 @@ import { useCallback, useRef, useState } from "react";
 import { callTool, lookupReceipt } from "../api";
 import type { StoredSession, ToolBinding, ToolCallOutcome } from "../api";
 import type { ActionReceipt, EventStateView, ReceiptLookupData, ToolEnvelope, ToolRequest } from "../types";
+import { receiptAnnouncement } from "./submissions";
 
 export type PanelName = "participant" | "organizer";
 
@@ -78,17 +79,6 @@ export interface MutationTracker {
   resend(id: string): void;
   dismiss(id: string): void;
   isSending(panel: PanelName, tool: string): boolean;
-}
-
-function receiptAnnouncement(label: string, receipt: ActionReceipt, fresh: EventStateView | null): string {
-  if (receipt.status === "rejected") {
-    return `${label}: rejected. ${receipt.error_code ?? ""} ${receipt.error_message ?? ""}`.trim();
-  }
-  if (receipt.status === "unknown") return `${label}: unresolved. The outcome is not established.`;
-  const confirmed = fresh?.receipts.some((r) => r.receipt_id === receipt.receipt_id && r.status === "applied");
-  return confirmed === true
-    ? `${label}: applied and confirmed in state revision ${fresh?.revision ?? receipt.revision_after}.`
-    : `${label}: the receipt says applied, but a fresh state read does not show it yet.`;
 }
 
 let localCounter = 0;

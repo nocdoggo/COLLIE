@@ -99,9 +99,15 @@ def _demo_rejections(args: argparse.Namespace) -> int:
 
 
 def _verify(args: argparse.Namespace) -> int:
-    from plan_b.evaluation.export_trace import verify_trace
+    from plan_b.evaluation.export_trace import verify_trace_bytes
 
-    problems = verify_trace(json.loads(Path(args.trace).read_text()))
+    # The exact bytes, as the browser replay checks them: decoding is part of the verdict.
+    try:
+        data = Path(args.trace).read_bytes()
+    except OSError as exc:
+        print(f"cannot read {args.trace}: {exc.strerror or exc}")
+        return 1
+    problems = verify_trace_bytes(data)
     print("intact" if not problems else "; ".join(problems))
     return 0 if not problems else 1
 

@@ -3,6 +3,7 @@
 // for scenario time.
 
 import type {
+  ActionReceipt,
   ActivityView,
   CheckStatus,
   DecisionKind,
@@ -164,6 +165,30 @@ export const APPLIED_UNCONFIRMED_LABEL: StatusLabel = {
   icon: "⧗",
   tone: "neutral",
 };
+
+/**
+ * An applied receipt that changed nothing: the revision stayed and no state changes are listed.
+ * The server answers this way to a duplicate (for example an observation it already stored), so
+ * the receipt has no transition of its own and must not read as a second success.
+ */
+export const APPLIED_NO_CHANGE_LABEL: StatusLabel = {
+  text: "Applied, no change (duplicate)",
+  icon: "⧉",
+  tone: "neutral",
+};
+
+export function appliedWithoutChange(receipt: ActionReceipt): boolean {
+  return (
+    receipt.status === "applied" &&
+    receipt.revision_after === receipt.revision_before &&
+    receipt.state_changes.length === 0
+  );
+}
+
+/** The badge for a receipt in a state read. */
+export function receiptLabel(receipt: ActionReceipt): StatusLabel {
+  return appliedWithoutChange(receipt) ? APPLIED_NO_CHANGE_LABEL : RECEIPT_STATUS_LABEL[receipt.status];
+}
 
 /** `passed` is used only for checks that rest on no candidate assumption. */
 export const CHECK_STATUS_LABEL: Record<CheckStatus, StatusLabel> = {

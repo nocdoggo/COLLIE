@@ -13,11 +13,13 @@ import type {
   IssuedSession,
   PolicyRunResult,
   RunMinutesResult,
+  UtcIso,
 } from "../types";
 import {
   actionHeadline,
   clockOutcome,
   isEarlierResult,
+  joinCodePreview,
   knownActiveEpisode,
   policyOutcome,
   resetNeedsConfirmation,
@@ -38,6 +40,32 @@ interface ErrorNote {
 
 function joinUrl(code: string): string {
   return `${window.location.origin}${window.location.pathname}#/join/${encodeURIComponent(code)}`;
+}
+
+/**
+ * A role's join link. Its text shows only a short prefix of the one-time code, so screenshots and
+ * screen shares never carry a usable code; the href keeps the full code. `data-join-link` (the
+ * principal id) is the stable selector for tests and screenshot masks.
+ */
+export function JoinLink({
+  principalId,
+  code,
+  url,
+  expiresWall,
+}: {
+  principalId: string;
+  code: string;
+  url: string;
+  expiresWall: UtcIso | undefined;
+}) {
+  return (
+    <p className="small">
+      <a href={url} target="_blank" rel="noopener noreferrer" data-join-link={principalId}>
+        Join link for {principalId} (code {joinCodePreview(code)})
+      </a>
+      {expiresWall !== undefined ? ` · expires ${fmtWall(expiresWall)} (wall clock)` : " · one-time code"}
+    </p>
+  );
 }
 
 function EarlierNote({ revision, view }: { revision: number | undefined; view: EventStateView | null }) {
@@ -469,13 +497,7 @@ export function ModeratorPanel({
                     ) : null}
                   </div>
                   {s !== undefined && url !== null ? (
-                    <p className="small">
-                      Join link:{" "}
-                      <a href={url} target="_blank" rel="noopener noreferrer">
-                        #/join/{s.join_code}
-                      </a>
-                      {s.expires_wall !== undefined ? ` · expires ${fmtWall(s.expires_wall)} (wall clock)` : " · one-time code"}
-                    </p>
+                    <JoinLink principalId={p.id} code={s.join_code} url={url} expiresWall={s.expires_wall} />
                   ) : null}
                 </li>
               );

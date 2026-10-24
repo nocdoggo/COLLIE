@@ -16,7 +16,7 @@ Contract: [docs/RUNTIME_CONTRACT.md](docs/RUNTIME_CONTRACT.md). Planning source:
 ## Requirements
 
 * Python 3.11 or 3.12 and [uv](https://docs.astral.sh/uv/) (tested with uv 0.9.18, Python 3.12.11)
-* Node.js 22 and npm (tested with Node 22.19.0)
+* Node.js 22.18 or newer and npm (tested with Node 22.19.0)
 
 The app has its own dependency boundary (`pyproject.toml` + `uv.lock`, `web/package-lock.json`).
 It does not use or change the COLLIE research environment at the repository root.
@@ -25,7 +25,7 @@ It does not use or change the COLLIE research environment at the repository root
 
 ```bash
 cd apps/plan_b
-uv sync --all-groups              # Python deps into apps/plan_b/.venv
+uv sync --all-groups --locked     # Python deps into apps/plan_b/.venv
 (cd web && npm ci && npm run build)   # browser app into web/dist
 ```
 
@@ -43,17 +43,21 @@ set `PLAN_B_MODERATOR_CODE`. Runtime state lives in `var/` (ignored by git).
 
 ### Core demo (browser)
 
-1. Open http://127.0.0.1:8765, sign in as moderator, and **Load** case `dev01`.
+1. Open http://127.0.0.1:8765, sign in as moderator, choose case `dev01` and click
+   **Load episode**.
 2. The board shows the goal, the 16:40 schedule, the projector notice, budget and readiness.
 3. **Run deterministic policy**: it queries order P17 (two simulated minutes), reports a 17:25
    ETA, evaluates the finite candidate menu, and applies the free swap of demonstrations and
    skills exchange. The receipt and the fresh state read show revision 4 → 5.
-4. **Open role tabs** for the facilitator and presenter; each tab is a separate scoped session.
-   Check in from those tabs (the facilitator before 17:10, the presenter before 17:30).
-5. Advance the clock (or **Run N minutes with policy**). The projector arrival appears at 17:24;
-   activities start only when their readiness evidence holds; closing completes at 18:00.
-6. **Export trace**, then open **Replay** to play it back under the *Recorded replay* label.
-7. **Load** again to reset into a new, clean episode.
+4. For the facilitator and the presenter, click **Issue join code**, then **Open in new tab**.
+   Each tab is a separate scoped session. Check in from those tabs (the facilitator before 17:10,
+   the presenter before 17:30).
+5. Advance the clock with the **+1 / +5 / +10 min** buttons, or set **Minutes** to 80 and click
+   **Run 80 minutes with policy**. The projector arrival appears at 17:24. Activities start only
+   when their readiness evidence holds, and closing completes at 18:00.
+6. **Export trace**, then **Open replay** to play it back under the *Recorded replay* label.
+7. To reset, click **Reset: load a clean episode…**, then confirm with **Close it and load case
+   dev01**. The old episode is closed and its sessions stop working.
 
 Other development cases: `dev02` (backup hold, organizer authorization, paid booking), `dev04`
 (false alarm plus a stale and duplicated notice), `dev05` (no feasible recovery), `dev06`
@@ -65,7 +69,28 @@ Other development cases: `dev02` (backup hold, organizer authorization, paid boo
 ```bash
 uv run plan-b run-case all --db var/runs.sqlite3 --out var/out
 uv run plan-b verify-trace var/out/traces/dev01_trace.json
+uv run plan-b serve --replay-dir var/out/traces   # replay them; board exports in var/traces are always listed
 ```
+
+`plan-b verify-trace` checks the frame, chain and content hashes, the algorithm label
+(`sha256`), `kind`, `trace_version`, and that the last frame's revision equals the final
+state's. It reads the file's bytes, and also rejects a byte order mark, invalid UTF-8, lone
+surrogates, nesting deeper than 256 levels and integers longer than 4300 digits. These are the
+same checks the browser replay makes. The hashes are not signed: "intact" means consistent with
+itself, not authentic.
+
+### Evidence
+
+```bash
+uv run python scripts/collect_evidence.py --out <new-or-empty-dir>   # every check, cases, traces, walkthrough
+uv run python scripts/write_manifest.py --evidence <dir>             # the packet manifest, from that evidence and git
+uv run python tests/e2e/walkthrough.py --out <dir>                   # the browser walkthrough on its own
+```
+
+The collector refuses a directory that already holds files. It writes local paths as
+placeholders, and fails its last check if any evidence file names the host, the user or a local
+path. A host or user name that is an ordinary word can be exempted with
+`--allow-identifier WORD`.
 
 ## Checks
 
@@ -73,7 +98,7 @@ uv run plan-b verify-trace var/out/traces/dev01_trace.json
 uv run pytest
 uv run ruff check . && uv run ruff format --check .
 uv run mypy
-(cd web && npm run typecheck && npm run build)
+(cd web && npm run typecheck && npm run build && npm test && npm run lint)
 ```
 
 ## Layout

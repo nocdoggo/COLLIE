@@ -439,6 +439,10 @@ class StatusResponse(Strict):
     source_record_id: str
     observed_at: UtcDatetime
     text: str
+    # The evidence lineage the record belongs to, e.g. the delivery whose notices and arrival
+    # share it. The observation created from the record carries it; None means
+    # "<entity_id>_status".
+    correlation_group: Identifier | None = None
 
 
 class StatusRecord(Strict):

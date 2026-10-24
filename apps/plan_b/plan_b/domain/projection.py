@@ -7,8 +7,10 @@ planner can be tested without a database. Nothing here can see private runner in
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from datetime import datetime
 
+from plan_b.domain.adapters.registry import adapter_for
 from plan_b.domain.models import (
     ActivityDef,
     ActivityLifecycleEvent,
@@ -29,7 +31,17 @@ from plan_b.domain.models import (
     ResourceView,
     StatusBasis,
 )
-from plan_b.domain.readiness import check_readiness
+
+
+@dataclass(frozen=True)
+class _ReadinessBasis:
+    """The parts of a snapshot that readiness reads, before the snapshot exists."""
+
+    activities: tuple[ActivityView, ...]
+    plan: PlanView
+    resources: tuple[ResourceView, ...]
+    checkins: tuple[CheckInView, ...]
+    commitments: tuple[CommitmentView, ...]
 
 
 def effective_hold_status(hold: HoldView, clock: datetime) -> HoldStatus:
@@ -137,38 +149,38 @@ def activity_views(
     checkins: tuple[CheckInView, ...],
     commitments: tuple[CommitmentView, ...],
     clock: datetime,
+    profile_id: str,
 ) -> tuple[ActivityView, ...]:
+    """Activity views; a not-started activity carries the preview readiness that the domain
+    adapter of ``profile_id`` (the episode's or fixture's own profile; there is no default)
+    reports for it at ``clock``."""
     by_activity = {a.activity_id: a for a in plan.assignments}
-    res_map = {r.definition.resource_id: r for r in resources}
-    program_ids = {d.activity_id for d in definitions if d.program}
-    views: list[ActivityView] = []
-    for d in definitions:
-        lifecycle = lifecycles[d.activity_id]
-        readiness = None
-        if lifecycle in ("planned", "ready"):
-            assignment = by_activity.get(d.activity_id)
-            readiness = check_readiness(
-                activity=d,
-                assignment=assignment,
-                at=clock,
-                mode="preview",
-                lifecycles=lifecycles,
-                assignments=by_activity,
-                resources=res_map,
-                checkins=checkins,
-                commitments=commitments,
-                program_activity_ids=program_ids,
-            )
-        views.append(
-            ActivityView(
-                definition=d,
-                lifecycle=lifecycle,  # type: ignore[arg-type]
-                history=tuple(e for e in history if e.activity_id == d.activity_id),
-                assignment=by_activity.get(d.activity_id),
-                readiness=readiness,
-            )
+    bare = tuple(
+        ActivityView(
+            definition=d,
+            lifecycle=lifecycles[d.activity_id],  # type: ignore[arg-type]
+            history=tuple(e for e in history if e.activity_id == d.activity_id),
+            assignment=by_activity.get(d.activity_id),
+            readiness=None,
         )
-    return tuple(views)
+        for d in definitions
+    )
+    adapter = adapter_for(profile_id)
+    basis = _ReadinessBasis(
+        activities=bare, plan=plan, resources=resources, checkins=checkins, commitments=commitments
+    )
+    return tuple(
+        v.model_copy(
+            update={
+                "readiness": adapter.check_readiness(
+                    basis, v.definition.activity_id, clock, mode="preview"
+                )
+            }
+        )
+        if v.lifecycle in ("planned", "ready")
+        else v
+        for v in bare
+    )
 
 
 def initial_snapshot(scenario: PublicScenario) -> PlanningSnapshot:
@@ -232,6 +244,7 @@ def initial_snapshot(scenario: PublicScenario) -> PlanningSnapshot:
         checkins=checkins,
         commitments=commitments,
         clock=st.clock,
+        profile_id=scenario.profile_id,
     )
     return PlanningSnapshot(
         event_id=scenario.event_id,

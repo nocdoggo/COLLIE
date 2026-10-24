@@ -20,6 +20,7 @@ from plan_b.store import repo
 from plan_b.store.engine import refresh_ready
 from plan_b.store.projection_db import capture_snapshot
 from plan_b.store.sessions import revoke_episode_sessions
+from plan_b.world.validate import validate_case_ref
 from plan_b.world.world import NO_CASE, available_cases, case_sha256
 
 
@@ -45,6 +46,10 @@ def create_episode(
     problems = adapter_for(sc.profile_id).validate_config(sc)
     if problems:
         raise ValueError("public scenario failed adapter validation: " + "; ".join(problems))
+    if case_ref != NO_CASE:
+        problems = validate_case_ref(sc, case_ref)
+        if problems:
+            raise ValueError(f"private case {case_ref} failed validation: " + "; ".join(problems))
     if close_others:
         for row in conn.execute("SELECT episode_id FROM episodes WHERE status = 'active'"):
             close_episode(conn, row["episode_id"])

@@ -4,7 +4,8 @@ Order inside one ``BEGIN IMMEDIATE`` transaction (docs/RUNTIME_CONTRACT.md secti
 session -> episode/event -> grant and tool authorization -> request validation ->
 idempotency (identical: original receipt; different body: conflict) -> static prechecks ->
 modeled tool duration (clock advance with event processing) -> grant validity at the new
-time -> handler validation and effects -> receipt + idempotency record -> snapshot -> call log.
+time -> handler validation and effects (in a savepoint: a rejection rolls back the handler's
+writes, not the duration) -> receipt + idempotency record -> snapshot -> call log.
 """
 
 from __future__ import annotations
@@ -519,12 +520,16 @@ def _run_call(
         ctx.receipt_id = f"rcpt_{repo.next_seq(conn, episode_id, 'receipt'):04d}"
 
     try:
-        # The grant can expire, or a scheduled organizer action can revoke it, during the
-        # modeled duration: check again at execution time.
-        problem = grant_problem(ctx.now)
-        if problem is not None:
-            raise problem
-        outcome = handlers.handle(ctx, tool)
+        # A rejection rolls back whatever the handler wrote before it was raised; the clock
+        # advance above, the call id and receipt id stay, and the rejected receipt, idempotency
+        # record and call log are written after the rollback.
+        with _savepoint(conn, f"handler_{call_id}"):
+            # The grant can expire, or a scheduled organizer action can revoke it, during the
+            # modeled duration: check again at execution time.
+            problem = grant_problem(ctx.now)
+            if problem is not None:
+                raise problem
+            outcome = handlers.handle(ctx, tool)
     except Rejection as rej:
         return reject(rej, revision_before)
 

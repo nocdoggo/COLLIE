@@ -1,4 +1,4 @@
-import { RECEIPT_STATUS_LABEL, compareIso, fmtSignedCents, fmtTime } from "../format";
+import { appliedWithoutChange, compareIso, fmtSignedCents, fmtTime, receiptLabel } from "../format";
 import type { ActionReceipt, EventStateView, JsonValue } from "../types";
 import { EvidenceCard } from "./EvidenceCard";
 import { Code, Empty, Section, StatusBadge, When, domId } from "./ui";
@@ -10,13 +10,18 @@ function short(value: JsonValue): string {
   return text.length > 80 ? `${text.slice(0, 77)}…` : text;
 }
 
+/** The card's tone class: a no-change ("duplicate") receipt is neutral, never the green applied. */
+export function receiptClass(receipt: ActionReceipt): string {
+  return `receipt ${appliedWithoutChange(receipt) ? "receipt-no-change" : `receipt-${receipt.status}`}`;
+}
+
 function ReceiptItem({ receipt, view }: { receipt: ActionReceipt; view: EventStateView }) {
   const tz = view.timezone;
   const referencedBy = view.decisions.filter((d) => d.receipt_refs.includes(receipt.receipt_id));
   return (
-    <li className={`receipt receipt-${receipt.status}`} id={domId("rcpt", receipt.receipt_id)} tabIndex={-1}>
+    <li className={receiptClass(receipt)} id={domId("rcpt", receipt.receipt_id)} tabIndex={-1}>
       <p className="receipt-head">
-        <StatusBadge label={RECEIPT_STATUS_LABEL[receipt.status]} /> <strong>{receipt.tool}</strong>{" "}
+        <StatusBadge label={receiptLabel(receipt)} /> <strong>{receipt.tool}</strong>{" "}
         <span className="muted">
           at <When iso={receipt.executed_at} text={fmtTime(receipt.executed_at, tz)} /> by{" "}
           <Code>{receipt.actor_id}</Code> ({receipt.actor_role.replace(/_/g, " ")}) · revision{" "}
@@ -36,6 +41,12 @@ function ReceiptItem({ receipt, view }: { receipt: ActionReceipt; view: EventSta
           The outcome of this request is not established.
           {receipt.error_code !== null ? ` ${receipt.error_code}` : ""}
           {receipt.error_message !== null ? `: ${receipt.error_message}` : ""}
+        </p>
+      ) : null}
+      {appliedWithoutChange(receipt) ? (
+        <p className="small">
+          No change: this receipt has no transition of its own. The server returned an existing
+          record, and the revision stayed {receipt.revision_before}.
         </p>
       ) : null}
       {receipt.status === "applied" ? (

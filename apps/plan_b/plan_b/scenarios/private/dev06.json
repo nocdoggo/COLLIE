@@ -24,6 +24,7 @@
         "domain_status": "available",
         "reported_eta": null,
         "source_record_id": "order_P17_revision_7",
+        "correlation_group": "projector_delivery_01",
         "observed_at": "2026-11-05T17:20:00-05:00",
         "text": "Order P17 was delivered at 17:20."
       }

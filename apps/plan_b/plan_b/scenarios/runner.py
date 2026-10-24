@@ -16,6 +16,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from typing import Any
 
+from plan_b.domain.fixtures import load_public_scenario
 from plan_b.domain.models import (
     ActorScript,
     EpisodeHistory,
@@ -36,6 +37,7 @@ from plan_b.store.engine import advance_by, run_due_scheduled
 from plan_b.store.episodes import create_episode
 from plan_b.store.projection_db import TRACE_VIEWER, build_view
 from plan_b.store.sessions import issue_session
+from plan_b.world.validate import validate_case
 from plan_b.world.world import load_case
 
 
@@ -269,7 +271,11 @@ def tick_loop(
     Wake rule: a revision the policy did not produce itself (an actor action, a world event, an
     engine transition, including ones that happened during the policy's own tool durations) is
     news, so the policy runs again on the next tick even if the revision changed mid-run. A run
-    that exhausted its tool budget or ended incomplete is also re-woken on the next tick."""
+    that exhausted its tool budget or ended incomplete is also re-woken on the next tick.
+
+    The policy is never woken at or after the event close, or once the coordinator's grant has
+    expired: nothing is left to schedule then, and with an expired grant even its first read
+    would be rejected (``GRANT_EXPIRED``)."""
     runs: list[PolicyRunResult] = []
     clock, _, hard_end = _clock(db, episode_id)
     stop_at = hard_end if minutes is None else min(hard_end, clock + timedelta(minutes=minutes))
@@ -277,8 +283,10 @@ def tick_loop(
     wait_until: datetime | None = None
     while _active(db, episode_id):
         clock, revision, _ = _clock(db, episode_id)
-        if run_policy and (
-            last_seen is None or revision != last_seen or (wait_until and clock >= wait_until)
+        if (
+            run_policy
+            and (last_seen is None or revision != last_seen or (wait_until and clock >= wait_until))
+            and _policy_may_act(db, episode_id)
         ):
             start_revision = revision
             result = host.run(episode_id, max_tool_calls)
@@ -299,6 +307,22 @@ def tick_loop(
                 break
             advance_by(conn, episode_id, 1)
     return runs
+
+
+def _policy_may_act(db: Database, episode_id: str) -> bool:
+    """Whether the event is still open and the coordinator's current grant is unexpired."""
+    with db.read() as conn:
+        ep = repo.get_episode(conn, episode_id)
+        if (
+            repo.get_flag(conn, episode_id, "event_closed")
+            or ep.clock >= repo.goal(conn, episode_id).hard_end
+        ):
+            return False
+        agent = next(
+            p for p in repo.scenario(conn, episode_id).principals if p.role == "coordinator_agent"
+        )
+        found = repo.current_grant(conn, episode_id, agent.grant_id)
+        return found is not None and ep.clock < found[0].expires_at
 
 
 def _exogenous_revisions(
@@ -356,6 +380,9 @@ def run_case(
     from plan_b.evaluation.scoring import score_episode
 
     case: PrivateCase = load_case(case_ref)
+    problems = validate_case(load_public_scenario(scenario_id), case)
+    if problems:
+        raise ValueError(f"private case {case_ref} failed validation: " + "; ".join(problems))
     with db.write() as conn:
         episode_id = create_episode(conn, scenario_id=scenario_id, case_ref=case_ref)
     host = PolicyHost(db, policy_factory)

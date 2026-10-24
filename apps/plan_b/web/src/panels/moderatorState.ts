@@ -5,6 +5,8 @@
 //   "maybe", and the board's own state is evidence too.
 // * An action result is labeled with the action and the scenario time it ran, so an old result
 //   never reads as the current state.
+// * A one-time join code is never shown whole: the page shows a short prefix, and only the link's
+//   href carries the full code.
 
 import { fmtTime } from "../format";
 import type { EventStateView, PolicyRunResult, UtcIso } from "../types";
@@ -63,4 +65,12 @@ export function policyOutcome(run: PolicyRunResult, tz: string | null): string {
 /** A result whose revision the board has since moved past. */
 export function isEarlierResult(resultRevision: number | undefined, view: EventStateView | null): boolean {
   return resultRevision !== undefined && view !== null && view.revision !== resultRevision;
+}
+
+/** Characters of a join code the page may show; never more than a quarter of the code. */
+export const JOIN_CODE_PREVIEW = 4;
+
+/** "P9Ne…": enough to tell two codes apart, too little to use one. */
+export function joinCodePreview(code: string): string {
+  return `${code.slice(0, Math.min(JOIN_CODE_PREVIEW, Math.floor(code.length / 4)))}…`;
 }

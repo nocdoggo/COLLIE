@@ -18,6 +18,7 @@
         "domain_status": "expected",
         "reported_eta": "2026-11-05T17:45:00-05:00",
         "source_record_id": "order_P17_revision_5",
+        "correlation_group": "projector_delivery_01",
         "observed_at": "2026-11-05T16:40:00-05:00",
         "text": "Order P17 currently reports a delayed projector delivery with estimated arrival at 17:45. This is a reported ETA, not confirmation of arrival."
       }

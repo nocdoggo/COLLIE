@@ -5,6 +5,13 @@ transactions (works on Python 3.11 and 3.12). Every write path runs inside
 ``BEGIN IMMEDIATE``: SQLite takes the write lock before the first read, so two writers cannot
 both read the same capacity or revision and then both write. WAL mode lets readers proceed
 while a writer holds the lock.
+
+Every connection also turns on ``recursive_triggers``. Without it, SQLite's REPLACE conflict
+resolution (``INSERT OR REPLACE``, ``REPLACE INTO``, ``UPDATE OR REPLACE``) deletes the
+conflicting row without firing its DELETE triggers, so it could rewrite a receipt, a ledger
+row or a plan version that the history guards refuse to delete. With it on, that delete fires
+the guard and the statement is refused. The app itself never uses REPLACE; its only upsert
+(``revision_snapshots``) is ``ON CONFLICT DO UPDATE``, which deletes nothing.
 """
 
 from __future__ import annotations
@@ -32,6 +39,8 @@ class Database:
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA foreign_keys = ON")
         conn.execute("PRAGMA busy_timeout = 30000")
+        # REPLACE fires the history guards' DELETE triggers only with this on (see above).
+        conn.execute("PRAGMA recursive_triggers = ON")
         return conn
 
     @contextmanager

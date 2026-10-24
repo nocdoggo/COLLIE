@@ -33,6 +33,18 @@ def test_case_matches_its_honest_expectation(results: dict[str, RunResult], ref:
     assert report.violations == ()
 
 
+@pytest.mark.parametrize("ref", ["dev01", "dev02", "dev04", "dev05", "dev06"])
+def test_runs_end_without_a_wake_after_the_close(results: dict[str, RunResult], ref: str) -> None:
+    # At the 18:00 hard end the grants expire and the event closes; the policy is not woken
+    # then, so no clean run ends with a rejected GRANT_EXPIRED read.
+    r = results[ref]
+    hard_end = r.final_view.goal.hard_end
+    assert r.report.rejected_attempts_without_receipt == 0
+    assert [c.call_id for c in r.history.tool_calls if c.error_code == "GRANT_EXPIRED"] == []
+    assert all(c.requested_at is None or c.requested_at < hard_end for c in r.history.tool_calls)
+    assert all(d.at < hard_end for d in r.history.decisions)
+
+
 def test_dev01_genuine_disruption_swap(results: dict[str, RunResult]) -> None:
     r = results["dev01"]
     assert r.report.goal_complete and r.report.applied_plans == 1 and r.report.committed_cents == 0

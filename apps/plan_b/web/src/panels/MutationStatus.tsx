@@ -1,6 +1,7 @@
 import { EPISODE_RESET_MESSAGE } from "../api";
 import { EvidenceCard } from "../components/EvidenceCard";
 import { Code, StatusBadge } from "../components/ui";
+import { appliedWithoutChange } from "../format";
 import type { EventStateView } from "../types";
 import { receiptBadge, receiptConfirmed } from "./submissions";
 import type { MutationTracker, Submission } from "./useMutations";
@@ -23,7 +24,9 @@ function Body({ submission, view, tracker }: { submission: Submission; view: Eve
             <StatusBadge label={receiptBadge(r, view)} />{" "}
             {r.status === "applied"
               ? receiptConfirmed(r, view)
-                ? `Confirmed in the current state: receipt ${r.receipt_id}, revision ${r.revision_before} → ${r.revision_after}.`
+                ? appliedWithoutChange(r)
+                  ? `Nothing new was recorded: receipt ${r.receipt_id} changed nothing and the state stays at revision ${r.revision_after}.`
+                  : `Confirmed in the current state: receipt ${r.receipt_id}, revision ${r.revision_before} → ${r.revision_after}.`
                 : `The receipt ${r.receipt_id} says applied; it counts as done once a fresh state read shows it.`
               : null}
             {r.status === "rejected"
