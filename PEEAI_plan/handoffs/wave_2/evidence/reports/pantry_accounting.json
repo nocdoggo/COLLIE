@@ -1,0 +1,2028 @@
+{
+ "pantry_dev01": {
+  "trace": "pantry_dev01_trace.json",
+  "frames": [
+   {
+    "seq": 1,
+    "revision": 3,
+    "scenario_time": "2026-11-09T17:30:00Z",
+    "cause": "episode_loaded dev_fixture_03",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 24,
+      "reserved_quantity": 0,
+      "available_quantity": 24,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 16,
+      "reserved_quantity": 0,
+      "available_quantity": 16,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 16,
+      "unfulfilled_quantity": 40,
+      "distributed_quantity": 0,
+      "on_time_quantity": 0,
+      "late_quantity": 0,
+      "committed_quantity": 0
+     }
+    ],
+    "handoff_tasks": [],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 2,
+    "revision": 4,
+    "scenario_time": "2026-11-09T17:32:00Z",
+    "cause": "observation obs_0001",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 24,
+      "reserved_quantity": 0,
+      "available_quantity": 24,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 16,
+      "reserved_quantity": 0,
+      "available_quantity": 16,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 16,
+      "unfulfilled_quantity": 40,
+      "distributed_quantity": 0,
+      "on_time_quantity": 0,
+      "late_quantity": 0,
+      "committed_quantity": 0
+     }
+    ],
+    "handoff_tasks": [],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 3,
+    "revision": 5,
+    "scenario_time": "2026-11-09T17:34:00Z",
+    "cause": "observation obs_0002",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 24,
+      "reserved_quantity": 0,
+      "available_quantity": 24,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 16,
+      "reserved_quantity": 0,
+      "available_quantity": 16,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 16,
+      "unfulfilled_quantity": 40,
+      "distributed_quantity": 0,
+      "on_time_quantity": 0,
+      "late_quantity": 0,
+      "committed_quantity": 0
+     }
+    ],
+    "handoff_tasks": [],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 4,
+    "revision": 6,
+    "scenario_time": "2026-11-09T17:35:00Z",
+    "cause": "hold_created hold_0001",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 24,
+      "reserved_quantity": 0,
+      "available_quantity": 24,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 16,
+      "reserved_quantity": 16,
+      "available_quantity": 0,
+      "held_quantity": 16,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 16,
+      "unfulfilled_quantity": 40,
+      "distributed_quantity": 0,
+      "on_time_quantity": 0,
+      "late_quantity": 0,
+      "committed_quantity": 0
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 16,
+      "status": "open"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 5,
+    "revision": 7,
+    "scenario_time": "2026-11-09T17:37:00Z",
+    "cause": "stock_received srec_0001",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 40,
+      "reserved_quantity": 0,
+      "available_quantity": 40,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 0,
+      "reserved_quantity": 0,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 0,
+      "unfulfilled_quantity": 40,
+      "distributed_quantity": 0,
+      "on_time_quantity": 0,
+      "late_quantity": 0,
+      "committed_quantity": 0
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 0,
+      "status": "fulfilled"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 6,
+    "revision": 8,
+    "scenario_time": "2026-11-09T17:38:00Z",
+    "cause": "hold_created hold_0002",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 40,
+      "reserved_quantity": 40,
+      "available_quantity": 0,
+      "held_quantity": 40,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 0,
+      "reserved_quantity": 0,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 0,
+      "unfulfilled_quantity": 40,
+      "distributed_quantity": 0,
+      "on_time_quantity": 0,
+      "late_quantity": 0,
+      "committed_quantity": 0
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 0,
+      "status": "fulfilled"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 7,
+    "revision": 9,
+    "scenario_time": "2026-11-09T17:39:00Z",
+    "cause": "plan_applied cand_0003_0e7eb095",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 40,
+      "reserved_quantity": 40,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 40,
+      "distributed_quantity": 0,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 0,
+      "reserved_quantity": 0,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 0,
+      "unfulfilled_quantity": 40,
+      "distributed_quantity": 0,
+      "on_time_quantity": 0,
+      "late_quantity": 0,
+      "committed_quantity": 40
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 0,
+      "status": "fulfilled"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 8,
+    "revision": 10,
+    "scenario_time": "2026-11-09T17:40:00Z",
+    "cause": "activity_started setup",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 40,
+      "reserved_quantity": 40,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 40,
+      "distributed_quantity": 0,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 0,
+      "reserved_quantity": 0,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 0,
+      "unfulfilled_quantity": 40,
+      "distributed_quantity": 0,
+      "on_time_quantity": 0,
+      "late_quantity": 0,
+      "committed_quantity": 40
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 0,
+      "status": "fulfilled"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 9,
+    "revision": 11,
+    "scenario_time": "2026-11-09T17:50:00Z",
+    "cause": "activity_completed setup",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 40,
+      "reserved_quantity": 40,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 40,
+      "distributed_quantity": 0,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 0,
+      "reserved_quantity": 0,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 0,
+      "unfulfilled_quantity": 40,
+      "distributed_quantity": 0,
+      "on_time_quantity": 0,
+      "late_quantity": 0,
+      "committed_quantity": 40
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 0,
+      "status": "fulfilled"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 10,
+    "revision": 12,
+    "scenario_time": "2026-11-09T17:50:00Z",
+    "cause": "activity_started briefing",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 40,
+      "reserved_quantity": 40,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 40,
+      "distributed_quantity": 0,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 0,
+      "reserved_quantity": 0,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 0,
+      "unfulfilled_quantity": 40,
+      "distributed_quantity": 0,
+      "on_time_quantity": 0,
+      "late_quantity": 0,
+      "committed_quantity": 40
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 0,
+      "status": "fulfilled"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 11,
+    "revision": 13,
+    "scenario_time": "2026-11-09T18:00:00Z",
+    "cause": "activity_completed briefing",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 40,
+      "reserved_quantity": 40,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 40,
+      "distributed_quantity": 0,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 0,
+      "reserved_quantity": 0,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 0,
+      "unfulfilled_quantity": 40,
+      "distributed_quantity": 0,
+      "on_time_quantity": 0,
+      "late_quantity": 0,
+      "committed_quantity": 40
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 0,
+      "status": "fulfilled"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 12,
+    "revision": 14,
+    "scenario_time": "2026-11-09T18:00:00Z",
+    "cause": "activity_started distribution",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 40,
+      "reserved_quantity": 40,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 40,
+      "distributed_quantity": 0,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 0,
+      "reserved_quantity": 0,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 0,
+      "unfulfilled_quantity": 40,
+      "distributed_quantity": 0,
+      "on_time_quantity": 0,
+      "late_quantity": 0,
+      "committed_quantity": 40
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 0,
+      "status": "fulfilled"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 13,
+    "revision": 15,
+    "scenario_time": "2026-11-09T18:40:00Z",
+    "cause": "activity_completed distribution",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 40,
+      "reserved_quantity": 40,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 40,
+      "distributed_quantity": 0,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 0,
+      "reserved_quantity": 0,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 0,
+      "unfulfilled_quantity": 40,
+      "distributed_quantity": 0,
+      "on_time_quantity": 0,
+      "late_quantity": 0,
+      "committed_quantity": 40
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 0,
+      "status": "fulfilled"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 14,
+    "revision": 16,
+    "scenario_time": "2026-11-09T18:40:00Z",
+    "cause": "stock_distributed dist_0001",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 0,
+      "reserved_quantity": 0,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 40,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 0,
+      "reserved_quantity": 0,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 0,
+      "unfulfilled_quantity": 0,
+      "distributed_quantity": 40,
+      "on_time_quantity": 40,
+      "late_quantity": 0,
+      "committed_quantity": 0
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 0,
+      "status": "fulfilled"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 15,
+    "revision": 17,
+    "scenario_time": "2026-11-09T18:40:00Z",
+    "cause": "activity_started reconciliation",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 0,
+      "reserved_quantity": 0,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 40,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 0,
+      "reserved_quantity": 0,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 0,
+      "unfulfilled_quantity": 0,
+      "distributed_quantity": 40,
+      "on_time_quantity": 40,
+      "late_quantity": 0,
+      "committed_quantity": 0
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 0,
+      "status": "fulfilled"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 16,
+    "revision": 18,
+    "scenario_time": "2026-11-09T19:00:00Z",
+    "cause": "activity_completed reconciliation",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 0,
+      "reserved_quantity": 0,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 40,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 0,
+      "reserved_quantity": 0,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 0,
+      "unfulfilled_quantity": 0,
+      "distributed_quantity": 40,
+      "on_time_quantity": 40,
+      "late_quantity": 0,
+      "committed_quantity": 0
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 0,
+      "status": "fulfilled"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 17,
+    "revision": 19,
+    "scenario_time": "2026-11-09T19:00:00Z",
+    "cause": "grant_expired grant_pantry_agent",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 0,
+      "reserved_quantity": 0,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 40,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 0,
+      "reserved_quantity": 0,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 0,
+      "unfulfilled_quantity": 0,
+      "distributed_quantity": 40,
+      "on_time_quantity": 40,
+      "late_quantity": 0,
+      "committed_quantity": 0
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 0,
+      "status": "fulfilled"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 18,
+    "revision": 20,
+    "scenario_time": "2026-11-09T19:00:00Z",
+    "cause": "grant_expired grant_pantry_staff",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 0,
+      "reserved_quantity": 0,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 40,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 0,
+      "reserved_quantity": 0,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 0,
+      "unfulfilled_quantity": 0,
+      "distributed_quantity": 40,
+      "on_time_quantity": 40,
+      "late_quantity": 0,
+      "committed_quantity": 0
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 0,
+      "status": "fulfilled"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 19,
+    "revision": 21,
+    "scenario_time": "2026-11-09T19:00:00Z",
+    "cause": "grant_expired grant_partner_steward",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 0,
+      "reserved_quantity": 0,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 40,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 0,
+      "reserved_quantity": 0,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 0,
+      "unfulfilled_quantity": 0,
+      "distributed_quantity": 40,
+      "on_time_quantity": 40,
+      "late_quantity": 0,
+      "committed_quantity": 0
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 0,
+      "status": "fulfilled"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 20,
+    "revision": 22,
+    "scenario_time": "2026-11-09T19:00:00Z",
+    "cause": "event_closed",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 0,
+      "reserved_quantity": 0,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 40,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 0,
+      "reserved_quantity": 0,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 0,
+      "unfulfilled_quantity": 0,
+      "distributed_quantity": 40,
+      "on_time_quantity": 40,
+      "late_quantity": 0,
+      "committed_quantity": 0
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 0,
+      "status": "fulfilled"
+     }
+    ],
+    "expected_unreceived": 20
+   }
+  ],
+  "original_targets": [
+   [
+    "kits_40",
+    40
+   ]
+  ],
+  "expected_unreceived_values": [
+   20
+  ],
+  "counter_sequence": [
+   [
+    16,
+    40
+   ],
+   [
+    0,
+    40
+   ],
+   [
+    0,
+    0
+   ]
+  ],
+  "problems": []
+ },
+ "pantry_dev02": {
+  "trace": "pantry_dev02_trace.json",
+  "frames": [
+   {
+    "seq": 1,
+    "revision": 3,
+    "scenario_time": "2026-11-09T17:30:00Z",
+    "cause": "episode_loaded dev_fixture_03",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 24,
+      "reserved_quantity": 0,
+      "available_quantity": 24,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 16,
+      "reserved_quantity": 0,
+      "available_quantity": 16,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 16,
+      "unfulfilled_quantity": 40,
+      "distributed_quantity": 0,
+      "on_time_quantity": 0,
+      "late_quantity": 0,
+      "committed_quantity": 0
+     }
+    ],
+    "handoff_tasks": [],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 2,
+    "revision": 4,
+    "scenario_time": "2026-11-09T17:32:00Z",
+    "cause": "observation obs_0001",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 24,
+      "reserved_quantity": 0,
+      "available_quantity": 24,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 16,
+      "reserved_quantity": 0,
+      "available_quantity": 16,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 16,
+      "unfulfilled_quantity": 40,
+      "distributed_quantity": 0,
+      "on_time_quantity": 0,
+      "late_quantity": 0,
+      "committed_quantity": 0
+     }
+    ],
+    "handoff_tasks": [],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 3,
+    "revision": 5,
+    "scenario_time": "2026-11-09T17:34:00Z",
+    "cause": "observation obs_0002",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 24,
+      "reserved_quantity": 0,
+      "available_quantity": 24,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 16,
+      "reserved_quantity": 0,
+      "available_quantity": 16,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 16,
+      "unfulfilled_quantity": 40,
+      "distributed_quantity": 0,
+      "on_time_quantity": 0,
+      "late_quantity": 0,
+      "committed_quantity": 0
+     }
+    ],
+    "handoff_tasks": [],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 4,
+    "revision": 6,
+    "scenario_time": "2026-11-09T17:35:00Z",
+    "cause": "hold_created hold_0001",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 24,
+      "reserved_quantity": 0,
+      "available_quantity": 24,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 16,
+      "reserved_quantity": 16,
+      "available_quantity": 0,
+      "held_quantity": 16,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 16,
+      "unfulfilled_quantity": 40,
+      "distributed_quantity": 0,
+      "on_time_quantity": 0,
+      "late_quantity": 0,
+      "committed_quantity": 0
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 16,
+      "status": "open"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 5,
+    "revision": 7,
+    "scenario_time": "2026-11-09T17:37:00Z",
+    "cause": "stock_received srec_0001",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 34,
+      "reserved_quantity": 0,
+      "available_quantity": 34,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 6,
+      "reserved_quantity": 6,
+      "available_quantity": 0,
+      "held_quantity": 6,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 6,
+      "unfulfilled_quantity": 40,
+      "distributed_quantity": 0,
+      "on_time_quantity": 0,
+      "late_quantity": 0,
+      "committed_quantity": 0
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 6,
+      "status": "partially_fulfilled"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 6,
+    "revision": 8,
+    "scenario_time": "2026-11-09T17:38:00Z",
+    "cause": "hold_created hold_0002",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 34,
+      "reserved_quantity": 34,
+      "available_quantity": 0,
+      "held_quantity": 34,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 6,
+      "reserved_quantity": 6,
+      "available_quantity": 0,
+      "held_quantity": 6,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 6,
+      "unfulfilled_quantity": 40,
+      "distributed_quantity": 0,
+      "on_time_quantity": 0,
+      "late_quantity": 0,
+      "committed_quantity": 0
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 6,
+      "status": "partially_fulfilled"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 7,
+    "revision": 9,
+    "scenario_time": "2026-11-09T17:39:00Z",
+    "cause": "plan_applied cand_0003_0e7eb095",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 34,
+      "reserved_quantity": 34,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 34,
+      "distributed_quantity": 0,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 6,
+      "reserved_quantity": 6,
+      "available_quantity": 0,
+      "held_quantity": 6,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 6,
+      "unfulfilled_quantity": 40,
+      "distributed_quantity": 0,
+      "on_time_quantity": 0,
+      "late_quantity": 0,
+      "committed_quantity": 34
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 6,
+      "status": "partially_fulfilled"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 8,
+    "revision": 10,
+    "scenario_time": "2026-11-09T17:40:00Z",
+    "cause": "activity_started setup",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 34,
+      "reserved_quantity": 34,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 34,
+      "distributed_quantity": 0,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 6,
+      "reserved_quantity": 6,
+      "available_quantity": 0,
+      "held_quantity": 6,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 6,
+      "unfulfilled_quantity": 40,
+      "distributed_quantity": 0,
+      "on_time_quantity": 0,
+      "late_quantity": 0,
+      "committed_quantity": 34
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 6,
+      "status": "partially_fulfilled"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 9,
+    "revision": 11,
+    "scenario_time": "2026-11-09T17:41:00Z",
+    "cause": "hold_released hold_0001",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 34,
+      "reserved_quantity": 34,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 34,
+      "distributed_quantity": 0,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 6,
+      "reserved_quantity": 0,
+      "available_quantity": 6,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 6,
+      "unfulfilled_quantity": 40,
+      "distributed_quantity": 0,
+      "on_time_quantity": 0,
+      "late_quantity": 0,
+      "committed_quantity": 34
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 6,
+      "status": "lapsed"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 10,
+    "revision": 12,
+    "scenario_time": "2026-11-09T17:50:00Z",
+    "cause": "activity_completed setup",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 34,
+      "reserved_quantity": 34,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 34,
+      "distributed_quantity": 0,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 6,
+      "reserved_quantity": 0,
+      "available_quantity": 6,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 6,
+      "unfulfilled_quantity": 40,
+      "distributed_quantity": 0,
+      "on_time_quantity": 0,
+      "late_quantity": 0,
+      "committed_quantity": 34
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 6,
+      "status": "lapsed"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 11,
+    "revision": 13,
+    "scenario_time": "2026-11-09T17:50:00Z",
+    "cause": "activity_started briefing",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 34,
+      "reserved_quantity": 34,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 34,
+      "distributed_quantity": 0,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 6,
+      "reserved_quantity": 0,
+      "available_quantity": 6,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 6,
+      "unfulfilled_quantity": 40,
+      "distributed_quantity": 0,
+      "on_time_quantity": 0,
+      "late_quantity": 0,
+      "committed_quantity": 34
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 6,
+      "status": "lapsed"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 12,
+    "revision": 14,
+    "scenario_time": "2026-11-09T18:00:00Z",
+    "cause": "activity_completed briefing",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 34,
+      "reserved_quantity": 34,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 34,
+      "distributed_quantity": 0,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 6,
+      "reserved_quantity": 0,
+      "available_quantity": 6,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 6,
+      "unfulfilled_quantity": 40,
+      "distributed_quantity": 0,
+      "on_time_quantity": 0,
+      "late_quantity": 0,
+      "committed_quantity": 34
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 6,
+      "status": "lapsed"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 13,
+    "revision": 15,
+    "scenario_time": "2026-11-09T18:00:00Z",
+    "cause": "activity_started distribution",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 34,
+      "reserved_quantity": 34,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 34,
+      "distributed_quantity": 0,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 6,
+      "reserved_quantity": 0,
+      "available_quantity": 6,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 6,
+      "unfulfilled_quantity": 40,
+      "distributed_quantity": 0,
+      "on_time_quantity": 0,
+      "late_quantity": 0,
+      "committed_quantity": 34
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 6,
+      "status": "lapsed"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 14,
+    "revision": 16,
+    "scenario_time": "2026-11-09T18:40:00Z",
+    "cause": "activity_completed distribution",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 34,
+      "reserved_quantity": 34,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 34,
+      "distributed_quantity": 0,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 6,
+      "reserved_quantity": 0,
+      "available_quantity": 6,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 6,
+      "unfulfilled_quantity": 40,
+      "distributed_quantity": 0,
+      "on_time_quantity": 0,
+      "late_quantity": 0,
+      "committed_quantity": 34
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 6,
+      "status": "lapsed"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 15,
+    "revision": 17,
+    "scenario_time": "2026-11-09T18:40:00Z",
+    "cause": "stock_distributed dist_0001",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 0,
+      "reserved_quantity": 0,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 34,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 6,
+      "reserved_quantity": 0,
+      "available_quantity": 6,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 6,
+      "unfulfilled_quantity": 6,
+      "distributed_quantity": 34,
+      "on_time_quantity": 34,
+      "late_quantity": 0,
+      "committed_quantity": 0
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 6,
+      "status": "lapsed"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 16,
+    "revision": 18,
+    "scenario_time": "2026-11-09T18:40:00Z",
+    "cause": "activity_started reconciliation",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 0,
+      "reserved_quantity": 0,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 34,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 6,
+      "reserved_quantity": 0,
+      "available_quantity": 6,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 6,
+      "unfulfilled_quantity": 6,
+      "distributed_quantity": 34,
+      "on_time_quantity": 34,
+      "late_quantity": 0,
+      "committed_quantity": 0
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 6,
+      "status": "lapsed"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 17,
+    "revision": 19,
+    "scenario_time": "2026-11-09T19:00:00Z",
+    "cause": "activity_completed reconciliation",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 0,
+      "reserved_quantity": 0,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 34,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 6,
+      "reserved_quantity": 0,
+      "available_quantity": 6,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 6,
+      "unfulfilled_quantity": 6,
+      "distributed_quantity": 34,
+      "on_time_quantity": 34,
+      "late_quantity": 0,
+      "committed_quantity": 0
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 6,
+      "status": "lapsed"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 18,
+    "revision": 20,
+    "scenario_time": "2026-11-09T19:00:00Z",
+    "cause": "grant_expired grant_pantry_agent",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 0,
+      "reserved_quantity": 0,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 34,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 6,
+      "reserved_quantity": 0,
+      "available_quantity": 6,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 6,
+      "unfulfilled_quantity": 6,
+      "distributed_quantity": 34,
+      "on_time_quantity": 34,
+      "late_quantity": 0,
+      "committed_quantity": 0
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 6,
+      "status": "lapsed"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 19,
+    "revision": 21,
+    "scenario_time": "2026-11-09T19:00:00Z",
+    "cause": "grant_expired grant_pantry_staff",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 0,
+      "reserved_quantity": 0,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 34,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 6,
+      "reserved_quantity": 0,
+      "available_quantity": 6,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 6,
+      "unfulfilled_quantity": 6,
+      "distributed_quantity": 34,
+      "on_time_quantity": 34,
+      "late_quantity": 0,
+      "committed_quantity": 0
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 6,
+      "status": "lapsed"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 20,
+    "revision": 22,
+    "scenario_time": "2026-11-09T19:00:00Z",
+    "cause": "grant_expired grant_partner_steward",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 0,
+      "reserved_quantity": 0,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 34,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 6,
+      "reserved_quantity": 0,
+      "available_quantity": 6,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 6,
+      "unfulfilled_quantity": 6,
+      "distributed_quantity": 34,
+      "on_time_quantity": 34,
+      "late_quantity": 0,
+      "committed_quantity": 0
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 6,
+      "status": "lapsed"
+     }
+    ],
+    "expected_unreceived": 20
+   },
+   {
+    "seq": 21,
+    "revision": 23,
+    "scenario_time": "2026-11-09T19:00:00Z",
+    "cause": "event_closed",
+    "pools": {
+     "pantry_stock": {
+      "on_hand_quantity": 0,
+      "reserved_quantity": 0,
+      "available_quantity": 0,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 34,
+      "expected_quantity": 20
+     },
+     "partner_stock": {
+      "on_hand_quantity": 6,
+      "reserved_quantity": 0,
+      "available_quantity": 6,
+      "held_quantity": 0,
+      "committed_quantity": 0,
+      "distributed_quantity": 0,
+      "expected_quantity": 0
+     }
+    },
+    "pool_total_plus_distributed": 40,
+    "service": [
+     {
+      "target_id": "kits_40",
+      "original_quantity": 40,
+      "target_quantity": 40,
+      "supply_gap_quantity": 6,
+      "unfulfilled_quantity": 6,
+      "distributed_quantity": 34,
+      "on_time_quantity": 34,
+      "late_quantity": 0,
+      "committed_quantity": 0
+     }
+    ],
+    "handoff_tasks": [
+     {
+      "hold_id": "hold_0001",
+      "requested_quantity": 16,
+      "remaining_quantity": 6,
+      "status": "lapsed"
+     }
+    ],
+    "expected_unreceived": 20
+   }
+  ],
+  "original_targets": [
+   [
+    "kits_40",
+    40
+   ]
+  ],
+  "expected_unreceived_values": [
+   20
+  ],
+  "counter_sequence": [
+   [
+    16,
+    40
+   ],
+   [
+    6,
+    40
+   ],
+   [
+    6,
+    6
+   ]
+  ],
+  "problems": []
+ },
+ "problems": []
+}

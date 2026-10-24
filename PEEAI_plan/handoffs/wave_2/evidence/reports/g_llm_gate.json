@@ -1,0 +1,338 @@
+{
+ "calls": [
+  {
+   "attempt": 1,
+   "call_id": "mc_0001",
+   "completion_tokens": 250,
+   "consumed_tool_call_ids": [],
+   "cost_basis": "provider_usage",
+   "cost_usd": 0.007526,
+   "error": null,
+   "generation_id": "gen-1792850559-uuzomovjOHfXkcKtGw9z",
+   "http_status": 200,
+   "latency_ms": 4978,
+   "model_id": "anthropic/claude-sonnet-5.5",
+   "outcome": "ok",
+   "prompt_id": "interpret.v1",
+   "prompt_tokens": 2513,
+   "purpose": "interpret",
+   "reasoning_tokens": 0,
+   "requested_model": "anthropic/claude-sonnet-5.5",
+   "started_at": "2026-10-24T14:02:39.691528Z",
+   "total_tokens": 2763
+  },
+  {
+   "attempt": 1,
+   "call_id": "mc_0002",
+   "completion_tokens": 351,
+   "consumed_tool_call_ids": [],
+   "cost_basis": "provider_usage",
+   "cost_usd": 0.015006,
+   "error": null,
+   "generation_id": "gen-1792850564-2YXou7ygOPoU5k24JCzg",
+   "http_status": 200,
+   "latency_ms": 4447,
+   "model_id": "anthropic/claude-sonnet-5.5",
+   "outcome": "ok",
+   "prompt_id": "choose_action.v1",
+   "prompt_tokens": 5748,
+   "purpose": "choose_action",
+   "reasoning_tokens": 178,
+   "requested_model": "anthropic/claude-sonnet-5.5",
+   "started_at": "2026-10-24T14:02:44.718495Z",
+   "total_tokens": 6099
+  },
+  {
+   "attempt": 1,
+   "call_id": "mc_0003",
+   "completion_tokens": 201,
+   "consumed_tool_call_ids": [
+    "call_00003"
+   ],
+   "cost_basis": "provider_usage",
+   "cost_usd": 0.012558,
+   "error": null,
+   "generation_id": "gen-1792850569-g6YXatkt0uWhBtdVtURv",
+   "http_status": 200,
+   "latency_ms": 3248,
+   "model_id": "anthropic/claude-sonnet-5.5",
+   "outcome": "ok",
+   "prompt_id": "choose_action.v1",
+   "prompt_tokens": 5274,
+   "purpose": "choose_action",
+   "reasoning_tokens": 0,
+   "requested_model": "anthropic/claude-sonnet-5.5",
+   "started_at": "2026-10-24T14:02:49.272259Z",
+   "total_tokens": 5475
+  }
+ ],
+ "checks": {
+  "continued_turn": {
+   "consumed_tool_call_ids": [
+    "call_00003"
+   ],
+   "model_call_ids": [
+    "mc_0003"
+   ]
+  },
+  "interpretation": {
+   "change_spec": {
+    "artifact_type": "change_spec",
+    "based_on_revision": 3,
+    "change_id": "chg_obs_notice_01",
+    "change_kind": "delay",
+    "event_id": "e_showcase_01",
+    "evidence_refs": [
+     "obs_notice_01"
+    ],
+    "interpretation": "The delivery contact claims the projector delivery (order P17) may arrive about 25 minutes after the promised 5 p.m., i.e. around 17:25. The wording is tentative (\"may be\"), and the current delivery status is not confirmed.",
+    "proposed_checks": [
+     "query_status"
+    ],
+    "schema_version": "0.2.0",
+    "subject_id": "projector",
+    "unresolved_fields": [
+     "current delivery status",
+     "confirmed arrival time"
+    ],
+    "valid_window": {
+     "end": "2026-11-05T23:00:00Z",
+     "start": "2026-11-05T21:39:00Z"
+    }
+   },
+   "expected_reading": true,
+   "failure": null,
+   "model_call_ids": [
+    "mc_0001"
+   ]
+  },
+  "tool_invocation": {
+   "invocations": [
+    {
+     "decision_id": "dec_0001",
+     "envelope_status": "succeeded",
+     "option_id": "query:projector:delivery_eta",
+     "receipt_id": null,
+     "tool": "query_status",
+     "tool_call_id": "call_00003"
+    },
+    {
+     "decision_id": "dec_0002",
+     "envelope_status": "succeeded",
+     "option_id": "apply:cand_0002_dc26f35f",
+     "receipt_id": "rcpt_0001",
+     "tool": "apply_plan",
+     "tool_call_id": "call_00006"
+    }
+   ]
+  }
+ },
+ "configuration": {
+  "base_url": "https://openrouter.ai/api/v1",
+  "key_file": ".local/keys/openrouter.key",
+  "key_file_present": true,
+  "ledger": "apps/plan_b/var/model_spend.json",
+  "max_model_calls": 6,
+  "max_run_cost_usd": 0.5,
+  "max_tool_calls": 16,
+  "max_total_cost_usd": 20.0,
+  "model_id": "anthropic/claude-sonnet-5.5",
+  "prompts": {
+   "choose_action.v1": "d82725c25cc976d303dd4b36ad4f36556f4ad5c168b6674e1ac59abfbfd25b8d",
+   "interpret.v1": "147d6c1cb253545af8de61a99958c3430e329f4369c228e5142bef97598556e4"
+  },
+  "provider": "openrouter",
+  "sources": {
+   "PLAN_B_MODEL_BASE_URL": "endpoint_file",
+   "PLAN_B_MODEL_ID": "default",
+   "PLAN_B_MODEL_KEY_FILE": "endpoint_file",
+   "PLAN_B_MODEL_MAX_RUN_COST_USD": "default",
+   "PLAN_B_MODEL_MAX_TOTAL_COST_USD": "default",
+   "PLAN_B_MODEL_PROVIDER": "endpoint_file"
+  },
+  "timeout_s": 90.0
+ },
+ "decisions": [
+  {
+   "candidate_refs": [],
+   "chosen_by": "model",
+   "decision_id": "dec_0001",
+   "failure": null,
+   "kind": "verify",
+   "observation_refs": [
+    "obs_notice_01",
+    "obs_0001"
+   ],
+   "option_id": "query:projector:delivery_eta",
+   "receipt_refs": [],
+   "summary": "Checked projector delivery_eta: delayed, expected, reported ETA 17:25 (obs_0001); notice obs_notice_01 corroborated.",
+   "tool_call_refs": [
+    "call_00003"
+   ]
+  },
+  {
+   "candidate_refs": [
+    "cand_0002_dc26f35f"
+   ],
+   "chosen_by": "model",
+   "decision_id": "dec_0002",
+   "failure": null,
+   "kind": "commit",
+   "observation_refs": [
+    "obs_0001",
+    "obs_notice_01"
+   ],
+   "option_id": "apply:cand_0002_dc26f35f",
+   "receipt_refs": [
+    "rcpt_0001"
+   ],
+   "summary": "Applied Swap demonstrations and skills exchange (cand_0002_dc26f35f, report rpt_0002_dc26f35f): changed demonstrations, skills_exchange, additional committed 0 cents, revision 4 -> 5; the current plan fails arrival_assumptions.",
+   "tool_call_refs": [
+    "call_00006"
+   ]
+  },
+  {
+   "candidate_refs": [
+    "cand_0003_4f53cda1"
+   ],
+   "chosen_by": "server",
+   "decision_id": "dec_0003",
+   "failure": null,
+   "kind": "keep",
+   "observation_refs": [
+    "obs_notice_01"
+   ],
+   "option_id": null,
+   "receipt_refs": [],
+   "summary": "Keep plan v2: it passes every hard check under its stated assumptions; projector is expected (status observation, reported ETA 17:25) for demonstrations at 17:30; notice obs_notice_01 corroborated by obs_0001.",
+   "tool_call_refs": []
+  }
+ ],
+ "episode_usage": {
+  "cost_usd": 0.03509,
+  "max_model_calls": 6,
+  "max_tool_calls": 16,
+  "model_calls": 3,
+  "tool_calls": 8
+ },
+ "error": null,
+ "finished_at": "2026-10-24T14:02:52Z",
+ "gate": "G-LLM",
+ "gate_version": "plan_b.gate/1.0.0",
+ "ledger": {
+  "gate_run_cost_usd": 0.03509,
+  "path": "apps/plan_b/var/model_spend.json",
+  "total_cost_usd_after": 0.03509,
+  "total_cost_usd_before": 0.0
+ },
+ "live": true,
+ "model": {
+  "requested": "anthropic/claude-sonnet-5.5",
+  "returned": [
+   "anthropic/claude-sonnet-5.5"
+  ]
+ },
+ "policy_id": "live/1.0.0",
+ "provider_version": "plan_b.provider/1.0.0",
+ "reasons": [],
+ "run": {
+  "note": "",
+  "status": "waiting",
+  "tool_calls": 8
+ },
+ "sandbox": {
+  "case_ref": "dev01",
+  "database": "temporary in-process SQLite, deleted after the run"
+ },
+ "started_at": "2026-10-24T14:02:39Z",
+ "tool_calls": [
+  {
+   "actor_id": "agent_demo",
+   "call_id": "call_00001",
+   "envelope_status": "succeeded",
+   "error_code": null,
+   "receipt_id": null,
+   "revision_after": 3,
+   "revision_before": 3,
+   "tool": "get_event_state"
+  },
+  {
+   "actor_id": "agent_demo",
+   "call_id": "call_00002",
+   "envelope_status": "succeeded",
+   "error_code": null,
+   "receipt_id": null,
+   "revision_after": 3,
+   "revision_before": 3,
+   "tool": "evaluate_candidates"
+  },
+  {
+   "actor_id": "agent_demo",
+   "call_id": "call_00003",
+   "envelope_status": "succeeded",
+   "error_code": null,
+   "receipt_id": null,
+   "revision_after": 4,
+   "revision_before": 3,
+   "tool": "query_status"
+  },
+  {
+   "actor_id": "agent_demo",
+   "call_id": "call_00004",
+   "envelope_status": "succeeded",
+   "error_code": null,
+   "receipt_id": null,
+   "revision_after": 4,
+   "revision_before": 4,
+   "tool": "get_event_state"
+  },
+  {
+   "actor_id": "agent_demo",
+   "call_id": "call_00005",
+   "envelope_status": "succeeded",
+   "error_code": null,
+   "receipt_id": null,
+   "revision_after": 4,
+   "revision_before": 4,
+   "tool": "evaluate_candidates"
+  },
+  {
+   "actor_id": "agent_demo",
+   "call_id": "call_00006",
+   "envelope_status": "succeeded",
+   "error_code": null,
+   "receipt_id": "rcpt_0001",
+   "revision_after": 5,
+   "revision_before": 4,
+   "tool": "apply_plan"
+  },
+  {
+   "actor_id": "agent_demo",
+   "call_id": "call_00007",
+   "envelope_status": "succeeded",
+   "error_code": null,
+   "receipt_id": null,
+   "revision_after": 5,
+   "revision_before": 5,
+   "tool": "get_event_state"
+  },
+  {
+   "actor_id": "agent_demo",
+   "call_id": "call_00008",
+   "envelope_status": "succeeded",
+   "error_code": null,
+   "receipt_id": null,
+   "revision_after": 5,
+   "revision_before": 5,
+   "tool": "evaluate_candidates"
+  }
+ ],
+ "totals": {
+  "completion_tokens": 802,
+  "cost_usd": 0.03509,
+  "latency_ms": 12673,
+  "model_calls": 3,
+  "prompt_tokens": 13535
+ },
+ "verdict": "pass"
+}

@@ -1,0 +1,504 @@
+{
+ "case_ref": "dev05",
+ "checks": {
+  "failures": [],
+  "fresh_state_agreement": [],
+  "notice_responses": [
+   {
+    "channel": "fixture_initial",
+    "entity_id": "projector",
+    "kind": "notice",
+    "observation_id": "obs_notice_01",
+    "received_at": "2026-11-05T21:40:00Z",
+    "responses": [
+     {
+      "at": "2026-11-05T21:42:00Z",
+      "chosen_by": "model",
+      "decision_id": "dec_0001",
+      "failure": null,
+      "interpretation": null,
+      "kind": "verify",
+      "summary": "Checked projector delivery_eta: cancelled, unavailable (obs_0001); notice obs_notice_01 superseded."
+     },
+     {
+      "at": "2026-11-05T21:44:00Z",
+      "chosen_by": "server",
+      "decision_id": "dec_0003",
+      "failure": null,
+      "interpretation": null,
+      "kind": "infeasible",
+      "summary": "No candidate in the declared action space (Templates keep; swap(demonstrations, skills_exchange); shift(demonstrations: -10, +10 min); shift(skills_exchange: -10, +10 min); substitute(demonstrations: projector -> backup_projector); at most 2 combined edits; 16 candidates generated, 16 evaluated (cap 64)) is feasible at revision 5: blocking constraints activity_windows, commitment_cutoff, dependencies, program_exclusivity, resource_status. Plan v1 is preserved and no booking or spend is made."
+     },
+     {
+      "at": "2026-11-05T22:00:00Z",
+      "chosen_by": "server",
+      "decision_id": "dec_0004",
+      "failure": null,
+      "interpretation": null,
+      "kind": "infeasible",
+      "summary": "No candidate in the declared action space (Templates keep; swap(demonstrations, skills_exchange); shift(demonstrations: -10, +10 min); shift(skills_exchange: -10, +10 min); substitute(demonstrations: projector -> backup_projector); at most 2 combined edits; 16 candidates generated, 16 evaluated (cap 64)) is feasible at revision 7: blocking constraints activity_windows, commitment_cutoff, dependencies, no_past_change, program_exclusivity, resource_status. Plan v1 is preserved and no booking or spend is made."
+     },
+     {
+      "at": "2026-11-05T22:05:00Z",
+      "chosen_by": "server",
+      "decision_id": "dec_0005",
+      "failure": null,
+      "interpretation": null,
+      "kind": "infeasible",
+      "summary": "No candidate in the declared action space (Templates keep; swap(demonstrations, skills_exchange); shift(demonstrations: -10, +10 min); shift(skills_exchange: -10, +10 min); substitute(demonstrations: projector -> backup_projector); at most 2 combined edits; 16 candidates generated, 16 evaluated (cap 64)) is feasible at revision 9: blocking constraints activity_windows, commitment_cutoff, dependencies, no_past_change, participant_availability, program_exclusivity, resource_status. Plan v1 is preserved and no booking or spend is made."
+     },
+     {
+      "at": "2026-11-05T22:10:00Z",
+      "chosen_by": "server",
+      "decision_id": "dec_0006",
+      "failure": null,
+      "interpretation": null,
+      "kind": "infeasible",
+      "summary": "No candidate in the declared action space (Templates keep; swap(demonstrations, skills_exchange); shift(demonstrations: -10, +10 min); shift(skills_exchange: -10, +10 min); substitute(demonstrations: projector -> backup_projector); at most 2 combined edits; 16 candidates generated, 16 evaluated (cap 64)) is feasible at revision 11: blocking constraints activity_windows, dependencies, no_past_change, program_exclusivity, started_history. Plan v1 is preserved and no booking or spend is made."
+     },
+     {
+      "at": "2026-11-05T22:30:00Z",
+      "chosen_by": "server",
+      "decision_id": "dec_0007",
+      "failure": null,
+      "interpretation": null,
+      "kind": "infeasible",
+      "summary": "No candidate in the declared action space (Templates keep; swap(demonstrations, skills_exchange); shift(demonstrations: -10, +10 min); shift(skills_exchange: -10, +10 min); substitute(demonstrations: projector -> backup_projector); at most 2 combined edits; 16 candidates generated, 16 evaluated (cap 64)) is feasible at revision 12: blocking constraints dependencies, no_past_change, program_exclusivity, started_history. Plan v1 is preserved and no booking or spend is made."
+     },
+     {
+      "at": "2026-11-05T22:50:00Z",
+      "chosen_by": "server",
+      "decision_id": "dec_0008",
+      "failure": null,
+      "interpretation": null,
+      "kind": "keep",
+      "summary": "No activity remains to re-plan in plan v1: completed setup, skills_exchange, welcome; in progress none; failed closing, demonstrations. No action can change these records; notice obs_notice_01 superseded by obs_0001."
+     }
+    ],
+    "source_id": "delivery_contact",
+    "text": "Our projector delivery may be about 25 minutes later than the promised 5 p.m. arrival. Please check order P17 for the latest status."
+   }
+  ],
+  "useful_tool_calls": [
+   {
+    "consumed_by_model_calls": [
+     "mc_0003"
+    ],
+    "decision_id": "dec_0001",
+    "envelope_status": "succeeded",
+    "error_code": null,
+    "option_id": "query:projector:delivery_eta",
+    "receipt_id": null,
+    "receipt_status": null,
+    "tool": "query_status",
+    "tool_call_id": "call_00003"
+   },
+   {
+    "consumed_by_model_calls": [],
+    "decision_id": "dec_0002",
+    "envelope_status": "succeeded",
+    "error_code": null,
+    "option_id": "query:backup_projector:availability",
+    "receipt_id": null,
+    "receipt_status": null,
+    "tool": "query_status",
+    "tool_call_id": "call_00006"
+   }
+  ],
+  "validated_actions": []
+ },
+ "configuration": {
+  "base_url": "https://openrouter.ai/api/v1",
+  "episode_caps": {
+   "max_model_calls": 8,
+   "max_tool_calls": 48,
+   "phase": "development"
+  },
+  "key_file": ".local/keys/openrouter.key",
+  "key_file_present": true,
+  "ledger": "apps/plan_b/var/model_spend.json",
+  "max_run_cost_usd": 0.5,
+  "max_total_cost_usd": 8.0,
+  "model_id": "anthropic/claude-sonnet-5.5",
+  "provider": "openrouter",
+  "sources": {
+   "PLAN_B_MODEL_BASE_URL": "endpoint_file",
+   "PLAN_B_MODEL_ID": "default",
+   "PLAN_B_MODEL_KEY_FILE": "endpoint_file",
+   "PLAN_B_MODEL_MAX_RUN_COST_USD": "default",
+   "PLAN_B_MODEL_MAX_TOTAL_COST_USD": "environment",
+   "PLAN_B_MODEL_PROVIDER": "endpoint_file"
+  }
+ },
+ "decisions": [
+  {
+   "at": "2026-11-05T21:42:00Z",
+   "candidate_refs": [],
+   "chosen_by": "model",
+   "decision_id": "dec_0001",
+   "failure": null,
+   "kind": "verify",
+   "mode_label": "Live agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [
+    "obs_notice_01",
+    "obs_0001"
+   ],
+   "option_id": "query:projector:delivery_eta",
+   "rationale_untrusted": "Notice obs_notice_01 claims the projector will arrive at 17:25, which would break the 17:10 demonstrations slot, and no check has answered it. A 2-minute query fits well before 17:10 and shows whether the free swap is needed.",
+   "receipt_refs": [],
+   "revision": 4,
+   "summary": "Checked projector delivery_eta: cancelled, unavailable (obs_0001); notice obs_notice_01 superseded.",
+   "tool_call_refs": [
+    "call_00003"
+   ]
+  },
+  {
+   "at": "2026-11-05T21:44:00Z",
+   "candidate_refs": [],
+   "chosen_by": "model",
+   "decision_id": "dec_0002",
+   "failure": null,
+   "kind": "verify",
+   "mode_label": "Live agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [
+    "obs_0002"
+   ],
+   "option_id": "query:backup_projector:availability",
+   "rationale_untrusted": "The projector is confirmed unavailable (obs_0001), so the keep plan fails. The cheapest working candidate, cand_0002_f5fc676f, rests only on a catalog entry for backup_projector. A 2-minute query fits before the 16:55 hold cutoff and should be done before holding or spending.",
+   "receipt_refs": [],
+   "revision": 5,
+   "summary": "Checked backup_projector availability: booked_elsewhere, unavailable (obs_0002).",
+   "tool_call_refs": [
+    "call_00006"
+   ]
+  },
+  {
+   "at": "2026-11-05T21:44:00Z",
+   "candidate_refs": [],
+   "chosen_by": "server",
+   "decision_id": "dec_0003",
+   "failure": null,
+   "kind": "infeasible",
+   "mode_label": "Live agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [
+    "obs_notice_01"
+   ],
+   "option_id": null,
+   "rationale_untrusted": null,
+   "receipt_refs": [],
+   "revision": 5,
+   "summary": "No candidate in the declared action space (Templates keep; swap(demonstrations, skills_exchange); shift(demonstrations: -10, +10 min); shift(skills_exchange: -10, +10 min); substitute(demonstrations: projector -> backup_projector); at most 2 combined edits; 16 candidates generated, 16 evaluated (cap 64)) is feasible at revision 5: blocking constraints activity_windows, commitment_cutoff, dependencies, program_exclusivity, resource_status. Plan v1 is preserved and no booking or spend is made.",
+   "tool_call_refs": []
+  },
+  {
+   "at": "2026-11-05T22:00:00Z",
+   "candidate_refs": [],
+   "chosen_by": "server",
+   "decision_id": "dec_0004",
+   "failure": null,
+   "kind": "infeasible",
+   "mode_label": "Live agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [
+    "obs_notice_01"
+   ],
+   "option_id": null,
+   "rationale_untrusted": null,
+   "receipt_refs": [],
+   "revision": 7,
+   "summary": "No candidate in the declared action space (Templates keep; swap(demonstrations, skills_exchange); shift(demonstrations: -10, +10 min); shift(skills_exchange: -10, +10 min); substitute(demonstrations: projector -> backup_projector); at most 2 combined edits; 16 candidates generated, 16 evaluated (cap 64)) is feasible at revision 7: blocking constraints activity_windows, commitment_cutoff, dependencies, no_past_change, program_exclusivity, resource_status. Plan v1 is preserved and no booking or spend is made.",
+   "tool_call_refs": []
+  },
+  {
+   "at": "2026-11-05T22:05:00Z",
+   "candidate_refs": [],
+   "chosen_by": "server",
+   "decision_id": "dec_0005",
+   "failure": null,
+   "kind": "infeasible",
+   "mode_label": "Live agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [
+    "obs_notice_01"
+   ],
+   "option_id": null,
+   "rationale_untrusted": null,
+   "receipt_refs": [],
+   "revision": 9,
+   "summary": "No candidate in the declared action space (Templates keep; swap(demonstrations, skills_exchange); shift(demonstrations: -10, +10 min); shift(skills_exchange: -10, +10 min); substitute(demonstrations: projector -> backup_projector); at most 2 combined edits; 16 candidates generated, 16 evaluated (cap 64)) is feasible at revision 9: blocking constraints activity_windows, commitment_cutoff, dependencies, no_past_change, participant_availability, program_exclusivity, resource_status. Plan v1 is preserved and no booking or spend is made.",
+   "tool_call_refs": []
+  },
+  {
+   "at": "2026-11-05T22:10:00Z",
+   "candidate_refs": [],
+   "chosen_by": "server",
+   "decision_id": "dec_0006",
+   "failure": null,
+   "kind": "infeasible",
+   "mode_label": "Live agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [
+    "obs_notice_01"
+   ],
+   "option_id": null,
+   "rationale_untrusted": null,
+   "receipt_refs": [],
+   "revision": 11,
+   "summary": "No candidate in the declared action space (Templates keep; swap(demonstrations, skills_exchange); shift(demonstrations: -10, +10 min); shift(skills_exchange: -10, +10 min); substitute(demonstrations: projector -> backup_projector); at most 2 combined edits; 16 candidates generated, 16 evaluated (cap 64)) is feasible at revision 11: blocking constraints activity_windows, dependencies, no_past_change, program_exclusivity, started_history. Plan v1 is preserved and no booking or spend is made.",
+   "tool_call_refs": []
+  },
+  {
+   "at": "2026-11-05T22:30:00Z",
+   "candidate_refs": [],
+   "chosen_by": "server",
+   "decision_id": "dec_0007",
+   "failure": null,
+   "kind": "infeasible",
+   "mode_label": "Live agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [
+    "obs_notice_01"
+   ],
+   "option_id": null,
+   "rationale_untrusted": null,
+   "receipt_refs": [],
+   "revision": 12,
+   "summary": "No candidate in the declared action space (Templates keep; swap(demonstrations, skills_exchange); shift(demonstrations: -10, +10 min); shift(skills_exchange: -10, +10 min); substitute(demonstrations: projector -> backup_projector); at most 2 combined edits; 16 candidates generated, 16 evaluated (cap 64)) is feasible at revision 12: blocking constraints dependencies, no_past_change, program_exclusivity, started_history. Plan v1 is preserved and no booking or spend is made.",
+   "tool_call_refs": []
+  },
+  {
+   "at": "2026-11-05T22:50:00Z",
+   "candidate_refs": [
+    "cand_0009_4f53cda1"
+   ],
+   "chosen_by": "server",
+   "decision_id": "dec_0008",
+   "failure": null,
+   "kind": "keep",
+   "mode_label": "Live agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [
+    "obs_notice_01"
+   ],
+   "option_id": null,
+   "rationale_untrusted": null,
+   "receipt_refs": [],
+   "revision": 14,
+   "summary": "No activity remains to re-plan in plan v1: completed setup, skills_exchange, welcome; in progress none; failed closing, demonstrations. No action can change these records; notice obs_notice_01 superseded by obs_0001.",
+   "tool_call_refs": []
+  }
+ ],
+ "episode_caps": {
+  "max_model_calls": 8,
+  "max_tool_calls": 48,
+  "model_calls": 3,
+  "phase": "development",
+  "reached": [],
+  "tool_calls": 20
+ },
+ "error": null,
+ "finished_at": "2026-10-24T15:04:26Z",
+ "label": "dev05",
+ "ledger": {
+  "calls_added": 3,
+  "outcomes": {
+   "ok": 3
+  },
+  "path": "apps/plan_b/var/model_spend.json",
+  "run_cost_usd": 0.036524,
+  "run_ids": [
+   "live-89a6ab30a7c7"
+  ],
+  "total_cost_usd_after": 0.260164,
+  "total_cost_usd_before": 0.22364
+ },
+ "matches_expectation": true,
+ "mode_label": "Live agent \u00b7 anthropic/claude-sonnet-5.5",
+ "model": {
+  "by_purpose": {
+   "choose_action": 2,
+   "interpret": 1
+  },
+  "call_log": [
+   {
+    "attempt": 1,
+    "call_id": "mc_0001",
+    "completion_tokens": 250,
+    "consumed_tool_call_ids": [],
+    "cost_basis": "provider_usage",
+    "cost_usd": 0.007526,
+    "decision_id": "dec_0001",
+    "error": null,
+    "http_status": 200,
+    "latency_ms": 2745,
+    "model_id": "anthropic/claude-sonnet-5.5",
+    "outcome": "ok",
+    "prompt_id": "interpret.v1",
+    "prompt_tokens": 2513,
+    "purpose": "interpret",
+    "reasoning_tokens": 0
+   },
+   {
+    "attempt": 1,
+    "call_id": "mc_0002",
+    "completion_tokens": 330,
+    "consumed_tool_call_ids": [],
+    "cost_basis": "provider_usage",
+    "cost_usd": 0.014796,
+    "decision_id": "dec_0001",
+    "error": null,
+    "http_status": 200,
+    "latency_ms": 3670,
+    "model_id": "anthropic/claude-sonnet-5.5",
+    "outcome": "ok",
+    "prompt_id": "choose_action.v1",
+    "prompt_tokens": 5748,
+    "purpose": "choose_action",
+    "reasoning_tokens": 180
+   },
+   {
+    "attempt": 1,
+    "call_id": "mc_0003",
+    "completion_tokens": 356,
+    "consumed_tool_call_ids": [
+     "call_00003"
+    ],
+    "cost_basis": "provider_usage",
+    "cost_usd": 0.014202,
+    "decision_id": "dec_0002",
+    "error": null,
+    "http_status": 200,
+    "latency_ms": 4021,
+    "model_id": "anthropic/claude-sonnet-5.5",
+    "outcome": "ok",
+    "prompt_id": "choose_action.v1",
+    "prompt_tokens": 5321,
+    "purpose": "choose_action",
+    "reasoning_tokens": 161
+   }
+  ],
+  "calls": 3,
+  "completion_tokens": 936,
+  "cost_basis": [
+   "provider_usage"
+  ],
+  "cost_usd": 0.036524,
+  "latency_ms": 10436,
+  "outcomes": {
+   "ok": 3
+  },
+  "prompt_tokens": 13582,
+  "reasoning_tokens": 341,
+  "requested": "anthropic/claude-sonnet-5.5",
+  "returned": [
+   "anthropic/claude-sonnet-5.5"
+  ]
+ },
+ "outcome": {
+  "activities": [
+   {
+    "activity_id": "setup",
+    "completed_at": "2026-11-05T21:50:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-05T21:30:00Z"
+   },
+   {
+    "activity_id": "welcome",
+    "completed_at": "2026-11-05T22:10:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-05T22:00:00Z"
+   },
+   {
+    "activity_id": "demonstrations",
+    "completed_at": null,
+    "failure_reasons": [
+     "projector is unavailable"
+    ],
+    "lifecycle": "failed",
+    "required": true,
+    "started_at": null
+   },
+   {
+    "activity_id": "skills_exchange",
+    "completed_at": "2026-11-05T22:50:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-05T22:30:00Z"
+   },
+   {
+    "activity_id": "closing",
+    "completed_at": null,
+    "failure_reasons": [
+     "predecessor demonstrations is failed, not completed"
+    ],
+    "lifecycle": "failed",
+    "required": true,
+    "started_at": null
+   }
+  ],
+  "applied_plans": 0,
+  "changed_assignments": 0,
+  "committed_cents": 0,
+  "duplicate_records_rejected": 0,
+  "episode_caps": {
+   "max_model_calls": 8,
+   "max_tool_calls": 48,
+   "model_calls": 3,
+   "phase": "development",
+   "reached": [],
+   "tool_calls": 20
+  },
+  "episode_id": "ep_a509bc53b31d",
+  "failed_status_queries": 0,
+  "final_clock": "2026-11-05T23:00:00Z",
+  "final_revision": 20,
+  "goal_complete": false,
+  "holds": {
+   "active_at_end": 0,
+   "committed": 0,
+   "created": 0,
+   "expired": 0,
+   "fulfilled": 0,
+   "released": 0
+  },
+  "infeasibility_reported": true,
+  "mode_label": "Live agent \u00b7 anthropic/claude-sonnet-5.5",
+  "policy_id": "live/1.0.0",
+  "recovery_delay_minutes": null,
+  "rejected_attempts_without_receipt": 0,
+  "rejected_receipts": 0,
+  "report_version": "1.0.0",
+  "reserved_cents_at_end": 0,
+  "scenario_id": "dev_fixture_01",
+  "service": [],
+  "staff_confirmations": 0,
+  "status_queries": 2,
+  "stock": [],
+  "unnecessary_reservations": 0,
+  "violations": []
+ },
+ "outcome_line": "dev05: goal_complete=False infeasibility_reported=True applied_plans=0 committed=0 violations=0 matches_expectation=True",
+ "policy": "live",
+ "policy_id": "live/1.0.0",
+ "record": "plan_b.live_run/1.0.0",
+ "started_at": "2026-10-24T15:04:13Z",
+ "tool_calls": {
+  "by_status": {
+   "succeeded": 20
+  },
+  "by_tool": {
+   "evaluate_candidates": 9,
+   "get_event_state": 9,
+   "query_status": 2
+  },
+  "rejected": [],
+  "total": 20
+ },
+ "trace": {
+  "bytes": 2499303,
+  "file": "traces/live_dev05_trace.json",
+  "sha256": "7d01b20e80a6238970e13da2fa84107f04515905118474133d14e84172454ce8",
+  "verify": "intact"
+ },
+ "wall_seconds": 12.9
+}

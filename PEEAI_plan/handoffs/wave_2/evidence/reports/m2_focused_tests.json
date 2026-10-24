@@ -1,0 +1,254 @@
+{
+  "checks": {
+    "Live campus behavior": {
+      "counts": {
+        "passed": 8,
+        "failed": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "tests": {
+        "tests/test_agent_boundary.py::test_dev01_scripted_model_reaches_the_verified_swap": "passed",
+        "tests/test_agent_boundary.py::test_dev02_style_ask_holds_asks_and_commits_after_authorization": "passed",
+        "tests/test_agent_boundary.py::test_interpretation_checks_identity_and_drops_unknown_evidence": "passed",
+        "tests/test_agent_boundary.py::test_duplicates_and_retractions_are_resolved_by_the_server": "passed",
+        "tests/test_agent_boundary.py::test_gate_passes_with_a_scripted_transport_and_records_no_secret": "passed",
+        "tests/test_agent_boundary.py::test_gate_fails_honestly_when_the_provider_fails": "passed",
+        "tests/test_agent_boundary.py::test_gate_fails_when_no_tool_is_invoked": "passed",
+        "tests/test_integration_policy.py::test_live_policy_selected_by_name_runs_under_the_same_caps": "passed"
+      }
+    },
+    "Bounded failure behavior": {
+      "counts": {
+        "passed": 35,
+        "failed": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "tests": {
+        "tests/test_agent_boundary.py::test_malformed_interpretation_after_one_repair_stays_unresolved": "passed",
+        "tests/test_agent_boundary.py::test_malformed_choice_after_one_repair_is_a_visible_wait": "passed",
+        "tests/test_agent_boundary.py::test_an_option_outside_the_menu_is_rejected_server_side[update_grant]": "passed",
+        "tests/test_agent_boundary.py::test_an_option_outside_the_menu_is_rejected_server_side[record_distribution]": "passed",
+        "tests/test_agent_boundary.py::test_an_option_outside_the_menu_is_rejected_server_side[apply:cand_9999_deadbeef]": "passed",
+        "tests/test_agent_boundary.py::test_an_option_outside_the_menu_is_rejected_server_side[query:main_room:status]": "passed",
+        "tests/test_agent_boundary.py::test_unknown_entity_is_unresolved_and_never_invented": "passed",
+        "tests/test_agent_boundary.py::test_model_call_cap_stops_the_episode": "passed",
+        "tests/test_agent_boundary.py::test_tool_call_cap_stops_the_episode": "passed",
+        "tests/test_agent_boundary.py::test_the_per_run_tool_budget_still_applies": "passed",
+        "tests/test_agent_boundary.py::test_provider_timeout_is_a_visible_wait_and_retried_later": "passed",
+        "tests/test_agent_boundary.py::test_provider_http_error_is_a_visible_wait": "passed",
+        "tests/test_agent_boundary.py::test_spend_cap_stops_without_sending": "passed",
+        "tests/test_agent_boundary.py::test_stale_revision_is_refreshed_and_re_evaluated": "passed",
+        "tests/test_agent_boundary.py::test_stale_revision_retries_are_bounded": "passed",
+        "tests/test_agent_boundary.py::test_lost_response_is_reconciled_with_the_original_key": "passed",
+        "tests/test_agent_boundary.py::test_lost_response_that_cannot_be_established_is_a_reconcile_decision": "passed",
+        "tests/test_agent_boundary.py::test_prompt_injection_in_observation_text_changes_nothing": "passed",
+        "tests/test_agent_boundary.py::test_the_key_never_appears_in_decisions_envelopes_logs_ledger_or_trace": "passed",
+        "tests/test_agent_provider.py::test_malformed_and_invalid_replies_are_typed[<html>not json</html>-ProviderMalformedJSON-malformed_json]": "passed",
+        "tests/test_agent_provider.py::test_malformed_and_invalid_replies_are_typed[this is prose, not JSON-ProviderMalformedJSON-malformed_json]": "passed",
+        "tests/test_agent_provider.py::test_malformed_and_invalid_replies_are_typed[reply2-ProviderSchemaViolation-schema_violation]": "passed",
+        "tests/test_agent_provider.py::test_malformed_and_invalid_replies_are_typed[reply3-ProviderRefusal-refused]": "passed",
+        "tests/test_agent_provider.py::test_malformed_and_invalid_replies_are_typed[reply4-ProviderMalformedJSON-malformed_json]": "passed",
+        "tests/test_agent_provider.py::test_malformed_and_invalid_replies_are_typed[reply5-ProviderMalformedJSON-malformed_json]": "passed",
+        "tests/test_agent_provider.py::test_http_status_errors_are_typed_and_scrubbed": "passed",
+        "tests/test_agent_provider.py::test_transport_timeout_is_typed_and_charged_at_the_bound": "passed",
+        "tests/test_agent_provider.py::test_bounded_timeout_against_a_local_server": "passed",
+        "tests/test_agent_provider.py::test_spend_guard_refuses_a_call_over_the_per_run_cap": "passed",
+        "tests/test_agent_provider.py::test_spend_guard_refuses_a_call_over_the_cumulative_cap": "passed",
+        "tests/test_agent_provider.py::test_spend_guard_fails_closed_on_an_unreadable_ledger": "passed",
+        "tests/test_integration_policy.py::test_a_reached_tool_cap_stops_the_rule_policy_and_says_so": "passed",
+        "tests/test_integration_policy.py::test_failed_calls_count_and_a_run_never_exceeds_the_remaining_budget": "passed",
+        "tests/test_integration_policy.py::test_a_reached_model_cap_stops_waking_the_live_policy": "passed",
+        "tests/test_integration_api.py::test_board_runs_stop_at_the_episode_cap": "passed"
+      }
+    },
+    "Community workflow": {
+      "counts": {
+        "passed": 40,
+        "failed": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "tests": {
+        "tests/test_community_skills_exchange.py::test_fixture_loads_through_the_campus_adapter_and_validates": "passed",
+        "tests/test_community_skills_exchange.py::test_the_changed_constraint_blocks_the_campus_style_swap": "passed",
+        "tests/test_community_skills_exchange.py::test_own_check_in_removes_a_role_assumption_and_changes_feasibility": "passed",
+        "tests/test_community_skills_exchange.py::test_skills_dev01_check_in_drives_one_correct_replan": "passed",
+        "tests/test_community_skills_exchange.py::test_participant_cannot_change_the_goal_or_attest_another_role": "passed",
+        "tests/test_community_skills_exchange.py::test_claiming_organizer_authority_in_a_message_grants_nothing": "passed",
+        "tests/test_community_skills_exchange.py::test_a_resource_offer_alone_reserves_and_spends_nothing": "passed",
+        "tests/test_community_skills_exchange.py::test_goal_version_change_invalidates_older_candidate_reports": "passed",
+        "tests/test_community_skills_exchange.py::test_goal_change_during_the_coordinators_apply_is_re_decided": "passed",
+        "tests/test_community_skills_exchange.py::test_skills_dev02_goal_version_change_invalidates_the_inflight_report": "passed",
+        "tests/test_resource_offer.py::test_owner_offer_activates_the_kit_and_nothing_else": "passed",
+        "tests/test_resource_offer.py::test_the_activated_kit_is_an_approved_option_for_the_planner": "passed",
+        "tests/test_resource_offer.py::test_an_offer_for_later_makes_the_kit_expected_until_confirmed": "passed",
+        "tests/test_resource_offer.py::test_a_retry_with_the_same_key_activates_once": "passed",
+        "tests/test_resource_offer.py::test_a_text_offer_without_the_fields_activates_nothing": "passed",
+        "tests/test_resource_offer.py::test_a_status_record_is_never_overridden": "passed",
+        "tests/test_resource_offer.py::test_refused_unless_the_caller_speaks_for_the_resource": "passed",
+        "tests/test_resource_offer.py::test_the_coordinator_cannot_offer": "passed",
+        "tests/test_resource_offer.py::test_refused_for_a_persons_role": "passed",
+        "tests/test_resource_offer.py::test_refused_for_consumable_stock": "passed",
+        "tests/test_resource_offer.py::test_refused_for_a_resource_that_is_no_approved_option": "passed",
+        "tests/test_resource_offer.py::test_refused_for_a_capability_the_resource_does_not_register": "passed",
+        "tests/test_resource_offer.py::test_refused_when_the_offer_omits_a_needed_capability": "passed",
+        "tests/test_resource_offer.py::test_refused_for_an_interval_the_planner_cannot_use[09:20-09:20-12:00-CONSTRAINT_VIOLATION]": "passed",
+        "tests/test_resource_offer.py::test_refused_for_an_interval_the_planner_cannot_use[09:40-09:40-11:00-CONSTRAINT_VIOLATION]": "passed",
+        "tests/test_resource_offer.py::test_refused_for_an_interval_the_planner_cannot_use[09:50-09:30-09:45-INVALID_REQUEST]": "passed",
+        "tests/test_resource_offer.py::test_refused_when_a_status_record_reports_it_unavailable": "passed",
+        "tests/test_resource_offer.py::test_refused_without_the_registered_terms": "passed",
+        "tests/test_resource_offer.py::test_refused_on_a_stale_revision": "passed",
+        "tests/test_resource_offer.py::test_refused_for_an_unknown_resource": "passed",
+        "tests/test_resource_offer.py::test_malformed_offers_are_invalid_requests[change0]": "passed",
+        "tests/test_resource_offer.py::test_malformed_offers_are_invalid_requests[change1]": "passed",
+        "tests/test_resource_offer.py::test_malformed_offers_are_invalid_requests[change2]": "passed",
+        "tests/test_resource_offer.py::test_malformed_offers_are_invalid_requests[change3]": "passed",
+        "tests/test_resource_offer.py::test_malformed_offers_are_invalid_requests[change4]": "passed",
+        "tests/test_resource_offer.py::test_malformed_offers_are_invalid_requests[change5]": "passed",
+        "tests/test_resource_offer.py::test_malformed_offers_are_invalid_requests[change6]": "passed",
+        "tests/test_integration_api.py::test_participation_tells_each_role_what_it_can_contribute": "passed",
+        "tests/test_integration_api.py::test_offer_and_goal_change_over_http": "passed",
+        "tests/test_stock_conservation.py::test_agent_cannot_call_staff_only_tools": "passed"
+      }
+    },
+    "Shared pantry core": {
+      "counts": {
+        "passed": 15,
+        "failed": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "tests": {
+        "tests/test_pantry_workflow.py::test_four_step_sequence_with_staff_sessions": "passed",
+        "tests/test_pantry_workflow.py::test_runner_case_dev01_reaches_the_target_through_staff": "passed",
+        "tests/test_pantry_workflow.py::test_runner_case_dev02_reports_the_partial_handoff_shortfall": "passed",
+        "tests/test_pantry_workflow.py::test_runner_is_deterministic": "passed",
+        "tests/test_pantry_workflow.py::test_trace_export_verifies_intact_and_carries_no_private_input": "passed",
+        "tests/test_pantry_workflow.py::test_pantry_policy_and_planner_cannot_reach_private_input[evaluation/policies/pantry_rules.py]": "passed",
+        "tests/test_pantry_workflow.py::test_pantry_policy_and_planner_cannot_reach_private_input[domain/adapters/pantry.py]": "passed",
+        "tests/test_pantry_workflow.py::test_pantry_policy_and_planner_cannot_reach_private_input[domain/stock.py]": "passed",
+        "tests/test_pantry_workflow.py::test_staff_actions_over_http": "passed",
+        "tests/test_pantry_fixture.py::test_pantry_fixture_loads_through_its_adapter_and_campus_is_unchanged": "passed",
+        "tests/test_pantry_fixture.py::test_runtime_1_0_0_records_still_parse": "passed",
+        "tests/test_integration_policy.py::test_rule_baselines_run_under_the_development_caps[dev01]": "passed",
+        "tests/test_integration_policy.py::test_rule_baselines_run_under_the_development_caps[dev02]": "passed",
+        "tests/test_integration_policy.py::test_rule_baselines_run_under_the_development_caps[pantry_dev01]": "passed",
+        "tests/test_integration_policy.py::test_rule_baselines_run_under_the_development_caps[skills_dev02]": "passed"
+      }
+    },
+    "Stock and service accounting": {
+      "counts": {
+        "passed": 7,
+        "failed": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "tests": {
+        "tests/test_stock_conservation.py::test_counters_follow_the_planned_table_exactly": "passed",
+        "tests/test_stock_conservation.py::test_handoff_conserves_stock_in_one_atomic_revision": "passed",
+        "tests/test_stock_conservation.py::test_apply_converts_holds_without_double_counting": "passed",
+        "tests/test_stock_conservation.py::test_external_receipt_reconciles_its_shipment_once": "passed",
+        "tests/test_stock_conservation.py::test_an_eta_or_message_never_adds_stock": "passed",
+        "tests/test_stock_conservation.py::test_stock_ledgers_are_append_only": "passed",
+        "tests/test_pantry_workflow.py::test_completion_distribution_and_next_start_order_at_the_inclusive_deadline": "passed"
+      }
+    },
+    "Quantity failure checks": {
+      "counts": {
+        "passed": 10,
+        "failed": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "tests": {
+        "tests/test_stock_conservation.py::test_overlapping_and_non_overlapping_double_allocation_reject": "passed",
+        "tests/test_stock_conservation.py::test_overdraw_unit_and_quantity_shape_are_refused": "passed",
+        "tests/test_stock_conservation.py::test_release_and_expiry_create_no_stock": "passed",
+        "tests/test_stock_conservation.py::test_duplicate_physical_records_cannot_credit_twice": "passed",
+        "tests/test_stock_conservation.py::test_partial_handoff_preserves_the_residual_reservation": "passed",
+        "tests/test_stock_conservation.py::test_early_distribution_cannot_exceed_attended_throughput": "passed",
+        "tests/test_stock_conservation.py::test_a_late_commitment_cannot_backdate_throughput": "passed",
+        "tests/test_stock_conservation.py::test_late_records_keep_their_times_and_fail_on_time_attainment": "passed",
+        "tests/test_stock_conservation.py::test_await_shipment_candidate_counting_expected_units_is_rejected": "passed",
+        "tests/test_stock_conservation.py::test_a_transfer_hold_too_late_for_the_staff_response_is_refused": "passed"
+      }
+    },
+    "Staff boundary": {
+      "counts": {
+        "passed": 11,
+        "failed": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "tests": {
+        "tests/test_stock_conservation.py::test_agent_cannot_call_staff_only_tools": "passed",
+        "tests/test_stock_conservation.py::test_without_staff_attestation_nothing_physical_succeeds": "passed",
+        "tests/test_stock_conservation.py::test_distribution_needs_a_started_service_and_committed_stock": "passed",
+        "tests/test_agent_boundary.py::test_agent_tools_exclude_staff_control_and_participant_tools": "passed",
+        "tests/test_agent_boundary.py::test_the_executor_rejects_staff_unknown_and_ungranted_tools_for_the_agent[record_stock_receipt-arguments0]": "passed",
+        "tests/test_agent_boundary.py::test_the_executor_rejects_staff_unknown_and_ungranted_tools_for_the_agent[record_distribution-arguments1]": "passed",
+        "tests/test_agent_boundary.py::test_the_executor_rejects_staff_unknown_and_ungranted_tools_for_the_agent[update_grant-arguments2]": "passed",
+        "tests/test_agent_boundary.py::test_the_executor_rejects_staff_unknown_and_ungranted_tools_for_the_agent[check_in-arguments3]": "passed",
+        "tests/test_agent_boundary.py::test_the_executor_rejects_staff_unknown_and_ungranted_tools_for_the_agent[no_such_tool-arguments4]": "passed",
+        "tests/test_pantry_workflow.py::test_outcome_scoring_flags_unattested_and_agent_records": "passed",
+        "tests/test_pantry_fixture.py::test_case_validation_rejects_a_staff_rule_outside_its_grant": "passed"
+      }
+    },
+    "Future comparison parity": {
+      "counts": {
+        "passed": 43,
+        "failed": 0,
+        "error": 0,
+        "skipped": 0
+      },
+      "tests": {
+        "tests/test_agent_boundary.py::test_policy_side_modules_cannot_reach_private_input[agent/orchestrator.py]": "passed",
+        "tests/test_agent_boundary.py::test_policy_side_modules_cannot_reach_private_input[agent/interpret.py]": "passed",
+        "tests/test_agent_boundary.py::test_policy_side_modules_cannot_reach_private_input[agent/menu.py]": "passed",
+        "tests/test_agent_boundary.py::test_policy_side_modules_cannot_reach_private_input[agent/prompts/__init__.py]": "passed",
+        "tests/test_agent_boundary.py::test_model_inputs_and_policy_envelopes_exclude_private_data[dev01]": "passed",
+        "tests/test_agent_boundary.py::test_model_inputs_and_policy_envelopes_exclude_private_data[dev02]": "passed",
+        "tests/test_agent_boundary.py::test_model_inputs_and_policy_envelopes_exclude_private_data[dev04]": "passed",
+        "tests/test_agent_boundary.py::test_model_inputs_and_policy_envelopes_exclude_private_data[dev05]": "passed",
+        "tests/test_agent_boundary.py::test_model_inputs_and_policy_envelopes_exclude_private_data[dev06]": "passed",
+        "tests/test_agent_boundary.py::test_the_policy_never_sends_a_tool_outside_its_set[record_stock_receipt]": "passed",
+        "tests/test_agent_boundary.py::test_the_policy_never_sends_a_tool_outside_its_set[record_distribution]": "passed",
+        "tests/test_agent_boundary.py::test_the_policy_never_sends_a_tool_outside_its_set[update_goal]": "passed",
+        "tests/test_agent_boundary.py::test_the_policy_never_sends_a_tool_outside_its_set[update_grant]": "passed",
+        "tests/test_agent_boundary.py::test_the_policy_never_sends_a_tool_outside_its_set[check_in]": "passed",
+        "tests/test_agent_boundary.py::test_the_policy_never_sends_a_tool_outside_its_set[no_such_tool]": "passed",
+        "tests/test_agent_boundary.py::test_the_menu_offers_only_granted_tools": "passed",
+        "tests/test_integration_policy.py::test_live_policy_selected_by_name_runs_under_the_same_caps": "passed",
+        "tests/test_integration_policy.py::test_mode_labels_name_the_policy_that_ran": "passed",
+        "tests/test_integration_policy.py::test_selection_locks_once_the_coordinator_acted_and_survives_a_restart": "passed",
+        "tests/test_runner_isolation.py::test_policy_and_planner_cannot_reach_private_input[evaluation/policies/parser.py]": "passed",
+        "tests/test_runner_isolation.py::test_policy_and_planner_cannot_reach_private_input[evaluation/policies/rules.py]": "passed",
+        "tests/test_runner_isolation.py::test_policy_and_planner_cannot_reach_private_input[evaluation/policies/base.py]": "passed",
+        "tests/test_runner_isolation.py::test_policy_and_planner_cannot_reach_private_input[domain/candidates.py]": "passed",
+        "tests/test_runner_isolation.py::test_policy_and_planner_cannot_reach_private_input[domain/constraints.py]": "passed",
+        "tests/test_runner_isolation.py::test_policy_and_planner_cannot_reach_private_input[domain/objective.py]": "passed",
+        "tests/test_runner_isolation.py::test_policy_and_planner_cannot_reach_private_input[domain/adapters/base.py]": "passed",
+        "tests/test_runner_isolation.py::test_policy_and_planner_cannot_reach_private_input[domain/adapters/campus.py]": "passed",
+        "tests/test_runner_isolation.py::test_policy_and_planner_cannot_reach_private_input[domain/adapters/campus_outcome.py]": "passed",
+        "tests/test_runner_isolation.py::test_policy_and_planner_cannot_reach_private_input[domain/adapters/outcome.py]": "passed",
+        "tests/test_runner_isolation.py::test_policy_and_planner_cannot_reach_private_input[domain/adapters/registry.py]": "passed",
+        "tests/test_runner_isolation.py::test_policy_and_planner_cannot_reach_private_input[domain/projection.py]": "passed",
+        "tests/test_runner_isolation.py::test_policy_and_planner_cannot_reach_private_input[domain/readiness.py]": "passed",
+        "tests/test_runner_isolation.py::test_leak_checker_detects_planted_leaks": "passed",
+        "tests/test_runner_isolation.py::test_policy_inputs_and_planner_inputs_exclude_private_data[dev01]": "passed",
+        "tests/test_runner_isolation.py::test_policy_inputs_and_planner_inputs_exclude_private_data[dev02]": "passed",
+        "tests/test_runner_isolation.py::test_policy_inputs_and_planner_inputs_exclude_private_data[dev04]": "passed",
+        "tests/test_runner_isolation.py::test_policy_inputs_and_planner_inputs_exclude_private_data[dev05]": "passed",
+        "tests/test_runner_isolation.py::test_policy_inputs_and_planner_inputs_exclude_private_data[dev06]": "passed",
+        "tests/test_runner_isolation.py::test_trace_is_sanitized_intact_and_matches_the_run": "passed",
+        "tests/test_runner_isolation.py::test_replay_endpoints_perform_no_writes": "passed",
+        "tests/test_runner_isolation.py::test_runs_are_deterministic": "passed",
+        "tests/test_runner_isolation.py::test_reset_clears_policy_memory_and_episode_records": "passed",
+        "tests/test_runner_isolation.py::test_browser_bundle_carries_no_private_data": "passed"
+      }
+    }
+  },
+  "problems": []
+}

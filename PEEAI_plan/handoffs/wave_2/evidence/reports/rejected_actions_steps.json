@@ -1,0 +1,281 @@
+{
+  "outcome": {
+    "activities": [
+      {
+        "activity_id": "setup",
+        "completed_at": "2026-11-05T21:50:00Z",
+        "failure_reasons": [],
+        "lifecycle": "completed",
+        "required": true,
+        "started_at": "2026-11-05T21:30:00Z"
+      },
+      {
+        "activity_id": "welcome",
+        "completed_at": "2026-11-05T22:10:00Z",
+        "failure_reasons": [],
+        "lifecycle": "completed",
+        "required": true,
+        "started_at": "2026-11-05T22:00:00Z"
+      },
+      {
+        "activity_id": "demonstrations",
+        "completed_at": "2026-11-05T22:30:00Z",
+        "failure_reasons": [],
+        "lifecycle": "completed",
+        "required": true,
+        "started_at": "2026-11-05T22:10:00Z"
+      },
+      {
+        "activity_id": "skills_exchange",
+        "completed_at": "2026-11-05T22:50:00Z",
+        "failure_reasons": [],
+        "lifecycle": "completed",
+        "required": true,
+        "started_at": "2026-11-05T22:30:00Z"
+      },
+      {
+        "activity_id": "closing",
+        "completed_at": "2026-11-05T23:00:00Z",
+        "failure_reasons": [],
+        "lifecycle": "completed",
+        "required": true,
+        "started_at": "2026-11-05T22:50:00Z"
+      }
+    ],
+    "applied_plans": 1,
+    "changed_assignments": 1,
+    "committed_cents": 3500,
+    "duplicate_records_rejected": 0,
+    "episode_caps": null,
+    "episode_id": "ep_2a57b3a56e60",
+    "failed_status_queries": 0,
+    "final_clock": "2026-11-05T23:00:00Z",
+    "final_revision": 26,
+    "goal_complete": true,
+    "holds": {
+      "active_at_end": 0,
+      "committed": 1,
+      "created": 1,
+      "expired": 0,
+      "fulfilled": 0,
+      "released": 0
+    },
+    "infeasibility_reported": false,
+    "mode_label": null,
+    "policy_id": null,
+    "recovery_delay_minutes": 8,
+    "rejected_attempts_without_receipt": 2,
+    "rejected_receipts": 7,
+    "report_version": "1.0.0",
+    "reserved_cents_at_end": 0,
+    "scenario_id": "dev_fixture_01",
+    "service": [],
+    "staff_confirmations": 0,
+    "status_queries": 1,
+    "stock": [],
+    "unnecessary_reservations": 0,
+    "violations": []
+  },
+  "steps": [
+    {
+      "code": null,
+      "envelope_status": "succeeded",
+      "expected": "succeeded",
+      "receipt_id": null,
+      "receipt_status": null,
+      "replayed_receipt": false,
+      "revision_after": 4,
+      "step": "query order P17"
+    },
+    {
+      "code": null,
+      "envelope_status": "succeeded",
+      "expected": "succeeded",
+      "receipt_id": null,
+      "receipt_status": null,
+      "replayed_receipt": false,
+      "revision_after": 4,
+      "step": "evaluate candidates"
+    },
+    {
+      "code": "BUDGET_EXCEEDED",
+      "envelope_status": "rejected",
+      "expected": "rejected BUDGET_EXCEEDED",
+      "receipt_id": "rcpt_0001",
+      "receipt_status": "rejected",
+      "replayed_receipt": false,
+      "revision_after": 4,
+      "step": "paid backup booking beyond the zero committed-spend grant"
+    },
+    {
+      "code": "CANDIDATE_REPORT_MISMATCH",
+      "envelope_status": "rejected",
+      "expected": "rejected CANDIDATE_REPORT_MISMATCH",
+      "receipt_id": "rcpt_0002",
+      "receipt_status": "rejected",
+      "replayed_receipt": false,
+      "revision_after": 4,
+      "step": "forged candidate/report pairing"
+    },
+    {
+      "code": null,
+      "envelope_status": "succeeded",
+      "expected": "applied",
+      "receipt_id": "rcpt_0003",
+      "receipt_status": "applied",
+      "replayed_receipt": false,
+      "revision_after": 5,
+      "step": "free provisional hold on the backup"
+    },
+    {
+      "code": "IDEMPOTENCY_CONFLICT",
+      "envelope_status": "rejected",
+      "expected": "rejected IDEMPOTENCY_CONFLICT (no receipt)",
+      "receipt_id": null,
+      "receipt_status": null,
+      "replayed_receipt": false,
+      "revision_after": 5,
+      "step": "same idempotency key, different body"
+    },
+    {
+      "code": "REVISION_CONFLICT",
+      "envelope_status": "rejected",
+      "expected": "rejected REVISION_CONFLICT",
+      "receipt_id": "rcpt_0004",
+      "receipt_status": "rejected",
+      "replayed_receipt": false,
+      "revision_after": 5,
+      "step": "apply a candidate evaluated before the hold"
+    },
+    {
+      "code": null,
+      "envelope_status": "succeeded",
+      "expected": "succeeded",
+      "receipt_id": null,
+      "receipt_status": null,
+      "replayed_receipt": false,
+      "revision_after": 5,
+      "step": "re-evaluate after the hold"
+    },
+    {
+      "code": "BUDGET_EXCEEDED",
+      "envelope_status": "rejected",
+      "expected": "rejected BUDGET_EXCEEDED",
+      "receipt_id": "rcpt_0005",
+      "receipt_status": "rejected",
+      "replayed_receipt": false,
+      "revision_after": 5,
+      "step": "convert the hold while the committed limit is still 0"
+    },
+    {
+      "code": "SCOPE_VIOLATION",
+      "envelope_status": "rejected",
+      "expected": "rejected SCOPE_VIOLATION",
+      "receipt_id": "rcpt_0006",
+      "receipt_status": "rejected",
+      "replayed_receipt": false,
+      "revision_after": 5,
+      "step": "participant checks in for someone else's role"
+    },
+    {
+      "code": null,
+      "envelope_status": "succeeded",
+      "expected": "applied (stored as data; no grant change)",
+      "receipt_id": "rcpt_0007",
+      "receipt_status": "applied",
+      "replayed_receipt": false,
+      "revision_after": 6,
+      "step": "message that claims organizer authority"
+    },
+    {
+      "code": "GRANT_REQUIRED",
+      "envelope_status": "rejected",
+      "expected": "rejected GRANT_REQUIRED (no receipt)",
+      "receipt_id": null,
+      "receipt_status": null,
+      "replayed_receipt": false,
+      "revision_after": 6,
+      "step": "participant cannot change a grant"
+    },
+    {
+      "code": null,
+      "envelope_status": "succeeded",
+      "expected": "applied",
+      "receipt_id": "rcpt_0008",
+      "receipt_status": "applied",
+      "replayed_receipt": false,
+      "revision_after": 7,
+      "step": "presenter checks in"
+    },
+    {
+      "code": "DUPLICATE_CHECK_IN",
+      "envelope_status": "rejected",
+      "expected": "rejected DUPLICATE_CHECK_IN",
+      "receipt_id": "rcpt_0009",
+      "receipt_status": "rejected",
+      "replayed_receipt": false,
+      "revision_after": 7,
+      "step": "duplicate check-in"
+    },
+    {
+      "code": null,
+      "envelope_status": "succeeded",
+      "expected": "applied",
+      "receipt_id": "rcpt_0010",
+      "receipt_status": "applied",
+      "replayed_receipt": false,
+      "revision_after": 8,
+      "step": "organizer authorizes 3500 committed for the backup"
+    },
+    {
+      "code": null,
+      "envelope_status": "succeeded",
+      "expected": "succeeded",
+      "receipt_id": null,
+      "receipt_status": null,
+      "replayed_receipt": false,
+      "revision_after": 8,
+      "step": "re-evaluate after authorization"
+    },
+    {
+      "code": null,
+      "envelope_status": "succeeded",
+      "expected": "applied",
+      "receipt_id": "rcpt_0011",
+      "receipt_status": "applied",
+      "replayed_receipt": false,
+      "revision_after": 9,
+      "step": "authorized backup booking"
+    },
+    {
+      "code": null,
+      "envelope_status": "succeeded",
+      "expected": "applied (original receipt replayed)",
+      "receipt_id": "rcpt_0011",
+      "receipt_status": "applied",
+      "replayed_receipt": true,
+      "revision_after": 9,
+      "step": "identical retry of the authorized booking"
+    },
+    {
+      "code": "HOLD_CONVERTED",
+      "envelope_status": "rejected",
+      "expected": "rejected HOLD_CONVERTED",
+      "receipt_id": "rcpt_0012",
+      "receipt_status": "rejected",
+      "replayed_receipt": false,
+      "revision_after": 9,
+      "step": "release the converted hold"
+    },
+    {
+      "code": null,
+      "envelope_status": "succeeded",
+      "expected": "applied",
+      "receipt_id": "rcpt_0013",
+      "receipt_status": "applied",
+      "replayed_receipt": false,
+      "revision_after": 14,
+      "step": "facilitator checks in"
+    }
+  ]
+}

@@ -1,0 +1,135 @@
+{
+  "report_version": "1.0.0",
+  "episode_id": "ep_f25fc4270eb1",
+  "scenario_id": "dev_fixture_01",
+  "final_clock": "2026-11-05T23:00:00Z",
+  "final_revision": 20,
+  "goal_complete": false,
+  "activities": [
+    {
+      "activity_id": "setup",
+      "required": true,
+      "lifecycle": "completed",
+      "started_at": "2026-11-05T21:30:00Z",
+      "completed_at": "2026-11-05T21:50:00Z",
+      "failure_reasons": []
+    },
+    {
+      "activity_id": "welcome",
+      "required": true,
+      "lifecycle": "completed",
+      "started_at": "2026-11-05T22:00:00Z",
+      "completed_at": "2026-11-05T22:10:00Z",
+      "failure_reasons": []
+    },
+    {
+      "activity_id": "demonstrations",
+      "required": true,
+      "lifecycle": "failed",
+      "started_at": null,
+      "completed_at": null,
+      "failure_reasons": [
+        "projector is unavailable"
+      ]
+    },
+    {
+      "activity_id": "skills_exchange",
+      "required": true,
+      "lifecycle": "completed",
+      "started_at": "2026-11-05T22:30:00Z",
+      "completed_at": "2026-11-05T22:50:00Z",
+      "failure_reasons": []
+    },
+    {
+      "activity_id": "closing",
+      "required": true,
+      "lifecycle": "failed",
+      "started_at": null,
+      "completed_at": null,
+      "failure_reasons": [
+        "predecessor demonstrations is failed, not completed"
+      ]
+    }
+  ],
+  "committed_cents": 0,
+  "reserved_cents_at_end": 0,
+  "holds": {
+    "created": 0,
+    "released": 0,
+    "expired": 0,
+    "committed": 0,
+    "active_at_end": 0,
+    "fulfilled": 0
+  },
+  "applied_plans": 0,
+  "changed_assignments": 0,
+  "status_queries": 2,
+  "failed_status_queries": 0,
+  "rejected_receipts": 0,
+  "rejected_attempts_without_receipt": 0,
+  "violations": [],
+  "infeasibility_reported": true,
+  "recovery_delay_minutes": null,
+  "case_ref": "dev05",
+  "policy_id": "rules/1.0.0",
+  "predicates": [
+    {
+      "predicate_id": "no_violations",
+      "kind": "no_executed_violations",
+      "passed": true,
+      "detail": "no violations"
+    },
+    {
+      "predicate_id": "within_limits",
+      "kind": "committed_within_limits",
+      "passed": true,
+      "detail": "committed spend within grant and budget"
+    },
+    {
+      "predicate_id": "no_early_equipment",
+      "kind": "no_equipment_start_before_arrival",
+      "passed": true,
+      "detail": "no equipment-dependent start before arrival"
+    },
+    {
+      "predicate_id": "infeasible_reported",
+      "kind": "infeasibility_reported",
+      "passed": true,
+      "detail": "infeasibility recorded in dec_0003"
+    },
+    {
+      "predicate_id": "demos_not_completed",
+      "kind": "activity_not_completed",
+      "passed": true,
+      "detail": "demonstrations is failed"
+    },
+    {
+      "predicate_id": "no_spend",
+      "kind": "committed_spend_equals",
+      "passed": true,
+      "detail": "committed 0 cents; expected 0"
+    },
+    {
+      "predicate_id": "no_plan_change",
+      "kind": "applied_plan_count",
+      "passed": true,
+      "detail": "0 applied plan changes; expected 0"
+    }
+  ],
+  "expected_outcome": "goal_not_complete_infeasibility_reported",
+  "matches_expectation": true,
+  "service": [],
+  "stock": [],
+  "staff_confirmations": 0,
+  "duplicate_records_rejected": 0,
+  "unnecessary_reservations": 0,
+  "mode_label": "Deterministic policy",
+  "episode_caps": {
+    "phase": "development",
+    "max_tool_calls": 48,
+    "max_model_calls": 8,
+    "tool_calls": 19,
+    "model_calls": 0,
+    "reached": []
+  }
+}

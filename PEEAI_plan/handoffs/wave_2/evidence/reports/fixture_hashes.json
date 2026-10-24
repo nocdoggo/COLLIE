@@ -1,0 +1,46 @@
+{
+  "public_fixtures": {
+    "campus_showcase.json": "aca70cd64310a31042a5cb6ab6d96347309a7b0ea42e475ba88d732f680a4377",
+    "community_skills_exchange.json": "4857067399fe4d1addf375420879c1c1e4ddf8f255859a08202b7e6d81355b78",
+    "pantry_continuity.json": "4fe08b0c7ea6d90c43d022cdf9bd97057d620329fad2d59a3489e08435b14004"
+  },
+  "private_cases": {
+    "dev01.json": "02b4e815aabe80ad6e6edfa075789070de60cb3d62fbc4960dd323e67820d1b0",
+    "dev02.json": "508cde3c720d33bdb3b7d70cf8a5ba3570ac1dcfb2708318ae63babd32d8f93d",
+    "dev04.json": "381a8f7ad443b669509a49564121c5a6eb8674dde59c74eb073733db3c6a04c8",
+    "dev05.json": "628c8a7a05f2951291af5885f788b77d1052296ad643660cd6823a1784b53bd4",
+    "dev06.json": "22987d9b6c936335e8ab710c91807fbeb5a92ba91622ad651066c8d3c7200bc0",
+    "pantry_dev01.json": "2d042d589b964c5074287b39570a4d7cf1407b888ca7ff7bddae21c4ffcb852e",
+    "pantry_dev02.json": "5a988c807481f1307eb43d8899f88b8da6e8fd6f0522a07900a1dd6891d0ac63",
+    "skills_dev01.json": "2ba3431032c72bb9bf59ec5cc9906da893816a4498de1dcb48568a85913929b3",
+    "skills_dev02.json": "6ebc680fc035da032704f3cb5f3f6f70a6146277ff17618a6e8dd7ed2c30104b"
+  },
+  "planning_examples": {
+    "campus_showcase.evaluator.json": "bb172333409586d58fd85cab306c462ad6c5103e6461f0306333685c695aff8e",
+    "campus_showcase.public.json": "6c85cda352517da0adba08ab453ec2baf8f0e2fe91fd6f18c3d8f5d7268ddb1e",
+    "candidate_plan.json": "3ad5e9292243a30a8588e23ddbd254e4d72ab50b87178b530eb99decf244c65b",
+    "change_spec.json": "65cc44ce9036651a080a5711e40e5931241292aa69297f879840ee6c810132a8",
+    "commit_receipt.json": "07991c41d055cf849b895e5f7f516970190594626b3a08150573b3a4f7159b17",
+    "commit_request.json": "57e6c0a9fa75c09a1290a106bdc7f17898348bb134d85f933b1839961797b3eb",
+    "community_skills_exchange.public.json": "70ddac23a8095fb7b80d4db4a5c162b8ea49678949a912e805014956f05f01cb",
+    "constraint_report.json": "f06c216d7af078cace7c52fe550a0a2d342e90aa5a6c01a6e4d9fea363b586cb",
+    "observation_after_query.json": "cb92018a9d2c85002075e200c483dec95373cb485eb7ba8e22a49eeaf2b4539c",
+    "pantry_continuity.evaluator.json": "606db0f2771f0fc18ad58783e29f9f0ad7e26c9e8512db5724ddcb69515f814e",
+    "pantry_continuity.public.json": "78d8b4d56e14284008fef60df6bb2ad65c0b610f8c08a3a90cad15af16b4443a"
+  },
+  "planning_schema": "02fa4a3b7c0e4947893fe7be8a146bc4c8bac4e1910d9258a08871791fef8a66",
+  "prompts": {
+    "choose_action.v1.txt": "d82725c25cc976d303dd4b36ad4f36556f4ad5c168b6674e1ac59abfbfd25b8d",
+    "interpret.v1.txt": "147d6c1cb253545af8de61a99958c3430e329f4369c228e5142bef97598556e4"
+  },
+  "lockfiles": {
+    "apps/plan_b/uv.lock": "95b8337fea6818cf0fe290a5df4d0187258a7392f9624bac769b68f974128803",
+    "apps/plan_b/web/package-lock.json": "b4f2e1e79ac52a503b73658dca6bf8a2cf2eb3345e9a3709abf4229634b00d7e"
+  },
+  "migrations": {
+    "0001_initial.sql": "9d22b458174bef4cc5e50369521e194857a39933756de7d64b41ccdcb3528ab1",
+    "0002_scheduled_actions.sql": "935784e86ed1fc370d5dd98149bf65f5ffe760e0335c9ee8f9b7baa4bb70c3c5",
+    "0003_history_guards.sql": "4bd0ccf0ffe447a4bdffb2f935037409824fdc2c66fd603d1762521803195da1",
+    "0004_consumable_stock.sql": "dca6ef2d423cf5d941f9af72da269689511559584559c9548c6ad11b5bdcb014"
+  }
+}

@@ -1,0 +1,180 @@
+{
+  "report_version": "1.0.0",
+  "episode_id": "ep_57666faf0474",
+  "scenario_id": "dev_fixture_03",
+  "final_clock": "2026-11-09T19:00:00Z",
+  "final_revision": 15,
+  "goal_complete": false,
+  "activities": [
+    {
+      "activity_id": "setup",
+      "required": true,
+      "lifecycle": "completed",
+      "started_at": "2026-11-09T17:40:00Z",
+      "completed_at": "2026-11-09T17:50:00Z",
+      "failure_reasons": []
+    },
+    {
+      "activity_id": "briefing",
+      "required": true,
+      "lifecycle": "completed",
+      "started_at": "2026-11-09T17:50:00Z",
+      "completed_at": "2026-11-09T18:00:00Z",
+      "failure_reasons": []
+    },
+    {
+      "activity_id": "distribution",
+      "required": true,
+      "lifecycle": "completed",
+      "started_at": "2026-11-09T18:00:00Z",
+      "completed_at": "2026-11-09T18:40:00Z",
+      "failure_reasons": []
+    },
+    {
+      "activity_id": "reconciliation",
+      "required": true,
+      "lifecycle": "completed",
+      "started_at": "2026-11-09T18:40:00Z",
+      "completed_at": "2026-11-09T19:00:00Z",
+      "failure_reasons": []
+    }
+  ],
+  "committed_cents": 0,
+  "reserved_cents_at_end": 0,
+  "holds": {
+    "created": 0,
+    "released": 0,
+    "expired": 0,
+    "committed": 0,
+    "active_at_end": 0,
+    "fulfilled": 0
+  },
+  "applied_plans": 0,
+  "changed_assignments": 0,
+  "status_queries": 0,
+  "failed_status_queries": 0,
+  "rejected_receipts": 0,
+  "rejected_attempts_without_receipt": 0,
+  "violations": [],
+  "infeasibility_reported": false,
+  "recovery_delay_minutes": null,
+  "case_ref": "pantry_dev01",
+  "policy_id": "live/1.0.0",
+  "predicates": [
+    {
+      "predicate_id": "p_required",
+      "kind": "all_required_completed_by_deadline",
+      "passed": true,
+      "detail": "all required activities completed by the deadline"
+    },
+    {
+      "predicate_id": "p_conserved",
+      "kind": "stock_conserved",
+      "passed": true,
+      "detail": "every pool conserved"
+    },
+    {
+      "predicate_id": "p_expected",
+      "kind": "expected_unreceived_equals",
+      "passed": true,
+      "detail": "S20: 20 unreceived; expected 20"
+    },
+    {
+      "predicate_id": "p_staff_only",
+      "kind": "no_staff_attestation_by_agent",
+      "passed": true,
+      "detail": "every stock attestation is staff's"
+    },
+    {
+      "predicate_id": "p_no_violations",
+      "kind": "no_executed_violations",
+      "passed": true,
+      "detail": "no violations"
+    },
+    {
+      "predicate_id": "p_spend",
+      "kind": "committed_spend_equals",
+      "passed": true,
+      "detail": "committed 0 cents; expected 0"
+    },
+    {
+      "predicate_id": "p_on_time",
+      "kind": "service_on_time_equals",
+      "passed": false,
+      "detail": "kits_40: 0 on time; expected 40"
+    },
+    {
+      "predicate_id": "p_unfulfilled",
+      "kind": "service_unfulfilled_equals",
+      "passed": false,
+      "detail": "kits_40: 40 unfulfilled; expected 0"
+    },
+    {
+      "predicate_id": "p_pantry_end",
+      "kind": "stock_on_hand_equals",
+      "passed": false,
+      "detail": "pantry_stock: 24 on hand; expected 0"
+    },
+    {
+      "predicate_id": "p_partner_end",
+      "kind": "stock_on_hand_equals",
+      "passed": false,
+      "detail": "partner_stock: 16 on hand; expected 0"
+    },
+    {
+      "predicate_id": "p_plans",
+      "kind": "applied_plan_count",
+      "passed": false,
+      "detail": "0 applied plan changes; expected 1"
+    }
+  ],
+  "expected_outcome": "goal_complete",
+  "matches_expectation": false,
+  "service": [
+    {
+      "target_id": "kits_40",
+      "unit": "standard_kit",
+      "original_quantity": 40,
+      "distributed_quantity": 0,
+      "on_time_quantity": 0,
+      "late_quantity": 0,
+      "unfulfilled_quantity": 40,
+      "supply_gap_quantity": 16,
+      "attained": false
+    }
+  ],
+  "stock": [
+    {
+      "resource_id": "pantry_stock",
+      "opening_quantity": 24,
+      "received_quantity": 0,
+      "transferred_out_quantity": 0,
+      "distributed_quantity": 0,
+      "closing_on_hand_quantity": 24,
+      "expected_unreceived_quantity": 20,
+      "conserved": true
+    },
+    {
+      "resource_id": "partner_stock",
+      "opening_quantity": 16,
+      "received_quantity": 0,
+      "transferred_out_quantity": 0,
+      "distributed_quantity": 0,
+      "closing_on_hand_quantity": 16,
+      "expected_unreceived_quantity": 0,
+      "conserved": true
+    }
+  ],
+  "staff_confirmations": 0,
+  "duplicate_records_rejected": 0,
+  "unnecessary_reservations": 0,
+  "mode_label": "Live agent · anthropic/claude-sonnet-5.5 (requested; no reply yet)",
+  "episode_caps": {
+    "phase": "development",
+    "max_tool_calls": 48,
+    "max_model_calls": 8,
+    "tool_calls": 10,
+    "model_calls": 0,
+    "reached": []
+  }
+}

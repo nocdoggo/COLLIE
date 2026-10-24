@@ -1,0 +1,221 @@
+{
+ "case_ref": "pantry_dev01",
+ "checks": {
+  "failures": [],
+  "fresh_state_agreement": [],
+  "notice_responses": [],
+  "useful_tool_calls": [],
+  "validated_actions": []
+ },
+ "configuration": {
+  "base_url": "https://openrouter.ai/api/v1",
+  "episode_caps": {
+   "max_model_calls": 8,
+   "max_tool_calls": 48,
+   "phase": "development"
+  },
+  "key_file": ".local/keys/openrouter.key",
+  "key_file_present": true,
+  "ledger": "apps/plan_b/var/model_spend.json",
+  "max_run_cost_usd": 0.5,
+  "max_total_cost_usd": 8.0,
+  "model_id": "anthropic/claude-sonnet-5.5",
+  "provider": "openrouter",
+  "sources": {
+   "PLAN_B_MODEL_BASE_URL": "endpoint_file",
+   "PLAN_B_MODEL_ID": "default",
+   "PLAN_B_MODEL_KEY_FILE": "endpoint_file",
+   "PLAN_B_MODEL_MAX_RUN_COST_USD": "default",
+   "PLAN_B_MODEL_MAX_TOTAL_COST_USD": "environment",
+   "PLAN_B_MODEL_PROVIDER": "endpoint_file"
+  }
+ },
+ "decisions": [
+  {
+   "at": "2026-11-09T17:30:00Z",
+   "candidate_refs": [
+    "cand_0001_cf54bd98"
+   ],
+   "chosen_by": "server",
+   "decision_id": "dec_0001",
+   "failure": null,
+   "kind": "wait",
+   "mode_label": "Live agent \u00b7 anthropic/claude-sonnet-5.5 (requested; no reply yet)",
+   "observation_refs": [],
+   "option_id": null,
+   "rationale_untrusted": null,
+   "receipt_refs": [],
+   "revision": 3,
+   "summary": "No candidate can be applied now; the best feasible option is Hand off partner_stock into pantry_stock for kits_40 (distribution) (cand_0001_cf54bd98). Not prepared because: no applicable preparation step. Plan v1 is kept unchanged.",
+   "tool_call_refs": []
+  }
+ ],
+ "episode_caps": {
+  "max_model_calls": 8,
+  "max_tool_calls": 48,
+  "model_calls": 0,
+  "phase": "development",
+  "reached": [],
+  "tool_calls": 10
+ },
+ "error": null,
+ "finished_at": "2026-10-24T15:03:50Z",
+ "label": "pantry_dev01",
+ "ledger": {
+  "calls_added": 0,
+  "outcomes": {},
+  "path": "apps/plan_b/var/model_spend.json",
+  "run_cost_usd": 0.0,
+  "run_ids": [],
+  "total_cost_usd_after": 0.22364,
+  "total_cost_usd_before": 0.22364
+ },
+ "matches_expectation": false,
+ "mode_label": "Live agent \u00b7 anthropic/claude-sonnet-5.5 (requested; no reply yet)",
+ "model": {
+  "by_purpose": {},
+  "call_log": [],
+  "calls": 0,
+  "completion_tokens": 0,
+  "cost_basis": [],
+  "cost_usd": 0,
+  "latency_ms": 0,
+  "outcomes": {},
+  "prompt_tokens": 0,
+  "reasoning_tokens": 0,
+  "requested": "anthropic/claude-sonnet-5.5",
+  "returned": []
+ },
+ "outcome": {
+  "activities": [
+   {
+    "activity_id": "setup",
+    "completed_at": "2026-11-09T17:50:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-09T17:40:00Z"
+   },
+   {
+    "activity_id": "briefing",
+    "completed_at": "2026-11-09T18:00:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-09T17:50:00Z"
+   },
+   {
+    "activity_id": "distribution",
+    "completed_at": "2026-11-09T18:40:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-09T18:00:00Z"
+   },
+   {
+    "activity_id": "reconciliation",
+    "completed_at": "2026-11-09T19:00:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-09T18:40:00Z"
+   }
+  ],
+  "applied_plans": 0,
+  "changed_assignments": 0,
+  "committed_cents": 0,
+  "duplicate_records_rejected": 0,
+  "episode_caps": {
+   "max_model_calls": 8,
+   "max_tool_calls": 48,
+   "model_calls": 0,
+   "phase": "development",
+   "reached": [],
+   "tool_calls": 10
+  },
+  "episode_id": "ep_57666faf0474",
+  "failed_status_queries": 0,
+  "final_clock": "2026-11-09T19:00:00Z",
+  "final_revision": 15,
+  "goal_complete": false,
+  "holds": {
+   "active_at_end": 0,
+   "committed": 0,
+   "created": 0,
+   "expired": 0,
+   "fulfilled": 0,
+   "released": 0
+  },
+  "infeasibility_reported": false,
+  "mode_label": "Live agent \u00b7 anthropic/claude-sonnet-5.5 (requested; no reply yet)",
+  "policy_id": "live/1.0.0",
+  "recovery_delay_minutes": null,
+  "rejected_attempts_without_receipt": 0,
+  "rejected_receipts": 0,
+  "report_version": "1.0.0",
+  "reserved_cents_at_end": 0,
+  "scenario_id": "dev_fixture_03",
+  "service": [
+   {
+    "attained": false,
+    "distributed_quantity": 0,
+    "late_quantity": 0,
+    "on_time_quantity": 0,
+    "original_quantity": 40,
+    "supply_gap_quantity": 16,
+    "target_id": "kits_40",
+    "unfulfilled_quantity": 40,
+    "unit": "standard_kit"
+   }
+  ],
+  "staff_confirmations": 0,
+  "status_queries": 0,
+  "stock": [
+   {
+    "closing_on_hand_quantity": 24,
+    "conserved": true,
+    "distributed_quantity": 0,
+    "expected_unreceived_quantity": 20,
+    "opening_quantity": 24,
+    "received_quantity": 0,
+    "resource_id": "pantry_stock",
+    "transferred_out_quantity": 0
+   },
+   {
+    "closing_on_hand_quantity": 16,
+    "conserved": true,
+    "distributed_quantity": 0,
+    "expected_unreceived_quantity": 0,
+    "opening_quantity": 16,
+    "received_quantity": 0,
+    "resource_id": "partner_stock",
+    "transferred_out_quantity": 0
+   }
+  ],
+  "unnecessary_reservations": 0,
+  "violations": []
+ },
+ "outcome_line": "pantry_dev01: goal_complete=False infeasibility_reported=False applied_plans=0 committed=0 violations=0 matches_expectation=False",
+ "policy": "live",
+ "policy_id": "live/1.0.0",
+ "record": "plan_b.live_run/1.0.0",
+ "started_at": "2026-10-24T15:03:48Z",
+ "tool_calls": {
+  "by_status": {
+   "succeeded": 10
+  },
+  "by_tool": {
+   "evaluate_candidates": 5,
+   "get_event_state": 5
+  },
+  "rejected": [],
+  "total": 10
+ },
+ "trace": {
+  "bytes": 819276,
+  "file": "traces/live_pantry_dev01_trace.json",
+  "sha256": "d404e9c08798e5c3b49ce9d7083f7bb1dacbb6d971319fb8ff13a88e38ed075e",
+  "verify": "intact"
+ },
+ "wall_seconds": 2.1
+}

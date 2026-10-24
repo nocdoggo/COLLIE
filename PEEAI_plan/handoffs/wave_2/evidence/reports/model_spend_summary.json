@@ -1,0 +1,96 @@
+{
+  "ledger": "apps/plan_b/var/model_spend.json",
+  "total_cost_usd": 0.29906,
+  "calls": 26,
+  "sum_of_runs_usd": 0.29906,
+  "runs": {
+    "gate-2026-10-24T14:02:39Z": {
+      "label": "G-LLM gate",
+      "calls": 3,
+      "cost_usd": 0.03509,
+      "outcomes": {
+        "ok": 3
+      },
+      "models_returned": [
+        "anthropic/claude-sonnet-5.5"
+      ]
+    },
+    "live-4baff74140e5": {
+      "label": "live run dev01",
+      "calls": 3,
+      "cost_usd": 0.03604,
+      "outcomes": {
+        "ok": 3
+      },
+      "models_returned": [
+        "anthropic/claude-sonnet-5.5"
+      ]
+    },
+    "live-d65d7b59fe0c": {
+      "label": "live run dev04",
+      "calls": 3,
+      "cost_usd": 0.0298,
+      "outcomes": {
+        "ok": 3
+      },
+      "models_returned": [
+        "anthropic/claude-sonnet-5.5"
+      ]
+    },
+    "live-2b5171c43573": {
+      "label": "live run dev02",
+      "calls": 6,
+      "cost_usd": 0.07743,
+      "outcomes": {
+        "ok": 6
+      },
+      "models_returned": [
+        "anthropic/claude-sonnet-5.5"
+      ]
+    },
+    "live-b72c18a0aaf7": {
+      "label": "live run skills_dev01",
+      "calls": 2,
+      "cost_usd": 0.017544,
+      "outcomes": {
+        "ok": 2
+      },
+      "models_returned": [
+        "anthropic/claude-sonnet-5.5"
+      ]
+    },
+    "live-9b3b21683c9b": {
+      "label": "live run skills_dev02",
+      "calls": 3,
+      "cost_usd": 0.027736,
+      "outcomes": {
+        "ok": 3
+      },
+      "models_returned": [
+        "anthropic/claude-sonnet-5.5"
+      ]
+    },
+    "live-89a6ab30a7c7": {
+      "label": "live run dev05",
+      "calls": 3,
+      "cost_usd": 0.036524,
+      "outcomes": {
+        "ok": 3
+      },
+      "models_returned": [
+        "anthropic/claude-sonnet-5.5"
+      ]
+    },
+    "live-c8f6e3344502": {
+      "label": "live run dev06",
+      "calls": 3,
+      "cost_usd": 0.038896,
+      "outcomes": {
+        "ok": 3
+      },
+      "models_returned": [
+        "anthropic/claude-sonnet-5.5"
+      ]
+    }
+  }
+}
