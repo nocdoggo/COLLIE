@@ -1,7 +1,7 @@
-# Byte-compiled / optimized / DLL files
 # Local application credentials (never commit key contents)
 /.local/keys/
 
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
 *$py.class
