@@ -5,13 +5,17 @@
 import { addMinutes, compareIso, toUtcIso } from "../format";
 import type { EventStateView, JsonObject, UtcIso } from "../types";
 
-/** Availability end choices: every 5 minutes from just after the scenario clock to the hard end. */
-export function endChoices(view: Pick<EventStateView, "clock" | "goal">): UtcIso[] {
+/**
+ * Availability end choices: every 5 minutes from just after the scenario clock to the hard end,
+ * or to `until` when that is earlier (a role's declared window scopes its availability).
+ */
+export function endChoices(view: Pick<EventStateView, "clock" | "goal">, until?: UtcIso): UtcIso[] {
   const out: UtcIso[] = [];
   const clockMs = new Date(view.clock).getTime();
   const firstMs = Math.ceil((clockMs + 60_000) / 300_000) * 300_000;
+  const last = until !== undefined && compareIso(until, view.goal.hard_end) < 0 ? until : view.goal.hard_end;
   let t = toUtcIso(new Date(firstMs));
-  while (compareIso(t, view.goal.hard_end) <= 0 && out.length < 60) {
+  while (compareIso(t, last) <= 0 && out.length < 60) {
     out.push(t);
     t = addMinutes(t, 5);
   }

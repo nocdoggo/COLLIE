@@ -148,7 +148,17 @@ def test_dev01_private_case_traces_to_planning_evaluator() -> None:
 
 
 def test_private_cases_are_opaque_and_separate() -> None:
-    assert available_cases() == ["dev01", "dev02", "dev04", "dev05", "dev06"]
+    assert available_cases() == [
+        "dev01",
+        "dev02",
+        "dev04",
+        "dev05",
+        "dev06",
+        "pantry_dev01",
+        "pantry_dev02",
+        "skills_dev01",
+        "skills_dev02",
+    ]
     for ref in available_cases():
         assert case_path(ref).name == f"{ref}.json"  # no revealing file names
         assert load_case(ref).never_expose_to_agent is True

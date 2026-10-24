@@ -8,8 +8,17 @@
 // * A one-time join code is never shown whole: the page shows a short prefix, and only the link's
 //   href carries the full code.
 
-import { fmtTime } from "../format";
-import type { EventStateView, PolicyRunResult, UtcIso } from "../types";
+import { DETERMINISTIC_POLICY_LABEL, fmtTime, liveAgentLabel } from "../format";
+import type { PolicySelection } from "../components/policyMode";
+import type {
+  EpisodePolicy,
+  EventStateView,
+  ModeratorCase,
+  PolicyChoice,
+  PolicyRunResult,
+  PolicySetting,
+  UtcIso,
+} from "../types";
 
 /** GET /api/moderator/current: an id, null (none), or undefined (no answer yet, or it failed). */
 export type CurrentEpisode = string | null | undefined;
@@ -73,4 +82,38 @@ export const JOIN_CODE_PREVIEW = 4;
 /** "P9Ne…": enough to tell two codes apart, too little to use one. */
 export function joinCodePreview(code: string): string {
   return `${code.slice(0, Math.min(JOIN_CODE_PREVIEW, Math.floor(code.length / 4)))}…`;
+}
+
+// ---------------------------------------------------------------------------
+// Coordinator policy switch
+// ---------------------------------------------------------------------------
+
+/** What a policy run button says for the selected policy. */
+export const RUN_POLICY_LABEL: Record<PolicyChoice, string> = {
+  rules: "Run deterministic policy",
+  live: "Run live agent",
+};
+
+/** The selection a server setting describes; its model id is the configured one. */
+export function selectionOf(setting: EpisodePolicy & { readonly model_id?: string | null }): PolicySelection {
+  return {
+    choice: setting.policy,
+    modelId: setting.policy === "live" ? (setting.model_id ?? null) : null,
+    label: setting.label ?? null,
+  };
+}
+
+/** "Deterministic policy" or "Live agent · <model id>" for a setting (the server's label first). */
+export function settingLabel(setting: PolicySetting): string {
+  if (typeof setting.label === "string" && setting.label.length > 0) return setting.label;
+  return setting.policy === "live" ? liveAgentLabel(setting.model_id ?? null) : DETERMINISTIC_POLICY_LABEL;
+}
+
+/**
+ * The scenario to load a case on: the one the case list names, else null so the server uses
+ * the case's own (a Wave 1 server lists campus cases only and defaults to their scenario).
+ */
+export function scenarioOfCase(cases: readonly ModeratorCase[] | null, caseRef: string): string | null {
+  const row = cases?.find((c) => c.case_ref === caseRef);
+  return typeof row?.scenario_id === "string" && row.scenario_id.length > 0 ? row.scenario_id : null;
 }

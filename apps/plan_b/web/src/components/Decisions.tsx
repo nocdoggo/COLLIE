@@ -1,25 +1,31 @@
 import { useState } from "react";
 
-import { DECISION_LABEL, compareIso, fmtCents, fmtTime, lookups } from "../format";
+import { compareIso, fmtTime } from "../format";
 import type { EventStateView } from "../types";
-import { AUTHORIZATION_STATE_TEXT, authorizationRequests } from "./authorization";
+import { authorizationRequests } from "./authorization";
+import { DecisionCard } from "./DecisionCard";
 import { EvidenceCard } from "./EvidenceCard";
-import { Code, Empty, JumpButton, Section, StatusBadge, Tag, When, domId } from "./ui";
+import { policyModeOf } from "./policyMode";
+import { Empty, Section, When } from "./ui";
 
-/** Policy decisions (kind + summary), newest first, with their evidence references. */
+/** Policy decisions, newest first, each as a DecisionCard with its evidence references. */
 export function Decisions({ view }: { view: EventStateView }) {
-  const tz = view.timezone;
-  const look = lookups(view);
   const requests = new Map(authorizationRequests(view).map((item) => [item.request.request_id, item]));
   const decisions = view.decisions
     .map((d, index) => ({ d, index }))
     .sort((a, b) => compareIso(b.d.at, a.d.at) || b.d.revision - a.d.revision || b.index - a.index)
     .map((x) => x.d);
+  const mode = policyModeOf(view.decisions);
   return (
     <Section
       id="decisions"
       title={`Policy decisions (${decisions.length})`}
-      subtitle="What the deterministic policy decided and why, as narration. Receipts are the evidence."
+      subtitle={
+        <>
+          What the coordinator policy decided and why, as narration. Receipts are the evidence.
+          {decisions.length > 0 ? <> Policy that ran: <strong>{mode.label}</strong>.</> : null}
+        </>
+      }
     >
       {decisions.length === 0 ? (
         <Empty>No decisions recorded.</Empty>
@@ -28,69 +34,8 @@ export function Decisions({ view }: { view: EventStateView }) {
           {decisions.map((d) => {
             const request = d.authorization_request;
             const item = request !== null ? requests.get(request.request_id) : undefined;
-            const isLatestForRequest = item !== undefined && item.decision.decision_id === d.decision_id;
-            return (
-              <li key={d.decision_id} id={domId("dec", d.decision_id)} tabIndex={-1} className="decision">
-                <p>
-                  <StatusBadge label={DECISION_LABEL[d.kind]} /> {d.summary}
-                </p>
-                <p className="muted small">
-                  <When iso={d.at} text={fmtTime(d.at, tz)} /> · revision {d.revision} · <Code>{d.policy_id}</Code>
-                  {d.wait_until !== null ? (
-                    <>
-                      {" "}· wait until <When iso={d.wait_until} text={fmtTime(d.wait_until, tz)} />
-                    </>
-                  ) : null}
-                </p>
-                {request !== null ? (
-                  <div className="notice tone-warn">
-                    <p>
-                      <span aria-hidden="true">⚑ </span>
-                      <strong>Authorization request</strong>: raise <Code>{request.target_grant_id}</Code>{" "}
-                      committed limit from {fmtCents(request.current_value)} to{" "}
-                      {fmtCents(request.requested_value)} for {look.resourceLabel(request.resource_id)} (candidate{" "}
-                      <Code>{request.candidate_id}</Code>). {request.reason}
-                    </p>
-                    {isLatestForRequest ? (
-                      <p>
-                        <Tag tone={item.state === "open" ? "warn" : "neutral"} icon={item.state === "open" ? "⧗" : "✓"}>
-                          {AUTHORIZATION_STATE_TEXT[item.state]}
-                        </Tag>
-                      </p>
-                    ) : null}
-                  </div>
-                ) : null}
-                {d.observation_refs.length > 0 ? (
-                  <p className="small">
-                    Updates:{" "}
-                    {d.observation_refs.map((ref) => (
-                      <JumpButton key={ref} targetId={domId("obs", ref)}>
-                        {ref}
-                      </JumpButton>
-                    ))}
-                  </p>
-                ) : null}
-                {d.receipt_refs.length > 0 ? (
-                  <p className="small">
-                    Receipts:{" "}
-                    {d.receipt_refs.map((ref) => (
-                      <JumpButton key={ref} targetId={domId("rcpt", ref)}>
-                        {ref}
-                      </JumpButton>
-                    ))}
-                  </p>
-                ) : null}
-                {d.candidate_refs.length > 0 ? (
-                  <p className="small muted">Candidates: {d.candidate_refs.join(", ")}</p>
-                ) : null}
-                {d.tool_call_refs.length > 0 ? (
-                  <p className="small muted">Tool calls: {d.tool_call_refs.join(", ")}</p>
-                ) : null}
-                {Object.keys(d.details).length > 0 ? (
-                  <EvidenceCard title="Decision details (JSON)" value={d.details} />
-                ) : null}
-              </li>
-            );
+            const latest = item !== undefined && item.decision.decision_id === d.decision_id ? item : undefined;
+            return <DecisionCard key={d.decision_id} decision={d} view={view} authorization={latest} />;
           })}
         </ol>
       )}

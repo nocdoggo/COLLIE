@@ -672,6 +672,7 @@ def test_dev02_run_reset_and_restart_pass_the_guards(tmp_path: Path) -> None:
         "0001_initial",
         "0002_scheduled_actions",
         "0003_history_guards",
+        "0004_consumable_stock",
     ]
     second = run_case(restarted, "dev02")
     assert second.report.matches_expectation and second.report.committed_cents == 3500

@@ -17,8 +17,10 @@ from plan_b.domain.models import (
     AuthorityGrant,
     CheckInView,
     CommitmentView,
+    DistributionView,
     EvaluationResult,
     EventGoal,
+    ExpectedShipment,
     HoldView,
     Observation,
     ObservationRecord,
@@ -28,6 +30,9 @@ from plan_b.domain.models import (
     ResourceDef,
     StatusCheckView,
     StatusFacts,
+    StockAllocationView,
+    StockMovementView,
+    StockReceiptView,
     TimeWindow,
     ToolCallRecord,
     TransitionView,
@@ -286,6 +291,7 @@ def holds(conn: sqlite3.Connection, episode_id: str) -> tuple[HoldView, ...]:
     rows = conn.execute("SELECT * FROM holds WHERE episode_id = ? ORDER BY rowid", (episode_id,))
     out = []
     for r in rows:
+        consumable = bool(r["consumable"])
         out.append(
             HoldView(
                 hold_id=r["hold_id"],
@@ -308,6 +314,12 @@ def holds(conn: sqlite3.Connection, episode_id: str) -> tuple[HoldView, ...]:
                 terminal_at=parse_ts(r["terminal_at"]) if r["terminal_at"] else None,
                 created_receipt_id=r["created_receipt_id"],
                 terminal_receipt_id=r["terminal_receipt_id"],
+                consumable=consumable,
+                # A reusable resource's hold has no consumable remainder to show.
+                remaining_quantity=r["remaining_quantity"] if consumable else None,
+                purpose=r["purpose"],
+                destination_resource_id=r["destination_resource_id"],
+                service_target_id=r["service_target_id"],
             )
         )
     return tuple(out)
@@ -656,6 +668,281 @@ def attempts(
             error_code=r["error_code"],
         )
         for r in rows
+    )
+
+
+# ---------------------------------------------------------------------------
+# Consumable stock ledgers (migration 0004, runtime 1.1.0)
+# ---------------------------------------------------------------------------
+
+
+def _ts(value: datetime | None) -> str | None:
+    return fmt_ts(value) if value is not None else None
+
+
+def stock_movements(conn: sqlite3.Connection, episode_id: str) -> tuple[StockMovementView, ...]:
+    rows = conn.execute(
+        "SELECT * FROM stock_movements WHERE episode_id = ? ORDER BY seq", (episode_id,)
+    )
+    return tuple(
+        StockMovementView(
+            seq=r["seq"],
+            at=parse_ts(r["at"]),
+            resource_id=r["resource_id"],
+            kind=r["kind"],
+            quantity=r["quantity"],
+            delta=r["delta"],
+            counterpart_resource_id=r["counterpart_resource_id"],
+            reference=r["reference"],
+            hold_id=r["hold_id"],
+            shipment_id=r["shipment_id"],
+            receipt_id=r["receipt_id"],
+            revision=r["revision"],
+        )
+        for r in rows
+    )
+
+
+def append_stock_movement(
+    conn: sqlite3.Connection,
+    episode_id: str,
+    *,
+    at: datetime,
+    resource_id: str,
+    kind: str,
+    quantity: int,
+    revision: int,
+    counterpart_resource_id: str | None = None,
+    reference: str | None = None,
+    hold_id: str | None = None,
+    shipment_id: str | None = None,
+    receipt_id: str | None = None,
+) -> None:
+    """One on-hand change. Credits (opening, receipt) are positive, debits negative."""
+    delta = quantity if kind in ("opening", "receipt") else -quantity
+    seq = next_seq(conn, episode_id, "stock_movement")
+    conn.execute(
+        "INSERT INTO stock_movements (episode_id, seq, at, resource_id, kind, quantity, delta,"
+        " counterpart_resource_id, reference, hold_id, shipment_id, receipt_id, revision)"
+        " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        (
+            episode_id,
+            seq,
+            fmt_ts(at),
+            resource_id,
+            kind,
+            quantity,
+            delta,
+            counterpart_resource_id,
+            reference,
+            hold_id,
+            shipment_id,
+            receipt_id,
+            revision,
+        ),
+    )
+
+
+def expected_shipments(conn: sqlite3.Connection, episode_id: str) -> tuple[ExpectedShipment, ...]:
+    rows = conn.execute(
+        "SELECT * FROM expected_shipments WHERE episode_id = ? ORDER BY rowid", (episode_id,)
+    )
+    return tuple(
+        ExpectedShipment(
+            shipment_id=r["shipment_id"],
+            destination_resource_id=r["destination_resource_id"],
+            quantity=r["quantity"],
+            received_quantity=r["received_quantity"],
+            expected_at=parse_ts(r["expected_at"]) if r["expected_at"] else None,
+            source_ref=r["source_ref"],
+        )
+        for r in rows
+    )
+
+
+def insert_expected_shipment(
+    conn: sqlite3.Connection, episode_id: str, shipment: ExpectedShipment
+) -> None:
+    conn.execute(
+        "INSERT INTO expected_shipments (episode_id, shipment_id, destination_resource_id,"
+        " quantity, received_quantity, expected_at, source_ref) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        (
+            episode_id,
+            shipment.shipment_id,
+            shipment.destination_resource_id,
+            shipment.quantity,
+            shipment.received_quantity,
+            _ts(shipment.expected_at),
+            shipment.source_ref,
+        ),
+    )
+
+
+def stock_receipts(conn: sqlite3.Connection, episode_id: str) -> tuple[StockReceiptView, ...]:
+    rows = conn.execute(
+        "SELECT * FROM stock_receipts WHERE episode_id = ? ORDER BY rowid", (episode_id,)
+    )
+    return tuple(
+        StockReceiptView(
+            stock_receipt_id=r["stock_receipt_id"],
+            receipt_reference=r["receipt_reference"],
+            kind=r["kind"],
+            resource_id=r["resource_id"],
+            source_resource_id=r["source_resource_id"],
+            source_hold_id=r["source_hold_id"],
+            shipment_id=r["shipment_id"],
+            quantity=r["quantity"],
+            unit=r["unit"],
+            source_observation_id=r["source_observation_id"],
+            at=parse_ts(r["at"]),
+            actor_id=r["actor_id"],
+            receipt_id=r["receipt_id"],
+            revision=r["revision"],
+        )
+        for r in rows
+    )
+
+
+def stock_receipt_by_reference(
+    conn: sqlite3.Connection, episode_id: str, reference: str
+) -> StockReceiptView | None:
+    return next(
+        (r for r in stock_receipts(conn, episode_id) if r.receipt_reference == reference), None
+    )
+
+
+def insert_stock_receipt(conn: sqlite3.Connection, episode_id: str, rec: StockReceiptView) -> None:
+    conn.execute(
+        "INSERT INTO stock_receipts (episode_id, stock_receipt_id, receipt_reference, kind,"
+        " resource_id, source_resource_id, source_hold_id, shipment_id, quantity, unit,"
+        " source_observation_id, at, actor_id, receipt_id, revision)"
+        " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        (
+            episode_id,
+            rec.stock_receipt_id,
+            rec.receipt_reference,
+            rec.kind,
+            rec.resource_id,
+            rec.source_resource_id,
+            rec.source_hold_id,
+            rec.shipment_id,
+            rec.quantity,
+            rec.unit,
+            rec.source_observation_id,
+            fmt_ts(rec.at),
+            rec.actor_id,
+            rec.receipt_id,
+            rec.revision,
+        ),
+    )
+
+
+def stock_allocations(conn: sqlite3.Connection, episode_id: str) -> tuple[StockAllocationView, ...]:
+    rows = conn.execute(
+        "SELECT * FROM stock_allocations WHERE episode_id = ? ORDER BY rowid", (episode_id,)
+    )
+    return tuple(
+        StockAllocationView(
+            allocation_id=r["allocation_id"],
+            resource_id=r["resource_id"],
+            service_target_id=r["service_target_id"],
+            activity_id=r["activity_id"],
+            quantity=r["quantity"],
+            remaining_quantity=r["remaining_quantity"],
+            source_hold_id=r["source_hold_id"],
+            plan_version=r["plan_version"],
+            created_at=parse_ts(r["created_at"]),
+            receipt_id=r["receipt_id"],
+            actor_id=r["actor_id"],
+            grant_id=r["grant_id"],
+        )
+        for r in rows
+    )
+
+
+def insert_stock_allocation(
+    conn: sqlite3.Connection, episode_id: str, alloc: StockAllocationView
+) -> None:
+    conn.execute(
+        "INSERT INTO stock_allocations (episode_id, allocation_id, resource_id,"
+        " service_target_id, activity_id, quantity, remaining_quantity, source_hold_id,"
+        " plan_version, created_at, receipt_id, actor_id, grant_id)"
+        " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        (
+            episode_id,
+            alloc.allocation_id,
+            alloc.resource_id,
+            alloc.service_target_id,
+            alloc.activity_id,
+            alloc.quantity,
+            alloc.remaining_quantity,
+            alloc.source_hold_id,
+            alloc.plan_version,
+            fmt_ts(alloc.created_at),
+            alloc.receipt_id,
+            alloc.actor_id,
+            alloc.grant_id,
+        ),
+    )
+
+
+def distributions(conn: sqlite3.Connection, episode_id: str) -> tuple[DistributionView, ...]:
+    rows = conn.execute(
+        "SELECT * FROM distributions WHERE episode_id = ? ORDER BY rowid", (episode_id,)
+    )
+    return tuple(
+        DistributionView(
+            distribution_id=r["distribution_id"],
+            distribution_reference=r["distribution_reference"],
+            resource_id=r["resource_id"],
+            service_target_id=r["service_target_id"],
+            activity_id=r["activity_id"],
+            quantity=r["quantity"],
+            unit=r["unit"],
+            goal_version=r["goal_version"],
+            allocation_ids=tuple(json.loads(r["allocation_ids_json"])),
+            at=parse_ts(r["at"]),
+            on_time=bool(r["on_time"]),
+            actor_id=r["actor_id"],
+            receipt_id=r["receipt_id"],
+            revision=r["revision"],
+        )
+        for r in rows
+    )
+
+
+def distribution_by_reference(
+    conn: sqlite3.Connection, episode_id: str, reference: str
+) -> DistributionView | None:
+    return next(
+        (d for d in distributions(conn, episode_id) if d.distribution_reference == reference),
+        None,
+    )
+
+
+def insert_distribution(conn: sqlite3.Connection, episode_id: str, rec: DistributionView) -> None:
+    conn.execute(
+        "INSERT INTO distributions (episode_id, distribution_id, distribution_reference,"
+        " resource_id, service_target_id, activity_id, quantity, unit, goal_version,"
+        " allocation_ids_json, at, on_time, actor_id, receipt_id, revision)"
+        " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        (
+            episode_id,
+            rec.distribution_id,
+            rec.distribution_reference,
+            rec.resource_id,
+            rec.service_target_id,
+            rec.activity_id,
+            rec.quantity,
+            rec.unit,
+            rec.goal_version,
+            dumps(list(rec.allocation_ids)),
+            fmt_ts(rec.at),
+            int(rec.on_time),
+            rec.actor_id,
+            rec.receipt_id,
+            rec.revision,
+        ),
     )
 
 

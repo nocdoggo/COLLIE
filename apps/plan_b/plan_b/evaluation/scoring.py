@@ -12,6 +12,11 @@ domain-independent: counters, the event budget and grant limits, and the predica
 Private ``PrivateCase`` predicates are evaluated only when the runner passes a case. Their
 results, the expected outcome and anything derived from them stay in the runner-side report;
 ``public_summary`` removes them for browser-facing use.
+
+Consumable profiles (runtime 1.1.0) add the service and stock columns of the report: each
+target against its original quantity (on time, late, unfulfilled, supply gap), each pool's
+conservation terms, staff confirmations, duplicate physical records refused and reservations
+that lapsed or were released unused. They come from the final view's ``stock`` projection.
 """
 
 from __future__ import annotations
@@ -22,6 +27,7 @@ from typing import Any, Literal
 from plan_b.domain.adapters.outcome import OutcomeRecords, Violation, required_completed
 from plan_b.domain.adapters.registry import adapter_for
 from plan_b.domain.models import (
+    STAFF_TOOLS,
     ActionReceipt,
     ActivityOutcome,
     EpisodeHistory,
@@ -34,12 +40,14 @@ from plan_b.domain.models import (
     PredicateResult,
     PrivateCase,
 )
+from plan_b.domain.stock import PANTRY_CHECK_IDS, service_outcomes, stock_outcomes
 from plan_b.domain.timeutil import local_label, minutes_between, parse_ts, to_utc
 
 REPORT_VERSION: Literal["1.0.0"] = "1.0.0"
 PLAN_CHANGE_FIELDS = frozenset({"scheduled_window", "resource_ids"})
 PRIVATE_FIELDS = frozenset({"predicates", "expected_outcome", "case_ref", "matches_expectation"})
-# Hard-check identifiers of the campus planner (contract section 10).
+# Hard-check identifiers of the planners (contract section 10): the campus checks, then the
+# consumable checks the pantry adapter adds.
 HARD_CHECK_IDS = (
     "required_activities",
     "fixed_venue",
@@ -58,6 +66,7 @@ HARD_CHECK_IDS = (
     "accessibility",
     "commitment_cutoff",
     "budget",
+    *PANTRY_CHECK_IDS,
 )
 BUDGET_CATEGORIES = frozenset({"grant_limit", "budget"})
 
@@ -114,6 +123,7 @@ def score_episode(
         infeasibility_reported=infeasible,
         recovery_delay_minutes=_recovery_delay(final, applied),
         policy_id=policy_id,
+        **_stock_columns(final, records),
     )
     if case is None:
         return report
@@ -269,7 +279,36 @@ def _hold_stats(final: EventStateView) -> HoldStats:
         expired=statuses.count("expired"),
         committed=statuses.count("committed"),
         active_at_end=statuses.count("active"),
+        fulfilled=statuses.count("fulfilled"),
     )
+
+
+def _stock_columns(final: EventStateView, records: OutcomeRecords) -> dict[str, Any]:
+    """The consumable report columns; empty for a profile without stock."""
+    stock = final.stock
+    if stock is None:
+        return {}
+    handed = {r.source_hold_id for r in stock.receipts if r.source_hold_id}
+    unused = sum(
+        1
+        for h in final.holds
+        if h.consumable
+        and h.effective_status in ("released", "expired")
+        and h.hold_id not in handed
+    )
+    return {
+        "service": service_outcomes(stock),
+        "stock": stock_outcomes(stock),
+        "staff_confirmations": sum(
+            1 for r in records.receipts if r.tool in STAFF_TOOLS and r.status == "applied"
+        ),
+        "duplicate_records_rejected": sum(
+            1
+            for r in records.receipts
+            if r.status == "rejected" and r.error_code == "DUPLICATE_REFERENCE"
+        ),
+        "unnecessary_reservations": unused,
+    }
 
 
 def _recovery_delay(final: EventStateView, applied: list[ActionReceipt]) -> int | None:
@@ -357,7 +396,91 @@ def _predicate(
         if report.infeasibility_reported:
             return result(False, "an infeasible decision exists but names no blocking constraint")
         return result(False, "no infeasible decision was recorded")
+    if kind in STOCK_PREDICATES:
+        return _stock_predicate(predicate, records, violations)
     return result(False, f"predicate kind {kind!r} is not supported")
+
+
+STOCK_PREDICATES = frozenset(
+    {
+        "service_on_time_equals",
+        "service_unfulfilled_equals",
+        "stock_on_hand_equals",
+        "expected_unreceived_equals",
+        "stock_conserved",
+        "no_staff_attestation_by_agent",
+    }
+)
+
+
+def _stock_predicate(
+    predicate: OutcomePredicate, records: OutcomeRecords, violations: list[Violation]
+) -> PredicateResult:
+    def result(passed: bool, detail: str) -> PredicateResult:
+        return PredicateResult(
+            predicate_id=predicate.predicate_id, kind=predicate.kind, passed=passed, detail=detail
+        )
+
+    params = predicate.params
+    kind = predicate.kind
+    stock = records.final.stock
+    if kind == "no_staff_attestation_by_agent":
+        by_agent = [
+            r.receipt_id
+            for r in records.receipts
+            if r.tool in STAFF_TOOLS
+            and r.actor_role == "coordinator_agent"
+            and r.status == "applied"
+        ]
+        found = [v.message for v in violations if v.category == "attestation_by_agent"]
+        ok = not by_agent and not found
+        return result(ok, "; ".join(found + by_agent) or "every stock attestation is staff's")
+    if stock is None:
+        return result(False, "the episode has no consumable stock projection")
+    if kind == "stock_conserved":
+        bad = [b.resource_id for b in stock.balances if not b.conserved]
+        return result(
+            not bad, f"not conserved: {', '.join(bad)}" if bad else "every pool conserved"
+        )
+    quantity = params.get("quantity")
+    if not isinstance(quantity, int):
+        return result(False, "parameter 'quantity' is missing or not an integer")
+    if kind in ("service_on_time_equals", "service_unfulfilled_equals"):
+        target = next((s for s in stock.service if s.target_id == params.get("target_id")), None)
+        if target is None:
+            return result(False, f"target {params.get('target_id')!r} is not registered")
+        actual = (
+            target.on_time_quantity
+            if kind == "service_on_time_equals"
+            else target.unfulfilled_quantity
+        )
+        what = "on time" if kind == "service_on_time_equals" else "unfulfilled"
+        return result(
+            actual == quantity, f"{target.target_id}: {actual} {what}; expected {quantity}"
+        )
+    if kind == "stock_on_hand_equals":
+        pool = next((b for b in stock.balances if b.resource_id == params.get("resource_id")), None)
+        if pool is None:
+            return result(False, f"pool {params.get('resource_id')!r} is not registered")
+        return result(
+            pool.on_hand_quantity == quantity,
+            f"{pool.resource_id}: {pool.on_hand_quantity} on hand; expected {quantity}",
+        )
+    shipment = next(
+        (
+            s
+            for s in stock.expected_shipments
+            if s.shipment.shipment_id == params.get("shipment_id")
+        ),
+        None,
+    )
+    if shipment is None:
+        return result(False, f"shipment {params.get('shipment_id')!r} is not registered")
+    return result(
+        shipment.outstanding_quantity == quantity,
+        f"{shipment.shipment.shipment_id}: {shipment.outstanding_quantity} unreceived;"
+        f" expected {quantity}",
+    )
 
 
 def _names_blocking(decision: PolicyDecision) -> bool:

@@ -3,19 +3,25 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ApiError, DEFAULT_SCENARIO_ID, DETERMINISTIC_POLICY_ID, NoResponseError, moderatorApi } from "../api";
 import type { StoredSession } from "../api";
 import { EvidenceCard } from "../components/EvidenceCard";
+import { policyModeOf } from "../components/policyMode";
+import type { PolicySelection } from "../components/policyMode";
 import { loadServerReplay } from "../replay/loader";
 import { Code, Empty, Section, StatusBadge, Tag } from "../components/ui";
-import { DECISION_LABEL, fmtWall } from "../format";
+import { DECISION_LABEL, DETERMINISTIC_POLICY_LABEL, LIVE_AGENT_LABEL, fmtWall, isLivePolicyId, liveAgentLabel } from "../format";
 import type {
   ClockAdvanceResult,
   EventStateView,
   ExportResult,
   IssuedSession,
+  ModeratorCase,
+  PolicyChoice,
   PolicyRunResult,
+  PolicySetting,
   RunMinutesResult,
   UtcIso,
 } from "../types";
 import {
+  RUN_POLICY_LABEL,
   actionHeadline,
   clockOutcome,
   isEarlierResult,
@@ -23,6 +29,9 @@ import {
   knownActiveEpisode,
   policyOutcome,
   resetNeedsConfirmation,
+  scenarioOfCase,
+  selectionOf,
+  settingLabel,
 } from "./moderatorState";
 import type { ActionStamp, CurrentEpisode, Stamped } from "./moderatorState";
 
@@ -79,8 +88,8 @@ function PolicyRunSummary({ run, tz, headline }: { run: PolicyRunResult; tz: str
     <div className="result">
       <p>
         {headline !== undefined ? <strong>{headline}</strong> : null}
-        {headline !== undefined ? " · policy " : "Policy "}
-        <Code>{run.policy_id}</Code>
+        {headline !== undefined ? " · " : ""}
+        {isLivePolicyId(run.policy_id) ? LIVE_AGENT_LABEL : DETERMINISTIC_POLICY_LABEL} <Code>{run.policy_id}</Code>
         {headline !== undefined ? "." : `: ${policyOutcome(run, tz)}.`}
         {run.note ? ` ${run.note}` : ""}
       </p>
@@ -97,20 +106,107 @@ function PolicyRunSummary({ run, tz, headline }: { run: PolicyRunResult; tz: str
   );
 }
 
+/** The coordinator-policy switch: deterministic baseline or live agent, and what ran. */
+function PolicySwitch({
+  setting,
+  problem,
+  busy,
+  view,
+  onChoose,
+}: {
+  setting: PolicySetting | null;
+  problem: string | null;
+  busy: boolean;
+  view: EventStateView | null;
+  onChoose: (choice: PolicyChoice) => void;
+}) {
+  const choice: PolicyChoice = setting?.policy ?? "rules";
+  const ran = view !== null && view.decisions.length > 0 ? policyModeOf(view.decisions) : null;
+  const liveOff = setting === null || setting.live_available === false;
+  const options: { value: PolicyChoice; label: string; hint: string }[] = [
+    {
+      value: "rules",
+      label: DETERMINISTIC_POLICY_LABEL,
+      hint: "The documented rule baseline for this event's profile. No model call.",
+    },
+    {
+      value: "live",
+      label: setting !== null ? liveAgentLabel(setting.model_id ?? null) : LIVE_AGENT_LABEL,
+      hint: "A model chooses among the server's checked options. Each run makes paid model calls; selecting makes none.",
+    },
+  ];
+  return (
+    <fieldset className="field policy-switch" disabled={busy}>
+      <legend>Policy for this episode</legend>
+      {options.map((o) => (
+        <label key={o.value} className="radio">
+          <input
+            type="radio"
+            name="coordinator-policy"
+            value={o.value}
+            checked={choice === o.value}
+            disabled={(o.value === "live" && liveOff && choice !== "live") || (setting?.locked === true && choice !== o.value)}
+            onChange={() => onChoose(o.value)}
+          />
+          <span>
+            <strong>{o.label}</strong> <span className="muted small">{o.hint}</span>
+          </span>
+        </label>
+      ))}
+      <p className="small" data-policy-selected={choice}>
+        Selected: <strong>{setting !== null ? settingLabel(setting) : DETERMINISTIC_POLICY_LABEL}</strong>
+        {setting?.policy_id ? <> (<Code>{setting.policy_id}</Code>)</> : null}
+        {ran !== null ? (
+          <>
+            {" "}· ran in this episode: <strong>{ran.label}</strong>
+          </>
+        ) : null}
+      </p>
+      {setting?.caps ? (
+        <p className="small muted" data-policy-caps="">
+          Episode caps ({setting.caps.phase ?? "development"}): {setting.caps.tool_calls ?? 0} of{" "}
+          {setting.caps.max_tool_calls ?? "?"} tool calls, {setting.caps.model_calls ?? 0} of{" "}
+          {setting.caps.max_model_calls ?? "?"} model calls
+          {setting.caps.reached !== undefined && setting.caps.reached.length > 0
+            ? `; reached: ${setting.caps.reached.join(", ")}`
+            : ""}
+          .
+        </p>
+      ) : null}
+      {setting?.locked === true ? (
+        <p className="small muted">
+          The coordinator has acted in this episode, so its policy is fixed; load a clean episode to change it.
+        </p>
+      ) : null}
+      {problem !== null ? <p className="small muted">{problem}</p> : null}
+      {setting !== null && setting.live_available === false ? (
+        <p className="small muted">
+          The live agent is not available{setting.reason ? `: ${setting.reason}` : ""}.
+        </p>
+      ) : null}
+    </fieldset>
+  );
+}
+
 export function ModeratorPanel({
   session,
   view,
   track,
   refresh,
   announce,
+  onSelection,
 }: {
   session: StoredSession;
   view: EventStateView | null;
   track: <T>(run: () => Promise<T>) => Promise<T>;
   refresh: () => Promise<EventStateView | null>;
   announce: (text: string) => void;
+  /** Tells the board which policy is selected, so its label is right before anything ran. */
+  onSelection?: (selection: PolicySelection | null) => void;
 }) {
-  const [cases, setCases] = useState<string[] | null>(null);
+  const [cases, setCases] = useState<ModeratorCase[] | null>(null);
+  const [setting, setSetting] = useState<PolicySetting | null>(null);
+  const [policyProblem, setPolicyProblem] = useState<string | null>(null);
   const [caseRef, setCaseRef] = useState("");
   const [current, setCurrent] = useState<CurrentEpisode>(undefined);
   const [currentFailure, setCurrentFailure] = useState<string | null>(null);
@@ -145,6 +241,41 @@ export function ModeratorPanel({
     }
   }, [session, addError]);
 
+  const selectedRef = useRef(onSelection);
+  selectedRef.current = onSelection;
+  const adoptSetting = useCallback((next: PolicySetting | null) => {
+    setSetting(next);
+    selectedRef.current?.(next !== null ? selectionOf(next) : null);
+  }, []);
+
+  // The setting belongs to the current episode: read it again whenever the board's episode changes.
+  const episodeId = view?.episode_id ?? null;
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const next = await moderatorApi.policy(session);
+        if (!cancelled) {
+          adoptSetting(next);
+          setPolicyProblem(null);
+        }
+      } catch (error) {
+        if (cancelled) return;
+        adoptSetting(null);
+        setPolicyProblem(
+          error instanceof ApiError && error.status === 404
+            ? "This server offers no policy switch; runs use the deterministic policy."
+            : error instanceof ApiError && error.status === 409
+              ? "Load an episode to choose its coordinator policy."
+              : `Could not read the policy setting (${error instanceof Error ? error.message : String(error)}); runs use the server's current policy.`,
+        );
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [session, adoptSetting, episodeId]);
+
   useEffect(() => {
     let cancelled = false;
     void (async () => {
@@ -152,7 +283,7 @@ export function ModeratorPanel({
         const list = await moderatorApi.cases(session);
         if (cancelled) return;
         const refs = list.map((c) => c.case_ref);
-        setCases(refs);
+        setCases(list);
         setCaseRef((prev) => (prev !== "" ? prev : refs[0] ?? ""));
       } catch (error) {
         if (!cancelled) addError(`Could not list cases: ${error instanceof Error ? error.message : String(error)}`);
@@ -192,6 +323,7 @@ export function ModeratorPanel({
   const activeEpisode = knownActiveEpisode(current, view);
   const hasEpisode = activeEpisode !== null;
   const confirmReset = resetNeedsConfirmation(current, view);
+  const runLabel = RUN_POLICY_LABEL[setting?.policy ?? "rules"];
   /** The action and the scenario time it ran, so its result is never read as current state. */
   const stamp = (action: string): ActionStamp => ({ action, ranAt: view?.clock ?? null });
   const principals =
@@ -205,7 +337,7 @@ export function ModeratorPanel({
   const loadEpisode = () =>
     void act(
       "Load clean episode",
-      () => moderatorApi.loadEpisode(session, DEFAULT_SCENARIO_ID, caseRef),
+      () => moderatorApi.loadEpisode(session, scenarioOfCase(cases, caseRef), caseRef),
       (loaded) => {
         setCurrent(loaded.episode_id);
         setConfirmLoad(false);
@@ -234,7 +366,7 @@ export function ModeratorPanel({
       id="moderator-panel"
       title="Moderator controls"
       className="panel"
-      subtitle="Sandbox operator: episodes, the scenario clock, the deterministic policy, role links and traces."
+      subtitle="Sandbox operator: episodes, the scenario clock, the coordinator policy, role links and traces."
     >
       {errors.length > 0 ? (
         <div className="error-list" role="alert">
@@ -259,7 +391,7 @@ export function ModeratorPanel({
         <p className="small">
           {typeof current === "string" ? (
             <>
-              Active episode <Code>{current}</Code> of scenario <Code>{DEFAULT_SCENARIO_ID}</Code>.
+              Active episode <Code>{current}</Code> of scenario <Code>{view?.scenario_id ?? DEFAULT_SCENARIO_ID}</Code>.
             </>
           ) : current === null && activeEpisode === null ? (
             "No active episode. Load one to begin."
@@ -293,8 +425,8 @@ export function ModeratorPanel({
           <select value={caseRef} onChange={(e) => setCaseRef(e.target.value)} disabled={cases === null}>
             {cases === null ? <option value="">Loading cases…</option> : null}
             {cases?.map((c) => (
-              <option key={c} value={c}>
-                {c}
+              <option key={c.case_ref} value={c.case_ref}>
+                {c.case_ref}
               </option>
             ))}
           </select>
@@ -383,10 +515,23 @@ export function ModeratorPanel({
       </div>
 
       <div className="form">
-        <h3 className="list-heading">Deterministic policy</h3>
+        <h3 className="list-heading">Coordinator policy</h3>
+        <PolicySwitch
+          setting={setting}
+          problem={policyProblem}
+          busy={busy !== null}
+          view={view}
+          onChoose={(choice) =>
+            void act(
+              choice === "live" ? "Select the live agent" : "Select the deterministic policy",
+              () => moderatorApi.setPolicy(session, choice),
+              (next) => adoptSetting(next),
+            )
+          }
+        />
         <p className="small muted">
-          Runs <Code>{DETERMINISTIC_POLICY_ID}</Code> once until it waits. It acts only through the
-          coordinator&apos;s own grant.
+          Runs <Code>{setting?.policy_id ?? (setting?.policy === "live" ? "live/1.0.0" : DETERMINISTIC_POLICY_ID)}</Code>{" "}
+          once until it waits. It acts only through the coordinator&apos;s own grant.
         </p>
         <button
           type="button"
@@ -394,12 +539,10 @@ export function ModeratorPanel({
           disabled={busy !== null || !hasEpisode}
           onClick={() => {
             const ran = stamp("Policy run");
-            void act("Run deterministic policy", () => moderatorApi.runPolicy(session), (result) =>
-              setPolicyResult({ ...ran, result }),
-            );
+            void act(runLabel, () => moderatorApi.runPolicy(session), (result) => setPolicyResult({ ...ran, result }));
           }}
         >
-          {busy === "Run deterministic policy" ? "Running policy…" : "Run deterministic policy"}
+          {busy === runLabel ? "Running policy…" : runLabel}
         </button>
         {policyResult !== null ? (
           <PolicyRunSummary

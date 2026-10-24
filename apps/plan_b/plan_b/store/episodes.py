@@ -144,6 +144,22 @@ def create_episode(
             " is_current, issued_at) VALUES (?, ?, 1, ?, ?, 0, 1, ?)",
             (episode_id, g.grant_id, g.model_dump_json(), g.principal_id, fmt_ts(st.clock)),
         )
+    # Consumable pools open with their counted on-hand stock as the first ledger row; expected
+    # shipments are registered expectations and add nothing to it (runtime 1.1.0).
+    for r in sc.resources:
+        if r.consumable_stock is not None:
+            repo.append_stock_movement(
+                conn,
+                episode_id,
+                at=st.clock,
+                resource_id=r.resource_id,
+                kind="opening",
+                quantity=r.consumable_stock.on_hand_quantity,
+                revision=st.revision,
+                reference=r.source_ref,
+            )
+    for shipment in st.expected_shipments:
+        repo.insert_expected_shipment(conn, episode_id, shipment)
     conn.execute(
         "INSERT INTO state_transitions (episode_id, revision, at, cause_kind, cause_ref, summary)"
         " VALUES (?, ?, ?, 'episode_loaded', ?, ?)",

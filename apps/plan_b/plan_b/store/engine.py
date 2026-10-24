@@ -9,20 +9,25 @@ from __future__ import annotations
 import json
 import sqlite3
 from datetime import datetime, timedelta
+from typing import Any
 
 from plan_b.domain.adapters.registry import adapter_for
 from plan_b.domain.clock import validate_advance
 from plan_b.domain.models import (
+    HoldView,
     Observation,
     ObservationRecord,
     StatusFacts,
     TimeWindow,
+    ToolEnvelope,
     TransitionView,
     WorldEvent,
 )
+from plan_b.domain.projection import with_effective_status
+from plan_b.domain.stock import distribution_fill, handoff_fill
 from plan_b.domain.timeutil import fmt_ts, local_label, parse_ts
 from plan_b.store import repo
-from plan_b.store.projection_db import build_snapshot, capture_snapshot
+from plan_b.store.projection_db import build_snapshot, capture_snapshot, consumable_view
 from plan_b.world.world import (
     World,
     mark_processed,
@@ -46,6 +51,7 @@ def advance_to(conn: sqlite3.Connection, episode_id: str, target: datetime) -> l
     start_revision = ep.revision
     # Catch up anything scheduled at or before the current instant (registered late).
     run_due_scheduled(conn, episode_id, ep.clock)
+    run_due_handoffs(conn, episode_id, ep.clock)
     while True:
         t = _next_event_time(
             conn, episode_id, world, after=repo.get_episode(conn, episode_id).clock
@@ -78,11 +84,12 @@ def _next_event_time(
         times.append(nxt)
     row = conn.execute(
         "SELECT MIN(due_at) AS due FROM scheduled_actions WHERE episode_id = ?"
-        " AND status = 'pending' AND due_at > ?",
+        " AND status = 'pending' AND due_at > ? AND " + _ONE_SHOT,
         (episode_id, fmt_ts(after)),
     ).fetchone()
     if row["due"] is not None:
         times.append(parse_ts(row["due"]))
+    times.extend(t for t, _, _ in _handoff_responses(conn, episode_id) if t > after)
     for h in repo.holds(conn, episode_id):
         if h.status == "active" and h.expires_at > after:
             times.append(h.expires_at)
@@ -138,8 +145,10 @@ def _process_instant(conn: sqlite3.Connection, episode_id: str, world: World, t:
     for index, ev in world.due_events(processed_world_events(conn, episode_id), t):
         _deliver_world_event(conn, episode_id, index, ev, t)
 
-    # 2b. scheduled exogenous actor actions due now (after world events, before starts)
+    # 2b. scheduled exogenous actor actions due now (after world events, before starts),
+    # then the staff simulator's responses to stock-transfer tasks due now
     run_due_scheduled(conn, episode_id, t)
+    run_due_handoffs(conn, episode_id, t)
 
     # 3. hold expiries
     for h in repo.holds(conn, episode_id):
@@ -364,33 +373,209 @@ def run_due_scheduled(conn: sqlite3.Connection, episode_id: str, t: datetime) ->
 
     rows = conn.execute(
         "SELECT * FROM scheduled_actions WHERE episode_id = ? AND status = 'pending'"
-        " AND due_at <= ? ORDER BY due_at, order_index",
+        " AND due_at <= ? AND " + _ONE_SHOT + " ORDER BY due_at, order_index",
         (episode_id, fmt_ts(t)),
     ).fetchall()
     for r in rows:
+        body = json.loads(r["body_json"])
+        if r["fill_rule"] == "staff_distribution_rule":
+            # The labeled staff simulator decides the quantity from the visible state now.
+            body, note = _fill_distribution(conn, episode_id, body, json.loads(r["fill_json"]), t)
+            if body is None:
+                _mark_done(conn, episode_id, r["action_id"], t, note=note)
+                continue
+            conn.execute(
+                "UPDATE scheduled_actions SET body_json = ?, note = ? WHERE episode_id = ?"
+                " AND action_id = ?",
+                (json.dumps(body, sort_keys=True), note, episode_id, r["action_id"]),
+            )
         _, env = execute_in(
             conn,
             r["tool"],
-            json.loads(r["body_json"]),
+            body,
             session_id=r["session_id"],
             fill_expected_revision=bool(r["fill_expected_revision"]),
         )
+        _mark_done(conn, episode_id, r["action_id"], t, env=env)
+    return len(rows)
+
+
+# Standing staff-handoff rules are not one-shot actions: the engine answers each matching
+# stock-transfer hold through a response row of its own (``run_due_handoffs``).
+_ONE_SHOT = "(fill_rule IS NULL OR fill_rule <> 'staff_handoff_rule')"
+
+
+def _mark_done(
+    conn: sqlite3.Connection,
+    episode_id: str,
+    action_id: str,
+    t: datetime,
+    *,
+    env: ToolEnvelope | None = None,
+    note: str | None = None,
+) -> None:
+    conn.execute(
+        "UPDATE scheduled_actions SET status = 'done', executed_at = ?, call_id = ?,"
+        " envelope_status = ?, receipt_id = ?, receipt_status = ?, error_code = ?,"
+        " note = COALESCE(?, note) WHERE episode_id = ? AND action_id = ?",
+        (
+            fmt_ts(t),
+            env.call_id if env else None,
+            env.status if env else None,
+            env.receipt.receipt_id if env and env.receipt else None,
+            env.receipt.status if env and env.receipt else None,
+            env.error.code if env and env.error else None,
+            note,
+            episode_id,
+            action_id,
+        ),
+    )
+
+
+def _fill_distribution(
+    conn: sqlite3.Connection,
+    episode_id: str,
+    body: dict[str, Any],
+    fill: dict[str, Any],
+    t: datetime,
+) -> tuple[dict[str, Any] | None, str]:
+    stock = consumable_view(conn, episode_id)
+    if stock is None:
+        return None, "the episode has no consumable stock; nothing recorded"
+    goal = repo.goal(conn, episode_id)
+    decided = distribution_fill(stock, goal, target_id=fill["service_target_id"], at=t)
+    if decided.arguments is None:
+        return None, decided.note
+    filled = {
+        **body,
+        "expected_goal_version": goal.version,
+        "arguments": {**body["arguments"], **decided.arguments},
+    }
+    return filled, decided.note
+
+
+def _handoff_rules(conn: sqlite3.Connection, episode_id: str) -> list[sqlite3.Row]:
+    return conn.execute(
+        "SELECT * FROM scheduled_actions WHERE episode_id = ? AND fill_rule = 'staff_handoff_rule'"
+        " ORDER BY order_index",
+        (episode_id,),
+    ).fetchall()
+
+
+def _handoff_responses(
+    conn: sqlite3.Connection, episode_id: str
+) -> list[tuple[datetime, sqlite3.Row, HoldView]]:
+    """(response time, rule, hold) for every stock-transfer hold a standing staff rule has not
+    answered yet: the declared staff latency after the hold was created."""
+    rules = _handoff_rules(conn, episode_id)
+    if not rules:
+        return []
+    pantry = repo.scenario(conn, episode_id).pantry_parameters
+    if pantry is None:
+        return []
+    answered = {
+        json.loads(r["fill_json"]).get("hold_id")
+        for r in conn.execute(
+            "SELECT fill_json FROM scheduled_actions WHERE episode_id = ?"
+            " AND fill_rule = 'staff_handoff_response'",
+            (episode_id,),
+        )
+    }
+    latency = timedelta(minutes=pantry.handoff_duration_minutes)
+    out = []
+    for rule in rules:
+        spec = json.loads(rule["fill_json"])
+        for h in repo.holds(conn, episode_id):
+            if (
+                h.consumable
+                and h.purpose == "stock_transfer"
+                and h.resource_id == spec["source_resource_id"]
+                and h.destination_resource_id == spec["destination_resource_id"]
+                and h.hold_id not in answered
+            ):
+                out.append((h.created_at + latency, rule, h))
+    return sorted(out, key=lambda item: (item[0], item[2].hold_id))
+
+
+def run_due_handoffs(conn: sqlite3.Connection, episode_id: str, t: datetime) -> int:
+    """The labeled staff simulator answers each stock-transfer hold of a standing handoff rule
+    once, at the declared response latency after the hold was created, through the staff's own
+    session and the same executor. What it confirms is decided from the visible state at that
+    instant (``stock.handoff_fill``); a hold that lapsed, or a closed window, gets no handoff.
+    Each answer is a response row of its own, so it is never given twice."""
+    from plan_b.tools.executor import execute_in  # executor imports this module
+
+    done = 0
+    for due, rule, hold in _handoff_responses(conn, episode_id):
+        if due > t:
+            continue
+        spec = json.loads(rule["fill_json"])
+        holds = with_effective_status(repo.holds(conn, episode_id), t)
+        confirmed = sum(
+            r.quantity
+            for r in repo.stock_receipts(conn, episode_id)
+            if r.actor_id == rule["principal_id"]
+            and r.source_resource_id == spec["source_resource_id"]
+        )
+        decided = handoff_fill(
+            holds,
+            hold_id=hold.hold_id,
+            already_confirmed=confirmed,
+            max_quantity=spec.get("max_quantity"),
+            now=t,
+            pantry=repo.scenario(conn, episode_id).pantry_parameters,
+        )
+        n = repo.next_seq(conn, episode_id, "scheduled_action")
+        sequence = 1 + sum(
+            1
+            for r in conn.execute(
+                "SELECT 1 FROM scheduled_actions WHERE episode_id = ?"
+                " AND fill_rule = 'staff_handoff_response' AND receipt_status = 'applied'",
+                (episode_id,),
+            )
+        )
+        body = json.loads(rule["body_json"])
+        if decided.arguments is not None:
+            body = {
+                **body,
+                "idempotency_key": f"{body['idempotency_key']}-{hold.hold_id}",
+                "arguments": {
+                    "resource_id": spec["destination_resource_id"],
+                    "source_resource_id": spec["source_resource_id"],
+                    "source_hold_id": hold.hold_id,
+                    "unit": spec["unit"],
+                    "source_observation_id": spec["source_observation_id"],
+                    "receipt_reference": f"{spec['receipt_reference_prefix']}_{sequence:03d}",
+                    **decided.arguments,
+                },
+            }
         conn.execute(
-            "UPDATE scheduled_actions SET status = 'done', executed_at = ?, call_id = ?,"
-            " envelope_status = ?, receipt_id = ?, receipt_status = ?, error_code = ?"
-            " WHERE episode_id = ? AND action_id = ?",
+            "INSERT INTO scheduled_actions (episode_id, action_id, due_at, order_index,"
+            " principal_id, session_id, tool, body_json, fill_expected_revision, status,"
+            " fill_rule, fill_json, note) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, 'pending',"
+            " 'staff_handoff_response', ?, ?)",
             (
-                fmt_ts(t),
-                env.call_id,
-                env.status,
-                env.receipt.receipt_id if env.receipt else None,
-                env.receipt.status if env.receipt else None,
-                env.error.code if env.error else None,
                 episode_id,
-                r["action_id"],
+                f"act_{n:03d}",
+                fmt_ts(due),
+                n,
+                rule["principal_id"],
+                rule["session_id"],
+                rule["tool"],
+                json.dumps(body, sort_keys=True),
+                json.dumps({"hold_id": hold.hold_id, "rule": rule["action_id"]}, sort_keys=True),
+                decided.note,
             ),
         )
-    return len(rows)
+        if decided.arguments is None:
+            _mark_done(conn, episode_id, f"act_{n:03d}", t)
+            continue
+        _, env = execute_in(
+            conn, rule["tool"], body, session_id=rule["session_id"], fill_expected_revision=True
+        )
+        _mark_done(conn, episode_id, f"act_{n:03d}", t, env=env)
+        done += 1
+    return done
 
 
 def validity_window(start: datetime, hard_end: datetime) -> TimeWindow:

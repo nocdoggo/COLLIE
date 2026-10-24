@@ -2,6 +2,8 @@ import type { ReactNode } from "react";
 
 import { ROLE_LABEL, fmtDate, fmtTime, zoneName } from "../format";
 import type { EventStateView } from "../types";
+import { policyModeOf } from "./policyMode";
+import type { PolicyMode, PolicySelection } from "./policyMode";
 import { Code, When } from "./ui";
 
 export type BoardMode = "live" | "replay";
@@ -9,18 +11,33 @@ export type BoardMode = "live" | "replay";
 export const PRODUCT_NAME = "Plan B: The Show Must Go On";
 export const SANDBOX_NOTICE = "Fictional sandbox — no real bookings, purchases, or messages";
 
+/** The policy label: which coordinator policy ran ("Deterministic policy", "Live agent · <model>"). */
+export function PolicyLabel({ policy, mode }: { policy: PolicyMode; mode: BoardMode }) {
+  return (
+    <p className={`mode-label ${mode === "live" ? "mode-live" : "mode-policy"} policy-${policy.kind}`} data-policy-mode={policy.kind}>
+      <span aria-hidden="true">{policy.kind === "live" ? "✦ " : "⚙ "}</span>
+      {policy.label}
+      {policy.basis === "selected" ? <span className="mode-note"> · selected, not run yet</span> : null}
+    </p>
+  );
+}
+
 /** Persistent identity strip: product, sandbox notice, mode, clock, goal, versions, viewer. */
 export function BoardHeader({
   view,
   mode,
   actions,
+  selection = null,
 }: {
   view: EventStateView;
   mode: BoardMode;
   actions?: ReactNode;
+  /** The policy a moderator selected; it labels the board until a decision is recorded. */
+  selection?: PolicySelection | null;
 }) {
   const tz = view.timezone;
   const zone = zoneName(view.clock, tz);
+  const policy = policyModeOf(view.decisions, selection);
   return (
     <header className="board-header">
       <div className="brand-row">
@@ -29,10 +46,12 @@ export function BoardHeader({
           <span aria-hidden="true">⚠ </span>
           {SANDBOX_NOTICE}
         </p>
-        <p className={`mode-label mode-${mode}`}>
-          <span aria-hidden="true">{mode === "live" ? "⚙ " : "▸ "}</span>
-          {mode === "live" ? "Deterministic policy" : "Recorded replay"}
-        </p>
+        {mode === "replay" ? (
+          <p className="mode-label mode-replay">
+            <span aria-hidden="true">▸ </span>Recorded replay
+          </p>
+        ) : null}
+        <PolicyLabel policy={policy} mode={mode} />
         <p className="viewer-label">
           {mode === "live" ? "Signed in as " : "Recorded view of "}
           <strong>{view.viewer.display_name}</strong>

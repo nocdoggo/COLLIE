@@ -1,6 +1,7 @@
 // Hand-written mirror of the models in plan_b/domain/models.py that cross HTTP
-// (runtime contract 1.0.0, trace format 1.0.0). Datetimes are UTC ISO 8601 strings ending in "Z".
+// (runtime contract 1.1.0, trace format 1.0.0). Datetimes are UTC ISO 8601 strings ending in "Z".
 // Python tuples arrive as JSON arrays; they are typed readonly because every model is frozen.
+// Fields added in runtime 1.1.0 are optional here: stored 1.0.0 states and traces lack them.
 
 export type UtcIso = string;
 export type JsonValue =
@@ -11,6 +12,8 @@ export type JsonValue =
   | readonly JsonValue[]
   | { readonly [key: string]: JsonValue };
 export type JsonObject = { readonly [key: string]: JsonValue };
+/** Records keep the runtime version they were written with. */
+export type RuntimeVersion = "1.0.0" | "1.1.0";
 
 // ---------------------------------------------------------------------------
 // Shared vocabulary
@@ -37,7 +40,9 @@ export type ObservationChannel =
   | "organizer_session";
 export type EnvelopeStatus = "succeeded" | "rejected" | "unknown" | "unavailable";
 export type ReceiptStatus = "applied" | "rejected" | "unknown";
-export type HoldStatus = "active" | "committed" | "released" | "expired";
+/** `fulfilled`: a consumable stock-transfer hold whose whole quantity was handed off. */
+export type HoldStatus = "active" | "committed" | "released" | "expired" | "fulfilled";
+export type HoldPurpose = "activity" | "stock_transfer";
 export type ConstraintResult = "feasible_under_assumptions" | "infeasible" | "unknown";
 export type CheckStatus = "passed" | "failed" | "not_applicable" | "unsupported";
 export type PreferencePreset = "balanced" | "preserve_order" | "minimize_spend";
@@ -49,18 +54,22 @@ export const READ_TOOLS = [
   "query_status",
   "evaluate_candidates",
 ] as const;
+/** Staff-only physical attestations (runtime 1.1.0). Never in a coordinator grant. */
+export const STAFF_TOOLS = ["record_stock_receipt", "record_distribution"] as const;
 export const MUTATION_TOOLS = [
   "hold_resource",
   "release_hold",
   "apply_plan",
   "check_in",
   "submit_observation",
+  ...STAFF_TOOLS,
 ] as const;
 export const CONTROL_TOOLS = ["update_goal", "update_grant"] as const;
 
 export type ReadTool = (typeof READ_TOOLS)[number];
 export type MutationTool = (typeof MUTATION_TOOLS)[number];
 export type ControlTool = (typeof CONTROL_TOOLS)[number];
+export type StaffTool = (typeof STAFF_TOOLS)[number];
 export type ToolName = ReadTool | MutationTool | ControlTool;
 
 export type ErrorCode =
@@ -102,7 +111,13 @@ export type ErrorCode =
   | "UNSUPPORTED_ACTION"
   | "EVENT_CLOSED"
   /** The call failed inside the server (HTTP 500); none of its effects were kept. */
-  | "INTERNAL_ERROR";
+  | "INTERNAL_ERROR"
+  // runtime 1.1.0 (consumable stock)
+  | "DUPLICATE_REFERENCE"
+  | "INSUFFICIENT_STOCK"
+  | "UNIT_MISMATCH"
+  | "THROUGHPUT_EXCEEDED"
+  | "HANDOFF_WINDOW_CLOSED";
 
 // ---------------------------------------------------------------------------
 // Scenario configuration (public parts that appear inside views)
@@ -128,6 +143,19 @@ export interface ResourceTerms {
   readonly terms_source_ref: string;
 }
 
+/**
+ * Planning ConsumableStock (integer units). On a definition it is the stock at load; on a
+ * ResourceView it is the live projection: on hand includes reserved, unconsumed units, and
+ * expected units are never on hand.
+ */
+export interface ConsumableStock {
+  readonly unit: string;
+  readonly on_hand_quantity: number;
+  readonly reserved_quantity: number;
+  readonly distributed_quantity: number;
+  readonly expected_quantity: number;
+}
+
 export interface ResourceDef {
   readonly resource_id: string;
   readonly label: string;
@@ -139,6 +167,8 @@ export interface ResourceDef {
   readonly capabilities: readonly string[];
   readonly approved_substitute_ids: readonly string[];
   readonly terms: ResourceTerms;
+  /** Runtime 1.1.0: a consumable pool (kind "supply"); null or absent for reusable resources. */
+  readonly consumable_stock?: ConsumableStock | null;
 }
 
 export interface ActivityDef {
@@ -168,6 +198,15 @@ export interface AccessibilityRequirement {
   readonly detail: string;
 }
 
+/** A staff-defined quantity of one unit, served by one activity by a deadline (inclusive). */
+export interface ServiceTarget {
+  readonly target_id: string;
+  readonly unit: string;
+  readonly quantity: number;
+  readonly deadline: UtcIso;
+  readonly activity_id: string;
+}
+
 export interface EventGoal {
   readonly goal_id: string;
   readonly description: string;
@@ -183,6 +222,8 @@ export interface EventGoal {
   readonly objective_weights: ObjectiveWeights;
   readonly accessibility_requirements: readonly AccessibilityRequirement[];
   readonly program_concurrency: number;
+  /** Runtime 1.1.0: quantity targets; only on-time staff-recorded distribution counts. */
+  readonly service_targets?: readonly ServiceTarget[];
 }
 
 export interface AuthorityGrant {
@@ -215,11 +256,19 @@ export interface Observation {
   readonly supersedes: readonly string[];
 }
 
+export interface ConsumableAllocation {
+  readonly resource_id: string;
+  readonly quantity: number;
+  readonly service_target_id: string;
+}
+
 export interface Assignment {
   readonly activity_id: string;
   readonly start: UtcIso;
   readonly end: UtcIso;
   readonly resource_ids: readonly string[];
+  /** Runtime 1.1.0: the activity's consumable demand. */
+  readonly consumable_allocations?: readonly ConsumableAllocation[];
 }
 
 export interface PlanningAssumption {
@@ -274,6 +323,8 @@ export interface SubmitObservationArgs {
   readonly client_record_id?: string | null;
   readonly correlation_group?: string | null;
   readonly supersedes?: readonly string[];
+  /** Runtime 1.1.0: a structured offer that may activate the resource `entity_id` names. */
+  readonly offer?: ResourceOfferArgs | null;
 }
 
 export interface UpdateGoalArgs {
@@ -287,6 +338,33 @@ export interface UpdateGrantArgs {
   readonly max_total_reserved_cents?: number | null;
   readonly revoke?: boolean;
   readonly reason: string;
+}
+
+/**
+ * Staff attestation of a physical receipt (runtime 1.1.0): an internal handoff (source pool and
+ * its stock-transfer hold) or a matched external shipment, never both. `receipt_reference` is
+ * the physical record's identity, unique per event whatever the idempotency key.
+ */
+export interface RecordStockReceiptArgs {
+  readonly resource_id: string;
+  readonly quantity: number;
+  readonly unit: string;
+  readonly source_observation_id: string;
+  readonly receipt_reference: string;
+  readonly source_resource_id?: string | null;
+  readonly source_hold_id?: string | null;
+  readonly shipment_id?: string | null;
+}
+
+/** Staff attestation of an aggregate, completed distribution of committed stock. */
+export interface RecordDistributionArgs {
+  readonly resource_id: string;
+  readonly quantity: number;
+  readonly unit: string;
+  readonly service_target_id: string;
+  readonly activity_id: string;
+  readonly distribution_reference: string;
+  readonly allocation_ids: readonly string[];
 }
 
 export interface ToolError {
@@ -303,7 +381,7 @@ export interface StateChange {
 }
 
 export interface ActionReceipt {
-  readonly runtime_version: "1.0.0";
+  readonly runtime_version: RuntimeVersion;
   readonly receipt_id: string;
   readonly episode_id: string;
   readonly event_id: string;
@@ -331,7 +409,7 @@ export interface ActionReceipt {
 }
 
 export interface ToolEnvelope {
-  readonly runtime_version: "1.0.0";
+  readonly runtime_version: RuntimeVersion;
   readonly call_id: string;
   readonly tool: string;
   readonly status: EnvelopeStatus;
@@ -369,6 +447,8 @@ export interface StatusFacts {
   readonly status_code: string;
   readonly domain_status: ResourceStatus;
   readonly reported_eta: UtcIso | null;
+  /** Runtime 1.1.0: the facts concern this expected shipment, not the resource's own status. */
+  readonly shipment_id?: string | null;
 }
 
 export interface ObservationRecord {
@@ -424,6 +504,8 @@ export interface ResourceView {
   readonly status_observed_at: UtcIso | null;
   readonly reported_eta: UtcIso | null;
   readonly occupancy: readonly OccupancyEntry[];
+  /** Runtime 1.1.0: live stock of a consumable pool. */
+  readonly consumable_stock?: ConsumableStock | null;
 }
 
 export interface HoldView {
@@ -445,6 +527,12 @@ export interface HoldView {
   readonly terminal_at: UtcIso | null;
   readonly created_receipt_id: string;
   readonly terminal_receipt_id: string | null;
+  /** Runtime 1.1.0 (consumable holds): `remaining_quantity` is the live claim. */
+  readonly consumable?: boolean;
+  readonly remaining_quantity?: number | null;
+  readonly purpose?: HoldPurpose;
+  readonly destination_resource_id?: string | null;
+  readonly service_target_id?: string | null;
 }
 
 export interface CommitmentView {
@@ -503,6 +591,181 @@ export interface TransitionView {
   readonly cause_kind: string;
   readonly cause_ref: string | null;
   readonly summary: string;
+}
+
+// ---------------------------------------------------------------------------
+// Consumable stock and service (runtime 1.1.0, pantry profile)
+// ---------------------------------------------------------------------------
+
+/** on_hand = opening + received - transferred_out - distributed; reserved = held + committed. */
+export interface StockBalanceView {
+  readonly resource_id: string;
+  readonly unit: string;
+  readonly opening_quantity: number;
+  readonly received_quantity: number;
+  readonly transferred_out_quantity: number;
+  readonly distributed_quantity: number;
+  readonly on_hand_quantity: number;
+  readonly held_quantity: number;
+  readonly committed_quantity: number;
+  readonly reserved_quantity: number;
+  readonly available_quantity: number;
+  readonly expected_quantity: number;
+  readonly conserved: boolean;
+}
+
+export type StockMovementKind = "opening" | "receipt" | "transfer_out" | "distribution";
+
+export interface StockMovementView {
+  readonly seq: number;
+  readonly at: UtcIso;
+  readonly resource_id: string;
+  readonly kind: StockMovementKind;
+  readonly quantity: number;
+  readonly delta: number;
+  readonly counterpart_resource_id: string | null;
+  readonly reference: string | null;
+  readonly hold_id: string | null;
+  readonly shipment_id: string | null;
+  readonly receipt_id: string | null;
+  readonly revision: number;
+}
+
+export interface StockReceiptView {
+  readonly stock_receipt_id: string;
+  readonly receipt_reference: string;
+  readonly kind: "internal_handoff" | "external_shipment";
+  readonly resource_id: string;
+  readonly source_resource_id: string | null;
+  readonly source_hold_id: string | null;
+  readonly shipment_id: string | null;
+  readonly quantity: number;
+  readonly unit: string;
+  readonly source_observation_id: string;
+  readonly at: UtcIso;
+  readonly actor_id: string;
+  readonly receipt_id: string;
+  readonly revision: number;
+}
+
+export interface DistributionView {
+  readonly distribution_id: string;
+  readonly distribution_reference: string;
+  readonly resource_id: string;
+  readonly service_target_id: string;
+  readonly activity_id: string;
+  readonly quantity: number;
+  readonly unit: string;
+  readonly goal_version: number;
+  readonly allocation_ids: readonly string[];
+  readonly at: UtcIso;
+  /** Recorded no later than the target's original deadline (inclusive). */
+  readonly on_time: boolean;
+  readonly actor_id: string;
+  readonly receipt_id: string;
+  readonly revision: number;
+}
+
+/** A committed consumable allocation, created by apply_plan from a hold. */
+export interface StockAllocationView {
+  readonly allocation_id: string;
+  readonly resource_id: string;
+  readonly service_target_id: string;
+  readonly activity_id: string;
+  readonly quantity: number;
+  /** Committed, reserved and not yet distributed. */
+  readonly remaining_quantity: number;
+  readonly source_hold_id: string;
+  readonly plan_version: number;
+  readonly created_at: UtcIso;
+  readonly receipt_id: string;
+  readonly actor_id: string;
+  readonly grant_id: string;
+}
+
+/** Planning ExpectedShipment. Outstanding = quantity - received; expected units are not stock. */
+export interface ExpectedShipment {
+  readonly shipment_id: string;
+  readonly destination_resource_id: string;
+  readonly quantity: number;
+  readonly received_quantity: number;
+  readonly expected_at: UtcIso | null;
+  readonly source_ref: string;
+}
+
+export interface ExpectedShipmentView {
+  readonly shipment: ExpectedShipment;
+  readonly outstanding_quantity: number;
+  readonly reported_eta: UtcIso | null;
+  readonly status_observation_id: string | null;
+}
+
+/**
+ * One target's service accounting. The two counters stay separate: the supply gap is measured
+ * against the remaining target after each distribution; unfulfilled = original target minus
+ * distribution recorded on time. Holds, commitments and receipts never change `unfulfilled`.
+ */
+export interface ServiceProgressView {
+  readonly target_id: string;
+  readonly unit: string;
+  readonly activity_id: string;
+  readonly deadline: UtcIso;
+  readonly target_quantity: number;
+  readonly original_quantity: number;
+  readonly distributed_quantity: number;
+  readonly on_time_quantity: number;
+  readonly late_quantity: number;
+  readonly committed_quantity: number;
+  readonly supply_gap_quantity: number;
+  readonly unfulfilled_quantity: number;
+  readonly qualified_minutes: number;
+  readonly capacity_quantity: number;
+  readonly attained: boolean;
+}
+
+export type HandoffTaskStatus = "open" | "fulfilled" | "partially_fulfilled" | "lapsed";
+
+/** The local staff task a live stock-transfer hold creates. */
+export interface HandoffTaskView {
+  readonly hold_id: string;
+  readonly source_resource_id: string;
+  readonly destination_resource_id: string;
+  readonly requested_quantity: number;
+  readonly remaining_quantity: number;
+  readonly requested_at: UtcIso;
+  readonly respond_after: UtcIso;
+  /** min(hold expiry, handoff window end); exclusive. */
+  readonly cutoff: UtcIso;
+  readonly status: HandoffTaskStatus;
+  readonly stock_receipt_ids: readonly string[];
+}
+
+export interface ConsumableStateView {
+  readonly balances: readonly StockBalanceView[];
+  readonly expected_shipments: readonly ExpectedShipmentView[];
+  readonly service: readonly ServiceProgressView[];
+  readonly allocations: readonly StockAllocationView[];
+  readonly movements: readonly StockMovementView[];
+  readonly receipts: readonly StockReceiptView[];
+  readonly distributions: readonly DistributionView[];
+  readonly handoff_tasks: readonly HandoffTaskView[];
+}
+
+/** Typed service capacity and staff-response timing; `handoff_window.end` is exclusive. */
+export interface PantryParameters {
+  readonly service_activity_id: string;
+  readonly staff_resource_id: string;
+  readonly service_rate_units_per_minute: number;
+  readonly handoff_duration_minutes: number;
+  readonly handoff_window: TimeWindow;
+}
+
+export interface StockOption {
+  readonly option: "allocate_stock" | "transfer_stock" | "await_shipment";
+  readonly activity_id: string;
+  readonly service_target_id: string;
+  readonly resource_id: string;
+  readonly source_resource_id?: string | null;
 }
 
 export interface StatusSource {
@@ -595,7 +858,15 @@ export interface PolicyDecision {
 // ---------------------------------------------------------------------------
 
 export interface Edit {
-  readonly kind: "keep" | "swap" | "shift" | "substitute" | "alternate_format";
+  readonly kind:
+    | "keep"
+    | "swap"
+    | "shift"
+    | "substitute"
+    | "alternate_format"
+    | "allocate_stock"
+    | "transfer_stock"
+    | "await_shipment";
   readonly activity_ids: readonly string[];
   readonly offset_minutes: number | null;
   readonly resource_id: string | null;
@@ -612,7 +883,12 @@ export interface CandidateCheck {
 
 export interface CandidateAssumption {
   readonly assumption_id: string;
-  readonly kind: "arrival_by_start" | "catalog_availability" | "declared_availability" | "hypothesis";
+  readonly kind:
+    | "arrival_by_start"
+    | "catalog_availability"
+    | "declared_availability"
+    | "hypothesis"
+    | "stock_handoff";
   readonly entity_id: string;
   readonly text: string;
   readonly basis_ref: string | null;
@@ -658,6 +934,37 @@ export interface AuthorizationAssessment {
   readonly missing: readonly MissingPermission[];
 }
 
+/** Consumable units a candidate still has to hold before apply_plan (runtime 1.1.0). */
+export interface RequiredStockHold {
+  readonly resource_id: string;
+  readonly activity_id: string;
+  readonly service_target_id: string;
+  readonly quantity: number;
+  readonly held_quantity: number;
+  readonly bound_hold_ids: readonly string[];
+}
+
+/** Units an alternate pool must hand off (staff-recorded) before a transfer candidate works. */
+export interface StockTransferNeed {
+  readonly source_resource_id: string;
+  readonly destination_resource_id: string;
+  readonly activity_id: string;
+  readonly service_target_id: string;
+  readonly quantity: number;
+  readonly held_quantity: number;
+  readonly bound_hold_ids: readonly string[];
+  readonly handoff_cutoff: UtcIso | null;
+}
+
+export interface ServiceCoverage {
+  readonly target_id: string;
+  readonly target_quantity: number;
+  readonly distributed_quantity: number;
+  readonly allocated_quantity: number;
+  readonly on_time_quantity: number;
+  readonly unfulfilled_quantity: number;
+}
+
 export interface CandidateResult {
   readonly candidate_id: string;
   readonly report_id: string;
@@ -677,6 +984,10 @@ export interface CandidateResult {
   readonly rank: number | null;
   readonly applicable_now: boolean;
   readonly rationale: string;
+  /** Runtime 1.1.0 (consumable profiles; empty otherwise). */
+  readonly required_stock_holds?: readonly RequiredStockHold[];
+  readonly stock_transfers?: readonly StockTransferNeed[];
+  readonly service_coverage?: readonly ServiceCoverage[];
 }
 
 export interface InfeasibilitySummary {
@@ -708,7 +1019,7 @@ export interface EvaluationResult {
 }
 
 export interface EventStateView {
-  readonly runtime_version: "1.0.0";
+  readonly runtime_version: RuntimeVersion;
   readonly episode_id: string;
   readonly event_id: string;
   readonly scenario_id: string;
@@ -742,6 +1053,10 @@ export interface EventStateView {
   readonly declared_assumptions: readonly PlanningAssumption[];
   readonly tool_durations_minutes: { readonly [tool: string]: number };
   readonly viewer: ViewerInfo;
+  /** Runtime 1.1.0 (consumable profiles; null or absent otherwise). */
+  readonly stock?: ConsumableStateView | null;
+  readonly pantry_parameters?: PantryParameters | null;
+  readonly stock_options?: readonly StockOption[];
 }
 
 // ---------------------------------------------------------------------------
@@ -764,6 +1079,56 @@ export interface ToolCallRecord {
   readonly request: JsonObject;
   readonly envelope: JsonObject;
 }
+
+/** One model call attributed to a live-policy decision (`details.model.calls[]`). */
+export interface ModelCallRecord {
+  readonly call_id: string;
+  readonly purpose: string;
+  readonly requested_model: string | null;
+  /** The model id the provider returned. */
+  readonly model_id: string | null;
+  readonly latency_ms: number | null;
+  readonly outcome: string;
+  readonly prompt_tokens: number | null;
+  readonly completion_tokens: number | null;
+  readonly total_tokens: number | null;
+  readonly cost_usd: number | null;
+  readonly cost_basis: string | null;
+  readonly error: string | null;
+  readonly consumed_tool_call_ids: readonly string[];
+}
+
+/** `details.model` of a live-policy decision: the calls behind it and the episode's usage. */
+export interface DecisionModelUsage {
+  readonly requested_model: string | null;
+  readonly model_id: string | null;
+  readonly calls: readonly ModelCallRecord[];
+  readonly latency_ms: number | null;
+  readonly prompt_tokens: number | null;
+  readonly completion_tokens: number | null;
+  readonly total_tokens: number | null;
+  readonly cost_usd: number | null;
+  readonly episode: {
+    readonly model_calls: number | null;
+    readonly max_model_calls: number | null;
+    readonly tool_calls: number | null;
+    readonly max_tool_calls: number | null;
+    readonly cost_usd: number | null;
+  } | null;
+}
+
+/** `details.choice` of a model-chosen action. The rationale is model text, untrusted. */
+export interface DecisionChoice {
+  readonly option_id: string;
+  readonly model_call_id: string | null;
+  readonly rationale_untrusted: string | null;
+  readonly cited_refs: readonly string[];
+  readonly dropped_refs: readonly string[];
+  readonly consumed_tool_call_ids: readonly string[];
+}
+
+/** Which coordinator policy a moderator selects: the deterministic baseline or the live agent. */
+export type PolicyChoice = "rules" | "live";
 
 export interface PolicyRunResult {
   readonly policy_id: string;
@@ -814,8 +1179,78 @@ export interface WhoAmIResponse {
   readonly expires_wall?: UtcIso | null;
 }
 
+/** A case row. Wave 1 servers send only `case_ref`; later ones may name the case's scenario. */
 export interface ModeratorCase {
   readonly case_ref: string;
+  readonly scenario_id?: string | null;
+  readonly profile_id?: string | null;
+}
+
+/** Per-episode caps every coordinator policy runs under, and the usage so far. */
+export interface EpisodeCapsReport {
+  readonly phase?: string;
+  readonly max_tool_calls?: number;
+  readonly max_model_calls?: number;
+  readonly tool_calls?: number;
+  readonly model_calls?: number;
+  readonly reached?: readonly string[];
+}
+
+/** `GET /api/policy` (any event session): the episode's coordinator policy and its label. */
+export interface EpisodePolicy {
+  readonly episode_id?: string;
+  readonly policy: PolicyChoice;
+  readonly policy_id?: string | null;
+  /** "Deterministic policy" or "Live agent · <model id>" (server-composed). */
+  readonly label?: string | null;
+  readonly caps?: EpisodeCapsReport | null;
+}
+
+/**
+ * The moderator's coordinator-policy setting (`GET`/`POST /api/moderator/policy`). `model_id` is
+ * the configured model, never a key; selecting a policy makes no model call. `locked` once the
+ * coordinator has acted: a different policy then needs a clean episode.
+ */
+export interface PolicySetting extends EpisodePolicy {
+  readonly requested_model?: string | null;
+  readonly returned_model_id?: string | null;
+  readonly model_id?: string | null;
+  readonly live_available?: boolean | null;
+  readonly reason?: string | null;
+  readonly locked?: boolean | null;
+}
+
+/** The registered facts a structured resource offer must confirm (`/api/participation/me`). */
+export interface OfferPrefill {
+  readonly approved_for: readonly string[];
+  readonly needed_capabilities: { readonly [resourceId: string]: readonly string[] };
+  readonly registered_capabilities: readonly string[];
+  readonly registered_window: TimeWindow;
+  readonly terms_ref: string;
+}
+
+export interface SpokenForResource {
+  readonly resource_id: string;
+  readonly label: string;
+  readonly kind: ResourceKind;
+  readonly status: ResourceStatus | null;
+  readonly check_in: boolean;
+  readonly offer: OfferPrefill | null;
+}
+
+/** `GET /api/participation/me`: what this event session may contribute, prefilled. */
+export interface ParticipationMe {
+  readonly principal_id: string;
+  readonly display_name: string;
+  readonly speaks_for: readonly SpokenForResource[];
+  readonly staff_tools: readonly string[];
+}
+
+/** The structured part of a resource offer (`submit_observation.offer`). */
+export interface ResourceOfferArgs {
+  readonly available: TimeWindow;
+  readonly capabilities: readonly string[];
+  readonly terms_ref: string;
 }
 
 export interface ModeratorCurrent {

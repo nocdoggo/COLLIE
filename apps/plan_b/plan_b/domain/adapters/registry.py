@@ -7,6 +7,8 @@ from functools import lru_cache
 from plan_b.domain.adapters.base import DomainAdapter
 
 CAMPUS_PROFILES = ("campus_showcase", "community_skills_exchange")
+# Runtime 1.1.0: the event core plus consumable stock and a service target (W2.3).
+PANTRY_PROFILES = ("pantry_continuity",)
 
 
 @lru_cache(maxsize=8)
@@ -15,4 +17,8 @@ def adapter_for(profile_id: str) -> DomainAdapter:
         from plan_b.domain.adapters.campus import CampusAdapter
 
         return CampusAdapter()
-    raise KeyError(f"no domain adapter for profile {profile_id!r} in Wave 1")
+    if profile_id in PANTRY_PROFILES:
+        from plan_b.domain.adapters.pantry import PantryAdapter
+
+        return PantryAdapter()
+    raise KeyError(f"no domain adapter for profile {profile_id!r}")

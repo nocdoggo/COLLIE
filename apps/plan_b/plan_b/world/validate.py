@@ -11,10 +11,13 @@ from __future__ import annotations
 
 from plan_b.domain.models import (
     OrganizerAuthorizationRule,
+    OrganizerGoalUpdateScript,
     ParticipantCheckInScript,
     ParticipantObservationScript,
     PrivateCase,
     PublicScenario,
+    StaffDistributionRule,
+    StaffHandoffRule,
 )
 from plan_b.world.world import load_case
 
@@ -30,8 +33,18 @@ def validate_case(public: PublicScenario, private: PrivateCase) -> list[str]:
     resources = {r.resource_id: r for r in public.resources}
     # The entities an observation may concern, as in submit_observation.
     entities = set(resources) | {a.activity_id for a in public.activities} | {public.event_id}
-    principals = {p.principal_id for p in public.principals}
+    principals = {p.principal_id: p for p in public.principals}
     grants = {g.grant_id for g in public.authority_grants}
+    # The tools each principal's own grant allows: a staff simulator acts only within it.
+    granted = {
+        p.principal_id: next(
+            (g.allowed_tools for g in public.authority_grants if g.grant_id == p.grant_id), ()
+        )
+        for p in public.principals
+    }
+    pools = {r.resource_id for r in public.resources if r.consumable_stock is not None}
+    targets = {t.target_id for t in public.goal.service_targets}
+    visible = {o.observation_id for o in public.visible_observations}
     for i, record in enumerate(private.status_model):
         where = f"status_model[{i}]"
         resource = resources.get(record.entity_id)
@@ -62,6 +75,27 @@ def validate_case(public: PublicScenario, private: PrivateCase) -> list[str]:
             for rid in script.resource_ids:
                 if rid not in resources:
                     problems.append(f"{where}: unknown resource {rid}")
+        elif isinstance(script, OrganizerGoalUpdateScript):
+            principal = principals.get(script.principal_id)
+            if principal is not None and principal.role != "organizer":
+                problems.append(f"{where}: {script.principal_id} is not an organizer")
+        elif isinstance(script, StaffHandoffRule):
+            if public.pantry_parameters is None:
+                problems.append(f"{where}: the scenario declares no staff handoff timing")
+            for rid in (script.source_resource_id, script.destination_resource_id):
+                if rid not in pools:
+                    problems.append(f"{where}: {rid} is not a consumable stock pool")
+            if script.source_observation_id not in visible:
+                problems.append(
+                    f"{where}: unknown source observation {script.source_observation_id}"
+                )
+            if "record_stock_receipt" not in granted.get(script.principal_id, ()):
+                problems.append(f"{where}: {script.principal_id} may not record stock receipts")
+        elif isinstance(script, StaffDistributionRule):
+            if script.service_target_id not in targets:
+                problems.append(f"{where}: unknown service target {script.service_target_id}")
+            if "record_distribution" not in granted.get(script.principal_id, ()):
+                problems.append(f"{where}: {script.principal_id} may not record distributions")
     return problems
 
 

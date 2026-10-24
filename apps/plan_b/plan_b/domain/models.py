@@ -1,7 +1,15 @@
 """Plan B runtime contract, version ``RUNTIME_VERSION``.
 
-These Pydantic models are the frozen Wave 1 interface between the store, tools, planner,
-policy, runner, API and browser. ``docs/RUNTIME_CONTRACT.md`` explains their semantics.
+These Pydantic models are the interface between the store, tools, planner, policy, runner,
+API and browser. ``docs/RUNTIME_CONTRACT.md`` explains their semantics.
+
+Runtime 1.1.0 (Wave 2) adds optional consumable-stock and service-target fields (pantry
+profile): ``EventGoal.service_targets``, ``ResourceDef.consumable_stock``,
+``Assignment.consumable_allocations``, expected shipments, typed ``pantry_parameters`` and the
+staff-only ``record_stock_receipt`` / ``record_distribution`` tools. It also adds the
+structured resource offer (``SubmitObservationArgs.offer``), the ``organizer_goal_update`` actor
+script and the per-episode caps recorded in outcome reports. Every addition has a default, so
+1.0.0 fixtures, receipts, snapshots and traces still parse unchanged.
 
 Relationship to the planning bundle (``PEEAI_plan/schemas/planning.schema.json`` 0.2.0):
 planning objects forbid additional properties, so runtime records are separate models that
@@ -17,12 +25,22 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Annotated, Any, Final, Literal
 
-from pydantic import AfterValidator, BaseModel, ConfigDict, Field, model_validator
+from pydantic import (
+    AfterValidator,
+    BaseModel,
+    ConfigDict,
+    Field,
+    SerializerFunctionWrapHandler,
+    model_serializer,
+    model_validator,
+)
 
 from plan_b.domain.timeutil import to_utc
 
-RUNTIME_VERSION: Final = "1.0.0"
+RUNTIME_VERSION: Final = "1.1.0"
 TRACE_VERSION: Final = "1.0.0"
+# Stored records keep the version they were written with: 1.0.0 data still parses.
+RuntimeVersion = Literal["1.0.0", "1.1.0"]
 PLANNING_SCHEMA_VERSION: Final = "0.2.0"
 
 UtcDatetime = Annotated[datetime, AfterValidator(to_utc)]
@@ -67,7 +85,9 @@ ObservationChannel = Literal[
 ]
 EnvelopeStatus = Literal["succeeded", "rejected", "unknown", "unavailable"]
 ReceiptStatus = Literal["applied", "rejected", "unknown"]
-HoldStatus = Literal["active", "committed", "released", "expired"]
+# ``fulfilled``: a consumable stock-transfer hold whose whole quantity was handed off.
+HoldStatus = Literal["active", "committed", "released", "expired", "fulfilled"]
+HoldPurpose = Literal["activity", "stock_transfer"]
 ConstraintResult = Literal["feasible_under_assumptions", "infeasible", "unknown"]
 CheckStatus = Literal["passed", "failed", "not_applicable", "unsupported"]
 
@@ -78,12 +98,16 @@ READ_TOOLS = (
     "query_status",
     "evaluate_candidates",
 )
+# Staff-only physical attestations (runtime 1.1.0). They are mutation tools under the common
+# transaction rules, granted only to staff principals and never to a coordinator agent.
+STAFF_TOOLS = ("record_stock_receipt", "record_distribution")
 MUTATION_TOOLS = (
     "hold_resource",
     "release_hold",
     "apply_plan",
     "check_in",
     "submit_observation",
+    *STAFF_TOOLS,
 )
 # Organizer control operations. They follow the mutation transaction rules but are not
 # coordinator-agent tools and appear in no coordinator grant.
@@ -129,6 +153,12 @@ ErrorCode = Literal[
     "UNSUPPORTED_ACTION",
     "EVENT_CLOSED",
     "INTERNAL_ERROR",
+    # runtime 1.1.0 (consumable stock)
+    "DUPLICATE_REFERENCE",
+    "INSUFFICIENT_STOCK",
+    "UNIT_MISMATCH",
+    "THROUGHPUT_EXCEEDED",
+    "HANDOFF_WINDOW_CLOSED",
 ]
 
 
@@ -180,6 +210,26 @@ class ResourceTerms(Strict):
     terms_source_ref: str
 
 
+# Quantities of consumable stock are whole units: a fractional, negative or string quantity is
+# refused rather than coerced.
+StockQuantity = Annotated[int, Field(strict=True, ge=1)]
+
+
+class ConsumableStock(Strict):
+    """Planning ConsumableStock, unchanged (integer units).
+
+    On a ``ResourceDef`` it is the stock at load. On a ``ResourceView`` it is the live
+    projection: ``on_hand_quantity`` includes reserved, unconsumed units; available is
+    ``on_hand - reserved``; ``expected_quantity`` (outstanding expected shipments) is never part
+    of on-hand stock."""
+
+    unit: Identifier
+    on_hand_quantity: int = Field(ge=0)
+    reserved_quantity: int = Field(ge=0)
+    distributed_quantity: int = Field(ge=0)
+    expected_quantity: int = Field(ge=0)
+
+
 class ResourceDef(Strict):
     resource_id: Identifier
     label: str
@@ -191,6 +241,8 @@ class ResourceDef(Strict):
     capabilities: tuple[str, ...]
     approved_substitute_ids: tuple[str, ...]
     terms: ResourceTerms
+    # Runtime 1.1.0: a consumable pool (kind "supply"). None for reusable resources.
+    consumable_stock: ConsumableStock | None = None
 
 
 class ActivityDef(Strict):
@@ -225,6 +277,17 @@ class AccessibilityRequirement(Strict):
 PreferencePreset = Literal["balanced", "preserve_order", "minimize_spend"]
 
 
+class ServiceTarget(Strict):
+    """Planning ServiceTarget, unchanged: a staff-defined quantity of one unit, tied to a
+    registered activity and a deadline (inclusive)."""
+
+    target_id: Identifier
+    unit: Identifier
+    quantity: int = Field(ge=1)
+    deadline: UtcDatetime
+    activity_id: Identifier
+
+
 class EventGoal(Strict):
     # Planning EventGoal fields
     goal_id: Identifier
@@ -242,6 +305,9 @@ class EventGoal(Strict):
     objective_weights: ObjectiveWeights
     accessibility_requirements: tuple[AccessibilityRequirement, ...] = ()
     program_concurrency: int = Field(default=1, ge=1)
+    # Runtime 1.1.0 (planning EventGoal.service_targets): quantity targets. Only distribution
+    # recorded by staff on time counts toward them.
+    service_targets: tuple[ServiceTarget, ...] = ()
 
 
 class KeepTemplate(Strict):
@@ -344,11 +410,23 @@ class Observation(Strict):
     supersedes: tuple[str, ...]
 
 
+class ConsumableAllocation(Strict):
+    """Planning ConsumableAllocation, unchanged: demand on one stock pool for one target. The
+    quantity is the plan's total claim on that pool for the target over the session, including
+    units already distributed from it."""
+
+    resource_id: Identifier
+    quantity: int = Field(ge=1)
+    service_target_id: Identifier
+
+
 class Assignment(Strict):
     activity_id: Identifier
     start: UtcDatetime
     end: UtcDatetime
     resource_ids: tuple[str, ...]
+    # Runtime 1.1.0: consumable demand of this activity (empty for reusable resources only).
+    consumable_allocations: tuple[ConsumableAllocation, ...] = ()
 
     @property
     def window(self) -> TimeWindow:
@@ -379,6 +457,25 @@ class InitialCheckIn(Strict):
     source_ref: str
 
 
+class ServiceProgress(Strict):
+    """Planning ServiceProgress, unchanged."""
+
+    target_id: Identifier
+    distributed_quantity: int = Field(ge=0)
+
+
+class ExpectedShipment(Strict):
+    """Planning ExpectedShipment, unchanged. Outstanding = ``quantity - received_quantity``;
+    only a matched staff-recorded receipt reconciles it."""
+
+    shipment_id: Identifier
+    destination_resource_id: Identifier
+    quantity: int = Field(ge=1)
+    received_quantity: int = Field(ge=0)
+    expected_at: UtcDatetime | None
+    source_ref: str
+
+
 class InitialState(Strict):
     event_id: Identifier
     revision: int = Field(ge=0)
@@ -388,6 +485,9 @@ class InitialState(Strict):
     assignments: tuple[Assignment, ...]
     lifecycle: tuple[InitialLifecycle, ...]
     checked_in: tuple[InitialCheckIn, ...]
+    # Runtime 1.1.0 (planning EventState fields)
+    service_progress: tuple[ServiceProgress, ...] = ()
+    expected_shipments: tuple[ExpectedShipment, ...] = ()
 
 
 class DerivedFrom(Strict):
@@ -402,11 +502,46 @@ class FixtureExtension(Strict):
     reason: str
 
 
+class PantryParameters(Strict):
+    """Planning PantryParameters, unchanged: typed service capacity and staff-response timing,
+    the same for every policy. ``handoff_window.end`` is the exclusive source cutoff."""
+
+    service_activity_id: Identifier
+    staff_resource_id: Identifier
+    service_rate_units_per_minute: int = Field(ge=1)
+    handoff_duration_minutes: int = Field(ge=1)
+    handoff_window: TimeWindow
+
+
+StockOptionKind = Literal["allocate_stock", "transfer_stock", "await_shipment"]
+
+
+class StockOption(Strict):
+    """One declared option of the consumable candidate menu (runtime extension).
+
+    ``allocate_stock`` allocates the pool's physical stock to the target; ``transfer_stock``
+    also counts an alternate pool's units after a staff-recorded handoff into the pool;
+    ``await_shipment`` counts the pool's outstanding expected shipments (expected units are not
+    stock, so the stock validator always rejects it while they are unreceived)."""
+
+    option: StockOptionKind
+    activity_id: Identifier
+    service_target_id: Identifier
+    resource_id: Identifier
+    source_resource_id: Identifier | None = None
+
+    @model_validator(mode="after")
+    def _source(self) -> StockOption:
+        if (self.option == "transfer_stock") != (self.source_resource_id is not None):
+            raise ValueError("source_resource_id is set exactly for a transfer_stock option")
+        return self
+
+
 class PublicScenario(Strict):
     artifact: Literal["plan_b.public_scenario"]
-    runtime_version: Literal["1.0.0"]
+    runtime_version: RuntimeVersion
     scenario_id: Identifier
-    profile_id: Literal["campus_showcase", "community_skills_exchange"]
+    profile_id: Literal["campus_showcase", "community_skills_exchange", "pantry_continuity"]
     fictional: Literal[True]
     timezone: Literal["America/New_York"]
     event_id: Identifier
@@ -423,6 +558,9 @@ class PublicScenario(Strict):
     tool_durations_minutes: dict[str, int]
     declared_assumptions: tuple[PlanningAssumption, ...]
     fixture_extensions: tuple[FixtureExtension, ...]
+    # Runtime 1.1.0 (consumable profiles only)
+    pantry_parameters: PantryParameters | None = None
+    stock_options: tuple[StockOption, ...] = ()
 
 
 # ---------------------------------------------------------------------------
@@ -443,6 +581,9 @@ class StatusResponse(Strict):
     # share it. The observation created from the record carries it; None means
     # "<entity_id>_status".
     correlation_group: Identifier | None = None
+    # Runtime 1.1.0: the record reports an expected shipment to this (consumable) resource. Its
+    # ETA updates that shipment's reported ETA; it never moves the stock's status or quantity.
+    shipment_id: Identifier | None = None
 
 
 class StatusRecord(Strict):
@@ -502,8 +643,59 @@ class OrganizerAuthorizationRule(Strict):
     resource_ids: tuple[str, ...]
 
 
+class OrganizerGoalUpdateScript(Strict):
+    """Simulated organizer: at ``at`` changes the goal's preference preset with
+    ``update_goal`` through its own session, citing ``expected_goal_version`` and the revision
+    current at that instant."""
+
+    kind: Literal["organizer_goal_update"]
+    at: UtcDatetime
+    principal_id: Identifier
+    preference_preset: PreferencePreset
+    expected_goal_version: int = Field(ge=1)
+    reason: str = Field(min_length=1, max_length=500)
+
+
+class StaffHandoffRule(Strict):
+    """Labeled staff simulator (runtime 1.1.0): answers each valid ``stock_transfer`` hold from
+    ``source_resource_id`` into ``destination_resource_id`` with one ``record_stock_receipt``,
+    ``pantry_parameters.handoff_duration_minutes`` after the hold was created, while the hold,
+    the handoff window and the staff grant are valid. It confirms the hold's remaining quantity
+    and cites ``source_observation_id``. ``max_quantity`` caps the units this staff confirms from
+    the source over the whole episode (a partial handoff that a repeated request cannot top
+    up)."""
+
+    kind: Literal["staff_handoff_rule"]
+    principal_id: Identifier
+    source_resource_id: Identifier
+    destination_resource_id: Identifier
+    source_observation_id: Identifier
+    receipt_reference_prefix: Identifier
+    max_quantity: int | None = Field(default=None, ge=1)
+    label: str
+
+
+class StaffDistributionRule(Strict):
+    """Labeled staff simulator (runtime 1.1.0): at ``at`` records one aggregate
+    ``record_distribution`` for the target. The quantity is decided from the visible state at
+    that instant: min(committed undistributed stock, target - distributed, accrued service
+    capacity - distributed). Nothing is recorded when that is zero."""
+
+    kind: Literal["staff_distribution_rule"]
+    principal_id: Identifier
+    at: UtcDatetime
+    service_target_id: Identifier
+    distribution_reference: Identifier
+    label: str
+
+
 ActorScript = Annotated[
-    ParticipantCheckInScript | ParticipantObservationScript | OrganizerAuthorizationRule,
+    ParticipantCheckInScript
+    | ParticipantObservationScript
+    | OrganizerAuthorizationRule
+    | OrganizerGoalUpdateScript
+    | StaffHandoffRule
+    | StaffDistributionRule,
     Field(discriminator="kind"),
 ]
 
@@ -520,6 +712,13 @@ class OutcomePredicate(Strict):
         "committed_spend_equals",
         "applied_plan_count",
         "infeasibility_reported",
+        # runtime 1.1.0 (consumable stock and service)
+        "service_on_time_equals",
+        "service_unfulfilled_equals",
+        "stock_on_hand_equals",
+        "expected_unreceived_equals",
+        "stock_conserved",
+        "no_staff_attestation_by_agent",
     ]
     params: dict[str, Any] = Field(default_factory=dict)
     description: str
@@ -527,7 +726,7 @@ class OutcomePredicate(Strict):
 
 class PrivateCase(Strict):
     artifact: Literal["plan_b.private_case"]
-    runtime_version: Literal["1.0.0"]
+    runtime_version: RuntimeVersion
     case_ref: Identifier
     scenario_id: Identifier
     never_expose_to_agent: Literal[True]
@@ -595,7 +794,17 @@ class Hypothesis(Strict):
     label: str
 
 
-TemplateName = Literal["keep", "swap", "shift", "substitute", "alternate_format"]
+TemplateName = Literal[
+    "keep",
+    "swap",
+    "shift",
+    "substitute",
+    "alternate_format",
+    # runtime 1.1.0: declared stock options (``PublicScenario.stock_options``)
+    "allocate_stock",
+    "transfer_stock",
+    "await_shipment",
+]
 
 
 class EvaluateCandidatesArgs(Strict):
@@ -607,13 +816,35 @@ class HoldResourceArgs(Strict):
     resource_id: Identifier
     activity_id: Identifier
     window: TimeWindow
-    quantity: int = Field(default=1, ge=1)
+    # Whole units: a fractional or string quantity is refused, not coerced (runtime 1.1.0).
+    quantity: int = Field(default=1, ge=1, strict=True)
     hold_minutes: int | None = Field(default=None, ge=1)
+    # Runtime 1.1.0, consumable resources only. ``stock_transfer`` reserves an alternate pool's
+    # units for a staff handoff into ``destination_resource_id`` (a local staff task); an
+    # ``activity`` hold reserves the pool's own units for ``service_target_id``.
+    purpose: HoldPurpose = "activity"
+    destination_resource_id: Identifier | None = None
+    service_target_id: Identifier | None = None
 
     @model_validator(mode="after")
     def _minutes(self) -> HoldResourceArgs:
         require_minute_window(self.window)
+        if (self.purpose == "stock_transfer") != (self.destination_resource_id is not None):
+            raise ValueError("destination_resource_id is set exactly for a stock_transfer hold")
         return self
+
+    @model_serializer(mode="wrap")
+    def _without_stock_defaults(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
+        """A hold on a reusable resource serializes exactly as in runtime 1.0.0: the consumable
+        fields appear only when set, so its request body, logged arguments and idempotency key
+        are unchanged."""
+        data: dict[str, Any] = handler(self)
+        if self.purpose == "activity":
+            data.pop("purpose", None)
+        for name in ("destination_resource_id", "service_target_id"):
+            if getattr(self, name) is None:
+                data.pop(name, None)
+        return data
 
 
 class ReleaseHoldArgs(Strict):
@@ -636,6 +867,22 @@ class CheckInArgs(Strict):
         return self
 
 
+class ResourceOffer(Strict):
+    """The structured part of a resource offer (runtime 1.1.0): the registered resource's owner
+    states the interval it is offered for, the capabilities it provides and the registered terms
+    it confirms. The natural-language text stays data; only these fields are checked, and an
+    offer that passes activates the preconfigured resource's availability and nothing else."""
+
+    available: TimeWindow
+    capabilities: tuple[Identifier, ...] = Field(min_length=1)
+    terms_ref: str = Field(min_length=1, max_length=200)
+
+    @model_validator(mode="after")
+    def _minutes(self) -> ResourceOffer:
+        require_minute_window(self.available)
+        return self
+
+
 class SubmitObservationArgs(Strict):
     text: str = Field(min_length=1, max_length=1000)
     entity_id: Identifier | None = None
@@ -644,6 +891,67 @@ class SubmitObservationArgs(Strict):
     client_record_id: Identifier | None = None
     correlation_group: Identifier | None = None
     supersedes: tuple[Identifier, ...] = ()
+    # Runtime 1.1.0: a structured offer that may activate the resource ``entity_id`` names.
+    # Without it a ``resource_offer`` is an unverified proposal that activates nothing.
+    offer: ResourceOffer | None = None
+
+    @model_validator(mode="after")
+    def _offer_shape(self) -> SubmitObservationArgs:
+        if self.offer is not None and (self.kind != "resource_offer" or self.entity_id is None):
+            raise ValueError("a structured offer needs kind resource_offer and the entity_id")
+        if self.offer is not None and self.observed_at is not None:
+            raise ValueError("an offer is observed when it is submitted; omit observed_at")
+        return self
+
+    @model_serializer(mode="wrap")
+    def _without_offer_default(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
+        """An observation without an offer serializes exactly as in runtime 1.0.0, so its
+        logged arguments are unchanged."""
+        data: dict[str, Any] = handler(self)
+        if self.offer is None:
+            data.pop("offer", None)
+        return data
+
+
+class RecordStockReceiptArgs(Strict):
+    """Staff attestation of a physical receipt into ``resource_id`` (runtime 1.1.0).
+
+    Either a registered internal handoff (``source_resource_id`` and the matching
+    ``source_hold_id``) or a matched external receipt (``shipment_id``), never both.
+    ``receipt_reference`` is the physical record's identity: unique per event, whatever the
+    request's idempotency key."""
+
+    resource_id: Identifier
+    quantity: StockQuantity
+    unit: Identifier
+    source_observation_id: Identifier
+    receipt_reference: Identifier
+    source_resource_id: Identifier | None = None
+    source_hold_id: Identifier | None = None
+    shipment_id: Identifier | None = None
+
+    @model_validator(mode="after")
+    def _one_source(self) -> RecordStockReceiptArgs:
+        internal = self.source_resource_id is not None or self.source_hold_id is not None
+        if internal and (self.source_resource_id is None or self.source_hold_id is None):
+            raise ValueError("an internal handoff names both source_resource_id and source_hold_id")
+        if internal == (self.shipment_id is not None):
+            raise ValueError("name either an internal handoff source or a shipment_id")
+        return self
+
+
+class RecordDistributionArgs(Strict):
+    """Staff attestation of an aggregate, completed distribution (runtime 1.1.0). It consumes
+    committed, reserved stock (``allocation_ids``) of ``resource_id`` for one target.
+    ``distribution_reference`` is unique per event, whatever the idempotency key."""
+
+    resource_id: Identifier
+    quantity: StockQuantity
+    unit: Identifier
+    service_target_id: Identifier
+    activity_id: Identifier
+    distribution_reference: Identifier
+    allocation_ids: tuple[Identifier, ...] = Field(min_length=1)
 
 
 class UpdateGoalArgs(Strict):
@@ -672,6 +980,8 @@ TOOL_ARGUMENT_MODELS: dict[str, type[Strict]] = {
     "submit_observation": SubmitObservationArgs,
     "update_goal": UpdateGoalArgs,
     "update_grant": UpdateGrantArgs,
+    "record_stock_receipt": RecordStockReceiptArgs,
+    "record_distribution": RecordDistributionArgs,
 }
 
 # Which envelope fields each tool requires. "optional" fields are checked when supplied.
@@ -696,6 +1006,12 @@ TOOL_REQUIREMENTS: dict[str, dict[str, str]] = {
         "expected_goal_version": "required",
     },
     "update_grant": {"idempotency_key": "required", "expected_revision": "required"},
+    "record_stock_receipt": {"idempotency_key": "required", "expected_revision": "required"},
+    "record_distribution": {
+        "idempotency_key": "required",
+        "expected_revision": "required",
+        "expected_goal_version": "required",
+    },
 }
 
 
@@ -713,7 +1029,7 @@ class StateChange(Strict):
 
 
 class ActionReceipt(Strict):
-    runtime_version: Literal["1.0.0"]
+    runtime_version: RuntimeVersion
     receipt_id: Identifier
     episode_id: Identifier
     event_id: Identifier
@@ -754,7 +1070,7 @@ class ActionReceipt(Strict):
 
 
 class ToolEnvelope(Strict):
-    runtime_version: Literal["1.0.0"]
+    runtime_version: RuntimeVersion
     call_id: Identifier
     tool: str
     status: EnvelopeStatus
@@ -779,6 +1095,8 @@ class StatusFacts(Strict):
     status_code: str
     domain_status: ResourceStatus
     reported_eta: UtcDatetime | None
+    # Runtime 1.1.0: the facts concern this expected shipment, not the resource's own status.
+    shipment_id: str | None = None
 
 
 class ObservationRecord(Strict):
@@ -839,6 +1157,8 @@ class ResourceView(Strict):
     status_observed_at: UtcDatetime | None
     reported_eta: UtcDatetime | None
     occupancy: tuple[OccupancyEntry, ...]
+    # Runtime 1.1.0: live stock of a consumable pool (None for reusable resources).
+    consumable_stock: ConsumableStock | None = None
 
 
 class HoldView(Strict):
@@ -860,6 +1180,13 @@ class HoldView(Strict):
     terminal_at: UtcDatetime | None
     created_receipt_id: str
     terminal_receipt_id: str | None
+    # Runtime 1.1.0 (consumable holds). ``remaining_quantity`` is the live claim: a partial
+    # handoff lowers it, and only a live (active) remainder reserves stock.
+    consumable: bool = False
+    remaining_quantity: int | None = None
+    purpose: HoldPurpose = "activity"
+    destination_resource_id: str | None = None
+    service_target_id: str | None = None
 
 
 class CommitmentView(Strict):
@@ -918,6 +1245,161 @@ class TransitionView(Strict):
     cause_kind: str
     cause_ref: str | None
     summary: str
+
+
+# ---------------------------------------------------------------------------
+# Consumable stock and service projections (runtime 1.1.0)
+# ---------------------------------------------------------------------------
+
+StockMovementKind = Literal["opening", "receipt", "transfer_out", "distribution"]
+
+
+class StockBalanceView(Strict):
+    """One pool's balance and its conservation terms:
+    ``on_hand = opening + received - transferred_out - distributed``. Reserved stock is the
+    live hold remainders plus the undistributed committed allocations (disjoint parts)."""
+
+    resource_id: str
+    unit: str
+    opening_quantity: int
+    received_quantity: int
+    transferred_out_quantity: int
+    distributed_quantity: int
+    on_hand_quantity: int
+    held_quantity: int
+    committed_quantity: int
+    reserved_quantity: int
+    available_quantity: int
+    expected_quantity: int
+    conserved: bool
+
+
+class StockMovementView(Strict):
+    """Append-only stock ledger row. ``delta`` is the signed change of the pool's on-hand."""
+
+    seq: int
+    at: UtcDatetime
+    resource_id: str
+    kind: StockMovementKind
+    quantity: int
+    delta: int
+    counterpart_resource_id: str | None
+    reference: str | None
+    hold_id: str | None
+    shipment_id: str | None
+    receipt_id: str | None
+    revision: int
+
+
+class StockReceiptView(Strict):
+    stock_receipt_id: str
+    receipt_reference: str
+    kind: Literal["internal_handoff", "external_shipment"]
+    resource_id: str
+    source_resource_id: str | None
+    source_hold_id: str | None
+    shipment_id: str | None
+    quantity: int
+    unit: str
+    source_observation_id: str
+    at: UtcDatetime
+    actor_id: str
+    receipt_id: str
+    revision: int
+
+
+class DistributionView(Strict):
+    distribution_id: str
+    distribution_reference: str
+    resource_id: str
+    service_target_id: str
+    activity_id: str
+    quantity: int
+    unit: str
+    goal_version: int
+    allocation_ids: tuple[str, ...]
+    at: UtcDatetime
+    on_time: bool  # completed no later than the target's deadline (inclusive)
+    actor_id: str
+    receipt_id: str
+    revision: int
+
+
+class StockAllocationView(Strict):
+    """A committed consumable allocation, created by ``apply_plan`` from a hold."""
+
+    allocation_id: str
+    resource_id: str
+    service_target_id: str
+    activity_id: str
+    quantity: int
+    remaining_quantity: int  # committed, reserved and not yet distributed
+    source_hold_id: str
+    plan_version: int
+    created_at: UtcDatetime
+    receipt_id: str
+    actor_id: str
+    grant_id: str
+
+
+class ExpectedShipmentView(Strict):
+    shipment: ExpectedShipment  # planning shape; received_quantity is the reconciled amount
+    outstanding_quantity: int
+    reported_eta: UtcDatetime | None  # latest typed shipment status, if any was queried
+    status_observation_id: str | None
+
+
+class ServiceProgressView(Strict):
+    """Service accounting for one target. The two counters stay separate:
+    ``supply_gap_quantity = max(remaining target - pantry-controlled on hand, 0)`` with the
+    remaining target measured after every distribution so far, and
+    ``unfulfilled_quantity = original target - distributed on time``. Reservations, plan
+    commitments and receipts never change ``unfulfilled_quantity``."""
+
+    target_id: str
+    unit: str
+    activity_id: str
+    deadline: UtcDatetime
+    target_quantity: int  # the current goal version's target
+    original_quantity: int  # the first goal version's target (attainment is scored on it)
+    distributed_quantity: int  # cumulative, on time and late
+    on_time_quantity: int
+    late_quantity: int
+    committed_quantity: int  # committed allocations not yet distributed
+    supply_gap_quantity: int
+    unfulfilled_quantity: int
+    qualified_minutes: int  # staffed service minutes with committed stock, up to the clock
+    capacity_quantity: int  # rate * qualified minutes - distributed (never negative)
+    attained: bool
+
+
+HandoffTaskStatus = Literal["open", "fulfilled", "partially_fulfilled", "lapsed"]
+
+
+class HandoffTaskView(Strict):
+    """The local staff task a live ``stock_transfer`` hold creates."""
+
+    hold_id: str
+    source_resource_id: str
+    destination_resource_id: str
+    requested_quantity: int
+    remaining_quantity: int
+    requested_at: UtcDatetime
+    respond_after: UtcDatetime  # requested_at + the modeled staff response latency
+    cutoff: UtcDatetime  # min(hold expiry, handoff window end); exclusive
+    status: HandoffTaskStatus
+    stock_receipt_ids: tuple[str, ...]
+
+
+class ConsumableStateView(Strict):
+    balances: tuple[StockBalanceView, ...]
+    expected_shipments: tuple[ExpectedShipmentView, ...]
+    service: tuple[ServiceProgressView, ...]
+    allocations: tuple[StockAllocationView, ...]
+    movements: tuple[StockMovementView, ...]
+    receipts: tuple[StockReceiptView, ...]
+    distributions: tuple[DistributionView, ...]
+    handoff_tasks: tuple[HandoffTaskView, ...]
 
 
 class AttemptView(Strict):
@@ -1009,7 +1491,19 @@ class PolicyDecision(Strict):
 
 
 class Edit(Strict):
-    kind: Literal["keep", "swap", "shift", "substitute", "alternate_format"]
+    # Stock edits (runtime 1.1.0): ``allocate_stock`` / ``await_shipment`` name the pool in
+    # ``resource_id``; ``transfer_stock`` names the pool in ``resource_id`` and the alternate
+    # pool whose units stand in for its shortfall in ``substitute_id``.
+    kind: Literal[
+        "keep",
+        "swap",
+        "shift",
+        "substitute",
+        "alternate_format",
+        "allocate_stock",
+        "transfer_stock",
+        "await_shipment",
+    ]
     activity_ids: tuple[str, ...] = ()
     offset_minutes: int | None = None
     resource_id: str | None = None
@@ -1026,7 +1520,14 @@ class CandidateCheck(Strict):
 
 class CandidateAssumption(Strict):
     assumption_id: str
-    kind: Literal["arrival_by_start", "catalog_availability", "declared_availability", "hypothesis"]
+    kind: Literal[
+        "arrival_by_start",
+        "catalog_availability",
+        "declared_availability",
+        "hypothesis",
+        # runtime 1.1.0: alternate units counted only after a staff-recorded handoff
+        "stock_handoff",
+    ]
     entity_id: str
     text: str
     basis_ref: str | None  # observation id, catalog source ref, or hypothesis label
@@ -1073,6 +1574,48 @@ class AuthorizationAssessment(Strict):
     missing: tuple[MissingPermission, ...]
 
 
+class RequiredStockHold(Strict):
+    """Consumable units a candidate still has to claim before ``apply_plan``: live activity
+    holds by this actor on the pool, for the activity and target, whose remaining quantities
+    sum exactly to ``quantity``. ``apply_plan`` converts them into committed allocations."""
+
+    resource_id: str
+    activity_id: str
+    service_target_id: str
+    quantity: int
+    held_quantity: int  # the actor's live matching hold remainders
+    bound_hold_ids: tuple[str, ...]  # empty unless held_quantity == quantity
+
+
+class StockTransferNeed(Strict):
+    """Units an alternate pool must hand off (a staff-recorded ``record_stock_receipt``) before
+    a transfer candidate can be feasible. A live ``stock_transfer`` hold reserves them."""
+
+    source_resource_id: str
+    destination_resource_id: str
+    activity_id: str
+    service_target_id: str
+    quantity: int
+    held_quantity: int
+    bound_hold_ids: tuple[str, ...]
+    handoff_cutoff: UtcDatetime | None
+
+
+class ServiceCoverage(Strict):
+    """What a candidate would leave of a target. ``allocated`` counts units already distributed;
+    ``on_time`` is the part staff can distribute by the deadline at the declared rate (late
+    units can still be distributed, truthfully, but do not count);
+    ``unfulfilled = target - on_time``. A coverage gap is not a hard-check failure; the
+    objective weighs it."""
+
+    target_id: str
+    target_quantity: int
+    distributed_quantity: int
+    allocated_quantity: int
+    on_time_quantity: int
+    unfulfilled_quantity: int
+
+
 class CandidateResult(Strict):
     candidate_id: str  # unique per evaluation
     report_id: str  # unique per evaluation
@@ -1092,6 +1635,10 @@ class CandidateResult(Strict):
     rank: int | None  # 1-based rank among constraint-feasible candidates
     applicable_now: bool  # feasible, authorized, every required hold bound, not hypothetical
     rationale: str
+    # Runtime 1.1.0 (consumable profiles; empty otherwise)
+    required_stock_holds: tuple[RequiredStockHold, ...] = ()
+    stock_transfers: tuple[StockTransferNeed, ...] = ()
+    service_coverage: tuple[ServiceCoverage, ...] = ()
 
 
 class EvaluationRequest(Strict):
@@ -1156,10 +1703,14 @@ class PlanningSnapshot(Strict):
     # dependent checks (no_past_change, commitment_cutoff, hold and grant liveness) use it, so
     # a candidate reported applicable is still valid when its apply executes. None = clock.
     effective_at: UtcDatetime | None = None
+    # Runtime 1.1.0 (consumable profiles; None / empty otherwise)
+    stock: ConsumableStateView | None = None
+    pantry_parameters: PantryParameters | None = None
+    stock_options: tuple[StockOption, ...] = ()
 
 
 class EventStateView(Strict):
-    runtime_version: Literal["1.0.0"]
+    runtime_version: RuntimeVersion
     episode_id: str
     event_id: str
     scenario_id: str
@@ -1193,6 +1744,10 @@ class EventStateView(Strict):
     declared_assumptions: tuple[PlanningAssumption, ...]
     tool_durations_minutes: dict[str, int]
     viewer: ViewerInfo
+    # Runtime 1.1.0 (consumable profiles; None / empty otherwise)
+    stock: ConsumableStateView | None = None
+    pantry_parameters: PantryParameters | None = None
+    stock_options: tuple[StockOption, ...] = ()
 
 
 # ---------------------------------------------------------------------------
@@ -1260,6 +1815,48 @@ class HoldStats(Strict):
     expired: int
     committed: int
     active_at_end: int
+    fulfilled: int = 0  # runtime 1.1.0: stock-transfer holds handed off in full
+
+
+class ServiceOutcome(Strict):
+    """A service target scored against its original quantity (runtime 1.1.0)."""
+
+    target_id: str
+    unit: str
+    original_quantity: int
+    distributed_quantity: int
+    on_time_quantity: int
+    late_quantity: int
+    unfulfilled_quantity: int
+    supply_gap_quantity: int
+    attained: bool
+
+
+class StockOutcome(Strict):
+    """One pool's conservation at the end (runtime 1.1.0)."""
+
+    resource_id: str
+    opening_quantity: int
+    received_quantity: int
+    transferred_out_quantity: int
+    distributed_quantity: int
+    closing_on_hand_quantity: int
+    expected_unreceived_quantity: int
+    conserved: bool
+
+
+class EpisodeCapsReport(Strict):
+    """The per-episode caps every coordinator policy runs under, and what this episode used
+    (runtime 1.1.0). ``phase`` is ``development`` for the Wave 2 values that Wave 3 freezes.
+    Tool calls count every call the coordinator session made (failed calls, retries and receipt
+    lookups included); model calls count every provider call attributed to a decision."""
+
+    phase: Literal["development", "frozen"]
+    max_tool_calls: int = Field(ge=1)
+    max_model_calls: int = Field(ge=1)
+    tool_calls: int = Field(ge=0)
+    model_calls: int = Field(ge=0)
+    reached: tuple[Literal["tool_calls", "model_calls"], ...] = ()
 
 
 class OutcomeReport(Strict):
@@ -1291,3 +1888,13 @@ class OutcomeReport(Strict):
     predicates: tuple[PredicateResult, ...] = ()
     expected_outcome: str | None = None
     matches_expectation: bool | None = None
+    # Runtime 1.1.0 (consumable profiles; empty / zero otherwise)
+    service: tuple[ServiceOutcome, ...] = ()
+    stock: tuple[StockOutcome, ...] = ()
+    staff_confirmations: int = 0  # applied staff receipts and distributions
+    duplicate_records_rejected: int = 0  # DUPLICATE_REFERENCE rejections
+    unnecessary_reservations: int = 0  # consumable holds that lapsed or were released unused
+    # Runtime 1.1.0: which coordinator policy ran ("Deterministic policy" or
+    # "Live agent · <returned model id>") and the per-episode caps it ran under.
+    mode_label: str | None = None
+    episode_caps: EpisodeCapsReport | None = None

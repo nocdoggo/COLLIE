@@ -2,10 +2,17 @@
 
 The runner owns the private case: it loads a clean episode, plays scripted exogenous actors
 through their *own* scoped sessions (participant check-ins; a simulated organizer answering an
-in-bounds authorization request after a declared latency), wakes the policy when public state
-changed or its requested wake time passed, and advances the clock one minute at a time to the
-hard end. It never writes state directly and never tells the policy what to do. Minute ticks,
-rather than jumps to private event times, keep wake-up timing from leaking hidden events.
+in-bounds authorization request after a declared latency; in the pantry profile a labeled staff
+simulator that answers stock-transfer tasks and records the aggregate distribution), wakes the
+policy when public state changed or its requested wake time passed, and advances the clock one
+minute at a time to the hard end. It never writes state directly and never tells the policy what
+to do. Minute ticks, rather than jumps to private event times, keep wake-up timing from leaking
+hidden events.
+
+``run_case`` chooses the coordinator policy by name: ``rules`` is the profile's deterministic
+baseline, ``live`` the live coordinator. Every policy runs under the same per-episode caps
+(``EpisodeCaps``, recorded in the outcome report); once a cap is reached the policy is not woken
+again.
 """
 
 from __future__ import annotations
@@ -14,7 +21,7 @@ import json
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from plan_b.domain.fixtures import load_public_scenario
 from plan_b.domain.models import (
@@ -22,15 +29,27 @@ from plan_b.domain.models import (
     EpisodeHistory,
     EventStateView,
     OrganizerAuthorizationRule,
+    OrganizerGoalUpdateScript,
     OutcomeReport,
     ParticipantCheckInScript,
     ParticipantObservationScript,
     PolicyRunResult,
     PrivateCase,
+    StaffDistributionRule,
+    StaffHandoffRule,
 )
 from plan_b.domain.timeutil import fmt_ts
 from plan_b.evaluation.policies.base import Policy
-from plan_b.scenarios.policy_host import PolicyHost, default_policy_factory
+from plan_b.scenarios.policy_host import (
+    DEVELOPMENT_CAPS,
+    EpisodeCaps,
+    PolicyChoice,
+    PolicyHost,
+    policy_factory_for,
+)
+from plan_b.scenarios.policy_host import (  # re-exported: the baseline used to live here
+    baseline_policy_factory as baseline_policy_factory,
+)
 from plan_b.store import repo
 from plan_b.store.database import Database
 from plan_b.store.engine import advance_by, run_due_scheduled
@@ -39,6 +58,9 @@ from plan_b.store.projection_db import TRACE_VIEWER, build_view
 from plan_b.store.sessions import issue_session
 from plan_b.world.validate import validate_case
 from plan_b.world.world import load_case
+
+if TYPE_CHECKING:
+    from plan_b.agent.config import ModelConfig
 
 
 @dataclass
@@ -95,6 +117,8 @@ class ScriptedActors:
         tool: str,
         body: dict[str, Any],
         fill_expected_revision: bool = False,
+        fill_rule: str | None = None,
+        fill: dict[str, Any] | None = None,
     ) -> None:
         sc = repo.scenario(conn, self._episode_id)
         if sc.tool_durations_minutes.get(tool, 0) != 0:
@@ -105,8 +129,8 @@ class ScriptedActors:
         n = repo.next_seq(conn, self._episode_id, "scheduled_action")
         conn.execute(
             "INSERT INTO scheduled_actions (episode_id, action_id, due_at, order_index,"
-            " principal_id, session_id, tool, body_json, fill_expected_revision, status)"
-            " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')",
+            " principal_id, session_id, tool, body_json, fill_expected_revision, status,"
+            " fill_rule, fill_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)",
             (
                 self._episode_id,
                 f"act_{n:03d}",
@@ -117,6 +141,8 @@ class ScriptedActors:
                 tool,
                 json.dumps(body, sort_keys=True),
                 int(fill_expected_revision),
+                fill_rule,
+                json.dumps(fill, sort_keys=True) if fill is not None else None,
             ),
         )
 
@@ -168,9 +194,74 @@ class ScriptedActors:
                             },
                         ),
                     )
+                elif isinstance(script, OrganizerGoalUpdateScript):
+                    self._register(
+                        conn,
+                        principal_id=script.principal_id,
+                        due=script.at,
+                        tool="update_goal",
+                        body={
+                            **self._body(
+                                "update_goal",
+                                key,
+                                {
+                                    "preference_preset": script.preference_preset,
+                                    "reason": script.reason,
+                                },
+                            ),
+                            "expected_goal_version": script.expected_goal_version,
+                        },
+                        fill_expected_revision=True,
+                    )
+                elif isinstance(script, StaffHandoffRule):
+                    self._register_handoff_rule(conn, key, script)
+                elif isinstance(script, StaffDistributionRule):
+                    # The quantity is decided from the visible state at the instant.
+                    self._register(
+                        conn,
+                        principal_id=script.principal_id,
+                        due=script.at,
+                        tool="record_distribution",
+                        body=self._body(
+                            "record_distribution",
+                            key,
+                            {"distribution_reference": script.distribution_reference},
+                        ),
+                        fill_expected_revision=True,
+                        fill_rule="staff_distribution_rule",
+                        fill={"service_target_id": script.service_target_id, "label": script.label},
+                    )
             run_due_scheduled(
                 conn, self._episode_id, repo.get_episode(conn, self._episode_id).clock
             )
+
+    def _register_handoff_rule(self, conn: Any, key: str, script: StaffHandoffRule) -> None:
+        """A standing staff rule: the clock engine answers each stock-transfer hold from the
+        source into the destination after the declared latency (``engine.run_due_handoffs``)."""
+        sc = repo.scenario(conn, self._episode_id)
+        destination = next(
+            r for r in sc.resources if r.resource_id == script.destination_resource_id
+        )
+        if sc.pantry_parameters is None or destination.consumable_stock is None:
+            raise ValueError("a staff handoff rule needs a pantry scenario and a stock pool")
+        self._register(
+            conn,
+            principal_id=script.principal_id,
+            due=sc.pantry_parameters.handoff_window.start,
+            tool="record_stock_receipt",
+            body=self._body("record_stock_receipt", key, {}),
+            fill_expected_revision=True,
+            fill_rule="staff_handoff_rule",
+            fill={
+                "source_resource_id": script.source_resource_id,
+                "destination_resource_id": script.destination_resource_id,
+                "source_observation_id": script.source_observation_id,
+                "receipt_reference_prefix": script.receipt_reference_prefix,
+                "max_quantity": script.max_quantity,
+                "unit": destination.consumable_stock.unit,
+                "label": script.label,
+            },
+        )
 
     def answer_requests(self) -> None:
         """The simulated organizer: schedule an answer to each new, in-bounds authorization
@@ -242,6 +333,8 @@ class ScriptedActors:
                 "receipt_id": r["receipt_id"],
                 "receipt_status": r["receipt_status"],
                 "error_code": r["error_code"],
+                "fill_rule": r["fill_rule"],
+                "note": r["note"],
             }
             for r in rows
         ]
@@ -275,7 +368,8 @@ def tick_loop(
 
     The policy is never woken at or after the event close, or once the coordinator's grant has
     expired: nothing is left to schedule then, and with an expired grant even its first read
-    would be rejected (``GRANT_EXPIRED``)."""
+    would be rejected (``GRANT_EXPIRED``). Nor is it woken once an episode cap is reached
+    (the host recorded a decision saying so)."""
     runs: list[PolicyRunResult] = []
     clock, _, hard_end = _clock(db, episode_id)
     stop_at = hard_end if minutes is None else min(hard_end, clock + timedelta(minutes=minutes))
@@ -287,6 +381,7 @@ def tick_loop(
             run_policy
             and (last_seen is None or revision != last_seen or (wait_until and clock >= wait_until))
             and _policy_may_act(db, episode_id)
+            and not host.capped(episode_id)
         ):
             start_revision = revision
             result = host.run(episode_id, max_tool_calls)
@@ -373,19 +468,33 @@ def run_case(
     db: Database,
     case_ref: str,
     *,
-    scenario_id: str = "dev_fixture_01",
-    policy_factory: Callable[[], Policy] = default_policy_factory,
+    scenario_id: str | None = None,
+    policy: PolicyChoice = "rules",
+    policy_factory: Callable[[], Policy] | None = None,
+    caps: EpisodeCaps = DEVELOPMENT_CAPS,
+    live_config: ModelConfig | None = None,
     max_tool_calls: int = 16,
 ) -> RunResult:
+    """Run one private case to the hard end. The public scenario is the case's own unless
+    ``scenario_id`` names it explicitly (a mismatch fails validation). ``policy`` chooses the
+    coordinator: ``rules`` (the profile's deterministic baseline) or ``live`` (the live policy,
+    its endpoint configuration read server-side; this makes paid model calls). An explicit
+    ``policy_factory`` (tests) takes precedence. Every policy runs under ``caps``."""
     from plan_b.evaluation.scoring import score_episode
 
     case: PrivateCase = load_case(case_ref)
-    problems = validate_case(load_public_scenario(scenario_id), case)
+    scenario_id = scenario_id or case.scenario_id
+    public = load_public_scenario(scenario_id)
+    if policy_factory is None:
+        policy_factory = policy_factory_for(
+            policy, public.profile_id, caps=caps, live_config=live_config
+        )
+    problems = validate_case(public, case)
     if problems:
         raise ValueError(f"private case {case_ref} failed validation: " + "; ".join(problems))
     with db.write() as conn:
         episode_id = create_episode(conn, scenario_id=scenario_id, case_ref=case_ref)
-    host = PolicyHost(db, policy_factory)
+    host = PolicyHost(db, policy_factory, caps=caps)
     actors = ScriptedActors(db, episode_id, case.actor_scripts)
     actors.schedule_initial()
     runs = tick_loop(
@@ -400,7 +509,12 @@ def run_case(
     final = audit_view(db, episode_id)
     history = episode_history(db, episode_id)
     policy_id = runs[0].policy_id if runs else None
-    report = score_episode(final, history, case, policy_id=policy_id)
+    report = score_episode(final, history, case, policy_id=policy_id).model_copy(
+        update={
+            "mode_label": host.mode_label(episode_id),
+            "episode_caps": host.caps_report(episode_id),
+        }
+    )
     return RunResult(
         episode_id=episode_id,
         case_ref=case_ref,

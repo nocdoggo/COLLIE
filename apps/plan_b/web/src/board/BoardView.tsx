@@ -11,7 +11,9 @@ import { ChangeSummary } from "../components/ChangeSummary";
 import { Authority, Constraints } from "../components/Constraints";
 import { Decisions, EvidenceDrawer, Transitions } from "../components/Decisions";
 import { Observations, StatusChecks } from "../components/Observations";
+import { PantryBoard } from "../components/PantryBoard";
 import { PlanComparison } from "../components/PlanComparison";
+import type { PolicySelection } from "../components/policyMode";
 import { Budget, HoldsAndCommitments, RoleReadiness } from "../components/Resources";
 import { Schedule } from "../components/Schedule";
 import type { EventStateView } from "../types";
@@ -23,6 +25,7 @@ export function BoardView({
   panel,
   beforeGrid,
   showHeader = true,
+  selection = null,
 }: {
   view: EventStateView;
   mode: BoardMode;
@@ -34,14 +37,17 @@ export function BoardView({
   panel?: ReactNode;
   /** Content between the header and the board grid (for example, replay frame controls). */
   beforeGrid?: ReactNode;
+  /** The moderator's policy selection, labeling the board until a decision is recorded. */
+  selection?: PolicySelection | null;
 }) {
   return (
     <div className={`board board-${mode}`}>
-      {showHeader ? <BoardHeader view={view} mode={mode} actions={headerActions} /> : null}
+      {showHeader ? <BoardHeader view={view} mode={mode} actions={headerActions} selection={selection} /> : null}
       {beforeGrid}
       <div className="board-grid">
         <div className="col-main">
           <ChangeSummary view={view} />
+          <PantryBoard view={view} />
           <Schedule view={view} />
           <StatusChecks view={view} mode={mode} />
           <PlanComparison view={view} />

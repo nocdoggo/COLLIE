@@ -17,7 +17,9 @@ from plan_b.domain.models import (
     Observation,
     ObservationChannel,
     ObservationRecord,
+    PublicScenario,
     ResourceDef,
+    ResourceOffer,
     StateChange,
     StatusFacts,
     TimeWindow,
@@ -268,6 +270,7 @@ def query_status(ctx: Ctx) -> Outcome:
                 status_code=resp.status_code,
                 domain_status=resp.domain_status,
                 reported_eta=resp.reported_eta,
+                shipment_id=resp.shipment_id,
             ),
         )
         repo.insert_observation(ctx.conn, ctx.episode_id, record_obj)
@@ -281,7 +284,9 @@ def query_status(ctx: Ctx) -> Outcome:
             or row["status_observed_at"] is None
             or row["status_observed_at"] <= fmt_ts(resp.observed_at)
         )
-        if newer:
+        # A record about an expected shipment updates that shipment's ETA evidence (projected
+        # from the observation); it never moves the receiving pool's status or stock.
+        if newer and resp.shipment_id is None:
             ctx.conn.execute(
                 "UPDATE resources SET status = ?, status_basis = 'status_observation',"
                 " status_observation_id = ?, status_observed_at = ?, reported_eta = ?"
@@ -379,6 +384,16 @@ def hold_resource(ctx: Ctx) -> Outcome:
         raise Rejection("SCOPE_VIOLATION", f"{resource.resource_id} is outside this grant")
     if activity.activity_id not in ctx.grant.activity_ids:
         raise Rejection("SCOPE_VIOLATION", f"{activity.activity_id} is outside this grant")
+    if resource.consumable_stock is not None:
+        from plan_b.tools import stock  # the stock tools import this module
+
+        return stock.hold_consumable(ctx, resource, activity)
+    if args.purpose != "activity" or args.service_target_id is not None:
+        raise Rejection(
+            "INVALID_REQUEST",
+            f"{resource.resource_id} is not a consumable stock pool; a hold on it has no stock"
+            " purpose or service target",
+        )
     terms = resource.terms
     if not terms.booking_required:
         raise Rejection(
@@ -486,8 +501,8 @@ def hold_resource(ctx: Ctx) -> Outcome:
     ctx.conn.execute(
         "INSERT INTO holds (episode_id, hold_id, resource_id, activity_id, quantity, window_start,"
         " window_end, created_at, expires_at, commitment_cutoff, reserved_cents, hold_fee_cents,"
-        " status, actor_id, grant_id, created_receipt_id)"
-        " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?)",
+        " status, actor_id, grant_id, created_receipt_id, remaining_quantity)"
+        " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?, ?, ?)",
         (
             ctx.episode_id,
             hold_id,
@@ -504,6 +519,7 @@ def hold_resource(ctx: Ctx) -> Outcome:
             ctx.actor_id,
             ctx.grant.grant_id,
             ctx.receipt_id,
+            args.quantity,  # a reusable resource's hold keeps its whole quantity
         ),
     )
     repo.append_ledger(
@@ -594,12 +610,26 @@ def release_hold(ctx: Ctx) -> Outcome:
         receipt_id=ctx.receipt_id,
     )
     _bump(ctx, "hold_released", hold.hold_id, f"Hold {hold.hold_id} released: {ctx.args.reason}")
+    changes = [
+        StateChange(entity_id=hold.hold_id, field="status", before="active", after="released")
+    ]
+    summary = f"Released hold {hold.hold_id}; {hold.reserved_cents} reserved cents returned"
+    if hold.consumable:
+        # Only the live remainder stops being reserved; release creates no stock.
+        units = hold.remaining_quantity or 0
+        changes.append(
+            StateChange(
+                entity_id=hold.resource_id,
+                field="released_reserved_quantity",
+                before=units,
+                after=0,
+            )
+        )
+        summary += f"; {units} reserved units of {hold.resource_id} are available again"
     return Outcome(
         data={"hold": _hold_view(ctx, hold.hold_id).model_dump(mode="json")},
-        summary=f"Released hold {hold.hold_id}; {hold.reserved_cents} reserved cents returned",
-        state_changes=[
-            StateChange(entity_id=hold.hold_id, field="status", before="active", after="released")
-        ],
+        summary=summary,
+        state_changes=changes,
         reserved_delta=-hold.reserved_cents,
     )
 
@@ -681,9 +711,29 @@ def apply_plan(ctx: Ctx) -> Outcome:
             "the candidate needs a live hold before it can be applied",
             {"resources": [h.resource_id for h in unbound]},
         )
+    pending = [t for t in fresh.stock_transfers if t.quantity > 0]
+    if pending:
+        raise Rejection(
+            "CANDIDATE_NOT_APPLICABLE",
+            "the candidate counts units that staff have not handed off yet; record the handoff"
+            " and re-evaluate",
+            {"transfers": [t.model_dump(mode="json") for t in pending]},
+        )
+    unbound_stock = [h for h in fresh.required_stock_holds if not h.bound_hold_ids]
+    if unbound_stock:
+        raise Rejection(
+            "CANDIDATE_NOT_APPLICABLE",
+            "the candidate needs live stock holds whose remaining quantities match its"
+            " allocation before it can be applied",
+            {"stock_holds": [h.model_dump(mode="json") for h in unbound_stock]},
+        )
     if not fresh.applicable_now:
         raise Rejection("CANDIDATE_NOT_APPLICABLE", "the candidate is not applicable now")
-    if not fresh.changed_activity_ids and not fresh.required_holds:
+    if (
+        not fresh.changed_activity_ids
+        and not fresh.required_holds
+        and not fresh.required_stock_holds
+    ):
         raise Rejection(
             "UNSUPPORTED_ACTION",
             "this candidate keeps the current plan; keeping a plan needs no mutation",
@@ -795,6 +845,16 @@ def apply_plan(ctx: Ctx) -> Outcome:
         changes.append(
             StateChange(entity_id=hold.hold_id, field="status", before="active", after="committed")
         )
+    data_extra: dict[str, Any] = {}
+    if fresh.required_stock_holds:
+        from plan_b.tools import stock  # the stock tools import this module
+
+        stock_changes, stock_converted, allocation_ids = stock.convert_stock_holds(
+            ctx, fresh, new_version
+        )
+        changes.extend(stock_changes)
+        converted.extend(stock_converted)
+        data_extra["allocation_ids"] = allocation_ids
     _bump(ctx, "plan_applied", fresh.candidate_id, f"Applied plan v{new_version}: {fresh.label}")
     new_plan = repo.plan(ctx.conn, ctx.episode_id)
     return Outcome(
@@ -802,6 +862,7 @@ def apply_plan(ctx: Ctx) -> Outcome:
             "plan": new_plan.model_dump(mode="json"),
             "converted_hold_ids": converted,
             "commitment_ids": commitment_ids,
+            **data_extra,
         },
         summary=f"Applied {fresh.label} as plan v{new_version}",
         state_changes=changes,
@@ -914,6 +975,106 @@ def check_in(ctx: Ctx) -> Outcome:
     )
 
 
+def offer_targets(scenario: PublicScenario, resource_id: str) -> tuple[ResourceDef, ...]:
+    """The registered resources an offered resource may stand in for: those whose approved
+    substitutes name it. An offer can activate only such a preconfigured option; it never
+    onboards a new resource."""
+    return tuple(r for r in scenario.resources if resource_id in r.approved_substitute_ids)
+
+
+def _offer_problem(ctx: Ctx, resource: ResourceDef, offer: ResourceOffer) -> None:
+    """The activation checks of a structured offer, in order: owner, preconfigured option,
+    capability, availability, terms. The first failure rejects the whole request."""
+    rid = resource.resource_id
+    p = repo.principal(ctx.conn, ctx.episode_id, ctx.actor_id)
+    if p is None or rid not in p.speaks_for_resource_ids or rid not in ctx.grant.resource_ids:
+        raise Rejection(
+            "SCOPE_VIOLATION",
+            f"{ctx.actor_id} does not speak for {rid}; only its registered owner can offer it",
+        )
+    if resource.consumable_stock is not None or resource.kind == "supply":
+        raise Rejection(
+            "UNSUPPORTED_ACTION",
+            f"{rid} is consumable stock: an offer cannot add stock; units enter only through a"
+            " staff-attested receipt",
+        )
+    if resource.kind == "person":
+        raise Rejection(
+            "UNSUPPORTED_ACTION", f"{rid} is a person's role: availability is a check-in"
+        )
+    targets = offer_targets(ctx.scenario, rid)
+    if not targets:
+        raise Rejection(
+            "UNSUPPORTED_ACTION",
+            f"{rid} is not a preconfigured approved option of any registered resource; an offer"
+            " cannot onboard a new resource",
+        )
+    unregistered = [c for c in offer.capabilities if c not in resource.capabilities]
+    if unregistered:
+        raise Rejection(
+            "CONSTRAINT_VIOLATION",
+            f"the registered {rid} does not provide {', '.join(unregistered)}",
+            {"registered_capabilities": list(resource.capabilities)},
+        )
+    stated = set(offer.capabilities)
+    if not any(set(t.capabilities) <= stated for t in targets):
+        needed = {t.resource_id: sorted(set(t.capabilities) - stated) for t in targets}
+        raise Rejection(
+            "CONSTRAINT_VIOLATION",
+            f"the offer does not state the capabilities {rid} needs to stand in for "
+            + "; ".join(f"{t}: {', '.join(caps)}" for t, caps in sorted(needed.items())),
+            {"needed": needed},
+        )
+    window = offer.available
+    if window.end <= ctx.now:
+        raise Rejection("INVALID_REQUEST", "the offered interval has already ended")
+    if not resource.window.contains(window) or window.end != resource.window.end:
+        raise Rejection(
+            "CONSTRAINT_VIOLATION",
+            f"the offer must lie inside {rid}'s registered window and cover it to its end"
+            f" ({local_label(resource.window.start)}-{local_label(resource.window.end)}); the"
+            " planner cannot use a shorter offer",
+        )
+    row = _resource_status_row(ctx, rid)
+    if row["status"] == "unavailable" and row["status_basis"] != "catalog":
+        raise Rejection(
+            "RESOURCE_UNAVAILABLE",
+            f"{rid} is reported unavailable ({row['status_observation_id']}); an offer cannot"
+            " override that record",
+        )
+    if offer.terms_ref != resource.terms.terms_source_ref:
+        raise Rejection(
+            "CONSTRAINT_VIOLATION",
+            f"the offer must confirm {rid}'s registered terms ({resource.terms.terms_source_ref})",
+        )
+
+
+def _resource_status_row(ctx: Ctx, resource_id: str) -> Any:
+    return ctx.conn.execute(
+        "SELECT status, status_basis, status_observation_id, status_observed_at FROM resources"
+        " WHERE episode_id = ? AND resource_id = ?",
+        (ctx.episode_id, resource_id),
+    ).fetchone()
+
+
+def _offer_basis(ctx: Ctx, row: Any) -> Observation | None:
+    """The earlier offer a resource's status rests on, if it rests on one."""
+    if row["status_basis"] != "status_observation" or row["status_observation_id"] is None:
+        return None
+    found = ctx.conn.execute(
+        "SELECT body_json FROM observations WHERE episode_id = ? AND observation_id = ?",
+        (ctx.episode_id, row["status_observation_id"]),
+    ).fetchone()
+    obs = Observation.model_validate_json(found["body_json"]) if found else None
+    return obs if obs is not None and obs.kind == "resource_offer" else None
+
+
+def _rests_on_offer(ctx: Ctx, row: Any) -> bool:
+    """Whether a resource's status comes from the catalog or an earlier offer, rather than from
+    a status or arrival record (which an offer never overrides)."""
+    return row["status_basis"] == "catalog" or _offer_basis(ctx, row) is not None
+
+
 def submit_observation(ctx: Ctx) -> Outcome:
     _check_revision(ctx)
     args = ctx.args
@@ -950,6 +1111,8 @@ def submit_observation(ctx: Ctx) -> Outcome:
                 " returned and nothing changed"
             ),
         )
+    if args.offer is not None:
+        return _activate_offer(ctx, _resource(ctx, entity), args.offer, record_id)
     goal = repo.goal(ctx.conn, ctx.episode_id)
     obs_id = f"obs_{repo.next_seq(ctx.conn, ctx.episode_id, 'observation'):04d}"
     scope = "organizer_instruction" if ctx.session.role == "organizer" else "self_report"
@@ -987,6 +1150,90 @@ def submit_observation(ctx: Ctx) -> Outcome:
         state_changes=[
             StateChange(entity_id=obs_id, field="observation", before=None, after=entity)
         ],
+    )
+
+
+def _activate_offer(
+    ctx: Ctx, resource: ResourceDef, offer: ResourceOffer, record_id: str
+) -> Outcome:
+    """A structured offer from the resource's owner: after the checks it is stored as a
+    ``resource_offer`` observation and, unless a status or arrival record speaks for the
+    resource, the resource's visible status rests on it: ``available`` from now, or ``expected``
+    at the offered start. One revision. It creates no hold, commitment, ledger entry or stock."""
+    _offer_problem(ctx, resource, offer)
+    rid = resource.resource_id
+    row = _resource_status_row(ctx, rid)
+    window = offer.available
+    status = "available" if window.start <= ctx.now else "expected"
+    eta = window.start if status == "expected" else None
+    # A new offer from the same owner supersedes the one the status rests on.
+    earlier = _offer_basis(ctx, row)
+    prior = earlier.observation_id if earlier and earlier.source_id == ctx.actor_id else None
+    obs_id = f"obs_{repo.next_seq(ctx.conn, ctx.episode_id, 'observation'):04d}"
+    observation = Observation(
+        observation_id=obs_id,
+        event_id=ctx.event_id,
+        entity_id=rid,
+        kind="resource_offer",
+        source_id=ctx.actor_id,
+        source_record_id=record_id,
+        correlation_group=ctx.args.correlation_group or f"offer_{rid}",
+        observed_at=ctx.now,
+        received_at=ctx.now,
+        valid_window=window,
+        authority_scope="self_report",
+        text=ctx.args.text,
+        supersedes=tuple(ctx.args.supersedes) or ((prior,) if prior else ()),
+    )
+    activates = _rests_on_offer(ctx, row)
+    summary = (
+        f"Offer from {ctx.actor_id} activates {rid}: {status}"
+        + (f" from {local_label(window.start)}" if eta else "")
+        + f" until {local_label(window.end)}"
+        if activates
+        else f"Offer from {ctx.actor_id} for {rid} recorded; a status record already speaks"
+        f" for {rid} ({row['status']})"
+    )
+    rev = _bump(ctx, "observation", obs_id, summary)
+    rec = ObservationRecord(
+        observation=observation,
+        channel="participant_session",
+        submitted_by=ctx.actor_id,
+        revision_after=rev,
+    )
+    repo.insert_observation(ctx.conn, ctx.episode_id, rec)
+    changes = [StateChange(entity_id=obs_id, field="observation", before=None, after=rid)]
+    if activates:
+        ctx.conn.execute(
+            "UPDATE resources SET status = ?, status_basis = 'status_observation',"
+            " status_observation_id = ?, status_observed_at = ?, reported_eta = ?"
+            " WHERE episode_id = ? AND resource_id = ?",
+            (
+                status,
+                obs_id,
+                fmt_ts(ctx.now),
+                fmt_ts(eta) if eta else None,
+                ctx.episode_id,
+                rid,
+            ),
+        )
+        changes.append(
+            StateChange(entity_id=rid, field="status", before=row["status"], after=status)
+        )
+    return Outcome(
+        data={
+            "observation": rec.model_dump(mode="json"),
+            "deduplicated": False,
+            "activation": {
+                "resource_id": rid,
+                "activated": activates,
+                "status": status if activates else row["status"],
+                "reported_eta": fmt_ts(eta) if activates and eta else None,
+                "approved_for": [t.resource_id for t in offer_targets(ctx.scenario, rid)],
+            },
+        },
+        summary=summary + " (content is data; nothing is reserved or spent)",
+        state_changes=changes,
     )
 
 
@@ -1165,6 +1412,18 @@ def update_grant(ctx: Ctx) -> Outcome:
     )
 
 
+def record_stock_receipt(ctx: Ctx) -> Outcome:
+    from plan_b.tools import stock  # the stock tools import this module
+
+    return stock.record_stock_receipt(ctx)
+
+
+def record_distribution(ctx: Ctx) -> Outcome:
+    from plan_b.tools import stock  # the stock tools import this module
+
+    return stock.record_distribution(ctx)
+
+
 HANDLERS = {
     "get_event_state": get_event_state,
     "get_action_receipt": get_action_receipt,
@@ -1178,4 +1437,6 @@ HANDLERS = {
     "submit_observation": submit_observation,
     "update_goal": update_goal,
     "update_grant": update_grant,
+    "record_stock_receipt": record_stock_receipt,
+    "record_distribution": record_distribution,
 }

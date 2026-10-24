@@ -1,6 +1,10 @@
-# Plan B runtime contract 1.0.0 (Wave 1)
+# Plan B runtime contract 1.1.0 (Waves 1 and 2)
 
-This is the frozen interface for the Wave 1 deterministic campus sandbox. The Pydantic models
+This is the interface of the Plan B sandbox: the Wave 1 deterministic campus core (contract
+1.0.0) and its additive Wave 2 extensions (contract 1.1.0). Wave 2 adds consumable stock and
+staff-only attestations for the pantry profile (sections 4, 15), resource offers (section 9), a
+second event configuration (section 1), the live coordinator policy (section 16), and
+per-episode caps and policy selection for every coordinator policy (section 17). The Pydantic models
 in [`plan_b/domain/models.py`](../plan_b/domain/models.py) are the machine-readable form; this
 document gives their semantics. Where they disagree, fix the disagreement rather than choosing one.
 
@@ -12,10 +16,11 @@ delivery, or message is made.
 
 | Contract | Version | Where |
 | --- | --- | --- |
-| Planning artifacts | 0.2.0 | `PEEAI_plan/schemas/planning.schema.json` (unchanged by Wave 1) |
-| Runtime contract | 1.0.0 | `models.RUNTIME_VERSION`, this file |
-| Trace format | 1.0.0 | `models.TRACE_VERSION`, section 13 |
-| Store schema | migrations `0001_initial.sql`, `0002_scheduled_actions.sql`, `0003_history_guards.sql` | `plan_b/store/migrations/` |
+| Planning artifacts | 0.2.0 | `PEEAI_plan/schemas/planning.schema.json` (unchanged by Waves 1 and 2) |
+| Runtime contract | 1.1.0 | `models.RUNTIME_VERSION`, this file. Stored records keep the version they were written with: `PublicScenario`, `PrivateCase`, `ActionReceipt`, `ToolEnvelope` and `EventStateView` accept `1.0.0` and `1.1.0` (`models.RuntimeVersion`), and the campus fixtures remain 1.0.0 documents |
+| Trace format | 1.0.0 | `models.TRACE_VERSION`, section 13 (unchanged in Wave 2) |
+| Store schema | migrations `0001_initial.sql`, `0002_scheduled_actions.sql`, `0003_history_guards.sql`, `0004_consumable_stock.sql` (Wave 2) | `plan_b/store/migrations/` |
+| Live policy prompts | `interpret.v1`, `choose_action.v1` | `plan_b/agent/prompts/`; every live decision records each prompt's sha256 (section 16) |
 
 Planning objects set `additionalProperties: false`, so runtime records never add fields to them.
 Each runtime record *contains* the planning fields unchanged and adds runtime fields beside them.
@@ -34,6 +39,39 @@ planning schema. Mapping rules:
 | `mutation_request` | `ToolRequest` | Same field names minus `artifact_type`/`schema_version`. |
 | `action_receipt` | `ActionReceipt` | Same fields; runtime adds `episode_id`, `grant_version`, `actor_role`, `requested_at`, `error_message`, `summary`. |
 
+**Runtime 1.1.0 additions** are optional fields with defaults, so 1.0.0 documents still validate
+(`test_pantry_fixture.py::test_runtime_1_0_0_records_still_parse` parses a Wave 1 trace's
+records): `EventGoal.service_targets`, `ResourceDef.consumable_stock` and
+`ResourceView.consumable_stock`, `Assignment.consumable_allocations`,
+`InitialState.service_progress` and `.expected_shipments`, `PublicScenario.pantry_parameters` and
+`.stock_options`, the consumable fields of `HoldView`, `CandidateResult.required_stock_holds`,
+`.stock_transfers` and `.service_coverage`, `EventStateView.stock`, `.pantry_parameters` and
+`.stock_options`, the `OutcomeReport` service, stock and policy fields, the staff rule actor
+scripts, `SubmitObservationArgs.offer` and the `organizer_goal_update` actor script. New JSON keys
+with defaults therefore appear in campus snapshots and traces; outcomes, request bodies,
+idempotency keys and digests are unchanged. `planning_map.py` does not yet project the pantry
+fields to planning artifacts.
+
+### Public fixtures
+
+| `scenario_id` | File | Profile | Adapter |
+| --- | --- | --- | --- |
+| `dev_fixture_01` | `scenarios/public/campus_showcase.json` | `campus_showcase` | `campus/1.0.0` |
+| `dev_fixture_02` | `scenarios/public/community_skills_exchange.json` | `community_skills_exchange` | `campus/1.0.0` (the same adapter; configuration reuse) |
+| `dev_fixture_03` | `scenarios/public/pantry_continuity.json` | `pantry_continuity` | `pantry/1.0.0` (section 10) |
+
+`dev_fixture_02` derives field by field from
+`PEEAI_plan/examples/community_skills_exchange.public.json`, with extensions x01-x09 listed in its
+`fixture_extensions`. Compared with the campus showcase, guided practice depends on the
+demonstration and shares the single learning kit, the mentor and the one-activity room, so a
+single swap with the flexible activity does not recover from a late kit; only the swap of
+skills_demo and peer_exchange combined with the +20 minute practice shift does. The coordinator
+may reserve 4000 cents but commit none. `dev_fixture_03` derives from
+`PEEAI_plan/examples/pantry_continuity.public.json` (its `derived_from` pins the sha256), with
+extensions x01-x10; the one departure is x03: the staff principal's role is `participant`, not
+`organizer` (section 2). These are development fixtures: fictional and synthetic, not community
+validation.
+
 ## 2. Identity, sessions and authority
 
 Identity comes only from a server-validated session. A request body never establishes actor,
@@ -44,8 +82,8 @@ role, grant or source: `ToolRequest` has no such fields and unknown fields are r
 * **Moderator.** The sandbox operator signs in with the moderator code (environment
   `PLAN_B_MODERATOR_CODE`, or generated at startup and written to `var/moderator_code.txt`,
   mode 0600). The moderator session is not an event principal: it can load/reset episodes,
-  advance the clock, run the deterministic policy, issue join codes and export traces. It
-  cannot call event tools.
+  advance the clock, choose and run the coordinator policy (section 17), issue join codes and
+  export traces. It cannot call event tools.
 * **Join codes.** The moderator issues a one-time join code (10 wall-clock minutes) for one
   principal of the current episode; a code from an episode that was reset answers
   `EPISODE_CLOSED`. A browser tab exchanges it at `POST /api/auth/join` for that
@@ -79,6 +117,31 @@ role, grant or source: `ToolRequest` has no such fields and unknown fields are r
 | `participant_presenter` | participant | `grant_presenter_self` | own check-in, observations |
 | `participant_host` | participant | `grant_host_self` | own check-in, observations |
 
+### Demo principals (fixture `dev_fixture_02`)
+
+| Principal | Role | Grant | Can |
+| --- | --- | --- | --- |
+| `agent_demo` | coordinator_agent | `grant_community_agent` | read, query, evaluate, hold/release, apply; committed limit 0, reserved limit 4000 |
+| `organizer_demo` | organizer | `grant_organizer_demo` | read any receipt, evaluate, submit observations, `update_goal`, `update_grant` (bounded by the 8000 budget) |
+| `participant_host` | participant | `grant_host_self` | own check-in, observations |
+| `participant_mentor` | participant | `grant_mentor_self` | own check-in, observations |
+| `participant_peer_lead` | participant | `grant_peer_self` | own check-in, observations |
+| `participant_kit_steward` | participant | `grant_kit_offer` | observations and resource offers for `backup_learning_kit` only; no check-in, hold or allocation |
+
+### Demo principals (fixture `dev_fixture_03`)
+
+| Principal | Role | Grant | Can |
+| --- | --- | --- | --- |
+| `agent_demo` | coordinator_agent | `grant_pantry_agent` | read, query, evaluate, hold/release quantities, apply; no money; no staff tools |
+| `fictional_staff` | participant | `grant_pantry_staff` | the planning grant's tools, including the staff-only `record_stock_receipt` and `record_distribution` |
+| `fictional_partner_steward` | participant | `grant_partner_steward` | read, observations about `partner_stock` |
+
+**Staff authority is a grant, not a role.** The executor refuses the two staff tools to any
+session whose grant does not list them (`GRANT_REQUIRED`, an attempt without a receipt), so the
+coordinator, whose grant lacks them, can never attest a physical receipt or a distribution. The
+browser derives a staff session from its grant (`allowed_tools` includes a staff tool), not from a
+role; the session's role stays `participant`.
+
 ## 3. HTTP API
 
 All responses are JSON. Tool calls always return a `ToolEnvelope` body; the HTTP status is
@@ -90,19 +153,23 @@ a body that fails `ToolRequest` or argument validation. Other endpoints return F
 
 | Method and path | Auth | Request → response |
 | --- | --- | --- |
-| `GET /api/health` | none | → `{ok, runtime_version, mode}` |
+| `GET /api/health` | none | → `{ok, runtime_version, mode}` (`runtime_version` is `1.1.0`) |
 | `POST /api/auth/moderator` | none | `{code}` → `{token, role, principal_id, display_name}` |
 | `POST /api/auth/join` | none | `{code}` → `{token, role, principal_id, display_name, episode_id, event_id, grant_id}` |
 | `GET /api/auth/whoami` | any | → `{role, principal_id, display_name, episode_id, grant_id}` plus `{event_id, episode_status}` for event sessions |
 | `GET /api/state` | any session | → `EventStateView` for the caller (moderator: organizer-level visibility of the current episode) |
 | `POST /api/tools/{tool}` | event session | `ToolRequest` → `ToolEnvelope` |
-| `GET /api/moderator/cases` | moderator | → `[{case_ref}]` only (no private descriptions) |
-| `POST /api/moderator/episodes` | moderator | `{scenario_id, case_ref}` → `{episode_id, event_id, clock, revision}`; loads a clean episode and closes every other active episode (reset) |
+| `GET /api/moderator/cases` | moderator | → `[{case_ref, scenario_id, profile_id}]` (public ids only; no private descriptions) |
+| `POST /api/moderator/episodes` | moderator | `{case_ref, scenario_id?, policy?}` → `{episode_id, event_id, scenario_id, clock, revision, policy, mode_label}`; `scenario_id` defaults to the case's own (another one is 400 `SCENARIO_MISMATCH`); `policy` is `rules` (default; the profile's deterministic baseline) or `live` (400 `MODEL_NOT_CONFIGURED`, checked before anything is reset, when the endpoint configuration is missing); loads a clean episode and closes every other active episode (reset) |
 | `GET /api/moderator/current` | moderator | → `{episode_id}` (null before the first load) |
 | `POST /api/moderator/sessions` | moderator | `{principal_id}` → `{join_code, join_path, principal_id, role, display_name}`; refuses `coordinator_agent`; codes are one-time and expire after 10 wall-clock minutes |
 | `POST /api/moderator/clock` | moderator | `{advance_minutes: 1..240}` → `{clock, revision, transitions}` |
-| `POST /api/moderator/policy/run` | moderator | `{max_tool_calls?: 1..64}` → `PolicyRunResult` plus `episode_id`, `episode_status` |
-| `POST /api/moderator/run` | moderator | `{minutes: 1..240, policy: bool}` → `{clock, revision, policy_runs}`; advances minute by minute, running the policy when public state changed (no scripted actors) |
+| `GET /api/moderator/policy` | moderator | → `{episode_id, policy, policy_id, label, requested_model, returned_model_id, model_id, live_available, reason, caps, locked}`; no key or local path |
+| `POST /api/moderator/policy` | moderator | `{policy}` → the same view; only before the episode's coordinator first acts (409 `POLICY_LOCKED`); a live choice reads the endpoint configuration and calls no model (400 `MODEL_NOT_CONFIGURED` when it is missing) |
+| `GET /api/policy` | any session | → `{episode_id, policy, policy_id, label, caps}` of the caller's episode |
+| `GET /api/participation/me` | event session | → the caller's principal, own grant, the resources it speaks for (check-in, or the registered facts an offer must confirm), organizer goal controls and staff tools; contributions themselves use `POST /api/tools/{tool}` (403 for a moderator session) |
+| `POST /api/moderator/policy/run` | moderator | `{max_tool_calls?: 1..64}` → `PolicyRunResult` plus `episode_id`, `episode_status`, `mode_label` |
+| `POST /api/moderator/run` | moderator | `{minutes: 1..240, policy: bool}` → `{clock, revision, policy_runs, mode_label}`; advances minute by minute, running the selected policy when public state changed (no scripted actors) |
 | `POST /api/moderator/export` | moderator | → `{name, trace}`; also writes `var/traces/<name>` |
 | `GET /api/replays` | none | → `[{name}]` of sanitized traces available for replay |
 | `GET /api/replays/{name}` | none | → one sanitized trace, byte-exact (read-only; replay never calls tools) |
@@ -137,13 +204,22 @@ all-clear. `replayed_receipt: true` marks an identical retry returning the origi
 | `list_resources` | read | 0 | Resources with terms, status, occupancy; optional capability/window filter |
 | `query_status` | read + evidence | 2 | Scoped status from the registered source; may append one observation |
 | `evaluate_candidates` | read + record | 0 | Pure evaluation, stored as an immutable evaluation and candidates |
-| `hold_resource` | mutation | 1 | Provisional hold: capacity + reserved exposure |
+| `hold_resource` | mutation | 1 | Provisional hold: capacity + reserved exposure; on a consumable pool, a quantity reservation (section 15) |
 | `release_hold` | mutation | 1 | Releases an active hold, returns its reserved exposure once |
-| `apply_plan` | mutation | 1 | Revalidates a stored candidate and replaces the active plan |
+| `apply_plan` | mutation | 1 | Revalidates a stored candidate and replaces the active plan; converts the candidate's bound stock holds into allocations |
 | `check_in` | mutation | 0 | Participant's own presence and availability interval |
-| `submit_observation` | mutation | 0 | Append an immutable observation; content is data |
+| `submit_observation` | mutation | 0 | Append an immutable observation; content is data; a structured resource offer may activate a preconfigured resource (section 9) |
+| `record_stock_receipt` | staff mutation | 0 | Staff-attested receipt: an internal handoff from a held alternate pool, or a matched external shipment (section 15) |
+| `record_distribution` | staff mutation | 0 | Staff-attested aggregate distribution consuming committed stock (section 15) |
 | `update_goal` | organizer control | 0 | New goal version (preference preset) |
 | `update_grant` | organizer control | 0 | New version of another principal's grant (limits, revoke) |
+
+`TOOL_REQUIREMENTS` (runtime 1.1.0): `record_stock_receipt` needs `idempotency_key` and
+`expected_revision`; `record_distribution` also `expected_goal_version`. `hold_resource` gains
+optional `purpose` (`activity` | `stock_transfer`), `destination_resource_id` (exactly for
+`stock_transfer`) and `service_target_id`. They are serialized only when set, so a reusable
+resource's hold body, and therefore its digest and idempotency key, is byte-identical to 1.0.0.
+`quantity` is a strict integer >= 1.
 
 Durations are read from `scenario.tool_durations_minutes`. A tool's duration is modeled
 latency **before** its effect: the executor advances the scenario clock by the duration
@@ -171,9 +247,11 @@ readable envelope treats the outcome as unknown and reconciles with the original
 | `evaluate_candidates` | `EvaluationResult` |
 | `hold_resource` | `{hold: HoldView}` |
 | `release_hold` | `{hold: HoldView}` |
-| `apply_plan` | `{plan: PlanView, converted_hold_ids: [...], commitment_ids: [...]}` |
+| `apply_plan` | `{plan: PlanView, converted_hold_ids: [...], commitment_ids: [...]}`, plus `allocation_ids` when it commits stock holds |
 | `check_in` | `{checkin: CheckInView, observation: ObservationRecord}` |
-| `submit_observation` | `{observation: ObservationRecord, deduplicated: bool}` |
+| `submit_observation` | `{observation: ObservationRecord, deduplicated: bool}`; with an `offer`, also `activation: {resource_id, activated, status, reported_eta, approved_for}` |
+| `record_stock_receipt` | `{stock_receipt, hold_status?}` |
+| `record_distribution` | `{distribution}` |
 | `update_goal` | `{goal: EventGoal}` |
 | `update_grant` | `{grant: GrantView}` |
 
@@ -235,8 +313,8 @@ COMMIT
   tool calls made with a moderator session. No actor and episode are resolved for them.
 
 **Failure vocabulary** (`models.ErrorCode`). "Receipt tools" are `hold_resource`, `release_hold`,
-`apply_plan`, `check_in`, `submit_observation`, `update_goal` and `update_grant`. The other tools
-are reads.
+`apply_plan`, `check_in`, `submit_observation`, `update_goal`, `update_grant`,
+`record_stock_receipt` and `record_distribution`. The other tools are reads.
 
 | Code | Raised for | Recorded as | HTTP |
 | --- | --- | --- | --- |
@@ -260,6 +338,11 @@ are reads.
 | `DUPLICATE_CHECK_IN` | a check-in repeating the caller's latest one with the same availability | rejected receipt | 200 |
 | `INVALID_EVIDENCE_REFERENCE` | `supersedes` names an observation that does not exist; a source record id reused for different text | rejected receipt | 200 |
 | `STATUS_UNKNOWN`, `STATUS_UNAVAILABLE` | `query_status` without an answer (envelope `unknown` / `unavailable`); `STATUS_UNAVAILABLE` also for a hold whose steward cannot be reached | attempt (query) or rejected receipt (hold) | 200 |
+| `DUPLICATE_REFERENCE` | a physical `receipt_reference` or `distribution_reference` already recorded in the episode, whatever the request key | rejected receipt | 200 |
+| `INSUFFICIENT_STOCK` | a quantity beyond the globally available stock, a hold's remainder, or the committed stock | rejected receipt | 200 |
+| `UNIT_MISMATCH` | a quantity in another unit than the pool's | rejected receipt | 200 |
+| `THROUGHPUT_EXCEEDED` | a distribution beyond the accrued staffed capacity | rejected receipt | 200 |
+| `HANDOFF_WINDOW_CLOSED` | a handoff or transfer hold outside the handoff window, including when the staff latency cannot complete before its exclusive end | rejected receipt | 200 |
 | `INTERNAL_ERROR` | an unexpected server error; every effect of the call is rolled back | attempt | 500 |
 | `EVENT_CLOSED` | reserved; not raised in Wave 1 (a call after the hard end fails `GRANT_EXPIRED`) | — | — |
 
@@ -276,12 +359,17 @@ sets the clock there, and processes every event at that instant in this fixed or
    18:00 completes.
 2. **World events** due at `t` (arrivals, message deliveries), in fixture order; then
    **scheduled actor actions** due at `t` (section 12), each executed through its actor's own
-   session by the same executor, in registration order.
+   session by the same executor, in registration order; then the staff simulator's handoff
+   responses due at `t` (`engine.run_due_handoffs`, pantry profile).
 3. **Hold expiries** (`expires_at == t`). A hold is usable only while `clock < expires_at`.
 4. **Grant expiries** (`expires_at == t`). A grant is valid only while `clock < expires_at`.
 5. **Activity starts** (`scheduled start == t`): strict execution readiness; ready → `started`,
    otherwise → `failed` with the unmet reasons.
 6. **Event close** at `goal.hard_end`.
+
+At an inclusive service deadline (pantry: 13:40) the service activity completes (1), the
+scheduled staff distribution is recorded (2, so it counts on time), and then the next activity
+starts (5). Hold expiry and the handoff cutoff are exclusive.
 
 After each state-changing event the revision increments by one and a transition and a public
 snapshot are stored. Readiness previews (`planned`↔`ready`) are recomputed after every change
@@ -361,6 +449,9 @@ start.
   hold → `HOLD_CONVERTED`. A committed allocation is not released through `release_hold`;
   campus terms declare no cancellation in Wave 1.
 * **Grant expiry or revocation** does not erase accepted commitments.
+* **Consumable pools** (pantry profile): `hold_resource` on a pool reserves a quantity, not a
+  booking, and `apply_plan` converts it into a stock allocation; the money ledger is untouched.
+  Section 15 gives the rules.
 * **Backup projector terms (fixture):** booking required; free hold for at most 10 minutes;
   reserved exposure 3500; commitment cost 3500; cutoff 15 minutes before use. The coordinator
   (committed limit 0) can hold it but cannot convert it unless the organizer raises its committed
@@ -377,6 +468,35 @@ existing observation without a revision change. Instructions embedded in text ar
 browser sends a `client_record_id` (`web-obs-<uuid>`) fixed per logical observation, so a
 resend under the same key, or a retyped identical update after an unknown outcome, is
 deduplicated; reusing a record id for different text is rejected.
+
+**Resource offers (runtime 1.1.0).** `submit_observation` with `kind: resource_offer`, the
+resource as `entity_id` and an `offer: {available, capabilities, terms_ref}` asks to activate a
+preconfigured resource. The text stays data; only the structured fields are checked, in this
+order, and the first failure is a durable rejected receipt that changes nothing:
+
+1. a current `expected_revision` when supplied (`REVISION_CONFLICT`) and a registered resource
+   (`UNKNOWN_ENTITY`);
+2. the submitter speaks for the resource and it is in its grant (`SCOPE_VIOLATION`);
+3. the resource is a preconfigured option, i.e. an approved substitute of a registered resource,
+   not a person's role (availability is a check-in) and not consumable stock (an offer cannot add
+   stock) (`UNSUPPORTED_ACTION`);
+4. the stated capabilities are registered for it and cover the capabilities of a resource it
+   stands in for (`CONSTRAINT_VIOLATION`, with `details.needed`);
+5. the interval has not ended (`INVALID_REQUEST`), lies inside the registered window and reaches
+   its end (`CONSTRAINT_VIOLATION`; the planner models the registered window), and no status or
+   arrival record reports the resource unavailable (`RESOURCE_UNAVAILABLE`);
+6. `terms_ref` equals `terms.terms_source_ref` (`CONSTRAINT_VIOLATION`).
+
+An accepted offer is one `resource_offer` observation (self_report, valid for the offered window,
+correlation group `offer_<resource_id>`, superseding the same owner's earlier offer) and one
+revision. Unless a status or arrival record already speaks for the resource, its status becomes
+`available` (offered from now) or `expected` with `reported_eta` = the offered start, with basis
+`status_observation` and `status_observation_id` = the offer; otherwise the offer is recorded with
+`activated: false`. It creates no hold, commitment, ledger entry or stock movement: the
+coordinator still holds and, when money is needed, asks for authorization under its own grant. An
+offer without `offer` fields is an unverified proposal that changes no status. `offer` requires
+`kind: resource_offer` and `entity_id`, and excludes `observed_at` (400 otherwise). In
+`dev_fixture_01` no participant speaks for equipment, so campus offers are always refused.
 
 `query_status {entity_id, fact}` requires a registered status source for that entity and fact
 (`STATUS_SOURCE_NOT_REGISTERED` otherwise). The private world answers from the latest
@@ -401,7 +521,7 @@ deduplicated; reusing a record id for different text is rejected.
 A query never returns the private scenario, future records, or arrival times. An arrival is
 visible only when the clock reaches it (observation channel `arrival_record`).
 
-## 10. Planner (campus adapter)
+## 10. Planner (campus and pantry adapters)
 
 `evaluate_candidates` builds a `PlanningSnapshot` from public state and calls
 `CampusAdapter.evaluate`. Evaluation has no side effects on holds, money or the plan.
@@ -439,7 +559,12 @@ anything is written:
   registered resource, an activity or the event;
 * actor scripts name registered principals; check-in scripts name a registered resource;
   observation scripts name a registered entity or none; organizer rules name a registered
-  grant and registered resources.
+  grant and registered resources;
+* organizer goal-update scripts name an organizer principal;
+* staff rules (pantry): a handoff rule needs the scenario's `pantry_parameters`, names two
+  consumable pools and a visible source observation, and its principal's grant allows
+  `record_stock_receipt`; a distribution rule names a registered service target and its
+  principal's grant allows `record_distribution`.
 
 A refusal raises `ValueError`. The moderator reset route then answers a generic 500 with no
 detail.
@@ -536,7 +661,36 @@ requires feasibility, authorization and bound holds (`CONSTRAINT_VIOLATION`,
 `BUDGET_EXCEEDED`, `HOLD_EXPIRED`, `CANDIDATE_NOT_APPLICABLE`). A client-supplied feasibility
 flag does not exist.
 
-## 11. Deterministic rule policy (P0, `rules/1.0.0`)
+### Pantry adapter (`pantry/1.0.0`, `domain/adapters/pantry.py`)
+
+The pantry adapter extends the campus adapter: the event checks above run unchanged on schedule
+and resources (consumable holds are excluded from them, and allocations are judged only by the
+stock checks). The executor, sessions, grants, receipts, clock, snapshots and trace format are
+shared; the adapter owns only the added stock semantics (`domain/stock.py`, `tools/stock.py`).
+
+* **Menu:** keep, the configured event edits, and one candidate per `stock_options` entry
+  (`allocate_stock`, `transfer_stock`, `await_shipment`), not combined. An option's allocation is
+  what was already distributed from the pool plus what it can count (usable units; plus
+  transferable alternate units; plus outstanding expected units), capped by the target and by
+  what staff can distribute before the event end.
+* **Checks:** `consumable_allocation`; `stock_on_hand` (demand summed across activities whatever
+  their windows; expected units never count, so `await_shipment` is infeasible while the shipment
+  is unreceived); `stock_transfer` (the shortfall can still be handed off: held and before the
+  cutoff, or a new hold whose staff response fits before it); `service_throughput` (new
+  reservations distributable before the event end).
+* **Coverage:** `service_coverage` reports allocated, on-time achievable (by the deadline at the
+  declared rate) and unfulfilled = target - on-time; each unfulfilled unit costs 100 objective
+  points (`weighted.unfulfilled_units`).
+* **Preconditions:** `required_stock_holds`: the actor's live activity holds on the pool for the
+  target and activity must sum exactly to the uncommitted allocation. `stock_transfers`: alternate
+  units still to be handed off; a candidate with any is never applicable.
+* **Readiness:** the core rules for non-stock resources; a pool is reported, not a start
+  condition.
+* **Scoring:** `score_outcome` = the core outcome plus every target attained on time against its
+  original quantity; violations `stock_not_conserved`, `unattested_stock_record`,
+  `attestation_by_agent`, `distribution_without_service`.
+
+## 11. Deterministic rule policies (P0: `rules/1.0.0`, `pantry-rules/1.0.0`)
 
 The policy sees only tool envelopes through a `ToolClient` bound to the coordinator session. It
 never imports the store, world, runner or private cases.
@@ -669,6 +823,21 @@ resource id); `verify` → also `verify_only` (the ids of the verify-only notice
 open until a later grant version of its target meets `requested_value`; the scripted organizer
 in headless runs answers each `request_id` at most once.
 
+### Pantry rule policy (`pantry-rules/1.0.0`, `evaluation/policies/pantry_rules.py`)
+
+The deterministic baseline of the pantry profile. It reads the state; queries each outstanding
+expected shipment once and, while a supply gap exists, each declared transfer source once (at most
+two attempts); evaluates; for the best feasible candidate with alternate units still to hand off,
+holds the shortfall on the source (`purpose: stock_transfer`, the staff task), records an `ask`
+and waits for the staff response, one request per source; once that is answered (fully or
+partly) or lapsed, plans without pending handoffs; holds exactly what the chosen candidate still
+needs, re-evaluates and applies. When the plan covers less than the target it records
+`infeasible` with `details.shortfall_quantity` and `blocking_constraints`. It releases its own
+transfer holds that are no longer awaited (one retry after a stale revision), never calls the
+staff tools, reconciles a lost response by its original key, and uses keys
+`pantry-r<revision>-<tool>-<sha8(arguments)>`. It is statically isolated from the store, world,
+scenarios, tools and API, like `rules/1.0.0`.
+
 ## 12. Runner and scripted actors
 
 `scenarios/runner.py` drives an episode minute by minute and advances the clock one minute at a
@@ -680,14 +849,17 @@ never wakes the policy at or after the event close (the engine's `event_closed` 
 clock at `goal.hard_end`), or once the coordinator's current grant has expired. A clean run
 therefore does not end with a rejected `get_event_state` (`GRANT_EXPIRED`), and
 `rejected_attempts_without_receipt` counts only real rejections. The tool budget
-(`max_tool_calls`, 16) bounds one policy run; a run that exhausts it is woken again with a fresh
-budget, so Wave 1 has no per-episode cap. It stops if the episode is reset meanwhile: a closed episode's clock never moves, no session is
+(`max_tool_calls`, 16) bounds one policy run, and every coordinator policy also runs under the
+per-episode caps of section 17: a run gets at most the remaining episode budget, and once a cap is
+reached the policy is not woken again. It stops if the episode is reset meanwhile: a closed episode's clock never moves, no session is
 issued for it, a policy run that loses its episode returns `stopped`, and its decisions are not
 written into the closed episode. Moderator controls that race a reset answer 409
 `EPISODE_CLOSED`, and run responses carry `episode_id` and `episode_status`.
 
 Scripted exogenous actors (participant check-ins and observations; the simulated organizer that
-answers an open, in-bounds `AuthorizationRequest` after its declared latency via `update_grant`)
+answers an open, in-bounds `AuthorizationRequest` after its declared latency via `update_grant`;
+an `organizer_goal_update` script that changes the goal's preference preset at its instant via
+`update_goal`, citing its `expected_goal_version`; and the labeled pantry staff simulator below)
 are registered as **scheduled actor actions** (`scheduled_actions` table, private) with the
 actor's own server-held session. The clock engine executes each one at its exact instant
 (section 6) through the same executor, so the instant does not depend on what any policy is
@@ -697,6 +869,24 @@ before acting). Scheduled tools must have zero duration. Scripted actors are ide
 policy. The runner never writes check-ins, observations or grants directly and never tells the
 policy what to do. In the browser, scripted actors are off: people act through role tabs.
 
+**Labeled staff simulator (pantry).** A `staff_handoff_rule` is a standing scheduled action: the
+engine answers each matching stock-transfer hold once, `handoff_duration_minutes` after the hold
+was created, through the staff session and the executor (`record_stock_receipt`), confirming the
+live remainder (capped over the episode by the rule's `max_quantity`) while the hold and the
+window are valid. A `staff_distribution_rule` records at its instant `min(committed
+undistributed, original target - distributed, accrued capacity)` (`record_distribution`). Both
+decide from the visible state at their instant and are identical for every policy. In the
+browser the simulator is off, and a human staff tab records directly (its latency is not
+enforced).
+
+**Cases and policies.** `run_case(db, case_ref, *, scenario_id=None, policy="rules"|"live",
+policy_factory=None, caps=DEVELOPMENT_CAPS, live_config=None, max_tool_calls=16)` runs a case on
+its own `scenario_id` unless one is passed explicitly. `rules` is the profile's deterministic
+baseline (`policy_host.baseline_policy_factory`: `rules/1.0.0`, or `pantry-rules/1.0.0` for
+`pantry_continuity`); `live` is the live coordinator `live/1.0.0` (section 16), with its endpoint
+configuration read server-side. An explicit `policy_factory` (tests) takes precedence. The
+profile selects a policy and its declared rules, never a scripted outcome.
+
 **Scoring.** `evaluation/scoring.py:score_episode(final, history, case)` scores from persisted,
 visible records only. It dispatches on `final.profile_id` to
 `DomainAdapter.score_outcome(final, history) -> DomainOutcome(activities, goal_attained, unmet,
@@ -704,10 +894,14 @@ violations)`, then appends the domain-independent spend-limit violations (`budge
 `reserved_negative`, `grant_limit`). The goal is complete when the adapter finds it attained and
 no violation was executed. The campus adapter's part is `domain/adapters/campus_outcome.py`.
 Readiness goes through `DomainAdapter.check_readiness(..., mode=)`: the clock engine uses
-`execution`, and the projection uses `preview` for the episode's own profile. Still
-campus-specific in the core are `scoring.HARD_CHECK_IDS` (used by the `infeasibility_reported`
-predicate) and the `equipment_before_arrival` category named by the
-`no_equipment_start_before_arrival` predicate.
+`execution`, and the projection uses `preview` for the episode's own profile.
+`scoring.HARD_CHECK_IDS` (used by the `infeasibility_reported` predicate) includes the pantry
+check ids (`stock.PANTRY_CHECK_IDS`). Consumable profiles fill `OutcomeReport.service`, `.stock`,
+`staff_confirmations`, `duplicate_records_rejected` and `unnecessary_reservations`; their
+predicates are `service_on_time_equals`, `service_unfulfilled_equals`, `stock_on_hand_equals`,
+`expected_unreceived_equals`, `stock_conserved` and `no_staff_attestation_by_agent`. Every report
+also carries `mode_label` and `episode_caps` (section 17). Still campus-specific in the core is the
+`equipment_before_arrival` category named by the `no_equipment_start_before_arrival` predicate.
 
 ## 13. Trace export and replay
 
@@ -740,7 +934,11 @@ moderator calls.
 values of the episode's recorded decisions: `null` when none were recorded (clock moves and
 participant actions only), the id when one policy decided, and the distinct ids sorted and
 joined with `,` when several did. `POST /api/moderator/export` derives it this way, and
-`plan-b run-case` records the id of the policy its runner ran.
+`plan-b run-case` records the id of the policy its runner ran. Decisions in traces carry
+`details.policy_mode.label`, which names the policy that ran ("Deterministic policy" or "Live
+agent · <model id as returned>", section 17). Live decisions also carry the model call records
+of section 16. Live traces are evidence of one run, not reproducible artifacts: model choices
+and the calls' wall-clock `started_at` vary between runs.
 
 **Verification.** `plan-b verify-trace` (`export_trace.verify_trace_bytes`) and the browser
 replay (`web/src/replay/integrity.ts`) make the same checks and accept and reject the same
@@ -800,3 +998,194 @@ that scenario time already carries the same lineage. That includes the episode's
 observations and the public scenario's visible observations, which every episode holds from its
 start (the shipped fixtures use `projector_delivery_01`, public from 16:40 through
 `obs_notice_01`). `plan_b/world/leakcheck.py:private_markers` implements this.
+
+The live policy (section 16) builds its model inputs only from the tool envelopes it received, so
+the same rule covers what is sent to the model provider: `tests/test_agent_boundary.py` scans the
+model request bodies and the policy's envelopes for private markers, and applies the static
+import rule to `plan_b/agent/orchestrator.py`, `interpret.py`, `menu.py` and `prompts/`.
+
+## 15. Consumable stock (pantry profile)
+
+A pool is a resource with `consumable_stock` (kind `supply`). Its live projection
+(`ResourceView.consumable_stock`, `EventStateView.stock`, `PlanningSnapshot.stock`) is computed
+from append-only ledgers by `plan_b/domain/stock.py`:
+
+* **on hand** = opening + receipts - transfers out - distributions (`stock_movements`);
+* **reserved** = live hold remainders + undistributed committed allocations (disjoint);
+* **available** = on hand - reserved;
+* **expected** = outstanding registered shipments, never on hand.
+
+**Quantity holds.** `hold_resource` on a pool reserves a quantity across the whole session and is
+refused with `INSUFFICIENT_STOCK` above the global available quantity, so two activities,
+overlapping or not, cannot claim the same units. Its window lies inside the resource and activity
+windows and must not have ended. A `stock_transfer` hold names a registered `transfer_stock`
+source and its destination, lives at most until `pantry_parameters.handoff_window.end`, and is
+refused (`HANDOFF_WINDOW_CLOSED`) before the window's start or when now +
+`handoff_duration_minutes` is not before its end (`HOLD_NOT_SUPPORTED` when the event declares no
+handoff timing).
+Its lifetime is `min(requested, terms.hold_max_minutes)`. The steward check ignores records about
+an expected shipment. `apply_plan` converts the candidate's bound stock holds into
+`stock_allocations` (hold `committed` with remainder 0; the allocation takes the remainder) in the
+plan's transaction and revision. `release_hold` and expiry end only a live remainder and never add
+stock; a committed allocation is not released (`HOLD_CONVERTED`; this adapter has no
+cancellation).
+
+**`record_stock_receipt`** (staff only). An internal handoff needs both pools in the grant, the
+same unit, a cited observation about the source or the destination, a live `stock_transfer` hold
+into that destination, a time inside the handoff window, a quantity at most the hold's remainder
+and the source's on hand, and the destination's storage bound. One revision writes the
+`transfer_out` and `receipt` movements, lowers the hold's remainder (`fulfilled` at zero; a
+partial handoff leaves the rest reserved) and one `stock_receipts` row. An external receipt names
+a `shipment_id` registered for that destination with a quantity at most the outstanding one; the
+shipment's `received_quantity` rises once.
+
+**`record_distribution`** (staff only). The target's activity has started or completed; the named
+allocations commit at least the quantity; the quantity is at most the original target minus what
+was distributed and at most the accrued capacity. `on_time` = recorded at or before the original
+deadline (inclusive). A late record is accepted truthfully and never counts on time.
+
+**Physical provenance.** `receipt_reference` and `distribution_reference` are unique per episode
+(unique indexes), separately from request idempotency: a resubmission under a fresh request key
+is `DUPLICATE_REFERENCE` and credits nothing.
+
+**Capacity.** A qualified minute accrues while the service activity has started, the staff
+resource's latest check-in covers it, committed undistributed stock exists, and before the hard
+end. Capacity = rate x qualified minutes - distributed; a late commitment cannot backdate it.
+
+**Counters.** Supply gap = `max(target - distributed - pantry-controlled on hand, 0)`, where the
+pantry-controlled on hand excludes units held for a transfer out or for other targets.
+Unfulfilled = original target - distributed on time. Holds, receipts and commitments never change
+the unfulfilled count; only a staff-recorded distribution does. For the canonical fixture the
+counters move 16/40 (initial) → 16/40 (partner 16 held) → 0/40 (handoff: pantry 40, partner 0)
+→ 0/40 (40 committed) → 0/0 (40 distributed on time), and the expected 20 stays unreceived.
+
+**Store guards (migration 0004).** `stock_movements`, `stock_receipts` and `distributions` refuse
+UPDATE and DELETE; `stock_allocations` refuse DELETE, definition updates and a growing remainder;
+`expected_shipments` refuse DELETE, definition updates and a falling received quantity. `holds` is
+rebuilt with `consumable`, `remaining_quantity`, `purpose`, `destination_resource_id`,
+`service_target_id` and status `fulfilled`, and refuses DELETE, a status update once terminal,
+definition updates, a growing remainder and any remainder change once terminal.
+
+## 16. Live coordinator policy (`live/1.0.0`)
+
+`plan_b/agent/orchestrator.py:LivePolicy` implements the same `Policy` protocol as `rules/1.0.0`
+and sees only tool envelopes. One run:
+
+1. read the state (stop when the event is over, the episode is closed or the grant is invalid);
+2. interpret new notices with the model into planning `change_spec` records (prompt
+   `interpret.v1`, at most 6 notices per call). Observation text is sent as quoted JSON (with `<`,
+   `>` and `&` escaped) inside `<untrusted_observations>`. The server validates every reading:
+   an unknown subject stays `unresolved` (`unknown_entity`) and is never kept; evidence ids that
+   name no visible observation are dropped; an order reference must be the subject's
+   `booking_ref` and a date must be the event date, else the notice is `inapplicable`; a claim
+   about equipment submitted through a session is hearsay. Duplicates (same correlation group and
+   normalized text) and same-source retractions are resolved by the server without a model call.
+   One structured-output repair is allowed; after it the notice stays `unresolved`
+   (`malformed_output`);
+3. `evaluate_candidates`, and, when verification of a weighed claim failed, again with the claimed
+   outcome as a hypothesis, keeping only candidates feasible under both;
+4. build a closed menu (`plan_b/agent/menu.py`: keep, `query:<entity>:<fact>`,
+   `hold:<resource>:<activity>:<window>`, `apply:<candidate_id>`, `ask:<candidate_id>`,
+   `release:<hold_id>`, wait) whose options carry the exact tool, arguments and expectations.
+   Queries are offered only for a stated reason (an unanswered material notice, the catalog-only
+   availability of a resource a hold would be offered for, or a one-time deadline watch); apply,
+   hold and ask only while the plan is in question; only tools in the grant's `allowed_tools`;
+5. the model returns one `option_id` (prompt `choose_action.v1`, strict JSON schema with the menu
+   ids as an enum) and the server rejects any id outside the menu (`invalid_choice`). A menu with
+   only keep and wait needs no model call: the server records keep, infeasible, unresolved or
+   wait with `details.chosen_by = "server"`;
+6. the option runs through the `ToolClient` with key `live-r<revision>-<tool>-<sha8(arguments)>`,
+   and the next model call carries the real tool result (`consumed_tool_call_ids`); then stop or
+   wait. At most 6 model-chosen steps run in one run.
+
+The policy only ever sends `get_event_state`, `get_action_receipt`, `evaluate_candidates`,
+`query_status`, `hold_resource`, `release_hold` and `apply_plan` (`AGENT_TOOLS`); anything else is
+refused before it reaches the client, and the executor refuses ungranted tools in any case. It
+has no stock-quantity options: on the pantry profile it can keep or wait but not hold or transfer
+stock (section 17 and the Wave 2 known limitations).
+
+**Caps and failures.** One instance per episode, under the episode caps of section 17: 8 model
+calls and 48 tool calls through the host, counting failed calls, repairs, retries and receipt
+lookups (`LivePolicy` constructed directly defaults to 8 and 32). Failures are decisions, never
+invented successes:
+
+| Failure | Decision | `details.failure` |
+| --- | --- | --- |
+| malformed or invalid output after one repair | `unresolved` notice, or `wait` | `malformed_output`, `invalid_choice` |
+| unknown entity | `unresolved` notice | `unknown_entity` |
+| model-call or tool-call cap exhausted | `stop`; the episode halts | `model_call_cap`, `tool_call_cap` |
+| spend cap (nothing is sent) | `stop` | `spend_cap` |
+| missing endpoint configuration | `stop` | `provider_config` |
+| provider timeout or error | `wait`, retried 2 minutes later | `provider_timeout`, `provider_error` |
+| stale revision | `wait`; re-read and re-evaluate, at most 2 per run | `stale_revision` |
+| lost mutation response | reconciled with `get_action_receipt` and the original key (at most 2 lookups and one identical retry); `reconcile` when it cannot be established, and no further mutation in that run | `lost_response` |
+
+**Decision records.** Every decision cites the observation, candidate, report, receipt and
+tool-call ids it rests on; `details.evaluation_id` and `details.report_id` name the evaluation.
+`details.model` records the requested model, the model id as returned and, for each model call
+attributed to the decision, its purpose, outcome, latency, prompt, completion and reasoning
+tokens, cost and cost basis, plus the episode's usage counters; each call is attributed to exactly
+one decision. `details.choice` records the chosen option, the cited ids that name visible records
+(others are dropped), the menu, the consumed tool-call ids, and the model's rationale as
+`rationale_untrusted` (model text; label it as such wherever it is shown). `details.prompts` maps
+each prompt id to its sha256. Summaries are composed by the server from facts. Ask decisions
+carry an `AuthorizationRequest` in the rule policy's format.
+
+**Model endpoint.** `PLAN_B_MODEL_PROVIDER`, `PLAN_B_MODEL_BASE_URL`, `PLAN_B_MODEL_KEY_FILE`,
+`PLAN_B_MODEL_ID` (default `anthropic/claude-sonnet-5.5`), `PLAN_B_MODEL_MAX_RUN_COST_USD`
+(default 0.50) and `PLAN_B_MODEL_MAX_TOTAL_COST_USD` (default 20.00), each from the environment,
+else from `.local/keys/model_endpoint.env` (see `apps/plan_b/.env.example`); relative paths
+resolve against the repository root. The base URL must be https (plain http only for
+127.0.0.1), without credentials or a query. The provider (`plan_b/agent/provider.py`, standard
+library only) requests strict structured output (`response_format` json_schema, `strict: true`;
+on OpenRouter also `usage.include` and `provider.require_parameters`), has a bounded total
+timeout (90 s), never follows a redirect and caps responses at 2 MB. It reads the key file on
+each call and sends the key only in the `Authorization` header; error text is scrubbed of it.
+`ModelConfig.public()` is the only form of the configuration that leaves the process (no key, no
+absolute path).
+
+**Spend.** A spend guard refuses, before sending, a call whose upper-bound cost would exceed the
+per-run cap (per episode: each policy instance has its own guard) or the cumulative cap of the
+ledger `apps/plan_b/var/model_spend.json` (gitignored, mode 0600, written atomically under a file
+lock; an unreadable ledger fails closed). The ledger records every call's model as requested and
+returned, tokens, cost, cost basis (`provider_usage`, `computed_from_prices` or
+`upper_bound_estimate`) and outcome.
+
+**G-LLM gate.** `uv run python -m plan_b.agent.gate --out <file>` runs one `LivePolicy` on a
+fresh dev01 episode in a temporary database (caps 6 model calls, 16 tool calls) and passes only
+when a strict interpretation validated, a model-chosen query, hold, apply or release ran through
+the executor, and a later model call consumed that tool call's result. It exits 0 on pass, 1 on
+fail and 2 on a configuration error; the record holds no secret.
+
+## 17. Per-episode caps and policy selection
+
+**Caps** (`scenarios/policy_host.py:EpisodeCaps`). Every coordinator policy, the rule baselines
+and the live agent alike, runs under one set of per-episode caps: 48 tool calls and 8 model calls
+(`DEVELOPMENT_CAPS`, phase `development`; Wave 3 freezes the final values). Tool calls are counted
+from the coordinator's persisted tool-call log, so failed calls, retries and receipt lookups
+count; model calls are counted from the decisions that carry them (or the live instance's own
+count when that is higher). A run gets at most `min(max_tool_calls, remaining episode budget)`.
+Once a cap is reached the host records one `stop` decision (`details.recorded_by = "host"`,
+`failure` `tool_call_cap` or `model_call_cap`, `reached`, `caps`, `usage`; the policy's own
+`policy_id`) and the runner never wakes the policy again; a direct `host.run` returns `stopped`
+with 0 calls. Configurable through `run_case(caps=)`, `plan-b run-case
+--max-episode-tool-calls/--max-episode-model-calls`, and `PLAN_B_EPISODE_MAX_TOOL_CALLS` /
+`PLAN_B_EPISODE_MAX_MODEL_CALLS` for the server (`api/config.py`). Values below 1 are refused. The
+rule baselines use 19-30 tool calls in the development cases; `OutcomeReport.episode_caps`
+records the caps and the usage.
+
+**Selection.** `rules` is the profile's deterministic baseline and `live` the live coordinator.
+`plan-b run-case <case|all> --policy rules|live` selects it on the command line; a missing or
+invalid live configuration prints a message and exits 2 before any database is created. The
+moderator chooses per episode, at load (`POST /api/moderator/episodes` `policy`) or later with
+`POST /api/moderator/policy`, but only before the episode's coordinator first calls a tool or
+records a decision (409 `POLICY_LOCKED` afterwards), so policies never mix within an episode.
+Selecting the live policy calls no model. After a server restart an episode whose last decision
+came from `live/*` keeps the live policy; one without decisions reverts to `rules`.
+
+**Mode labels.** The host stamps every stored decision with `details.policy_mode = {policy,
+label, caps}`. The label is `Deterministic policy` or `Live agent · <model id returned by the
+provider>`; before the first reply it is the configured model marked `(requested; no reply yet)`.
+`OutcomeReport.mode_label`, `GET /api/moderator/policy`, `GET /api/policy`, and the run and
+episode responses carry it. `EventStateView` has no label field: before an episode's first
+decision only the endpoints show it.

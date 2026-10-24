@@ -10,7 +10,14 @@ from plan_b.domain.models import PublicScenario
 SCENARIO_DIR = Path(__file__).resolve().parent.parent / "scenarios"
 PUBLIC_DIR = SCENARIO_DIR / "public"
 
-PUBLIC_SCENARIOS = {"dev_fixture_01": "campus_showcase.json"}
+# scenario_id -> public fixture file. The profile, not the file, selects the domain adapter
+# (registry.adapter_for): the campus showcase and the skills exchange share the campus
+# adapter; Pantry Continuity (W2.3) has its own.
+PUBLIC_SCENARIOS = {
+    "dev_fixture_01": "campus_showcase.json",
+    "dev_fixture_02": "community_skills_exchange.json",
+    "dev_fixture_03": "pantry_continuity.json",
+}
 
 
 def public_scenario_path(scenario_id: str) -> Path:

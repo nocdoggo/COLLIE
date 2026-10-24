@@ -7,6 +7,7 @@
 
 import type {
   ClockAdvanceResult,
+  EpisodePolicy,
   EventStateView,
   ExportResult,
   IssuedSession,
@@ -16,7 +17,10 @@ import type {
   ModeratorAuthResponse,
   ModeratorCase,
   ModeratorCurrent,
+  ParticipationMe,
+  PolicyChoice,
   PolicyRunResult,
+  PolicySetting,
   RunMinutesResult,
   SessionRole,
   ToolEnvelope,
@@ -27,10 +31,13 @@ import type {
 
 export const SESSION_STORAGE_KEY = "planb.session";
 
-/** The deterministic rule policy (P0) that moderator runs drive. */
+/** The deterministic rule policy (P0) that moderator runs drive by default. */
 export const DETERMINISTIC_POLICY_ID = "rules/1.0.0";
 
-/** The public fixture loaded by the moderator (contract: scenario "dev_fixture_01"). */
+/**
+ * The public fixture a case runs on when the case list does not name one (Wave 1 servers list
+ * campus cases only, all on "dev_fixture_01").
+ */
 export const DEFAULT_SCENARIO_ID = "dev_fixture_01";
 
 const REQUEST_TIMEOUT_MS = 20_000;
@@ -329,6 +336,16 @@ export async function readState(session: StoredSession): Promise<StateRead> {
   return { view: raw.body as EventStateView, text: raw.text };
 }
 
+/** The caller's episode policy and its label (any session; reads only). */
+export function readEpisodePolicy(session: StoredSession): Promise<EpisodePolicy> {
+  return sendJson<EpisodePolicy>("GET", "/api/policy", session.token);
+}
+
+/** What this event session may contribute, with the registered facts an offer must state. */
+export function readParticipation(session: StoredSession): Promise<ParticipationMe> {
+  return sendJson<ParticipationMe>("GET", "/api/participation/me", session.token);
+}
+
 // ---------------------------------------------------------------------------
 // Tool calls
 // ---------------------------------------------------------------------------
@@ -459,11 +476,20 @@ export const moderatorApi = {
   current(session: StoredSession): Promise<ModeratorCurrent | null> {
     return sendJson<ModeratorCurrent | null>("GET", "/api/moderator/current", session.token);
   },
-  loadEpisode(session: StoredSession, scenarioId: string, caseRef: string): Promise<LoadedEpisode> {
+  /** Load a clean episode; `scenarioId` null lets the server use the case's own scenario. */
+  loadEpisode(session: StoredSession, scenarioId: string | null, caseRef: string): Promise<LoadedEpisode> {
     return sendJson<LoadedEpisode>("POST", "/api/moderator/episodes", session.token, {
-      scenario_id: scenarioId,
+      ...(scenarioId !== null ? { scenario_id: scenarioId } : {}),
       case_ref: caseRef,
     });
+  },
+  /** The coordinator policy the moderator's runs use, and the configured live model id. */
+  policy(session: StoredSession): Promise<PolicySetting> {
+    return sendJson<PolicySetting>("GET", "/api/moderator/policy", session.token);
+  },
+  /** Choose the coordinator policy for the current episode. Choosing makes no model call. */
+  setPolicy(session: StoredSession, policy: PolicyChoice): Promise<PolicySetting> {
+    return sendJson<PolicySetting>("POST", "/api/moderator/policy", session.token, { policy });
   },
   issueSession(session: StoredSession, principalId: string): Promise<IssuedSession> {
     return sendJson<IssuedSession>("POST", "/api/moderator/sessions", session.token, {

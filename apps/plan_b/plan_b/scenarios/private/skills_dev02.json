@@ -1,0 +1,108 @@
+{
+  "artifact": "plan_b.private_case",
+  "runtime_version": "1.0.0",
+  "case_ref": "skills_dev02",
+  "scenario_id": "dev_fixture_02",
+  "never_expose_to_agent": true,
+  "planning_label": "SKILLS-DEV02 (organizer goal change while a plan change is in flight)",
+  "description": "Skills-exchange development trajectory. As in skills_dev01, the learning kit is received at 09:50, the host checks in at 09:45 and the mentor at 09:55 for the whole session, and at 10:05 the peer lead checks in available only until 11:05. At 10:06, while the coordinator's apply_plan (one modeled minute) is in flight, the organizer switches the goal preference to preserve_order, creating goal version 2. The report the coordinator is applying was evaluated under goal version 1.",
+  "derived_from": null,
+  "status_model": [],
+  "world_events": [
+    {
+      "at": "2026-11-07T09:50:00-05:00",
+      "kind": "resource_arrival",
+      "entity_id": "learning_kit",
+      "observation_kind": "status",
+      "source_id": "community_room_desk",
+      "source_record_id": "kit_receipt_skills02",
+      "correlation_group": "learning_kit_delivery_02",
+      "observed_at": "2026-11-07T09:50:00-05:00",
+      "authority_scope": "resource_status",
+      "text": "Shared learning kit received in the community room and checked complete.",
+      "new_status": "available"
+    }
+  ],
+  "actor_scripts": [
+    {
+      "kind": "participant_check_in",
+      "at": "2026-11-07T09:45:00-05:00",
+      "principal_id": "participant_host",
+      "resource_id": "host",
+      "available_start": "2026-11-07T09:45:00-05:00",
+      "available_end": "2026-11-07T12:00:00-05:00"
+    },
+    {
+      "kind": "participant_check_in",
+      "at": "2026-11-07T09:55:00-05:00",
+      "principal_id": "participant_mentor",
+      "resource_id": "mentor",
+      "available_start": "2026-11-07T09:55:00-05:00",
+      "available_end": "2026-11-07T12:00:00-05:00"
+    },
+    {
+      "kind": "participant_check_in",
+      "at": "2026-11-07T10:05:00-05:00",
+      "principal_id": "participant_peer_lead",
+      "resource_id": "peer_lead",
+      "available_start": "2026-11-07T10:05:00-05:00",
+      "available_end": "2026-11-07T11:05:00-05:00"
+    },
+    {
+      "kind": "organizer_goal_update",
+      "at": "2026-11-07T10:06:00-05:00",
+      "principal_id": "organizer_demo",
+      "preference_preset": "preserve_order",
+      "expected_goal_version": 1,
+      "reason": "Keep the announced order of activities where possible."
+    }
+  ],
+  "outcome_predicates": [
+    {
+      "predicate_id": "all_required",
+      "kind": "all_required_completed_by_deadline",
+      "description": "All six required activities complete by 12:00 in the community room."
+    },
+    {
+      "predicate_id": "welcome_1000",
+      "kind": "activity_started_at",
+      "params": {
+        "activity_id": "welcome",
+        "at": "2026-11-07T10:00:00-05:00"
+      },
+      "description": "Welcome starts at the 10:00 public start."
+    },
+    {
+      "predicate_id": "no_violations",
+      "kind": "no_executed_violations",
+      "description": "No resource, role, program, or budget constraint is violated in persisted execution records."
+    },
+    {
+      "predicate_id": "within_limits",
+      "kind": "committed_within_limits",
+      "description": "No committed spending exceeds the active grant or event budget."
+    },
+    {
+      "predicate_id": "no_early_equipment",
+      "kind": "no_equipment_start_before_arrival",
+      "description": "A kit-dependent activity cannot execute before the kit's actual arrival."
+    },
+    {
+      "predicate_id": "no_spend",
+      "kind": "committed_spend_equals",
+      "params": {
+        "cents": 0
+      },
+      "description": "No committed spending: the backup kit is not booked."
+    },
+    {
+      "predicate_id": "one_plan_change",
+      "kind": "applied_plan_count",
+      "params": {
+        "count": 1
+      },
+      "description": "Exactly one plan change is applied: the report evaluated under goal version 1 is not, and the change applied comes from a report under goal version 2."
+    }
+  ],
+  "expected_outcome": "goal_complete"
+}

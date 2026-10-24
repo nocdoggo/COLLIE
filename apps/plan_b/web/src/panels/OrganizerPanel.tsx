@@ -7,7 +7,7 @@ import { authorizationRequests } from "../components/authorization";
 import type { AuthorizationItem } from "../components/authorization";
 import { Code, Empty, Section, Tag } from "../components/ui";
 import { PRESET_LABEL, fmtCents, lookups } from "../format";
-import type { EvaluationResult, EventStateView, GrantView, PreferencePreset } from "../types";
+import type { EvaluationResult, EventGoal, EventStateView, GrantView, PreferencePreset } from "../types";
 import { SubmissionList } from "./MutationStatus";
 import type { MutationTracker } from "./useMutations";
 
@@ -16,6 +16,46 @@ const PRESETS: { value: PreferencePreset; hint: string }[] = [
   { value: "preserve_order", hint: "Prefer keeping the announced order of activities." },
   { value: "minimize_spend", hint: "Prefer alternatives that add the least committed spend." },
 ];
+
+/** Every goal version, newest first, and whether the latest evaluation still matches the goal. */
+export function GoalVersions({ view }: { view: EventStateView }) {
+  const versions: EventGoal[] = [...view.goal_history, view.goal]
+    .filter((g, i, all) => all.findIndex((x) => x.version === g.version) === i)
+    .sort((a, b) => b.version - a.version);
+  const evaluated = view.latest_evaluation;
+  return (
+    <div className="form" data-goal-versions={versions.length}>
+      <h3 className="list-heading">Goal versions ({versions.length})</h3>
+      <ol className="fact-list small">
+        {versions.map((g) => (
+          <li key={g.version}>
+            <strong>v{g.version}</strong>: {PRESET_LABEL[g.preference_preset] ?? g.preference_preset}
+            {g.version === view.goal.version ? (
+              <>
+                {" "}
+                <Tag tone="info" icon="●">
+                  Current
+                </Tag>
+              </>
+            ) : null}
+          </li>
+        ))}
+      </ol>
+      {evaluated !== null && evaluated.goal_version !== view.goal.version ? (
+        <p className="small tone-text-warn">
+          The latest evaluation (<Code>{evaluated.evaluation_id}</Code>) was made under goal v{evaluated.goal_version}.
+          Its candidate reports are stale: an apply citing them is rejected until the alternatives are evaluated
+          again under v{view.goal.version}.
+        </p>
+      ) : (
+        <p className="muted small">
+          A new goal version makes every candidate report made under an older one stale; the coordinator must
+          evaluate again before it can apply a plan.
+        </p>
+      )}
+    </div>
+  );
+}
 
 function AuthorizationAnswer({
   item,
@@ -240,6 +280,8 @@ export function OrganizerPanel({
           {preset === view.goal.preference_preset ? "Already the current preference" : "Change preference"}
         </button>
       </form>
+
+      <GoalVersions view={view} />
 
       <div className="form">
         <h3 className="list-heading">Re-rank alternatives</h3>

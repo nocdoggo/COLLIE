@@ -2,6 +2,10 @@
 
 Endpoints are synchronous (FastAPI runs them in a thread pool); every write uses its own
 ``BEGIN IMMEDIATE`` transaction, so concurrent requests serialize at SQLite.
+
+The moderator chooses each episode's coordinator policy (``rules``: the profile's deterministic
+baseline; ``live``: the live agent) when loading it or before its coordinator first acts.
+Selecting the live policy reads its endpoint configuration on the server and calls no model.
 """
 
 from __future__ import annotations
@@ -10,18 +14,34 @@ import json
 import os
 import re
 import secrets
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, ConfigDict, Field
 
+from plan_b.agent.config import ModelConfigError, load_model_config
+from plan_b.api.config import (
+    ConfigLoader,
+    FactoryFor,
+    factory_for,
+    live_availability,
+    load_episode_caps,
+)
+from plan_b.api.participation import participation_router
+from plan_b.domain.fixtures import load_public_scenario
 from plan_b.domain.models import RUNTIME_VERSION, ViewerInfo
 from plan_b.evaluation.export_trace import build_trace, write_trace
-from plan_b.scenarios.policy_host import PolicyHost
+from plan_b.evaluation.policies.base import Policy
+from plan_b.scenarios.policy_host import (
+    EpisodeCaps,
+    PolicyChoice,
+    PolicyHost,
+    PolicyLockedError,
+)
 from plan_b.scenarios.runner import tick_loop
 from plan_b.store import repo
 from plan_b.store.database import Database
@@ -38,7 +58,7 @@ from plan_b.store.sessions import (
     resolve,
 )
 from plan_b.tools.executor import execute
-from plan_b.world.world import available_cases
+from plan_b.world.world import available_cases, load_case
 
 APP_DIR = Path(__file__).resolve().parents[2]
 DEFAULT_VAR = APP_DIR / "var"
@@ -54,8 +74,13 @@ class CodeBody(_Body):
 
 
 class EpisodeBody(_Body):
-    scenario_id: str = "dev_fixture_01"
+    scenario_id: str | None = None  # default: the case's own public scenario
     case_ref: str
+    policy: Literal["rules", "live"] = "rules"
+
+
+class PolicySelectBody(_Body):
+    policy: Literal["rules", "live"]
 
 
 class SessionBody(_Body):
@@ -114,10 +139,18 @@ def create_app(
     web_dist: str | Path | None = None,
     moderator_code: str | None = None,
     replay_dirs: list[str | Path] | None = None,
+    caps: EpisodeCaps | None = None,
+    live_config_loader: ConfigLoader = load_model_config,
+    policy_factories: FactoryFor | None = None,
 ) -> FastAPI:
+    """``caps`` default to ``PLAN_B_EPISODE_MAX_*`` or the development values;
+    ``live_config_loader`` and ``policy_factories`` exist so tests can stand in for the model
+    endpoint (nothing here calls a model)."""
     var = Path(var_dir) if var_dir else DEFAULT_VAR
     db = Database(db_path or var / "plan_b.sqlite3")
-    host = PolicyHost(db)
+    caps = caps or load_episode_caps()
+    factories = policy_factories or factory_for(caps, live_config_loader)
+    host = PolicyHost(db, caps=caps, factory_for=factories)
     code = moderator_code or load_moderator_code(var)
     traces_dir = var / "traces"
     replay_roots = [traces_dir] + [Path(p) for p in (replay_dirs or [])]
@@ -151,6 +184,26 @@ def create_app(
                 status_code=409, detail={"code": "NO_EPISODE", "message": "load an episode first"}
             )
         return ep
+
+    def factory(choice: PolicyChoice, profile_id: str) -> Callable[[], Policy]:
+        try:
+            return factories(choice, profile_id)
+        except ModelConfigError as exc:
+            raise HTTPException(
+                status_code=400,
+                detail={"code": "MODEL_NOT_CONFIGURED", "message": str(exc)},
+            ) from exc
+
+    def policy_view(episode_id: str) -> dict[str, Any]:
+        live = live_availability(live_config_loader)
+        described = host.describe(episode_id)
+        return {
+            **described,
+            # The configured model of the live policy (as the switch would use it), never a key.
+            "model_id": described["requested_model"] or live.model_id,
+            "live_available": live.available,
+            "reason": live.reason,
+        }
 
     @app.get("/api/health")
     def health() -> dict[str, Any]:
@@ -260,8 +313,19 @@ def create_app(
 
     @app.get("/api/moderator/cases")
     def cases(authorization: str | None = Header(default=None)) -> list[dict[str, str]]:
+        """Each case with the public scenario and profile it runs on (no private content)."""
         moderator(authorization)
-        return [{"case_ref": c} for c in available_cases()]
+        out = []
+        for ref in available_cases():
+            scenario_id = load_case(ref).scenario_id
+            out.append(
+                {
+                    "case_ref": ref,
+                    "scenario_id": scenario_id,
+                    "profile_id": load_public_scenario(scenario_id).profile_id,
+                }
+            )
+        return out
 
     @app.post("/api/moderator/episodes")
     def load_episode(
@@ -272,21 +336,37 @@ def create_app(
             raise HTTPException(
                 status_code=400, detail={"code": "UNKNOWN_ENTITY", "message": "unknown case"}
             )
+        scenario_id = load_case(body.case_ref).scenario_id
+        if body.scenario_id is not None and body.scenario_id != scenario_id:
+            raise HTTPException(
+                status_code=400,
+                detail={
+                    "code": "SCENARIO_MISMATCH",
+                    "message": f"case {body.case_ref} runs on another public scenario; omit"
+                    " scenario_id to load the case's own",
+                },
+            )
+        # A live policy's configuration is checked before anything is reset.
+        chosen = factory(body.policy, load_public_scenario(scenario_id).profile_id)
         with db.write() as conn:
             closing = [
                 row["episode_id"]
                 for row in conn.execute("SELECT episode_id FROM episodes WHERE status = 'active'")
             ]
-            episode_id = create_episode(conn, scenario_id=body.scenario_id, case_ref=body.case_ref)
+            episode_id = create_episode(conn, scenario_id=scenario_id, case_ref=body.case_ref)
             ep = repo.get_episode(conn, episode_id)
         # Drop policy memory only after the reset committed (never while holding the write lock).
         for old in closing:
             host.forget(old)
+        host.select(episode_id, body.policy, chosen)
         return {
             "episode_id": episode_id,
             "event_id": ep.event_id,
+            "scenario_id": scenario_id,
             "clock": ep.clock.strftime("%Y-%m-%dT%H:%M:%SZ"),
             "revision": ep.revision,
+            "policy": body.policy,
+            "mode_label": host.mode_label(episode_id),
         }
 
     @app.get("/api/moderator/current")
@@ -336,6 +416,40 @@ def create_app(
             "transitions": [t.model_dump(mode="json") for t in transitions],
         }
 
+    @app.get("/api/moderator/policy")
+    def policy_get(authorization: str | None = Header(default=None)) -> dict[str, Any]:
+        moderator(authorization)
+        return policy_view(current_episode())
+
+    @app.post("/api/moderator/policy")
+    def policy_select(
+        body: PolicySelectBody, authorization: str | None = Header(default=None)
+    ) -> dict[str, Any]:
+        """Choose the current episode's policy before its coordinator first acts. No model is
+        called; a live choice only reads the endpoint configuration."""
+        moderator(authorization)
+        episode_id = current_episode()
+        try:
+            host.select(episode_id, body.policy, factory(body.policy, host_profile(episode_id)))
+        except PolicyLockedError as exc:
+            raise HTTPException(
+                status_code=409, detail={"code": "POLICY_LOCKED", "message": str(exc)}
+            ) from exc
+        return policy_view(episode_id)
+
+    def host_profile(episode_id: str) -> str:
+        with db.read() as conn:
+            return repo.get_episode(conn, episode_id).profile_id
+
+    @app.get("/api/policy")
+    def policy_public(authorization: str | None = Header(default=None)) -> dict[str, Any]:
+        """The coordinator policy of the caller's episode and its label, for any session."""
+        s = session_of(authorization)
+        episode_id = current_episode() if s.role == "moderator" else s.episode_id
+        assert episode_id is not None
+        described = host.describe(episode_id)
+        return {k: described[k] for k in ("episode_id", "policy", "policy_id", "label", "caps")}
+
     @app.post("/api/moderator/policy/run")
     def policy_run(body: PolicyBody, authorization: str | None = Header(default=None)) -> Any:
         moderator(authorization)
@@ -345,7 +459,12 @@ def create_app(
             status = repo.get_episode(conn, episode_id).status
         # episode_status is "closed" when a reset interrupted the run.
         return JSONResponse(
-            {**result.model_dump(mode="json"), "episode_id": episode_id, "episode_status": status}
+            {
+                **result.model_dump(mode="json"),
+                "episode_id": episode_id,
+                "episode_status": status,
+                "mode_label": host.mode_label(episode_id),
+            }
         )
 
     @app.post("/api/moderator/run")
@@ -363,6 +482,7 @@ def create_app(
             "clock": ep.clock.strftime("%Y-%m-%dT%H:%M:%SZ"),
             "revision": ep.revision,
             "policy_runs": [r.model_dump(mode="json") for r in runs],
+            "mode_label": host.mode_label(episode_id),
         }
 
     @app.post("/api/moderator/export")
@@ -379,6 +499,8 @@ def create_app(
         name = f"{episode_id}_rev{trace['final_state']['revision']}.json"
         write_trace(trace, traces_dir / name)
         return JSONResponse({"name": name, "trace": trace})
+
+    app.include_router(participation_router(db, session_of))
 
     # ------------------------------------------------------------------ replays (public, read-only)
 

@@ -7,14 +7,16 @@ touched, so a projection cannot carry private runner input.
 from __future__ import annotations
 
 import sqlite3
-from datetime import timedelta
+from datetime import datetime, timedelta
 from typing import Literal
 
 from plan_b.domain.models import (
     RUNTIME_VERSION,
     ActorContext,
+    ConsumableStateView,
     EventStateView,
     GrantView,
+    HoldView,
     PlanningSnapshot,
     ViewerInfo,
 )
@@ -24,6 +26,7 @@ from plan_b.domain.projection import (
     resource_view,
     with_effective_status,
 )
+from plan_b.domain.stock import StockRecords, as_consumable_stock, balance_of, consumable_state
 from plan_b.domain.timeutil import parse_ts
 from plan_b.store import repo
 
@@ -45,6 +48,7 @@ def build_snapshot(
     holds = with_effective_status(repo.holds(conn, episode_id), ep.clock)
     commitments = repo.commitments(conn, episode_id)
     checkins = repo.checkins(conn, episode_id)
+    stock = consumable_view(conn, episode_id, holds=holds)
     resources = tuple(
         resource_view(
             repo.resource_def(r),
@@ -61,6 +65,14 @@ def build_snapshot(
         )
         for r in repo.resource_rows(conn, episode_id)
     )
+    if stock is not None:
+        # A consumable pool's view carries its live stock before readiness reads it.
+        resources = tuple(
+            r.model_copy(update={"consumable_stock": as_consumable_stock(b)})
+            if (b := balance_of(stock, r.definition.resource_id)) is not None
+            else r
+            for r in resources
+        )
     defs, lifecycles = repo.activity_rows(conn, episode_id)
     activities = activity_views(
         definitions=defs,
@@ -87,7 +99,53 @@ def build_snapshot(
         checkins=checkins,
         budget=budget_view(goal, holds, commitments),
         effective_at=ep.clock + timedelta(minutes=apply_lead_minutes),
+        stock=stock,
+        pantry_parameters=sc.pantry_parameters,
+        stock_options=sc.stock_options,
     )
+
+
+def stock_records(
+    conn: sqlite3.Connection, episode_id: str, *, holds: tuple[HoldView, ...] | None = None
+) -> StockRecords | None:
+    """The consumable ledgers of an episode, or None for a profile without consumable stock.
+    ``holds`` must already carry their effective status at the episode clock."""
+    sc = repo.scenario(conn, episode_id)
+    if not any(r.consumable_stock is not None for r in sc.resources):
+        return None
+    ep = repo.get_episode(conn, episode_id)
+    if holds is None:
+        holds = with_effective_status(repo.holds(conn, episode_id), ep.clock)
+    goal = repo.goal(conn, episode_id)
+    starts: dict[str, datetime] = {}
+    for event in repo.activity_history(conn, episode_id):
+        if event.state == "started":
+            starts.setdefault(event.activity_id, event.at)
+    return StockRecords(
+        clock=ep.clock,
+        hard_end=goal.hard_end,
+        goal=goal,
+        original_goal=repo.goal(conn, episode_id, 1),
+        pantry=sc.pantry_parameters,
+        activities=sc.activities,
+        resources=sc.resources,
+        holds=holds,
+        movements=repo.stock_movements(conn, episode_id),
+        receipts=repo.stock_receipts(conn, episode_id),
+        distributions=repo.distributions(conn, episode_id),
+        allocations=repo.stock_allocations(conn, episode_id),
+        shipments=repo.expected_shipments(conn, episode_id),
+        observations=repo.observations(conn, episode_id),
+        activity_starts=starts,
+        checkins=repo.checkins(conn, episode_id),
+    )
+
+
+def consumable_view(
+    conn: sqlite3.Connection, episode_id: str, *, holds: tuple[HoldView, ...] | None = None
+) -> ConsumableStateView | None:
+    rec = stock_records(conn, episode_id, holds=holds)
+    return consumable_state(rec) if rec is not None else None
 
 
 def _grant_views(
@@ -205,6 +263,9 @@ def build_view(
         declared_assumptions=sc.declared_assumptions,
         tool_durations_minutes=dict(sc.tool_durations_minutes),
         viewer=viewer,
+        stock=snap.stock,
+        pantry_parameters=sc.pantry_parameters,
+        stock_options=sc.stock_options,
     )
 
 

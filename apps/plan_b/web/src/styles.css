@@ -525,6 +525,8 @@ code,
 
 .field {
   display: grid;
+  /* One column that never grows past the panel: a long option must not widen the page. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.25rem;
   border: none;
   padding: 0;
@@ -554,7 +556,8 @@ input[type="range"] {
   min-height: 1.5rem;
 }
 
-input[type="radio"] {
+input[type="radio"],
+input[type="checkbox"] {
   min-height: auto;
   width: 1.1rem;
   height: 1.1rem;
@@ -1150,6 +1153,221 @@ textarea {
 
 .board-replay .board-header {
   border: 2px solid var(--replay-bg);
+}
+
+/* ---------------------------------------------------------------- policy mode (Wave 2) */
+
+.mode-policy {
+  border: 2px solid var(--replay-bg);
+  color: var(--text);
+  background: var(--surface);
+}
+
+.mode-live.policy-live {
+  background: var(--replay-bg);
+}
+
+.mode-note {
+  font-weight: 500;
+}
+
+.policy-switch .radio strong {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------- decision cards */
+
+.decision-live {
+  border-left: 5px solid var(--info-line);
+}
+
+.decision-refs {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 0.1rem 0.75rem;
+  margin: 0.25rem 0;
+}
+
+.decision-refs > div {
+  display: contents;
+}
+
+.decision-refs dt {
+  color: var(--muted);
+  font-weight: 650;
+}
+
+.decision-refs dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.model-figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: 0.25rem 1rem;
+  margin: 0.25rem 0;
+}
+
+.model-figures dt {
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-weight: 650;
+}
+
+.model-figures dd {
+  margin: 0;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.model-calls {
+  padding-left: 1.1rem;
+  overflow-wrap: anywhere;
+}
+
+.untrusted {
+  margin: 0.25rem 0;
+  padding: 0.25rem 0.75rem;
+  border-left: 4px dashed var(--warn-line);
+  background: var(--surface-2);
+}
+
+/* ---------------------------------------------------------------- stock and service */
+
+.counter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+}
+
+.counter {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-left-width: 5px;
+  border-radius: var(--radius);
+}
+
+.counter dt {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-weight: 650;
+}
+
+.counter dd {
+  margin: 0;
+}
+
+.counter-value {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.tone-line-ok {
+  border-left-color: var(--ok-line);
+}
+
+.tone-line-warn {
+  border-left-color: var(--warn-line);
+}
+
+.tone-line-bad {
+  border-left-color: var(--bad-line);
+}
+
+.tone-line-neutral {
+  border-left-color: var(--neutral-line);
+}
+
+.table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.stock-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.stock-table th,
+.stock-table td {
+  padding: 0.35rem 0.5rem;
+  border-top: 1px solid var(--surface-2);
+  text-align: left;
+  vertical-align: top;
+}
+
+.stock-table td {
+  font-size: 1.2rem;
+  font-weight: 750;
+}
+
+.stock-table thead th {
+  font-size: 0.85rem;
+  color: var(--muted);
+  border-top: none;
+}
+
+/* ---------------------------------------------------------------- participation and staff */
+
+.alias {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 0.2rem 0.75rem;
+  margin: 0 0 0.5rem;
+}
+
+.alias > div {
+  display: contents;
+}
+
+.alias dt {
+  color: var(--muted);
+  font-weight: 650;
+}
+
+.alias dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.alias-role {
+  display: block;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.25rem;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 0.5rem;
+}
+
+.tab {
+  font: inherit;
+  font-weight: 650;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: var(--radius) var(--radius) 0 0;
+  background: var(--surface-2);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.tab-selected {
+  background: var(--surface);
+  border-color: var(--accent);
+  box-shadow: inset 0 3px 0 var(--accent);
+}
+
+.tab:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {

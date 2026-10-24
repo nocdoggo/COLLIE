@@ -1,6 +1,7 @@
 import {
   HOLD_STATUS_LABEL,
   fmtCents,
+  fmtQuantity,
   fmtTime,
   fmtWindow,
   lookups,
@@ -123,16 +124,35 @@ export function HoldsAndCommitments({ view }: { view: EventStateView }) {
           {holds.map((h) => {
             const activity = view.activities.find((a) => a.definition.activity_id === h.activity_id);
             const start = activity?.assignment?.start ?? h.window.start;
+            const unit =
+              view.resources.find((r) => r.definition.resource_id === h.resource_id)?.definition.consumable_stock?.unit ??
+              "unit";
             return (
               <li key={h.hold_id} className="hold">
                 <p>
                   <strong>{look.resourceLabel(h.resource_id)}</strong> for{" "}
                   {look.activityLabel(h.activity_id)}{" "}
-                  <StatusBadge label={HOLD_STATUS_LABEL[h.effective_status]} />
+                  <StatusBadge label={HOLD_STATUS_LABEL[h.effective_status] ?? HOLD_STATUS_LABEL.active} />
                   {h.status !== h.effective_status ? (
                     <span className="muted"> (stored as {h.status}; effective at the current clock)</span>
                   ) : null}
                 </p>
+                {h.consumable === true ? (
+                  <p className="small">
+                    {h.purpose === "stock_transfer" ? (
+                      <>
+                        Staff handoff of {fmtQuantity(h.quantity, unit)} into{" "}
+                        {look.resourceLabel(h.destination_resource_id ?? "")}
+                      </>
+                    ) : (
+                      <>
+                        Reserves {fmtQuantity(h.quantity, unit)}
+                        {h.service_target_id ? <> for target <code>{h.service_target_id}</code></> : null}
+                      </>
+                    )}
+                    ; {h.remaining_quantity ?? 0} still reserved. A hold moves no stock and serves nobody.
+                  </p>
+                ) : null}
                 <dl className="hold-times">
                   <div>
                     <dt>Hold expires</dt>

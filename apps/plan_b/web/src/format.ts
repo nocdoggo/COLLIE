@@ -118,6 +118,24 @@ export function fmtSignedCents(cents: number): string {
   return `${cents > 0 ? "+" : "−"}${fmtCents(Math.abs(cents))}`;
 }
 
+/** "16 standard kits": a whole-unit stock quantity with its unit, plural when not one. */
+export function fmtQuantity(quantity: number, unit: string): string {
+  const name = unit.replace(/_/g, " ");
+  return `${quantity} ${quantity === 1 || name.endsWith("s") ? name : `${name}s`}`;
+}
+
+/** A model call's cost as the provider reported it, in US dollars (real money, not sandbox). */
+export function fmtUsd(cost: number | null): string {
+  if (cost === null) return "cost not reported";
+  return cost === 0 ? "$0 USD" : `$${cost.toFixed(4)} USD`;
+}
+
+/** "4.98 s" or "820 ms". */
+export function fmtLatency(ms: number | null): string {
+  if (ms === null) return "latency not reported";
+  return ms >= 1000 ? `${(ms / 1000).toFixed(2)} s` : `${Math.round(ms)} ms`;
+}
+
 // ---------------------------------------------------------------------------
 // Labels and icons. Every status is shown as text plus an icon, never color alone.
 // ---------------------------------------------------------------------------
@@ -151,6 +169,7 @@ export const HOLD_STATUS_LABEL: Record<HoldStatus, StatusLabel> = {
   committed: { text: "Committed", icon: "✔", tone: "ok" },
   released: { text: "Released", icon: "↩", tone: "neutral" },
   expired: { text: "Expired", icon: "⧖", tone: "warn" },
+  fulfilled: { text: "Handed off (fulfilled)", icon: "⇉", tone: "ok" },
 };
 
 export const RECEIPT_STATUS_LABEL: Record<ReceiptStatus, StatusLabel> = {
@@ -249,6 +268,10 @@ export const CHECK_NAME: Record<string, string> = {
   accessibility: "Accessibility requirements are met",
   commitment_cutoff: "Bookings are committed before their cutoff",
   budget: "Spending stays within the event budget",
+  consumable_allocation: "Stock allocations match what the target needs",
+  stock_on_hand: "Allocated stock is physically on hand (expected units never count)",
+  stock_transfer: "A transfer can still be handed off before the cutoff",
+  service_throughput: "Staff can distribute the reserved stock before the event ends",
 };
 
 export function checkName(constraintId: string): string {
@@ -260,6 +283,23 @@ export const PRESET_LABEL: Record<string, string> = {
   preserve_order: "Preserve the announced order",
   minimize_spend: "Minimize additional spend",
 };
+
+// ---------------------------------------------------------------------------
+// Which coordinator policy ran (mode label)
+// ---------------------------------------------------------------------------
+
+export const DETERMINISTIC_POLICY_LABEL = "Deterministic policy";
+export const LIVE_AGENT_LABEL = "Live agent";
+
+/** "Live agent · anthropic/claude-sonnet-5.5"; the model id as the provider returned it. */
+export function liveAgentLabel(modelId: string | null): string {
+  return `${LIVE_AGENT_LABEL} · ${modelId ?? "model not reported yet"}`;
+}
+
+/** Live-policy decisions carry policy ids "live/<version>"; every other policy is deterministic. */
+export function isLivePolicyId(policyId: string): boolean {
+  return policyId.startsWith("live/");
+}
 
 export const ROLE_LABEL: Record<string, string> = {
   moderator: "Moderator (sandbox operator)",

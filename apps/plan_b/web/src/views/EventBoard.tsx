@@ -3,16 +3,19 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { ApiError, NoResponseError, readState, sessionEndMessage } from "../api";
+import { ApiError, NoResponseError, readEpisodePolicy, readState, sessionEndMessage } from "../api";
 import type { StoredSession, ToolBinding } from "../api";
 import { BoardView } from "../board/BoardView";
 import { BoardHeader, PRODUCT_NAME, SANDBOX_NOTICE } from "../components/BoardHeader";
-import { ROLE_LABEL } from "../format";
+import type { PolicySelection } from "../components/policyMode";
+import { DETERMINISTIC_POLICY_LABEL, ROLE_LABEL } from "../format";
 import { ModeratorPanel } from "../panels/ModeratorPanel";
+import { selectionOf } from "../panels/moderatorState";
 import { OrganizerPanel } from "../panels/OrganizerPanel";
-import { ParticipantPanel } from "../panels/ParticipantPanel";
 import { useMutationTracker } from "../panels/useMutations";
 import type { EventStateView } from "../types";
+import { Participation } from "./Participation";
+import { StaffWorkspace, staffToolsOf } from "./StaffActions";
 
 const POLL_MS = 1500;
 
@@ -33,6 +36,8 @@ export function EventBoard({
   const [view, setView] = useState<EventStateView | null>(null);
   const [problem, setProblem] = useState<LoadProblem | null>(null);
   const [announcement, setAnnouncement] = useState("");
+  /** The moderator's policy selection (moderator tabs only); it labels the board until a run. */
+  const [selection, setSelection] = useState<PolicySelection | null>(null);
   const inFlight = useRef(0);
   const lastText = useRef("");
   const knownReceipts = useRef<Set<string> | null>(null);
@@ -122,6 +127,29 @@ export function EventBoard({
 
   const tracker = useMutationTracker({ session, binding, refresh, announce, track });
 
+  // Before the coordinator records a decision, the server's GET /api/policy names the policy the
+  // episode will run, so every tab's label is right before anything ran.
+  const [served, setServed] = useState<PolicySelection | null>(null);
+  const episodeId = view?.episode_id ?? null;
+  const undecided = view !== null && view.decisions.length === 0;
+  const revision = view?.revision ?? null;
+  useEffect(() => {
+    if (episodeId === null || !undecided) return;
+    let cancelled = false;
+    readEpisodePolicy(session).then(
+      (policy) => {
+        if (!cancelled) setServed(selectionOf(policy));
+      },
+      () => {
+        if (!cancelled) setServed(null);
+      },
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [session, episodeId, undecided, revision]);
+  const labelSelection = selection ?? served;
+
   const signOut = (
     <button type="button" className="button secondary small" onClick={onSignOut}>
       Sign out of this tab
@@ -130,8 +158,11 @@ export function EventBoard({
 
   const role = view?.viewer.role ?? session.role;
   let sidePanel = null;
-  if (view !== null && binding !== null && view.viewer.role === "participant") {
-    sidePanel = <ParticipantPanel view={view} binding={binding} tracker={tracker} />;
+  const grant = view?.grants.find((g) => g.grant.grant_id === view.viewer.grant_id);
+  if (view !== null && binding !== null && view.viewer.role === "participant" && staffToolsOf(grant).length > 0) {
+    sidePanel = <StaffWorkspace view={view} binding={binding} tracker={tracker} session={session} />;
+  } else if (view !== null && binding !== null && view.viewer.role === "participant") {
+    sidePanel = <Participation view={view} binding={binding} tracker={tracker} session={session} />;
   } else if (view !== null && binding !== null && view.viewer.role === "organizer") {
     sidePanel = (
       <OrganizerPanel
@@ -152,7 +183,7 @@ export function EventBoard({
         {announcement}
       </div>
       {view !== null ? (
-        <BoardHeader key="header" view={view} mode="live" actions={signOut} />
+        <BoardHeader key="header" view={view} mode="live" actions={signOut} selection={labelSelection} />
       ) : (
         <header key="header-pending" className="board-header">
           <div className="brand-row">
@@ -161,7 +192,7 @@ export function EventBoard({
               <span aria-hidden="true">⚠ </span>
               {SANDBOX_NOTICE}
             </p>
-            <p className="mode-label mode-live">Deterministic policy</p>
+            <p className="mode-label mode-live">{DETERMINISTIC_POLICY_LABEL}</p>
             <p className="viewer-label">
               Signed in as {ROLE_LABEL[session.role] ?? session.role} ·{" "}
               <code className="code">{session.principal_id}</code>
@@ -196,7 +227,14 @@ export function EventBoard({
       ) : null}
       {role === "moderator" ? (
         <div key="moderator-deck" className="control-deck">
-          <ModeratorPanel session={session} view={view} track={track} refresh={refresh} announce={announce} />
+          <ModeratorPanel
+            session={session}
+            view={view}
+            track={track}
+            refresh={refresh}
+            announce={announce}
+            onSelection={setSelection}
+          />
         </div>
       ) : null}
       {view !== null ? (

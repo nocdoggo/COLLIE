@@ -1,4 +1,4 @@
-# Plan B: The Show Must Go On — Wave 1 sandbox
+# Plan B: The Show Must Go On — sandbox (Waves 1 and 2)
 
 A deterministic, **fictional, local** sandbox for keeping a small campus event workable when a
 delivery, a participant, or a resource changes. It verifies a decision-relevant fact, prepares a
@@ -6,12 +6,18 @@ reversible contingency, commits a feasible and authorized adjustment, keeps the 
 change is needed, or explains the unresolved constraint when recovery is impossible.
 
 Every action is a real mutation of the local SQLite store and nothing else. No university
-booking, purchase, delivery, or message is made. Wave 1 has **no LLM**: the coordinator is a
-documented deterministic rule policy (`rules/1.0.0`).
+booking, purchase, delivery, or message is made. By default the coordinator is a documented
+deterministic rule policy (`rules/1.0.0`, and `pantry-rules/1.0.0` for the pantry profile).
+Wave 2 adds an optional **live agent** (`live/1.0.0`) that interprets notices and chooses among
+server-built options with a language model; it makes **paid** model calls and is off unless
+selected. Wave 2 also adds a second event configuration (a community skills exchange), a pantry
+profile with consumable stock and staff-only attestations, participant check-ins and resource
+offers, and per-episode caps for every policy.
 
-Contract: [docs/RUNTIME_CONTRACT.md](docs/RUNTIME_CONTRACT.md). Planning source:
-[`PEEAI_plan/`](../../PEEAI_plan/README.md). Audit packet:
-[`PEEAI_plan/handoffs/wave_1/`](../../PEEAI_plan/handoffs/wave_1/README.md).
+Contract: [docs/RUNTIME_CONTRACT.md](docs/RUNTIME_CONTRACT.md) (runtime 1.1.0). Planning source:
+[`PEEAI_plan/`](../../PEEAI_plan/README.md). Audit packets:
+[`PEEAI_plan/handoffs/wave_1/`](../../PEEAI_plan/handoffs/wave_1/README.md) and
+[`PEEAI_plan/handoffs/wave_2/`](../../PEEAI_plan/handoffs/wave_2/README.md).
 
 ## Requirements
 
@@ -29,7 +35,7 @@ uv sync --all-groups --locked     # Python deps into apps/plan_b/.venv
 (cd web && npm ci && npm run build)   # browser app into web/dist
 ```
 
-After installation nothing needs network access.
+After installation nothing needs network access, except the optional live agent (below).
 
 ## Run the sandbox
 
@@ -64,6 +70,33 @@ Other development cases: `dev02` (backup hold, organizer authorization, paid boo
 (status service unavailable). Their hidden trajectories live in
 `plan_b/scenarios/private/` and are never sent to the policy or the browser.
 
+### Wave 2 demos (browser)
+
+The case list names each case's scenario, and **Load episode** loads it on its own scenario.
+
+* **Community skills exchange** (`skills_dev01`, scenario `dev_fixture_02`). Open a tab for the
+  peer lead: the Participation view shows the volunteer alias, the role's declared window and one
+  **Check in**. Checking in available only until 11:05 makes the planned 11:20 peer exchange
+  infeasible, and the policy applies the free swap of practice and peer exchange. A tab for the
+  kit steward can **Offer a resource**: a structured offer that states the registered window,
+  capabilities and terms activates the preconfigured backup kit and reserves, spends and adds
+  nothing. In an organizer tab a preference change creates a new goal version and marks older
+  reports stale. `skills_dev02` changes the goal while the coordinator's apply is in flight.
+* **Pantry continuity** (`pantry_dev01`, scenario `dev_fixture_03`). The pantry board keeps the
+  pantry-controlled supply gap and the unfulfilled service target as separate counters and shows
+  each pool's on-hand, reserved, available and expected (not stock) quantities. Run the policy: it
+  holds the 16 partner kits. A tab for `fictional_staff` opens **Staff actions** (beside
+  **Updates**): record the handoff (24/16 becomes 40/0), run the policy again (it commits the 40
+  kits), advance to 13:40 and record the distribution (40 on time; the counters read 0/0; the 20
+  expected kits stay unreceived). `pantry_dev02` hands off only 10 of 16 kits and ends with a
+  disclosed 6-kit shortfall.
+* **Policy switch.** Under **Policy for this episode** the moderator chooses **Deterministic
+  policy** or **Live agent · <model id>** before the coordinator first acts; the button then reads
+  **Run deterministic policy** or **Run live agent**. Selecting the live agent calls no model;
+  running it does (paid). Every decision card names the policy that ran, and a live card shows the
+  model id as returned, latency, tokens, cost and the episode's usage against its caps, with the
+  model's rationale labelled as untrusted text.
+
 ### Headless runs
 
 ```bash
@@ -71,6 +104,44 @@ uv run plan-b run-case all --db var/runs.sqlite3 --out var/out
 uv run plan-b verify-trace var/out/traces/dev01_trace.json
 uv run plan-b serve --replay-dir var/out/traces   # replay them; board exports in var/traces are always listed
 ```
+
+`plan-b run-case <case|all> [--policy rules|live] [--max-episode-tool-calls N]
+[--max-episode-model-calls N]` runs development cases on their own scenarios. Every policy runs
+under the per-episode caps (development values: 48 tool calls, 8 model calls); once one is reached
+the policy records a `stop` and is not woken again. `--policy live` makes paid model calls.
+
+| Case | Scenario | What it exercises | Deterministic outcome |
+| --- | --- | --- | --- |
+| dev01, dev02, dev04, dev05, dev06 | `dev_fixture_01` | the Wave 1 campus cases above | unchanged from Wave 1 |
+| skills_dev01 | `dev_fixture_02` | the peer lead's own check-in narrows their window to 10:05-11:05, so the planned 11:20 peer exchange no longer fits | the free swap of practice and peer exchange at 10:06; all activities complete; $0 |
+| skills_dev02 | `dev_fixture_02` | the organizer switches to preserve_order (goal v2) at 10:06 while the coordinator's apply from a goal-v1 report is in flight | the stale apply is rejected; re-evaluated under goal v2 and applied at 10:07; $0 |
+| pantry_dev01 | `dev_fixture_03` | target 40 kits, pantry 24, partner 16, a 20-kit shipment delayed past the session | hold 16, staff handoff (40/0), commit 40, 40 distributed on time; S20 stays 20 unreceived |
+| pantry_dev02 | `dev_fixture_03` | staff hands off only 10 of the 16 held kits | 34 distributed, a disclosed 6-kit shortfall against the unchanged target 40 |
+
+### Live agent (optional, paid)
+
+The live agent needs an OpenAI-compatible endpoint (OpenRouter by default). Its configuration is
+read server-side from the environment, else from `.local/keys/model_endpoint.env` at the
+repository root; see [`.env.example`](.env.example) for the names (`PLAN_B_MODEL_PROVIDER`,
+`PLAN_B_MODEL_BASE_URL`, `PLAN_B_MODEL_KEY_FILE`, `PLAN_B_MODEL_ID`,
+`PLAN_B_MODEL_MAX_RUN_COST_USD`, `PLAN_B_MODEL_MAX_TOTAL_COST_USD`). The key lives only in the
+key file (mode 0600, ignored by git); the provider reads it per call and sends it only in the
+`Authorization` header. It never reaches the browser, a trace, a log or a decision. A spend guard
+refuses any call that could exceed the per-run (per-episode) cap or the cumulative cap of the
+ledger `var/model_spend.json`, which records every call.
+
+```bash
+uv run python -m plan_b.agent.gate --out <file>                 # the G-LLM gate on a fresh dev01 episode (paid)
+uv run plan-b run-case dev01 --policy live --db var/live.sqlite3 --out var/live_out   # paid
+uv run python scripts/run_live_cases.py --out <dir> dev01 dev04 # recorded live runs with their records (paid)
+```
+
+`scripts/run_live_cases.py` runs each case once under the live policy, exports and verifies the
+trace, and writes a run record: the outcome line, the model as requested and as returned, every
+model call's latency, tokens and cost, the ledger before and after, the tool calls, the decisions,
+and checks computed from the trace (useful tool calls, validated actions, fresh-state agreement,
+the response to each notice). A recorded run is never overwritten. Live runs are evidence of one
+run, not reproducible artifacts: replay is the reproducible form.
 
 `plan-b verify-trace` checks the frame, chain and content hashes, the algorithm label
 (`sha256`), `kind`, `trace_version`, and that the last frame's revision equals the final
@@ -82,10 +153,21 @@ itself, not authentic.
 ### Evidence
 
 ```bash
-uv run python scripts/collect_evidence.py --out <new-or-empty-dir>   # every check, cases, traces, walkthrough
-uv run python scripts/write_manifest.py --evidence <dir>             # the packet manifest, from that evidence and git
-uv run python tests/e2e/walkthrough.py --out <dir>                   # the browser walkthrough on its own
+uv run python scripts/collect_evidence.py --out <new-or-empty-dir>   # every check, cases, traces, walkthrough (Wave 1 set)
+uv run python scripts/write_manifest.py --evidence <dir>             # the Wave 1 packet manifest, from that evidence and git
+uv run python tests/e2e/walkthrough.py --out <dir>                   # the Wave 1 browser walkthrough on its own (41 checks)
+uv run python tests/e2e/walkthrough_wave2.py --out <dir>             # the Wave 2 browser walkthrough (30 checks)
+uv run python scripts/collect_wave2_evidence.py --out <new-or-empty-dir> \
+    --live <run_live_cases.py output> --gate <gate record>           # the Wave 2 set (no paid call)
 ```
+
+`walkthrough_wave2.py` covers the pantry staff flow, the community check-in and offer, and the
+policy switch; it needs `npm run build` and selects, but never runs, the live agent (only the
+presence of the endpoint configuration is checked). `collect_wave2_evidence.py` runs every check,
+the deterministic cases, both walkthroughs, the pantry accounting check over the pantry traces,
+the focused M2 test mapping and a check that dev01-dev06 print their Wave 1 lines; it copies the
+recorded live runs and the gate record without calling a model, and scans everything it wrote for
+local paths, identifiers and credential-shaped text.
 
 The collector refuses a directory that already holds files. It writes local paths as
 placeholders, and fails its last check if any evidence file names the host, the user or a local
@@ -105,12 +187,14 @@ uv run mypy
 
 | Path | Contents |
 | --- | --- |
-| `plan_b/domain/` | Runtime models, clock semantics, readiness, projection, planner (`candidates`, `constraints`, `objective`), campus adapter, planning-artifact mapping |
+| `plan_b/domain/` | Runtime models, clock semantics, readiness, projection, planner (`candidates`, `constraints`, `objective`), campus and pantry adapters, stock accounting, planning-artifact mapping |
 | `plan_b/store/` | SQLite database and migrations, repository, engine (clock and events), sessions, episodes, projections |
-| `plan_b/tools/` | The single executor, per-tool handlers, in-process client |
+| `plan_b/tools/` | The single executor, per-tool handlers (stock and staff tools in `stock.py`), in-process client |
 | `plan_b/world/` | Private world (status trajectories, timed events) and the leak checker |
-| `plan_b/scenarios/` | Public fixture, private development cases, policy host, runner |
-| `plan_b/evaluation/` | Deterministic rule policy and parser, state-based scoring, trace export |
-| `plan_b/api/` | FastAPI application |
+| `plan_b/scenarios/` | Public fixtures (campus, skills exchange, pantry), private development cases, policy host with episode caps, runner |
+| `plan_b/evaluation/` | Deterministic rule policies (campus and pantry) and parser, state-based scoring, trace export |
+| `plan_b/agent/` | Live agent (Wave 2): endpoint configuration, provider and spend ledger, interpretation, closed action menu, orchestrator, prompts, the G-LLM gate |
+| `plan_b/api/` | FastAPI application, policy configuration, participation view |
 | `web/` | React + TypeScript board and replay |
+| `scripts/` | Evidence collectors, the Wave 1 manifest writer, recorded live runs |
 | `tests/` | Focused tests against the real store and executor |

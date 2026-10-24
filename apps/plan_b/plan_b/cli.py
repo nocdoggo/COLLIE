@@ -32,16 +32,34 @@ def _serve(args: argparse.Namespace) -> int:
 def _run_case(args: argparse.Namespace) -> int:
     from plan_b.evaluation.export_trace import build_trace, write_trace
     from plan_b.evaluation.scoring import public_summary
+    from plan_b.scenarios.policy_host import EpisodeCaps
     from plan_b.scenarios.runner import run_case
     from plan_b.store.database import Database
     from plan_b.world.world import available_cases
 
+    try:
+        caps = EpisodeCaps(
+            max_tool_calls=args.max_episode_tool_calls,
+            max_model_calls=args.max_episode_model_calls,
+        )
+    except ValueError as exc:
+        print(f"invalid caps: {exc}")
+        return 2
+    live_config = None
+    if args.policy == "live":
+        from plan_b.agent.config import ModelConfigError, load_model_config
+
+        try:
+            live_config = load_model_config()  # server-side; the key itself is not read here
+        except ModelConfigError as exc:
+            print(f"the live policy is not configured: {exc}")
+            return 2
     cases = available_cases() if args.case == "all" else [args.case]
     out = Path(args.out) if args.out else None
     db = Database(args.db)
     ok = True
     for case_ref in cases:
-        result = run_case(db, case_ref)
+        result = run_case(db, case_ref, policy=args.policy, caps=caps, live_config=live_config)
         report = result.report
         line = (
             f"{case_ref}: goal_complete={report.goal_complete} "
@@ -113,6 +131,8 @@ def _verify(args: argparse.Namespace) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
+    from plan_b.scenarios.policy_host import DEVELOPMENT_CAPS
+
     parser = argparse.ArgumentParser(prog="plan-b")
     sub = parser.add_subparsers(dest="command", required=True)
     serve = sub.add_parser("serve", help="run the API and browser app")
@@ -121,10 +141,29 @@ def main(argv: list[str] | None = None) -> int:
     serve.add_argument("--var", default=str(APP_DIR / "var"))
     serve.add_argument("--replay-dir", action="append", default=[])
     serve.set_defaults(func=_serve)
-    run = sub.add_parser("run-case", help="run a development case with the deterministic policy")
+    run = sub.add_parser("run-case", help="run a development case to the hard end")
     run.add_argument("case", help="case ref (dev01, dev02, ...) or 'all'")
     run.add_argument("--db", default=str(APP_DIR / "var" / "runs.sqlite3"))
     run.add_argument("--out", default=None, help="write traces and reports under this directory")
+    run.add_argument(
+        "--policy",
+        choices=("rules", "live"),
+        default="rules",
+        help="rules: the profile's deterministic baseline (default); live: the live agent"
+        " (paid model calls; needs the model endpoint configuration)",
+    )
+    run.add_argument(
+        "--max-episode-tool-calls",
+        type=int,
+        default=DEVELOPMENT_CAPS.max_tool_calls,
+        help="per-episode tool-call cap for every policy (development value: %(default)s)",
+    )
+    run.add_argument(
+        "--max-episode-model-calls",
+        type=int,
+        default=DEVELOPMENT_CAPS.max_model_calls,
+        help="per-episode model-call cap of the live policy (development value: %(default)s)",
+    )
     run.set_defaults(func=_run_case)
     demo = sub.add_parser("demo-rejections", help="executed run exercising rejected actions")
     demo.add_argument("--db", default=str(APP_DIR / "var" / "runs.sqlite3"))

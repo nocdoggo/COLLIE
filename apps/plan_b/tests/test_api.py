@@ -53,7 +53,7 @@ def _tool(c: TestClient, token: str, tool: str, **body: Any) -> Any:
 
 
 def test_health_and_moderator_auth(client: TestClient) -> None:
-    assert client.get("/api/health").json()["runtime_version"] == "1.0.0"
+    assert client.get("/api/health").json()["runtime_version"] == "1.1.0"
     assert client.post("/api/auth/moderator", json={"code": "wrong"}).status_code == 401
     mod = _moderator(client)
     assert client.get("/api/auth/whoami", headers=_auth(mod)).json()["role"] == "moderator"
@@ -179,7 +179,7 @@ def test_http_payloads_carry_no_private_case_data(client: TestClient) -> None:
     client.post("/api/moderator/episodes", json={"case_ref": "dev01"}, headers=_auth(mod))
     org = _join(client, mod, "organizer_demo")
     cases = client.get("/api/moderator/cases", headers=_auth(mod)).json()
-    assert all(set(c) == {"case_ref"} for c in cases)
+    assert all(set(c) == {"case_ref", "scenario_id", "profile_id"} for c in cases)
     texts: list[tuple[str, str]] = []
     for minutes in (0, 10, 20, 30, 40):
         if minutes:

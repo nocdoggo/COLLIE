@@ -17,7 +17,7 @@ import type { StoredSession, ToolBinding, ToolCallOutcome } from "../api";
 import type { ActionReceipt, EventStateView, ReceiptLookupData, ToolEnvelope, ToolRequest } from "../types";
 import { receiptAnnouncement } from "./submissions";
 
-export type PanelName = "participant" | "organizer";
+export type PanelName = "participant" | "organizer" | "staff";
 
 export interface LookupNote {
   readonly result: "not_found" | "pending" | "failed";
