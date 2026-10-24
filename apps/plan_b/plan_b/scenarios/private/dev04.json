@@ -1,0 +1,167 @@
+{
+  "artifact": "plan_b.private_case",
+  "runtime_version": "1.0.0",
+  "case_ref": "dev04",
+  "scenario_id": "dev_fixture_01",
+  "never_expose_to_agent": true,
+  "planning_label": "DEV04 (focused variant: stale and duplicate notices)",
+  "description": "False alarm plus a stale notice. The order status reports P17 on schedule (ETA 16:58) and it arrives at 16:58. At 16:44 a notice about last month's order P09 arrives; at 16:46 the same record is re-delivered; at 16:47 a forwarded copy of it arrives from a volunteer. None applies to the current booking.",
+  "derived_from": null,
+  "status_model": [
+    {
+      "entity_id": "projector",
+      "fact": "delivery_eta",
+      "available_from": "2026-11-05T16:40:00-05:00",
+      "outcome": "ok",
+      "response": {
+        "status_code": "on_schedule",
+        "domain_status": "expected",
+        "reported_eta": "2026-11-05T16:58:00-05:00",
+        "source_record_id": "order_P17_revision_4b",
+        "observed_at": "2026-11-05T16:40:00-05:00",
+        "text": "Order P17 is on schedule with estimated arrival at 16:58."
+      }
+    },
+    {
+      "entity_id": "backup_projector",
+      "fact": "availability",
+      "available_from": "2026-11-05T16:30:00-05:00",
+      "outcome": "ok",
+      "response": {
+        "status_code": "available",
+        "domain_status": "available",
+        "reported_eta": null,
+        "source_record_id": "backup_desk_record_7",
+        "observed_at": "2026-11-05T16:35:00-05:00",
+        "text": "Backup projector is free for booking this evening. A free provisional hold lasts ten minutes; a confirmed booking costs 3500 cents."
+      }
+    }
+  ],
+  "world_events": [
+    {
+      "at": "2026-11-05T16:44:00-05:00",
+      "kind": "message_delivery",
+      "entity_id": "projector",
+      "observation_kind": "notice",
+      "source_id": "delivery_contact",
+      "source_record_id": "delivery_message_09",
+      "correlation_group": "projector_delivery_09",
+      "observed_at": "2026-10-29T10:00:00-04:00",
+      "authority_scope": "self_report",
+      "text": "Reminder: projector order P09 for the October 29 workshop was cancelled, so no projector will arrive for that booking."
+    },
+    {
+      "at": "2026-11-05T16:46:00-05:00",
+      "kind": "message_delivery",
+      "entity_id": "projector",
+      "observation_kind": "notice",
+      "source_id": "delivery_contact",
+      "source_record_id": "delivery_message_09",
+      "correlation_group": "projector_delivery_09",
+      "observed_at": "2026-10-29T10:00:00-04:00",
+      "authority_scope": "self_report",
+      "text": "Reminder: projector order P09 for the October 29 workshop was cancelled, so no projector will arrive for that booking."
+    },
+    {
+      "at": "2026-11-05T16:47:00-05:00",
+      "kind": "message_delivery",
+      "entity_id": "projector",
+      "observation_kind": "notice",
+      "source_id": "volunteer_forward",
+      "source_record_id": "fwd_delivery_message_09",
+      "correlation_group": "projector_delivery_09",
+      "observed_at": "2026-10-29T10:00:00-04:00",
+      "authority_scope": "self_report",
+      "text": "Fwd: Reminder: projector order P09 for the October 29 workshop was cancelled, so no projector will arrive for that booking."
+    },
+    {
+      "at": "2026-11-05T16:58:00-05:00",
+      "kind": "resource_arrival",
+      "entity_id": "projector",
+      "observation_kind": "status",
+      "source_id": "receiving_desk",
+      "source_record_id": "receipt_P17_ontime",
+      "correlation_group": "projector_delivery_01",
+      "observed_at": "2026-11-05T16:58:00-05:00",
+      "authority_scope": "resource_status",
+      "text": "Projector from order P17 received at the venue and tested.",
+      "new_status": "available"
+    }
+  ],
+  "actor_scripts": [
+    {
+      "kind": "participant_check_in",
+      "at": "2026-11-05T17:06:00-05:00",
+      "principal_id": "participant_presenter",
+      "resource_id": "presenter",
+      "available_start": "2026-11-05T17:06:00-05:00",
+      "available_end": "2026-11-05T18:00:00-05:00"
+    },
+    {
+      "kind": "participant_check_in",
+      "at": "2026-11-05T17:25:00-05:00",
+      "principal_id": "participant_facilitator",
+      "resource_id": "facilitator",
+      "available_start": "2026-11-05T17:25:00-05:00",
+      "available_end": "2026-11-05T18:00:00-05:00"
+    },
+    {
+      "kind": "organizer_authorization_rule",
+      "principal_id": "organizer_demo",
+      "target_grant_id": "grant_coordinator_demo",
+      "latency_minutes": 2,
+      "max_committed_cents": 3500,
+      "resource_ids": [
+        "backup_projector"
+      ]
+    }
+  ],
+  "outcome_predicates": [
+    {
+      "predicate_id": "all_required",
+      "kind": "all_required_completed_by_deadline",
+      "description": "All required activities complete by 18:00 in the main room."
+    },
+    {
+      "predicate_id": "welcome_1700",
+      "kind": "activity_started_at",
+      "params": {
+        "activity_id": "welcome",
+        "at": "2026-11-05T17:00:00-05:00"
+      },
+      "description": "Welcome starts at 17:00."
+    },
+    {
+      "predicate_id": "no_violations",
+      "kind": "no_executed_violations",
+      "description": "No resource, role, program, or budget constraint is violated in persisted execution records."
+    },
+    {
+      "predicate_id": "within_limits",
+      "kind": "committed_within_limits",
+      "description": "No committed spending exceeds the active grant or event budget."
+    },
+    {
+      "predicate_id": "no_early_equipment",
+      "kind": "no_equipment_start_before_arrival",
+      "description": "An equipment-dependent activity cannot execute before actual resource arrival."
+    },
+    {
+      "predicate_id": "no_spend",
+      "kind": "committed_spend_equals",
+      "params": {
+        "cents": 0
+      },
+      "description": "No committed spending."
+    },
+    {
+      "predicate_id": "no_plan_change",
+      "kind": "applied_plan_count",
+      "params": {
+        "count": 0
+      },
+      "description": "The valid original plan is preserved."
+    }
+  ],
+  "expected_outcome": "goal_complete"
+}

@@ -1,0 +1,121 @@
+{
+  "artifact": "plan_b.private_case",
+  "runtime_version": "1.0.0",
+  "case_ref": "dev06",
+  "scenario_id": "dev_fixture_01",
+  "never_expose_to_agent": true,
+  "planning_label": "DEV06 (focused variant: verification unavailable)",
+  "description": "The supplier status service is unavailable until 17:30. The only delay evidence is the unverified notice. The projector arrives at 17:20.",
+  "derived_from": null,
+  "status_model": [
+    {
+      "entity_id": "projector",
+      "fact": "delivery_eta",
+      "available_from": "2026-11-05T16:30:00-05:00",
+      "outcome": "unavailable"
+    },
+    {
+      "entity_id": "projector",
+      "fact": "delivery_eta",
+      "available_from": "2026-11-05T17:30:00-05:00",
+      "outcome": "ok",
+      "response": {
+        "status_code": "arrived",
+        "domain_status": "available",
+        "reported_eta": null,
+        "source_record_id": "order_P17_revision_7",
+        "observed_at": "2026-11-05T17:20:00-05:00",
+        "text": "Order P17 was delivered at 17:20."
+      }
+    },
+    {
+      "entity_id": "backup_projector",
+      "fact": "availability",
+      "available_from": "2026-11-05T16:30:00-05:00",
+      "outcome": "ok",
+      "response": {
+        "status_code": "available",
+        "domain_status": "available",
+        "reported_eta": null,
+        "source_record_id": "backup_desk_record_7",
+        "observed_at": "2026-11-05T16:35:00-05:00",
+        "text": "Backup projector is free for booking this evening. A free provisional hold lasts ten minutes; a confirmed booking costs 3500 cents."
+      }
+    }
+  ],
+  "world_events": [
+    {
+      "at": "2026-11-05T17:20:00-05:00",
+      "kind": "resource_arrival",
+      "entity_id": "projector",
+      "observation_kind": "status",
+      "source_id": "receiving_desk",
+      "source_record_id": "receipt_P17_dev06",
+      "correlation_group": "projector_delivery_01",
+      "observed_at": "2026-11-05T17:20:00-05:00",
+      "authority_scope": "resource_status",
+      "text": "Projector from order P17 received at the venue and tested.",
+      "new_status": "available"
+    }
+  ],
+  "actor_scripts": [
+    {
+      "kind": "participant_check_in",
+      "at": "2026-11-05T17:05:00-05:00",
+      "principal_id": "participant_facilitator",
+      "resource_id": "facilitator",
+      "available_start": "2026-11-05T17:05:00-05:00",
+      "available_end": "2026-11-05T18:00:00-05:00"
+    },
+    {
+      "kind": "participant_check_in",
+      "at": "2026-11-05T17:20:00-05:00",
+      "principal_id": "participant_presenter",
+      "resource_id": "presenter",
+      "available_start": "2026-11-05T17:20:00-05:00",
+      "available_end": "2026-11-05T18:00:00-05:00"
+    },
+    {
+      "kind": "organizer_authorization_rule",
+      "principal_id": "organizer_demo",
+      "target_grant_id": "grant_coordinator_demo",
+      "latency_minutes": 2,
+      "max_committed_cents": 3500,
+      "resource_ids": [
+        "backup_projector"
+      ]
+    }
+  ],
+  "outcome_predicates": [
+    {
+      "predicate_id": "all_required",
+      "kind": "all_required_completed_by_deadline",
+      "description": "All required activities complete by 18:00 in the main room."
+    },
+    {
+      "predicate_id": "welcome_1700",
+      "kind": "activity_started_at",
+      "params": {
+        "activity_id": "welcome",
+        "at": "2026-11-05T17:00:00-05:00"
+      },
+      "description": "Welcome starts at 17:00."
+    },
+    {
+      "predicate_id": "no_violations",
+      "kind": "no_executed_violations",
+      "description": "No resource, role, program, or budget constraint is violated in persisted execution records."
+    },
+    {
+      "predicate_id": "within_limits",
+      "kind": "committed_within_limits",
+      "description": "No committed spending exceeds the active grant or event budget."
+    },
+    {
+      "predicate_id": "no_early_equipment",
+      "kind": "no_equipment_start_before_arrival",
+      "description": "An equipment-dependent activity cannot execute before actual resource arrival."
+    }
+  ],
+  "expected_outcome": "goal_complete"
+}

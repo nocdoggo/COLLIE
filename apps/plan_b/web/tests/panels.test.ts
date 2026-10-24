@@ -1,0 +1,265 @@
+// Role and moderator panels: what a submission may claim (review web-2, web-4), check-in
+// availability (web-7), reset confirmation (web-5), stamped moderator results, and the
+// reset-episode message for 401 EPISODE_CLOSED.
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+
+import {
+  ApiError,
+  EPISODE_RESET_MESSAGE,
+  buildToolRequest,
+  errorCodeOf,
+  newClientRecordId,
+  sessionEndMessage,
+} from "../src/api.ts";
+import type { StoredSession } from "../src/api.ts";
+import { ModeratorPanel } from "../src/panels/ModeratorPanel.tsx";
+import { MutationStatus } from "../src/panels/MutationStatus.tsx";
+import { ParticipantPanel } from "../src/panels/ParticipantPanel.tsx";
+import { checkInArguments, endChoices } from "../src/panels/checkInForm.ts";
+import {
+  actionHeadline,
+  clockOutcome,
+  isEarlierResult,
+  knownActiveEpisode,
+  policyOutcome,
+  resetNeedsConfirmation,
+} from "../src/panels/moderatorState.ts";
+import {
+  observationArguments,
+  receiptBadge,
+  reusableRecordId,
+  unresolvedSubmissions,
+} from "../src/panels/submissions.ts";
+import type { MutationTracker, Submission, SubmissionPhase } from "../src/panels/useMutations.ts";
+import type { EventStateView, ToolRequest } from "../src/types.ts";
+import { local, makeReceipt, makeView, textOf } from "./support/view.ts";
+
+const BINDING = { event_id: "evt_demo", grant_id: "grant_participant_presenter" };
+const IDENTIFIER = /^[A-Za-z0-9_.:-]{1,128}$/;
+const UNKNOWN: SubmissionPhase = { kind: "unknown", message: "No response within 20 s.", checking: false, lookup: null };
+
+function submission(request: ToolRequest, phase: SubmissionPhase, extra: Partial<Submission> = {}): Submission {
+  return { id: "sub-1", panel: "participant", label: "Update", request, sends: 1, phase, dismissed: false, ...extra };
+}
+
+function tracker(submissions: readonly Submission[]): MutationTracker {
+  return {
+    submissions,
+    submit: () => undefined,
+    checkStatus: () => undefined,
+    resend: () => undefined,
+    dismiss: () => undefined,
+    isSending: () => false,
+  };
+}
+
+function observationRequest(text: string, recordId = newClientRecordId()): ToolRequest {
+  return buildToolRequest(
+    BINDING,
+    "submit_observation",
+    observationArguments({ text, entity_id: null, kind: "notice" }, recordId),
+    { idempotent: true },
+  );
+}
+
+// ------------------------------------------------------------------ web-4: applied receipts
+
+function statusHtml(view: EventStateView, phase: SubmissionPhase): string {
+  const request = buildToolRequest(BINDING, "check_in", { resource_id: "presenter" }, { idempotent: true });
+  return renderToStaticMarkup(
+    createElement(MutationStatus, { submission: submission(request, phase), view, tracker: tracker([]) }),
+  );
+}
+
+test("an applied receipt is neutral until a fresh state read contains it", () => {
+  const receipt = makeReceipt();
+  const phase: SubmissionPhase = { kind: "receipt", receipt, replayed: false, via: "response" };
+  const pending = statusHtml(makeView(), phase);
+  assert.ok(textOf(pending).includes("⧗ Applied — confirming in a fresh state read"), textOf(pending));
+  assert.ok(!pending.includes("badge tone-ok"));
+
+  const confirmed = statusHtml(makeView({ receipts: [receipt] }), phase);
+  assert.ok(textOf(confirmed).includes("✔ Applied Confirmed in the current state"));
+  assert.ok(confirmed.includes("badge tone-ok"));
+
+  assert.equal(receiptBadge(receipt, makeView()).tone, "neutral");
+  assert.equal(receiptBadge(makeReceipt({ status: "rejected", error_code: "SCOPE_VIOLATION" }), makeView()).text, "Rejected");
+});
+
+test("a 401 EPISODE_CLOSED submission says the episode was reset", () => {
+  const html = statusHtml(makeView(), {
+    kind: "not_executed",
+    httpStatus: 401,
+    code: "EPISODE_CLOSED",
+    message: "EPISODE_CLOSED: this episode has been reset",
+  });
+  assert.ok(textOf(html).includes(EPISODE_RESET_MESSAGE));
+  assert.ok(!textOf(html).includes("sign in again"));
+});
+
+// ------------------------------------------------------------------ web-2: observations
+
+test("every observation request carries a valid client_record_id in its frozen request", () => {
+  const request = observationRequest("Presenter here: I am at the side door.");
+  const id = request.arguments.client_record_id;
+  assert.equal(typeof id, "string");
+  assert.match(id as string, IDENTIFIER);
+  assert.ok(Object.isFrozen(request));
+  assert.notEqual(newClientRecordId(), newClientRecordId());
+});
+
+test("an identical observation after an unknown outcome reuses the earlier record id", () => {
+  const earlier = observationRequest("Presenter here: I am at the side door.", "web-obs-earlier");
+  const same = { text: "Presenter here: I am at the side door.", entity_id: null, kind: "notice" } as const;
+  // Still unresolved, or dismissed without an answer: the server must see the same record id.
+  assert.equal(reusableRecordId([submission(earlier, UNKNOWN)], same), "web-obs-earlier");
+  assert.equal(reusableRecordId([submission(earlier, UNKNOWN, { dismissed: true })], same), "web-obs-earlier");
+  // Different content, or an earlier one with a known outcome, is a new logical observation.
+  assert.equal(reusableRecordId([submission(earlier, UNKNOWN)], { ...same, text: "Now inside." }), null);
+  assert.equal(reusableRecordId([submission(earlier, UNKNOWN)], { ...same, entity_id: "projector" }), null);
+  const recorded: SubmissionPhase = { kind: "receipt", receipt: makeReceipt(), replayed: false, via: "response" };
+  assert.equal(reusableRecordId([submission(earlier, recorded)], same), null);
+});
+
+test("an unresolved observation blocks a new one until checked or dismissed", () => {
+  const earlier = observationRequest("Presenter here: I am at the side door.");
+  assert.equal(unresolvedSubmissions([submission(earlier, UNKNOWN)], "participant", "submit_observation").length, 1);
+  const notFound: SubmissionPhase = {
+    ...UNKNOWN,
+    lookup: { result: "not_found", message: "No receipt exists for this request's key.", checkedAt: 0 },
+  };
+  assert.equal(unresolvedSubmissions([submission(earlier, notFound)], "participant", "submit_observation").length, 0);
+  const pending: SubmissionPhase = { ...UNKNOWN, lookup: { result: "failed", message: "x", checkedAt: 0 } };
+  assert.equal(unresolvedSubmissions([submission(earlier, pending)], "participant", "submit_observation").length, 1);
+  assert.equal(
+    unresolvedSubmissions([submission(earlier, UNKNOWN, { dismissed: true })], "participant", "submit_observation")
+      .length,
+    0,
+  );
+});
+
+test("the update form warns about an unresolved earlier update", () => {
+  const earlier = observationRequest("Presenter here: I am at the side door.");
+  const render = (subs: readonly Submission[]) =>
+    textOf(
+      renderToStaticMarkup(
+        createElement(ParticipantPanel, { view: makeView(), binding: BINDING, tracker: tracker(subs) }),
+      ),
+    );
+  const warned = render([submission(earlier, UNKNOWN)]);
+  assert.ok(
+    warned.includes("An earlier update is unresolved: “Presenter here: I am at the side door.”"),
+    warned,
+  );
+  assert.ok(warned.includes("Use Check action status on it"));
+  assert.ok(!render([]).includes("An earlier update is unresolved"));
+});
+
+// ------------------------------------------------------------------ web-7: availability
+
+test("a chosen 'available until' time that has passed blocks the check-in", () => {
+  const blocked = checkInArguments("presenter", local("16:45"), local("16:50"));
+  assert.deepEqual(blocked, { ok: false, passedEnd: local("16:45") });
+  assert.deepEqual(checkInArguments("presenter", local("16:50"), local("16:50")), {
+    ok: false,
+    passedEnd: local("16:50"),
+  });
+  assert.deepEqual(checkInArguments("presenter", local("17:00"), local("16:50")), {
+    ok: true,
+    args: { resource_id: "presenter", available: { start: local("16:50"), end: local("17:00") } },
+  });
+  assert.deepEqual(checkInArguments("presenter", "", local("16:50")), { ok: true, args: { resource_id: "presenter" } });
+  // The choices themselves start after the clock, so a passed choice can only be a stale one.
+  const choices = endChoices(makeView({ clock: local("16:50") }));
+  assert.equal(choices[0], local("16:55"));
+  assert.equal(choices[choices.length - 1], local("18:00"));
+});
+
+// ------------------------------------------------------------------ web-5: reset confirmation
+
+test("reset asks for confirmation whenever an episode might be active", () => {
+  const active = makeView();
+  const closed = makeView({ episode_status: "closed" });
+  assert.equal(resetNeedsConfirmation("ep_1", null), true);
+  assert.equal(resetNeedsConfirmation(undefined, null), true, "an unanswered or failed read is 'maybe'");
+  assert.equal(resetNeedsConfirmation(null, active), true, "the board's own state is evidence");
+  assert.equal(resetNeedsConfirmation(null, closed), false);
+  assert.equal(resetNeedsConfirmation(null, null), false);
+  assert.equal(knownActiveEpisode(undefined, active), "ep_test");
+  assert.equal(knownActiveEpisode("ep_1", active), "ep_1");
+  assert.equal(knownActiveEpisode(undefined, closed), null);
+});
+
+test("before the current-episode read answers, the load button is the guarded reset", () => {
+  const session: StoredSession = {
+    token: "t",
+    role: "moderator",
+    principal_id: "moderator",
+    display_name: null,
+    episode_id: null,
+    event_id: null,
+    grant_id: null,
+    expires_wall: null,
+  };
+  const html = renderToStaticMarkup(
+    createElement(ModeratorPanel, {
+      session,
+      view: makeView(),
+      track: (run) => run(),
+      refresh: async () => null,
+      announce: () => undefined,
+    }),
+  );
+  const text = textOf(html);
+  assert.ok(text.includes("Reset: load a clean episode…"), text);
+  assert.ok(!text.includes("Load episode"));
+});
+
+// ------------------------------------------------------------------ moderator results
+
+test("moderator results name the action and the time it ran", () => {
+  const tz = "America/New_York";
+  const ran = { action: "+1 min", ranAt: local("16:40") };
+  assert.equal(
+    actionHeadline(ran, clockOutcome(local("16:41"), 3, tz), tz),
+    "+1 min at 16:40 → clock 16:41, revision 3",
+  );
+  assert.equal(actionHeadline({ action: "Export", ranAt: null }, "trace written", tz), "Export → trace written");
+  assert.equal(clockOutcome(undefined, undefined, tz), "finished");
+  const run = {
+    policy_id: "rules/1.0.0",
+    status: "waiting",
+    decisions: [],
+    tool_calls: 1,
+    wait_until: local("16:50"),
+    note: "",
+  } as const;
+  assert.equal(
+    actionHeadline({ action: "Policy run", ranAt: local("16:41") }, policyOutcome(run, tz), tz),
+    "Policy run at 16:41 → waiting after 1 tool call, until 16:50",
+  );
+  assert.equal(isEarlierResult(3, makeView({ revision: 5 })), true);
+  assert.equal(isEarlierResult(5, makeView({ revision: 5 })), false);
+});
+
+// ------------------------------------------------------------------ EPISODE_CLOSED
+
+test("a 401 EPISODE_CLOSED ends the session with the reset message", () => {
+  const body = { detail: { code: "EPISODE_CLOSED", message: "this episode was reset; ask for a new link" } };
+  const error = new ApiError(401, "EPISODE_CLOSED: this episode was reset", body);
+  assert.equal(error.code, "EPISODE_CLOSED");
+  assert.equal(sessionEndMessage(error.code, error.message), EPISODE_RESET_MESSAGE);
+  assert.equal(EPISODE_RESET_MESSAGE, "This episode was reset; ask the moderator for a new link.");
+  assert.equal(
+    sessionEndMessage("SESSION_INVALID", "session is unknown or revoked"),
+    "This tab's session is no longer valid: session is unknown or revoked",
+  );
+  assert.equal(errorCodeOf({ error: { code: "EPISODE_CLOSED", message: "m" } }), "EPISODE_CLOSED");
+  assert.equal(errorCodeOf({ detail: "plain" }), null);
+  assert.equal(errorCodeOf("text"), null);
+});

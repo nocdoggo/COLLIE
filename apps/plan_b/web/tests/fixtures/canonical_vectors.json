@@ -1,0 +1,37 @@
+{
+  "generator": "web/tests/make_vectors.py using plan_b.domain.digest.canonical_json",
+  "vectors": [
+    {
+      "name": "numbers",
+      "text": "[0, 1, -1, 9007199254740993, -1180591620717411303424, 1.0, -0.0, 0.0, 100.0, 123.456, 0.30000000000000004, 1000000000000000.0, 1e+16, 1234567890123456.0, 1.2345678901234568e+16, 1e+22, 0.0001, 1e-05, 1.5e-05, 1e-07, 5e-324, 1.7976931348623157e+308, 3.141592653589793, NaN, Infinity, -Infinity]",
+      "canonical": "[0,1,-1,9007199254740993,-1180591620717411303424,1.0,-0.0,0.0,100.0,123.456,0.30000000000000004,1000000000000000.0,1e+16,1234567890123456.0,1.2345678901234568e+16,1e+22,0.0001,1e-05,1.5e-05,1e-07,5e-324,1.7976931348623157e+308,3.141592653589793,NaN,Infinity,-Infinity]",
+      "sha256": "c2cfb211edfcccb07743bd92add46716533c8592b62517c23d756b71f04bcf64"
+    },
+    {
+      "name": "strings_raw",
+      "text": "[\n  \"plain\",\n  \"héllo\",\n  \"日本\",\n  \"😀 emoji\",\n  \"line sep \",\n  \"del\",\n  \"ctl\\u0000\\u0001\\u001f\",\n  \"quote \\\" and backslash \\\\\",\n  \"\\t\\n\\r\\b\\f\",\n  \"slash / stays\",\n  \"<script>&amp;</script>\"\n]",
+      "canonical": "[\"plain\",\"héllo\",\"日本\",\"😀 emoji\",\"line sep \",\"del\",\"ctl\\u0000\\u0001\\u001f\",\"quote \\\" and backslash \\\\\",\"\\t\\n\\r\\b\\f\",\"slash / stays\",\"<script>&amp;</script>\"]",
+      "sha256": "bc4e1dff1cd864be5333f649edd42dbc2900734dd366a72429c1925bb4a7a2f3"
+    },
+    {
+      "name": "strings_escaped",
+      "text": "[\"plain\", \"h\\u00e9llo\", \"\\u65e5\\u672c\", \"\\ud83d\\ude00 emoji\", \"line\\u2028sep\\u2029\", \"del\\u007f\", \"ctl\\u0000\\u0001\\u001f\", \"quote \\\" and backslash \\\\\", \"\\t\\n\\r\\b\\f\", \"slash / stays\", \"<script>&amp;</script>\"]",
+      "canonical": "[\"plain\",\"héllo\",\"日本\",\"😀 emoji\",\"line sep \",\"del\",\"ctl\\u0000\\u0001\\u001f\",\"quote \\\" and backslash \\\\\",\"\\t\\n\\r\\b\\f\",\"slash / stays\",\"<script>&amp;</script>\"]",
+      "sha256": "bc4e1dff1cd864be5333f649edd42dbc2900734dd366a72429c1925bb4a7a2f3"
+    },
+    {
+      "name": "key_order",
+      "text": "{\n \"b\": 1,\n \"a\": 2,\n \"B\": 3,\n \"\": 4,\n \"é\": 5,\n \"😀\": 6,\n \"￿\": 7,\n \"\": 8,\n \"a😀\": 9,\n \"a￿\": 10,\n \"aa\": 11\n}",
+      "canonical": "{\"\":4,\"B\":3,\"a\":2,\"aa\":11,\"a￿\":10,\"a😀\":9,\"b\":1,\"é\":5,\"\":8,\"￿\":7,\"😀\":6}",
+      "sha256": "cd6df5ef3cad1e5fb7ca1e60ce859a21e88549830a2bebcb9041b3b9e6c4091c"
+    },
+    {
+      "name": "nested",
+      "text": "{\n  \"frames\": [\n    {\n      \"seq\": 1,\n      \"state\": {\n        \"clock\": \"2026-11-05T21:40:00Z\",\n        \"x\": [\n          1,\n          2.5,\n          null\n        ]\n      }\n    }\n  ],\n  \"flags\": [\n    true,\n    false,\n    null\n  ],\n  \"empty_obj\": {},\n  \"empty_list\": [],\n  \"text\": \"Our projector delivery may be about 25 minutes later.\"\n}",
+      "canonical": "{\"empty_list\":[],\"empty_obj\":{},\"flags\":[true,false,null],\"frames\":[{\"seq\":1,\"state\":{\"clock\":\"2026-11-05T21:40:00Z\",\"x\":[1,2.5,null]}}],\"text\":\"Our projector delivery may be about 25 minutes later.\"}",
+      "sha256": "9b7b68fb3fc861d77c22ea00c8c253e5aeba00151a848c072c8d7428b5d08575"
+    }
+  ],
+  "trace_text": "{\n  \"trace_version\": \"1.0.0\",\n  \"runtime_version\": \"1.0.0\",\n  \"kind\": \"plan_b_sanitized_trace\",\n  \"mode_label\": \"Recorded replay\",\n  \"source\": {\n    \"episode_id\": \"ep_test\",\n    \"policy_id\": null,\n    \"generator\": \"vectors\"\n  },\n  \"frames\": [\n    {\n      \"seq\": 0,\n      \"revision\": 3,\n      \"scenario_time\": \"2026-11-05T21:40:00Z\",\n      \"cause_kind\": \"observation\",\n      \"cause_ref\": \"obs_0\",\n      \"summary\": \"frame 0 café 😀\",\n      \"state\": {\n        \"revision\": 3,\n        \"ratio\": 0.0,\n        \"budget\": {\n          \"remaining_cents\": 15000\n        }\n      }\n    },\n    {\n      \"seq\": 1,\n      \"revision\": 4,\n      \"scenario_time\": \"2026-11-05T21:41:00Z\",\n      \"cause_kind\": \"observation\",\n      \"cause_ref\": \"obs_1\",\n      \"summary\": \"frame 1 café 😀\",\n      \"state\": {\n        \"revision\": 4,\n        \"ratio\": 0.5,\n        \"budget\": {\n          \"remaining_cents\": 15000\n        }\n      }\n    },\n    {\n      \"seq\": 2,\n      \"revision\": 5,\n      \"scenario_time\": \"2026-11-05T21:42:00Z\",\n      \"cause_kind\": \"observation\",\n      \"cause_ref\": \"obs_2\",\n      \"summary\": \"frame 2 café 😀\",\n      \"state\": {\n        \"revision\": 5,\n        \"ratio\": 1.0,\n        \"budget\": {\n          \"remaining_cents\": 15000\n        }\n      }\n    }\n  ],\n  \"tool_calls\": [],\n  \"decisions\": [],\n  \"receipts\": [],\n  \"final_state\": {\n    \"revision\": 5,\n    \"ratio\": 1.0,\n    \"budget\": {\n      \"remaining_cents\": 15000\n    }\n  },\n  \"integrity\": {\n    \"algorithm\": \"sha256\",\n    \"frame_hashes\": [\n      \"24a4d920831701bd78d93d6646cdf3a68cbcb90a5c316bec091d52873607a6b3\",\n      \"eec33ba74afe10abf4a41de8ff7f70487bbc483a6087b6d0ac2901b2d03b8f80\",\n      \"6136a43906921aabfd2c46f28cf0009a442d5a72b617855cd5c69e3d3707498e\"\n    ],\n    \"chain_sha256\": \"e75fe78f43e9a7361a00422873e7e200410c190b5d4e63bfccd6a535863264e3\",\n    \"content_sha256\": \"2c5c4553b7497bd6ccc96d23d1b9e695ec06366c677a1757ada23b3235e8100b\"\n  }\n}",
+  "tampered_trace_text": "{\n  \"trace_version\": \"1.0.0\",\n  \"runtime_version\": \"1.0.0\",\n  \"kind\": \"plan_b_sanitized_trace\",\n  \"mode_label\": \"Recorded replay\",\n  \"source\": {\n    \"episode_id\": \"ep_test\",\n    \"policy_id\": null,\n    \"generator\": \"vectors\"\n  },\n  \"frames\": [\n    {\n      \"seq\": 0,\n      \"revision\": 3,\n      \"scenario_time\": \"2026-11-05T21:40:00Z\",\n      \"cause_kind\": \"observation\",\n      \"cause_ref\": \"obs_0\",\n      \"summary\": \"edited\",\n      \"state\": {\n        \"revision\": 3,\n        \"ratio\": 0.0,\n        \"budget\": {\n          \"remaining_cents\": 15000\n        }\n      }\n    },\n    {\n      \"seq\": 1,\n      \"revision\": 4,\n      \"scenario_time\": \"2026-11-05T21:41:00Z\",\n      \"cause_kind\": \"observation\",\n      \"cause_ref\": \"obs_1\",\n      \"summary\": \"frame 1 café 😀\",\n      \"state\": {\n        \"revision\": 4,\n        \"ratio\": 0.5,\n        \"budget\": {\n          \"remaining_cents\": 15000\n        }\n      }\n    },\n    {\n      \"seq\": 2,\n      \"revision\": 5,\n      \"scenario_time\": \"2026-11-05T21:42:00Z\",\n      \"cause_kind\": \"observation\",\n      \"cause_ref\": \"obs_2\",\n      \"summary\": \"frame 2 café 😀\",\n      \"state\": {\n        \"revision\": 5,\n        \"ratio\": 1.0,\n        \"budget\": {\n          \"remaining_cents\": 15000\n        }\n      }\n    }\n  ],\n  \"tool_calls\": [],\n  \"decisions\": [],\n  \"receipts\": [],\n  \"final_state\": {\n    \"revision\": 5,\n    \"ratio\": 1.0,\n    \"budget\": {\n      \"remaining_cents\": 15000\n    }\n  },\n  \"integrity\": {\n    \"algorithm\": \"sha256\",\n    \"frame_hashes\": [\n      \"24a4d920831701bd78d93d6646cdf3a68cbcb90a5c316bec091d52873607a6b3\",\n      \"eec33ba74afe10abf4a41de8ff7f70487bbc483a6087b6d0ac2901b2d03b8f80\",\n      \"6136a43906921aabfd2c46f28cf0009a442d5a72b617855cd5c69e3d3707498e\"\n    ],\n    \"chain_sha256\": \"e75fe78f43e9a7361a00422873e7e200410c190b5d4e63bfccd6a535863264e3\",\n    \"content_sha256\": \"2c5c4553b7497bd6ccc96d23d1b9e695ec06366c677a1757ada23b3235e8100b\"\n  }\n}"
+}
