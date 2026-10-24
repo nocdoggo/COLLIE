@@ -42,8 +42,8 @@ is partial, and the live pantry run, which failed.** The details are in
 | Staff boundary | Pass |
 | Future comparison parity | **Partial**: P1 and P3 are not built, and the live policy has no stock options (the live pantry run reached 0 of 40) |
 
-The checks behind this, all from the working tree on 2026-10-24
-(`scripts/collect_wave2_evidence.py`, every command exited 0):
+The checks behind this come from a clean checkout of `fd04d48` on 2026-10-24
+(`scripts/collect_wave2_evidence.py`; every command exited 0):
 
 * **Python:** 634 tests passed, 0 skipped.
 * **Web:** 379 tests passed; typecheck, build and boundary lint passed (25 read-only modules).
@@ -54,9 +54,9 @@ The checks behind this, all from the working tree on 2026-10-24
 * **Browser:** both walkthroughs passed, 41/41 (Wave 1) and 30/30 (Wave 2), in Chromium.
 * **Scans:** the credential-pattern and identifier scans found nothing.
 
-The evidence was produced before the integrator's commit, so `environment.json` records
-`app_tree_clean: false`. A clean-checkout regeneration needs no paid call (VERIFICATION.md,
-section 8).
+The recorded live runs were made once, before the commit. The rest of the evidence was
+regenerated from the clean checkout, with no paid call (VERIFICATION.md, section 1).
+`environment.json` records `app_tree_clean: true`.
 
 Before committing, the integrator re-ran the full battery on the tree that `bf71e43` commits,
 with the same results: ruff, ruff format and mypy clean; 634 Python tests passed; web
@@ -136,6 +136,6 @@ The browser demos for the skills exchange, the pantry staff flow and the policy 
 * **Run held-out evaluation** with repeated live trials.
 * **Store `AuthorizationRequest` state explicitly.**
 * **Optionally, the MBTA adapter.**
-* **The integrator's items:** the tree is committed (`bf71e43`). Still open: optionally add
-  the agent modules to `tests/test_runner_isolation.py::ISOLATED_MODULES`, and regenerate the
-  evidence from a clean checkout if a commit-pinned record is wanted.
+* **The integrator's items:** the tree is committed (`bf71e43`), and the evidence is regenerated
+  from a clean checkout of `fd04d48`. Still open: optionally add the agent modules to
+  `tests/test_runner_isolation.py::ISOLATED_MODULES`.

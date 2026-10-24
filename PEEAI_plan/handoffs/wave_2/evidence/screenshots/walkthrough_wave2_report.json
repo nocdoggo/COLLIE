@@ -72,7 +72,7 @@
     {
       "check": "pantry trace replays: integrity passed, pantry board and policy label shown",
       "passed": true,
-      "detail": "ep_7a0470469bff_rev17.json",
+      "detail": "ep_72cf8d30c1d0_rev17.json",
       "flow": "pantry"
     },
     {
@@ -114,7 +114,7 @@
     {
       "check": "community trace replays: integrity passed, the check-in and the re-plan shown",
       "passed": true,
-      "detail": "ep_0903e40fa87a_rev4.json",
+      "detail": "ep_55985ef52196_rev4.json",
       "flow": "community"
     },
     {

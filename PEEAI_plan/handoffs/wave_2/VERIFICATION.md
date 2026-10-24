@@ -12,10 +12,17 @@ evaluation, it supports no comparative claim, and it is not community validation
 
 ## 1. How the evidence was produced
 
-Two scripts produced it, both from the working tree of branch `hackathon/peeaai-plan` on
-2026-10-24, after every Wave 2 worker had finished. Nothing had been committed yet, so
-`environment.json` records `git_head` = the Wave 1 packet commit `d6b9256` and
-`app_tree_clean = false` (DECISIONS W2-D9).
+Two scripts produced it on 2026-10-24. The recorded live runs were made once from the working
+tree, after every Wave 2 worker had finished. The rest of the evidence was then regenerated from
+a fresh, clean checkout of the packet commit `fd04d48`, after the integrator's commits.
+`environment.json` records `git_head = fd04d48…` and `app_tree_clean = true`. The collector made
+no paid call: it copied the recorded live runs and verified each live trace again.
+
+A clean checkout has no `.local/` directory, so the regeneration passed the non-secret endpoint
+settings of `.local/keys/model_endpoint.env` as environment variables (`PLAN_B_MODEL_PROVIDER`,
+`PLAN_B_MODEL_BASE_URL`, `PLAN_B_MODEL_KEY_FILE`). The Wave 2 walkthrough only selects the live
+policy, so no model call was made. Without these settings its policy-switch flow correctly
+reports that the live policy is not configured.
 
 ```bash
 cd apps/plan_b
@@ -26,9 +33,11 @@ PLAN_B_MODEL_MAX_TOTAL_COST_USD=8.00 uv run python scripts/run_live_cases.py --o
 PLAN_B_MODEL_MAX_TOTAL_COST_USD=8.00 uv run python scripts/run_live_cases.py --out <live> skills_dev01
 PLAN_B_MODEL_MAX_TOTAL_COST_USD=8.00 uv run python scripts/run_live_cases.py --out <live> skills_dev02 pantry_dev01
 PLAN_B_MODEL_MAX_TOTAL_COST_USD=8.00 uv run python scripts/run_live_cases.py --out <live> dev05 dev06
-# 2. Every check, the deterministic cases, both walkthroughs and the scans (no paid call)
-uv run python scripts/collect_wave2_evidence.py --out ../../PEEAI_plan/handoffs/wave_2/evidence \
-    --live <live> --gate <the Build 1 G-LLM gate record>
+# 2. Every check, the deterministic cases, both walkthroughs and the scans (no paid call),
+#    from a clean checkout of fd04d48 (git worktree, uv sync --all-groups --locked, npm ci)
+uv run python scripts/collect_wave2_evidence.py --out <empty dir> \
+    --live ../../PEEAI_plan/handoffs/wave_2/evidence \
+    --gate ../../PEEAI_plan/handoffs/wave_2/evidence/reports/g_llm_gate.json
 ```
 
 Every `run_live_cases.py` invocation exited 0. The collector printed `all checks passed` and
@@ -331,7 +340,6 @@ run. It holds 26 calls in total, every one with outcome `ok`:
 * **The live agent in a real browser session:** the walkthrough selects it but does not run it.
 * **Other browsers, screen readers, Python 3.11, comprehension by new viewers, community
   validation:** not run, as in Wave 1.
-* **A clean-checkout regeneration of this evidence after the integrator's commit:** not run (no
-  worker may commit). It needs no paid call:
-  `uv run python scripts/collect_wave2_evidence.py --out <empty> --live ../../PEEAI_plan/handoffs/wave_2/evidence --gate ../../PEEAI_plan/handoffs/wave_2/evidence/reports/g_llm_gate.json` (from `apps/plan_b`).
-  The `--live` directory only needs `reports/live_*`, `traces/live_*` and `runner_private/live_*`.
+* **Re-recording the live runs from the committed tree:** not done. The live runs were recorded
+  once from the working tree that `bf71e43` commits, and the clean-checkout regeneration only
+  re-verified them.

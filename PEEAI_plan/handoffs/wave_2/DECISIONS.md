@@ -152,11 +152,12 @@ model calls**, phase `development`, for every coordinator policy (`policy_host.E
   evidence collector (`scripts/collect_wave2_evidence.py`) copies them and verifies their traces
   again, but makes no model call, so regenerating the deterministic evidence costs nothing.
   Failed live runs (pantry_dev01) are kept.
-* **The deterministic evidence was regenerated from the working tree**, before the integrator's
-  commit, so `environment.json` records `app_tree_clean: false`. Wave 1's evidence came from a
-  clean checkout of a commit. That was not possible here, because no worker may commit. The
-  integrator's commit should be compared with this tree. A clean-checkout regeneration needs no
-  paid call.
+* **The deterministic evidence comes from a clean checkout of the packet commit `fd04d48`.** It
+  was first produced from the working tree, before the integrator's commit (no worker may
+  commit). After the commits it was regenerated from a fresh worktree of `fd04d48`, as Wave 1's
+  was, so `environment.json` records `app_tree_clean: true`. The regeneration made no paid call:
+  the recorded live runs were copied and re-verified. The non-secret endpoint settings were
+  passed as environment variables, because a clean checkout has no `.local/`.
 * **The collector checks that the five Wave 1 case lines are unchanged**, against the Wave 1
   evidence's `checks.json`.
 * **Each M2 check is mapped to its focused tests** in the same pytest run's JUnit report. A

@@ -134,8 +134,9 @@ below says otherwise.
   into a shell variable to search the gate record and the ledger for it. Nothing was found, and
   the key was never printed or written. This was a read outside server-side code. The live-run
   evidence here is scanned only for credential shapes, without reading the key.
-* **Concurrent workers.** The deterministic evidence was regenerated after every worker of the
-  wave had finished, from the working tree that the integrator commits (DECISIONS W2-D9).
+* **Concurrent workers.** The live runs were recorded after every worker of the wave had
+  finished, from the working tree that the integrator then committed. The deterministic
+  evidence was regenerated afterwards from a clean checkout of `fd04d48` (DECISIONS W2-D9).
 
 ## Wave 1 debt still open
 

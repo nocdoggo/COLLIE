@@ -6,7 +6,7 @@
   "npm": "11.15.0",
   "playwright": "Version 1.64.1",
   "sqlite": "3.50.3",
-  "git_head": "d6b9256dd74f3d6545081f1cae77402174188bd6",
-  "git_branch": "hackathon/peeaai-plan",
-  "app_tree_clean": false
+  "git_head": "fd04d488375647ddcaa202e3d729d0e5debf533c",
+  "git_branch": "(detached HEAD)",
+  "app_tree_clean": true
 }
