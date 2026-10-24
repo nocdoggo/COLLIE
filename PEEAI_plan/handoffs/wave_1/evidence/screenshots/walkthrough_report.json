@@ -1,0 +1,346 @@
+{
+  "base_url_kind": "local plan-b serve on a free port with a fresh state directory",
+  "browser": "Chromium (Playwright)",
+  "passed": true,
+  "checks": [
+    {
+      "check": "header shows product, sandbox and mode labels",
+      "passed": true,
+      "detail": "Plan B: The Show Must Go On | \u26a0 Fictional sandbox \u2014 no real bookings, purchases, or messages | \u2699 Deterministic policy",
+      "workflow_step": 1
+    },
+    {
+      "check": "scenario clock 16:40 in America/New_York",
+      "passed": true,
+      "detail": "",
+      "workflow_step": 1
+    },
+    {
+      "check": "goal and public deadline visible",
+      "passed": true,
+      "detail": "",
+      "workflow_step": 1
+    },
+    {
+      "check": "schedule, modeled budget and authority envelope visible (fresh API read)",
+      "passed": true,
+      "detail": "5 activities, budget $150.00, 5 grants",
+      "workflow_step": 1
+    },
+    {
+      "check": "focused control has a visible focus outline",
+      "passed": true,
+      "detail": "solid"
+    },
+    {
+      "check": "keyboard Tab + Enter operated a control",
+      "passed": true,
+      "detail": "2026-11-05T21:40:00Z -> 2026-11-05T21:41:00Z"
+    },
+    {
+      "check": "fresh API read: swap applied at revision 4->5",
+      "passed": true,
+      "detail": "[[\"rcpt_0001\", \"apply_plan\", \"applied\"]]",
+      "workflow_step": 5
+    },
+    {
+      "check": "receipt shown on the board matches the API receipt",
+      "passed": true,
+      "detail": "",
+      "workflow_step": 5
+    },
+    {
+      "check": "status query result shown with its reported ETA",
+      "passed": true,
+      "detail": "",
+      "workflow_step": 3
+    },
+    {
+      "check": "alternatives show feasible and rejected candidates",
+      "passed": true,
+      "detail": "",
+      "workflow_step": 4
+    },
+    {
+      "check": "evaluating alternatives reserved nothing (fresh API read)",
+      "passed": true,
+      "detail": "{\"budget_cents\": 15000, \"committed_cents\": 0, \"reserved_cents\": 0, \"remaining_cents\": 15000}",
+      "workflow_step": 4
+    },
+    {
+      "check": "participant tab is a distinct scoped session",
+      "passed": true,
+      "detail": "Signed in as Skills facilitator \u00b7 Participant \u00b7 participant_facilitator"
+    },
+    {
+      "check": "no token rendered in the page",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "moderator tab shows the facilitator without a check-in before it",
+      "passed": true,
+      "detail": "Skills facilitator (facilitator) \u29d7No check-in yet | lacks 'Checked in'",
+      "workflow_step": 6
+    },
+    {
+      "check": "moderator tab observes the persisted check-in by polling",
+      "passed": true,
+      "detail": "1.3 s after the receipt (poll interval 1.5 s): Skills facilitator (facilitator) \u2713Checked in | At 16:44, available 16:44\u201318:00 (participant session) by participant_facilitator",
+      "workflow_step": 6
+    },
+    {
+      "check": "duplicate check-in shown as rejected",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "participant update recorded through submit_observation (fresh API read)",
+      "passed": true,
+      "detail": "rcpt_0004 applied: obs_0003 from participant_facilitator about skills_exchange (self_report)",
+      "workflow_step": 2
+    },
+    {
+      "check": "participant tab confirms its update with the API receipt",
+      "passed": true,
+      "detail": "rcpt_0004",
+      "workflow_step": 2
+    },
+    {
+      "check": "board shows the update's source, times and affected entity",
+      "passed": true,
+      "detail": "Participant session | from participant_facilitator | Affects Skills exchange (skills_exchange) | Observed 16:44 | received 16:44",
+      "workflow_step": 2
+    },
+    {
+      "check": "all required activities completed (fresh API read)",
+      "passed": true,
+      "detail": "{\"setup\": \"completed\", \"welcome\": \"completed\", \"demonstrations\": \"completed\", \"skills_exchange\": \"completed\", \"closing\": \"completed\"}",
+      "workflow_step": 6
+    },
+    {
+      "check": "arrival observed before demonstrations started",
+      "passed": true,
+      "detail": "",
+      "workflow_step": 6
+    },
+    {
+      "check": "the executed run is exported as a trace on the server",
+      "passed": true,
+      "detail": "ep_6e2fb0796e53_rev24.json",
+      "workflow_step": 7
+    },
+    {
+      "check": "reset created a clean episode",
+      "passed": true,
+      "detail": "",
+      "workflow_step": 7
+    },
+    {
+      "check": "old participant session rejected after reset",
+      "passed": true,
+      "detail": "",
+      "workflow_step": 7
+    },
+    {
+      "check": "replay shows the persistent Recorded replay label",
+      "passed": true,
+      "detail": "",
+      "workflow_step": 7
+    },
+    {
+      "check": "replay integrity verified in the browser",
+      "passed": true,
+      "detail": "",
+      "workflow_step": 7
+    },
+    {
+      "check": "replay opened after the reset shows the pre-reset episode",
+      "passed": true,
+      "detail": "replayed ep_6e2fb0796e53; live ep_35e5cb8e1b3f",
+      "workflow_step": 7
+    },
+    {
+      "check": "replay labels recorded results as not re-queried",
+      "passed": true,
+      "detail": "",
+      "workflow_step": 7
+    },
+    {
+      "check": "replay plays the visible trace through to its last frame",
+      "passed": true,
+      "detail": "22 frames played in 32 s",
+      "workflow_step": 7
+    },
+    {
+      "check": "replayed final state shows every receipt of the executed run",
+      "passed": true,
+      "detail": "rcpt_0001, rcpt_0002, rcpt_0003, rcpt_0004, rcpt_0005",
+      "workflow_step": 7
+    },
+    {
+      "check": "replay issued no POST/PUT/DELETE requests",
+      "passed": true,
+      "detail": "[]",
+      "workflow_step": 7
+    },
+    {
+      "check": "replay created no action in the live episode",
+      "passed": true,
+      "detail": "live revision 3 -> 3",
+      "workflow_step": 7
+    },
+    {
+      "check": "impossible case stays visibly unsuccessful",
+      "passed": true,
+      "detail": "{\"setup\": \"completed\", \"welcome\": \"completed\", \"demonstrations\": \"failed\", \"skills_exchange\": \"failed\", \"closing\": \"failed\"}",
+      "workflow_step": 6
+    },
+    {
+      "check": "status query shows the unavailable outcome as it is (dev06)",
+      "passed": true,
+      "detail": "API: 2 unavailable of 2 status queries (STATUS_UNAVAILABLE); board: 2",
+      "workflow_step": 3
+    },
+    {
+      "check": "organizer sees the authorization request",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "authorized paid backup booking committed once",
+      "passed": true,
+      "detail": "{\"budget_cents\": 15000, \"committed_cents\": 3500, \"reserved_cents\": 0, \"remaining_cents\": 11500}",
+      "workflow_step": 5
+    },
+    {
+      "check": "no horizontal overflow at 1920px",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "no horizontal overflow at 1280px",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "no page errors",
+      "passed": true,
+      "detail": "0 page errors: []"
+    },
+    {
+      "check": "no join code or session token in the visible text at any screenshot",
+      "passed": true,
+      "detail": "21 screenshots; 3 join codes, 4 session tokens and the moderator code checked; 8 join links masked; exposed: []"
+    },
+    {
+      "check": "every step of the minimum visible workflow ran with passing checks",
+      "passed": true,
+      "detail": "steps 1-7"
+    }
+  ],
+  "minimum_visible_workflow": [
+    {
+      "step": 1,
+      "title": "Load the fixture into a clean sandbox; show goal, schedule, budget and authority",
+      "checks": [
+        "header shows product, sandbox and mode labels",
+        "scenario clock 16:40 in America/New_York",
+        "goal and public deadline visible",
+        "schedule, modeled budget and authority envelope visible (fresh API read)"
+      ],
+      "passed": true
+    },
+    {
+      "step": 2,
+      "title": "Submit an update through submit_observation; show source, time and affected entity",
+      "checks": [
+        "participant update recorded through submit_observation (fresh API read)",
+        "participant tab confirms its update with the API receipt",
+        "board shows the update's source, times and affected entity"
+      ],
+      "passed": true
+    },
+    {
+      "step": 3,
+      "title": "Scoped status query; show the actual result, including unknown/unavailable outcomes",
+      "checks": [
+        "status query result shown with its reported ETA",
+        "status query shows the unavailable outcome as it is (dev06)"
+      ],
+      "passed": true
+    },
+    {
+      "step": 4,
+      "title": "Show alternatives and assumptions from evaluate_candidates; a preview reserves nothing",
+      "checks": [
+        "alternatives show feasible and rejected candidates",
+        "evaluating alternatives reserved nothing (fresh API read)"
+      ],
+      "passed": true
+    },
+    {
+      "step": 5,
+      "title": "Place a hold or apply a checked plan; show the receipt and the next state read",
+      "checks": [
+        "fresh API read: swap applied at revision 4->5",
+        "receipt shown on the board matches the API receipt",
+        "authorized paid backup booking committed once"
+      ],
+      "passed": true
+    },
+    {
+      "step": 6,
+      "title": "Advance the clock: readiness and actual completion or supported failure",
+      "checks": [
+        "moderator tab shows the facilitator without a check-in before it",
+        "moderator tab observes the persisted check-in by polling",
+        "all required activities completed (fresh API read)",
+        "arrival observed before demonstrations started",
+        "impossible case stays visibly unsuccessful"
+      ],
+      "passed": true
+    },
+    {
+      "step": 7,
+      "title": "Reset to a new episode, then play the visible trace under Recorded replay",
+      "checks": [
+        "the executed run is exported as a trace on the server",
+        "reset created a clean episode",
+        "old participant session rejected after reset",
+        "replay shows the persistent Recorded replay label",
+        "replay integrity verified in the browser",
+        "replay opened after the reset shows the pre-reset episode",
+        "replay labels recorded results as not re-queried",
+        "replay plays the visible trace through to its last frame",
+        "replayed final state shows every receipt of the executed run",
+        "replay issued no POST/PUT/DELETE requests",
+        "replay created no action in the live episode"
+      ],
+      "passed": true
+    }
+  ],
+  "screenshots": [
+    "01_loaded_dev01.png",
+    "01_loaded_dev01_full.png",
+    "01b_keyboard_focus.png",
+    "02_policy_verified_and_swapped_full.png",
+    "02b_before_after.png",
+    "02c_alternatives.png",
+    "03_participant_checked_in.png",
+    "04_duplicate_check_in_rejected.png",
+    "03b_participant_update_sent.png",
+    "03c_board_shows_participant_update.png",
+    "05_dev01_completed_full.png",
+    "05_dev01_completed.png",
+    "07_recorded_replay.png",
+    "07b_recorded_replay_final_full.png",
+    "08_dev05_infeasible_full.png",
+    "09_dev05_end_full.png",
+    "09b_dev06_status_unavailable.png",
+    "10_organizer_sees_request_full.png",
+    "11_dev02_committed_full.png",
+    "12_board_1920x1080.png",
+    "12_board_1280x800.png"
+  ]
+}

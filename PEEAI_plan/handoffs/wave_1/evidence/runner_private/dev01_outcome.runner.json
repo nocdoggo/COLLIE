@@ -1,0 +1,110 @@
+{
+  "report_version": "1.0.0",
+  "episode_id": "ep_328df750e75e",
+  "scenario_id": "dev_fixture_01",
+  "final_clock": "2026-11-05T23:00:00Z",
+  "final_revision": 23,
+  "goal_complete": true,
+  "activities": [
+    {
+      "activity_id": "setup",
+      "required": true,
+      "lifecycle": "completed",
+      "started_at": "2026-11-05T21:30:00Z",
+      "completed_at": "2026-11-05T21:50:00Z",
+      "failure_reasons": []
+    },
+    {
+      "activity_id": "welcome",
+      "required": true,
+      "lifecycle": "completed",
+      "started_at": "2026-11-05T22:00:00Z",
+      "completed_at": "2026-11-05T22:10:00Z",
+      "failure_reasons": []
+    },
+    {
+      "activity_id": "demonstrations",
+      "required": true,
+      "lifecycle": "completed",
+      "started_at": "2026-11-05T22:30:00Z",
+      "completed_at": "2026-11-05T22:50:00Z",
+      "failure_reasons": []
+    },
+    {
+      "activity_id": "skills_exchange",
+      "required": true,
+      "lifecycle": "completed",
+      "started_at": "2026-11-05T22:10:00Z",
+      "completed_at": "2026-11-05T22:30:00Z",
+      "failure_reasons": []
+    },
+    {
+      "activity_id": "closing",
+      "required": true,
+      "lifecycle": "completed",
+      "started_at": "2026-11-05T22:50:00Z",
+      "completed_at": "2026-11-05T23:00:00Z",
+      "failure_reasons": []
+    }
+  ],
+  "committed_cents": 0,
+  "reserved_cents_at_end": 0,
+  "holds": {
+    "created": 0,
+    "released": 0,
+    "expired": 0,
+    "committed": 0,
+    "active_at_end": 0
+  },
+  "applied_plans": 1,
+  "changed_assignments": 2,
+  "status_queries": 1,
+  "failed_status_queries": 0,
+  "rejected_receipts": 0,
+  "rejected_attempts_without_receipt": 0,
+  "violations": [],
+  "infeasibility_reported": false,
+  "recovery_delay_minutes": 3,
+  "case_ref": "dev01",
+  "policy_id": "rules/1.0.0",
+  "predicates": [
+    {
+      "predicate_id": "all_required",
+      "kind": "all_required_completed_by_deadline",
+      "passed": true,
+      "detail": "all required activities completed by the deadline"
+    },
+    {
+      "predicate_id": "welcome_1700",
+      "kind": "activity_started_at",
+      "passed": true,
+      "detail": "welcome started at 17:00; expected 17:00"
+    },
+    {
+      "predicate_id": "no_violations",
+      "kind": "no_executed_violations",
+      "passed": true,
+      "detail": "no violations"
+    },
+    {
+      "predicate_id": "within_limits",
+      "kind": "committed_within_limits",
+      "passed": true,
+      "detail": "committed spend within grant and budget"
+    },
+    {
+      "predicate_id": "no_early_equipment",
+      "kind": "no_equipment_start_before_arrival",
+      "passed": true,
+      "detail": "no equipment-dependent start before arrival"
+    },
+    {
+      "predicate_id": "no_spend",
+      "kind": "committed_spend_equals",
+      "passed": true,
+      "detail": "committed 0 cents; expected 0"
+    }
+  ],
+  "expected_outcome": "goal_complete",
+  "matches_expectation": true
+}

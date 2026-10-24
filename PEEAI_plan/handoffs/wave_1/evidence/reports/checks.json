@@ -1,0 +1,277 @@
+{
+  "pytest_counts": {
+    "tests": 455,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "web_test_counts": {
+    "tests": 362,
+    "suites": 0,
+    "pass": 362,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "case_outcomes": {
+    "dev01": {
+      "goal_complete": true,
+      "infeasibility_reported": false,
+      "applied_plans": 1,
+      "committed": 0,
+      "violations": 0,
+      "matches_expectation": true
+    },
+    "dev02": {
+      "goal_complete": true,
+      "infeasibility_reported": false,
+      "applied_plans": 1,
+      "committed": 3500,
+      "violations": 0,
+      "matches_expectation": true
+    },
+    "dev04": {
+      "goal_complete": true,
+      "infeasibility_reported": false,
+      "applied_plans": 0,
+      "committed": 0,
+      "violations": 0,
+      "matches_expectation": true
+    },
+    "dev05": {
+      "goal_complete": false,
+      "infeasibility_reported": true,
+      "applied_plans": 0,
+      "committed": 0,
+      "violations": 0,
+      "matches_expectation": true
+    },
+    "dev06": {
+      "goal_complete": true,
+      "infeasibility_reported": false,
+      "applied_plans": 1,
+      "committed": 0,
+      "violations": 0,
+      "matches_expectation": true
+    }
+  },
+  "checks": [
+    {
+      "name": "ruff check",
+      "command": "uv run ruff check .",
+      "cwd": "apps/plan_b",
+      "exit_code": 0,
+      "seconds": 0.0,
+      "summary": [
+        "All checks passed!"
+      ]
+    },
+    {
+      "name": "ruff format --check",
+      "command": "uv run ruff format --check .",
+      "cwd": "apps/plan_b",
+      "exit_code": 0,
+      "seconds": 0.0,
+      "summary": [
+        "74 files already formatted"
+      ]
+    },
+    {
+      "name": "mypy (strict defs)",
+      "command": "uv run mypy",
+      "cwd": "apps/plan_b",
+      "exit_code": 0,
+      "seconds": 2.2,
+      "summary": [
+        "Success: no issues found in 51 source files"
+      ]
+    },
+    {
+      "name": "web typecheck",
+      "command": "npm run typecheck",
+      "cwd": "apps/plan_b/web",
+      "exit_code": 0,
+      "seconds": 2.0,
+      "summary": [
+        "> plan-b-web@0.1.0 typecheck",
+        "> tsc --noEmit -p ."
+      ]
+    },
+    {
+      "name": "web build",
+      "command": "npm run build",
+      "cwd": "apps/plan_b/web",
+      "exit_code": 0,
+      "seconds": 3.6,
+      "summary": [
+        "rendering chunks...",
+        "computing gzip size...",
+        "dist/index.html                   0.67 kB \u2502 gzip:  0.38 kB",
+        "dist/assets/index-C2pVjq0a.css   14.54 kB \u2502 gzip:  3.98 kB",
+        "dist/assets/index-S7LmXHaT.js   276.42 kB \u2502 gzip: 83.43 kB",
+        "\u2713 built in 576ms"
+      ]
+    },
+    {
+      "name": "pytest",
+      "command": "uv run pytest -o addopts= -q -p no:cacheprovider --junitxml=<evidence>/reports/pytest_junit.xml",
+      "cwd": "apps/plan_b",
+      "exit_code": 0,
+      "seconds": 105.4,
+      "summary": [
+        ".venv/lib/python3.12/site-packages/fastapi/testclient.py:1",
+        "  <repo>/apps/plan_b/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.",
+        "    from starlette.testclient import TestClient as TestClient  # noqa",
+        "-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html",
+        "- generated xml file: <evidence>/reports/pytest_junit.xml -",
+        "455 passed, 1 warning in 104.81s (0:01:44)"
+      ]
+    },
+    {
+      "name": "web tests",
+      "command": "npm test",
+      "cwd": "apps/plan_b/web",
+      "exit_code": 0,
+      "seconds": 19.4,
+      "summary": [
+        "# pass 362",
+        "# fail 0",
+        "# cancelled 0",
+        "# skipped 0",
+        "# todo 0",
+        "# duration_ms 19302.144857"
+      ]
+    },
+    {
+      "name": "web boundary lint",
+      "command": "npm run lint",
+      "cwd": "apps/plan_b/web",
+      "exit_code": 0,
+      "seconds": 0.4,
+      "summary": [
+        "> plan-b-web@0.1.0 lint",
+        "> node scripts/check-boundaries.mjs",
+        "Boundary check passed: 21 read-only modules, 34 sources, dist bundle scanned."
+      ]
+    },
+    {
+      "name": "plan-b run-case all",
+      "command": "uv run plan-b run-case all --db <work>/runs.sqlite3 --out <work>/out",
+      "cwd": "apps/plan_b",
+      "exit_code": 0,
+      "seconds": 11.7,
+      "summary": [
+        "dev01: goal_complete=True infeasibility_reported=False applied_plans=1 committed=0 violations=0 matches_expectation=True",
+        "dev02: goal_complete=True infeasibility_reported=False applied_plans=1 committed=3500 violations=0 matches_expectation=True",
+        "dev04: goal_complete=True infeasibility_reported=False applied_plans=0 committed=0 violations=0 matches_expectation=True",
+        "dev05: goal_complete=False infeasibility_reported=True applied_plans=0 committed=0 violations=0 matches_expectation=True",
+        "dev06: goal_complete=True infeasibility_reported=False applied_plans=1 committed=0 violations=0 matches_expectation=True"
+      ]
+    },
+    {
+      "name": "plan-b demo-rejections",
+      "command": "uv run plan-b demo-rejections --db <work>/demo.sqlite3 --out <work>/out",
+      "cwd": "apps/plan_b",
+      "exit_code": 0,
+      "seconds": 0.9,
+      "summary": [
+        "re-evaluate after authorization: expected succeeded; got succeeded",
+        "authorized backup booking: expected applied; got applied",
+        "identical retry of the authorized booking: expected applied (original receipt replayed); got applied",
+        "release the converted hold: expected rejected HOLD_CONVERTED; got rejected HOLD_CONVERTED",
+        "facilitator checks in: expected applied; got applied",
+        "final: goal_complete=True committed=3500 rejected_receipts=7 attempts_without_receipt=2 violations=0"
+      ]
+    },
+    {
+      "name": "verify-trace dev01_trace.json",
+      "command": "uv run plan-b verify-trace <work>/out/traces/dev01_trace.json",
+      "cwd": "apps/plan_b",
+      "exit_code": 0,
+      "seconds": 0.2,
+      "summary": [
+        "intact"
+      ]
+    },
+    {
+      "name": "verify-trace dev02_trace.json",
+      "command": "uv run plan-b verify-trace <work>/out/traces/dev02_trace.json",
+      "cwd": "apps/plan_b",
+      "exit_code": 0,
+      "seconds": 0.2,
+      "summary": [
+        "intact"
+      ]
+    },
+    {
+      "name": "verify-trace dev04_trace.json",
+      "command": "uv run plan-b verify-trace <work>/out/traces/dev04_trace.json",
+      "cwd": "apps/plan_b",
+      "exit_code": 0,
+      "seconds": 0.2,
+      "summary": [
+        "intact"
+      ]
+    },
+    {
+      "name": "verify-trace dev05_trace.json",
+      "command": "uv run plan-b verify-trace <work>/out/traces/dev05_trace.json",
+      "cwd": "apps/plan_b",
+      "exit_code": 0,
+      "seconds": 0.2,
+      "summary": [
+        "intact"
+      ]
+    },
+    {
+      "name": "verify-trace dev06_trace.json",
+      "command": "uv run plan-b verify-trace <work>/out/traces/dev06_trace.json",
+      "cwd": "apps/plan_b",
+      "exit_code": 0,
+      "seconds": 0.2,
+      "summary": [
+        "intact"
+      ]
+    },
+    {
+      "name": "verify-trace rejected_actions_trace.json",
+      "command": "uv run plan-b verify-trace <work>/out/traces/rejected_actions_trace.json",
+      "cwd": "apps/plan_b",
+      "exit_code": 0,
+      "seconds": 0.2,
+      "summary": [
+        "intact"
+      ]
+    },
+    {
+      "name": "browser walkthrough (Playwright, Chromium)",
+      "command": "uv run python tests/e2e/walkthrough.py --out <work>/shots",
+      "cwd": "apps/plan_b",
+      "exit_code": 0,
+      "seconds": 73.6,
+      "summary": [
+        "PASS no horizontal overflow at 1920px",
+        "PASS no horizontal overflow at 1280px",
+        "PASS no page errors - 0 page errors: []",
+        "PASS no join code or session token in the visible text at any screenshot - 21 screenshots; 3 join codes, 4 session tokens and the moderator code checked; 8 join links masked; exposed: []",
+        "PASS every step of the minimum visible workflow ran with passing checks - steps 1-7",
+        "41/41 checks passed"
+      ]
+    },
+    {
+      "name": "evidence identifier scan",
+      "command": "every text file written to <evidence>: host name, user name, git email, local paths",
+      "cwd": "apps/plan_b",
+      "exit_code": 0,
+      "seconds": 0.6,
+      "summary": [
+        "20 text files: no host name, user name, git email or local path"
+      ]
+    }
+  ],
+  "identifier_scan": {
+    "allowed_identifiers": [],
+    "not_scanned": []
+  }
+}

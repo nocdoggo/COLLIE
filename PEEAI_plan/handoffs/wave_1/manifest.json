@@ -1,0 +1,727 @@
+{
+  "manifest_version": "1.0.0",
+  "packet": "plan_b_wave_1_handoff",
+  "project": "Plan B: The Show Must Go On (fictional local sandbox)",
+  "repository": {
+    "branch": "hackathon/peeaai-plan",
+    "head": "afe502e1f92c34f7c4cfc0bb24f9ee4d6e62a161",
+    "planning_baseline_commit": "65997ac4accc1307d53a28c79219fd65bc602b10",
+    "commits": [
+      {
+        "id": "63aee9decca247af23ee90bb07e461c26d7f7db0",
+        "author": "Noctis <45600261+nocdoggo@users.noreply.github.com>",
+        "committer": "Noctis <45600261+nocdoggo@users.noreply.github.com>",
+        "committed_at": "2026-10-23T20:32:27-04:00",
+        "subject": "plan_b: Wave 1 deterministic campus sandbox",
+        "trailers": [],
+        "areas": [
+          "apps/plan_b"
+        ]
+      },
+      {
+        "id": "25363fbf41899935524c8a5e566ad3d2ae655795",
+        "author": "Noctis <45600261+nocdoggo@users.noreply.github.com>",
+        "committer": "Noctis <45600261+nocdoggo@users.noreply.github.com>",
+        "committed_at": "2026-10-23T20:41:39-04:00",
+        "subject": "plan_b: evidence collector writes no local paths and runs pytest after the build",
+        "trailers": [],
+        "areas": [
+          "apps/plan_b"
+        ]
+      },
+      {
+        "id": "3028cbf2f52eb2ef0f3287a0ba45ee71ec73fd88",
+        "author": "Noctis <45600261+nocdoggo@users.noreply.github.com>",
+        "committer": "Noctis <45600261+nocdoggo@users.noreply.github.com>",
+        "committed_at": "2026-10-23T23:23:39-04:00",
+        "subject": "plan_b: verify-only notices are checked after the decision, and only when it can matter",
+        "trailers": [],
+        "areas": [
+          "apps/plan_b"
+        ]
+      },
+      {
+        "id": "8b7aea36a064ca88ea9300371a67dfe3de942759",
+        "author": "Noctis <45600261+nocdoggo@users.noreply.github.com>",
+        "committer": "Noctis <45600261+nocdoggo@users.noreply.github.com>",
+        "committed_at": "2026-10-23T23:23:46-04:00",
+        "subject": "gitignore: keep the local-keys rule apart from the byte-compiled header",
+        "trailers": [],
+        "areas": [
+          ".gitignore"
+        ]
+      },
+      {
+        "id": "afe502e1f92c34f7c4cfc0bb24f9ee4d6e62a161",
+        "author": "Noctis <45600261+nocdoggo@users.noreply.github.com>",
+        "committer": "Noctis <45600261+nocdoggo@users.noreply.github.com>",
+        "committed_at": "2026-10-24T08:42:56-04:00",
+        "subject": "plan_b: resolve the Wave 1 audit findings",
+        "trailers": [],
+        "areas": [
+          "apps/plan_b"
+        ]
+      }
+    ],
+    "authors": [
+      "Noctis <45600261+nocdoggo@users.noreply.github.com>"
+    ],
+    "committers": [
+      "Noctis <45600261+nocdoggo@users.noreply.github.com>"
+    ],
+    "commits_with_trailers": [],
+    "evidence_generated_at_commit": "afe502e1f92c34f7c4cfc0bb24f9ee4d6e62a161",
+    "app_changed_since_evidence": false,
+    "packet_commit": "the commit that adds this manifest (a file cannot name its own commit)",
+    "upstream": null,
+    "upstream_contains_head": null,
+    "remote_branches_containing_head": [],
+    "pushed": false
+  },
+  "versions": {
+    "recorded": {
+      "runtime": [
+        "1.0.0"
+      ],
+      "trace": [
+        "1.0.0"
+      ],
+      "trace_kind": [
+        "plan_b_sanitized_trace"
+      ],
+      "policies": [
+        "rules/1.0.0"
+      ]
+    },
+    "code": {
+      "app_package": "plan-b 0.1.0",
+      "runtime": "1.0.0",
+      "parser": "rules-parser/1.2.0",
+      "planning_schema": "urn:plan-b:planning:0.2.0"
+    }
+  },
+  "environment": {
+    "python": "3.12.11",
+    "platform": "Linux-5.15.0-43-generic-x86_64-with-glibc2.35",
+    "uv": "uv 0.9.18",
+    "node": "v22.19.0",
+    "npm": "11.15.0",
+    "playwright": "Version 1.64.1",
+    "sqlite": "3.50.3",
+    "git_head": "afe502e1f92c34f7c4cfc0bb24f9ee4d6e62a161",
+    "git_branch": "(detached HEAD)",
+    "app_tree_clean": true
+  },
+  "fixtures_and_locks": {
+    "public_fixture": {
+      "path": "apps/plan_b/plan_b/scenarios/public/campus_showcase.json",
+      "sha256": "aca70cd64310a31042a5cb6ab6d96347309a7b0ea42e475ba88d732f680a4377"
+    },
+    "private_cases": {
+      "dev01.json": "02b4e815aabe80ad6e6edfa075789070de60cb3d62fbc4960dd323e67820d1b0",
+      "dev02.json": "508cde3c720d33bdb3b7d70cf8a5ba3570ac1dcfb2708318ae63babd32d8f93d",
+      "dev04.json": "381a8f7ad443b669509a49564121c5a6eb8674dde59c74eb073733db3c6a04c8",
+      "dev05.json": "628c8a7a05f2951291af5885f788b77d1052296ad643660cd6823a1784b53bd4",
+      "dev06.json": "22987d9b6c936335e8ab710c91807fbeb5a92ba91622ad651066c8d3c7200bc0"
+    },
+    "planning_examples": {
+      "campus_showcase.evaluator.json": "bb172333409586d58fd85cab306c462ad6c5103e6461f0306333685c695aff8e",
+      "campus_showcase.public.json": "6c85cda352517da0adba08ab453ec2baf8f0e2fe91fd6f18c3d8f5d7268ddb1e",
+      "candidate_plan.json": "3ad5e9292243a30a8588e23ddbd254e4d72ab50b87178b530eb99decf244c65b",
+      "change_spec.json": "65cc44ce9036651a080a5711e40e5931241292aa69297f879840ee6c810132a8",
+      "commit_receipt.json": "07991c41d055cf849b895e5f7f516970190594626b3a08150573b3a4f7159b17",
+      "commit_request.json": "57e6c0a9fa75c09a1290a106bdc7f17898348bb134d85f933b1839961797b3eb",
+      "community_skills_exchange.public.json": "70ddac23a8095fb7b80d4db4a5c162b8ea49678949a912e805014956f05f01cb",
+      "constraint_report.json": "f06c216d7af078cace7c52fe550a0a2d342e90aa5a6c01a6e4d9fea363b586cb",
+      "observation_after_query.json": "cb92018a9d2c85002075e200c483dec95373cb485eb7ba8e22a49eeaf2b4539c",
+      "pantry_continuity.evaluator.json": "606db0f2771f0fc18ad58783e29f9f0ad7e26c9e8512db5724ddcb69515f814e",
+      "pantry_continuity.public.json": "78d8b4d56e14284008fef60df6bb2ad65c0b610f8c08a3a90cad15af16b4443a"
+    },
+    "planning_schema": "02fa4a3b7c0e4947893fe7be8a146bc4c8bac4e1910d9258a08871791fef8a66",
+    "lockfiles": {
+      "apps/plan_b/uv.lock": "95b8337fea6818cf0fe290a5df4d0187258a7392f9624bac769b68f974128803",
+      "apps/plan_b/web/package-lock.json": "b4f2e1e79ac52a503b73658dca6bf8a2cf2eb3345e9a3709abf4229634b00d7e"
+    },
+    "migrations": {
+      "0001_initial.sql": "9d22b458174bef4cc5e50369521e194857a39933756de7d64b41ccdcb3528ab1",
+      "0002_scheduled_actions.sql": "935784e86ed1fc370d5dd98149bf65f5ffe760e0335c9ee8f9b7baa4bb70c3c5",
+      "0003_history_guards.sql": "4bd0ccf0ffe447a4bdffb2f935037409824fdc2c66fd603d1762521803195da1"
+    }
+  },
+  "checks": [
+    {
+      "name": "ruff check",
+      "cwd": "apps/plan_b",
+      "command": "uv run ruff check .",
+      "exit_code": 0,
+      "seconds": 0.0,
+      "last_line": "All checks passed!"
+    },
+    {
+      "name": "ruff format --check",
+      "cwd": "apps/plan_b",
+      "command": "uv run ruff format --check .",
+      "exit_code": 0,
+      "seconds": 0.0,
+      "last_line": "74 files already formatted"
+    },
+    {
+      "name": "mypy (strict defs)",
+      "cwd": "apps/plan_b",
+      "command": "uv run mypy",
+      "exit_code": 0,
+      "seconds": 2.2,
+      "last_line": "Success: no issues found in 51 source files"
+    },
+    {
+      "name": "web typecheck",
+      "cwd": "apps/plan_b/web",
+      "command": "npm run typecheck",
+      "exit_code": 0,
+      "seconds": 2.0,
+      "last_line": "> tsc --noEmit -p ."
+    },
+    {
+      "name": "web build",
+      "cwd": "apps/plan_b/web",
+      "command": "npm run build",
+      "exit_code": 0,
+      "seconds": 3.6,
+      "last_line": "\u2713 built in 576ms"
+    },
+    {
+      "name": "pytest",
+      "cwd": "apps/plan_b",
+      "command": "uv run pytest -o addopts= -q -p no:cacheprovider --junitxml=<evidence>/reports/pytest_junit.xml",
+      "exit_code": 0,
+      "seconds": 105.4,
+      "last_line": "455 passed, 1 warning in 104.81s (0:01:44)"
+    },
+    {
+      "name": "web tests",
+      "cwd": "apps/plan_b/web",
+      "command": "npm test",
+      "exit_code": 0,
+      "seconds": 19.4,
+      "last_line": "# duration_ms 19302.144857"
+    },
+    {
+      "name": "web boundary lint",
+      "cwd": "apps/plan_b/web",
+      "command": "npm run lint",
+      "exit_code": 0,
+      "seconds": 0.4,
+      "last_line": "Boundary check passed: 21 read-only modules, 34 sources, dist bundle scanned."
+    },
+    {
+      "name": "plan-b run-case all",
+      "cwd": "apps/plan_b",
+      "command": "uv run plan-b run-case all --db <work>/runs.sqlite3 --out <work>/out",
+      "exit_code": 0,
+      "seconds": 11.7,
+      "last_line": "dev06: goal_complete=True infeasibility_reported=False applied_plans=1 committed=0 violations=0 matches_expectation=True"
+    },
+    {
+      "name": "plan-b demo-rejections",
+      "cwd": "apps/plan_b",
+      "command": "uv run plan-b demo-rejections --db <work>/demo.sqlite3 --out <work>/out",
+      "exit_code": 0,
+      "seconds": 0.9,
+      "last_line": "final: goal_complete=True committed=3500 rejected_receipts=7 attempts_without_receipt=2 violations=0"
+    },
+    {
+      "name": "verify-trace dev01_trace.json",
+      "cwd": "apps/plan_b",
+      "command": "uv run plan-b verify-trace <work>/out/traces/dev01_trace.json",
+      "exit_code": 0,
+      "seconds": 0.2,
+      "last_line": "intact"
+    },
+    {
+      "name": "verify-trace dev02_trace.json",
+      "cwd": "apps/plan_b",
+      "command": "uv run plan-b verify-trace <work>/out/traces/dev02_trace.json",
+      "exit_code": 0,
+      "seconds": 0.2,
+      "last_line": "intact"
+    },
+    {
+      "name": "verify-trace dev04_trace.json",
+      "cwd": "apps/plan_b",
+      "command": "uv run plan-b verify-trace <work>/out/traces/dev04_trace.json",
+      "exit_code": 0,
+      "seconds": 0.2,
+      "last_line": "intact"
+    },
+    {
+      "name": "verify-trace dev05_trace.json",
+      "cwd": "apps/plan_b",
+      "command": "uv run plan-b verify-trace <work>/out/traces/dev05_trace.json",
+      "exit_code": 0,
+      "seconds": 0.2,
+      "last_line": "intact"
+    },
+    {
+      "name": "verify-trace dev06_trace.json",
+      "cwd": "apps/plan_b",
+      "command": "uv run plan-b verify-trace <work>/out/traces/dev06_trace.json",
+      "exit_code": 0,
+      "seconds": 0.2,
+      "last_line": "intact"
+    },
+    {
+      "name": "verify-trace rejected_actions_trace.json",
+      "cwd": "apps/plan_b",
+      "command": "uv run plan-b verify-trace <work>/out/traces/rejected_actions_trace.json",
+      "exit_code": 0,
+      "seconds": 0.2,
+      "last_line": "intact"
+    },
+    {
+      "name": "browser walkthrough (Playwright, Chromium)",
+      "cwd": "apps/plan_b",
+      "command": "uv run python tests/e2e/walkthrough.py --out <work>/shots",
+      "exit_code": 0,
+      "seconds": 73.6,
+      "last_line": "41/41 checks passed"
+    },
+    {
+      "name": "evidence identifier scan",
+      "cwd": "apps/plan_b",
+      "command": "every text file written to <evidence>: host name, user name, git email, local paths",
+      "exit_code": 0,
+      "seconds": 0.6,
+      "last_line": "20 text files: no host name, user name, git email or local path"
+    }
+  ],
+  "identifier_scan": {
+    "allowed_identifiers": [],
+    "not_scanned": []
+  },
+  "pytest_counts": {
+    "tests": 455,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 455
+  },
+  "web_test_counts": {
+    "tests": 362,
+    "suites": 0,
+    "pass": 362,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "browser_walkthrough": {
+    "browser": "Chromium (Playwright)",
+    "checks_total": 41,
+    "checks_passed": 41,
+    "failed_checks": [],
+    "minimum_visible_workflow": [
+      {
+        "step": 1,
+        "title": "Load the fixture into a clean sandbox; show goal, schedule, budget and authority",
+        "checks": 4,
+        "passed": true
+      },
+      {
+        "step": 2,
+        "title": "Submit an update through submit_observation; show source, time and affected entity",
+        "checks": 3,
+        "passed": true
+      },
+      {
+        "step": 3,
+        "title": "Scoped status query; show the actual result, including unknown/unavailable outcomes",
+        "checks": 2,
+        "passed": true
+      },
+      {
+        "step": 4,
+        "title": "Show alternatives and assumptions from evaluate_candidates; a preview reserves nothing",
+        "checks": 2,
+        "passed": true
+      },
+      {
+        "step": 5,
+        "title": "Place a hold or apply a checked plan; show the receipt and the next state read",
+        "checks": 3,
+        "passed": true
+      },
+      {
+        "step": 6,
+        "title": "Advance the clock: readiness and actual completion or supported failure",
+        "checks": 5,
+        "passed": true
+      },
+      {
+        "step": 7,
+        "title": "Reset to a new episode, then play the visible trace under Recorded replay",
+        "checks": 11,
+        "passed": true
+      }
+    ],
+    "screenshots": 21,
+    "report": "evidence/screenshots/walkthrough_report.json"
+  },
+  "development_cases": [
+    {
+      "case_ref": "dev01",
+      "goal_complete": true,
+      "infeasibility_reported": false,
+      "applied_plans": 1,
+      "committed_cents": 0,
+      "reserved_cents_at_end": 0,
+      "violations": 0,
+      "rejected_receipts": 0,
+      "rejected_attempts_without_receipt": 0,
+      "matches_expectation": true,
+      "public_report": "evidence/reports/dev01_outcome.public.json",
+      "trace": "evidence/traces/dev01_trace.json"
+    },
+    {
+      "case_ref": "dev02",
+      "goal_complete": true,
+      "infeasibility_reported": false,
+      "applied_plans": 1,
+      "committed_cents": 3500,
+      "reserved_cents_at_end": 0,
+      "violations": 0,
+      "rejected_receipts": 0,
+      "rejected_attempts_without_receipt": 0,
+      "matches_expectation": true,
+      "public_report": "evidence/reports/dev02_outcome.public.json",
+      "trace": "evidence/traces/dev02_trace.json"
+    },
+    {
+      "case_ref": "dev04",
+      "goal_complete": true,
+      "infeasibility_reported": false,
+      "applied_plans": 0,
+      "committed_cents": 0,
+      "reserved_cents_at_end": 0,
+      "violations": 0,
+      "rejected_receipts": 0,
+      "rejected_attempts_without_receipt": 0,
+      "matches_expectation": true,
+      "public_report": "evidence/reports/dev04_outcome.public.json",
+      "trace": null
+    },
+    {
+      "case_ref": "dev05",
+      "goal_complete": false,
+      "infeasibility_reported": true,
+      "applied_plans": 0,
+      "committed_cents": 0,
+      "reserved_cents_at_end": 0,
+      "violations": 0,
+      "rejected_receipts": 0,
+      "rejected_attempts_without_receipt": 0,
+      "matches_expectation": true,
+      "public_report": "evidence/reports/dev05_outcome.public.json",
+      "trace": "evidence/traces/dev05_trace.json"
+    },
+    {
+      "case_ref": "dev06",
+      "goal_complete": true,
+      "infeasibility_reported": false,
+      "applied_plans": 1,
+      "committed_cents": 0,
+      "reserved_cents_at_end": 0,
+      "violations": 0,
+      "rejected_receipts": 0,
+      "rejected_attempts_without_receipt": 0,
+      "matches_expectation": true,
+      "public_report": "evidence/reports/dev06_outcome.public.json",
+      "trace": null
+    }
+  ],
+  "rejection_steps": {
+    "steps": 20,
+    "report": "evidence/reports/rejected_actions_steps.json"
+  },
+  "m1": {
+    "status": "passed_on_recorded_automated_checks",
+    "self_assessed": true,
+    "independent_audit": "pending",
+    "conditions": [
+      {
+        "condition": "checks were recorded",
+        "met": true
+      },
+      {
+        "condition": "every recorded check exited 0",
+        "met": true
+      },
+      {
+        "condition": "the browser walkthrough is a recorded check",
+        "met": true
+      },
+      {
+        "condition": "every walkthrough check passed",
+        "met": true
+      },
+      {
+        "condition": "the required evidence is present",
+        "met": true
+      },
+      {
+        "condition": "the evidence came from a clean app tree",
+        "met": true
+      },
+      {
+        "condition": "the app is unchanged between the evidence commit and HEAD",
+        "met": true
+      }
+    ],
+    "reasons": [],
+    "required_evidence": [
+      {
+        "item": "fixture hashes",
+        "evidence": [
+          "evidence/reports/fixture_hashes.json"
+        ],
+        "present": true
+      },
+      {
+        "item": "a successful trace",
+        "evidence": [
+          "evidence/traces/dev01_trace.json",
+          "evidence/traces/dev02_trace.json"
+        ],
+        "present": true
+      },
+      {
+        "item": "a rejected-action trace",
+        "evidence": [
+          "evidence/traces/rejected_actions_trace.json"
+        ],
+        "present": true
+      },
+      {
+        "item": "an impossible-case trace",
+        "evidence": [
+          "evidence/traces/dev05_trace.json"
+        ],
+        "present": true
+      },
+      {
+        "item": "an M1 completion record",
+        "evidence": [
+          "VERIFICATION.md"
+        ],
+        "present": true
+      }
+    ],
+    "record": "VERIFICATION.md"
+  },
+  "evidence_files": {
+    "evidence/reports/checks.json": {
+      "sha256": "9d4f9ddd8350793edc433b6ebe1a9d969debaa47708d03a91180f3d7490edfa2",
+      "bytes": 8575,
+      "visibility": "public"
+    },
+    "evidence/reports/dev01_outcome.public.json": {
+      "sha256": "86694755018d5fc268bead00538fccd9cf763bfee92958d0b1f5f52756f6282f",
+      "bytes": 1779,
+      "visibility": "public"
+    },
+    "evidence/reports/dev02_outcome.public.json": {
+      "sha256": "ffecfdcce0954c15148427be93aa165394d68e0d8d0f7e617c960e6abda2f9cd",
+      "bytes": 1782,
+      "visibility": "public"
+    },
+    "evidence/reports/dev04_outcome.public.json": {
+      "sha256": "050432ebf2915d014b4287e880cd573a9e1b1523db423ec94ac612a9e0f7e89e",
+      "bytes": 1782,
+      "visibility": "public"
+    },
+    "evidence/reports/dev05_outcome.public.json": {
+      "sha256": "4246759721fc9d098ccb0cc40d5a11b3f90a085e16de6d01a59cbe27e7ceb141",
+      "bytes": 1815,
+      "visibility": "public"
+    },
+    "evidence/reports/dev06_outcome.public.json": {
+      "sha256": "b3b67bc36c66fb2fa6f3e488bb112837a657b3779cc9665d594cf5a11000c71f",
+      "bytes": 1779,
+      "visibility": "public"
+    },
+    "evidence/reports/environment.json": {
+      "sha256": "f58e4ea32c1591f360ab130f8df057056d39ee9bb0a9511ed0d0097af1523eff",
+      "bytes": 327,
+      "visibility": "public"
+    },
+    "evidence/reports/fixture_hashes.json": {
+      "sha256": "4309b7d7f214021369ab482f74820ede20293af06a98fe62b07f65d0c1262f9c",
+      "bytes": 2410,
+      "visibility": "public"
+    },
+    "evidence/reports/pytest_junit.xml": {
+      "sha256": "300e486ced1170e6b27703058feb9a642c4b4f154f3c05c057fc2eea150ea7e8",
+      "bytes": 60398,
+      "visibility": "public"
+    },
+    "evidence/reports/rejected_actions_steps.json": {
+      "sha256": "9aebffe2db87bb66137fe3992395ca797b15dc0861294895c51184c1f676d77c",
+      "bytes": 7834,
+      "visibility": "public"
+    },
+    "evidence/runner_private/dev01_outcome.runner.json": {
+      "sha256": "cab7dc5c44237ca4dcb72d46bd0e8b783bf43d2fe83c7ed14859c8b02cea85e0",
+      "bytes": 2924,
+      "visibility": "evaluator_private"
+    },
+    "evidence/runner_private/dev02_outcome.runner.json": {
+      "sha256": "35f6e30f4e372a339cb6b174551ea3d38198139aa12427b716984f83f10ba260",
+      "bytes": 3093,
+      "visibility": "evaluator_private"
+    },
+    "evidence/runner_private/dev04_outcome.runner.json": {
+      "sha256": "d6213a87bb4962ebc97d2b4ee7610cf3cbeb959172d2f110542b88106b528a35",
+      "bytes": 3091,
+      "visibility": "evaluator_private"
+    },
+    "evidence/runner_private/dev05_outcome.runner.json": {
+      "sha256": "3c9043908d8667da5ee1d64142115939576933582479071637d8a1855f380edd",
+      "bytes": 3125,
+      "visibility": "evaluator_private"
+    },
+    "evidence/runner_private/dev06_outcome.runner.json": {
+      "sha256": "b3b00d12d2e5cd0f16fbf6cff76212ec1de8a67e00b7009b13ab004d374a602c",
+      "bytes": 2767,
+      "visibility": "evaluator_private"
+    },
+    "evidence/screenshots/01_loaded_dev01.png": {
+      "sha256": "c41116b5d96d4ad7db93df1f8f80b4e85fc0311e09d266bad01c046554c90e1e",
+      "bytes": 61056,
+      "visibility": "public"
+    },
+    "evidence/screenshots/01_loaded_dev01_full.png": {
+      "sha256": "3c22046576c44248f06320c4d4fbb1d0c4a0b5c59fd9f1892af53df587754ece",
+      "bytes": 379307,
+      "visibility": "public"
+    },
+    "evidence/screenshots/01b_keyboard_focus.png": {
+      "sha256": "8503a5937e7f246cea0474768140a35d2876224b8613f73ff0af78ff54928de9",
+      "bytes": 61076,
+      "visibility": "public"
+    },
+    "evidence/screenshots/02_policy_verified_and_swapped_full.png": {
+      "sha256": "f79abfc9bd278786ab9407c7d71af81ad2ec8e350e191e8505da8bb72180f459",
+      "bytes": 895748,
+      "visibility": "public"
+    },
+    "evidence/screenshots/02b_before_after.png": {
+      "sha256": "5b40af2f738142a628534506f6c1d80c39f71940ff98495c600de720a01ddfde",
+      "bytes": 90277,
+      "visibility": "public"
+    },
+    "evidence/screenshots/02c_alternatives.png": {
+      "sha256": "94b1a41d182d2a7a0c38a4d84c11ba6546e6779b799ffb7203e7b32cd553dd8d",
+      "bytes": 58380,
+      "visibility": "public"
+    },
+    "evidence/screenshots/03_participant_checked_in.png": {
+      "sha256": "5772fdd612e60c14ef1671bbf47219f4f35eda0c91370063e5fe700ca115fd3c",
+      "bytes": 84012,
+      "visibility": "public"
+    },
+    "evidence/screenshots/03b_participant_update_sent.png": {
+      "sha256": "058427f4092a553e5f248df982aec5ee683c86672472a5ef22920d084e341b5b",
+      "bytes": 89611,
+      "visibility": "public"
+    },
+    "evidence/screenshots/03c_board_shows_participant_update.png": {
+      "sha256": "140a9e5d228850a462144f60131af563a095b2a304a6b8fc693a42f3813a67c6",
+      "bytes": 56242,
+      "visibility": "public"
+    },
+    "evidence/screenshots/04_duplicate_check_in_rejected.png": {
+      "sha256": "4315d8a3275cfe498c20e64d67a9a073f9037c4e4e6cf6f92aae9e8219f1b392",
+      "bytes": 85919,
+      "visibility": "public"
+    },
+    "evidence/screenshots/05_dev01_completed.png": {
+      "sha256": "3ccc046b62b397c9aac83671c078e2f649d050847a9f8bbfcf0155db592e6635",
+      "bytes": 54426,
+      "visibility": "public"
+    },
+    "evidence/screenshots/05_dev01_completed_full.png": {
+      "sha256": "b89429ef2d23dfe4c3ef827487da130055d117e8ff511d0a672cbafcef267786",
+      "bytes": 1249770,
+      "visibility": "public"
+    },
+    "evidence/screenshots/07_recorded_replay.png": {
+      "sha256": "831de155a2c169ce30c5a1b291a6a96b9a5f3cf63037da44c38d5a2208ccebc9",
+      "bytes": 65093,
+      "visibility": "public"
+    },
+    "evidence/screenshots/07b_recorded_replay_final_full.png": {
+      "sha256": "690c73ba7b6595b41db2ab702065bc69a8a8fdabe51ee9336ba042b959448e26",
+      "bytes": 898132,
+      "visibility": "public"
+    },
+    "evidence/screenshots/08_dev05_infeasible_full.png": {
+      "sha256": "3de4922e04670801521bd4bd3751ef37a3404c1e45de07eb50f657dd25de542b",
+      "bytes": 683581,
+      "visibility": "public"
+    },
+    "evidence/screenshots/09_dev05_end_full.png": {
+      "sha256": "de9080905598085741bc53eab8f3971cb5ca1a9aa47c61256389b0291f63f59f",
+      "bytes": 940221,
+      "visibility": "public"
+    },
+    "evidence/screenshots/09b_dev06_status_unavailable.png": {
+      "sha256": "0694105a4c9ad2fad834c71f952193fcad5d3fa2a9fc7230ab79b1752aa59fea",
+      "bytes": 99840,
+      "visibility": "public"
+    },
+    "evidence/screenshots/10_organizer_sees_request_full.png": {
+      "sha256": "30588462ea090aef456c9a68c43436e75773948bd2ca538fbbc42bd514649666",
+      "bytes": 814341,
+      "visibility": "public"
+    },
+    "evidence/screenshots/11_dev02_committed_full.png": {
+      "sha256": "9e9f5c1790e2b8616dc6b01c63230ee83437093f7084421b93f3a2360cd5e0af",
+      "bytes": 965825,
+      "visibility": "public"
+    },
+    "evidence/screenshots/12_board_1280x800.png": {
+      "sha256": "3db7f90b48ea623c5daca6352505e27d078ae881e7cf84694dc20a381ba00c86",
+      "bytes": 44953,
+      "visibility": "public"
+    },
+    "evidence/screenshots/12_board_1920x1080.png": {
+      "sha256": "53abc3e2ebeb316d1a4e5f642f938d6d9e2cb20e73426fa13c764cf74d57c968",
+      "bytes": 75882,
+      "visibility": "public"
+    },
+    "evidence/screenshots/walkthrough_report.json": {
+      "sha256": "12a7ccafba4b9a2129354d00b7b3b8acee0847c3fdac21b39cb6506600a7a2c5",
+      "bytes": 11478,
+      "visibility": "public"
+    },
+    "evidence/traces/dev01_trace.json": {
+      "sha256": "f875291e70952a31780d09105925e622296a59eaadc6003aa603817299ab8ed5",
+      "bytes": 2338777,
+      "visibility": "public"
+    },
+    "evidence/traces/dev02_trace.json": {
+      "sha256": "547378feef3130db77c62506c546b3f83011a38b098de6d20c058c16868c6df1",
+      "bytes": 3041571,
+      "visibility": "public"
+    },
+    "evidence/traces/dev05_trace.json": {
+      "sha256": "568316359c33570a0e40d2ac93b991fc74114de547b1580b84644befeb34b33f",
+      "bytes": 2047403,
+      "visibility": "public"
+    },
+    "evidence/traces/rejected_actions_trace.json": {
+      "sha256": "9c45a5f69ce81c1812c5c35ca1ef0d21a2efba3a799a5a89713e48b41d751b0c",
+      "bytes": 2042342,
+      "visibility": "public"
+    }
+  }
+}
