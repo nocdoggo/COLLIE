@@ -166,3 +166,47 @@ def test_fresh_status_is_not_rechecked_for_an_unsupported_notice(db: Database) -
     # hearsay channel) does not justify another within the 30-minute freshness window.
     assert len(projector_queries) == 1, projector_queries
     assert queries_before >= 1
+
+
+def test_a_check_answers_a_verify_only_notice_as_of_its_request_time(db: Database) -> None:
+    from plan_b.domain.models import StatusCheckView
+    from plan_b.evaluation.policies.rules import _check_answer, _session_check_fresh
+    from tests.conftest import at
+
+    interp = _interp("Order P17 was cancelled by the carrier this afternoon; sorry.", "projector")
+    assert interp.verify_subject_id == "projector" and interp.received_at == at("16:44")
+    view = Sandbox(db, "dev01").view()
+
+    def check(requested: str, completed: str, status: str = "succeeded") -> StatusCheckView:
+        return StatusCheckView(
+            call_id=f"c{requested}",
+            actor_id="agent_demo",
+            entity_id="projector",
+            fact="delivery_eta",
+            requested_at=at(requested),
+            completed_at=at(completed),
+            envelope_status=status,  # type: ignore[arg-type]
+            error_code=None,
+            observation_id=f"obs_{requested}",
+            deduplicated=False,
+            stale=False,
+            reason=None,
+        )
+
+    def answer(*checks: StatusCheckView) -> str | None:
+        return _check_answer(view.model_copy(update={"status_checks": checks}), interp)
+
+    # Neither a check made before the notice nor one in flight when it arrived answers it.
+    assert answer(check("16:40", "16:42")) is None
+    assert answer(check("16:43", "16:45")) is None
+    assert answer(check("16:44", "16:46", status="unavailable")) is None
+    # A successful check requested at or after the notice's arrival does.
+    assert answer(check("16:43", "16:45"), check("16:44", "16:46")) == "obs_16:44"
+    # A supplier notice is never skipped for freshness; a session submission is.
+    fresh = view.model_copy(
+        update={"clock": at("16:45"), "status_checks": (check("16:40", "16:42"),)}
+    )
+    assert not _session_check_fresh(fresh, interp)
+    session = interp.model_copy(update={"channel": "participant_session"})
+    assert _session_check_fresh(fresh, session)
+    assert not _session_check_fresh(fresh.model_copy(update={"clock": at("17:11")}), session)

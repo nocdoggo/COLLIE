@@ -1820,6 +1820,7 @@ def test_unsupported_notice_prompts_only_verification_and_typed_status_drives_th
     v6 = v5.model_copy(
         update={"revision": 6, "clock": local("16:44"), "plan": plan_view(2, SWAPPED, "16:44")}
     )
+    ev_before = evaluation(1, 4, local("16:41"), (keep_c(1, applicable=True, rank=1),))
     ev = evaluation(
         1,
         5,
@@ -1830,14 +1831,17 @@ def test_unsupported_notice_prompts_only_verification_and_typed_status_drives_th
         {
             "get_event_state": [state(v4), state(v5), state(v6)],
             "query_status": [query_ok(status)],
-            "evaluate_candidates": [evaluated(ev)],
+            "evaluate_candidates": [evaluated(ev_before), evaluated(ev)],
             "apply_plan": [mutation_ok(5, "16:44")],
         }
     )
     result = RulePolicy().run(client)
 
+    # The decision on the current typed status comes first; the notice's check follows it, and
+    # the typed answer (17:45) is what changes the plan.
     assert client.tools() == [
         "get_event_state",
+        "evaluate_candidates",
         "query_status",
         "get_event_state",
         "evaluate_candidates",
@@ -1848,12 +1852,14 @@ def test_unsupported_notice_prompts_only_verification_and_typed_status_drives_th
         "entity_id": "projector",
         "fact": "delivery_eta",
     }
-    assert client.of("evaluate_candidates")[0].arguments == {}  # the notice is no hypothesis
-    assert [d.kind for d in result.decisions] == ["unresolved", "verify", "commit"]
-    notice, verify, commit = result.decisions
+    # The notice is never a hypothesis.
+    assert [e.arguments for e in client.of("evaluate_candidates")] == [{}, {}]
+    assert [d.kind for d in result.decisions] == ["unresolved", "keep", "verify", "commit"]
+    notice, keep, verify, commit = result.decisions
     assert "outside the supported message forms" in notice.summary
     assert "the only step it can prompt is verification of projector" in notice.summary
     assert notice.details["verify_only"] == "projector"
+    assert "obs_0005 (not a supported message form) is checked with projector's" in keep.summary
     assert "obs_0005 verified only (not a supported message form" in verify.summary
     assert verify.details["verify_only"] == ["obs_0005"]
     assert commit.candidate_refs == (ev.candidates[0].candidate_id,)
@@ -1880,21 +1886,20 @@ def test_unverifiable_unsupported_notice_causes_no_hedging_hold_or_ask() -> None
     )
     result = RulePolicy().run(client)
 
-    # Bounded verification, then one plain evaluation: no hypothesis, hold, ask or change.
+    # One plain evaluation, then bounded verification: no hypothesis, hold, ask or change.
     assert client.tools() == [
         "get_event_state",
-        "query_status",
-        "query_status",
         "evaluate_candidates",
+        "query_status",
+        "query_status",
     ]
     assert client.of("evaluate_candidates")[0].arguments == {}
-    assert [d.kind for d in result.decisions] == ["unresolved", "verify", "verify", "keep"]
+    assert [d.kind for d in result.decisions] == ["unresolved", "keep", "verify", "verify"]
     assert all(d.authorization_request is None for d in result.decisions)
-    assert "obs_0005 is not a supported message form" in result.decisions[2].summary
-    assert (
-        "notice obs_0005 (not a supported message form) unverified, never weighed as a claim"
-        in result.decisions[3].summary
+    assert "is checked with projector's status source after this decision" in (
+        result.decisions[1].summary
     )
+    assert "obs_0005 is not a supported message form" in result.decisions[3].summary
 
 
 # ---------------------------------------------------------------------- settled state

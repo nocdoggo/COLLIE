@@ -71,6 +71,7 @@ from plan_b.domain.timeutil import local_label
 from plan_b.evaluation.policies.base import ToolClient, TransportLost
 from plan_b.evaluation.policies.parser import (
     NOTICE_KINDS,
+    SESSION_CHANNELS,
     EvidenceStatus,
     Interpretation,
     assess_claim,
@@ -326,21 +327,26 @@ class RulePolicy:
                 if dirty:
                     view = self._refresh(run)
                     dirty = False
-                attempted, changed = self._verify_claims(view, run)
+                attempted, changed = self._verify_claims(view, run, verify_only=False)
                 if changed:
                     dirty = True
                     continue
                 current = (view.revision, view.goal.version)
                 decided = current
-                if index == 0 and not (force or attempted) and current == self._settled:
-                    break
-                step = self._decide(view, run, cycle, woke_hold)
-                if step == "again":
+                if not (index == 0 and not (force or attempted) and current == self._settled):
+                    step = self._decide(view, run, cycle, woke_hold)
+                    if step == "again":
+                        dirty = True
+                        continue
+                    if step == "refresh":
+                        view = self._refresh(run)
+                        self._release_unneeded(view, run, keep=set())
+                # A verify-only notice is never weighed, so its check runs after the decision
+                # and cannot delay a hold, an ask or a commit; new typed status re-decides.
+                _, changed = self._verify_claims(view, run, verify_only=True)
+                if changed:
                     dirty = True
                     continue
-                if step == "refresh":
-                    view = self._refresh(run)
-                    self._release_unneeded(view, run, keep=set())
                 break
         except _Stop as stop:
             self._record_stop(run, stop.reason)
@@ -482,6 +488,9 @@ class RulePolicy:
         for claim in self._claims.values():
             if claim.answered_by is not None:
                 continue
+            if claim.verify_only:
+                claim.answered_by = _check_answer(view, claim.interpretation)
+                continue
             latest: tuple[str, ObservationRecord] | None = None
             for record in view.observations:
                 obs = record.observation
@@ -509,10 +518,6 @@ class RulePolicy:
         res = _resources(view).get(claim.subject_id)
         if res is None or res.definition.kind != "equipment":
             return []
-        if claim.verify_only and _recently_checked(view, claim.subject_id):
-            # Typed status for this resource was fetched within its source's freshness window:
-            # an unsupported notice does not justify spending another check.
-            return []
         lifecycles = _lifecycles(view)
         interp = claim.interpretation
         eta = interp.claims.claimed_eta
@@ -532,17 +537,82 @@ class RulePolicy:
 
     # ------------------------------------------------------------------ verification
 
-    def _verify_claims(self, view: EventStateView, run: _Run) -> tuple[bool, bool]:
-        """Query the registered source for every material unanswered claim.
+    def _verify_only_skip(self, view: EventStateView, claim: _Claim) -> tuple[str, str] | None:
+        """Why an unanswered, material verify-only notice prompts no check now, as
+        (reason key, text), or None.
+
+        A session submission waits while its resource's status is fresh. Any verify-only notice
+        waits while fresh typed status already rules its resource out for every not-started
+        activity that uses it: the plan cannot rely on the resource whatever the check returns,
+        so the check would only spend time."""
+        rid = claim.subject_id
+        if _session_check_fresh(view, claim.interpretation):
+            return (
+                "session_fresh",
+                f"submitted in a session; {rid} was checked within its source's freshness window",
+            )
+        res = _resources(view).get(rid)
+        checked = _fresh_check_time(view, rid)
+        if res is None or checked is None:
+            return None
+        uses = self._material(view, claim)
+        if res.status == "unavailable":
+            why = f"{rid} is unavailable"
+        elif (
+            res.status == "expected"
+            and res.reported_eta is not None
+            and all(res.reported_eta > a.start for a in uses)
+        ):
+            why = f"{rid} is expected only at {self._t(res.reported_eta, view)}"
+        else:
+            return None
+        starts = ", ".join(f"{a.activity_id} at {self._t(a.start, view)}" for a in uses)
+        return (
+            "ruled_out",
+            f"typed status checked at {self._t(checked, view)} says {why}, after the start of "
+            f"{starts}, so the plan cannot rely on it whatever a check returns",
+        )
+
+    def _verify_claims(
+        self, view: EventStateView, run: _Run, *, verify_only: bool
+    ) -> tuple[bool, bool]:
+        """Query the registered source for every material unanswered claim, or (verify_only)
+        for every material unanswered verify-only notice.
 
         Returns (attempted, state_changed)."""
+        eligible = [
+            c
+            for c in self._claims.values()
+            if c.answered_by is None and not c.verification_unavailable and self._material(view, c)
+        ]
         groups: dict[str, list[_Claim]] = {}
-        for claim in self._claims.values():
-            if claim.answered_by is not None or claim.verification_unavailable:
+        for claim in eligible:
+            if claim.verify_only != verify_only:
                 continue
-            if not self._material(view, claim):
+            skip = self._verify_only_skip(view, claim) if verify_only else None
+            if skip is not None:
+                key, why = skip
+                self._record_once(
+                    run,
+                    ("verify_skip", claim.observation_id, key),
+                    "verify",
+                    f"No check of {claim.subject_id} for notice {claim.observation_id} (not a "
+                    f"supported message form): {why}.",
+                    observation_refs=(claim.observation_id,),
+                    details={
+                        "entity_id": claim.subject_id,
+                        "outcome": "not_checked",
+                        "reason": key,
+                        "verify_only": [claim.observation_id],
+                    },
+                )
                 continue
             groups.setdefault(claim.subject_id, []).append(claim)
+        if not verify_only:
+            # A verify-only notice about a resource that is checked anyway joins that check.
+            for claim in eligible:
+                if claim.verify_only and claim.subject_id in groups:
+                    groups[claim.subject_id].append(claim)
         attempted = changed = False
         resources = _resources(view)
         for rid, claims in sorted(groups.items()):
@@ -1196,6 +1266,17 @@ class RulePolicy:
                 parts.append(f"notice {claim.observation_id} unverified")
             elif not self._material(view, claim):
                 parts.append(f"notice {claim.observation_id} not material for the current plan")
+            elif claim.verify_only and (skip := self._verify_only_skip(view, claim)) is not None:
+                parts.append(
+                    f"notice {claim.observation_id} (not a supported message form) not checked: "
+                    f"{skip[1]}"
+                )
+            elif claim.verify_only:
+                parts.append(
+                    f"notice {claim.observation_id} (not a supported message form) is checked "
+                    f"with {claim.subject_id}'s status source after this decision, never weighed "
+                    "as a claim"
+                )
         if robust_note:
             parts.append(robust_note)
         summary = "; ".join(parts) + "."
@@ -1651,18 +1732,62 @@ def _verify_details(envelope: ToolEnvelope, rid: str, fact: str, attempt: int) -
     }
 
 
-def _recently_checked(view: EventStateView, resource_id: str) -> bool:
-    """A successful status check of the resource completed within its source's freshness
-    window (contract section 9)."""
-    window = {e: src.freshness_minutes for src in view.status_sources for e in src.entity_ids}.get(
-        resource_id
-    )
-    if window is None:
+def _session_check_fresh(view: EventStateView, interp: Interpretation) -> bool:
+    """A notice submitted in a session waits while a successful check of its resource was
+    requested within the source's freshness window, so session text cannot keep spending the
+    coordinator's time on unsupported wording (contract section 11)."""
+    if interp.channel not in SESSION_CHANNELS:
         return False
-    return any(
-        c.entity_id == resource_id
+    rid = interp.verify_subject_id
+    window = {e: src.freshness_minutes for src in view.status_sources for e in src.entity_ids}.get(
+        rid or ""
+    )
+    return window is not None and any(
+        c.entity_id == rid
         and c.envelope_status == "succeeded"
-        and c.completed_at is not None
-        and view.clock - c.completed_at <= timedelta(minutes=window)
+        and c.requested_at is not None
+        and view.clock - c.requested_at <= timedelta(minutes=window)
         for c in view.status_checks
     )
+
+
+def _check_answer(view: EventStateView, interp: Interpretation) -> str | None:
+    """What answers a verify-only notice: the latest successful check of its resource requested
+    at or after the notice arrived (a check answers as of its request time, contract section 9),
+    or a status observation observed at or after it."""
+    rid = interp.verify_subject_id
+    answer: str | None = None
+    for c in view.status_checks:
+        if (
+            c.entity_id == rid
+            and c.envelope_status == "succeeded"
+            and c.requested_at is not None
+            and c.requested_at >= interp.received_at
+        ):
+            answer = c.observation_id or c.call_id
+    if answer is not None:
+        return answer
+    for record in view.observations:
+        obs = record.observation
+        if obs.entity_id == rid and obs.kind == "status" and obs.observed_at >= interp.received_at:
+            answer = obs.observation_id
+    return answer
+
+
+def _fresh_check_time(view: EventStateView, rid: str) -> datetime | None:
+    """Request time of the latest successful check of the resource within its source's
+    freshness window, or None."""
+    window = {e: src.freshness_minutes for src in view.status_sources for e in src.entity_ids}.get(
+        rid
+    )
+    if window is None:
+        return None
+    times = [
+        c.requested_at
+        for c in view.status_checks
+        if c.entity_id == rid
+        and c.envelope_status == "succeeded"
+        and c.requested_at is not None
+        and view.clock - c.requested_at <= timedelta(minutes=window)
+    ]
+    return max(times, default=None)

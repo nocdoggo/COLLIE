@@ -502,18 +502,30 @@ has been cancelled." is a claim, while "Order P17 was cancelled because the van 
   rental, borrowed, different, old) identifies nothing. A notice that says nothing about delivery
   status (no word such as late, delay, cancelled, ETA, arrival, available, status) identifies
   nothing. An order reference that names no registered booking, or a second identified equipment
-  resource, leaves `verify_subject_id` unset. A verify-only notice is not checked again while a
-  successful status check of that resource is within its source's freshness window. The policy may then query that resource's
-  registered status source under the claim bounds below, and it records a decision stating that
-  the wording is not a supported form and that only verification is done. The notice is never a
-  claim: no hypothesis, hold, ask or robust plan change comes from it, and the typed status that
-  the query returns drives planning as usual.
+  resource, leaves `verify_subject_id` unset. A verify-only notice is answered by a successful
+  check of its resource *requested* at or after the notice arrived (a check answers as of its
+  request time, section 9), or by a status observation observed at or after it. A check that
+  was already in flight when the notice arrived does not answer it. If the resource is being
+  checked for a supported claim anyway, the notice joins that check. Otherwise the policy queries
+  the resource's registered status source *after* its decision step, under the claim bounds
+  below, so a verify-only check never delays a hold, an ask or a commit; new typed status from it
+  starts another decision cycle. No check is made, and a `verify` decision with
+  `details.outcome = "not_checked"` records why, in two cases. (1) A notice submitted in a
+  session (participant or organizer) waits while a successful check of that resource was
+  requested within its source's freshness window. (2) Any verify-only notice waits while such a
+  fresh check left the resource `unavailable`, or `expected` only after the start of every
+  not-started activity that uses it in the active plan: the plan cannot rely on the resource
+  whatever a check returns, so a check would only spend time (value of information). The policy
+  records a decision stating that the wording is not a supported form and that only
+  verification is done. The notice is never a claim: no hypothesis, hold, ask
+  or robust plan change comes from it, and the typed status that the query returns drives
+  planning as usual.
 * Typed evidence: status and arrival observations carry `structured` facts and are used
   directly; their text is never pattern-matched. A `resource_status` observation received after
   a notice supersedes the notice's claim for planning.
 
 **Decision rules** (bounded loop): read state → interpret new observations → for each material
-applicable claim, or verify-only notice, on an equipment resource used by a not-started activity, verify with
+applicable claim on an equipment resource used by a not-started activity, verify with
 `query_status` if a source is registered (at most 2 attempts per claim; `unknown`/`unavailable`
 leave it unverified) → `evaluate_candidates` → keep if the keep candidate is applicable and
 evidence does not contradict it → if verification failed, also evaluate the claimed ETA as a
@@ -522,8 +534,9 @@ apply the best applicable candidate → otherwise, for the best feasible candida
 booking: verify the substitute's availability if it rests on the catalog, hold it if the
 reserved limit allows, and record an `ask` decision with an `AuthorizationRequest` when the
 committed limit is short → if nothing is feasible, record `infeasible` with blocking constraints
-and preserve the plan → release own holds the current plan no longer needs → wait. A lost
-mutation response is reconciled with `get_action_receipt` and the original key.
+and preserve the plan → release own holds the current plan no longer needs → verify unanswered
+verify-only notices (same bounds; new typed status re-enters the loop) → wait. A lost mutation
+response is reconciled with `get_action_receipt` and the original key.
 
 When nothing is feasible but some candidates are `unknown` (an unsupported requirement), the
 decision is `unresolved`, not `infeasible`, naming the unsupported requirement and the undecided
