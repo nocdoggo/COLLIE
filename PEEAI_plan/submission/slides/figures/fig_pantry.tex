@@ -1,0 +1,40 @@
+% Pantry Continuity (development case pantry_dev01): the stock pools and the two counters at
+% four moments. Numbers from PEEAI_plan/handoffs/wave_2/DEMO.md section 4 and
+% evidence/reports/pantry_accounting.json. Fictional sandbox.
+\documentclass[border=4pt]{standalone}
+\input{fig_style}
+\begin{document}
+\begin{tikzpicture}[x=1cm, y=0.072cm, font=\small]
+  \def\bw{0.5}
+  \draw[umbdark, line width=0.9pt, dash pattern=on 4pt off 2pt] (-0.4,40) -- (13.0,40);
+  \node[anchor=west, text=umbdark, font=\footnotesize\bfseries] at (13.05,40) {target 40};
+  \draw[line] (-0.4,0) -- (13.0,0);
+  % x, pantry on hand, partner on hand, partner held, handed out, label, shortfall, deficit
+  \foreach \x/\pan/\ptn/\held/\srv/\name/\shf/\dfc in {
+      0.4/24/16/0/0/Start/16/40,
+      3.8/24/16/1/0/16 held/16/40,
+      7.2/40/0/0/0/Staff handoff/0/40,
+      10.6/0/0/0/40/Distribution/0/0}{
+    \ifnum\pan>0 \fill[primary] (\x,0) rectangle (\x+\bw,\pan); \fi
+    \node[font=\footnotesize, text=primary, anchor=south] at (\x+\bw/2,\pan) {\pan};
+    \ifnum\ptn>0
+      \ifnum\held=1 \fill[umborange] (\x+\bw+0.08,0) rectangle (\x+2*\bw+0.08,\ptn);
+      \else \fill[line] (\x+\bw+0.08,0) rectangle (\x+2*\bw+0.08,\ptn); \fi
+    \fi
+    \node[font=\footnotesize, text=muted, anchor=south] at (\x+1.5*\bw+0.08,\ptn) {\ptn};
+    \draw[muted, dash pattern=on 2pt off 1.5pt] (\x+2*\bw+0.16,0) rectangle (\x+3*\bw+0.16,20);
+    \ifnum\srv>0 \fill[okgreen] (\x+3*\bw+0.24,0) rectangle (\x+4*\bw+0.24,\srv);
+      \node[font=\footnotesize, text=okgreen, anchor=south] at (\x+3.5*\bw+0.24,\srv) {\srv}; \fi
+    \node[font=\small\bfseries, text=ink, anchor=north] at (\x+2*\bw,-2) {\name};
+    \node[font=\footnotesize, text=umborange, anchor=north] at (\x+2*\bw,-9) {shortfall \shf};
+    \node[font=\footnotesize, text=umbdark, anchor=north] at (\x+2*\bw,-15.5) {deficit \dfc};
+  }
+  \begin{scope}[shift={(0,58)}]
+    \fill[primary] (0,0) rectangle (0.3,4); \node[anchor=west, font=\footnotesize] at (0.35,2) {on the pantry shelf};
+    \fill[line] (3.0,0) rectangle (3.3,4); \node[anchor=west, font=\footnotesize] at (3.35,2) {partner pool};
+    \fill[umborange] (5.5,0) rectangle (5.8,4); \node[anchor=west, font=\footnotesize] at (5.85,2) {held};
+    \draw[muted, dash pattern=on 2pt off 1.5pt] (7.1,0) rectangle (7.4,4); \node[anchor=west, font=\footnotesize] at (7.45,2) {20 late, not stock};
+    \fill[okgreen] (10.3,0) rectangle (10.6,4); \node[anchor=west, font=\footnotesize] at (10.65,2) {handed out};
+  \end{scope}
+\end{tikzpicture}
+\end{document}

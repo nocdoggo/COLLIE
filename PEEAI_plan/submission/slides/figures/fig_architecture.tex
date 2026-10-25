@@ -1,0 +1,35 @@
+% Any policy, one gate: four coordinator policies, one executor at the authority boundary, and
+% one recorded model decision that passed it. Module map from apps/plan_b/README.md and
+% docs/RUNTIME_CONTRACT.md (sections 4, 5, 10, 16 to 18). The card is retyped from the Wave 2
+% storyboard frame story_12 (development run live_p2-live_dev02, policy live/1.0.0) and
+% DEMO.md section 4.
+\documentclass[border=4pt]{standalone}
+\input{fig_style}
+\begin{document}
+\begin{tikzpicture}[font=\small]
+  \tikzset{pol/.style={box, text width=4.4cm, align=left, minimum height=1.05cm}}
+  \node[pol] (p0) at (0,2.4) {{\bfseries P0} fixed rules, no model};
+  \node[pol] (p1) at (0,0.95) {{\bfseries P1} a model calls the tools itself};
+  \node[pol, keybox, align=left, text width=4.4cm] (p2) at (0,-0.5) {{\bfseries P2 (mine)} a model picks one option the server built};
+  \node[pol] (p3) at (0,-1.95) {{\bfseries P3} P2, with every relevant status check run first};
+  % the gate
+  \node[okbox, text width=2.5cm, minimum height=5.9cm] (exec) at (4.3,0.22)
+    {{\bfseries Executor}\\[4pt] checks each request: the role's rights, the state version, the budget\\[4pt] writes a receipt};
+  \draw[umborange, line width=1.4pt, dash pattern=on 5pt off 3pt]
+    ($(exec.north west)+(-0.28,0.28)$) rectangle ($(exec.south east)+(0.28,-0.28)$);
+  \node[text=umborange, font=\footnotesize\bfseries, anchor=north] at ($(exec.south)+(0,-0.32)$) {one gate for every policy and person};
+  \node[box, text width=2.75cm, align=left, font=\footnotesize] (store) at (7.65,2.55) {{\bfseries\small Event state}\\ plan versions, holds, receipts};
+  \node[box, text width=2.75cm, align=left, font=\footnotesize] (planner) at (10.95,2.55) {{\bfseries\small Planner}\\ builds and checks the options};
+  \foreach \p in {p0,p1,p2,p3}{\draw[flow] (\p.east) -- (\p.east -| exec.west);}
+  \draw[flow] (exec.east |- store.west) -- (store.west);
+  \draw[flow, <->] (store.east) -- (planner.west);
+  % one recorded decision
+  \node[box, text width=6.1cm, align=left, draw=primary, line width=0.9pt, inner sep=6pt, anchor=north west] (card)
+    at (6.05,1.25) {%
+    {\footnotesize\color{muted} One recorded P2 decision (development case dev02)}\\[2pt]
+    {\bfseries\color{primary} Chosen by a model call}: use the backup projector for the demonstrations\\
+    {\footnotesize claude-sonnet-5.5, 3.75 s, \$0.0135}\\[3pt]
+    {\bfseries\color{okgreen} Checked by the server}: receipt \texttt{rcpt\_0003}, after the scripted organizer approved \$35};
+  \draw[flow, primary, dashed] (card.west) -- (card.west -| exec.east);
+\end{tikzpicture}
+\end{document}

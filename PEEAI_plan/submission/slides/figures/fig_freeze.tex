@@ -1,0 +1,13 @@
+% How the test was kept fair: practice on development cases, freeze, then run held-out cases.
+\documentclass[border=4pt]{standalone}
+\input{fig_style}
+\begin{document}
+\begin{tikzpicture}[font=\small, node distance=9mm]
+  \tikzset{stage/.style={box, text width=4.3cm, minimum height=2.0cm, align=left}}
+  \node[stage] (a) {{\bfseries\color{primary} 1. Practice}\\ development cases I built and debugged with};
+  \node[stage, keybox, align=left, right=of a] (b) {{\bfseries\color{primary} 2. Freeze}\\ code, prompts, model and limits fixed by hash before the test};
+  \node[stage, okbox, align=left, right=of b] (c) {{\bfseries\color{okgreen} 3. Test once}\\ held-out cases, hidden from every policy, three runs per model policy};
+  \draw[flow] (a) -- (b);
+  \draw[flow] (b) -- (c);
+\end{tikzpicture}
+\end{document}

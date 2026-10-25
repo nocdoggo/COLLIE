@@ -1,0 +1,16 @@
+% One recovery in four steps (development case dev01, from the Wave 2 storyboard frames
+% story_04 to story_07): the message, the check, the change, the receipt.
+\documentclass[border=4pt]{standalone}
+\input{fig_style}
+\begin{document}
+\begin{tikzpicture}[font=\small, node distance=7mm]
+  \tikzset{stp/.style={box, text width=3.35cm, minimum height=2.1cm, align=left}}
+  \node[stp, hotbox, align=left] (a) {{\bfseries\color{umborange} 1. Message}\\ 16:40: the projector may be about 25 minutes late};
+  \node[stp, right=of a] (b) {{\bfseries\color{primary} 2. Checked}\\ supplier status: delayed, reported ETA 17:25};
+  \node[stp, right=of b] (c) {{\bfseries\color{primary} 3. Changed}\\ demonstrations and skills exchange swap places, cost \$0};
+  \node[stp, okbox, align=left, right=of c] (d) {{\bfseries\color{okgreen} 4. Receipt}\\ the server's record \texttt{rcpt\_0001}, plan version 1 to 2};
+  \draw[flow] (a) -- (b);
+  \draw[flow] (b) -- (c);
+  \draw[flow] (c) -- (d);
+\end{tikzpicture}
+\end{document}

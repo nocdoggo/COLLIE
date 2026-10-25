@@ -1,0 +1,24 @@
+% The decision loop: verify, prepare, commit, keep, with this event's examples (development
+% cases dev01, dev02 and dev04). After the diagram in PEEAI_plan/09_seven_minute_presentation.md.
+\documentclass[border=4pt]{standalone}
+\input{fig_style}
+\begin{document}
+\begin{tikzpicture}[font=\small]
+  \tikzset{opt/.style={box, text width=6.3cm, align=left, minimum height=1.25cm},
+           ex/.style={font=\footnotesize, text=muted}}
+  \node[box, text width=2.9cm] (goal) at (0,1.0) {\bfseries Goal and limits\\ \normalfont deadline, people, budget};
+  \node[hotbox, text width=2.9cm] (msg) at (0,-1.0) {\bfseries New message\\ \normalfont a claim, not a fact};
+  \node[keybox, text width=2.3cm, minimum height=1.5cm, font=\small\bfseries] (decide) at (3.7,0) {Decide the next step};
+  \node[opt] (verify) at (9.0,2.55) {{\bfseries\color{primary} Verify} one fact that could change the decision\\ {\footnotesize\color{muted} supplier status: delayed, ETA 17:25}};
+  \node[opt] (prepare) at (9.0,0.85) {{\bfseries\color{primary} Prepare} a backup while a fact or an approval is pending\\ {\footnotesize\color{muted} ETA 17:45: backup held to 16:55, \$35 asked}};
+  \node[opt] (commit) at (9.0,-0.85) {{\bfseries\color{primary} Commit} only a plan the server checked\\ {\footnotesize\color{muted} the free swap at 16:43}};
+  \node[opt, fill=softgray] (keep) at (9.0,-2.55) {{\bfseries\color{muted} Keep} the plan when nothing should change\\ {\footnotesize\color{muted} the stale reminder}};
+  \node[okbox, text width=2.2cm] (receipt) at (14.3,0) {\bfseries Receipt\\ \normalfont and the new state};
+  \draw[flow] (goal.east) -- (decide);
+  \draw[flow] (msg.east) -- (decide);
+  \foreach \n in {verify, prepare, commit, keep}{\draw[flow] (decide.east) -- (\n.west);}
+  \foreach \n in {verify, prepare, commit}{\draw[flow] (\n.east) -- (receipt.west);}
+  \draw[flow, primary, line width=1.1pt] (receipt.south) |- (9.0,-3.75) -| node[pos=0.25, below, text=primary, font=\footnotesize]
+    {the next decision uses what actually happened} (decide.south);
+\end{tikzpicture}
+\end{document}

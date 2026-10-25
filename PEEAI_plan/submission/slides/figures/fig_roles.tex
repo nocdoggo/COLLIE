@@ -1,0 +1,31 @@
+% Who may do what. Grants from the campus and pantry fixtures (RUNTIME_CONTRACT sections 2 and
+% 15, storyboard frame story_03). The executor enforces every grant on the server.
+\documentclass[border=4pt]{standalone}
+\input{fig_style}
+\begin{document}
+\begin{tikzpicture}[font=\small, node distance=4mm]
+  \tikzset{role/.style={box, text width=3.55cm, minimum height=3.75cm, anchor=north, align=left}}
+  \node[role, keybox, align=left] (agent) at (0,0) {%
+    {\bfseries\color{primary} Coordinator agent}\\[2pt]
+    May: check sources, compare options, hold a backup worth up to \$35, apply a checked free change\\[2pt]
+    {\color{umborange} May not: spend, change the goal}};
+  \node[role] (org) at (3.95,0) {%
+    {\bfseries\color{umbdark} Organizer}\\[2pt]
+    Approves spending\\
+    Changes the goal and its constraints};
+  \node[role] (part) at (7.9,0) {%
+    {\bfseries\color{umbdark} Participant}\\[2pt]
+    Checks in for themselves\\
+    Offers a listed resource\\[2pt]
+    {\color{muted} Cannot change anyone else}};
+  \node[role] (staff) at (11.85,0) {%
+    {\bfseries\color{umbdark} Pantry staff}\\[2pt]
+    Records stock that physically arrived\\
+    Records a distribution\\[2pt]
+    {\color{muted} Only staff can}};
+  \node[okbox, minimum width=15.4cm, below=7mm of org.south west, anchor=north west, xshift=-3.95cm,
+        font=\small\bfseries] (exec)
+    {The server checks every request against the role's rights, the current state version and the budget};
+  \foreach \n in {agent, org, part, staff}{\draw[flow] (\n.south) -- (\n.south |- exec.north);}
+\end{tikzpicture}
+\end{document}

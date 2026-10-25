@@ -1,0 +1,422 @@
+% Copyright (c) 2022 by Lars Spreng
+% This work is licensed under the Creative Commons Attribution 4.0 International License.
+% To view a copy of this license, visit http://creativecommons.org/licenses/by/4.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
+%
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% Plan B: The Show Must Go On. Seven-minute hackathon presentation (420 s, 12 slides plus
+% backup slides). Author: Noctis Zhang, University of Massachusetts Boston.
+% Speaker notes for each slide live in the \note{...} blocks and match pres-note.md.
+% Uncomment the \setbeameroption line below to see them.
+%
+% Every held-out number comes from figures/results_numbers.tex and figures/fig_results.tex, which
+% ../make_results.py writes from the committed run wave3_heldout_20261025T1625Z (metrics.json).
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+\documentclass[
+t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle={Plan B: The Show Must Go On},pdfsubject={Seven-minute project presentation}}
+]{beamer}
+% Keep the PDF metadata to title, author and subject: no producer, creator or embedded file info.
+\pdfsuppressptexinfo=-1
+\hypersetup{pdfcreator={},pdfproducer={}}
+
+\input{loadslides.tex} % Loads packages and some defined commands
+\usepackage{appendixnumberbeamer} % backups are not counted in the slide total
+\input{figures/results_numbers.tex} % Held-out numbers, read as \res{suite:policy:key}
+
+% \setbeameroption{show notes} % uncomment to render speaker notes alongside slides
+
+% The template ships \emphasize as an environment. Redefine it as a one-argument command for
+% inline highlighting, as the ICML deck does.
+\renewcommand{\emphasize}[1]{\textcolor{primary}{#1}}
+
+\usetikzlibrary{arrows.meta,positioning}
+\graphicspath{{figures/}{figures/frames/}}
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
+
+\definecolor{umborange}{HTML}{FF791F}
+\definecolor{muted}{HTML}{6B6B6B}
+
+% Small caption under a figure.
+\newcommand{\figcaption}[1]{{\scriptsize\color{muted}#1\par}}
+
+\title[Plan B]{Plan B: The Show Must Go On}
+\subtitle{Deciding what to verify, what to prepare, and when to commit a change}
+\author[Noctis Zhang]{Noctis Zhang}
+\institute{University of Massachusetts Boston}
+\date{Paul English Applied AI Institute (PEAAII) Hackathon, UMass Boston, October 2026}
+\titlegraphic{\vspace{0.2cm}\includegraphics[height=1.35cm]{Blue-UMB-logo-lockup.png}}
+
+\begin{document}
+\hypersetup{pdftitle={Plan B: The Show Must Go On}}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% 1. TITLE (10 s)
+{
+\setbeamertemplate{footline}{}
+\begin{frame}
+  \titlepage
+  \note{
+    \textbf{(10s, ends 0:10)} Hello, I am Noctis Zhang from UMass Boston. This is Plan B. It
+    decides what to verify, what to prepare, and when to commit a change.
+  }
+\end{frame}
+}
+\addtocounter{framenumber}{-1}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% 2. THE PROBLEM (27 s)
+\begin{frame}{Twenty minutes before opening, the projector may be late}
+  \begin{itemize}
+    \item A \textbf{fictional campus showcase}: five activities, opens at 17:00, must finish by 18:00.
+    \item At 16:40 a message: the projector \emphasize{may be about 25 minutes late}. Change too much and people lose time. Wait too long and the demos fail.
+    \item AI agents now act on messages like this. \textbf{Acting on a wrong message} is the failure that matters.
+  \end{itemize}
+  \vspace{0.1cm}
+  \begin{center}
+    \includegraphics[width=0.86\textwidth]{fig_timeline.pdf}
+  \end{center}
+  \note{
+    \textbf{(27s, ends 0:37)} Imagine you organize a campus showcase. It opens at five and must
+    end by six. At four forty, a message says the projector may be twenty five minutes late.
+    Change too much and people lose time. Wait too long and the demos fail. AI agents now act on
+    messages like this. Would you wait, check, or prepare a backup?
+  }
+\end{frame}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% 3. AUTHORITY (35 s)
+\begin{frame}{The coordinator may check, hold and make free changes, not spend}
+  \begin{itemize}
+    \item Plan B is a \textbf{coordinator}: an AI agent with written limits.
+    \item A \textbf{hold} is a free reservation of a backup that expires on its own, here worth up to \emphasize{\$35}.
+    \item \textbf{Spending needs the organizer.} Participants and staff have their own narrow rights.
+    \item Everything runs in a \textbf{fictional local sandbox}: no real bookings, purchases or messages.
+  \end{itemize}
+  \vspace{0.1cm}
+  \begin{center}
+    \includegraphics[width=0.97\textwidth]{fig_roles.pdf}
+  \end{center}
+  \note{
+    \textbf{(35s, ends 1:12)} Plan B is a coordinator, an AI agent with written limits. It may
+    check sources, compare options, and place a hold. A hold is a free reservation of a backup
+    that expires on its own, here worth up to thirty five dollars. It may also make a change
+    that costs nothing. It cannot spend a cent without the organizer. Everything runs in a
+    fictional local sandbox. [Skip if late: Participants and staff have their own narrow
+    rights.]
+  }
+\end{frame}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% 4. VERIFY (35 s)
+\begin{frame}{A message is a claim, not a fact}
+  \begin{itemize}
+    \item A \textbf{status check} asks the supplier's status service. It takes \emphasize{two simulated minutes} and returns a report, \textbf{not an arrival}.
+  \end{itemize}
+  \vspace{0.05cm}
+  \begin{center}
+    \includegraphics[height=7.3cm]{fig_claim.pdf}\\[2pt]
+    \figcaption{Crops of the real app, from an automated run of development case dev01.}
+  \end{center}
+  \note{
+    \textbf{(35s, ends 1:47)} Here is the notice, from the delivery contact. Plan B treats it as
+    a claim, not a fact. Before changing anything, it checks the one fact that could change the
+    decision. A status check asks the supplier's status service. In this sandbox that takes two
+    simulated minutes. The answer is delayed, with a reported arrival at five twenty five. Even
+    that is a report, not an arrival, so the plan must still work if it slips.
+  }
+\end{frame}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% 5. COMMIT (48 s)
+\begin{frame}{One checked change, one receipt}
+  \begin{itemize}
+    \item The \textbf{planner} builds the allowed repairs and checks each: \emphasize{16 built, 3 pass}. Best: a swap that \emphasize{costs \$0}.
+    \item A \textbf{receipt} is the server's own record of an accepted change. The AI cannot write it.
+  \end{itemize}
+  \vspace{0.05cm}
+  \begin{center}
+    \includegraphics[width=0.84\textwidth]{fig_swap.pdf}\\[4pt]
+    \fcolorbox{muted}{white}{\includegraphics[width=0.84\textwidth]{receipt_line.png}}\\[3pt]
+    \figcaption{Shown: my fixed-rule baseline in an automated run. In a recorded practice run, the AI coordinator made the same check and the same swap at 16:43.}
+  \end{center}
+  \note{
+    \textbf{(48s, ends 2:35)} Now the planner builds the allowed repairs from fixed templates,
+    like a swap or a ten minute shift, and checks each against the deadline, the people, and the
+    budget. Sixteen are built and three pass. The best is free: swap the demonstrations with the
+    skills exchange, so the demos start at five thirty, after the reported arrival. It is
+    applied at four forty three, and the server writes a receipt, its own record of the change.
+    The AI cannot write it. These frames show my rule baseline. In a recorded run, the AI
+    coordinator made the same check and the same swap.
+  }
+\end{frame}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% 6. KEEP (50 s)
+\begin{frame}{Four messages, zero changes}
+  \begin{itemize}
+    \item A second practice case, \textbf{in the order it happened}.
+    \item Not acting is the harder skill: \emphasize{no hold, no spending, no change}.
+  \end{itemize}
+  \vspace{0.15cm}
+  \begin{center}
+    \includegraphics[width=0.95\textwidth]{fig_quiet.pdf}\\[3pt]
+    \figcaption{Development case dev04, decided by the rule baseline in an automated run of the app.}
+  \end{center}
+  \note{
+    \textbf{(50s, ends 3:25)} Not acting is the harder skill. Here is a second practice case, in
+    the order it happened. First, the same delay notice, but the status check says on schedule,
+    arriving at four fifty eight. A false alarm, so the plan stays. Then a reminder that order P
+    nine for an October workshop was cancelled. That is another order on another date, so it
+    does not apply. [Skip if late: It arrives again, and a volunteer forwards it. One source
+    repeated is still one source.] In the end there is no hold, no spending and no change. Three
+    of my eight final test cases are quiet ones like this.
+  }
+\end{frame}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% 7. THE LOOP (28 s)
+\begin{frame}{Verify, prepare, commit}
+  \vspace{-0.1cm}
+  \begin{center}
+    \includegraphics[width=\textwidth]{fig_loop.pdf}
+  \end{center}
+  \vspace{-0.1cm}
+  \begin{itemize}
+    \item \textbf{Prepare} example: the projector arrives too late, so the backup is \emphasize{held until 16:55} while the organizer decides on \$35.
+  \end{itemize}
+  \note{
+    \textbf{(28s, ends 3:53)} So the loop is simple. Verify one fact that could change the
+    decision. Prepare a backup while a fact or an approval is pending. In another case the
+    projector arrives too late, so Plan B holds the backup until four fifty five and asks the
+    organizer for thirty five dollars. Commit only a plan the server checked. Or keep the plan.
+  }
+\end{frame}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% 8. THE MODEL CHOOSES, THE SERVER CHECKS (30 s)
+\begin{frame}{The model chooses, the server checks}
+  \begin{itemize}
+    \item A \textbf{policy} is the rule that picks the next step. Rules read only the messages they were written for. A \textbf{model} reads any wording, so it chooses and \emphasize{the server checks}.
+  \end{itemize}
+  \vspace{0.05cm}
+  \begin{center}
+    \includegraphics[width=0.9\textwidth]{fig_architecture.pdf}
+  \end{center}
+  \note{
+    \textbf{(30s, ends 4:23)} A policy is the rule that picks the next step. P zero is fixed
+    rules, which only read the messages they were written for. P one lets a model call the tools
+    freely. P two, mine, lets the model pick from options the server built and checked. [Skip if
+    late: P three is P two with every relevant check run first.] Every policy passes the same
+    gate.
+  }
+\end{frame}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% 9. THE HELD-OUT TEST (50 s)
+\begin{frame}{Held-out test: zero violations, no clear winner}
+  \begin{itemize}
+    \item \textbf{Held-out cases}: locked before the test and hidden from every policy. Code, prompts, model and limits were \textbf{frozen} first. A run is \textbf{met} when its final state and receipts show the case's outcome.
+  \end{itemize}
+  \begin{center}
+    \includegraphics[width=\textwidth]{fig_results.pdf}
+  \end{center}
+  \vspace{-0.1cm}
+  \begin{itemize}
+    \item All \res{both:recorded} runs recorded. Every policy: \textbf{\res{both:viol} executed violations}, \textbf{\res{both:unnec} changes} on the 3 quiet cases. Refused: \res{campus:all:refused} campus and \res{pantry:all:refused} pantry requests (\res{both:stale} on a state that changed meanwhile).
+    \item \emphasize{No consistent advantage for P2.} Campus model cost: P1 met \res{campus:P1:metk} of \res{campus:P1:metn} runs for \$\res{campus:P1:usd}, P3 \res{campus:P3:metk} for \$\res{campus:P3:usd}, P2 \res{campus:P2:metk} for \$\res{campus:P2:usd}. Fixed rules met every pantry run.
+  \end{itemize}
+  \note{
+    \textbf{(50s, ends 5:13)} Everything so far came from development cases, practice cases I
+    built with. Then I froze the code, the prompts, the model and the limits, and ran held-out
+    cases, hidden from every policy. A first attempt hit the provider's rate limit, so I voided
+    it and kept it on record. In the reported run all one hundred twenty runs were recorded. The
+    server refused fifty five requests in all, and no policy executed a violation or changed a
+    quiet event. But my P two showed no consistent advantage. P one, the model calling tools
+    freely, met all twenty four campus runs, at three times P two's model cost. On the pantry,
+    fixed rules met every run.
+  }
+\end{frame}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% 10. ONE FAILURE (26 s)
+\begin{frame}{One failure: a correct reading that never reached the planner}
+  \begin{itemize}
+    \item Held-out case \textbf{C06}: a volunteer will be late, with a later check-in.
+    \item P2 and P3 failed it in all \textbf{6 runs}, and every one stays \textbf{in the count}. P1 met it in 3 of 3.
+  \end{itemize}
+  \vspace{0.25cm}
+  \begin{center}
+    \includegraphics[width=\textwidth]{fig_failure.pdf}\\[6pt]
+    \figcaption{From the run's failure analysis. Other failures: the limit of 8 model calls per run ended 15 of the 26 failed runs (backup).}
+  \end{center}
+  \vspace{0.2cm}
+  \begin{itemize}
+    \item The reading was right. It was lost before the planner saw it (\textbf{planner input}), a limit disclosed before the runs.
+  \end{itemize}
+  \note{
+    \textbf{(26s, ends 5:39)} Here is one failure. In one held-out case a volunteer says they
+    will be late. P two and P three read the message correctly. But my frozen rule passes only
+    equipment claims to the planner, so the plan was never questioned. All six of their runs
+    stay in the count. P one met this case every time.
+  }
+\end{frame}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% 11. PANTRY (50 s)
+\begin{frame}{Same loop, a new rule: 40 kits for a fictional pantry}
+  \begin{itemize}
+    \item Staff need \textbf{40 kits by 13:40}. 24 are on the shelf, \emphasize{20 are late and do not count}, 16 wait in a partner pool.
+    \item Only \textbf{staff} record the handoff and the distribution. The agent can hold kits but never records them.
+  \end{itemize}
+  \vspace{0.05cm}
+  \begin{center}
+    \includegraphics[width=0.74\textwidth]{fig_pantry.pdf}\\[2pt]
+    \figcaption{\textbf{Shortfall}: kits still missing from the shelf. \textbf{Deficit}: kits not yet handed out. Fictional pantry sandbox, development case pantry\_dev01.}
+  \end{center}
+  \vspace{-0.1cm}
+  \begin{itemize}
+    \item \textbf{Held-out pantry}: rules met \res{pantry:P0:metk} of \res{pantry:P0:metn} runs, model policies \res{pantry:P1:metk} to \res{pantry:P2:metk} of 12, partly from a frozen planner defect (T03). \emphasize{No kit counted twice.}
+  \end{itemize}
+  \note{
+    \textbf{(50s, ends 6:29)} The same loop also runs a fictional pantry, with a new rule about
+    quantities. Staff need forty kits by one forty. Twenty four are on the shelf. Twenty more
+    are late, and late stock does not count. Sixteen wait in a partner pool at the same venue.
+    Plan B holds those sixteen. Only staff can record the handoff, which fills the shelf to
+    forty. And only the recorded distribution brings the kits not yet handed out to zero. On
+    four held-out pantry cases, fixed rules met all four runs, and the model policies six to
+    nine of twelve, partly because of a defect in my frozen planner. No kit was counted twice.
+  }
+\end{frame}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% 12. CLOSE (31 s)
+\begin{frame}{What works today, and what is next}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.7\textwidth}
+      \begin{itemize}
+        \item \textbf{Works}: verify, prepare, commit in a local sandbox. Every accepted change has a \emphasize{receipt}, and people approve spending.
+        \item \textbf{Tested} on 12 held-out cases (\res{both:recorded} runs): \emphasize{zero executed violations}, and no clear winner among the four policies.
+        \item \textbf{In real life} a message is a text, a status check is a tracking page, a hold is a refundable reservation.
+        \item \textbf{Not shown}: real bookings, real stock, community validation. \textbf{Next}: review the workflows with community staff.
+      \end{itemize}
+    \column{0.28\textwidth}
+      \centering
+      \includegraphics[width=0.8\textwidth]{fig_qr.pdf}\\[2pt]
+      {\scriptsize github.com/nocdoggo/COLLIE\\ branch hackathon/peeaai-plan\\ app in apps/plan\_b\par}
+  \end{columns}
+  \vfill
+  \begin{columns}[c,onlytextwidth]
+    \column{0.7\textwidth}
+      \textbf{Noctis Zhang}\\
+      University of Massachusetts Boston
+    \column{0.3\textwidth}
+      \hfill\includegraphics[height=1.0cm]{Blue-UMB-logo-lockup.png}
+  \end{columns}
+  \note{
+    \textbf{(31s, ends 7:00)} Today Plan B verifies, prepares and commits in a local sandbox.
+    Every accepted change has a receipt, and people approve spending. On held-out cases no
+    policy executed a violation, but my policy showed no consistent advantage over the others.
+    In real life a message is a text, a status check is a tracking page, and a hold is a
+    refundable reservation. Next, I want to review these workflows with community staff. Thank
+    you.
+  }
+\end{frame}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% BACKUP SLIDES (not timed)
+\appendix
+\begin{frame}{Backup: one model decision, as recorded}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.42\textwidth}
+      \begin{itemize}
+        \item A \textbf{replay} re-shows a recorded run. It never calls a tool and is never a new trial.
+        \item Wave 2 development run of P2 (\texttt{live/1.0.0}) on case dev02.
+        \item The model chose one option the server built. The server checked it and wrote the receipt. The model's own rationale is shown as \emphasize{untrusted text}.
+      \end{itemize}
+    \column{0.56\textwidth}
+      \centering
+      \includegraphics[height=8.1cm]{live_card.png}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Backup: the report's per-case figure, campus}
+  \begin{center}
+    \includegraphics[height=8.6cm]{report_campus.pdf}\\[2pt]
+    \figcaption{\texttt{campus/report/figure.svg} of run wave3\_heldout\_20261025T1625Z, printed to PDF. Case order as in the report.}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Backup: the report's per-case figure, pantry}
+  \begin{center}
+    \includegraphics[width=0.92\textwidth]{report_pantry.pdf}\\[2pt]
+    \figcaption{\texttt{pantry/report/figure.svg} of the same run, printed to PDF.}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Backup: what the held-out runs cost}
+  \begin{center}
+  {\small
+  \setlength{\tabcolsep}{6pt}
+  \begin{tabular}{@{}lcccc@{}}
+    \toprule
+    & \multicolumn{2}{c}{\textbf{Campus}} & \multicolumn{2}{c}{\textbf{Pantry}} \\
+    \textbf{Policy} & \textbf{Model calls} & \textbf{Model USD} & \textbf{Model calls} & \textbf{Model USD} \\
+    \midrule
+    P0 fixed rules & \res{campus:P0:calls} & \res{campus:P0:usd} & \res{pantry:P0:calls} & \res{pantry:P0:usd} \\
+    P1 model calls tools & \res{campus:P1:calls} & \res{campus:P1:usd} & \res{pantry:P1:calls} & \res{pantry:P1:usd} \\
+    P2 model picks options & \res{campus:P2:calls} & \res{campus:P2:usd} & \res{pantry:P2:calls} & \res{pantry:P2:usd} \\
+    P3 every check first & \res{campus:P3:calls} & \res{campus:P3:usd} & \res{pantry:P3:calls} & \res{pantry:P3:usd} \\
+    \bottomrule
+  \end{tabular}\par}
+  \end{center}
+  \begin{itemize}
+    \item Provider-reported cost of the reported run. Runs stopped by the 8-call limit: campus \res{campus:all:capped}, pantry \res{pantry:all:capped}. They stay in the counts.
+    \item A first attempt was \textbf{voided} before the reported run began: the provider's rate limit (20 requests a minute) answered most calls with an error. It is kept on record, the void departs from the frozen status rules, and the whole protocol was rerun one run at a time.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Backup: what the held-out numbers do not show}
+  \begin{itemize}
+    \item \textbf{The case is the unit}: 8 campus and 4 pantry cases. Three runs of a case are repeated trials. No significance test.
+    \item \textbf{C06} is out of reach for P0, P2 and P3 by a frozen rule, disclosed before the runs.
+    \item \textbf{Pantry}: only P2 and P3 had pantry guidance in their prompts. A defect in my frozen planner kept a pool checked as unavailable on offer, and it is the first break of all six P2 and P3 failures on case T03.
+    \item The 8 model calls per run come from development and ended 15 of the 26 failed runs.
+    \item These held-out cases are now spent. A new version needs new cases and a new freeze.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Backup: a development failure, kept on record}
+  \begin{itemize}
+    \item Wave 2, P1's first run on the pantry practice case: the executor \textbf{refused 6 holds}, the model call limit was reached, \emphasize{0 of 40} kits were served.
+    \item Cause: a defect in my P1 harness. The prompt never said which time window a hold covers, and the reply limit counted the model's reasoning.
+    \item Fixed in the prompt and the limit. The rerun served \emphasize{40 of 40}. The failed run is kept.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Backup: a participant's own check-in changes the plan}
+  \begin{center}
+    \includegraphics[height=7.6cm]{community_replanned.png}\\[3pt]
+    \figcaption{Development case skills\_dev01: the peer lead can stay only until 11:05, so the plan swaps two activities. Rule baseline, automated run.}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Backup: a partial handoff stays partial}
+  \begin{itemize}
+    \item Development case pantry\_dev02: staff hand off only \textbf{10 of the 16} kits.
+    \item \emphasize{34 kits} are distributed and a \emphasize{6-kit deficit} is reported. The target stays 40.
+    \item Stock is conserved: 34 handed out plus 6 left in the partner pool make 40. The late 20 never count.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Backup: the frozen configuration}
+  \begin{itemize}
+    \item \textbf{Policies}: P0 \texttt{rules/1.0.0} and \texttt{pantry-rules/1.1.0}, P1 \texttt{tool-use/1.1.0}, P2 \texttt{live/1.1.0}, P3 \texttt{verify-all/1.1.0}.
+    \item \textbf{Model}: \texttt{anthropic/claude-sonnet-5.5} through OpenRouter, the same for P1 to P3.
+    \item \textbf{Limits per run}: 48 tool calls, 8 model calls, \$0.50, 900 seconds.
+    \item \textbf{Seeds} 101, 202 and 303 are recorded but not sent, because the model's endpoints refuse a seed. The three runs of a case are repeated trials, not reproducible ones.
+    \item Frozen by hash in \texttt{freeze.json} before the first held-out call.
+  \end{itemize}
+\end{frame}
+
+\end{document}

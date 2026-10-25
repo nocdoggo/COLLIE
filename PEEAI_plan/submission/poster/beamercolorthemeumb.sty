@@ -1,0 +1,62 @@
+% UMass Boston color theme for the Gemini beamerposter theme
+% Official UMB brand colors (UMass Boston Style Guide v7):
+%   Dark Blue   #132245  RGB(19,34,69)    PMS 282 C   -- primary / header
+%   Beacon Blue #005A8B  RGB(0,90,139)    PMS 7462 C  -- signature accent (preferred logo color)
+%   Orange      #FF791F  RGB(255,121,31)  PMS 716 C   -- secondary accent / highlight
+%   Yellow      #FEDE42  RGB(254,222,66)  PMS 107 C   -- secondary accent
+
+% ====================
+% Definitions
+% ====================
+
+\definecolor{umbdark}{RGB}{19, 34, 69}
+\definecolor{umbblue}{RGB}{0, 90, 139}
+\definecolor{umborange}{RGB}{255, 121, 31}
+\definecolor{umbyellow}{RGB}{254, 222, 66}
+
+% Soft tints for block backgrounds
+\definecolor{umbalertbg}{RGB}{255, 241, 230}    % soft orange tint (highlight blocks)
+\definecolor{umbexamplebg}{RGB}{233, 242, 248}  % soft beacon-blue tint (example blocks)
+
+% ====================
+% Theme
+% ====================
+
+% Basic colors
+\setbeamercolor{palette primary}{fg=black,bg=white}
+\setbeamercolor{palette secondary}{fg=black,bg=white}
+\setbeamercolor{palette tertiary}{bg=black,fg=white}
+\setbeamercolor{palette quaternary}{fg=black,bg=white}
+\setbeamercolor{structure}{fg=umbblue}
+
+% Headline (dark blue band, white text -> white UMB logo reads crisply)
+\setbeamercolor{headline}{fg=white,bg=umbdark}
+\setbeamercolor{headline rule}{bg=umborange}   % thin orange rule under header / above footer
+
+% Block
+\setbeamercolor{block title}{fg=umbdark,bg=white}
+\setbeamercolor{block separator}{bg=umbblue}
+\setbeamercolor{block body}{fg=black,bg=white}
+
+% Alert Block (use for the eye-catching "highlight" content)
+\setbeamercolor{block alerted title}{fg=umbdark,bg=umbalertbg}
+\setbeamercolor{block alerted separator}{bg=umborange}
+\setbeamercolor{block alerted body}{fg=black,bg=umbalertbg}
+
+% Example Block
+\setbeamercolor{block example title}{fg=umbdark,bg=umbexamplebg}
+\setbeamercolor{block example separator}{bg=umbblue}
+\setbeamercolor{block example body}{fg=black,bg=umbexamplebg}
+
+% Heading (\heading inside blocks)
+\setbeamercolor{heading}{fg=umbblue}
+
+% Itemize
+\setbeamercolor{item}{fg=umbblue}
+
+% Bibliography
+\setbeamercolor{bibliography item}{fg=black}
+\setbeamercolor{bibliography entry author}{fg=black}
+\setbeamercolor{bibliography entry title}{fg=black}
+\setbeamercolor{bibliography entry location}{fg=black}
+\setbeamercolor{bibliography entry note}{fg=black}

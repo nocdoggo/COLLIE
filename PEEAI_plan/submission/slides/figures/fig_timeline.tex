@@ -1,0 +1,31 @@
+% The fictional campus showcase (development case dev01): five activities between 16:30 and
+% 18:00. The demonstrations need the projector that may be late. Times from the dev01 fixture.
+\documentclass[border=4pt]{standalone}
+\input{fig_style}
+\begin{document}
+\begin{tikzpicture}[x=1.25cm, y=0.62cm, font=\small]
+  % time axis: 0 = 16:30, one unit = 10 minutes, 9 = 18:00
+  \foreach \t/\l in {0/16:30, 1/16:40, 3/17:00, 6/17:30, 9/18:00}{
+    \draw[line] (\t,0.4) -- (\t,-5.4);
+    \node[lbl, font=\footnotesize] at (\t,0.85) {\l};
+  }
+  \foreach \row/\name/\a/\b/\style in {
+      1/Prepare the event/0/2/keybox,
+      2/Welcome/3/4/keybox,
+      3/Demonstrations/4/6/hotbox,
+      4/Skills exchange/6/8/keybox,
+      5/Closing/8/9/keybox}{
+    \node[anchor=east, text=ink] at (-0.2,-\row+0.5) {\name};
+    \draw[\style, rounded corners=2pt] (\a,-\row+0.15) rectangle (\b,-\row+0.85);
+  }
+  % the message at 16:40
+  \draw[umborange, line width=1.6pt] (1,0.4) -- (1,-5.4);
+  \node[hotbox, anchor=west, font=\footnotesize, text width=4.6cm] (msg) at (3.3,-0.5)
+    {16:40 message: the projector\\ \emph{may be about 25 minutes later}};
+  \draw[->, umborange, line width=1pt] (msg.west) -- (1.08,-0.5 |- msg.west);
+  \node[text=umborange, font=\footnotesize\bfseries, anchor=north] at (5,-5.45) {needs the projector};
+  \draw[->, umborange, line width=0.8pt] (5,-5.5) -- (5,-3.2);
+  \node[lbl, font=\footnotesize, anchor=north] at (3,-5.45) {opens};
+  \node[lbl, font=\footnotesize, anchor=north] at (9,-5.45) {must finish};
+\end{tikzpicture}
+\end{document}

@@ -1,0 +1,31 @@
+% The free swap of dev01: demonstrations and skills exchange change places, so the
+% demonstrations start after the projector's reported ETA (17:25). Times from story_07.
+\documentclass[border=4pt]{standalone}
+\input{fig_style}
+\begin{document}
+\begin{tikzpicture}[x=1.25cm, y=0.62cm, font=\small]
+  \foreach \t/\l in {0/16:30, 3/17:00, 6/17:30, 9/18:00}{
+    \draw[line] (\t,0.4) -- (\t,-5.4);
+    \node[lbl, font=\footnotesize] at (\t,0.85) {\l};
+  }
+  \foreach \row/\name/\a/\b in {1/Prepare the event/0/2, 2/Welcome/3/4, 5/Closing/8/9}{
+    \node[anchor=east, text=ink] at (-0.2,-\row+0.5) {\name};
+    \draw[keybox, rounded corners=2pt] (\a,-\row+0.15) rectangle (\b,-\row+0.85);
+  }
+  % before (dashed) and after (filled)
+  \node[anchor=east, text=ink] at (-0.2,-2.5) {Demonstrations};
+  \draw[muted, dash pattern=on 3pt off 2pt, rounded corners=2pt] (4,-2.85) rectangle (6,-2.15);
+  \draw[okbox, rounded corners=2pt] (6,-2.85) rectangle (8,-2.15);
+  \node[anchor=east, text=ink] at (-0.2,-3.5) {Skills exchange};
+  \draw[muted, dash pattern=on 3pt off 2pt, rounded corners=2pt] (6,-3.85) rectangle (8,-3.15);
+  \draw[okbox, rounded corners=2pt] (4,-3.85) rectangle (6,-3.15);
+  \draw[->, okgreen, line width=1pt] (5,-2.5) -- (6.6,-2.5);
+  \draw[->, okgreen, line width=1pt] (7,-3.5) -- (5.4,-3.5);
+  % projector ETA
+  \draw[umborange, line width=1.6pt] (5.5,0.4) -- (5.5,-5.4);
+  \node[text=umborange, font=\footnotesize\bfseries, anchor=north] at (5.5,-5.45) {projector ETA 17:25};
+  \node[lbl, font=\footnotesize, anchor=north] at (3,-5.45) {opens};
+  \node[lbl, font=\footnotesize, anchor=north] at (9,-5.45) {must finish};
+  \node[anchor=west, font=\footnotesize, text=muted] at (6.15,-0.5) {dashed: before, green: after};
+\end{tikzpicture}
+\end{document}

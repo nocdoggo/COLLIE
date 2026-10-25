@@ -1,0 +1,14 @@
+% A message is a claim: the dev01 notice and the one status check that answers it (two crops of
+% the Wave 2 storyboard frames story_04 and story_05, made by crop_frames.py).
+\documentclass[border=4pt]{standalone}
+\input{fig_style}
+\begin{document}
+\begin{tikzpicture}[font=\small]
+  \node[draw=line, inner sep=2pt] (notice) at (0,0) {\includegraphics[width=9.6cm]{frames/notice.png}};
+  \node[draw=line, inner sep=3pt, below=13mm of notice] (status) {\includegraphics[width=11cm]{frames/status_line.png}};
+  \draw[flow, primary, line width=1.3pt] (notice.south) -- node[right=2mm, text=primary, font=\small\bfseries]
+    {1 status check, 2 simulated minutes} (status.north);
+  \node[hotbox, below=3mm of status, font=\small] {reported ETA 17:25, which is still not an arrival};
+  \node[lbl, anchor=south west, font=\footnotesize] at (notice.north west) {the notice, as the app shows it};
+\end{tikzpicture}
+\end{document}

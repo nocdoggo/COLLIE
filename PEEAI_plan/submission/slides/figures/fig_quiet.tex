@@ -1,0 +1,20 @@
+% Development case dev04 in the order it happened: three messages, zero changes. Texts from
+% scenarios/private/dev04.json (a development case), verdicts from storyboard frame story_08.
+\documentclass[border=4pt]{standalone}
+\input{fig_style}
+\begin{document}
+\begin{tikzpicture}[font=\small]
+  \tikzset{msg/.style={box, text width=4.6cm, minimum height=2.15cm, align=left},
+           verdict/.style={box, text width=4.6cm, minimum height=1.35cm, align=left, fill=softgray}}
+  \node[msg] (m1) at (0,0) {{\bfseries 16:40 \enspace the delay notice}\\ ``may be about 25 minutes later''};
+  \node[msg] (m2) at (5.2,0) {{\bfseries 16:44 \enspace a reminder}\\ ``order P09 for the October 29 workshop was cancelled''};
+  \node[msg] (m3) at (10.4,0) {{\bfseries 16:46 and 16:47}\\ the same reminder again, then a volunteer's forwarded copy};
+  \node[verdict, below=6mm of m1] (v1) {status check: on schedule, ETA 16:58\\ {\bfseries\color{primary} false alarm}};
+  \node[verdict, below=6mm of m2] (v2) {another order, another date\\ {\bfseries\color{primary} does not apply}};
+  \node[verdict, below=6mm of m3] (v3) {one source repeated\\ {\bfseries\color{primary} duplicate}};
+  \foreach \i in {1,2,3}{\draw[flow] (m\i) -- (v\i);}
+  \node[okbox, minimum width=15cm, below=6mm of v2, font=\small\bfseries] (keep)
+    {Plan version 1 kept: no hold, no spending, no change};
+  \foreach \i in {1,2,3}{\draw[flow] (v\i.south) -- (v\i.south |- keep.north);}
+\end{tikzpicture}
+\end{document}

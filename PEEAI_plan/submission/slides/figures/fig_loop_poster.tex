@@ -1,0 +1,20 @@
+% The decision loop, simplified for the poster column (large type).
+\documentclass[border=4pt]{standalone}
+\input{fig_style}
+\begin{document}
+\begin{tikzpicture}[font=\small, node distance=4mm]
+  \tikzset{opt/.style={box, text width=3.3cm, minimum height=1.25cm, align=center}}
+  \node[hotbox, text width=7.2cm] (msg) at (0,0) {\bfseries New message: a claim, not a fact};
+  \node[keybox, text width=7.2cm, below=6mm of msg, font=\small\bfseries] (decide) {Decide the next step};
+  \node[opt, below=6mm of decide.south west, anchor=north west] (verify) {{\bfseries\color{primary} Verify}\\ one fact};
+  \node[opt, below=6mm of decide.south east, anchor=north east] (prepare) {{\bfseries\color{primary} Prepare}\\ hold a backup};
+  \node[opt, below=3mm of verify] (commit) {{\bfseries\color{primary} Commit}\\ a checked plan};
+  \node[opt, below=3mm of prepare, fill=softgray] (keep) {{\bfseries\color{muted} Keep}\\ change nothing};
+  \node[okbox, text width=7.2cm, below=6mm of commit.south west, anchor=north west] (receipt) {\bfseries Receipt and the new state};
+  \draw[flow] (msg) -- (decide);
+  \draw[flow] (decide.south -| verify) -- (verify);
+  \draw[flow] (decide.south -| prepare) -- (prepare);
+  \draw[flow] (commit.south) -- (commit.south |- receipt.north);
+  \draw[flow, primary, line width=1.1pt] (receipt.east) -- ++(0.5,0) |- (decide.east);
+\end{tikzpicture}
+\end{document}

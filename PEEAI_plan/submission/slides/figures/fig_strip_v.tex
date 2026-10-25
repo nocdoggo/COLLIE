@@ -1,0 +1,15 @@
+% One recovery in four steps, vertical (poster column). Development case dev01.
+\documentclass[border=4pt]{standalone}
+\input{fig_style}
+\begin{document}
+\begin{tikzpicture}[font=\small, node distance=5mm]
+  \tikzset{stp/.style={box, text width=6.4cm, align=left}}
+  \node[stp, hotbox, align=left] (a) {{\bfseries\color{umborange} 1. Message}\\ the projector may be about 25 minutes late};
+  \node[stp, below=of a] (b) {{\bfseries\color{primary} 2. Checked}\\ supplier status: delayed, ETA 17:25};
+  \node[stp, below=of b] (c) {{\bfseries\color{primary} 3. Changed}\\ two activities swap places, cost \$0};
+  \node[stp, okbox, align=left, below=of c] (d) {{\bfseries\color{okgreen} 4. Receipt}\\ the server's record of the change};
+  \draw[flow] (a) -- (b);
+  \draw[flow] (b) -- (c);
+  \draw[flow] (c) -- (d);
+\end{tikzpicture}
+\end{document}

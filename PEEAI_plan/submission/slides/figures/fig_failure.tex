@@ -1,0 +1,17 @@
+% One held-out failure in four steps: case C06 ("volunteer late, with a later check-in", the
+% protocol's public condition in PEEAI_plan/08_evaluation.md) under P2 and P3. Source: FAILURES.md
+% of run wave3_heldout_20261025T1625Z (the earliest broken stage is planner input).
+\documentclass[border=4pt]{standalone}
+\input{fig_style}
+\begin{document}
+\begin{tikzpicture}[font=\normalsize, node distance=6mm]
+  \tikzset{stp/.style={box, text width=3.45cm, minimum height=3.0cm, align=left}}
+  \node[stp, hotbox, align=left] (a) {{\bfseries\color{umborange} 1. Message}\\ a volunteer says they will be late};
+  \node[stp, okbox, align=left, right=of a] (b) {{\bfseries\color{okgreen} 2. Read correctly}\\ the model reads the delay and its time};
+  \node[stp, keybox, draw=umborange, line width=1.4pt, align=left, right=of b] (c) {{\bfseries\color{umborange} 3. Stopped here}\\ my frozen rule passes only equipment claims to the planner};
+  \node[stp, right=of c] (d) {{\bfseries\color{ink} 4. Plan kept}\\ the activity they lead cannot start in time};
+  \draw[flow] (a) -- (b);
+  \draw[flow] (b) -- (c);
+  \draw[flow] (c) -- (d);
+\end{tikzpicture}
+\end{document}

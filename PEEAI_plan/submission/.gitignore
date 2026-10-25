@@ -1,0 +1,20 @@
+# LaTeX build files (the compiled PDFs are kept)
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.nav
+*.out
+*.run.xml
+*.snm
+*.synctex.gz
+*.toc
+*.vrb
+*.xdv
+# Python
+__pycache__/
+# Scratch renders made while checking the items
+_render/
