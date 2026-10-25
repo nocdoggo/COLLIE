@@ -22,7 +22,7 @@ _about 44 seconds_
 
 A language model reads the message and picks one option, but the server built those options and checks every action. I froze the system, then tested it on cases it never saw, against three other coordinators, from fixed rules to a model calling tools freely.
 
-On twelve held-out cases, one hundred twenty runs in all, no policy executed a violation, and none changed a plan that needed no change. But my policy showed no consistent advantage. The model calling tools freely met every campus run, at three times my policy's model cost, and fixed rules met every pantry run.
+On twelve held-out cases, one hundred twenty runs in all, no policy executed a violation, and on the three cases that needed no change, none changed the plan. But my policy showed no consistent advantage. The model calling tools freely met every campus run, at three times my policy's model cost, and fixed rules met every pantry run.
 
 ## The pantry, in one sentence
 _about 10 seconds_

@@ -167,6 +167,7 @@ def what_it_does(doc) -> None:
 
 def walkthrough(doc) -> None:
     doc.add_heading("4. A recovery, step by step", level=1)
+    para(doc, "The fictional campus showcase in these development cases takes place on November 5, 2026.")
     doc.add_heading("4.1 The late projector (development case dev01)", level=2)
     numbered(
         doc,
@@ -591,8 +592,8 @@ def results(doc) -> None:
     bullets(
         doc,
         [
-            "Python tests: 896 passed, rerun for this document on October 25, 2026 at commit c052338 "
-            "(`uv run pytest -q`). The Wave 3 evidence collector (`PEEAI_plan/handoffs/wave_3/evidence/reports/checks.json`) also passed 396 "
+            "Python tests: 896 passed, in the Wave 3 evidence collector's run from a clean checkout of "
+            "commit 3442874 (`PEEAI_plan/handoffs/wave_3/evidence/reports/checks.json`). The same run passed 396 "
             "web tests, the browser walkthroughs 41 of 41 and 30 of 30, the storyboard 32 of 32 and the "
             "keyboard walk 19 of 19, and `plan-b run-case all` matched all 9 development cases.",
             "At the Wave 2 packet (development evidence): 766 Python tests and 392 web tests passed, the "
@@ -796,6 +797,7 @@ def appendices(doc) -> None:
             ["Partial handoff, 34 distributed, 6-kit deficit", "Wave 2 README (pantry_dev02)"],
             ["Frozen policies, model, limits, seeds", "`freeze.json`, `RUNTIME_CONTRACT.md` section 20"],
             ["Wave 2 test counts", "Wave 2 README and `VERIFICATION.md`"],
+            ["Wave 3 test counts (section 12.6)", "`PEEAI_plan/handoffs/wave_3/evidence/reports/checks.json` (clean checkout of 3442874)"],
             ["Held-out results (section 12)", "`apps/plan_b/evaluation/results/wave3_heldout_20261025T1625Z/` (commit c052338): `campus/report/metrics.json`, `pantry/report/metrics.json`, `README.md`, `FAILURES.md`, read by `PEEAI_plan/submission/make_results.py`"],
         ],
         [3.3, 3.2],

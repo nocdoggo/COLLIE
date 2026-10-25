@@ -33,7 +33,7 @@ The audience should be able to retell four things:
 | Part | Default mode | Label on screen | Evidence the mode works |
 | --- | --- | --- | --- |
 | Slides 1 to 12 | The deck alone (PDF). It needs no server | none | the deck file |
-| Optional board, slides 4 to 7 | **Deterministic policy** acting on the sandbox (`rules/1.0.0`), no model call | Header badge "Deterministic policy" | 3 automated rehearsals ([REHEARSALS.md](REHEARSALS.md)) |
+| Optional board, slides 3 to 7 | **Deterministic policy** acting on the sandbox (`rules/1.0.0`), no model call | Header badge "Deterministic policy" | 3 automated rehearsals ([REHEARSALS.md](REHEARSALS.md)) |
 | Optional board, slide 8 | **Recorded replay** of a real paid development run (`live_p2-live_dev02_trace.json`, `live/1.0.0`) | Purple "Recorded replay" banner. "Integrity check passed" | rehearsals, and the storyboard check |
 | Optional board, slide 11 (pantry cameo) | **Live sandbox tools with the deterministic pantry policy** (`pantry-rules/1.1.0`), no model call | "Fictional pantry sandbox". Header "Deterministic policy" | rehearsals (40 of 40 on time in all three) |
 
@@ -79,6 +79,9 @@ the story. **Point at** is what to show. **Say** follows `pres-note.md`, about 1
 minute. The spoken script is 953 words, an estimated 408 s against the 420 s plan, so board
 actions are spoken over and never paused for. If the board is used, drop the "skip if late"
 sentences of slides 3, 6 and 8.
+
+Slide numbers here follow `pres-note.md` and the PDF pages. The deck's footer counts only the 11
+slides after the title, so slide 9 here shows "8 / 11" in the footer.
 
 ### Slide 1 · 0:00 to 0:10 · Title (10 s)
 

@@ -70,7 +70,7 @@ Checked when this was written:
 - `poster.pdf`: one page, 121.92 by 68.58 cm (16:9), no overfull box. Raleway and Lato come
   from TeX Live, with Lato Regular instead of Light for projection.
 - `pres-note.md`: 953 spoken words, about 6:48 at 140 words a minute, inside 7:00.
-- `poster-note.md`: 263 spoken words, about 1:53.
+- `poster-note.md`: 267 spoken words, about 1:54.
 - `check_writing.py`: 0 forbidden characters in both PDFs, the Word text and both scripts.
 
 ## Template credits

@@ -54,10 +54,18 @@ reports summarized there, `apps/plan_b/docs/RELEASE_CHECKS.md` and this packet's
     (`plan_b/scenarios/private/eval/`, 25 files) and the evaluator records (`runner_private/`)
     are committed on `hackathon/peeaai-plan` and become public when the branch is pushed. The
     packaged sanitized traces and `FAILURES.md` already show the held-out messages as delivered.
+    The package withholds the `runner_private/` files themselves, but `failure_digests/*.txt` and
+    `FAILURES.md`, both packaged, reproduce the failed predicate ids and details of every
+    non-success episode.
     The held-out set is therefore spent: a later evaluation needs new cases.
-16. **The identifier scan exempts two public strings by design:** the repository URL and the
-    presenter's name, which appear on the submission items and the checklist. Every other
-    occurrence of the local user or host name fails the scan.
+16. **The identifier scan exempts three public strings by design:** the repository URL, the
+    presenter's name and the LICENSE copyright line, which appear on the submission items, the
+    checklist and the license. Every other occurrence of the local user or host name fails the
+    scan. The package is selected by globbing the working tree, not git's tracked files. So an
+    untracked or ignored file under an included directory would be packaged unless an exclude
+    pattern matches it (for example a `.env.local`). Build the package from a fresh clone. At
+    `8ea9d48` no such file exists under the included directories apart from the excluded caches
+    and the built `web/dist`.
 17. **Functional check 11 is partly covered.** No runtime test resolves every verify decision to
     a matching successful check. The consumed-kits-in-a-later-slot check is partly covered too
     (RELEASE_CHECKS.md).
