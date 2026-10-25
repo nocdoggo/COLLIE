@@ -10,6 +10,15 @@ traces store UTC.
 All of this is **development evidence** on fictional, synthetic fixtures. It is not held-out
 evaluation, it supports no comparative claim, and it is not community validation.
 
+**Finishing Wave 2 (2026-10-25).** P1 (`tool-use/1.0.0`) and P3 (`verify-all/1.0.0`) were
+built, P2 (`live/1.0.0`) gained the pantry's stock options, and one development run each of P1,
+P2 and P3 was recorded on five cases (section 1b, section 4). The M2 table (section 3) is
+updated: "Future comparison parity" is now passed, and the live pantry result is the P2 run
+`live_p2-live_pantry_dev01`. The audit step then reran P1's four `tool_use.v1` runs under the
+shipped `tool_use.v2` and fixed what its five auditors confirmed (section 1c). Sections 1 and 2
+still describe the regeneration from `fd04d48`; the integration step regenerates
+`reports/checks.json` from a clean checkout of the finishing commit.
+
 ## 1. How the evidence was produced
 
 Two scripts produced it on 2026-10-24. The recorded live runs were made once from the working
@@ -60,6 +69,115 @@ exited 0. Its temporary directory was removed.
 cases, the 11 planning examples, the planning schema, the prompts, both lockfiles and migrations
 0001–0004.
 
+### 1b. Finishing Wave 2: the P1-P3 development runs (2026-10-25)
+
+Run from the working tree with the finished P1, P2 and P3 code, before the integration commit.
+The cumulative spend cap was 5.29 USD over a ledger at 0.29906, so this step could spend at most
+5 USD.
+
+```bash
+cd apps/plan_b
+# 0. one read-only GET /api/v1/key (numeric fields only): limit 50, remaining 49.70094, usage 0.29906
+# 1. the development runs (paid; each once; kept as recorded)
+PLAN_B_MODEL_MAX_TOTAL_COST_USD=5.29 uv run python scripts/run_live_cases.py --out <live> --policy tool-use dev01
+PLAN_B_MODEL_MAX_TOTAL_COST_USD=5.29 uv run python scripts/run_live_cases.py --out <live> --policy tool-use dev02 dev04 pantry_dev01 skills_dev01
+PLAN_B_MODEL_MAX_TOTAL_COST_USD=5.29 uv run python scripts/run_live_cases.py --out <live> --policy live dev01 dev02 dev04 pantry_dev01 skills_dev01
+PLAN_B_MODEL_MAX_TOTAL_COST_USD=5.29 uv run python scripts/run_live_cases.py --out <live> --policy verify-all dev01 dev02 dev04 pantry_dev01 skills_dev01
+# 2. P1's pantry_dev01 run failed on a defect in our P1 harness (DECISIONS W2-D11); after the fix:
+uv run pytest -q -o addopts= -p no:cacheprovider        # 756 passed, 1 warning, exit 0
+PLAN_B_MODEL_MAX_TOTAL_COST_USD=5.29 uv run python scripts/run_live_cases.py --out <live> \
+    --policy tool-use --label p1-tool-use_pantry_dev01_r2 pantry_dev01
+# 3. copied into evidence/{reports,traces,runner_private}; then (no model call):
+uv run python scripts/write_development_results.py --evidence ../../PEEAI_plan/handoffs/wave_2/evidence
+uv run plan-b verify-trace ../../PEEAI_plan/handoffs/wave_2/evidence/traces/live_p<N>-*_trace.json   # 16 x intact
+```
+
+Results:
+
+* **The runs.** Every invocation exited 0. 15 of the 16 recorded runs matched expectation.
+  The exception is the superseded first P1 pantry_dev01 run. Every trace verifies `intact`.
+  The model was `anthropic/claude-sonnet-5.5`, requested and returned on every call. Section 4
+  has the table.
+* **The defect and its fix.** `tool_use.v1` did not document a hold's window, and the
+  1536-token turn limit was shared with the model's reasoning tokens. The fix is a new prompt
+  `tool_use.v2` and a 4096-token limit, with `tests/test_tool_use_hold_window.py` (2 tests).
+  `tests/test_live_workflow.py` and `tests/test_comparison_policy_fixes.py` were updated to the
+  new prompt id and limit. The affected focused tests passed (6), then the full suite passed
+  (756) before the rerun.
+* **The collector's live-run part, checked in isolation** (not the full collector).
+  `copy_live` copied 24 live records (the 8 Wave 2 runs and the 16 new ones). `live_summary`
+  and the new `live_by_policy` summarized them per policy id. `spend_summary` labelled every
+  ledger run id, and its sum equalled the ledger total. `m2_focused`, on a JUnit report of the
+  six parity and workflow test files (140 passed), matched every new pattern with passing
+  tests: "Future comparison parity" 82 and "Bounded failure behavior" 22.
+* **Scans.** No credential-shaped text and no local path or identifier in the new evidence and
+  results files (a pattern search of those files).
+* **Not run in this step:** the web checks and the browser walkthroughs (a concurrent worker
+  was changing `web/src`), and the full collector. The integration step runs them from a clean
+  checkout.
+
+### 1c. Wave 2 audit step: P1 reruns and confirmed fixes (2026-10-25)
+
+Five auditor subagents reviewed the finishing step's tree: claims against evidence, M2
+completeness, the contract and docs against the code, security and sanitization, and the demo.
+They raised 38 findings, 37 after merging one duplicate. Each was checked by reproduction or by
+tracing the code, and every confirmed one was fixed except two outside the audit's files
+(KNOWN_LIMITATIONS, "One record path still to harden"; the integration step then closed the
+gate's exception text and the staff receipt default). A re-audit reviewed the fixes. The
+four P1 runs recorded under `tool_use.v1` no longer reflected the shipped P1, so they were run
+again.
+
+```bash
+cd apps/plan_b
+# 1. P1 under the shipped prompt (paid; one trial each; ledger before: 1.96562 USD, 102 entries)
+PLAN_B_MODEL_MAX_TOTAL_COST_USD=3.46562 uv run python scripts/run_live_cases.py --out <live> \
+    --policy tool-use --label p1-tool-use_<case>_r2 <case>   # dev01, dev02, dev04, skills_dev01
+uv run python scripts/write_development_results.py --evidence ../../PEEAI_plan/handoffs/wave_2/evidence   # 20 runs written; spend 2.5798 USD
+uv run plan-b verify-trace ../../PEEAI_plan/handoffs/wave_2/evidence/traces/live_p1-tool-use_<case>_r2_trace.json   # 4 x intact
+# 2. browser checks: one press of "Run live agent" on a fresh dev01 (paid; per-run cap 0.10 USD),
+#    and one press with PLAN_B_MODEL_BASE_URL=http://127.0.0.1:9/api/v1 (a closed local port)
+# 3. the battery, after every fix
+uv run pytest -q -o addopts= -p no:cacheprovider --junitxml=<work>/junit.xml   # 762 passed, 1 warning
+uv run plan-b run-case all --db <work>/runs.sqlite3 --out <work>/out           # 9 lines, all matching
+uv run plan-b verify-trace <work>/out/traces/<each>_trace.json                 # 9 x intact
+(cd web && npm run typecheck && npm test && npm run build && npm run lint)      # 390 pass; build and boundary lint pass
+uv run python tests/e2e/walkthrough.py --out <work>/wt1                        # 41/41 checks passed
+uv run python tests/e2e/walkthrough_wave2.py --out <work>/wt2                  # 30/30 checks passed
+uv run python tests/e2e/storyboard.py --out <work>/sb --port 8791              # 32/32 checks passed
+uv run python tests/e2e/storyboard.py --port 8791   # 32/32; rewrote evidence/storyboard/
+```
+
+Results:
+
+* **The reruns.** All four matched expectation, every call `ok`, every trace `intact`: dev01
+  8 model calls (cap at 17:24), 22 tool calls, 0.2408 USD; dev02 8 (cap at 17:44), 24, 0.2425;
+  dev04 6, 20, 0.1761; skills_dev01 8 (cap at 10:06), 20, 0.2539. In all, 30 calls and
+  0.91328 USD. The `tool_use.v1` runs are kept and marked superseded by the prompt change.
+* **The browser checks.** The press made 3 calls in 11.5 s for 0.03655 USD and recorded verify,
+  the swap (`rcpt_0001`) and keep: the live button works. Against the closed port, the press
+  returned in 0.3 s with a labeled `wait` (`provider_error`) and an unchanged plan, and a clean
+  reload, the deterministic run and a replay then worked. The ledger records that check at
+  cost 0 (`transport`).
+* **The battery.** The 9 case lines are identical to the evidence `checks.json`, and dev01–dev06
+  to Wave 1. Mapped with the collector's `m2_focused` on the JUnit of the 762-test run, every
+  M2 check's tests passed: live campus 8, bounded failure 57, community 40, shared pantry core
+  15, stock and service 7, quantity 10, staff 11, parity 101.
+* **Behavioral fixes, with tests.** A restarted server now resumes an episode's model spend, so
+  the per-run USD cap stays per episode (`test_comparison_policy_fixes.py`, 4 tests). A recorded
+  run's error text names no local path (`test_live_run_script.py`, 2 tests). The web shows the
+  pantry capacity tile as "Can still be distributed now" and an unreachable provider as "failed
+  or could not be reached" (`web/tests/demo_story.test.ts`, 2 tests). The live badge no longer
+  uses the replay's purple. The storyboard places cards under the replay banner, frames the
+  organizer at the deck size and guards its secret check. The collector now runs the storyboard
+  into `<evidence>/storyboard/`.
+* **Security scans** (the security auditor): no key material in 124,534 files of the working
+  tree, the evidence, the web bundle and `var/` (a script that read the key in memory and
+  printed file names only; see KNOWN_LIMITATIONS); no credential, host name, user name or
+  absolute path in the packet or the results; no private truth in browser-visible files,
+  replays or public reports; all 31 evidence traces `intact`.
+* **Not run here:** the full collector from a clean checkout (the integration step), and any
+  further browser run of a model-driven policy.
+
 ## 2. Commands and results
 
 These are the collector's rows from `reports/checks.json`. `<work>` is its temporary directory
@@ -94,18 +212,20 @@ report is `reports/pytest_junit.xml`, with its host name replaced and its timest
 
 The checks are the "Mandatory M2 checks" of `PEEAI_plan/waves/02_adaptation.md`. Test paths are
 relative to `apps/plan_b/tests/`. `reports/m2_focused_tests.json` lists every mapped test with
-its outcome in the row-6 run.
+its outcome in the row-6 run (the `fd04d48` regeneration, before P1-P3 and their tests existed).
+The finishing rows' counts below come from the audit step's full run (section 1c), mapped with
+the collector's own `m2_focused`; the integration step records them in that file.
 
 | M2 check | Recorded outcome | Evidence |
 | --- | --- | --- |
-| **Live campus behavior**: one real model-driven end-to-end recovery with a useful tool call, a validated action and fresh-state agreement; a stale warning gets a distinct, justified response | **Pass** (one live trial each; see the dev01 and dev04 details below the table) | `reports/live_dev01_run.json`, `traces/live_dev01_trace.json`; `reports/live_dev04_run.json`, `traces/live_dev04_trace.json`; also live dev02, dev05, dev06, skills_dev01 and skills_dev02 (section 4); `reports/g_llm_gate.json` (G-LLM pass); 8 focused tests passed |
-| **Bounded failure behavior**: malformed output, unknown entity, exhausted cap, timeout and stale revision stay visible and produce no invented success | **Pass on the focused tests; two failure paths also occurred live** (see below the table) | 35 focused tests passed (`test_agent_boundary.py`, `test_agent_provider.py`, `test_integration_policy.py`, `test_integration_api.py`); `reports/live_skills_dev02_run.json`, `reports/live_dev06_run.json` |
+| **Live campus behavior**: one real model-driven end-to-end recovery with a useful tool call, a validated action and fresh-state agreement; a stale warning gets a distinct, justified response | **Pass** (one live trial each; see the dev01 and dev04 details below the table; Wave 2 runs from the `bf71e43` tree, reproduced on the shipped code by `live_p2-live_dev01` and `live_p2-live_dev04`) | `reports/live_dev01_run.json`, `traces/live_dev01_trace.json`; `reports/live_dev04_run.json`, `traces/live_dev04_trace.json`; also live dev02, dev05, dev06, skills_dev01 and skills_dev02 (section 4); `reports/g_llm_gate.json` (G-LLM pass); 8 focused tests passed |
+| **Bounded failure behavior**: malformed output, unknown entity, exhausted cap, timeout and stale revision stay visible and produce no invented success | **Pass on the focused tests; four failure paths also occurred live** (see below the table) | 57 mapped tests passed in the audit step's run (35 in `test_agent_boundary.py`, `test_agent_provider.py`, `test_integration_policy.py`, `test_integration_api.py`, as recorded at `fd04d48`; 22 for every class under P1, P2 and P3 in `test_live_workflow.py`); `reports/live_skills_dev02_run.json`, `reports/live_dev06_run.json`, `reports/live_p1-tool-use_pantry_dev01_run.json`, `reports/live_p1-tool-use_dev02_run.json` |
 | **Community workflow**: participant input changes a role fact and affects planning; unauthorized goal or stock actions reject; the skills exchange loads through the event adapter | **Pass** (see below the table) | 40 focused tests passed (`test_community_skills_exchange.py`, `test_resource_offer.py`, `test_integration_api.py`, `test_stock_conservation.py::test_agent_cannot_call_staff_only_tools`); `traces/skills_dev01_trace.json`; `traces/live_skills_dev01_trace.json`; walkthrough_wave2 community flow (`screenshots/w2_07`–`w2_10`) |
 | **Shared pantry core**: the same orchestration, grants, receipts, replay and transaction boundary run the pantry scenario; the domain adapter owns only the added semantics | **Pass** (see below the table) | `traces/pantry_dev01_trace.json`, `traces/pantry_dev02_trace.json` (`intact`); 15 focused tests passed (`test_pantry_workflow.py`, `test_pantry_fixture.py`, `test_integration_policy.py`); walkthrough_wave2 pantry flow (`screenshots/w2_01`–`w2_06`) |
 | **Stock and service accounting**: the 24/16 to 40/0 handoff conserves stock; the target stays 40; a receipt or commit does not reduce the service deficit; only distribution records achieved service | **Pass** | `reports/pantry_accounting.json` (section 5); 7 focused tests passed (`test_stock_conservation.py`, `test_pantry_workflow.py::test_completion_distribution_and_next_start_order_at_the_inclusive_deadline`) |
 | **Quantity failure checks**: overlapping and non-overlapping double allocation reject; release and expiry create no stock; duplicate physical records cannot credit twice; a partial handoff keeps its residual reservation; early distribution cannot exceed attended throughput; late records keep truthful times and fail on-time attainment | **Pass** | 10 focused tests passed (`test_stock_conservation.py`); pantry_dev02's partial handoff in `reports/pantry_accounting.json` |
-| **Staff boundary**: the agent cannot call the staff-only receipt or distribution operations; without staff attestation there is no fictional physical success | **Pass** (see below the table) | 11 focused tests passed (`test_stock_conservation.py`, `test_agent_boundary.py`, `test_pantry_workflow.py`, `test_pantry_fixture.py`); `reports/live_pantry_dev01_run.json` |
-| **Future comparison parity**: P0–P3 use the same candidates, grants, executor, tools and domain semantics within each suite; policy-specific prompts are recorded | **Partial, not passed** (see below the table) | 43 focused tests passed (`test_runner_isolation.py`, `test_agent_boundary.py`, `test_integration_policy.py`); `reports/live_pantry_dev01_run.json`; KNOWN_LIMITATIONS |
+| **Staff boundary**: the agent cannot call the staff-only receipt or distribution operations; without staff attestation there is no fictional physical success | **Pass** (see below the table) | 11 focused tests passed (`test_stock_conservation.py`, `test_agent_boundary.py`, `test_pantry_workflow.py`, `test_pantry_fixture.py`); `reports/live_pantry_dev01_run.json`; the P1, P2 and P3 pantry runs (`runner_private/live_p*_pantry_dev01*`, `p_staff_only` passed in each) |
+| **Future comparison parity**: P0–P3 use the same candidates, grants, executor, tools and domain semantics within each suite; policy-specific prompts are recorded | **Pass** (finishing step, 2026-10-25; see below the table) | `test_policy_parity.py`, `test_live_workflow.py`, `test_pantry_live_menu.py`, `test_comparison_policy_fixes.py`, `test_runner_isolation.py`, `test_tool_use_hold_window.py`, with `test_agent_boundary.py` and `test_integration_policy.py` (101 mapped tests passed in the audit step's 762-test run); the 20 development runs of P1-P3 (`reports/live_p*_run.json`, section 4) |
 
 **Live campus behavior, in detail.**
 
@@ -153,8 +273,16 @@ its outcome in the row-6 run.
     10:07 (`rcpt_0006`).
   * `live_dev06`: the status query was `unavailable` (`STATUS_UNAVAILABLE`, kept visible as
     unverified), and the model then chose the robust free swap.
-* **Not induced against the real provider:** malformed output, an unknown entity, exhausted
-  caps and timeouts.
+  * `live_p1-tool-use_pantry_dev01` (superseded; DECISIONS W2-D11): two replies were cut off
+    at the token limit (`malformed_json`); one was repaired and the other ended at the model-call
+    cap. Six refused holds stayed visible as `wait` decisions with their error codes. Nothing
+    was invented: 0 of 40 kits, stock conserved.
+  * Exhausted caps: P1 reached the 8-call model cap in `live_p1-tool-use_dev01_r2` (17:24),
+    `live_p1-tool-use_dev02_r2` (17:44) and `live_p1-tool-use_skills_dev01_r2` (10:06), and in
+    the superseded `live_p1-tool-use_dev02` (17:44), `live_p1-tool-use_skills_dev01` (10:06) and
+    the run above (12:35). Each is a host `stop`, and the plan and commitments stayed as they
+    were.
+* **Not induced against the real provider:** an unknown entity and timeouts.
 
 **Community workflow, in detail.**
 
@@ -189,21 +317,39 @@ its outcome in the row-6 run.
   rejects them with `GRANT_REQUIRED` and an unchanged revision.
 * Without staff attestation, nothing physical succeeds.
 * Scoring flags unattested and agent-made records.
-* The live pantry run made no attestation: `no_staff_attestation_by_agent` passed.
+* No live pantry run made an attestation: `no_staff_attestation_by_agent` passed in the Wave 2
+  run and in the four P1, P2 and P3 pantry_dev01 runs (`p_staff_only`). In the three completed
+  runs only the labeled staff simulator recorded the receipt and the distribution.
 
-**Future comparison parity, in detail.**
+**Future comparison parity, in detail** (passed in the finishing step).
 
-* **What holds.** P0 (`rules/1.0.0`, `pantry-rules/1.0.0`) and the model-driven `live/1.0.0` use:
-  * the same `run_case`, `PolicyHost`, episode caps, scripted actors and staff simulator;
-  * the same candidate generator, grants, executor and tool vocabulary;
-  * the same isolation rules.
-
-  Every live decision records its prompt ids and sha256.
-* **What does not.**
-  * P1 and P3 are not built.
-  * The live policy has no stock-quantity options, so on the pantry profile it cannot use the
-    adapter's candidates the way P0 does. The live pantry run reached 0 of 40 kits.
-  * The pantry suite therefore does not yet meet the equal-adapter rule.
+* **The same harness for P0–P3.** All four run through `run_case`, `PolicyHost`, the episode caps,
+  the scripted actors, the labeled staff simulator, one coordinator grant and one executor.
+  `test_policy_parity.py::test_each_policy_reads_the_same_grant_tools_and_candidates` runs every
+  policy behind a recording client on dev01, skills_dev01 and pantry_dev01. It compares the
+  grant (principal, id, body, version), the candidate sets of every evaluation and the tools
+  called. It also checks that P1's tool enum is the grant's tools minus the staff tools.
+* **Each suite end to end.** `test_live_workflow.py::test_p1_to_p3_complete_each_suite_end_to_end_with_recorded_prompts`
+  runs P1, P2 and P3 on the campus, community and pantry suites with scripted models. Every run
+  matches expectation with no violation, uses only granted coordinator tools, and records its
+  prompts by sha256 on every decision.
+* **The pantry suite now meets the equal-adapter rule.** P2 and P3 offer the adapter's own
+  stock candidates (`test_pantry_live_menu.py`, 13 tests), and P1 reads the same candidates and
+  calls the same tools. P2 and P3 report a shortfall and release closed handoff holds as P0
+  does.
+* **P3's relevance rule** (`verify-all-relevance/1.0.0`) names event and resource identifiers
+  only, and is tested on dev01, dev06 and the pantry.
+* **With the real model.** One development run each of P1, P2 and P3 on dev01, dev02, dev04,
+  pantry_dev01 and skills_dev01 went through this harness. Each decision records its prompt ids
+  and hashes: P1 `tool_use.v1` or `tool_use.v2`; P2 and P3 `interpret.v1`, `choose_action.v1`
+  and `choose_action_pantry.v1`. The first P1 pantry run exposed a documentation defect in P1's
+  prompt and was rerun after the fix (W2-D11); the audit step reran P1's other four `tool_use.v1`
+  runs under `tool_use.v2` too (section 1c). Parity holds on candidates, grants, tools and
+  executor, not on instructions: each policy has its own prompts, which are published and
+  recorded.
+* **Still open for Wave 3:** freeze the prompts (P1's current runs all use `tool_use.v2`; its
+  five superseded runs used `tool_use.v1`), the caps, the output-token limits and the model
+  before any comparison.
 
 ## 4. Development cases: deterministic baselines and recorded live runs
 
@@ -223,8 +369,13 @@ reached.
 | skills_dev01 | true | false | 1 | 0 | 0 | true | 24 |
 | skills_dev02 | true | false | 1 | 0 | 0 | true | 29 |
 
-**Recorded live runs** (`policy="live"`, `live/1.0.0`). Each case ran once, under caps of 48 tool
-calls and 8 model calls. The model was `anthropic/claude-sonnet-5.5`, requested and returned on
+**Recorded live runs** (`policy="live"`, `live/1.0.0` as of the `bf71e43` tree, 2026-10-24). The
+finishing step later changed `live/1.0.0` without a new id: pantry stock options and
+`choose_action_pantry.v1`, server-side shortfall and release steps on the pantry, and no apply
+option for a candidate that changes nothing, on every profile. So these runs are not the shipped
+code; the P2 runs further below are (`live_p2-live_*`), and on dev01 and dev04 they reproduce
+the behavior described here. Each case ran once, under caps of 48 tool calls and 8 model
+calls. The model was `anthropic/claude-sonnet-5.5`, requested and returned on
 every call. Spend is the ledger difference over the run, and it equals the sum of the run's
 calls' provider-reported costs. Every live trace verifies `intact`.
 
@@ -260,10 +411,62 @@ calls' provider-reported costs. Every live trace verifies `intact`.
   3. the server recorded `infeasible` with the blocking constraints, and nothing was spent.
 * **dev06:**
   1. query the projector (`STATUS_UNAVAILABLE`);
-  2. apply the robust free swap. One failed query was enough here, where the baseline makes two.
+  2. apply the robust free swap (one failed status query in this run).
 * **pantry_dev01:** **failed**, recorded honestly. There was no notice to interpret and the menu
   had no stock option. The server recorded `wait` and no model call was made. Nothing was
   committed, so 0 of 40 kits were distributed. Stock stayed conserved.
+  It is kept as recorded. The live pantry result is now the P2 development run below.
+
+**Development runs of P1-P3** (finishing step, 2026-10-25; section 1b). One trial each, under the
+same caps. The model was `anthropic/claude-sonnet-5.5`, requested and returned on every call.
+Spend is the ledger difference over the run. Every trace verifies `intact`. "cap" marks a run
+that reached the 8-call model cap. These are development runs: no comparison between policies is
+drawn from them. `plan_b/evaluation/development/README.md` gives one sentence per run, read from
+its trace.
+
+| Run | Policy | Prompts | goal_complete | matches | Model calls | Tool calls | Model latency | Tokens (prompt / completion) | Spend (USD) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| live_p1-tool-use_dev01 (superseded) | tool-use/1.0.0 | tool_use.v1 | True | True | 7 (7 turns) | 21 | 30.9 s | 86294 / 3175 | 0.2043 |
+| live_p1-tool-use_dev01_r2 | tool-use/1.0.0 | tool_use.v2 | True | True | 8 (8 turns) cap | 22 | 33.3 s | 102028 / 3675 | 0.2408 |
+| live_p1-tool-use_dev02 (superseded) | tool-use/1.0.0 | tool_use.v1 | True | True | 8 (8 turns) cap | 24 | 32.7 s | 101817 / 3634 | 0.2400 |
+| live_p1-tool-use_dev02_r2 | tool-use/1.0.0 | tool_use.v2 | True | True | 8 (8 turns) cap | 24 | 32.0 s | 103472 / 3557 | 0.2425 |
+| live_p1-tool-use_dev04 (superseded) | tool-use/1.0.0 | tool_use.v1 | True | True | 7 (7 turns) | 20 | 21.6 s | 87635 / 1963 | 0.1949 |
+| live_p1-tool-use_dev04_r2 | tool-use/1.0.0 | tool_use.v2 | True | True | 6 (6 turns) | 20 | 19.8 s | 77106 / 2187 | 0.1761 |
+| live_p1-tool-use_pantry_dev01 (superseded) | tool-use/1.0.0 | tool_use.v1 | False | False | 8 (8 turns) cap | 15 | 72.2 s | 86360 / 9182 | 0.2645 |
+| live_p1-tool-use_pantry_dev01_r2 | tool-use/1.0.0 | tool_use.v2 | True | True | 6 (6 turns) | 18 | 28.8 s | 63160 / 3363 | 0.1600 |
+| live_p1-tool-use_skills_dev01 (superseded) | tool-use/1.0.0 | tool_use.v1 | True | True | 8 (8 turns) cap | 21 | 31.2 s | 110590 / 3226 | 0.2534 |
+| live_p1-tool-use_skills_dev01_r2 | tool-use/1.0.0 | tool_use.v2 | True | True | 8 (8 turns) cap | 20 | 29.5 s | 110544 / 3279 | 0.2539 |
+| live_p2-live_dev01 | live/1.0.0 | choose_action.v1, interpret.v1 | True | True | 3 (2 choose, 1 interpret) | 24 | 10.6 s | 13535 / 955 | 0.0366 |
+| live_p2-live_dev02 | live/1.0.0 | choose_action.v1, interpret.v1 | True | True | 6 (5 choose, 1 interpret) | 32 | 20.4 s | 28445 / 1924 | 0.0761 |
+| live_p2-live_dev04 | live/1.0.0 | choose_action.v1, interpret.v1 | True | True | 3 (1 choose, 2 interpret) | 25 | 8.4 s | 10765 / 826 | 0.0298 |
+| live_p2-live_pantry_dev01 | live/1.0.0 | choose_action_pantry.v1 | True | True | 4 (4 choose) | 21 | 14.9 s | 17544 / 1012 | 0.0452 |
+| live_p2-live_skills_dev01 | live/1.0.0 | choose_action.v1, interpret.v1 | True | True | 2 (1 choose, 1 interpret) | 25 | 5.4 s | 6657 / 416 | 0.0175 |
+| live_p3-verify-all_dev01 | verify-all/1.0.0 | choose_action.v1, interpret.v1 | True | True | 2 (1 choose, 1 interpret) | 24 | 5.9 s | 7689 / 439 | 0.0198 |
+| live_p3-verify-all_dev02 | verify-all/1.0.0 | choose_action.v1, interpret.v1 | True | True | 4 (3 choose, 1 interpret) | 29 | 14.9 s | 17439 / 1269 | 0.0476 |
+| live_p3-verify-all_dev04 | verify-all/1.0.0 | interpret.v1 | True | True | 2 (2 interpret) | 24 | 4.9 s | 5017 / 494 | 0.0150 |
+| live_p3-verify-all_pantry_dev01 | verify-all/1.0.0 | choose_action_pantry.v1 | True | True | 4 (4 choose) | 24 | 14.5 s | 16932 / 963 | 0.0435 |
+| live_p3-verify-all_skills_dev01 | verify-all/1.0.0 | choose_action.v1, interpret.v1 | True | True | 2 (1 choose, 1 interpret) | 28 | 5.0 s | 6861 / 467 | 0.0184 |
+
+The 20 runs made 106 model calls for 2.57984 USD: the finishing step's 16 runs 76 calls and
+1.66656 USD, the audit step's four P1 reruns 30 calls and 0.91328 USD. Five runs are superseded
+(the P1 runs under `tool_use.v1`), and the 15 current runs all matched expectation. In short:
+
+* **The live pantry result is `live_p2-live_pantry_dev01`.** P2 asked staff for the 16-kit
+  handoff at 12:31, waited for the staff simulator's receipt at 12:33 (24/16 → 40/0), held the 40
+  pantry kits at 12:34 and committed them at 12:35. Staff distributed 40 of 40 on time at 13:40,
+  and S20 stayed 20 unreceived. The counters went 16/40 → 0/40 → 0/0, as in the baseline. P3 did
+  the same after its two server-side checks, and so did P1 after its fix.
+* **`live_p1-tool-use_pantry_dev01` failed and is superseded** by `..._r2` (DECISIONS W2-D11).
+  The failure was a defect in P1's prompt and turn limit, not the model's judgment. The run is
+  kept as recorded.
+* **P1's v1 runs are superseded by the prompt change.** dev01, dev02, dev04 and skills_dev01
+  first ran under `tool_use.v1` and matched; they were rerun once under the shipped `tool_use.v2`
+  in the audit step (`..._r2`) and matched again. The v1 runs are kept as recorded.
+* **P1 reached the 8-call model cap** in its current dev01 (17:24), dev02 (17:44) and
+  skills_dev01 (10:06) runs, after its plan was in place. All three still matched expectation
+  (KNOWN_LIMITATIONS).
+* **P3's checks are made by the server**, so its model-call counts are not comparable with
+  P2's.
 
 ## 5. Pantry accounting (deterministic baseline, `pantry-rules/1.0.0`)
 
@@ -301,6 +504,27 @@ pantry_dev02 (partial handoff):
   target of 40.
 * Counters: 16/40 → 6/40 → 6/6.
 
+### Adapter implementation effort and changed interfaces
+
+`02_adaptation.md` asks the M2 record to keep the pantry adapter's implementation effort. Effort
+was not timed; its size is the measure recorded here. Line counts are of the current tree; the
+pantry files are new since the Wave 1 packet (`d6b9256`):
+
+| Part | Files | Lines |
+| --- | --- | --- |
+| Domain adapter and stock accounting | `domain/adapters/pantry.py`, `domain/stock.py` | 1338 + 631 |
+| Staff and stock tools | `tools/stock.py` | 858 |
+| Storage | `store/migrations/0004_consumable_stock.sql` | 249 |
+| Pantry rule policy (P0) | `evaluation/policies/pantry_rules.py` | 845 |
+| Scenario fixture | `scenarios/public/pantry_continuity.json` | 729 |
+| Browser | `web/src/components/PantryBoard.tsx`, `web/src/views/StaffActions.tsx` | 290 + 493 |
+| Live agent's pantry options (finishing step; the diff also holds P3's hook and the audit fixes) | `agent/menu.py`, `agent/orchestrator.py` (+358/−9 and +425/−4 over `40b6162`), prompt `choose_action_pantry.v1` (55) | 783 added |
+
+Shared interfaces that changed for the pantry, rather than files added beside them:
+`domain/models.py`, `store/engine.py`, `store/repo.py`, `store/projection_db.py` and
+`tools/handlers.py`. RUNTIME_CONTRACT.md sections 10 (pantry planner), 15 (consumable stock) and
+16 (the live agent's pantry menu) describe them.
+
 ## 6. G-LLM gate
 
 The gate passed once, on 2026-10-24, run by the Build 1 worker. Its record is
@@ -318,28 +542,51 @@ The gate passed once, on 2026-10-24, run by the Build 1 worker. Its record is
 ## 7. Spend
 
 `reports/model_spend_summary.json` summarizes the ledger `apps/plan_b/var/model_spend.json` by
-run. It holds 26 calls in total, every one with outcome `ok`:
+run. The table below reads the ledger after the audit step. It holds 136 entries: 133 calls with
+outcome `ok`, 2 `malformed_json` (the cut-off P1 replies, section 3) and 1 `transport` at cost 0
+(the audit's fallback check against a closed local port, section 1c). Every call that was answered
+returned `anthropic/claude-sonnet-5.5`, with cost basis `provider_usage`.
 
 | Run | Calls | Cost (USD) |
 | --- | --- | --- |
 | G-LLM gate (Build 1) | 3 | 0.03509 |
-| live runs of this step (8 runs, section 4) | 23 | 0.26397 |
-| **ledger total** | **26** | **0.29906** |
+| Wave 2 live runs (8 runs, section 4) | 23 | 0.26397 |
+| P1-P3 development runs of the finishing step (16 runs, section 4) | 76 | 1.66656 |
+| P1 reruns under `tool_use.v2`, audit step (4 runs, section 4) | 30 | 0.91328 |
+| Audit step's browser checks: one press of **Run live agent**, and the fallback check | 3 + 1 | 0.03655 + 0 |
+| **ledger total** | **136** | **2.91545** |
+
+`reports/model_spend_summary.json` in this packet still shows the 26 calls of the `fd04d48`
+regeneration. The integration step's collector run rewrites it from the ledger.
 
 * **Key check:** one read-only `GET /api/v1/key`, made before the live runs, reported limit 50,
   remaining 49.96491 and usage 0.03509. That usage equals the ledger total at that time.
 * **Caps:** this step's cumulative cap was 8.00 USD. No call was refused by the spend guard,
   and no episode reached a cap.
+* **Finishing step:** one read-only `GET /api/v1/key` before the development runs reported limit
+  50, remaining 49.70094 and usage 0.29906, which equals the ledger total then. The cumulative cap
+  was 5.29 USD (at most 5 USD for the step). The step spent 1.66656 USD. No call was refused by
+  the spend guard. The episode model-call cap was reached in three P1 runs.
+* **Audit step:** no key check was made. The reruns ran under a cumulative cap of 3.46562 USD
+  (1.50 above the ledger at the start); the browser press ran under a 0.10 USD per-run cap. The
+  step spent 0.94983 USD. No call was refused by the spend guard. The model-call cap was reached
+  in three of the four reruns.
 
 ## 8. Not run, or not verified
 
 * **W2.4 MBTA (stretch): not built.** No transit adapter exists and the MBTA key was not read.
-* **Failure classes against the real provider:** malformed output, unknown entity, caps and
-  timeout were tested only with scripted transports (section 3).
-* **Repeated live trials and variance:** each live case ran once.
-* **The live agent in a real browser session:** the walkthrough selects it but does not run it.
+* **Failure classes against the real provider:** an unknown entity and a timeout were tested
+  only with scripted transports. Malformed output (a cut-off reply) and exhausted model-call caps
+  occurred live in P1 runs (section 3).
+* **Repeated live trials and variance:** each live case ran once, for each policy.
+* **A held-out evaluation and any comparison of P0-P3:** not run (Wave 3). The development runs
+  support no comparative claim.
+* **The model-driven policies in a real browser session:** the walkthrough selects the live agent
+  but does not run it. The audit pressed **Run live agent** once by hand (section 1c); no
+  automated browser test runs a model-driven policy.
 * **Other browsers, screen readers, Python 3.11, comprehension by new viewers, community
   validation:** not run, as in Wave 1.
-* **Re-recording the live runs from the committed tree:** not done. The live runs were recorded
-  once from the working tree that `bf71e43` commits, and the clean-checkout regeneration only
-  re-verified them.
+* **Re-recording the live runs from the committed tree:** not done. The Wave 2 live runs were
+  recorded once from the working tree that `bf71e43` commits, and the P1-P3 development runs from
+  the finishing and audit steps' working trees before their commit. The clean-checkout
+  regeneration only re-verifies them.

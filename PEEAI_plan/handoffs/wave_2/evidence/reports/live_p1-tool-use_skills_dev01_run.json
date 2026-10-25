@@ -1,0 +1,773 @@
+{
+ "case_ref": "skills_dev01",
+ "checks": {
+  "failures": [
+   {
+    "decision_id": "dec_0011",
+    "failure": "model_call_cap",
+    "kind": "stop",
+    "recorded_by": "host",
+    "summary": "Episode cap reached: 8 of 8 model calls used (development-phase caps). The coordinator policy is not woken again in this episode; the accepted plan and every commitment stay as they are."
+   }
+  ],
+  "fresh_state_agreement": [
+   {
+    "final_state_matches_receipt": true,
+    "next_state_read": "call_00023",
+    "read_after_receipt": true,
+    "read_revision": 9,
+    "receipt_id": "rcpt_0004",
+    "snapshot_matches_receipt": true,
+    "snapshot_plan_receipt": "rcpt_0004"
+   }
+  ],
+  "notice_responses": [
+   {
+    "channel": "fixture_initial",
+    "entity_id": "backup_learning_kit",
+    "kind": "resource_offer",
+    "observation_id": "obs_community_offer_01",
+    "received_at": "2026-11-07T14:20:00Z",
+    "responses": [
+     {
+      "at": "2026-11-07T14:28:00Z",
+      "chosen_by": "model",
+      "decision_id": "dec_0005",
+      "failure": null,
+      "interpretation": null,
+      "kind": "keep",
+      "summary": "The tool-use agent ended its turn with 'keep' at revision 1: plan v1 stands; latest evaluation eval_0001 at revision 1: 3 feasible, 3 applicable now."
+     },
+     {
+      "at": "2026-11-07T14:45:00Z",
+      "chosen_by": "model",
+      "decision_id": "dec_0006",
+      "failure": null,
+      "interpretation": null,
+      "kind": "keep",
+      "summary": "The tool-use agent ended its turn with 'keep' at revision 3: plan v1 stands; latest evaluation eval_0002 at revision 3: 3 feasible, 3 applicable now."
+     },
+     {
+      "at": "2026-11-07T14:50:00Z",
+      "chosen_by": "model",
+      "decision_id": "dec_0007",
+      "failure": null,
+      "interpretation": null,
+      "kind": "keep",
+      "summary": "The tool-use agent ended its turn with 'keep' at revision 5: plan v1 stands; latest evaluation eval_0003 at revision 5: 3 feasible, 3 applicable now."
+     }
+    ],
+    "source_id": "participant_kit_steward",
+    "text": "I may be able to bring the registered backup learning kit by 10:20. I will confirm availability through the participant page."
+   }
+  ],
+  "useful_tool_calls": [
+   {
+    "consumed_by_model_calls": [
+     "mc_0002"
+    ],
+    "decision_id": "dec_0001",
+    "envelope_status": "unknown",
+    "error_code": "STATUS_UNKNOWN",
+    "option_id": "query_status",
+    "receipt_id": null,
+    "receipt_status": null,
+    "tool": "query_status",
+    "tool_call_id": "call_00003"
+   },
+   {
+    "consumed_by_model_calls": [
+     "mc_0002"
+    ],
+    "decision_id": "dec_0002",
+    "envelope_status": "unknown",
+    "error_code": "STATUS_UNKNOWN",
+    "option_id": "query_status",
+    "receipt_id": null,
+    "receipt_status": null,
+    "tool": "query_status",
+    "tool_call_id": "call_00004"
+   },
+   {
+    "consumed_by_model_calls": [
+     "mc_0003"
+    ],
+    "decision_id": "dec_0003",
+    "envelope_status": "unknown",
+    "error_code": "STATUS_UNKNOWN",
+    "option_id": "query_status",
+    "receipt_id": null,
+    "receipt_status": null,
+    "tool": "query_status",
+    "tool_call_id": "call_00006"
+   },
+   {
+    "consumed_by_model_calls": [
+     "mc_0003"
+    ],
+    "decision_id": "dec_0004",
+    "envelope_status": "unknown",
+    "error_code": "STATUS_UNKNOWN",
+    "option_id": "query_status",
+    "receipt_id": null,
+    "receipt_status": null,
+    "tool": "query_status",
+    "tool_call_id": "call_00007"
+   },
+   {
+    "consumed_by_model_calls": [
+     "mc_0008"
+    ],
+    "decision_id": "dec_0009",
+    "envelope_status": "succeeded",
+    "error_code": null,
+    "option_id": "apply_plan",
+    "receipt_id": "rcpt_0004",
+    "receipt_status": "applied",
+    "tool": "apply_plan",
+    "tool_call_id": "call_00022"
+   }
+  ],
+  "validated_actions": [
+   {
+    "applicable_when_evaluated": true,
+    "candidate_label": "Swap practice and peer exchange",
+    "candidate_plan_id": "cand_0005_b7ee3104",
+    "committed_delta_cents": 0,
+    "constraint_report_ref": "rpt_0005_b7ee3104",
+    "constraint_status": "feasible_under_assumptions",
+    "evaluation_id": "eval_0005",
+    "evaluation_revision": 8,
+    "expected_goal_version": 1,
+    "expected_revision": 8,
+    "goal_version": 1,
+    "receipt_id": "rcpt_0004",
+    "report_matches_candidate": true,
+    "revision_after": 9,
+    "revision_before": 8,
+    "tool_call_id": "call_00022"
+   }
+  ]
+ },
+ "configuration": {
+  "base_url": "https://openrouter.ai/api/v1",
+  "episode_caps": {
+   "max_model_calls": 8,
+   "max_tool_calls": 48,
+   "phase": "development"
+  },
+  "key_file": ".local/keys/openrouter.key",
+  "key_file_present": true,
+  "ledger": "apps/plan_b/var/model_spend.json",
+  "max_run_cost_usd": 0.5,
+  "max_total_cost_usd": 5.29,
+  "model_id": "anthropic/claude-sonnet-5.5",
+  "provider": "openrouter",
+  "sources": {
+   "PLAN_B_MODEL_BASE_URL": "endpoint_file",
+   "PLAN_B_MODEL_ID": "default",
+   "PLAN_B_MODEL_KEY_FILE": "endpoint_file",
+   "PLAN_B_MODEL_MAX_RUN_COST_USD": "default",
+   "PLAN_B_MODEL_MAX_TOTAL_COST_USD": "environment",
+   "PLAN_B_MODEL_PROVIDER": "endpoint_file"
+  }
+ },
+ "decisions": [
+  {
+   "at": "2026-11-07T14:22:00Z",
+   "candidate_refs": [],
+   "chosen_by": "model",
+   "decision_id": "dec_0001",
+   "failure": null,
+   "final_decision": null,
+   "kind": "verify",
+   "mode_label": "Tool-use agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [],
+   "option_id": null,
+   "rationale_untrusted": "The learning kit has no reported ETA and the current plan depends on it, so I am checking its registered status source before changing anything. I am also checking the backup kit's availability, because the steward's offer is only a self-report and the backup would need committed spend the grant does not allow.",
+   "receipt_refs": [],
+   "revision": 1,
+   "summary": "Checked learning_kit delivery_eta: unknown (STATUS_UNKNOWN); the status stays unverified.",
+   "tool": "query_status",
+   "tool_call_refs": [
+    "call_00002",
+    "call_00003"
+   ],
+   "verify_all": null
+  },
+  {
+   "at": "2026-11-07T14:24:00Z",
+   "candidate_refs": [],
+   "chosen_by": "model",
+   "decision_id": "dec_0002",
+   "failure": null,
+   "final_decision": null,
+   "kind": "verify",
+   "mode_label": "Tool-use agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [],
+   "option_id": null,
+   "rationale_untrusted": "The learning kit has no reported ETA and the current plan depends on it, so I am checking its registered status source before changing anything. I am also checking the backup kit's availability, because the steward's offer is only a self-report and the backup would need committed spend the grant does not allow.",
+   "receipt_refs": [],
+   "revision": 1,
+   "summary": "Checked backup_learning_kit availability: unknown (STATUS_UNKNOWN); the status stays unverified.",
+   "tool": "query_status",
+   "tool_call_refs": [
+    "call_00004"
+   ],
+   "verify_all": null
+  },
+  {
+   "at": "2026-11-07T14:26:00Z",
+   "candidate_refs": [],
+   "chosen_by": "model",
+   "decision_id": "dec_0003",
+   "failure": null,
+   "final_decision": null,
+   "kind": "verify",
+   "mode_label": "Tool-use agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [],
+   "option_id": null,
+   "rationale_untrusted": "Both status checks returned unknown once; one retry each is allowed before deciding. The accepted plan stays in place, and the steward's offer is an unverified self-report that must not trigger any change.",
+   "receipt_refs": [],
+   "revision": 1,
+   "summary": "Checked learning_kit delivery_eta: unknown (STATUS_UNKNOWN); the status stays unverified.",
+   "tool": "query_status",
+   "tool_call_refs": [
+    "call_00006"
+   ],
+   "verify_all": null
+  },
+  {
+   "at": "2026-11-07T14:28:00Z",
+   "candidate_refs": [],
+   "chosen_by": "model",
+   "decision_id": "dec_0004",
+   "failure": null,
+   "final_decision": null,
+   "kind": "verify",
+   "mode_label": "Tool-use agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [],
+   "option_id": null,
+   "rationale_untrusted": "Both status checks returned unknown once; one retry each is allowed before deciding. The accepted plan stays in place, and the steward's offer is an unverified self-report that must not trigger any change.",
+   "receipt_refs": [],
+   "revision": 1,
+   "summary": "Checked backup_learning_kit availability: unknown (STATUS_UNKNOWN); the status stays unverified.",
+   "tool": "query_status",
+   "tool_call_refs": [
+    "call_00007"
+   ],
+   "verify_all": null
+  },
+  {
+   "at": "2026-11-07T14:28:00Z",
+   "candidate_refs": [],
+   "chosen_by": "model",
+   "decision_id": "dec_0005",
+   "failure": null,
+   "final_decision": "keep",
+   "kind": "keep",
+   "mode_label": "Tool-use agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [
+    "obs_community_offer_01",
+    "call_00006",
+    "call_00007"
+   ],
+   "option_id": null,
+   "rationale_untrusted": "The accepted plan is still feasible under its assumptions, and both kit status checks were already retried and came back unknown. The steward's offer of the backup kit is an unverified self-report, and using that kit would need committed spend that the grant (max 0) does not allow, so I will not replace a working commitment for it.",
+   "receipt_refs": [],
+   "revision": 1,
+   "summary": "The tool-use agent ended its turn with 'keep' at revision 1: plan v1 stands; latest evaluation eval_0001 at revision 1: 3 feasible, 3 applicable now.",
+   "tool": null,
+   "tool_call_refs": [],
+   "verify_all": null
+  },
+  {
+   "at": "2026-11-07T14:45:00Z",
+   "candidate_refs": [],
+   "chosen_by": "model",
+   "decision_id": "dec_0006",
+   "failure": null,
+   "final_decision": "keep",
+   "kind": "keep",
+   "mode_label": "Tool-use agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [
+    "obs_community_offer_01",
+    "call_00006",
+    "call_00007"
+   ],
+   "option_id": null,
+   "rationale_untrusted": "Both status checks on the learning kit and backup kit were retried and stayed unknown, and the backup-kit offer is an unverified self-report, so there is no basis to replace the working plan. The current plan is still the top-ranked feasible candidate at no added cost, and the backup kit would need $40 of committed spend that the grant does not allow.",
+   "receipt_refs": [],
+   "revision": 3,
+   "summary": "The tool-use agent ended its turn with 'keep' at revision 3: plan v1 stands; latest evaluation eval_0002 at revision 3: 3 feasible, 3 applicable now.",
+   "tool": null,
+   "tool_call_refs": [
+    "call_00012"
+   ],
+   "verify_all": null
+  },
+  {
+   "at": "2026-11-07T14:50:00Z",
+   "candidate_refs": [],
+   "chosen_by": "model",
+   "decision_id": "dec_0007",
+   "failure": null,
+   "final_decision": "keep",
+   "kind": "keep",
+   "mode_label": "Tool-use agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [
+    "obs_0002",
+    "obs_community_offer_01"
+   ],
+   "option_id": null,
+   "rationale_untrusted": "The learning kit's arrival is verified by a typed arrival record at 09:50 and the current plan is still feasible at zero cost, so no change is needed. The backup kit offer is an unverified self-report, and the backup candidates would need committed spend the grant does not allow (max 0).",
+   "receipt_refs": [],
+   "revision": 5,
+   "summary": "The tool-use agent ended its turn with 'keep' at revision 5: plan v1 stands; latest evaluation eval_0003 at revision 5: 3 feasible, 3 applicable now.",
+   "tool": null,
+   "tool_call_refs": [
+    "call_00014"
+   ],
+   "verify_all": null
+  },
+  {
+   "at": "2026-11-07T14:55:00Z",
+   "candidate_refs": [],
+   "chosen_by": "model",
+   "decision_id": "dec_0008",
+   "failure": null,
+   "final_decision": "keep",
+   "kind": "keep",
+   "mode_label": "Tool-use agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [
+    "obs_0002",
+    "obs_0001",
+    "obs_0003"
+   ],
+   "option_id": null,
+   "rationale_untrusted": "The learning kit arrival record (obs_0002) shows it arrived and was checked complete, so the accepted plan works with no spend. The backup kit offer is an unverified self-report that needs committed spend we aren't granted, so there is no reason to change anything.",
+   "receipt_refs": [],
+   "revision": 6,
+   "summary": "The tool-use agent ended its turn with 'keep' at revision 6: plan v1 stands; latest evaluation eval_0004 at revision 6: 3 feasible, 3 applicable now.",
+   "tool": null,
+   "tool_call_refs": [
+    "call_00017"
+   ],
+   "verify_all": null
+  },
+  {
+   "at": "2026-11-07T15:06:00Z",
+   "candidate_refs": [
+    "cand_0005_b7ee3104"
+   ],
+   "chosen_by": "model",
+   "decision_id": "dec_0009",
+   "failure": null,
+   "final_decision": null,
+   "kind": "commit",
+   "mode_label": "Tool-use agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [],
+   "option_id": null,
+   "rationale_untrusted": "The current plan puts peer_exchange at 11:20, but peer_lead is only available until 11:05, so keeping it fails participant_availability. The rank-1 candidate swaps practice and peer_exchange, costs 0 and is applicable now, with the learning kit confirmed arrived (obs_0002), so I am applying it.",
+   "receipt_refs": [
+    "rcpt_0004"
+   ],
+   "revision": 9,
+   "summary": "Applied candidate cand_0005_b7ee3104 (report rpt_0005_b7ee3104), revision 8 -> 9: Applied Swap practice and peer exchange as plan v2",
+   "tool": "apply_plan",
+   "tool_call_refs": [
+    "call_00021",
+    "call_00022"
+   ],
+   "verify_all": null
+  },
+  {
+   "at": "2026-11-07T15:06:00Z",
+   "candidate_refs": [],
+   "chosen_by": "model",
+   "decision_id": "dec_0010",
+   "failure": null,
+   "final_decision": "keep",
+   "kind": "keep",
+   "mode_label": "Tool-use agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [
+    "obs_0002",
+    "obs_0004",
+    "rcpt_0004"
+   ],
+   "option_id": null,
+   "rationale_untrusted": "The learning kit arrival record shows it is available, and plan v2 puts peer exchange at 10:40-11:00, inside the peer lead's availability until 11:05. The keep candidate is applicable at no cost, so no change or spend is needed.",
+   "receipt_refs": [],
+   "revision": 9,
+   "summary": "The tool-use agent ended its turn with 'keep' at revision 9: plan v2 stands; latest evaluation eval_0006 at revision 9: 2 feasible, 2 applicable now.",
+   "tool": null,
+   "tool_call_refs": [
+    "call_00024"
+   ],
+   "verify_all": null
+  },
+  {
+   "at": "2026-11-07T15:06:00Z",
+   "candidate_refs": [],
+   "chosen_by": null,
+   "decision_id": "dec_0011",
+   "failure": "model_call_cap",
+   "final_decision": null,
+   "kind": "stop",
+   "mode_label": "Tool-use agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [],
+   "option_id": null,
+   "rationale_untrusted": null,
+   "receipt_refs": [],
+   "revision": 9,
+   "summary": "Episode cap reached: 8 of 8 model calls used (development-phase caps). The coordinator policy is not woken again in this episode; the accepted plan and every commitment stay as they are.",
+   "tool": null,
+   "tool_call_refs": [],
+   "verify_all": null
+  }
+ ],
+ "episode_caps": {
+  "max_model_calls": 8,
+  "max_tool_calls": 48,
+  "model_calls": 8,
+  "phase": "development",
+  "reached": [
+   "model_calls"
+  ],
+  "tool_calls": 21
+ },
+ "error": null,
+ "finished_at": "2026-10-25T06:33:02Z",
+ "label": "p1-tool-use_skills_dev01",
+ "ledger": {
+  "calls_added": 8,
+  "outcomes": {
+   "ok": 8
+  },
+  "path": "apps/plan_b/var/model_spend.json",
+  "run_cost_usd": 0.25344,
+  "run_ids": [
+   "tool-use-19f2082a1352"
+  ],
+  "total_cost_usd_after": 1.456252,
+  "total_cost_usd_before": 1.202812
+ },
+ "matches_expectation": true,
+ "mode_label": "Tool-use agent \u00b7 anthropic/claude-sonnet-5.5",
+ "model": {
+  "by_purpose": {
+   "tool_turn": 8
+  },
+  "call_log": [
+   {
+    "attempt": 1,
+    "call_id": "mc_0001",
+    "completion_tokens": 446,
+    "consumed_tool_call_ids": [],
+    "cost_basis": "provider_usage",
+    "cost_usd": 0.030788,
+    "decision_id": "dec_0001",
+    "error": null,
+    "http_status": 200,
+    "latency_ms": 4028,
+    "model_id": "anthropic/claude-sonnet-5.5",
+    "outcome": "ok",
+    "prompt_id": "tool_use.v1",
+    "prompt_tokens": 13164,
+    "purpose": "tool_turn",
+    "reasoning_tokens": 149
+   },
+   {
+    "attempt": 1,
+    "call_id": "mc_0002",
+    "completion_tokens": 585,
+    "consumed_tool_call_ids": [
+     "call_00003",
+     "call_00004"
+    ],
+    "cost_basis": "provider_usage",
+    "cost_usd": 0.03307,
+    "decision_id": "dec_0003",
+    "error": null,
+    "http_status": 200,
+    "latency_ms": 5491,
+    "model_id": "anthropic/claude-sonnet-5.5",
+    "outcome": "ok",
+    "prompt_id": "tool_use.v1",
+    "prompt_tokens": 13610,
+    "purpose": "tool_turn",
+    "reasoning_tokens": 333
+   },
+   {
+    "attempt": 1,
+    "call_id": "mc_0003",
+    "completion_tokens": 390,
+    "consumed_tool_call_ids": [
+     "call_00006",
+     "call_00007"
+    ],
+    "cost_basis": "provider_usage",
+    "cost_usd": 0.032012,
+    "decision_id": "dec_0005",
+    "error": null,
+    "http_status": 200,
+    "latency_ms": 4143,
+    "model_id": "anthropic/claude-sonnet-5.5",
+    "outcome": "ok",
+    "prompt_id": "tool_use.v1",
+    "prompt_tokens": 14056,
+    "purpose": "tool_turn",
+    "reasoning_tokens": 200
+   },
+   {
+    "attempt": 1,
+    "call_id": "mc_0004",
+    "completion_tokens": 411,
+    "consumed_tool_call_ids": [],
+    "cost_basis": "provider_usage",
+    "cost_usd": 0.03338,
+    "decision_id": "dec_0006",
+    "error": null,
+    "http_status": 200,
+    "latency_ms": 4780,
+    "model_id": "anthropic/claude-sonnet-5.5",
+    "outcome": "ok",
+    "prompt_id": "tool_use.v1",
+    "prompt_tokens": 14635,
+    "purpose": "tool_turn",
+    "reasoning_tokens": 209
+   },
+   {
+    "attempt": 1,
+    "call_id": "mc_0005",
+    "completion_tokens": 178,
+    "consumed_tool_call_ids": [],
+    "cost_basis": "provider_usage",
+    "cost_usd": 0.03071,
+    "decision_id": "dec_0007",
+    "error": null,
+    "http_status": 200,
+    "latency_ms": 2615,
+    "model_id": "anthropic/claude-sonnet-5.5",
+    "outcome": "ok",
+    "prompt_id": "tool_use.v1",
+    "prompt_tokens": 14465,
+    "purpose": "tool_turn",
+    "reasoning_tokens": 0
+   },
+   {
+    "attempt": 1,
+    "call_id": "mc_0006",
+    "completion_tokens": 186,
+    "consumed_tool_call_ids": [],
+    "cost_basis": "provider_usage",
+    "cost_usd": 0.029172,
+    "decision_id": "dec_0008",
+    "error": null,
+    "http_status": 200,
+    "latency_ms": 2005,
+    "model_id": "anthropic/claude-sonnet-5.5",
+    "outcome": "ok",
+    "prompt_id": "tool_use.v1",
+    "prompt_tokens": 13656,
+    "purpose": "tool_turn",
+    "reasoning_tokens": 0
+   },
+   {
+    "attempt": 1,
+    "call_id": "mc_0007",
+    "completion_tokens": 673,
+    "consumed_tool_call_ids": [],
+    "cost_basis": "provider_usage",
+    "cost_usd": 0.03335,
+    "decision_id": "dec_0009",
+    "error": null,
+    "http_status": 200,
+    "latency_ms": 5138,
+    "model_id": "anthropic/claude-sonnet-5.5",
+    "outcome": "ok",
+    "prompt_id": "tool_use.v1",
+    "prompt_tokens": 13310,
+    "purpose": "tool_turn",
+    "reasoning_tokens": 376
+   },
+   {
+    "attempt": 1,
+    "call_id": "mc_0008",
+    "completion_tokens": 357,
+    "consumed_tool_call_ids": [
+     "call_00022"
+    ],
+    "cost_basis": "provider_usage",
+    "cost_usd": 0.030958,
+    "decision_id": "dec_0010",
+    "error": null,
+    "http_status": 200,
+    "latency_ms": 2992,
+    "model_id": "anthropic/claude-sonnet-5.5",
+    "outcome": "ok",
+    "prompt_id": "tool_use.v1",
+    "prompt_tokens": 13694,
+    "purpose": "tool_turn",
+    "reasoning_tokens": 178
+   }
+  ],
+  "calls": 8,
+  "completion_tokens": 3226,
+  "cost_basis": [
+   "provider_usage"
+  ],
+  "cost_usd": 0.25344,
+  "latency_ms": 31192,
+  "outcomes": {
+   "ok": 8
+  },
+  "prompt_tokens": 110590,
+  "reasoning_tokens": 1445,
+  "requested": "anthropic/claude-sonnet-5.5",
+  "returned": [
+   "anthropic/claude-sonnet-5.5"
+  ]
+ },
+ "outcome": {
+  "activities": [
+   {
+    "activity_id": "setup",
+    "completed_at": "2026-11-07T14:50:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-07T14:30:00Z"
+   },
+   {
+    "activity_id": "welcome",
+    "completed_at": "2026-11-07T15:10:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-07T15:00:00Z"
+   },
+   {
+    "activity_id": "skills_demo",
+    "completed_at": "2026-11-07T15:40:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-07T15:10:00Z"
+   },
+   {
+    "activity_id": "practice",
+    "completed_at": "2026-11-07T16:40:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-07T16:00:00Z"
+   },
+   {
+    "activity_id": "peer_exchange",
+    "completed_at": "2026-11-07T16:00:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-07T15:40:00Z"
+   },
+   {
+    "activity_id": "closing",
+    "completed_at": "2026-11-07T17:00:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-07T16:40:00Z"
+   }
+  ],
+  "applied_plans": 1,
+  "changed_assignments": 2,
+  "committed_cents": 0,
+  "duplicate_records_rejected": 0,
+  "episode_caps": {
+   "max_model_calls": 8,
+   "max_tool_calls": 48,
+   "model_calls": 8,
+   "phase": "development",
+   "reached": [
+    "model_calls"
+   ],
+   "tool_calls": 21
+  },
+  "episode_id": "ep_ad58ce6f99b7",
+  "failed_status_queries": 4,
+  "final_clock": "2026-11-07T17:00:00Z",
+  "final_revision": 25,
+  "goal_complete": true,
+  "holds": {
+   "active_at_end": 0,
+   "committed": 0,
+   "created": 0,
+   "expired": 0,
+   "fulfilled": 0,
+   "released": 0
+  },
+  "infeasibility_reported": false,
+  "mode_label": "Tool-use agent \u00b7 anthropic/claude-sonnet-5.5",
+  "policy_id": "tool-use/1.0.0",
+  "recovery_delay_minutes": null,
+  "rejected_attempts_without_receipt": 0,
+  "rejected_receipts": 0,
+  "report_version": "1.0.0",
+  "reserved_cents_at_end": 0,
+  "scenario_id": "dev_fixture_02",
+  "service": [],
+  "staff_confirmations": 0,
+  "status_queries": 4,
+  "stock": [],
+  "unnecessary_reservations": 0,
+  "violations": []
+ },
+ "outcome_line": "skills_dev01: goal_complete=True infeasibility_reported=False applied_plans=1 committed=0 violations=0 matches_expectation=True",
+ "policy": "tool-use",
+ "policy_id": "tool-use/1.0.0",
+ "record": "plan_b.live_run/1.0.0",
+ "started_at": "2026-10-25T06:32:27Z",
+ "tool_calls": {
+  "by_status": {
+   "succeeded": 17,
+   "unknown": 4
+  },
+  "by_tool": {
+   "apply_plan": 1,
+   "evaluate_candidates": 6,
+   "get_event_state": 10,
+   "query_status": 4
+  },
+  "rejected": [
+   {
+    "call_id": "call_00003",
+    "error_code": "STATUS_UNKNOWN",
+    "tool": "query_status"
+   },
+   {
+    "call_id": "call_00004",
+    "error_code": "STATUS_UNKNOWN",
+    "tool": "query_status"
+   },
+   {
+    "call_id": "call_00006",
+    "error_code": "STATUS_UNKNOWN",
+    "tool": "query_status"
+   },
+   {
+    "call_id": "call_00007",
+    "error_code": "STATUS_UNKNOWN",
+    "tool": "query_status"
+   }
+  ],
+  "total": 21
+ },
+ "trace": {
+  "bytes": 3132210,
+  "file": "traces/live_p1-tool-use_skills_dev01_trace.json",
+  "sha256": "7bc83b49ca217b14d4aaec4ccd7b19b3d46a10ebc16c341cb117a95aa8de6353",
+  "verify": "intact"
+ },
+ "wall_seconds": 35.2
+}

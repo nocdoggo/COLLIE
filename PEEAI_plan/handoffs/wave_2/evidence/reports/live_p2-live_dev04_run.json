@@ -1,0 +1,564 @@
+{
+ "case_ref": "dev04",
+ "checks": {
+  "failures": [],
+  "fresh_state_agreement": [],
+  "notice_responses": [
+   {
+    "channel": "fixture_initial",
+    "entity_id": "projector",
+    "kind": "notice",
+    "observation_id": "obs_notice_01",
+    "received_at": "2026-11-05T21:40:00Z",
+    "responses": [
+     {
+      "at": "2026-11-05T21:42:00Z",
+      "chosen_by": "model",
+      "decision_id": "dec_0001",
+      "failure": null,
+      "interpretation": null,
+      "kind": "verify",
+      "summary": "Checked projector delivery_eta: on_schedule, expected, reported ETA 16:58 (obs_0001); notice obs_notice_01 contradicted."
+     },
+     {
+      "at": "2026-11-05T21:42:00Z",
+      "chosen_by": "server",
+      "decision_id": "dec_0002",
+      "failure": null,
+      "interpretation": null,
+      "kind": "keep",
+      "summary": "Keep plan v1: it passes every hard check under its stated assumptions; projector is expected (status observation, reported ETA 16:58) for demonstrations at 17:10; notice obs_notice_01 contradicted by obs_0001."
+     },
+     {
+      "at": "2026-11-05T21:58:00Z",
+      "chosen_by": "server",
+      "decision_id": "dec_0005",
+      "failure": null,
+      "interpretation": null,
+      "kind": "keep",
+      "summary": "Keep plan v1: it passes every hard check under its stated assumptions; projector is available (arrival observation) for demonstrations at 17:10; notice obs_notice_01 contradicted by obs_0001."
+     },
+     {
+      "at": "2026-11-05T22:10:00Z",
+      "chosen_by": "server",
+      "decision_id": "dec_0006",
+      "failure": null,
+      "interpretation": null,
+      "kind": "keep",
+      "summary": "Keep plan v1: it passes every hard check under its stated assumptions; notice obs_notice_01 contradicted by obs_0001."
+     },
+     {
+      "at": "2026-11-05T22:50:00Z",
+      "chosen_by": "server",
+      "decision_id": "dec_0007",
+      "failure": null,
+      "interpretation": null,
+      "kind": "keep",
+      "summary": "No activity remains to re-plan in plan v1: completed demonstrations, setup, skills_exchange, welcome; in progress closing; failed none. No action can change these records; notice obs_notice_01 contradicted by obs_0001."
+     }
+    ],
+    "source_id": "delivery_contact",
+    "text": "Our projector delivery may be about 25 minutes later than the promised 5 p.m. arrival. Please check order P17 for the latest status."
+   },
+   {
+    "channel": "scenario_delivery",
+    "entity_id": "projector",
+    "kind": "notice",
+    "observation_id": "obs_0002",
+    "received_at": "2026-11-05T21:44:00Z",
+    "responses": [
+     {
+      "at": "2026-11-05T21:44:00Z",
+      "chosen_by": "server",
+      "decision_id": "dec_0003",
+      "failure": null,
+      "interpretation": {
+       "change_kind": "unavailability",
+       "claimed_eta": null,
+       "contains_instructions": false,
+       "duplicate_of": null,
+       "failure": null,
+       "hearsay": false,
+       "model_reading": "The notice claims projector order P09 for the October 29 workshop was cancelled, so no projector will arrive for that booking. It concerns a different order and date than the current booking P17 for 2026-11-05, so it appears not to affect this event.",
+       "retracts": [],
+       "server_notes": [
+        "inapplicable: the reading marks it as about another event or booking",
+        "inapplicable: order P09 is not projector's booking (P17)",
+        "inapplicable: referenced date 2026-10-29 is not the event date"
+       ],
+       "standing": "inapplicable",
+       "subject_resource_id": "projector"
+      },
+      "kind": "inapplicable",
+      "summary": "Notice obs_0002 does not apply to this event: the reading marks it as about another event or booking; order P09 is not projector's booking (P17); referenced date 2026-10-29 is not the event date. No plan change."
+     },
+     {
+      "at": "2026-11-05T21:47:00Z",
+      "chosen_by": "server",
+      "decision_id": "dec_0004",
+      "failure": null,
+      "interpretation": {
+       "change_kind": "no_change",
+       "claimed_eta": null,
+       "contains_instructions": false,
+       "duplicate_of": "obs_0002",
+       "failure": null,
+       "hearsay": false,
+       "model_reading": "Same correlation group and text as obs_0002: one evidence lineage, not corroboration.",
+       "retracts": [],
+       "server_notes": [],
+       "standing": "duplicate",
+       "subject_resource_id": null
+      },
+      "kind": "duplicate",
+      "summary": "Notice obs_0003 repeats handled notice obs_0002 (same correlation group and text): one evidence lineage, not corroboration. No plan change."
+     }
+    ],
+    "source_id": "delivery_contact",
+    "text": "Reminder: projector order P09 for the October 29 workshop was cancelled, so no projector will arrive for that booking."
+   },
+   {
+    "channel": "scenario_delivery",
+    "entity_id": "projector",
+    "kind": "notice",
+    "observation_id": "obs_0003",
+    "received_at": "2026-11-05T21:47:00Z",
+    "responses": [
+     {
+      "at": "2026-11-05T21:47:00Z",
+      "chosen_by": "server",
+      "decision_id": "dec_0004",
+      "failure": null,
+      "interpretation": {
+       "change_kind": "no_change",
+       "claimed_eta": null,
+       "contains_instructions": false,
+       "duplicate_of": "obs_0002",
+       "failure": null,
+       "hearsay": false,
+       "model_reading": "Same correlation group and text as obs_0002: one evidence lineage, not corroboration.",
+       "retracts": [],
+       "server_notes": [],
+       "standing": "duplicate",
+       "subject_resource_id": null
+      },
+      "kind": "duplicate",
+      "summary": "Notice obs_0003 repeats handled notice obs_0002 (same correlation group and text): one evidence lineage, not corroboration. No plan change."
+     }
+    ],
+    "source_id": "volunteer_forward",
+    "text": "Fwd: Reminder: projector order P09 for the October 29 workshop was cancelled, so no projector will arrive for that booking."
+   }
+  ],
+  "useful_tool_calls": [
+   {
+    "consumed_by_model_calls": [],
+    "decision_id": "dec_0001",
+    "envelope_status": "succeeded",
+    "error_code": null,
+    "option_id": "query:projector:delivery_eta",
+    "receipt_id": null,
+    "receipt_status": null,
+    "tool": "query_status",
+    "tool_call_id": "call_00003"
+   }
+  ],
+  "validated_actions": []
+ },
+ "configuration": {
+  "base_url": "https://openrouter.ai/api/v1",
+  "episode_caps": {
+   "max_model_calls": 8,
+   "max_tool_calls": 48,
+   "phase": "development"
+  },
+  "key_file": ".local/keys/openrouter.key",
+  "key_file_present": true,
+  "ledger": "apps/plan_b/var/model_spend.json",
+  "max_run_cost_usd": 0.5,
+  "max_total_cost_usd": 5.29,
+  "model_id": "anthropic/claude-sonnet-5.5",
+  "provider": "openrouter",
+  "sources": {
+   "PLAN_B_MODEL_BASE_URL": "endpoint_file",
+   "PLAN_B_MODEL_ID": "default",
+   "PLAN_B_MODEL_KEY_FILE": "endpoint_file",
+   "PLAN_B_MODEL_MAX_RUN_COST_USD": "default",
+   "PLAN_B_MODEL_MAX_TOTAL_COST_USD": "environment",
+   "PLAN_B_MODEL_PROVIDER": "endpoint_file"
+  }
+ },
+ "decisions": [
+  {
+   "at": "2026-11-05T21:42:00Z",
+   "candidate_refs": [],
+   "chosen_by": "model",
+   "decision_id": "dec_0001",
+   "failure": null,
+   "final_decision": null,
+   "kind": "verify",
+   "mode_label": "Live agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [
+    "obs_notice_01",
+    "obs_0001"
+   ],
+   "option_id": "query:projector:delivery_eta",
+   "rationale_untrusted": "Notice obs_notice_01 claims a projector delay to 17:25 that nothing has verified, and it would decide between keeping the plan and swapping activities. A 2-minute query fits well before the 17:10 start, so verify before committing to any change.",
+   "receipt_refs": [],
+   "revision": 4,
+   "summary": "Checked projector delivery_eta: on_schedule, expected, reported ETA 16:58 (obs_0001); notice obs_notice_01 contradicted.",
+   "tool": null,
+   "tool_call_refs": [
+    "call_00003"
+   ],
+   "verify_all": null
+  },
+  {
+   "at": "2026-11-05T21:42:00Z",
+   "candidate_refs": [
+    "cand_0002_4f53cda1"
+   ],
+   "chosen_by": "server",
+   "decision_id": "dec_0002",
+   "failure": null,
+   "final_decision": null,
+   "kind": "keep",
+   "mode_label": "Live agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [
+    "obs_notice_01"
+   ],
+   "option_id": null,
+   "rationale_untrusted": null,
+   "receipt_refs": [],
+   "revision": 4,
+   "summary": "Keep plan v1: it passes every hard check under its stated assumptions; projector is expected (status observation, reported ETA 16:58) for demonstrations at 17:10; notice obs_notice_01 contradicted by obs_0001.",
+   "tool": null,
+   "tool_call_refs": [],
+   "verify_all": null
+  },
+  {
+   "at": "2026-11-05T21:44:00Z",
+   "candidate_refs": [],
+   "chosen_by": "server",
+   "decision_id": "dec_0003",
+   "failure": null,
+   "final_decision": null,
+   "kind": "inapplicable",
+   "mode_label": "Live agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [
+    "obs_0002"
+   ],
+   "option_id": null,
+   "rationale_untrusted": null,
+   "receipt_refs": [],
+   "revision": 5,
+   "summary": "Notice obs_0002 does not apply to this event: the reading marks it as about another event or booking; order P09 is not projector's booking (P17); referenced date 2026-10-29 is not the event date. No plan change.",
+   "tool": null,
+   "tool_call_refs": [],
+   "verify_all": null
+  },
+  {
+   "at": "2026-11-05T21:47:00Z",
+   "candidate_refs": [],
+   "chosen_by": "server",
+   "decision_id": "dec_0004",
+   "failure": null,
+   "final_decision": null,
+   "kind": "duplicate",
+   "mode_label": "Live agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [
+    "obs_0003",
+    "obs_0002"
+   ],
+   "option_id": null,
+   "rationale_untrusted": null,
+   "receipt_refs": [],
+   "revision": 6,
+   "summary": "Notice obs_0003 repeats handled notice obs_0002 (same correlation group and text): one evidence lineage, not corroboration. No plan change.",
+   "tool": null,
+   "tool_call_refs": [],
+   "verify_all": null
+  },
+  {
+   "at": "2026-11-05T21:58:00Z",
+   "candidate_refs": [
+    "cand_0006_4f53cda1"
+   ],
+   "chosen_by": "server",
+   "decision_id": "dec_0005",
+   "failure": null,
+   "final_decision": null,
+   "kind": "keep",
+   "mode_label": "Live agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [
+    "obs_notice_01"
+   ],
+   "option_id": null,
+   "rationale_untrusted": null,
+   "receipt_refs": [],
+   "revision": 8,
+   "summary": "Keep plan v1: it passes every hard check under its stated assumptions; projector is available (arrival observation) for demonstrations at 17:10; notice obs_notice_01 contradicted by obs_0001.",
+   "tool": null,
+   "tool_call_refs": [],
+   "verify_all": null
+  },
+  {
+   "at": "2026-11-05T22:10:00Z",
+   "candidate_refs": [
+    "cand_0009_4f53cda1"
+   ],
+   "chosen_by": "server",
+   "decision_id": "dec_0006",
+   "failure": null,
+   "final_decision": null,
+   "kind": "keep",
+   "mode_label": "Live agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [
+    "obs_notice_01"
+   ],
+   "option_id": null,
+   "rationale_untrusted": null,
+   "receipt_refs": [],
+   "revision": 12,
+   "summary": "Keep plan v1: it passes every hard check under its stated assumptions; notice obs_notice_01 contradicted by obs_0001.",
+   "tool": null,
+   "tool_call_refs": [],
+   "verify_all": null
+  },
+  {
+   "at": "2026-11-05T22:50:00Z",
+   "candidate_refs": [
+    "cand_0012_4f53cda1"
+   ],
+   "chosen_by": "server",
+   "decision_id": "dec_0007",
+   "failure": null,
+   "final_decision": null,
+   "kind": "keep",
+   "mode_label": "Live agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [
+    "obs_notice_01"
+   ],
+   "option_id": null,
+   "rationale_untrusted": null,
+   "receipt_refs": [],
+   "revision": 17,
+   "summary": "No activity remains to re-plan in plan v1: completed demonstrations, setup, skills_exchange, welcome; in progress closing; failed none. No action can change these records; notice obs_notice_01 contradicted by obs_0001.",
+   "tool": null,
+   "tool_call_refs": [],
+   "verify_all": null
+  }
+ ],
+ "episode_caps": {
+  "max_model_calls": 8,
+  "max_tool_calls": 48,
+  "model_calls": 3,
+  "phase": "development",
+  "reached": [],
+  "tool_calls": 25
+ },
+ "error": null,
+ "finished_at": "2026-10-25T06:33:49Z",
+ "label": "p2-live_dev04",
+ "ledger": {
+  "calls_added": 3,
+  "outcomes": {
+   "ok": 3
+  },
+  "path": "apps/plan_b/var/model_spend.json",
+  "run_cost_usd": 0.02979,
+  "run_ids": [
+   "live-73a9c00e6f37"
+  ],
+  "total_cost_usd_after": 1.598792,
+  "total_cost_usd_before": 1.569002
+ },
+ "matches_expectation": true,
+ "mode_label": "Live agent \u00b7 anthropic/claude-sonnet-5.5",
+ "model": {
+  "by_purpose": {
+   "choose_action": 1,
+   "interpret": 2
+  },
+  "call_log": [
+   {
+    "attempt": 1,
+    "call_id": "mc_0001",
+    "completion_tokens": 250,
+    "consumed_tool_call_ids": [],
+    "cost_basis": "provider_usage",
+    "cost_usd": 0.007526,
+    "decision_id": "dec_0001",
+    "error": null,
+    "http_status": 200,
+    "latency_ms": 1924,
+    "model_id": "anthropic/claude-sonnet-5.5",
+    "outcome": "ok",
+    "prompt_id": "interpret.v1",
+    "prompt_tokens": 2513,
+    "purpose": "interpret",
+    "reasoning_tokens": 0
+   },
+   {
+    "attempt": 1,
+    "call_id": "mc_0002",
+    "completion_tokens": 322,
+    "consumed_tool_call_ids": [],
+    "cost_basis": "provider_usage",
+    "cost_usd": 0.014716,
+    "decision_id": "dec_0001",
+    "error": null,
+    "http_status": 200,
+    "latency_ms": 3637,
+    "model_id": "anthropic/claude-sonnet-5.5",
+    "outcome": "ok",
+    "prompt_id": "choose_action.v1",
+    "prompt_tokens": 5748,
+    "purpose": "choose_action",
+    "reasoning_tokens": 172
+   },
+   {
+    "attempt": 1,
+    "call_id": "mc_0003",
+    "completion_tokens": 254,
+    "consumed_tool_call_ids": [],
+    "cost_basis": "provider_usage",
+    "cost_usd": 0.007548,
+    "decision_id": "dec_0003",
+    "error": null,
+    "http_status": 200,
+    "latency_ms": 2799,
+    "model_id": "anthropic/claude-sonnet-5.5",
+    "outcome": "ok",
+    "prompt_id": "interpret.v1",
+    "prompt_tokens": 2504,
+    "purpose": "interpret",
+    "reasoning_tokens": 0
+   }
+  ],
+  "calls": 3,
+  "completion_tokens": 826,
+  "cost_basis": [
+   "provider_usage"
+  ],
+  "cost_usd": 0.02979,
+  "latency_ms": 8360,
+  "outcomes": {
+   "ok": 3
+  },
+  "prompt_tokens": 10765,
+  "reasoning_tokens": 172,
+  "requested": "anthropic/claude-sonnet-5.5",
+  "returned": [
+   "anthropic/claude-sonnet-5.5"
+  ]
+ },
+ "outcome": {
+  "activities": [
+   {
+    "activity_id": "setup",
+    "completed_at": "2026-11-05T21:50:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-05T21:30:00Z"
+   },
+   {
+    "activity_id": "welcome",
+    "completed_at": "2026-11-05T22:10:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-05T22:00:00Z"
+   },
+   {
+    "activity_id": "demonstrations",
+    "completed_at": "2026-11-05T22:30:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-05T22:10:00Z"
+   },
+   {
+    "activity_id": "skills_exchange",
+    "completed_at": "2026-11-05T22:50:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-05T22:30:00Z"
+   },
+   {
+    "activity_id": "closing",
+    "completed_at": "2026-11-05T23:00:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-05T22:50:00Z"
+   }
+  ],
+  "applied_plans": 0,
+  "changed_assignments": 0,
+  "committed_cents": 0,
+  "duplicate_records_rejected": 0,
+  "episode_caps": {
+   "max_model_calls": 8,
+   "max_tool_calls": 48,
+   "model_calls": 3,
+   "phase": "development",
+   "reached": [],
+   "tool_calls": 25
+  },
+  "episode_id": "ep_91a7466a08ba",
+  "failed_status_queries": 0,
+  "final_clock": "2026-11-05T23:00:00Z",
+  "final_revision": 24,
+  "goal_complete": true,
+  "holds": {
+   "active_at_end": 0,
+   "committed": 0,
+   "created": 0,
+   "expired": 0,
+   "fulfilled": 0,
+   "released": 0
+  },
+  "infeasibility_reported": false,
+  "mode_label": "Live agent \u00b7 anthropic/claude-sonnet-5.5",
+  "policy_id": "live/1.0.0",
+  "recovery_delay_minutes": null,
+  "rejected_attempts_without_receipt": 0,
+  "rejected_receipts": 0,
+  "report_version": "1.0.0",
+  "reserved_cents_at_end": 0,
+  "scenario_id": "dev_fixture_01",
+  "service": [],
+  "staff_confirmations": 0,
+  "status_queries": 1,
+  "stock": [],
+  "unnecessary_reservations": 0,
+  "violations": []
+ },
+ "outcome_line": "dev04: goal_complete=True infeasibility_reported=False applied_plans=0 committed=0 violations=0 matches_expectation=True",
+ "policy": "live",
+ "policy_id": "live/1.0.0",
+ "record": "plan_b.live_run/1.0.0",
+ "started_at": "2026-10-25T06:33:39Z",
+ "tool_calls": {
+  "by_status": {
+   "succeeded": 25
+  },
+  "by_tool": {
+   "evaluate_candidates": 12,
+   "get_event_state": 12,
+   "query_status": 1
+  },
+  "rejected": [],
+  "total": 25
+ },
+ "trace": {
+  "bytes": 3233281,
+  "file": "traces/live_p2-live_dev04_trace.json",
+  "sha256": "b73171ed9c9bd85be29898f91450132dbf4c5942a09662663a5a89968653a679",
+  "verify": "intact"
+ },
+ "wall_seconds": 11.0
+}

@@ -1,0 +1,640 @@
+{
+ "case_ref": "dev04",
+ "checks": {
+  "failures": [],
+  "fresh_state_agreement": [],
+  "notice_responses": [
+   {
+    "channel": "fixture_initial",
+    "entity_id": "projector",
+    "kind": "notice",
+    "observation_id": "obs_notice_01",
+    "received_at": "2026-11-05T21:40:00Z",
+    "responses": [
+     {
+      "at": "2026-11-05T21:44:00Z",
+      "chosen_by": "model",
+      "decision_id": "dec_0003",
+      "failure": null,
+      "interpretation": null,
+      "kind": "keep",
+      "summary": "The tool-use agent ended its turn with 'keep' at revision 6: plan v1 stands; latest evaluation eval_0002 at revision 6: 4 feasible, 2 applicable now."
+     },
+     {
+      "at": "2026-11-05T21:58:00Z",
+      "chosen_by": "model",
+      "decision_id": "dec_0005",
+      "failure": null,
+      "interpretation": null,
+      "kind": "keep",
+      "summary": "The tool-use agent ended its turn with 'keep' at revision 9: plan v1 stands; latest evaluation eval_0004 at revision 9: 3 feasible, 2 applicable now."
+     }
+    ],
+    "source_id": "delivery_contact",
+    "text": "Our projector delivery may be about 25 minutes later than the promised 5 p.m. arrival. Please check order P17 for the latest status."
+   },
+   {
+    "channel": "scenario_delivery",
+    "entity_id": "projector",
+    "kind": "notice",
+    "observation_id": "obs_0002",
+    "received_at": "2026-11-05T21:44:00Z",
+    "responses": [
+     {
+      "at": "2026-11-05T21:44:00Z",
+      "chosen_by": "model",
+      "decision_id": "dec_0003",
+      "failure": null,
+      "interpretation": null,
+      "kind": "keep",
+      "summary": "The tool-use agent ended its turn with 'keep' at revision 6: plan v1 stands; latest evaluation eval_0002 at revision 6: 4 feasible, 2 applicable now."
+     },
+     {
+      "at": "2026-11-05T21:47:00Z",
+      "chosen_by": "model",
+      "decision_id": "dec_0004",
+      "failure": null,
+      "interpretation": null,
+      "kind": "inapplicable",
+      "summary": "The tool-use agent ended its turn with 'inapplicable' at revision 7: plan v1 stands; latest evaluation eval_0003 at revision 7: 4 feasible, 2 applicable now."
+     },
+     {
+      "at": "2026-11-05T21:58:00Z",
+      "chosen_by": "model",
+      "decision_id": "dec_0005",
+      "failure": null,
+      "interpretation": null,
+      "kind": "keep",
+      "summary": "The tool-use agent ended its turn with 'keep' at revision 9: plan v1 stands; latest evaluation eval_0004 at revision 9: 3 feasible, 2 applicable now."
+     },
+     {
+      "at": "2026-11-05T22:06:00Z",
+      "chosen_by": "model",
+      "decision_id": "dec_0006",
+      "failure": null,
+      "interpretation": null,
+      "kind": "keep",
+      "summary": "The tool-use agent ended its turn with 'keep' at revision 11: plan v1 stands; latest evaluation eval_0005 at revision 11: 3 feasible, 2 applicable now."
+     },
+     {
+      "at": "2026-11-05T22:25:00Z",
+      "chosen_by": "model",
+      "decision_id": "dec_0007",
+      "failure": null,
+      "interpretation": null,
+      "kind": "keep",
+      "summary": "The tool-use agent ended its turn with 'keep' at revision 14: plan v1 stands; latest evaluation eval_0006 at revision 14: 1 feasible, 1 applicable now."
+     }
+    ],
+    "source_id": "delivery_contact",
+    "text": "Reminder: projector order P09 for the October 29 workshop was cancelled, so no projector will arrive for that booking."
+   },
+   {
+    "channel": "scenario_delivery",
+    "entity_id": "projector",
+    "kind": "notice",
+    "observation_id": "obs_0004",
+    "received_at": "2026-11-05T21:47:00Z",
+    "responses": [
+     {
+      "at": "2026-11-05T21:47:00Z",
+      "chosen_by": "model",
+      "decision_id": "dec_0004",
+      "failure": null,
+      "interpretation": null,
+      "kind": "inapplicable",
+      "summary": "The tool-use agent ended its turn with 'inapplicable' at revision 7: plan v1 stands; latest evaluation eval_0003 at revision 7: 4 feasible, 2 applicable now."
+     },
+     {
+      "at": "2026-11-05T21:58:00Z",
+      "chosen_by": "model",
+      "decision_id": "dec_0005",
+      "failure": null,
+      "interpretation": null,
+      "kind": "keep",
+      "summary": "The tool-use agent ended its turn with 'keep' at revision 9: plan v1 stands; latest evaluation eval_0004 at revision 9: 3 feasible, 2 applicable now."
+     },
+     {
+      "at": "2026-11-05T22:06:00Z",
+      "chosen_by": "model",
+      "decision_id": "dec_0006",
+      "failure": null,
+      "interpretation": null,
+      "kind": "keep",
+      "summary": "The tool-use agent ended its turn with 'keep' at revision 11: plan v1 stands; latest evaluation eval_0005 at revision 11: 3 feasible, 2 applicable now."
+     },
+     {
+      "at": "2026-11-05T22:25:00Z",
+      "chosen_by": "model",
+      "decision_id": "dec_0007",
+      "failure": null,
+      "interpretation": null,
+      "kind": "keep",
+      "summary": "The tool-use agent ended its turn with 'keep' at revision 14: plan v1 stands; latest evaluation eval_0006 at revision 14: 1 feasible, 1 applicable now."
+     }
+    ],
+    "source_id": "volunteer_forward",
+    "text": "Fwd: Reminder: projector order P09 for the October 29 workshop was cancelled, so no projector will arrive for that booking."
+   }
+  ],
+  "useful_tool_calls": [
+   {
+    "consumed_by_model_calls": [
+     "mc_0002"
+    ],
+    "decision_id": "dec_0001",
+    "envelope_status": "succeeded",
+    "error_code": null,
+    "option_id": "query_status",
+    "receipt_id": null,
+    "receipt_status": null,
+    "tool": "query_status",
+    "tool_call_id": "call_00003"
+   },
+   {
+    "consumed_by_model_calls": [
+     "mc_0002"
+    ],
+    "decision_id": "dec_0002",
+    "envelope_status": "succeeded",
+    "error_code": null,
+    "option_id": "query_status",
+    "receipt_id": null,
+    "receipt_status": null,
+    "tool": "query_status",
+    "tool_call_id": "call_00004"
+   }
+  ],
+  "validated_actions": []
+ },
+ "configuration": {
+  "base_url": "https://openrouter.ai/api/v1",
+  "episode_caps": {
+   "max_model_calls": 8,
+   "max_tool_calls": 48,
+   "phase": "development"
+  },
+  "key_file": ".local/keys/openrouter.key",
+  "key_file_present": true,
+  "ledger": "apps/plan_b/var/model_spend.json",
+  "max_run_cost_usd": 0.5,
+  "max_total_cost_usd": 3.46562,
+  "model_id": "anthropic/claude-sonnet-5.5",
+  "provider": "openrouter",
+  "sources": {
+   "PLAN_B_MODEL_BASE_URL": "endpoint_file",
+   "PLAN_B_MODEL_ID": "default",
+   "PLAN_B_MODEL_KEY_FILE": "endpoint_file",
+   "PLAN_B_MODEL_MAX_RUN_COST_USD": "default",
+   "PLAN_B_MODEL_MAX_TOTAL_COST_USD": "environment",
+   "PLAN_B_MODEL_PROVIDER": "endpoint_file"
+  }
+ },
+ "decisions": [
+  {
+   "at": "2026-11-05T21:42:00Z",
+   "candidate_refs": [],
+   "chosen_by": "model",
+   "decision_id": "dec_0001",
+   "failure": null,
+   "final_decision": null,
+   "kind": "verify",
+   "mode_label": "Tool-use agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [
+    "obs_0001"
+   ],
+   "option_id": null,
+   "rationale_untrusted": "The delivery notice is an unverified claim that references order P17, which matches the projector booking. I will check the typed status from the supplier and the backup's availability before changing a working plan.",
+   "receipt_refs": [],
+   "revision": 4,
+   "summary": "Checked projector delivery_eta: on_schedule, expected, reported ETA 16:58 (obs_0001).",
+   "tool": "query_status",
+   "tool_call_refs": [
+    "call_00002",
+    "call_00003"
+   ],
+   "verify_all": null
+  },
+  {
+   "at": "2026-11-05T21:44:00Z",
+   "candidate_refs": [],
+   "chosen_by": "model",
+   "decision_id": "dec_0002",
+   "failure": null,
+   "final_decision": null,
+   "kind": "verify",
+   "mode_label": "Tool-use agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [
+    "obs_0003"
+   ],
+   "option_id": null,
+   "rationale_untrusted": "The delivery notice is an unverified claim that references order P17, which matches the projector booking. I will check the typed status from the supplier and the backup's availability before changing a working plan.",
+   "receipt_refs": [],
+   "revision": 6,
+   "summary": "Checked backup_projector availability: available, available (obs_0003).",
+   "tool": "query_status",
+   "tool_call_refs": [
+    "call_00004"
+   ],
+   "verify_all": null
+  },
+  {
+   "at": "2026-11-05T21:44:00Z",
+   "candidate_refs": [],
+   "chosen_by": "model",
+   "decision_id": "dec_0003",
+   "failure": null,
+   "final_decision": "keep",
+   "kind": "keep",
+   "mode_label": "Tool-use agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [
+    "obs_0001",
+    "obs_notice_01",
+    "obs_0002"
+   ],
+   "option_id": null,
+   "rationale_untrusted": "The typed supplier status (obs_0001) shows order P17 on schedule with ETA 16:58, which outranks the unverified self-report notice of a delay. The P09 cancellation concerns a different order and date, so the current plan stands at no cost, and the backup would need committed spend, which the grant does not allow.",
+   "receipt_refs": [],
+   "revision": 6,
+   "summary": "The tool-use agent ended its turn with 'keep' at revision 6: plan v1 stands; latest evaluation eval_0002 at revision 6: 4 feasible, 2 applicable now.",
+   "tool": null,
+   "tool_call_refs": [
+    "call_00006"
+   ],
+   "verify_all": null
+  },
+  {
+   "at": "2026-11-05T21:47:00Z",
+   "candidate_refs": [],
+   "chosen_by": "model",
+   "decision_id": "dec_0004",
+   "failure": null,
+   "final_decision": "inapplicable",
+   "kind": "inapplicable",
+   "mode_label": "Tool-use agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [
+    "obs_0002",
+    "obs_0004",
+    "obs_0001"
+   ],
+   "option_id": null,
+   "rationale_untrusted": "The P09 cancellation notice and its forwarded copy concern the October 29 workshop order, not booking P17 for this event date. The typed supplier status (obs_0001) shows P17 on schedule with ETA 16:58, so the accepted plan stands with no spend.",
+   "receipt_refs": [],
+   "revision": 7,
+   "summary": "The tool-use agent ended its turn with 'inapplicable' at revision 7: plan v1 stands; latest evaluation eval_0003 at revision 7: 4 feasible, 2 applicable now.",
+   "tool": null,
+   "tool_call_refs": [
+    "call_00009"
+   ],
+   "verify_all": null
+  },
+  {
+   "at": "2026-11-05T21:58:00Z",
+   "candidate_refs": [],
+   "chosen_by": "model",
+   "decision_id": "dec_0005",
+   "failure": null,
+   "final_decision": "keep",
+   "kind": "keep",
+   "mode_label": "Tool-use agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [
+    "obs_0005",
+    "obs_0001",
+    "obs_notice_01",
+    "obs_0002",
+    "obs_0004"
+   ],
+   "option_id": null,
+   "rationale_untrusted": "The projector for order P17 has a typed arrival record (obs_0005, received and tested at 16:58), which outranks the earlier delay notice. The P09 cancellation notices concern the October 29 workshop and a different order, and the forward adds no corroboration, so the accepted plan stands with no spend.",
+   "receipt_refs": [],
+   "revision": 9,
+   "summary": "The tool-use agent ended its turn with 'keep' at revision 9: plan v1 stands; latest evaluation eval_0004 at revision 9: 3 feasible, 2 applicable now.",
+   "tool": null,
+   "tool_call_refs": [
+    "call_00012"
+   ],
+   "verify_all": null
+  },
+  {
+   "at": "2026-11-05T22:06:00Z",
+   "candidate_refs": [],
+   "chosen_by": "model",
+   "decision_id": "dec_0006",
+   "failure": null,
+   "final_decision": "keep",
+   "kind": "keep",
+   "mode_label": "Tool-use agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [
+    "obs_0005",
+    "obs_0006",
+    "obs_0002",
+    "obs_0004"
+   ],
+   "option_id": null,
+   "rationale_untrusted": "The projector arrival record (obs_0005) shows it was received and tested, and the presenter checked in at 17:06, so the accepted plan still works at no extra cost. The P09 cancellation notice concerns a different order and date, so it does not apply, and the paid backup projector and the swap are unnecessary.",
+   "receipt_refs": [],
+   "revision": 11,
+   "summary": "The tool-use agent ended its turn with 'keep' at revision 11: plan v1 stands; latest evaluation eval_0005 at revision 11: 3 feasible, 2 applicable now.",
+   "tool": null,
+   "tool_call_refs": [
+    "call_00016"
+   ],
+   "verify_all": null
+  },
+  {
+   "at": "2026-11-05T22:25:00Z",
+   "candidate_refs": [],
+   "chosen_by": "model",
+   "decision_id": "dec_0007",
+   "failure": null,
+   "final_decision": "keep",
+   "kind": "keep",
+   "mode_label": "Tool-use agent \u00b7 anthropic/claude-sonnet-5.5",
+   "observation_refs": [
+    "obs_0005",
+    "obs_0006",
+    "obs_0007",
+    "obs_0002",
+    "obs_0004"
+   ],
+   "option_id": null,
+   "rationale_untrusted": "The projector arrived and was tested at 16:58 (typed arrival record obs_0005), and the presenter and facilitator have checked in, so the accepted plan still works. The P09 notices concern another order and date, and every alternative candidate is infeasible or needs unnecessary spending.",
+   "receipt_refs": [],
+   "revision": 14,
+   "summary": "The tool-use agent ended its turn with 'keep' at revision 14: plan v1 stands; latest evaluation eval_0006 at revision 14: 1 feasible, 1 applicable now.",
+   "tool": null,
+   "tool_call_refs": [
+    "call_00020"
+   ],
+   "verify_all": null
+  }
+ ],
+ "episode_caps": {
+  "max_model_calls": 8,
+  "max_tool_calls": 48,
+  "model_calls": 6,
+  "phase": "development",
+  "reached": [],
+  "tool_calls": 20
+ },
+ "error": null,
+ "finished_at": "2026-10-25T07:12:48Z",
+ "label": "p1-tool-use_dev04_r2",
+ "ledger": {
+  "calls_added": 6,
+  "outcomes": {
+   "ok": 6
+  },
+  "path": "apps/plan_b/var/model_spend.json",
+  "run_cost_usd": 0.176082,
+  "run_ids": [
+   "tool-use-82d8211147da"
+  ],
+  "total_cost_usd_after": 2.625022,
+  "total_cost_usd_before": 2.44894
+ },
+ "matches_expectation": true,
+ "mode_label": "Tool-use agent \u00b7 anthropic/claude-sonnet-5.5",
+ "model": {
+  "by_purpose": {
+   "tool_turn": 6
+  },
+  "call_log": [
+   {
+    "attempt": 1,
+    "call_id": "mc_0001",
+    "completion_tokens": 392,
+    "consumed_tool_call_ids": [],
+    "cost_basis": "provider_usage",
+    "cost_usd": 0.028384,
+    "decision_id": "dec_0001",
+    "error": null,
+    "http_status": 200,
+    "latency_ms": 3204,
+    "model_id": "anthropic/claude-sonnet-5.5",
+    "outcome": "ok",
+    "prompt_id": "tool_use.v2",
+    "prompt_tokens": 12232,
+    "purpose": "tool_turn",
+    "reasoning_tokens": 148
+   },
+   {
+    "attempt": 1,
+    "call_id": "mc_0002",
+    "completion_tokens": 366,
+    "consumed_tool_call_ids": [
+     "call_00003",
+     "call_00004"
+    ],
+    "cost_basis": "provider_usage",
+    "cost_usd": 0.029546,
+    "decision_id": "dec_0003",
+    "error": null,
+    "http_status": 200,
+    "latency_ms": 3818,
+    "model_id": "anthropic/claude-sonnet-5.5",
+    "outcome": "ok",
+    "prompt_id": "tool_use.v2",
+    "prompt_tokens": 12943,
+    "purpose": "tool_turn",
+    "reasoning_tokens": 180
+   },
+   {
+    "attempt": 1,
+    "call_id": "mc_0003",
+    "completion_tokens": 697,
+    "consumed_tool_call_ids": [],
+    "cost_basis": "provider_usage",
+    "cost_usd": 0.033572,
+    "decision_id": "dec_0004",
+    "error": null,
+    "http_status": 200,
+    "latency_ms": 5907,
+    "model_id": "anthropic/claude-sonnet-5.5",
+    "outcome": "ok",
+    "prompt_id": "tool_use.v2",
+    "prompt_tokens": 13301,
+    "purpose": "tool_turn",
+    "reasoning_tokens": 523
+   },
+   {
+    "attempt": 1,
+    "call_id": "mc_0004",
+    "completion_tokens": 195,
+    "consumed_tool_call_ids": [],
+    "cost_basis": "provider_usage",
+    "cost_usd": 0.028458,
+    "decision_id": "dec_0005",
+    "error": null,
+    "http_status": 200,
+    "latency_ms": 1918,
+    "model_id": "anthropic/claude-sonnet-5.5",
+    "outcome": "ok",
+    "prompt_id": "tool_use.v2",
+    "prompt_tokens": 13254,
+    "purpose": "tool_turn",
+    "reasoning_tokens": 0
+   },
+   {
+    "attempt": 1,
+    "call_id": "mc_0005",
+    "completion_tokens": 350,
+    "consumed_tool_call_ids": [],
+    "cost_basis": "provider_usage",
+    "cost_usd": 0.02955,
+    "decision_id": "dec_0006",
+    "error": null,
+    "http_status": 200,
+    "latency_ms": 3091,
+    "model_id": "anthropic/claude-sonnet-5.5",
+    "outcome": "ok",
+    "prompt_id": "tool_use.v2",
+    "prompt_tokens": 13025,
+    "purpose": "tool_turn",
+    "reasoning_tokens": 162
+   },
+   {
+    "attempt": 1,
+    "call_id": "mc_0006",
+    "completion_tokens": 187,
+    "consumed_tool_call_ids": [],
+    "cost_basis": "provider_usage",
+    "cost_usd": 0.026572,
+    "decision_id": "dec_0007",
+    "error": null,
+    "http_status": 200,
+    "latency_ms": 1852,
+    "model_id": "anthropic/claude-sonnet-5.5",
+    "outcome": "ok",
+    "prompt_id": "tool_use.v2",
+    "prompt_tokens": 12351,
+    "purpose": "tool_turn",
+    "reasoning_tokens": 0
+   }
+  ],
+  "calls": 6,
+  "completion_tokens": 2187,
+  "cost_basis": [
+   "provider_usage"
+  ],
+  "cost_usd": 0.176082,
+  "latency_ms": 19790,
+  "outcomes": {
+   "ok": 6
+  },
+  "prompt_tokens": 77106,
+  "reasoning_tokens": 1013,
+  "requested": "anthropic/claude-sonnet-5.5",
+  "returned": [
+   "anthropic/claude-sonnet-5.5"
+  ]
+ },
+ "outcome": {
+  "activities": [
+   {
+    "activity_id": "setup",
+    "completed_at": "2026-11-05T21:50:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-05T21:30:00Z"
+   },
+   {
+    "activity_id": "welcome",
+    "completed_at": "2026-11-05T22:10:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-05T22:00:00Z"
+   },
+   {
+    "activity_id": "demonstrations",
+    "completed_at": "2026-11-05T22:30:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-05T22:10:00Z"
+   },
+   {
+    "activity_id": "skills_exchange",
+    "completed_at": "2026-11-05T22:50:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-05T22:30:00Z"
+   },
+   {
+    "activity_id": "closing",
+    "completed_at": "2026-11-05T23:00:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-05T22:50:00Z"
+   }
+  ],
+  "applied_plans": 0,
+  "changed_assignments": 0,
+  "committed_cents": 0,
+  "duplicate_records_rejected": 0,
+  "episode_caps": {
+   "max_model_calls": 8,
+   "max_tool_calls": 48,
+   "model_calls": 6,
+   "phase": "development",
+   "reached": [],
+   "tool_calls": 20
+  },
+  "episode_id": "ep_d4e609374bf6",
+  "failed_status_queries": 0,
+  "final_clock": "2026-11-05T23:00:00Z",
+  "final_revision": 25,
+  "goal_complete": true,
+  "holds": {
+   "active_at_end": 0,
+   "committed": 0,
+   "created": 0,
+   "expired": 0,
+   "fulfilled": 0,
+   "released": 0
+  },
+  "infeasibility_reported": false,
+  "mode_label": "Tool-use agent \u00b7 anthropic/claude-sonnet-5.5",
+  "policy_id": "tool-use/1.0.0",
+  "recovery_delay_minutes": null,
+  "rejected_attempts_without_receipt": 0,
+  "rejected_receipts": 0,
+  "report_version": "1.0.0",
+  "reserved_cents_at_end": 0,
+  "scenario_id": "dev_fixture_01",
+  "service": [],
+  "staff_confirmations": 0,
+  "status_queries": 2,
+  "stock": [],
+  "unnecessary_reservations": 0,
+  "violations": []
+ },
+ "outcome_line": "dev04: goal_complete=True infeasibility_reported=False applied_plans=0 committed=0 violations=0 matches_expectation=True",
+ "policy": "tool-use",
+ "policy_id": "tool-use/1.0.0",
+ "record": "plan_b.live_run/1.0.0",
+ "started_at": "2026-10-25T07:12:24Z",
+ "tool_calls": {
+  "by_status": {
+   "succeeded": 20
+  },
+  "by_tool": {
+   "evaluate_candidates": 6,
+   "get_event_state": 12,
+   "query_status": 2
+  },
+  "rejected": [],
+  "total": 20
+ },
+ "trace": {
+  "bytes": 2467244,
+  "file": "traces/live_p1-tool-use_dev04_r2_trace.json",
+  "sha256": "7ea79810f2d340e19f3ae03606e52422329670491807a42312d4cc2d4a472945",
+  "verify": "intact"
+ },
+ "wall_seconds": 24.4
+}

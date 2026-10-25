@@ -1,0 +1,805 @@
+{
+  "kind": "storyboard of the seven-minute demo (PEEAI_plan/handoffs/wave_2/DEMO.md)",
+  "base_url_kind": "local plan-b serve on 127.0.0.1 with a clean demo_prep state",
+  "browser": "Chromium (Playwright)",
+  "viewport": {
+    "width": 1536,
+    "height": 864
+  },
+  "paths": "deterministic policies, role tabs and recorded replays; no model call",
+  "passed": true,
+  "planned_seconds": 420,
+  "automated_run_seconds": 41.6,
+  "segments": [
+    {
+      "segment": "showcase",
+      "clock": "0:00-0:35",
+      "planned_seconds": 35,
+      "title": "The campus showcase",
+      "frames": [
+        "story_01_campus_showcase.png"
+      ],
+      "automated_seconds": 1.9,
+      "passed": true
+    },
+    {
+      "segment": "commitments",
+      "clock": "0:35-1:10",
+      "planned_seconds": 35,
+      "title": "What is committed and what the agent may change",
+      "frames": [
+        "story_02_current_plan.png",
+        "story_03_agent_authority.png"
+      ],
+      "automated_seconds": 1.1,
+      "passed": true
+    },
+    {
+      "segment": "delay",
+      "clock": "1:10-2:25",
+      "planned_seconds": 75,
+      "title": "The delayed projector: verify, then commit",
+      "frames": [
+        "story_04_notice_is_a_claim.png",
+        "story_05_verified_status.png",
+        "story_06_alternatives.png",
+        "story_07_committed_with_receipt.png"
+      ],
+      "automated_seconds": 2.2,
+      "passed": true
+    },
+    {
+      "segment": "stale",
+      "clock": "2:25-3:10",
+      "planned_seconds": 45,
+      "title": "A stale and a duplicate warning, handled without churn",
+      "frames": [
+        "story_08_stale_and_duplicate.png"
+      ],
+      "automated_seconds": 5.9,
+      "passed": true
+    },
+    {
+      "segment": "backup",
+      "clock": "3:10-4:00",
+      "planned_seconds": 50,
+      "title": "Prepare, ask, commit: the organizer-approved paid backup",
+      "frames": [
+        "story_09_backup_held_and_asked.png",
+        "story_10_organizer_approves.png",
+        "story_11_paid_backup_committed.png"
+      ],
+      "automated_seconds": 10.4,
+      "passed": true
+    },
+    {
+      "segment": "live",
+      "clock": "4:00-4:55",
+      "planned_seconds": 55,
+      "title": "The live coordinator's decision card (recorded replay)",
+      "frames": [
+        "story_12_live_decision_card.png",
+        "story_13_policy_choices.png",
+        "story_14_p3_server_checks.png",
+        "story_15_harness_bug_on_record.png"
+      ],
+      "automated_seconds": 3.1,
+      "passed": true
+    },
+    {
+      "segment": "community",
+      "clock": "4:55-5:40",
+      "planned_seconds": 45,
+      "title": "A participant's own check-in changes the plan",
+      "frames": [
+        "story_16_participant_check_in.png",
+        "story_17_community_replanned.png",
+        "story_18_resource_offer.png"
+      ],
+      "automated_seconds": 7.2,
+      "passed": true
+    },
+    {
+      "segment": "pantry",
+      "clock": "5:40-6:25",
+      "planned_seconds": 45,
+      "title": "Pantry Continuity cameo",
+      "frames": [
+        "story_19_pantry_loaded.png",
+        "story_20_handoff_requested.png",
+        "story_21_staff_handoff.png",
+        "story_22_kits_committed.png",
+        "story_23_distributed.png"
+      ],
+      "automated_seconds": 8.4,
+      "passed": true
+    },
+    {
+      "segment": "close",
+      "clock": "6:25-7:00",
+      "planned_seconds": 35,
+      "title": "Close: what is delivered, and the fallback",
+      "frames": [
+        "story_24_fallback_ready.png"
+      ],
+      "automated_seconds": 0.6,
+      "passed": true
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "slug": "campus_showcase",
+      "segment": "showcase",
+      "clock": "0:00-0:35",
+      "caption": "dev01 loaded: goal, 18:00 deadline, budget and the programme, in a fictional sandbox.",
+      "frame": "story_01_campus_showcase.png",
+      "checks": [
+        {
+          "check": "clean dev01 episode: revision 3, no receipt, no hold; header labels visible",
+          "passed": true,
+          "detail": "\u26a0 Fictional sandbox \u2014 no real bookings, purchases, or messages | \u2699 Deterministic policy \u00b7 selected, not run yet | 16:40 | Opens 17:00 \u00b7 Public deadline: must finish by 18:00 EST",
+          "story_step": 1
+        }
+      ],
+      "started_s": 2.4,
+      "seconds": 1.9
+    },
+    {
+      "step": 2,
+      "slug": "current_plan",
+      "segment": "commitments",
+      "clock": "0:35-1:10",
+      "caption": "Plan version 1: five activities; demonstrations need the projector, due 17:00.",
+      "frame": "story_02_current_plan.png",
+      "checks": [
+        {
+          "check": "the schedule shows plan version 1 with every activity (fresh API read)",
+          "passed": true,
+          "detail": "5 activities; Current schedule (plan version 1)",
+          "story_step": 2
+        }
+      ],
+      "started_s": 4.3,
+      "seconds": 0.5
+    },
+    {
+      "step": 3,
+      "slug": "agent_authority",
+      "segment": "commitments",
+      "clock": "0:35-1:10",
+      "caption": "The agent's grant: it may hold up to $35.00, but commit $0.00 without the organizer.",
+      "frame": "story_03_agent_authority.png",
+      "checks": [
+        {
+          "check": "the agent's grant is on the board: $0.00 committed limit, $35.00 hold limit",
+          "passed": true,
+          "detail": "committed limit 0 cents; agent_demo (coordinator agent, grant_coordinator_demo v1) \u2713Valid now",
+          "story_step": 3
+        }
+      ],
+      "started_s": 4.8,
+      "seconds": 0.6
+    },
+    {
+      "step": 4,
+      "slug": "notice_is_a_claim",
+      "segment": "delay",
+      "clock": "1:10-2:25",
+      "caption": "16:40: a delivery notice says the projector is late. A claim, not yet a fact.",
+      "frame": "story_04_notice_is_a_claim.png",
+      "checks": [
+        {
+          "check": "the projector notice is on the board with its source and times",
+          "passed": true,
+          "detail": "notice \u00b7 from delivery_contact | Observed 16:39 \u00b7 received 16:40",
+          "story_step": 4
+        }
+      ],
+      "started_s": 5.4,
+      "seconds": 0.4
+    },
+    {
+      "step": 5,
+      "slug": "verified_status",
+      "segment": "delay",
+      "clock": "1:10-2:25",
+      "caption": "Run deterministic policy: one status query answers 'delayed, ETA 17:25'.",
+      "frame": "story_05_verified_status.png",
+      "checks": [
+        {
+          "check": "the status query's answer is shown with its ETA (fresh API read)",
+          "passed": true,
+          "detail": "Primary projector delivery \u29d7Expected, not yet arrived basis: status observation at 16:40\u25f7Reported ETA 17:25 \u2014 not an arrival | delivery eta: reported delayed \u29d7Expected, not yet arrived\u25f7Reported ETA 17:25 \u2014 a reported ETA is not an arrival",
+          "story_step": 5
+        }
+      ],
+      "started_s": 5.8,
+      "seconds": 0.8
+    },
+    {
+      "step": 6,
+      "slug": "alternatives",
+      "segment": "delay",
+      "clock": "1:10-2:25",
+      "caption": "The planner's checked alternatives: the free swap ranks first of 3 feasible; 13 rejected.",
+      "frame": "story_06_alternatives.png",
+      "checks": [
+        {
+          "check": "alternatives show the feasible swap and the rejected candidates; nothing reserved",
+          "passed": true,
+          "detail": "#1 Swap demonstrations and skills exchange | Objective terms for Swap demonstrations and skills exchange | #3 Swap demonstrations and skills exchange + Use backup_projector instead of projector for demonstrations | Objective terms for Swap demonstrations and skills exchange + Use backup_projector instead of projector for demonstrations | Rejected alternatives (13) and the checks they fail",
+          "story_step": 6
+        }
+      ],
+      "started_s": 6.6,
+      "seconds": 0.5
+    },
+    {
+      "step": 7,
+      "slug": "committed_with_receipt",
+      "segment": "delay",
+      "clock": "1:10-2:25",
+      "caption": "Commit: the swap is applied with a receipt, revision 4 to 5; before and after shown.",
+      "frame": "story_07_committed_with_receipt.png",
+      "checks": [
+        {
+          "check": "one applied plan receipt (4 -> 5), shown on the board; no money committed",
+          "passed": true,
+          "detail": "rcpt_0001; Plan version 1 \u2192 2, applied at 16:43 by receipt rcpt_0001 from candidate cand_0001_dc26f35f.",
+          "story_step": 7
+        }
+      ],
+      "started_s": 7.1,
+      "seconds": 0.5
+    },
+    {
+      "step": 8,
+      "slug": "stale_and_duplicate",
+      "segment": "stale",
+      "clock": "2:25-3:10",
+      "caption": "dev04: last month's order P09 is 'inapplicable'; its forwarded copy is a 'duplicate'.",
+      "frame": "story_08_stale_and_duplicate.png",
+      "checks": [
+        {
+          "check": "the stale notice is inapplicable with its reasons and the copy is a duplicate",
+          "passed": true,
+          "detail": "\u29c9Duplicate Notice obs_0003 is a forwarded copy of handled notice obs_0002 (same correlation group and text): one evidence lineage, not corroboration. No plan change. | \u2298Does not apply Notice obs_0002 does not apply to this event: refers to 2026-10-29 but the event is on 2026-11-05; order P09 is not projector's booking P17. No plan change.",
+          "story_step": 8
+        },
+        {
+          "check": "no churn: plan v1 kept, no hold, nothing committed or reserved (fresh API read)",
+          "passed": true,
+          "detail": "{\"plan\": 1, \"budget\": {\"budget_cents\": 15000, \"committed_cents\": 0, \"reserved_cents\": 0, \"remaining_cents\": 15000}}",
+          "story_step": 8
+        }
+      ],
+      "started_s": 7.6,
+      "seconds": 5.9
+    },
+    {
+      "step": 9,
+      "slug": "backup_held_and_asked",
+      "segment": "backup",
+      "clock": "3:10-4:00",
+      "caption": "dev02: ETA 17:45 is too late. The agent holds the backup (expiry shown) and asks.",
+      "frame": "story_09_backup_held_and_asked.png",
+      "checks": [
+        {
+          "check": "a hold on the backup projector with its id and expiry; an authorization request",
+          "passed": true,
+          "detail": "hold_0001 expires 16:55; Hold expires",
+          "story_step": 9
+        }
+      ],
+      "started_s": 13.5,
+      "seconds": 5.2
+    },
+    {
+      "step": 10,
+      "slug": "organizer_approves",
+      "segment": "backup",
+      "clock": "3:10-4:00",
+      "caption": "The organizer, in their own session, sees the request and approves $35.00.",
+      "frame": "story_10_organizer_approves.png",
+      "checks": [
+        {
+          "check": "the organizer's approval raised the coordinator's committed limit to $35.00",
+          "passed": true,
+          "detail": "grant_coordinator_demo max_total_committed_cents 3500",
+          "story_step": 10
+        }
+      ],
+      "started_s": 18.7,
+      "seconds": 1.4
+    },
+    {
+      "step": 11,
+      "slug": "paid_backup_committed",
+      "segment": "backup",
+      "clock": "3:10-4:00",
+      "caption": "Run again: the paid backup is booked once, $35.00 committed, the hold converted.",
+      "frame": "story_11_paid_backup_committed.png",
+      "checks": [
+        {
+          "check": "one commitment of $35.00, nothing left reserved (fresh API read and board)",
+          "passed": true,
+          "detail": "{\"budget_cents\": 15000, \"committed_cents\": 3500, \"reserved_cents\": 0, \"remaining_cents\": 11500}",
+          "story_step": 11
+        }
+      ],
+      "started_s": 20.1,
+      "seconds": 3.8
+    },
+    {
+      "step": 12,
+      "slug": "live_decision_card",
+      "segment": "live",
+      "clock": "4:00-4:55",
+      "caption": "Replay of the live agent's paid dev02 run: a model call chose, the server checked.",
+      "frame": "story_12_live_decision_card.png",
+      "checks": [
+        {
+          "check": "the replay is labeled, verified, and from the recorded live run",
+          "passed": true,
+          "detail": "\u25b8 Recorded replay | \u2714Integrity check passed (hashes not signed) | Loaded server: live_p2-live_dev02_trace.json \u00b7 trace 1.0.0, runtime 1.1.0 \u00b7 episode ep_660fc1b24c93 \u00b7 scenario dev_fixture_01 \u00b7 policy live/1.0.0 \u00b7 24 frames, 35 tool calls, 5 receipts | \u2714 Integrity check passed. The trace is consistent with its own hashes, recomputed in this browser (SHA-256 of canonical JSON).",
+          "story_step": 12
+        },
+        {
+          "check": "the decision card names the model call that chose it, the model, latency and cost",
+          "passed": true,
+          "detail": "16:48 \u00b7 revision 8 \u00b7 live/1.0.0 \u00b7 chosen by a model call | Model (as returned) | Chose menu option apply:cand_0005_f5fc676f in model call mc_0006, citing cand_0005_f5fc676f, rpt_0005_f5fc676f, obs_notice_01, hold_0001, cand_0005_4f53cda1.",
+          "story_step": 12
+        },
+        {
+          "check": "the replay issued no POST/PUT/DELETE request",
+          "passed": true,
+          "detail": "[]",
+          "story_step": 12
+        }
+      ],
+      "started_s": 23.9,
+      "seconds": 0.8
+    },
+    {
+      "step": 13,
+      "slug": "policy_choices",
+      "segment": "live",
+      "clock": "4:00-4:55",
+      "caption": "P0 rules, P1 tool-use, P2 live, P3 verify-all share tools and checks; not yet compared.",
+      "frame": "story_13_policy_choices.png",
+      "checks": [
+        {
+          "check": "the moderator's policy selector offers P0-P3 by name; the deterministic one is selected",
+          "passed": true,
+          "detail": "Deterministic policy The documented rule baseline for this e | Tool-use agent \u00b7 anthropic/claude-sonnet-5.5 P1: a model cho | Live agent \u00b7 anthropic/claude-sonnet-5.5 P2, selective: a mo | Verify-all agent \u00b7 anthropic/claude-sonnet-5.5 P3: every rel",
+          "story_step": 13
+        }
+      ],
+      "started_s": 24.7,
+      "seconds": 0.5
+    },
+    {
+      "step": 14,
+      "slug": "p3_server_checks",
+      "segment": "live",
+      "clock": "4:00-4:55",
+      "caption": "Backup: in P3's replay its own status checks are server checks; its choices model calls.",
+      "frame": "story_14_p3_server_checks.png",
+      "checks": [
+        {
+          "check": "a P3 server check is labeled with its relevance rule, a P3 hold as a model choice",
+          "passed": true,
+          "detail": "16:42 \u00b7 revision 4 \u00b7 verify-all/1.0.0 \u00b7 server check under verify-all-relevance/1.0.0, no model choice | 16:45 \u00b7 revision 6 \u00b7 verify-all/1.0.0 \u00b7 chosen by a model call",
+          "story_step": 14
+        }
+      ],
+      "started_s": 25.2,
+      "seconds": 0.8
+    },
+    {
+      "step": 15,
+      "slug": "harness_bug_on_record",
+      "segment": "live",
+      "clock": "4:00-4:55",
+      "caption": "On record: a run caught a bug in our P1 prompt; every bad hold was refused. Fixed: 40 of 40.",
+      "frame": "story_15_harness_bug_on_record.png",
+      "checks": [
+        {
+          "check": "P1's recorded pantry run replays with 0 of 40 on time, executor rejections and the cap",
+          "passed": true,
+          "detail": "6 rejected holds; 0 of 40 on time | \u26a0 Failure model_call_cap: the episode's model-call cap is reached. Nothing was invented in its place. | \u25a0Stop Stopped for this episode: the model-call cap of 8 for this episode is spent. No further action is taken; the accepted plan and every commitment stay as they are.",
+          "story_step": 15
+        },
+        {
+          "check": "the rerun under the fixed prompt replays with 40 of 40 on time and no refused hold",
+          "passed": true,
+          "detail": "40 of 40 on time",
+          "story_step": 15
+        }
+      ],
+      "started_s": 26.0,
+      "seconds": 1.0
+    },
+    {
+      "step": 16,
+      "slug": "participant_check_in",
+      "segment": "community",
+      "clock": "4:55-5:40",
+      "caption": "Skills exchange: the peer lead checks in from their own tab, available until 11:05.",
+      "frame": "story_16_participant_check_in.png",
+      "checks": [
+        {
+          "check": "the check-in is recorded from the participant's own session, until 11:05",
+          "passed": true,
+          "detail": "participant_peer_lead until 11:05",
+          "story_step": 16
+        }
+      ],
+      "started_s": 27.0,
+      "seconds": 1.9
+    },
+    {
+      "step": 17,
+      "slug": "community_replanned",
+      "segment": "community",
+      "clock": "4:55-5:40",
+      "caption": "The 11:20 peer exchange no longer fits; the policy swaps it to 10:40 (receipt shown).",
+      "frame": "story_17_community_replanned.png",
+      "checks": [
+        {
+          "check": "plan v2 moves the peer exchange to 10:40, inside the peer lead's window",
+          "passed": true,
+          "detail": "10:10\u201310:40 | 10:40\u201311:00 | Guided practice (practice) \u25cbPlanned\u21bbChanged: was 10:40\u201311:20 | \u29d7 Pending: predecessor skills_demo scheduled to complete by 10:40",
+          "story_step": 17
+        }
+      ],
+      "started_s": 28.9,
+      "seconds": 4.6
+    },
+    {
+      "step": 18,
+      "slug": "resource_offer",
+      "segment": "community",
+      "clock": "4:55-5:40",
+      "caption": "A steward offers the registered backup kit: activated after checks; no hold, no spend.",
+      "frame": "story_18_resource_offer.png",
+      "checks": [
+        {
+          "check": "the offer activates the preconfigured backup kit; no hold, spend or plan change",
+          "passed": true,
+          "detail": "backup kit expected (status_observation)",
+          "story_step": 18
+        }
+      ],
+      "started_s": 33.5,
+      "seconds": 0.7
+    },
+    {
+      "step": 19,
+      "slug": "pantry_loaded",
+      "segment": "pantry",
+      "clock": "5:40-6:25",
+      "caption": "Target 40 kits. 24 on hand, 20 expected (not stock), 16 at the partner pool.",
+      "frame": "story_19_pantry_loaded.png",
+      "checks": [
+        {
+          "check": "fictional pantry board: shortfall 16, deficit 40; pantry 24, expected 20, partner 16",
+          "passed": true,
+          "detail": "board gap 16 standard kits, unfulfilled 40 standard kits; pools {\"pantry_stock\": {\"on_hand\": 24, \"reserved\": 0, \"available\": 24, \"expected\": 20, \"distributed\": 0}, \"partner_stock\": {\"on_hand\": 16, \"reserved\": 0, \"available\": 16, \"expected\": 0, \"distributed\": 0}}; Fictional pantry sandbox: fictional kits, stock and staff. Physical receipt and distribution are staff attestations; the coordinator agent cannot record them. | Supply shortfall",
+          "story_step": 19
+        }
+      ],
+      "started_s": 34.2,
+      "seconds": 1.9
+    },
+    {
+      "step": 20,
+      "slug": "handoff_requested",
+      "segment": "pantry",
+      "clock": "5:40-6:25",
+      "caption": "The agent verifies and holds the partner's 16 kits for a staff handoff. Stock stays 24.",
+      "frame": "story_20_handoff_requested.png",
+      "checks": [
+        {
+          "check": "16 partner kits held for an open staff task; pantry still 24; shortfall 16, deficit 40",
+          "passed": true,
+          "detail": "board gap 16 standard kits, unfulfilled 40 standard kits; pools {\"pantry_stock\": {\"on_hand\": 24, \"reserved\": 0, \"available\": 24, \"expected\": 20, \"distributed\": 0}, \"partner_stock\": {\"on_hand\": 16, \"reserved\": 16, \"available\": 0, \"expected\": 0, \"distributed\": 0}}",
+          "story_step": 20
+        }
+      ],
+      "started_s": 36.1,
+      "seconds": 1.1
+    },
+    {
+      "step": 21,
+      "slug": "staff_handoff",
+      "segment": "pantry",
+      "clock": "5:40-6:25",
+      "caption": "Staff (the presenter, in a staff tab) record the handoff: pantry 24 to 40, partner 0.",
+      "frame": "story_21_staff_handoff.png",
+      "checks": [
+        {
+          "check": "one staff receipt of 16; pantry 40, partner 0; shortfall 0, deficit still 40",
+          "passed": true,
+          "detail": "[0, 40]",
+          "story_step": 21
+        }
+      ],
+      "started_s": 37.2,
+      "seconds": 1.2
+    },
+    {
+      "step": 22,
+      "slug": "kits_committed",
+      "segment": "pantry",
+      "clock": "5:40-6:25",
+      "caption": "Run again: the agent reserves 40 and applies the plan. Committed, but nobody served yet.",
+      "frame": "story_22_kits_committed.png",
+      "checks": [
+        {
+          "check": "40 committed; shortfall 0, deficit still 40, 0 achieved",
+          "passed": true,
+          "detail": "board gap 0 standard kits, unfulfilled 40 standard kits; pools {\"pantry_stock\": {\"on_hand\": 40, \"reserved\": 40, \"available\": 0, \"expected\": 20, \"distributed\": 0}, \"partner_stock\": {\"on_hand\": 0, \"reserved\": 0, \"available\": 0, \"expected\": 0, \"distributed\": 0}}; achieved 0 of 40 on time",
+          "story_step": 22
+        }
+      ],
+      "started_s": 38.4,
+      "seconds": 0.9
+    },
+    {
+      "step": 23,
+      "slug": "distributed",
+      "segment": "pantry",
+      "clock": "5:40-6:25",
+      "caption": "Advance to 13:40 (simulated clock); staff record 40 distributed. Both counters reach 0.",
+      "frame": "story_23_distributed.png",
+      "checks": [
+        {
+          "check": "40 of 40 on time at 13:40; shortfall 0, deficit 0; S20 still 20 unreceived",
+          "passed": true,
+          "detail": "ran 63 minutes from 12:37; board gap 0 standard kits, unfulfilled 0 standard kits; pools {\"pantry_stock\": {\"on_hand\": 0, \"reserved\": 0, \"available\": 0, \"expected\": 20, \"distributed\": 40}, \"partner_stock\": {\"on_hand\": 0, \"reserved\": 0, \"available\": 0, \"expected\": 0, \"distributed\": 0}}",
+          "story_step": 23
+        }
+      ],
+      "started_s": 39.3,
+      "seconds": 3.3
+    },
+    {
+      "step": 24,
+      "slug": "fallback_ready",
+      "segment": "close",
+      "clock": "6:25-7:00",
+      "caption": "Offline fallback: recorded traces only, each checked in the browser, labeled replay.",
+      "frame": "story_24_fallback_ready.png",
+      "checks": [
+        {
+          "check": "the replay list holds the recorded traces the runbook opens",
+          "passed": true,
+          "detail": "31 traces",
+          "story_step": 24
+        },
+        {
+          "check": "no model call in the story: every decision of its 5 episodes came from a deterministic policy, and the selection stayed deterministic",
+          "passed": true,
+          "detail": "{\"episodes\": 5, \"policies\": [\"pantry-rules/1.0.0\", \"rules/1.0.0\"], \"caps\": {\"phase\": \"development\", \"max_tool_calls\": 48, \"max_model_calls\": 8, \"tool_calls\": 21, \"model_calls\": 0, \"reached\": []}}",
+          "story_step": 24
+        },
+        {
+          "check": "no horizontal overflow at 1536px",
+          "passed": true,
+          "detail": "",
+          "story_step": 24
+        },
+        {
+          "check": "no page errors",
+          "passed": true,
+          "detail": "0 page errors: []",
+          "story_step": 24
+        },
+        {
+          "check": "no join code or session token in the visible text at any frame",
+          "passed": true,
+          "detail": "24 frames; 4 join codes, 5 session tokens and the moderator code checked; 6 join links masked; exposed: []",
+          "story_step": 24
+        }
+      ],
+      "started_s": 42.6,
+      "seconds": 0.6
+    }
+  ],
+  "checks": [
+    {
+      "check": "clean dev01 episode: revision 3, no receipt, no hold; header labels visible",
+      "passed": true,
+      "detail": "\u26a0 Fictional sandbox \u2014 no real bookings, purchases, or messages | \u2699 Deterministic policy \u00b7 selected, not run yet | 16:40 | Opens 17:00 \u00b7 Public deadline: must finish by 18:00 EST",
+      "story_step": 1
+    },
+    {
+      "check": "the schedule shows plan version 1 with every activity (fresh API read)",
+      "passed": true,
+      "detail": "5 activities; Current schedule (plan version 1)",
+      "story_step": 2
+    },
+    {
+      "check": "the agent's grant is on the board: $0.00 committed limit, $35.00 hold limit",
+      "passed": true,
+      "detail": "committed limit 0 cents; agent_demo (coordinator agent, grant_coordinator_demo v1) \u2713Valid now",
+      "story_step": 3
+    },
+    {
+      "check": "the projector notice is on the board with its source and times",
+      "passed": true,
+      "detail": "notice \u00b7 from delivery_contact | Observed 16:39 \u00b7 received 16:40",
+      "story_step": 4
+    },
+    {
+      "check": "the status query's answer is shown with its ETA (fresh API read)",
+      "passed": true,
+      "detail": "Primary projector delivery \u29d7Expected, not yet arrived basis: status observation at 16:40\u25f7Reported ETA 17:25 \u2014 not an arrival | delivery eta: reported delayed \u29d7Expected, not yet arrived\u25f7Reported ETA 17:25 \u2014 a reported ETA is not an arrival",
+      "story_step": 5
+    },
+    {
+      "check": "alternatives show the feasible swap and the rejected candidates; nothing reserved",
+      "passed": true,
+      "detail": "#1 Swap demonstrations and skills exchange | Objective terms for Swap demonstrations and skills exchange | #3 Swap demonstrations and skills exchange + Use backup_projector instead of projector for demonstrations | Objective terms for Swap demonstrations and skills exchange + Use backup_projector instead of projector for demonstrations | Rejected alternatives (13) and the checks they fail",
+      "story_step": 6
+    },
+    {
+      "check": "one applied plan receipt (4 -> 5), shown on the board; no money committed",
+      "passed": true,
+      "detail": "rcpt_0001; Plan version 1 \u2192 2, applied at 16:43 by receipt rcpt_0001 from candidate cand_0001_dc26f35f.",
+      "story_step": 7
+    },
+    {
+      "check": "the stale notice is inapplicable with its reasons and the copy is a duplicate",
+      "passed": true,
+      "detail": "\u29c9Duplicate Notice obs_0003 is a forwarded copy of handled notice obs_0002 (same correlation group and text): one evidence lineage, not corroboration. No plan change. | \u2298Does not apply Notice obs_0002 does not apply to this event: refers to 2026-10-29 but the event is on 2026-11-05; order P09 is not projector's booking P17. No plan change.",
+      "story_step": 8
+    },
+    {
+      "check": "no churn: plan v1 kept, no hold, nothing committed or reserved (fresh API read)",
+      "passed": true,
+      "detail": "{\"plan\": 1, \"budget\": {\"budget_cents\": 15000, \"committed_cents\": 0, \"reserved_cents\": 0, \"remaining_cents\": 15000}}",
+      "story_step": 8
+    },
+    {
+      "check": "a hold on the backup projector with its id and expiry; an authorization request",
+      "passed": true,
+      "detail": "hold_0001 expires 16:55; Hold expires",
+      "story_step": 9
+    },
+    {
+      "check": "the organizer's approval raised the coordinator's committed limit to $35.00",
+      "passed": true,
+      "detail": "grant_coordinator_demo max_total_committed_cents 3500",
+      "story_step": 10
+    },
+    {
+      "check": "one commitment of $35.00, nothing left reserved (fresh API read and board)",
+      "passed": true,
+      "detail": "{\"budget_cents\": 15000, \"committed_cents\": 3500, \"reserved_cents\": 0, \"remaining_cents\": 11500}",
+      "story_step": 11
+    },
+    {
+      "check": "the replay is labeled, verified, and from the recorded live run",
+      "passed": true,
+      "detail": "\u25b8 Recorded replay | \u2714Integrity check passed (hashes not signed) | Loaded server: live_p2-live_dev02_trace.json \u00b7 trace 1.0.0, runtime 1.1.0 \u00b7 episode ep_660fc1b24c93 \u00b7 scenario dev_fixture_01 \u00b7 policy live/1.0.0 \u00b7 24 frames, 35 tool calls, 5 receipts | \u2714 Integrity check passed. The trace is consistent with its own hashes, recomputed in this browser (SHA-256 of canonical JSON).",
+      "story_step": 12
+    },
+    {
+      "check": "the decision card names the model call that chose it, the model, latency and cost",
+      "passed": true,
+      "detail": "16:48 \u00b7 revision 8 \u00b7 live/1.0.0 \u00b7 chosen by a model call | Model (as returned) | Chose menu option apply:cand_0005_f5fc676f in model call mc_0006, citing cand_0005_f5fc676f, rpt_0005_f5fc676f, obs_notice_01, hold_0001, cand_0005_4f53cda1.",
+      "story_step": 12
+    },
+    {
+      "check": "the replay issued no POST/PUT/DELETE request",
+      "passed": true,
+      "detail": "[]",
+      "story_step": 12
+    },
+    {
+      "check": "the moderator's policy selector offers P0-P3 by name; the deterministic one is selected",
+      "passed": true,
+      "detail": "Deterministic policy The documented rule baseline for this e | Tool-use agent \u00b7 anthropic/claude-sonnet-5.5 P1: a model cho | Live agent \u00b7 anthropic/claude-sonnet-5.5 P2, selective: a mo | Verify-all agent \u00b7 anthropic/claude-sonnet-5.5 P3: every rel",
+      "story_step": 13
+    },
+    {
+      "check": "a P3 server check is labeled with its relevance rule, a P3 hold as a model choice",
+      "passed": true,
+      "detail": "16:42 \u00b7 revision 4 \u00b7 verify-all/1.0.0 \u00b7 server check under verify-all-relevance/1.0.0, no model choice | 16:45 \u00b7 revision 6 \u00b7 verify-all/1.0.0 \u00b7 chosen by a model call",
+      "story_step": 14
+    },
+    {
+      "check": "P1's recorded pantry run replays with 0 of 40 on time, executor rejections and the cap",
+      "passed": true,
+      "detail": "6 rejected holds; 0 of 40 on time | \u26a0 Failure model_call_cap: the episode's model-call cap is reached. Nothing was invented in its place. | \u25a0Stop Stopped for this episode: the model-call cap of 8 for this episode is spent. No further action is taken; the accepted plan and every commitment stay as they are.",
+      "story_step": 15
+    },
+    {
+      "check": "the rerun under the fixed prompt replays with 40 of 40 on time and no refused hold",
+      "passed": true,
+      "detail": "40 of 40 on time",
+      "story_step": 15
+    },
+    {
+      "check": "the check-in is recorded from the participant's own session, until 11:05",
+      "passed": true,
+      "detail": "participant_peer_lead until 11:05",
+      "story_step": 16
+    },
+    {
+      "check": "plan v2 moves the peer exchange to 10:40, inside the peer lead's window",
+      "passed": true,
+      "detail": "10:10\u201310:40 | 10:40\u201311:00 | Guided practice (practice) \u25cbPlanned\u21bbChanged: was 10:40\u201311:20 | \u29d7 Pending: predecessor skills_demo scheduled to complete by 10:40",
+      "story_step": 17
+    },
+    {
+      "check": "the offer activates the preconfigured backup kit; no hold, spend or plan change",
+      "passed": true,
+      "detail": "backup kit expected (status_observation)",
+      "story_step": 18
+    },
+    {
+      "check": "fictional pantry board: shortfall 16, deficit 40; pantry 24, expected 20, partner 16",
+      "passed": true,
+      "detail": "board gap 16 standard kits, unfulfilled 40 standard kits; pools {\"pantry_stock\": {\"on_hand\": 24, \"reserved\": 0, \"available\": 24, \"expected\": 20, \"distributed\": 0}, \"partner_stock\": {\"on_hand\": 16, \"reserved\": 0, \"available\": 16, \"expected\": 0, \"distributed\": 0}}; Fictional pantry sandbox: fictional kits, stock and staff. Physical receipt and distribution are staff attestations; the coordinator agent cannot record them. | Supply shortfall",
+      "story_step": 19
+    },
+    {
+      "check": "16 partner kits held for an open staff task; pantry still 24; shortfall 16, deficit 40",
+      "passed": true,
+      "detail": "board gap 16 standard kits, unfulfilled 40 standard kits; pools {\"pantry_stock\": {\"on_hand\": 24, \"reserved\": 0, \"available\": 24, \"expected\": 20, \"distributed\": 0}, \"partner_stock\": {\"on_hand\": 16, \"reserved\": 16, \"available\": 0, \"expected\": 0, \"distributed\": 0}}",
+      "story_step": 20
+    },
+    {
+      "check": "one staff receipt of 16; pantry 40, partner 0; shortfall 0, deficit still 40",
+      "passed": true,
+      "detail": "[0, 40]",
+      "story_step": 21
+    },
+    {
+      "check": "40 committed; shortfall 0, deficit still 40, 0 achieved",
+      "passed": true,
+      "detail": "board gap 0 standard kits, unfulfilled 40 standard kits; pools {\"pantry_stock\": {\"on_hand\": 40, \"reserved\": 40, \"available\": 0, \"expected\": 20, \"distributed\": 0}, \"partner_stock\": {\"on_hand\": 0, \"reserved\": 0, \"available\": 0, \"expected\": 0, \"distributed\": 0}}; achieved 0 of 40 on time",
+      "story_step": 22
+    },
+    {
+      "check": "40 of 40 on time at 13:40; shortfall 0, deficit 0; S20 still 20 unreceived",
+      "passed": true,
+      "detail": "ran 63 minutes from 12:37; board gap 0 standard kits, unfulfilled 0 standard kits; pools {\"pantry_stock\": {\"on_hand\": 0, \"reserved\": 0, \"available\": 0, \"expected\": 20, \"distributed\": 40}, \"partner_stock\": {\"on_hand\": 0, \"reserved\": 0, \"available\": 0, \"expected\": 0, \"distributed\": 0}}",
+      "story_step": 23
+    },
+    {
+      "check": "the replay list holds the recorded traces the runbook opens",
+      "passed": true,
+      "detail": "31 traces",
+      "story_step": 24
+    },
+    {
+      "check": "no model call in the story: every decision of its 5 episodes came from a deterministic policy, and the selection stayed deterministic",
+      "passed": true,
+      "detail": "{\"episodes\": 5, \"policies\": [\"pantry-rules/1.0.0\", \"rules/1.0.0\"], \"caps\": {\"phase\": \"development\", \"max_tool_calls\": 48, \"max_model_calls\": 8, \"tool_calls\": 21, \"model_calls\": 0, \"reached\": []}}",
+      "story_step": 24
+    },
+    {
+      "check": "no horizontal overflow at 1536px",
+      "passed": true,
+      "detail": "",
+      "story_step": 24
+    },
+    {
+      "check": "no page errors",
+      "passed": true,
+      "detail": "0 page errors: []",
+      "story_step": 24
+    },
+    {
+      "check": "no join code or session token in the visible text at any frame",
+      "passed": true,
+      "detail": "24 frames; 4 join codes, 5 session tokens and the moderator code checked; 6 join links masked; exposed: []",
+      "story_step": 24
+    }
+  ]
+}
