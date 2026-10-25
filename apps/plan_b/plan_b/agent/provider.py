@@ -12,10 +12,19 @@ scrubbed of it and exceptions are raised without the urllib context.
 
 Spend. Before each request the ``SpendGuard`` estimates an upper bound (prompt bytes / 3 tokens
 plus ``max_tokens`` at the model's per-token prices, or ceiling prices for an unlisted model)
-and refuses a call that could exceed the per-run cap or the cumulative ledger cap. After the
-call it charges the provider-reported cost (OpenRouter usage accounting), else the cost
-computed from the reported tokens, else (timeout, unreadable reply) the upper bound. The
-ledger (``var/model_spend.json``) records every call's model, tokens, cost and outcome.
+and refuses a call that could exceed the per-run cap or the cumulative ledger cap; otherwise it
+reserves the bound in the ledger under its lock, so concurrent episode processes sharing the
+ledger cannot together pass the cumulative cap. After the call it charges the provider-reported
+cost (OpenRouter usage accounting), else the cost computed from the reported tokens, else
+(timeout, unreadable reply) the upper bound, in place of the reservation. The ledger
+(``var/model_spend.json``) records every call's model, tokens, cost and outcome.
+
+Generation settings (1.1.0) are the same for every call of P1, P2 and P3: ``MAX_OUTPUT_TOKENS``
+output tokens, no sampling parameter (``TEMPERATURE``), strict JSON schema output and, on
+OpenRouter, ``require_parameters``. A run may carry a seed (``seed``), sent as the
+OpenAI-compatible ``seed`` unless the model's endpoints refuse it (``SEED_UNSUPPORTED``). Every
+``CallRecord`` records these settings, whether the seed was sent, and the reply's ``seed`` and
+``system_fingerprint`` when it names them.
 """
 
 from __future__ import annotations
@@ -25,6 +34,8 @@ import http.client
 import json
 import math
 import os
+import socket
+import ssl
 import tempfile
 import threading
 import time
@@ -45,10 +56,28 @@ try:  # POSIX advisory lock so two local processes cannot interleave ledger upda
 except ImportError:  # pragma: no cover - non-POSIX hosts fall back to the in-process lock
     fcntl = None  # type: ignore[assignment]
 
-PROVIDER_VERSION = "plan_b.provider/1.0.0"
+PROVIDER_VERSION = "plan_b.provider/1.1.0"  # 1.1.0: one output limit, seeds, recorded settings
 DEFAULT_TIMEOUT_S = 90.0
+# The output-token limit of every model call of P1, P2 and P3 (interpretation, menu choice and
+# tool turn alike). Reasoning tokens count against it; 4096 is what P1 needed (W2-D11) and is
+# ample for the shorter replies.
+MAX_OUTPUT_TOKENS = 4096
+# No sampling parameter is sent: none of the configured model's OpenRouter endpoints lists
+# ``temperature`` (2026-10-25), and ``require_parameters`` would refuse a request carrying one.
+# Every call therefore runs at the provider's default and records ``temperature: null``.
+TEMPERATURE: float | None = None
+# Models whose OpenRouter endpoints accept no ``seed``. Checked 2026-10-25: the public endpoint
+# list of this model names ``seed`` for none of its 8 endpoints, and one seeded request (with
+# ``require_parameters``) was refused, HTTP 404 "No endpoints found that can handle the
+# requested parameters", not billed. A run's seed is then recorded on every call and not sent,
+# so repeated trials are independent runs, not reproducible ones.
+SEED_UNSUPPORTED: frozenset[str] = frozenset({"anthropic/claude-sonnet-5.5"})
 MAX_RESPONSE_BYTES = 2_000_000
 ERROR_EXCERPT_CHARS = 300
+# Transport failures known to happen before the request goes out (name resolution, a refused
+# connection, a certificate refused): not billed. Any other may follow the request: billed at
+# its bound, so the ledger never counts less than may have been spent.
+BEFORE_SEND_FAILURES = (socket.gaierror, ConnectionRefusedError, ssl.SSLCertVerificationError)
 # USD per million tokens (prompt, completion), as OpenRouter's public model list gave them on
 # 2026-10-24; used for the pre-call bound and when the reply reports no cost.
 PRICES_PER_MTOK: dict[str, tuple[float, float]] = {
@@ -105,6 +134,11 @@ class CallRecord:
     # Generation settings of the request (the response format is always strict JSON schema).
     provider: str | None = None
     max_tokens: int | None = None
+    temperature: float | None = None  # None: not sent, the provider's default
+    seed: int | None = None  # the run's requested seed (None: no seed requested)
+    seed_sent: bool = False  # whether the request carried it as ``seed``
+    seed_echo: int | None = None  # a ``seed`` the reply named, when it named one
+    system_fingerprint: str | None = None  # the reply's backend fingerprint, when given
 
     def as_dict(self) -> dict[str, Any]:
         out = asdict(self)
@@ -123,7 +157,7 @@ class ModelRequest:
     schema_name: str
     schema: dict[str, Any]
     output_model: type[BaseModel]
-    max_tokens: int = 4096
+    max_tokens: int = MAX_OUTPUT_TOKENS
     context: dict[str, Any] = field(default_factory=dict)
     call_id: str = "mc_0000"
     attempt: int = 1
@@ -232,9 +266,18 @@ class SpendCapReached(ProviderError):
 
 
 class SpendLedger:
-    """Cumulative spend in a JSON file: ``{ledger, version, total_cost_usd, calls: [...]}``.
-    Updates are atomic (temporary file + replace, mode 0600) under a lock. An unreadable
-    ledger fails closed: the guard refuses calls rather than guess the total."""
+    """Cumulative spend in a JSON file: ``{ledger, version, total_cost_usd, calls: [...]}``, plus
+    ``reservations`` while calls are in flight. Updates are atomic (temporary file + replace,
+    mode 0600) under a lock: a thread lock and, between processes, an ``fcntl`` lock on a
+    sibling ``.lock`` file. An unreadable ledger fails closed: the guard refuses calls rather
+    than guess the total.
+
+    Several episode processes may share one ledger. The cumulative cap holds across them
+    because a call's upper bound is reserved, under the lock, before it is sent
+    (``reserve``): the cap is checked against the charged total plus every other live
+    reservation, and the charge (``append``) replaces the reservation with the actual cost.
+    A reservation whose process is gone is charged at its bound (outcome ``abandoned``), so the
+    ledger never counts less than may have been spent."""
 
     def __init__(self, path: Path) -> None:
         self.path = path
@@ -254,31 +297,125 @@ class SpendLedger:
         total = data.get("total_cost_usd")
         if not isinstance(total, int | float) or not math.isfinite(total) or total < 0:
             raise ValueError("ledger total is not a finite non-negative number")
+        if not isinstance(data.get("reservations", []), list):
+            raise ValueError("ledger reservations are not a list")
         return data
 
     def total_usd(self) -> float:
         return float(self.read()["total_cost_usd"])
 
-    def append(self, entry: dict[str, Any]) -> float:
+    def reserve(
+        self, *, run_id: str, call_id: str, amount_usd: float, max_total_usd: float
+    ) -> tuple[str | None, str | None]:
+        """Reserve ``amount_usd`` for one call when the charged total plus every live
+        reservation plus it stays within ``max_total_usd``: (reservation id, None), else
+        (None, the refusal)."""
         with self._locked():
             data = self.read()
-            data["calls"].append(entry)
-            data["total_cost_usd"] = round(
-                float(data["total_cost_usd"]) + float(entry.get("cost_usd") or 0.0), 8
+            settled = self._settle_abandoned(data)
+            total = float(data["total_cost_usd"])
+            pending = sum(float(r["amount_usd"]) for r in data.get("reservations", []))
+            if total + pending + amount_usd > max_total_usd:
+                if settled:
+                    self._write(data)
+                return None, (
+                    f"cumulative cap {max_total_usd:.2f} USD: ledger total {total:.4f}, "
+                    f"{pending:.4f} reserved by calls in flight, next call bounded at "
+                    f"{amount_usd:.4f}"
+                )
+            reservation = f"rsv-{os.getpid()}-{run_id}-{call_id}-{time.monotonic_ns()}"
+            data.setdefault("reservations", []).append(
+                {
+                    "reservation_id": reservation,
+                    "run_id": run_id,
+                    "call_id": call_id,
+                    "amount_usd": round(amount_usd, 8),
+                    "at": _wall(),
+                    "pid": os.getpid(),
+                    "pid_start": _process_start(os.getpid()),
+                }
             )
-            self.path.parent.mkdir(parents=True, exist_ok=True)
-            fd, tmp = tempfile.mkstemp(dir=self.path.parent, prefix=".model_spend.")
-            try:
-                with os.fdopen(fd, "w", encoding="utf-8") as handle:
-                    json.dump(data, handle, indent=1, sort_keys=True)
-                    handle.write("\n")
-                os.chmod(tmp, 0o600)
-                os.replace(tmp, self.path)
-            except BaseException:
-                with contextlib.suppress(OSError):
-                    os.unlink(tmp)
-                raise
+            self._write(data)
+            return reservation, None
+
+    def release(self, reservation: str | None) -> None:
+        """Drop a reservation whose call was never sent (nothing to charge)."""
+        if reservation is None:
+            return
+        with self._locked():
+            data = self.read()
+            data["reservations"] = [
+                r for r in data.get("reservations", []) if r["reservation_id"] != reservation
+            ]
+            self._settle_abandoned(data)
+            self._write(data)
+
+    def abandon(self, reservation: str) -> float:
+        """Charge a reservation at its bound (outcome ``abandoned``): its call was sent but
+        never charged. Returns the amount charged (0 when it is no longer reserved)."""
+        with self._locked():
+            data = self.read()
+            found = [r for r in data.get("reservations", []) if r["reservation_id"] == reservation]
+            data["reservations"] = [
+                r for r in data.get("reservations", []) if r["reservation_id"] != reservation
+            ]
+            for r in found:
+                self._charge(data, _abandoned(r, "left by a call that was never charged"))
+            self._settle_abandoned(data)
+            self._write(data)
+            return sum(float(r["amount_usd"]) for r in found)
+
+    def append(self, entry: dict[str, Any], *, reservation: str | None = None) -> float:
+        with self._locked():
+            data = self.read()
+            if reservation is not None:
+                data["reservations"] = [
+                    r for r in data.get("reservations", []) if r["reservation_id"] != reservation
+                ]
+            self._charge(data, entry)
+            self._settle_abandoned(data)
+            self._write(data)
             return float(data["total_cost_usd"])
+
+    @staticmethod
+    def _charge(data: dict[str, Any], entry: dict[str, Any]) -> None:
+        data["calls"].append(entry)
+        data["total_cost_usd"] = round(
+            float(data["total_cost_usd"]) + float(entry.get("cost_usd") or 0.0), 8
+        )
+
+    def _settle_abandoned(self, data: dict[str, Any]) -> bool:
+        """Charge the bound of each reservation whose process no longer exists; True when one
+        was charged."""
+        live: list[dict[str, Any]] = []
+        settled = False
+        for r in data.get("reservations", []):
+            if _process_alive(int(r.get("pid", 0)), r.get("pid_start")):
+                live.append(r)
+                continue
+            settled = True
+            self._charge(
+                data, _abandoned(r, "reserved by a process that ended before charging the call")
+            )
+        if live or "reservations" in data:
+            data["reservations"] = live
+        return settled
+
+    def _write(self, data: dict[str, Any]) -> None:
+        if not data.get("reservations"):
+            data.pop("reservations", None)  # the settled file keeps its Wave 2 shape
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        fd, tmp = tempfile.mkstemp(dir=self.path.parent, prefix=".model_spend.")
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as handle:
+                json.dump(data, handle, indent=1, sort_keys=True)
+                handle.write("\n")
+            os.chmod(tmp, 0o600)
+            os.replace(tmp, self.path)
+        except BaseException:
+            with contextlib.suppress(OSError):
+                os.unlink(tmp)
+            raise
 
     @contextlib.contextmanager
     def _locked(self) -> Iterator[None]:
@@ -298,7 +435,8 @@ class SpendLedger:
 
 
 class SpendGuard:
-    """Per-run and cumulative caps. One guard is one run (a policy episode or a gate run)."""
+    """Per-run and cumulative caps. One guard is one run (a policy episode or a gate run); its
+    calls are sequential, so it holds at most one reservation at a time."""
 
     def __init__(
         self, ledger: SpendLedger, *, max_run_usd: float, max_total_usd: float, run_id: str
@@ -308,9 +446,11 @@ class SpendGuard:
         self.max_total_usd = max_total_usd
         self.run_id = run_id
         self.run_spent_usd = 0.0
+        self._reservation: str | None = None
 
     def check(self, estimate_usd: float) -> str | None:
-        """Why a call bounded by ``estimate_usd`` is refused, or None when it may proceed."""
+        """Why a call bounded by ``estimate_usd`` is refused, or None when it may proceed (a
+        read-only check; ``reserve`` is the one a call makes)."""
         if self.run_spent_usd + estimate_usd > self.max_run_usd:
             return (
                 f"per-run cap {self.max_run_usd:.2f} USD: spent {self.run_spent_usd:.4f}, next "
@@ -326,6 +466,37 @@ class SpendGuard:
                 f"call bounded at {estimate_usd:.4f}"
             )
         return None
+
+    def reserve(self, estimate_usd: float, *, call_id: str = "") -> str | None:
+        """Reserve the call's bound in the ledger (``SpendLedger.reserve``), or say why the
+        call is refused: the per-run cap, the cumulative cap with every process's calls in
+        flight counted, or an unreadable ledger."""
+        if self._reservation is not None:
+            # An earlier call of this run left before it was charged (an unexpected error
+            # after the reply): charge its bound, so neither cap counts less than was spent.
+            stale, self._reservation = self._reservation, None
+            with contextlib.suppress(OSError, ValueError):
+                self.run_spent_usd += self.ledger.abandon(stale)
+        if self.run_spent_usd + estimate_usd > self.max_run_usd:
+            return (
+                f"per-run cap {self.max_run_usd:.2f} USD: spent {self.run_spent_usd:.4f}, next "
+                f"call bounded at {estimate_usd:.4f}"
+            )
+        try:
+            self._reservation, refusal = self.ledger.reserve(
+                run_id=self.run_id,
+                call_id=call_id,
+                amount_usd=estimate_usd,
+                max_total_usd=self.max_total_usd,
+            )
+        except (OSError, ValueError) as exc:
+            return f"spend ledger unreadable ({type(exc).__name__}); refusing to guess the total"
+        return refusal
+
+    def release(self) -> None:
+        """The reserved call was never sent."""
+        reservation, self._reservation = self._reservation, None
+        self.ledger.release(reservation)
 
     def charge(self, record: CallRecord, *, provider: str) -> None:
         self.run_spent_usd += record.cost_usd
@@ -349,7 +520,8 @@ class SpendGuard:
             "cost_basis": record.cost_basis,
             "generation_id": record.generation_id,
         }
-        self.ledger.append(entry)
+        reservation, self._reservation = self._reservation, None
+        self.ledger.append(entry, reservation=reservation)
 
 
 def prices_for(model_id: str) -> tuple[tuple[float, float], bool]:
@@ -381,12 +553,28 @@ class OpenAICompatibleProvider:
     """``POST {base_url}/chat/completions`` with strict structured output."""
 
     def __init__(
-        self, config: ModelConfig, guard: SpendGuard, *, timeout_s: float = DEFAULT_TIMEOUT_S
+        self,
+        config: ModelConfig,
+        guard: SpendGuard,
+        *,
+        timeout_s: float = DEFAULT_TIMEOUT_S,
+        seed: int | None = None,
     ) -> None:
         self.config = config
         self.guard = guard
         self.timeout_s = timeout_s
+        self.seed = seed
         self._opener = urllib.request.build_opener(_NoRedirect())
+
+    @property
+    def sends_seed(self) -> bool:
+        """Whether requests carry the run's seed as the OpenAI-compatible ``seed``: when one is
+        set, unless the routed endpoints are known to refuse it (``SEED_UNSUPPORTED``)."""
+        if self.seed is None:
+            return False
+        return not (
+            self.config.provider == "openrouter" and self.config.model_id in SEED_UNSUPPORTED
+        )
 
     @property
     def requested_model(self) -> str:
@@ -397,6 +585,8 @@ class OpenAICompatibleProvider:
             "model": self.config.model_id,
             "messages": request.messages(),
             "max_tokens": request.max_tokens,
+            **({"temperature": TEMPERATURE} if TEMPERATURE is not None else {}),
+            **({"seed": self.seed} if self.sends_seed else {}),
             "response_format": {
                 "type": "json_schema",
                 "json_schema": {
@@ -415,14 +605,18 @@ class OpenAICompatibleProvider:
         data = json.dumps(self.body(request), ensure_ascii=False).encode("utf-8")
         bound = upper_bound_usd(self.config.model_id, len(data), request.max_tokens)
         started = _wall()
-        refusal = self.guard.check(bound)
+        refusal = self.guard.reserve(bound, call_id=request.call_id)
         if refusal is not None:
             record = self._record(request, started, 0, "spend_cap", error=refusal)
             # The refusal is recorded (cost 0, nothing sent); an unreadable ledger stays closed.
             with contextlib.suppress(OSError, ValueError):
                 self.guard.charge(record, provider=self.config.provider)
             raise SpendCapReached(f"spend cap reached: {refusal}", record=record)
-        key = self._read_key(request, started)
+        try:
+            key = self._read_key(request, started)
+        except ProviderConfigError:
+            self.guard.release()  # nothing was sent
+            raise
         http_request = urllib.request.Request(
             self.config.chat_url,
             data=data,
@@ -466,12 +660,18 @@ class OpenAICompatibleProvider:
             ) from None
         except (urllib.error.URLError, http.client.HTTPException, OSError) as exc:
             reason = _scrub(str(getattr(exc, "reason", exc))[:ERROR_EXCERPT_CHARS], key)
+            # A connection lost after the request went out (reset, closed, a reply cut short, a
+            # TLS failure mid-reply) may have been generated and billed: charged at its bound,
+            # as a timeout is. Only a failure known to precede sending is not billed.
+            cause = exc.reason if isinstance(exc, urllib.error.URLError) else exc
+            sent = not isinstance(cause, BEFORE_SEND_FAILURES)
             record = self._record(
                 request,
                 started,
                 _ms(t0),
                 "transport",
-                basis="not_billed",
+                cost=bound if sent else 0.0,
+                basis="upper_bound_estimate" if sent else "not_billed",
                 error=f"transport failure: {reason}",
             )
             self.guard.charge(record, provider=self.config.provider)
@@ -597,9 +797,18 @@ class OpenAICompatibleProvider:
             error=error,
             consumed_tool_call_ids=request.consumed_tool_call_ids,
             prompt_id=request.prompt_id,
-            provider=self.config.provider,
-            max_tokens=request.max_tokens,
+            **self._settings(request),
         )
+
+    def _settings(self, request: ModelRequest) -> dict[str, Any]:
+        """The request's generation settings, as each call records them."""
+        return {
+            "provider": self.config.provider,
+            "max_tokens": request.max_tokens,
+            "temperature": TEMPERATURE,
+            "seed": self.seed,
+            "seed_sent": self.sends_seed,
+        }
 
     def _usage_record(
         self,
@@ -631,6 +840,8 @@ class OpenAICompatibleProvider:
             cost, basis = bound, "upper_bound_estimate"
         model = payload.get("model")
         generation = payload.get("id")
+        echo = payload.get("seed")
+        fingerprint = payload.get("system_fingerprint")
         return CallRecord(
             call_id=request.call_id,
             purpose=request.purpose,
@@ -650,8 +861,9 @@ class OpenAICompatibleProvider:
             generation_id=str(generation)[:200] if isinstance(generation, str) else None,
             consumed_tool_call_ids=request.consumed_tool_call_ids,
             prompt_id=request.prompt_id,
-            provider=self.config.provider,
-            max_tokens=request.max_tokens,
+            **self._settings(request),
+            seed_echo=_int(echo),
+            system_fingerprint=str(fingerprint)[:200] if isinstance(fingerprint, str) else None,
         )
 
 
@@ -707,3 +919,43 @@ def _ms(t0: float) -> int:
 
 def _wall() -> str:
     return datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+
+
+def _abandoned(reservation: dict[str, Any], note: str) -> dict[str, Any]:
+    """The ledger entry charging a reservation at its bound."""
+    return {
+        "at": reservation.get("at"),
+        "run_id": reservation.get("run_id"),
+        "call_id": reservation.get("call_id"),
+        "outcome": "abandoned",
+        "cost_usd": float(reservation["amount_usd"]),
+        "cost_basis": "upper_bound_estimate",
+        "note": note,
+    }
+
+
+def _process_start(pid: int) -> str | None:
+    """The process's start time in clock ticks since boot (Linux ``/proc``), or None."""
+    try:
+        stat = Path(f"/proc/{pid}/stat").read_bytes()
+    except OSError:
+        return None
+    fields = stat[stat.rfind(b")") + 2 :].split()  # the name may hold any bytes, even ")"
+    return fields[19].decode("ascii", "replace") if len(fields) > 19 else None
+
+
+def _process_alive(pid: int, start: str | None = None) -> bool:
+    """Whether a reservation's owner still runs: a local process with this id exists and,
+    when its start time was recorded, started then (a reused id is another process)."""
+    if pid <= 0:
+        return False
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True  # it exists under another user
+    if start is not None:
+        now = _process_start(pid)
+        return now is None or now == start
+    return True

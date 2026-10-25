@@ -1,9 +1,9 @@
-"""P1, the ordinary tool-using model baseline: ``tool-use/1.0.0``.
+"""P1, the ordinary tool-using model baseline: ``tool-use/1.1.0``.
 
 A serious baseline in the sense of ``PEEAI_plan/08_evaluation.md``: the model reads the visible
 state and chooses tools and arguments itself, by strict JSON (``calls``: a tool name from the
 coordinator grant's ``allowed_tools`` and its arguments as a JSON object), with no server-built
-menu. Its instructions (prompt ``tool_use.v2``) cover the objective, source timestamps, the
+menu. Its instructions (prompt ``tool_use.v3``) cover the objective, source timestamps, the
 budget, the deadline, tool documentation, failure handling and preserving valid commitments,
 and it may hold and verify. Every call goes through the same ``ToolClient`` and executor as
 every other policy, which validates it; the candidates are the planner's own
@@ -13,9 +13,18 @@ One ``run`` (one wake):
 
 1. read the state (stop when the event is over, the episode closed or the grant not valid);
 2. when nothing new happened since the model last decided (the plan, goal, observations,
-   grants, holds, commitments, stock, staff tasks and failed activities are unchanged) and its
-   wake time has not passed, wait without a model call;
-3. otherwise up to ``MAX_TURNS`` model turns. Each turn's observation is the state and the
+   grants, holds, commitments, stock, staff tasks and failed activities are unchanged), no new
+   notice arrived and no wake time passed (its own ``wait_minutes``, a retry, or the shared wake
+   schedule: a deadline watch, an open request's hold, an awaited staff handoff, the opening of
+   the handoff window), wait without a model call;
+3. the attention rule shared with P2 and P3 (``agent/attention.py``, 1.1.0): a new notice
+   warrants a turn (a repeat of one already shown is recorded as a duplicate by the server);
+   otherwise the planner's evaluation is read and a turn is warranted only when the decision
+   menu P2 would build from this state offers an action. If not, the server records what the
+   state determines (keep, a shortfall, infeasible, or a wait), as for P2, and no model call is
+   made. So status answers, arrival records and check-ins that change nothing actionable cost
+   no model call;
+4. otherwise up to ``MAX_TURNS`` model turns. Each turn's observation is the state and the
    planner's current evaluation (read with ``evaluate_candidates`` whenever the revision moved,
    as the selective policy reads it before each choice). Each turn returns up to
    ``MAX_CALLS_PER_TURN`` tool calls, run in order with the key
@@ -38,10 +47,16 @@ a lost mutation response is reconciled with ``get_action_receipt`` and the origi
 
 Summaries are composed by the server from receipts and envelopes. The model's rationale is kept
 as ``details.choice.rationale_untrusted``; an ``ask`` carries an ``AuthorizationRequest`` that
-the server builds and checks against the grant and the latest evaluation, as the menu checks
-P2's: a feasible candidate short only of committed spending, one of its bookings, and a value
-above the current limit and at most what the candidate needs. The request's content is part of
-its id, so a corrected ask is a new request.
+the server builds and checks against the grant and the evaluation of the state the ask is made
+in (1.1.0: when the turn's own calls moved the state, such as a hold in the same turn, the state
+is evaluated again and the named candidate is checked as it stands there): a feasible candidate
+short only of committed spending, one of its bookings, and a value above the current limit and
+at most what the candidate needs. The request's content is part of its id, so a corrected ask is
+a new request; an open request is remembered, as P2 remembers its own, so the menu offers no
+repeat of it.
+
+Generation settings and the seed are the provider's (``agent/provider.py``): the same output
+limit, sampling settings and seed handling as P2 and P3, recorded on every call.
 """
 
 from __future__ import annotations
@@ -54,8 +69,10 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any, Literal
 
+from plan_b.agent.attention import AttentionMixin, _Evaluated, _Watch
 from plan_b.agent.config import ModelConfig, load_model_config
-from plan_b.agent.menu import ask_reason, own_grant, shortfalls
+from plan_b.agent.interpret import LiveInterpretation
+from plan_b.agent.menu import OpenAsk, ask_reason, own_grant, shortfalls
 from plan_b.agent.orchestrator import (
     _candidate_context,
     _status_text,
@@ -65,6 +82,7 @@ from plan_b.agent.orchestrator import (
 from plan_b.agent.prompts import Prompt, load_prompt
 from plan_b.agent.provider import (
     DEFAULT_TIMEOUT_S,
+    MAX_OUTPUT_TOKENS,
     CallRecord,
     ModelProvider,
     ModelRequest,
@@ -95,9 +113,10 @@ from plan_b.domain.models import (
 )
 from plan_b.domain.timeutil import local_label
 from plan_b.evaluation.policies.base import ToolClient, TransportLost
+from plan_b.evaluation.policies.parser import NOTICE_KINDS, normalize_text
 
-POLICY_ID = "tool-use/1.0.0"
-PROMPT_ID = "tool_use.v2"  # v1 lacked the hold window; kept for the runs that cite it
+POLICY_ID = "tool-use/1.1.0"
+PROMPT_ID = "tool_use.v3"  # v3: when the server calls; v1 and v2 kept for the runs citing them
 SCHEMA_NAME = "plan_b_tool_turn"
 DEFAULT_MAX_MODEL_CALLS = 8
 DEFAULT_MAX_TOOL_CALLS = 32
@@ -110,7 +129,7 @@ MAX_DECISIONS_SHOWN = 6
 MAX_RATIONALE_CHARS = 400
 MAX_WAIT_MINUTES = 240
 MAX_RECEIPT_LOOKUPS = 2
-TURN_MAX_TOKENS = 4096  # the model's reasoning tokens count against it
+TURN_MAX_TOKENS = MAX_OUTPUT_TOKENS  # the provider's one limit; reasoning tokens count
 PROVIDER_RETRY = timedelta(minutes=2)
 STALE = frozenset({"REVISION_CONFLICT", "CANDIDATE_STALE", "GOAL_VERSION_CONFLICT"})
 MUTATIONS = frozenset({"hold_resource", "release_hold", "apply_plan"})
@@ -285,8 +304,10 @@ class _Outcome:
 # ---------------------------------------------------------------------------------- policy
 
 
-class ToolUsePolicy:
-    """``tool-use/1.0.0``: the model picks tools and arguments; the executor validates."""
+class ToolUsePolicy(AttentionMixin):
+    """``tool-use/1.1.0``: the model picks tools and arguments; the executor validates. When a
+    model turn is warranted is the server-side attention rule shared with P2 and P3
+    (``agent/attention.py``)."""
 
     policy_id = POLICY_ID
 
@@ -313,8 +334,19 @@ class ToolUsePolicy:
         self._history: list[dict[str, Any]] = []  # recent results, for continuity
         self._evaluation: EvaluationResult | None = None
         self._settled: str | None = None
-        self._wake: datetime | None = None
+        self._model_wake: datetime | None = None  # the model's wait_minutes, a retry, a bound
         self._halted: str | None = None
+        # The shared attention rule's state (``AttentionMixin``). P1 keeps no interpretations.
+        self._interps: dict[str, LiveInterpretation] = {}
+        self._open_ask: OpenAsk | None = None
+        self._hold_counts: dict[tuple[str, str, int], int] = {}
+        self._wake: datetime | None = None  # an open authorization request's hold lapses
+        self._watch: _Watch | None = None
+        self._watch_offered: set[tuple[str, str, int]] = set()
+        self._window: datetime | None = None
+        self._recorded: set[tuple[Any, ...]] = set()
+        self._seen_notices: set[str] = set()  # notices a model turn has shown
+        self._lineages: dict[tuple[str, str], str] = {}  # (group, text) -> first notice shown
         self._principal = ""
         self._at: datetime | None = None
         self._revision: int | None = None
@@ -399,13 +431,31 @@ class ToolUsePolicy:
             self._record(run, "stop", f"Stopped: {stop.reason}. No further action.")
             return "stopped", None
         now = self._now(view)
-        woke = self._wake is not None and now >= self._wake
-        if self._settled == _digest(view) and not woke:
-            return "waiting", self._wake
-        self._wake = None
+        woke = self._model_wake is not None and now >= self._model_wake
+        woke_ask = self._wake is not None and now >= self._wake
+        woke_watch = self._watch is not None and now >= self._watch.at
+        woke_window = self._window is not None and now >= self._window
+        fresh = self._fresh_notices(view, run)
+        if self._settled == _digest(view) and not (
+            fresh or woke or woke_ask or woke_watch or woke_window
+        ):
+            return "waiting", self._next_wake(view, now)
+        if woke:
+            self._model_wake = None
+        # A timed wake can change what the clock-dependent checks say (the handoff window, a
+        # deadline watch) with no new revision: the evaluation is read again.
+        timed = woke or woke_ask or woke_watch or woke_window
         try:
+            # The shared attention rule: a new notice warrants a turn; otherwise only a state
+            # whose decision menu offers an action does (P2's rule, ``agent/attention.py``). A
+            # wake the model asked for (its wait_minutes, a retry after a failed call, the turn
+            # bound's continuation) is its own turn, as P2's open claims keep it called.
+            if not fresh and not woke and not self._warranted(view, run, woke_watch, timed):
+                self._settled = _digest(view)
+                return "waiting", self._next_wake(view, self._now(view))
+            self._model_wake = None
             for _ in range(MAX_TURNS):
-                self._observe(view, run)
+                self._observe(view, run, refresh=timed)
                 turn = self._turn(view, run)
                 if turn is None:
                     break
@@ -423,14 +473,14 @@ class ToolUsePolicy:
                     break
             else:
                 run.notes.append(f"turn bound of {MAX_TURNS} reached; the next wake continues")
-                self._wake = self._now(view)
+                self._model_wake = self._now(view)
         except _Stop as stop:
             self._record(run, "stop", f"Stopped: {stop.reason}. No further action.")
             return "stopped", None
         except _ModelFailed as failed:
             what = "timed out" if failed.failure == "provider_timeout" else "failed"
             retry = self._now(view) + PROVIDER_RETRY
-            self._wake = retry
+            self._model_wake = retry
             self._record(
                 run,
                 "wait",
@@ -442,7 +492,83 @@ class ToolUsePolicy:
             )
             return "waiting", retry
         self._settled = _digest(view)
-        return "waiting", self._wake
+        return "waiting", self._next_wake(view, self._now(view))
+
+    # ------------------------------------------------------------------ attention
+
+    def _fresh_notices(self, view: EventStateView, run: _Run) -> list[ObservationRecord]:
+        """Notices no model turn has shown yet. A repeat of a shown notice (same correlation
+        group and text) is one evidence lineage: the server records it as a duplicate without
+        a model call, as P2's server does."""
+        fresh: list[ObservationRecord] = []
+        for record in view.observations:
+            obs = record.observation
+            if obs.kind not in NOTICE_KINDS or obs.observation_id in self._seen_notices:
+                continue
+            original = self._lineages.get((obs.correlation_group, normalize_text(obs.text)))
+            if original is None:
+                fresh.append(record)
+                continue
+            self._seen_notices.add(obs.observation_id)
+            self._record(
+                run,
+                "duplicate",
+                f"Notice {obs.observation_id} repeats notice {original} (same correlation group "
+                "and text): one evidence lineage, not corroboration. No plan change.",
+                observation_refs=(obs.observation_id, original),
+                details={"duplicate_of": original},
+            )
+        return fresh
+
+    def _mark_shown(self, view: EventStateView) -> None:
+        """Every visible notice reached the model in this turn (``_observations``)."""
+        for record in view.observations:
+            obs = record.observation
+            if obs.kind in NOTICE_KINDS and obs.observation_id not in self._seen_notices:
+                self._seen_notices.add(obs.observation_id)
+                self._lineages.setdefault(
+                    (obs.correlation_group, normalize_text(obs.text)), obs.observation_id
+                )
+
+    def _warranted(
+        self, view: EventStateView, run: _Run, woke_watch: bool, timed: bool = False
+    ) -> bool:
+        """Whether the decision menu of this state offers an action (``AttentionMixin``). When
+        it does not, the server records what the state determines, as for P2."""
+        envelope = self._observe(view, run, refresh=timed)
+        ev = self._evaluation
+        if ev is None or (ev.revision, ev.goal_version) != (view.revision, view.goal.version):
+            code = (
+                envelope.error.code
+                if envelope is not None and envelope.error is not None
+                else envelope.status
+                if envelope is not None
+                else "not available"
+            )
+            self._record_once(
+                run,
+                ("wait", "evaluation", code, view.revision),
+                "wait",
+                f"evaluate_candidates was {code}; no model turn is warranted without an "
+                f"evaluation and plan v{view.plan.plan_version} is unchanged.",
+                tool_call_refs=tuple(run.read_refs),
+                details={"error_code": code},
+            )
+            run.read_refs = []
+            return False
+        evaluated = _Evaluated(ev=ev)
+        menu = self._attend(view, run, evaluated, [], woke_watch)
+        if menu.needs_choice:
+            return True
+        self._record_default(view, run, evaluated, menu, [])
+        run.read_refs = []
+        return False
+
+    def _next_wake(self, view: EventStateView, now: datetime) -> datetime | None:
+        """The shared wake schedule (deadline watch, an open request's hold, an awaited staff
+        handoff, the handoff window's opening) and the model's own requested wake."""
+        times = [t for t in (self._compute_wait(view, now), self._model_wake) if t is not None]
+        return min(times) if times else None
 
     # ------------------------------------------------------------------ tools
 
@@ -522,19 +648,28 @@ class ToolUsePolicy:
             return self._checked(EventStateView.model_validate(env.data))
         return self._refresh(run)
 
-    def _observe(self, view: EventStateView, run: _Run) -> None:
+    def _observe(
+        self, view: EventStateView, run: _Run, *, refresh: bool = False
+    ) -> ToolEnvelope | None:
         """The turn's observation: the state and the planner's current evaluation, read with
-        the same ``evaluate_candidates`` the selective policy reads before each choice. The
-        model can still call it itself (with hypotheses, for example)."""
+        the same ``evaluate_candidates`` the selective policy reads before each choice (the
+        read's envelope, or None when the evaluation is current). ``refresh`` (a timed wake)
+        also reads it again when it was made at an earlier scenario time at the same revision.
+        The model can still call it itself (with hypotheses, for example)."""
         ev = self._evaluation
-        if ev is not None and (ev.revision, ev.goal_version) == (view.revision, view.goal.version):
-            return
+        if (
+            ev is not None
+            and (ev.revision, ev.goal_version) == (view.revision, view.goal.version)
+            and not (refresh and ev.evaluated_at < view.clock)
+        ):
+            return None
         if "evaluate_candidates" not in self._tools(view):
-            return
+            return None
         envelope = self._read(run, "evaluate_candidates", {})
         run.read_refs.append(envelope.call_id)
         if envelope.status == "succeeded" and envelope.data is not None:
             self._evaluation = EvaluationResult.model_validate(envelope.data)
+        return envelope
 
     def _tools(self, view: EventStateView) -> tuple[str, ...]:
         """The coordinator grant's tools, the staff attestations excepted (no grant of this
@@ -736,6 +871,7 @@ class ToolUsePolicy:
             )
             return
         assert o.receipt is not None
+        self._note_applied(view, o, args)
         summary = o.receipt.summary[:300]
         data = o.envelope.data if o.envelope is not None else None
         hold = data.get("hold") if isinstance(data, dict) else None
@@ -776,6 +912,32 @@ class ToolUsePolicy:
             details=base | extra,
         )
 
+    def _note_applied(self, view: EventStateView, o: _Outcome, args: dict[str, Any]) -> None:
+        """The attention rule's memory of applied requests, kept as P2 keeps it: holds per
+        (resource, activity, grant version), and the open request an apply or release closes."""
+        ask = self._open_ask
+        if o.tool == "apply_plan":
+            ev = self._evaluation
+            cand = next(
+                (
+                    c
+                    for c in (ev.candidates if ev is not None else ())
+                    if c.candidate_id == args.get("candidate_plan_id")
+                ),
+                None,
+            )
+            if ask is not None and cand is not None and cand.signature == ask.signature:
+                self._open_ask, self._wake = None, None
+        elif o.tool == "release_hold":
+            if ask is not None and args.get("hold_id") in ask.hold_ids:
+                self._open_ask, self._wake = None, None
+        elif o.tool == "hold_resource" and args.get("purpose") != "stock_transfer":
+            grant = own_grant(view, self._principal)
+            rid, aid = args.get("resource_id"), args.get("activity_id")
+            if grant is not None and isinstance(rid, str) and isinstance(aid, str):
+                key = (rid, aid, grant.version)
+                self._hold_counts[key] = self._hold_counts.get(key, 0) + 1
+
     def _finish(
         self, view: EventStateView, run: _Run, output: TurnOutput, response: ModelResponse
     ) -> None:
@@ -787,10 +949,17 @@ class ToolUsePolicy:
         wait_until = None
         if output.wait_minutes is not None and output.wait_minutes >= 1:
             wait_until = now + timedelta(minutes=min(output.wait_minutes, MAX_WAIT_MINUTES))
-            self._wake = wait_until
+            self._model_wake = wait_until
         decision = output.decision
         if decision == "infeasible":
             self._observe(view, run)  # its shortfall names the state it ends on
+            refs = (*refs, *run.read_refs)
+            run.read_refs = []
+        asked: tuple[AuthorizationRequest | None, CandidateResult | None, str] = (None, None, "")
+        if decision == "ask":
+            # Checked against the state the ask is made in: the turn's own calls (a hold made
+            # in the same turn) may have moved it since the turn's evaluation.
+            asked = self._ask_request(view, run, output)
             refs = (*refs, *run.read_refs)
             run.read_refs = []
         ev = self._evaluation
@@ -801,8 +970,8 @@ class ToolUsePolicy:
         if ev is not None:
             details["evaluation_id"] = ev.evaluation_id
         if decision == "ask":
-            request, problem = self._ask_request(view, output)
-            if request is None:
+            request, cand, problem = asked
+            if request is None or cand is None:
                 self._record(
                     run,
                     "wait",
@@ -825,6 +994,7 @@ class ToolUsePolicy:
                 wait_until=wait_until,
                 details=details,
             )
+            self._remember_ask(view, request, cand)
             return
         if decision == "infeasible" and ev is not None and ev.infeasibility is not None:
             details["blocking_constraints"] = list(ev.infeasibility.blocking_constraints)
@@ -854,37 +1024,66 @@ class ToolUsePolicy:
         )
 
     def _ask_request(
-        self, view: EventStateView, output: TurnOutput
-    ) -> tuple[AuthorizationRequest | None, str]:
+        self, view: EventStateView, run: _Run, output: TurnOutput
+    ) -> tuple[AuthorizationRequest | None, CandidateResult | None, str]:
         """The organizer request the model asked for, checked against the grant and the
-        latest evaluation: only committed spending of this grant, for a stored candidate."""
+        evaluation of the state it is made in: only committed spending of this grant, for a
+        stored candidate. When the turn's own calls moved the state since the evaluation the
+        model read (a hold in the same turn), the state is evaluated again and the named
+        candidate is checked as it stands there (the same signature)."""
         spec = output.ask
         grant = own_grant(view, self._principal)
-        ev = self._evaluation
+        read = self._evaluation
         if spec is None:
-            return None, "decision 'ask' without an ask"
-        if grant is None or ev is None:
-            return None, "no grant or evaluation to ask against"
-        cand: CandidateResult | None = next(
-            (c for c in ev.candidates if c.candidate_id == spec.candidate_id), None
+            return None, None, "decision 'ask' without an ask"
+        if grant is None or read is None:
+            return None, None, "no grant or evaluation to ask against"
+        named: CandidateResult | None = next(
+            (c for c in read.candidates if c.candidate_id == spec.candidate_id), None
         )
+        if named is None:
+            return (
+                None,
+                None,
+                f"candidate {spec.candidate_id[:64]!r} is not in the latest evaluation",
+            )
+        self._observe(view, run)
+        ev = self._evaluation
+        if ev is None or (ev.revision, ev.goal_version) != (view.revision, view.goal.version):
+            return None, None, f"no evaluation of revision {view.revision} to ask against"
+        cand = next((c for c in ev.candidates if c.signature == named.signature), None)
         if cand is None:
-            return None, f"candidate {spec.candidate_id[:64]!r} is not in the latest evaluation"
+            return (
+                None,
+                None,
+                (
+                    f"candidate {named.candidate_id} ({named.label}) is not in the evaluation of "
+                    f"revision {ev.revision}"
+                ),
+            )
         if spec.resource_id not in {r.definition.resource_id for r in view.resources}:
-            return None, f"resource {spec.resource_id[:64]!r} is not registered"
+            return None, None, f"resource {spec.resource_id[:64]!r} is not registered"
         missing = cand.authorization.missing
         if cand.constraint_status != "feasible_under_assumptions" or not missing:
-            return None, f"candidate {cand.candidate_id} is not feasible and short of authority"
+            return (
+                None,
+                None,
+                f"candidate {cand.candidate_id} is not feasible and short of authority",
+            )
         if any(m.kind != "committed_spend_limit" for m in missing):
-            return None, f"candidate {cand.candidate_id} lacks more than committed spending"
+            return None, None, f"candidate {cand.candidate_id} lacks more than committed spending"
         if spec.resource_id not in {rh.resource_id for rh in cand.required_holds}:
-            return None, f"{spec.resource_id[:64]!r} is not a booking of {cand.candidate_id}"
+            return None, None, f"{spec.resource_id[:64]!r} is not a booking of {cand.candidate_id}"
         current = grant.grant.max_total_committed_cents
         need = grant.committed_used_cents + cand.incremental_committed_cents
         if not current < spec.requested_value <= need:
-            return None, (
-                f"requested {spec.requested_value} is not above the current {current} and "
-                f"at most the {need} the candidate needs"
+            return (
+                None,
+                None,
+                (
+                    f"requested {spec.requested_value} is not above the current {current} and "
+                    f"at most the {need} the candidate needs"
+                ),
             )
         content = sha256_hex(
             canonical_json([grant.version, spec.resource_id, spec.requested_value])
@@ -902,7 +1101,22 @@ class ToolUsePolicy:
                 grant.grant.grant_id, current, spec.requested_value, cand, spec.resource_id
             ),
         )
-        return request, ""
+        return request, cand, ""
+
+    def _remember_ask(
+        self, view: EventStateView, request: AuthorizationRequest, cand: CandidateResult
+    ) -> None:
+        """The open request, as P2 keeps its own: the menu offers no repeat of it, and the
+        wake schedule looks again before the holds that keep its candidate open lapse."""
+        grant = own_grant(view, self._principal)
+        if grant is None:
+            return
+        bound = tuple(rh.bound_hold_id for rh in cand.required_holds if rh.bound_hold_id)
+        self._open_ask = OpenAsk(
+            request=request, signature=cand.signature, grant_version=grant.version, hold_ids=bound
+        )
+        holds = {h.hold_id: h for h in view.holds}
+        self._wake = self._ask_wake(view, [holds[h].expires_at for h in bound if h in holds])
 
     def _flush(self, run: _Run) -> None:
         if self._pending_calls and self._at is not None and self._revision is not None:
@@ -1003,7 +1217,9 @@ class ToolUsePolicy:
         request = ModelRequest(
             purpose="tool_turn",
             system=self._prompt.system,
-            user=self._prompt.render(state=context, observations=_observations(view)),
+            user=self._prompt.render(
+                state=context, observations=_observations(view, self._seen_notices)
+            ),
             schema_name=SCHEMA_NAME,
             schema=turn_schema(tools),
             output_model=TurnOutput,
@@ -1028,6 +1244,7 @@ class ToolUsePolicy:
             output = response.parsed
             bad = _invalid(output, tools)
             if bad is None:
+                self._mark_shown(view)
                 return output, response
             problem, failure = bad, "invalid_choice"
             if attempt == 1:
@@ -1035,6 +1252,7 @@ class ToolUsePolicy:
                     response.raw_text, problem, call_id=self._next_call_id()
                 )
         self._results = []
+        self._mark_shown(view)  # read, though its reply was unusable (P2: ``malformed_output``)
         self._record(
             run,
             "wait",
@@ -1334,12 +1552,6 @@ class ToolUsePolicy:
             out["summary"] = f"state at revision {env.revision} (shown in this prompt)"
         return out
 
-    def _now(self, view: EventStateView) -> datetime:
-        return self._at if self._at is not None and self._at >= view.clock else view.clock
-
-    def _t(self, value: datetime, view: EventStateView) -> str:
-        return local_label(value, view.timezone)
-
 
 # ---------------------------------------------------------------------------------- factory
 
@@ -1351,8 +1563,10 @@ def tool_use_policy_factory(
     max_model_calls: int = DEFAULT_MAX_MODEL_CALLS,
     max_tool_calls: int = DEFAULT_MAX_TOOL_CALLS,
     ledger_path: Path | None = None,
+    seed: int | None = None,
 ) -> Callable[[], ToolUsePolicy]:
-    """One provider and spend guard per instance (episode), as for the live policy."""
+    """One provider and spend guard per instance (episode), and the run's ``seed``, as for
+    the live policy."""
     cfg = config or load_model_config()
     ledger = SpendLedger(ledger_path or cfg.ledger_path)
 
@@ -1363,7 +1577,7 @@ def tool_use_policy_factory(
             max_total_usd=cfg.max_total_cost_usd,
             run_id=f"tool-use-{uuid.uuid4().hex[:12]}",
         )
-        provider = OpenAICompatibleProvider(cfg, guard, timeout_s=timeout_s)
+        provider = OpenAICompatibleProvider(cfg, guard, timeout_s=timeout_s, seed=seed)
         return ToolUsePolicy(
             provider, max_model_calls=max_model_calls, max_tool_calls=max_tool_calls
         )
@@ -1452,10 +1666,20 @@ def _digest(view: EventStateView) -> str:
     )
 
 
-def _observations(view: EventStateView) -> list[dict[str, Any]]:
-    """Visible observations, newest last, as quoted data with their source timestamps."""
+def _observations(view: EventStateView, shown: set[str] | None = None) -> list[dict[str, Any]]:
+    """Visible observations, newest last, as quoted data with their source timestamps: the
+    latest ``MAX_OBSERVATIONS_SHOWN``, and every older notice not in ``shown`` (no notice
+    reaches a decision unread)."""
+    latest = view.observations[-MAX_OBSERVATIONS_SHOWN:]
+    older = [
+        r
+        for r in view.observations[: -MAX_OBSERVATIONS_SHOWN or None]
+        if shown is not None
+        and r.observation.kind in NOTICE_KINDS
+        and r.observation.observation_id not in shown
+    ]
     out: list[dict[str, Any]] = []
-    for record in view.observations[-MAX_OBSERVATIONS_SHOWN:]:
+    for record in [*older, *latest]:
         obs = record.observation
         facts = record.structured
         out.append(

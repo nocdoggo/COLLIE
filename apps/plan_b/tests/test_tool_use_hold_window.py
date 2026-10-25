@@ -4,8 +4,9 @@ That run (``live_p1-tool-use_pantry_dev01``, prompt ``tool_use.v1``) sent six tr
 executor refused: ``tool_use.v1`` never said which window a hold covers, so the model used the
 staff handoff window, and a stock_transfer hold with a service target. Two of its turns were
 also cut off at 1536 tokens, which the model's reasoning tokens count against. ``tool_use.v2``
-documents the window and the transfer hold; a turn may use 4096 tokens. These tests run the
-real store and executor, with a scripted provider for the model.
+documents the window and the transfer hold (``tool_use.v3`` keeps that text and adds when the
+server calls the model); a turn may use 4096 tokens. These tests run the real store and
+executor, with a scripted provider for the model.
 """
 
 from __future__ import annotations
@@ -50,7 +51,7 @@ def _transfer(pantry: PantrySandbox, window: dict[str, str], **extra: Any) -> tu
 def test_the_prompt_documents_the_hold_window_the_executor_accepts(
     pantry: PantrySandbox,
 ) -> None:
-    assert PROMPT_ID == "tool_use.v2"
+    assert PROMPT_ID == "tool_use.v3"
     text = " ".join(load_prompt(PROMPT_ID).system.split())
     assert "the activity's window in the candidate you hold for" in text
     assert "never the handoff window or the hold's lifetime" in text
@@ -89,7 +90,9 @@ def test_the_prompt_documents_the_hold_window_the_executor_accepts(
     )
 
 
-def test_each_p1_turn_sends_the_v2_prompt_with_room_to_reason(db: Database, tmp_path: Path) -> None:
+def test_each_p1_turn_sends_the_current_prompt_with_room_to_reason(
+    db: Database, tmp_path: Path
+) -> None:
     policy, opener = build("P1", tmp_path)
     result = run_with(db, "pantry_dev01", policy)
     assert result.report.matches_expectation is True
@@ -104,4 +107,4 @@ def test_each_p1_turn_sends_the_v2_prompt_with_room_to_reason(db: Database, tmp_
     ]
     assert holds and all(t.envelope_status == "succeeded" for t in holds)
     prompts = {p for d in result.history.decisions for p in d.details.get("prompts", {}) if p}
-    assert prompts == {"tool_use.v2"}
+    assert prompts == {"tool_use.v3"}

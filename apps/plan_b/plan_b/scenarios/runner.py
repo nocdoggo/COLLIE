@@ -475,13 +475,17 @@ def run_case(
     caps: EpisodeCaps = DEVELOPMENT_CAPS,
     live_config: ModelConfig | None = None,
     max_tool_calls: int = 16,
+    seed: int | None = None,
 ) -> RunResult:
     """Run one private case to the hard end. The public scenario is the case's own unless
     ``scenario_id`` names it explicitly (a mismatch fails validation). ``policy`` chooses the
     coordinator: ``rules`` (the profile's deterministic baseline) or a model-driven policy,
     ``tool-use``, ``live`` (alias ``selective``) or ``verify-all``, whose endpoint configuration
-    is read server-side (these make paid model calls). An explicit ``policy_factory`` (tests)
-    takes precedence. Every policy runs under ``caps``."""
+    is read server-side (these make paid model calls). ``seed`` is the trial's provider seed for
+    a model-driven policy: passed as the OpenAI-compatible ``seed`` when the model's endpoints
+    accept one, and recorded on every model call either way (``seed``, ``seed_sent``); the
+    deterministic baseline ignores it. An explicit ``policy_factory`` (tests) takes precedence.
+    Every policy runs under ``caps``."""
     from plan_b.evaluation.scoring import score_episode
 
     case: PrivateCase = load_case(case_ref)
@@ -489,7 +493,7 @@ def run_case(
     public = load_public_scenario(scenario_id)
     if policy_factory is None:
         policy_factory = policy_factory_for(
-            policy, public.profile_id, caps=caps, live_config=live_config
+            policy, public.profile_id, caps=caps, live_config=live_config, seed=seed
         )
     problems = validate_case(public, case)
     if problems:

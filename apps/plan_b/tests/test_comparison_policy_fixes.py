@@ -197,7 +197,10 @@ def test_tool_use_ends_its_turn_on_news_it_has_already_seen(
     assert len(opener.bodies) <= 2
     final = result.decisions[-1]
     assert final.kind == "wait" and final.details.get("final_decision") == "wait"
-    assert final.wait_until is not None and result.wait_until == final.wait_until
+    # The model's wake stands; the run wakes at it or earlier, at the shared wake schedule
+    # (here dev01's deadline watch on the projector, 17:05).
+    assert final.wait_until is not None and policy._model_wake == final.wait_until
+    assert result.wait_until is not None and result.wait_until <= final.wait_until
 
 
 def test_a_tool_use_shortfall_is_read_after_its_own_apply(db: Database, tmp_path: Path) -> None:
@@ -251,7 +254,7 @@ def test_a_lost_apply_is_never_narrated_from_a_stale_state(db: Database, tmp_pat
 
 
 def test_each_model_call_records_its_generation_settings(db: Database, tmp_path: Path) -> None:
-    expected = {"tool_turn": 4096, "choose_action": 1024, "interpret": 2048}
+    expected = {"tool_turn": 4096, "choose_action": 4096, "interpret": 4096}  # one limit (W3)
     for kind in ("P1", "P2"):
         sb = Sandbox(db, "dev01")
         policy, _ = build(kind, tmp_path / kind)
@@ -308,8 +311,16 @@ def test_a_tool_use_shortfall_report_names_what_blocks_coverage(
     policy, _ = build("P1", tmp_path, ToolScript(honest))
     result = run_with(db, "pantry_dev02", policy)
     infeasible = [d for d in result.history.decisions if d.kind == "infeasible"]
-    assert infeasible and infeasible[0].details["blocking_constraints"]
-    assert infeasible[0].details["shortfalls"][0]["shortfall_quantity"] == 6
+    assert infeasible and all(d.details["blocking_constraints"] for d in infeasible)
+    # Reported by the model (``details.shortfalls``) or, when no model call is warranted, by the
+    # server's narration shared with P2 (1.1.0; the shortfall's own fields).
+    quantities = {
+        d.details["shortfalls"][0]["shortfall_quantity"]
+        if "shortfalls" in d.details
+        else d.details["shortfall_quantity"]
+        for d in infeasible
+    }
+    assert quantities == {6}
     assert result.report.matches_expectation is True, result.report.predicates
 
 

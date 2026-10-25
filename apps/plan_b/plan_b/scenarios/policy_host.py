@@ -12,8 +12,8 @@ gets at most the remaining tool budget. Once a cap is reached the policy is not 
 the host records one ``stop`` decision that says so.
 
 The host also knows which policy an episode runs, by the evaluation plan's names: ``rules``
-(P0, the profile's deterministic baseline), ``tool-use`` (P1, ``tool-use/1.0.0``), ``live`` or
-its alias ``selective`` (P2, ``live/1.0.0``) and ``verify-all`` (P3, ``verify-all/1.0.0``). Every
+(P0, the profile's deterministic baseline), ``tool-use`` (P1, ``tool-use/1.1.0``), ``live`` or
+its alias ``selective`` (P2, ``live/1.1.0``) and ``verify-all`` (P3, ``verify-all/1.1.0``). Every
 stored decision is stamped with ``details.policy_mode``: the mode label ("Deterministic policy",
 or "<policy label> · <returned model id>", e.g. "Live agent · …") and the caps it ran under.
 """
@@ -120,39 +120,58 @@ def canonical_choice(choice: str) -> PolicyChoice:
 
 
 def live_factory(
-    caps: EpisodeCaps = DEVELOPMENT_CAPS, config: ModelConfig | None = None
+    caps: EpisodeCaps = DEVELOPMENT_CAPS,
+    config: ModelConfig | None = None,
+    *,
+    seed: int | None = None,
 ) -> Callable[[], Policy]:
-    """The live coordinator (``live/1.0.0``) under the episode caps. Its endpoint configuration
+    """The live coordinator (``live/1.1.0``) under the episode caps. Its endpoint configuration
     is read now, server-side (environment, else ``.local/keys/model_endpoint.env``); the key is
-    read only by the provider, per call. Raises ``ModelConfigError`` when the endpoint is not
-    configured."""
+    read only by the provider, per call. ``seed`` is the run's provider seed (recorded on every
+    call). Raises ``ModelConfigError`` when the endpoint is not configured."""
     from plan_b.agent.orchestrator import live_policy_factory
 
     return live_policy_factory(
-        config, max_model_calls=caps.max_model_calls, max_tool_calls=caps.max_tool_calls
+        config,
+        max_model_calls=caps.max_model_calls,
+        max_tool_calls=caps.max_tool_calls,
+        seed=seed,
     )
 
 
 def tool_use_factory(
-    caps: EpisodeCaps = DEVELOPMENT_CAPS, config: ModelConfig | None = None
+    caps: EpisodeCaps = DEVELOPMENT_CAPS,
+    config: ModelConfig | None = None,
+    *,
+    seed: int | None = None,
 ) -> Callable[[], Policy]:
-    """P1, the tool-using model baseline (``tool-use/1.0.0``), under the same caps and the same
-    server-side endpoint configuration as the live coordinator."""
+    """P1, the tool-using model baseline (``tool-use/1.1.0``), under the same caps, the same
+    server-side endpoint configuration and the same seed handling as the live coordinator."""
     from plan_b.agent.policies.tool_use import tool_use_policy_factory
 
     return tool_use_policy_factory(
-        config, max_model_calls=caps.max_model_calls, max_tool_calls=caps.max_tool_calls
+        config,
+        max_model_calls=caps.max_model_calls,
+        max_tool_calls=caps.max_tool_calls,
+        seed=seed,
     )
 
 
 def verify_all_factory(
-    caps: EpisodeCaps = DEVELOPMENT_CAPS, config: ModelConfig | None = None
+    caps: EpisodeCaps = DEVELOPMENT_CAPS,
+    config: ModelConfig | None = None,
+    *,
+    seed: int | None = None,
 ) -> Callable[[], Policy]:
-    """P3, the verify-all ablation (``verify-all/1.0.0``), under the same caps and endpoint."""
+    """P3, the verify-all ablation (``verify-all/1.1.0``), under the same caps, endpoint and
+    seed handling."""
     from plan_b.agent.policies.verify_all import verify_all_policy_factory
 
     return verify_all_policy_factory(
-        config, max_model_calls=caps.max_model_calls, max_tool_calls=caps.max_tool_calls
+        config,
+        max_model_calls=caps.max_model_calls,
+        max_tool_calls=caps.max_tool_calls,
+        seed=seed,
     )
 
 
@@ -162,17 +181,19 @@ def policy_factory_for(
     *,
     caps: EpisodeCaps = DEVELOPMENT_CAPS,
     live_config: ModelConfig | None = None,
+    seed: int | None = None,
 ) -> Callable[[], Policy]:
-    """``rules`` is the profile's deterministic baseline (P0); the model-driven choices share
-    the endpoint configuration, read server-side (``ModelConfigError`` when it is missing)."""
+    """``rules`` is the profile's deterministic baseline (P0; it has nothing to seed, so
+    ``seed`` is ignored); the model-driven choices share the endpoint configuration, read
+    server-side (``ModelConfigError`` when it is missing), and pass ``seed`` to the provider."""
     choice = canonical_choice(choice)
     if choice == "rules":
         return baseline_policy_factory(profile_id)
     if choice == "tool-use":
-        return tool_use_factory(caps, live_config)
+        return tool_use_factory(caps, live_config, seed=seed)
     if choice == "verify-all":
-        return verify_all_factory(caps, live_config)
-    return live_factory(caps, live_config)
+        return verify_all_factory(caps, live_config, seed=seed)
+    return live_factory(caps, live_config, seed=seed)
 
 
 def is_live(policy_id: str) -> bool:

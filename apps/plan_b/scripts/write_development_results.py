@@ -17,6 +17,11 @@ replaced after a defect in our code was fixed. Writes into ``<dir>``:
   model-, server- and host-recorded steps from the run record, and the sentence;
 * ``README.md``: one table row per run, in the same order.
 
+Wave 3: each ``<dir>/wave3_*/`` holding a ``plan.json`` is a results directory of ``plan-b eval
+run`` on development cases (the freeze smoke): its episodes are added as ``wave3_runs`` and as
+their own table, after the Wave 2 tables, from their public records (``episodes/*/record.json``)
+and, for ``matches_expectation`` of these development cases, their ``runner_private/`` records.
+
 These are development runs: one trial each, on development cases, never the held-out
 evaluation, and no comparison between policies is drawn from them.
 """
@@ -195,6 +200,91 @@ def markdown(runs: list[dict[str, Any]], p0: list[dict[str, Any]]) -> str:
     return "\n".join(head + rows + tail)
 
 
+def _eval_runs(out: Path) -> list[dict[str, Any]]:
+    """The episodes of each ``plan-b eval run`` results directory ``out/wave3_*/``."""
+    runs = []
+    for plan_file in sorted(out.glob("wave3_*/plan.json")):
+        results = plan_file.parent
+        plan = json.loads(plan_file.read_text(encoding="utf-8"))
+        for episode in plan["episodes"]:
+            key = episode["key"]
+            record_file = results / "episodes" / key / "record.json"
+            if not record_file.is_file():
+                continue
+            record = json.loads(record_file.read_text(encoding="utf-8"))
+            private_file = results / "runner_private" / f"{key}.runner.json"
+            private = (
+                json.loads(private_file.read_text(encoding="utf-8"))
+                if private_file.is_file()
+                else {}
+            )
+            outcome = record.get("outcome") or {}
+            model = record.get("model") or {}
+            seeds = model.get("seed_fields") or []
+            runs.append(
+                {
+                    "label": key,
+                    "results": results.name,
+                    "policy": record.get("policy"),
+                    "policy_id": record.get("policy_id"),
+                    "case_ref": record["case_ref"],
+                    "status": record.get("status"),
+                    "goal_complete": outcome.get("goal_complete"),
+                    "infeasibility_reported": outcome.get("infeasibility_reported"),
+                    "matches_expectation": private.get("matches_expectation"),
+                    "model_calls": model.get("calls"),
+                    "model_calls_by_purpose": model.get("by_purpose"),
+                    "tool_calls": (record.get("tool_calls") or {}).get("total"),
+                    "caps_reached": (record.get("episode_caps") or {}).get("reached"),
+                    "cost_usd": model.get("cost_usd", 0.0),
+                    "max_tokens": model.get("max_tokens"),
+                    "seed": record.get("seed"),
+                    "seed_sent": sorted({bool(f.get("seed_sent")) for f in seeds}),
+                    "model_returned": model.get("returned"),
+                    "started_at": record.get("started_at"),
+                    "trace_file": f"{results.name}/episodes/{key}/trace.json.gz",
+                    "trace_sha256": (record.get("trace") or {}).get("sha256"),
+                    "trace_verify": (record.get("trace") or {}).get("verify"),
+                    "measured_files_sha256": record.get("measured_files_sha256"),
+                }
+            )
+    return sorted(runs, key=lambda r: (r["results"], str(r["policy"]), str(r["label"])))
+
+
+def eval_markdown(runs: list[dict[str, Any]]) -> list[str]:
+    if not runs:
+        return []
+    lines = [
+        "",
+        "## Wave 3 freeze smoke (`plan-b eval run`, development cases)",
+        "",
+        "Episodes of `plan-b eval run` on development cases with the frozen configuration and",
+        "the real provider, one trial each (results directories `wave3_*/` beside this file;",
+        "public records and traces, with the evaluator side of these development cases in their",
+        "`runner_private/`). They prove the frozen comparison runs end to end; they are not the",
+        "held-out evaluation and **no comparison between policies is drawn from them**.",
+        "",
+        "| Policy | Case | Status | goal_complete | matches_expectation | Model calls | Tool calls"
+        " | Cost (USD) | max_tokens | Seed (sent) | Trace |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+    ]
+    for r in runs:
+        sent = "/".join("yes" if x else "no" for x in r["seed_sent"]) or "—"
+        lines.append(
+            f"| {r['policy']} `{r['policy_id']}` | {r['case_ref']} | {r['status']}"
+            f" | {_cell(r['goal_complete'])} | {_cell(r['matches_expectation'])}"
+            f" | {_cell(r['model_calls'])} | {_cell(r['tool_calls'])} | {r['cost_usd']:.4f}"
+            f" | {_cell(r['max_tokens'])} | {_cell(r['seed'])} ({sent}) | `{r['trace_file']}` |"
+        )
+    total = sum(r["cost_usd"] for r in runs)
+    lines += [
+        "",
+        f"Provider-reported spend over these {len(runs)} episodes: {total:.4f} USD.",
+        "",
+    ]
+    return lines
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="scripts/write_development_results.py")
     parser.add_argument("--evidence", required=True, help="the Wave 2 evidence directory")
@@ -222,6 +312,7 @@ def main(argv: list[str] | None = None) -> int:
     ]
     p0 = [_p0_entry(evidence, c, lines) for c in CASES]
     out.mkdir(parents=True, exist_ok=True)
+    wave3 = _eval_runs(out)
     data = {
         "results": RESULTS_VERSION,
         "kind": "development runs (one trial each; not the held-out evaluation; no comparison)",
@@ -230,10 +321,14 @@ def main(argv: list[str] | None = None) -> int:
         "p0_reference": p0,
         "spend_usd": round(sum(r["cost_usd"] for r in runs), 8),
     }
+    if wave3:
+        data["wave3_runs"] = wave3
     (out / "development_runs.json").write_text(
         json.dumps(data, indent=1, sort_keys=False) + "\n", encoding="utf-8"
     )
-    (out / "README.md").write_text(markdown(runs, p0), encoding="utf-8")
+    (out / "README.md").write_text(
+        markdown(runs, p0) + "\n".join(eval_markdown(wave3)), encoding="utf-8"
+    )
     without = [r["label"] for r in runs if not r["what_happened"]]
     print(f"{len(runs)} runs written; spend {data['spend_usd']:.4f} USD")
     if without or missing:

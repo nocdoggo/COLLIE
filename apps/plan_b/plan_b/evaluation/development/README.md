@@ -53,3 +53,22 @@ once in `reports/checks.json`; no model call.
 | skills_dev01 | rules/1.0.0 | yes | yes | 24 |
 
 Spend over these 20 runs: 2.5798 USD (the ledger difference of each run).
+
+## Wave 3 freeze smoke (`plan-b eval run`, development cases)
+
+Episodes of `plan-b eval run` on development cases with the frozen configuration and
+the real provider, one trial each (results directories `wave3_*/` beside this file;
+public records and traces, with the evaluator side of these development cases in their
+`runner_private/`). They prove the frozen comparison runs end to end; they are not the
+held-out evaluation and **no comparison between policies is drawn from them**.
+
+| Policy | Case | Status | goal_complete | matches_expectation | Model calls | Tool calls | Cost (USD) | max_tokens | Seed (sent) | Trace |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| P1 `tool-use/1.1.0` | dev01 | completed | yes | yes | 6 | 26 | 0.1788 | 4096 | 101 (no) | `wave3_freeze_smoke_campus/episodes/dev01__P1__s101/trace.json.gz` |
+| P2 `live/1.1.0` | dev01 | completed | yes | yes | 3 | 24 | 0.0361 | 4096 | 101 (no) | `wave3_freeze_smoke_campus/episodes/dev01__P2__s101/trace.json.gz` |
+| P3 `verify-all/1.1.0` | dev01 | completed | yes | yes | 2 | 24 | 0.0201 | 4096 | 101 (no) | `wave3_freeze_smoke_campus/episodes/dev01__P3__s101/trace.json.gz` |
+| P1 `tool-use/1.1.0` | pantry_dev01 | completed | yes | yes | 5 | 19 | 0.1400 | 4096 | 101 (no) | `wave3_freeze_smoke_pantry/episodes/pantry_dev01__P1__s101/trace.json.gz` |
+| P2 `live/1.1.0` | pantry_dev01 | completed | yes | yes | 4 | 21 | 0.0455 | 4096 | 101 (no) | `wave3_freeze_smoke_pantry/episodes/pantry_dev01__P2__s101/trace.json.gz` |
+| P3 `verify-all/1.1.0` | pantry_dev01 | completed | yes | yes | 4 | 24 | 0.0434 | 4096 | 101 (no) | `wave3_freeze_smoke_pantry/episodes/pantry_dev01__P3__s101/trace.json.gz` |
+
+Provider-reported spend over these 6 episodes: 0.4640 USD.

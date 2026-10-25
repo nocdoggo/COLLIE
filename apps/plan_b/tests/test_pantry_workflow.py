@@ -127,7 +127,7 @@ def test_four_step_sequence_with_staff_sessions(pantry: PantrySandbox) -> None:
 def test_runner_case_dev01_reaches_the_target_through_staff(db: Database) -> None:
     result = run_case(db, "pantry_dev01")
     report = result.report
-    assert report.policy_id == "pantry-rules/1.0.0"
+    assert report.policy_id == "pantry-rules/1.1.0"
     assert report.matches_expectation and report.goal_complete
     assert all(p.passed for p in report.predicates), [p for p in report.predicates if not p.passed]
     assert [(s.target_id, s.on_time_quantity, s.unfulfilled_quantity) for s in report.service] == [
@@ -208,7 +208,7 @@ def test_trace_export_verifies_intact_and_carries_no_private_input(
     trace = build_trace(db, result.episode_id, policy_id=result.report.policy_id)
     assert trace["trace_version"] == TRACE_VERSION and verify_trace(trace) == []
     assert trace["source"]["profile_id"] == "pantry_continuity"
-    assert trace["source"]["policy_id"] == "pantry-rules/1.0.0"
+    assert trace["source"]["policy_id"] == "pantry-rules/1.1.0"
     assert trace["final_state"]["stock"]["service"][0]["on_time_quantity"] == 40
     path = write_trace(trace, tmp_path / "traces" / "pantry_trace.json")
     capsys.readouterr()

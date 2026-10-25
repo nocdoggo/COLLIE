@@ -420,32 +420,52 @@ def test_a_stock_hold_bound_by_a_feasible_candidate_gets_no_release_option(
 def test_stock_improvable_names_a_pursuable_candidate_that_covers_more(db: Database) -> None:
     """The agent holds the 24 pantry kits: the kept plan is applicable and covers 24 of 40, the
     handoff candidate would cover 40. Catches: treating every candidate as pursuable, dropping
-    the ``unfulfilled(c) < unfulfilled(keep)`` comparison (or making it ``<=``), ignoring the
-    eligibility filter, or dropping the awaited-handoff clause of ``pursuable``."""
+    the ``unfulfilled(c) < unfulfilled(keep)`` comparison (or making it ``<=`` for a committed
+    plan), ignoring the eligibility filter, dropping the awaited-handoff clause of
+    ``pursuable``, or (1.1.0) keeping a plan whose allocation rests only on holds instead of
+    committing it."""
     sb = PantrySandbox(db, "pantry_dev01")
     held = sb.hold_pantry("pool-24", 24)
     assert held.status == "succeeded", held.error
     view, ev = evaluated(sb)
-    keep, cand = keep_candidate(ev), handoff_candidate(ev)
+    keep, cand, alloc = keep_candidate(ev), handoff_candidate(ev), allocate_candidate(ev)
     assert keep.applicable_now and unfulfilled(keep) == 16
     assert not cand.applicable_now and unfulfilled(cand) == 0
     assert stock_improvable(view, ev, inputs(view.clock), everyone) is True
     # In question, the stock options reopen; settled, the menu is keep and wait.
     assert HANDOFF_16 in menu(view, ev)
     assert menu(view, ev, plan_in_question=False) == ("keep", "wait")
-    # Nothing pursuable covers more: at 12:47 the handoff can no longer be requested.
-    assert stock_improvable(view, ev, inputs(pt("12:47")), everyone) is False
-    # The applicable allocation covers what the kept plan covers, which is not more.
+    # At 12:47 the handoff can no longer be requested, but the kept plan's 24 rest only on a
+    # hold: the applicable allocation that commits them is pursuable though it covers no more
+    # (uncommitted stock serves nobody).
+    assert keep.required_stock_holds and alloc.applicable_now and unfulfilled(alloc) == 16
+    assert stock_improvable(view, ev, inputs(pt("12:47")), everyone) is True
+    neither = {cand.signature, alloc.signature}
     rest = ev.model_copy(
-        update={
-            "candidates": tuple(c for c in ev.candidates if c.candidate_id != cand.candidate_id)
-        }
+        update={"candidates": tuple(c for c in ev.candidates if c.signature not in neither)}
     )
     assert stock_improvable(view, rest, inputs(view.clock), everyone) is False
     assert (
-        stock_improvable(view, ev, inputs(view.clock), lambda c: c.signature != cand.signature)
+        stock_improvable(view, ev, inputs(view.clock), lambda c: c.signature not in neither)
         is False
     )
+    # Committed, the kept allocation needs no hold: then only more coverage counts, and at
+    # 12:47 nothing pursuable covers more.
+    committed = sb.agent.call(
+        "apply_plan",
+        arguments={
+            "candidate_plan_id": alloc.candidate_id,
+            "constraint_report_ref": alloc.report_id,
+        },
+        idempotency_key="commit-24",
+        expected_revision=ev.revision,
+        expected_goal_version=ev.goal_version,
+    )
+    assert committed.status == "succeeded", committed.error
+    view, ev = evaluated(sb)
+    assert not keep_candidate(ev).required_stock_holds
+    assert stock_improvable(view, ev, inputs(view.clock), everyone) is True  # the handoff
+    assert stock_improvable(view, ev, inputs(pt("12:47")), everyone) is False
     # Requested, the awaited handoff keeps the candidate pursuable after requests close, until
     # the staff task's cutoff.
     asked = sb.hold_partner("full-16")

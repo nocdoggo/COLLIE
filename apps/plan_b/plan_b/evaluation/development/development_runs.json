@@ -940,5 +940,207 @@
    "trace_file": "traces/skills_dev01_trace.json"
   }
  ],
- "spend_usd": 2.57984
+ "spend_usd": 2.57984,
+ "wave3_runs": [
+  {
+   "label": "dev01__P1__s101",
+   "results": "wave3_freeze_smoke_campus",
+   "policy": "P1",
+   "policy_id": "tool-use/1.1.0",
+   "case_ref": "dev01",
+   "status": "completed",
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "matches_expectation": true,
+   "model_calls": 6,
+   "model_calls_by_purpose": {
+    "tool_turn": 6
+   },
+   "tool_calls": 26,
+   "caps_reached": [],
+   "cost_usd": 0.178774,
+   "max_tokens": [
+    4096
+   ],
+   "seed": 101,
+   "seed_sent": [
+    false
+   ],
+   "model_returned": [
+    "anthropic/claude-sonnet-5.5"
+   ],
+   "started_at": "2026-10-25T14:51:51Z",
+   "trace_file": "wave3_freeze_smoke_campus/episodes/dev01__P1__s101/trace.json.gz",
+   "trace_sha256": "23f3dd84ed54f35695ab8fc909dd04d418a8017a4593ef6a99ab69de452a0a84",
+   "trace_verify": "intact",
+   "measured_files_sha256": "7d41fada702f2172c39a968bb6a2a1d72b6cac4e6d23cb047133d47ce373596f"
+  },
+  {
+   "label": "dev01__P2__s101",
+   "results": "wave3_freeze_smoke_campus",
+   "policy": "P2",
+   "policy_id": "live/1.1.0",
+   "case_ref": "dev01",
+   "status": "completed",
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "matches_expectation": true,
+   "model_calls": 3,
+   "model_calls_by_purpose": {
+    "choose_action": 2,
+    "interpret": 1
+   },
+   "tool_calls": 24,
+   "caps_reached": [],
+   "cost_usd": 0.03614,
+   "max_tokens": [
+    4096
+   ],
+   "seed": 101,
+   "seed_sent": [
+    false
+   ],
+   "model_returned": [
+    "anthropic/claude-sonnet-5.5"
+   ],
+   "started_at": "2026-10-25T14:51:51Z",
+   "trace_file": "wave3_freeze_smoke_campus/episodes/dev01__P2__s101/trace.json.gz",
+   "trace_sha256": "5c25a00fdeb486fbe5c0721e7fec557b8f526f2b23f7ef323503755e72bed983",
+   "trace_verify": "intact",
+   "measured_files_sha256": "7d41fada702f2172c39a968bb6a2a1d72b6cac4e6d23cb047133d47ce373596f"
+  },
+  {
+   "label": "dev01__P3__s101",
+   "results": "wave3_freeze_smoke_campus",
+   "policy": "P3",
+   "policy_id": "verify-all/1.1.0",
+   "case_ref": "dev01",
+   "status": "completed",
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "matches_expectation": true,
+   "model_calls": 2,
+   "model_calls_by_purpose": {
+    "choose_action": 1,
+    "interpret": 1
+   },
+   "tool_calls": 24,
+   "caps_reached": [],
+   "cost_usd": 0.020148,
+   "max_tokens": [
+    4096
+   ],
+   "seed": 101,
+   "seed_sent": [
+    false
+   ],
+   "model_returned": [
+    "anthropic/claude-sonnet-5.5"
+   ],
+   "started_at": "2026-10-25T14:51:51Z",
+   "trace_file": "wave3_freeze_smoke_campus/episodes/dev01__P3__s101/trace.json.gz",
+   "trace_sha256": "c9608beb0ae61c9e10aabd0d6a5f9677766e2bf9400f6a6f862587ec81543dfb",
+   "trace_verify": "intact",
+   "measured_files_sha256": "7d41fada702f2172c39a968bb6a2a1d72b6cac4e6d23cb047133d47ce373596f"
+  },
+  {
+   "label": "pantry_dev01__P1__s101",
+   "results": "wave3_freeze_smoke_pantry",
+   "policy": "P1",
+   "policy_id": "tool-use/1.1.0",
+   "case_ref": "pantry_dev01",
+   "status": "completed",
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "matches_expectation": true,
+   "model_calls": 5,
+   "model_calls_by_purpose": {
+    "tool_turn": 5
+   },
+   "tool_calls": 19,
+   "caps_reached": [],
+   "cost_usd": 0.140044,
+   "max_tokens": [
+    4096
+   ],
+   "seed": 101,
+   "seed_sent": [
+    false
+   ],
+   "model_returned": [
+    "anthropic/claude-sonnet-5.5"
+   ],
+   "started_at": "2026-10-25T14:52:31Z",
+   "trace_file": "wave3_freeze_smoke_pantry/episodes/pantry_dev01__P1__s101/trace.json.gz",
+   "trace_sha256": "f6154f1728342b2074e16ea4240d0b18629dcd83cf2f72c8754fdeb82cc49e74",
+   "trace_verify": "intact",
+   "measured_files_sha256": "7d41fada702f2172c39a968bb6a2a1d72b6cac4e6d23cb047133d47ce373596f"
+  },
+  {
+   "label": "pantry_dev01__P2__s101",
+   "results": "wave3_freeze_smoke_pantry",
+   "policy": "P2",
+   "policy_id": "live/1.1.0",
+   "case_ref": "pantry_dev01",
+   "status": "completed",
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "matches_expectation": true,
+   "model_calls": 4,
+   "model_calls_by_purpose": {
+    "choose_action": 4
+   },
+   "tool_calls": 21,
+   "caps_reached": [],
+   "cost_usd": 0.045528,
+   "max_tokens": [
+    4096
+   ],
+   "seed": 101,
+   "seed_sent": [
+    false
+   ],
+   "model_returned": [
+    "anthropic/claude-sonnet-5.5"
+   ],
+   "started_at": "2026-10-25T14:52:31Z",
+   "trace_file": "wave3_freeze_smoke_pantry/episodes/pantry_dev01__P2__s101/trace.json.gz",
+   "trace_sha256": "fb506d3f899a58e0c455e2a90a7553fc397e7465cc85f2a3d6665462f7e59d08",
+   "trace_verify": "intact",
+   "measured_files_sha256": "7d41fada702f2172c39a968bb6a2a1d72b6cac4e6d23cb047133d47ce373596f"
+  },
+  {
+   "label": "pantry_dev01__P3__s101",
+   "results": "wave3_freeze_smoke_pantry",
+   "policy": "P3",
+   "policy_id": "verify-all/1.1.0",
+   "case_ref": "pantry_dev01",
+   "status": "completed",
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "matches_expectation": true,
+   "model_calls": 4,
+   "model_calls_by_purpose": {
+    "choose_action": 4
+   },
+   "tool_calls": 24,
+   "caps_reached": [],
+   "cost_usd": 0.043414,
+   "max_tokens": [
+    4096
+   ],
+   "seed": 101,
+   "seed_sent": [
+    false
+   ],
+   "model_returned": [
+    "anthropic/claude-sonnet-5.5"
+   ],
+   "started_at": "2026-10-25T14:52:31Z",
+   "trace_file": "wave3_freeze_smoke_pantry/episodes/pantry_dev01__P3__s101/trace.json.gz",
+   "trace_sha256": "ee676303f15ac16c96e08dfe01b18bdacc24fbeb5b4b5c40920990bb5bd58875",
+   "trace_verify": "intact",
+   "measured_files_sha256": "7d41fada702f2172c39a968bb6a2a1d72b6cac4e6d23cb047133d47ce373596f"
+  }
+ ]
 }

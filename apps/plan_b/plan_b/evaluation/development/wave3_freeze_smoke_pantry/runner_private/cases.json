@@ -1,0 +1,21 @@
+{
+ "cases": [
+  {
+   "achievable_on_time": null,
+   "actionable_record_ids": [],
+   "annotations": [],
+   "case_id": "pantry_dev01",
+   "case_ref": "pantry_dev01",
+   "condition": null,
+   "heldout": false,
+   "negative_control": false,
+   "negative_control_evidence": null,
+   "outcome_class": "target",
+   "profile_id": "pantry_continuity",
+   "requires_recovery": true,
+   "scenario_id": "dev_fixture_03",
+   "suite": "pantry",
+   "target_quantity": null
+  }
+ ]
+}

@@ -1,11 +1,12 @@
-# Plan B runtime contract 1.1.0 (Waves 1 and 2)
+# Plan B runtime contract 1.1.0 (Waves 1 and 2; Wave 3 calibration and freeze)
 
 This is the interface of the Plan B sandbox: the Wave 1 deterministic campus core (contract
 1.0.0) and its additive Wave 2 extensions (contract 1.1.0). Wave 2 adds consumable stock and
 staff-only attestations for the pantry profile (sections 4, 15), resource offers (section 9), a
 second event configuration (section 1), the live coordinator policy P2 with its pantry stock
 options (section 16), per-episode caps and policy selection for every coordinator policy
-(section 17), and the comparison policies P1 and P3 with the development runs (section 18). The
+(section 17), and the comparison policies P1 and P3 with the development runs (section 18). Wave
+3 calibrates the policies before the comparison (section 19) and freezes it (section 20). The
 Pydantic models
 in [`plan_b/domain/models.py`](../plan_b/domain/models.py) are the machine-readable form; this
 document gives their semantics. Where they disagree, fix the disagreement rather than choosing one.
@@ -1351,3 +1352,170 @@ through OpenRouter. The records, traces and evaluator-side reports are in
 `live_p3-verify-all_*`); `plan_b/evaluation/development/README.md` tabulates them with one
 sentence per run read from its trace. They are development runs: not the held-out evaluation, no
 variance measured, and no comparison between policies is drawn from them.
+
+## 19. Wave 3 pre-freeze policy changes (development-only calibration)
+
+Made before any held-out case or evaluation manifest existed, and checked on the development
+cases only. They settle the freeze items of the Wave 2 packet (`PEEAI_plan/handoffs/wave_2/`,
+README "What remains" and KNOWN_LIMITATIONS). Where sections 1, 11, 16, 17 and 18 say otherwise
+about the items below, this section supersedes them. The runtime contract stays 1.1.0 and the
+trace format 1.0.0; no stored record changes shape. Policy ids were bumped only where behaviour
+changed:
+
+| Policy | Wave 2 | Now | Why the id changed |
+| --- | --- | --- | --- |
+| P0, event profiles | `rules/1.0.0` | `rules/1.0.0` | Unchanged |
+| P0, pantry | `pantry-rules/1.0.0` | `pantry-rules/1.1.0` | Handoff-window wake; no handoff-blocked shortfall reported before the window opens |
+| P1 | `tool-use/1.0.0`, prompt `tool_use.v2` | `tool-use/1.1.0`, prompt `tool_use.v3` | The shared attention rule and wake schedule, the window wake, an ask checked against the state it is made in, the open request remembered; the prompt says when the server calls the model |
+| P2 | `live/1.0.0` | `live/1.1.0` | One output limit (choice 1024 → 4096, interpretation 2048 → 4096 tokens), the window wake, the commit of a held planned allocation |
+| P3 | `verify-all/1.0.0` | `verify-all/1.1.0` | As P2 (it inherits P2's logic); its relevance rule `verify-all-relevance/1.0.0` is unchanged |
+| Provider | `plan_b.provider/1.0.0` | `plan_b.provider/1.1.0` | Generation settings recorded per call, seeds, ledger reservations |
+
+The prompts `interpret.v1`, `choose_action.v1` and `choose_action_pantry.v1` are unchanged.
+`tool_use.v3` is `tool_use.v2` plus one paragraph, "When you are called", and a corrected wording
+of `wait_minutes`; v1 and v2 stay in `agent/prompts/` because recorded runs cite them. On every
+development case (dev01-dev06, skills_dev01/02, pantry_dev01/02) P0, P2 and P3 make exactly the
+decisions and tool calls they made before these changes, with scripted models (P0: the
+`run-case all` lines are identical to Wave 1 and Wave 2); only P1's changed.
+
+**One attention rule for P1, P2 and P3** (`plan_b/agent/attention.py`, `AttentionMixin`). The
+code P2 used to decide whether its menu needs the model now lives in one mixin that P1, P2 and P3
+all inherit (the same functions; `tests/test_w3_fix_attention.py`). A model call is warranted when
+a new notice arrives that the server cannot resolve (a repeat with the same correlation group and
+normalized text is a server-recorded `duplicate`), or when the decision menu built from the
+visible state and the current evaluation (`menu.build_menu`) offers an option that acts: a status
+check for a stated need, an apply, hold, handoff request or ask while the plan is in question, or
+the release of an unused own hold. Otherwise the server records what the state determines (keep,
+a shortfall, infeasible, undecided, or a wait for staff or the organizer), `chosen_by =
+"server"`, once per state. P2 and P3 interpret each new notice (`interpret.v1`); P1 has no
+separate interpretation step, so a new notice warrants its next turn and the rule otherwise
+weighs only what rests on no model reading (no claims, no robustness restriction). P1 still sees
+every visible observation when it is called, every notice not yet shown included
+(`tool_use._observations`). Effect on the development cases, with the scripted P1: 2-4 model
+calls per episode instead of 5-7, none after a check-in or arrival record that changes nothing
+actionable (`dev01`), and still a turn when a check-in breaks the plan (`skills_dev01`, 10:05).
+
+**Wakes.** Every policy (P0-P3) wakes when the pantry handoff window opens while it is still
+ahead (`domain/stock.handoff_window_opening`; no state change marks that moment), besides its
+existing wakes. P1, P2 and P3 share one wake schedule (`AttentionMixin._compute_wait`): the
+deadline watch (expected equipment ahead of a not-started activity: the earlier of start - 5 min
+and reported ETA + 1 min, with one status check offered per watch), the lapse of an open
+authorization request's hold, an awaited staff handoff's due time, and the window opening; P1
+adds its own `wait_minutes`, retries and turn-bound continuation. A wake is not a model call: the
+attention rule decides. No policy reports a shortfall that only a handoff could close before
+the window opens (P2 and P3 already did not; P0 now does not either, and P1's server narration
+shares P2's). Both development pantry cases open the window at load, so they are
+unaffected; `tests/test_w3_fix_window.py` builds a development-only variant whose window opens at
+12:42 (P0-P3 now request the handoff after 12:42 and serve 40 of 40; on the Wave 2 code all four
+missed it).
+
+**A held planned allocation is committed** (`menu.stock_improvable`). While the keep candidate's
+allocation rests only on holds (it still lists required stock holds, so nothing of it is
+committed, and uncommitted stock serves nobody), an applicable candidate that commits as much
+puts the plan in question, so the menu offers its apply. On the Wave 2 code P2 and P3 held the
+24 kits on hand and then kept the plan uncommitted when no handoff was possible, and served
+nothing (`test_w3_fix_window.py`, the closed-window variant; P0 already committed them).
+
+**Generation settings** (`agent/provider.py`). Every model call of P1, P2 and P3 uses the same
+settings: `max_tokens = MAX_OUTPUT_TOKENS = 4096` (P1's Wave 2 turn limit, which W2-D11 showed is
+needed once reasoning tokens count; ample for the shorter replies), strict JSON schema output,
+OpenRouter `usage.include` and `provider.require_parameters`, and no sampling parameter: none of
+the 8 OpenRouter endpoints of `anthropic/claude-sonnet-5.5` lists `temperature` or `seed`
+(public endpoint list, 2026-10-25), and `require_parameters` would refuse a request carrying one,
+so every call runs at the provider's default temperature. Each `CallRecord` (in
+`details.model.calls`) records `provider`, `max_tokens`, `temperature` (null: not sent), `seed`,
+`seed_sent`, `seed_echo` and `system_fingerprint`. The larger limit raises each call's spend
+upper bound (about 0.04 USD more at this model's prices), not its actual cost.
+
+**Seeds.** `run_case(db, case_ref, *, policy=..., seed=None, live_config=..., ...)` takes a
+keyword-only `seed` and passes it through `policy_factory_for` and the P1-P3 factories to the
+provider (P0 ignores it: nothing to seed). The provider sends it as the OpenAI-compatible `seed`
+unless the configured model's endpoints refuse it (`provider.SEED_UNSUPPORTED`). The configured
+model is in that set: one seeded request on 2026-10-25 was refused by OpenRouter with HTTP 404
+"No endpoints found that can handle the requested parameters" and was not billed. Its seeds are
+therefore recorded on every call with `seed_sent = false`, and repeated trials are independent
+runs, not reproducible ones (the protocol's unsupported-seed case, `08_evaluation.md`).
+
+**The spend ledger across processes** (`provider.SpendLedger`, `SpendGuard`). Several episode
+processes may share `var/model_spend.json`. Every ledger update holds a thread lock and an
+`fcntl` lock on `model_spend.json.lock`, and replaces the file atomically. Before a call the
+guard reserves its upper bound under that lock, against the per-run cap (in the process: one
+guard per episode) and the cumulative cap counted as the charged total plus every live
+reservation; the charge then replaces the reservation with the actual cost, and a call never sent
+releases it. A reservation whose process has ended is charged at its bound (outcome `abandoned`),
+so the ledger never counts less than may have been spent. While calls are in flight the file
+carries a `reservations` list; once settled it has its Wave 2 shape. `tests/test_w3_fix_ledger.py`
+checks this with real processes: no lost update among 8 writers, and with 8 concurrent episodes
+the per-run and cumulative caps hold. With the Wave 2 sequence (an unlocked check before the
+call, the charge after it) the same 8-episode scenario passed the cumulative cap: 13 calls,
+0.052 USD against a 0.026 cap.
+
+**P1's ask is checked against the state it is made in.** Reproduced: an `ask` decided in the
+same turn as the hold its candidate needs was checked against the evaluation the turn started
+from (revision before the hold, the hold unbound), and the request named that evaluation's
+candidate. Now, when the turn's calls moved the state, the server evaluates it again and checks
+the ask against the candidate with the same signature there, so the request names the candidate
+whose hold is bound (`tests/test_w3_fix_ask.py`). The open request is remembered, as P2 remembers
+its own, so the menu offers no repeat of it and the wake schedule looks again before its holds
+lapse.
+
+**Changes from the freeze audit** (development-only, before the freeze; the ids above stand,
+because none of them was frozen or recorded in a committed run before; the scripted
+development decisions of P2 and P3 are unchanged on all nine development cases, P0's
+`run-case all` lines are unchanged, and P1's differ on `dev02` only by one more
+`evaluate_candidates` read at the 17:05 deadline watch):
+
+* **P1's own wakes are its turns.** A wake the model asked for (its `wait_minutes`, the retry two
+  minutes after a failed model call, the continuation after `MAX_TURNS`) now calls the model
+  within the caps instead of being judged by the attention rule. Before, a P1 that deferred on
+  `dev01` was next called at the 17:05 deadline watch, while P2, whose open claim keeps its plan
+  in question, was called again at 16:50; and the failed-call record's "the next wake tries
+  again" was not true. `tool_use.v3` was amended before the freeze to say so ("When you are
+  called" and the `wait_minutes` wording); the fix sub-wave's scratch smoke used its first text.
+* **P1 re-evaluates on a timed wake.** When a wake (its own, the deadline watch, an open
+  request's hold, the handoff window) finds the evaluation made at an earlier scenario time at
+  the same revision, P1 reads `evaluate_candidates` again: the clock-dependent checks (the
+  handoff window, arrival assumptions) may have changed with no new revision. Before, a window
+  opening at 12:39 with no state change after P1's 12:36 evaluation was read as "too early" and
+  P1 never requested the handoff (24 of 40 kits).
+* **A check answers a notice as of its request time** (P2, P3; `AttentionMixin._answer`): a
+  status whose checks were all requested before the notice arrived (one in flight when it came)
+  no longer answers it, as `menu.VerifyNeed` and P3's relevance rule already said; a status no
+  check produced (an arrival record) answers as of its observation time. P3 now checks a notice's
+  subject again when the notice arrived during a check of it.
+* **P0 retries a transfer hold rejected by a retryable conflict** (`pantry_rules._hold_transfer`):
+  a `REVISION_CONFLICT` at the window's opening (an activity starting during the hold's minute)
+  re-reads the state and holds again, within `MAX_CYCLES`, as its applies already did.
+* **A shortfall is held back only while a handoff could still serve it**
+  (`domain/stock.handoff_still_possible`, P0-P3): before the window opens, a shortfall only a
+  handoff could close is not reported only if the window opens before the target's deadline.
+* **The spend ledger never counts less than may have been spent**: a reservation an earlier call
+  of the same run left (an unexpected error after the reply) is charged at its bound before the
+  next call; a connection lost after the request went out (reset, closed, a reply cut short) is
+  charged at its bound, as a timeout is (an HTTP error status and a failure before sending stay
+  unbilled: no completion is returned); abandoned reservations are settled on every ledger
+  update; a reservation records its process's start time, so a reused process id is not taken
+  for its owner.
+
+## 20. Wave 3 freeze
+
+The comparison is frozen by `plan_b/evaluation/manifests/freeze.json`, written with
+`uv run plan-b eval freeze` after the freeze audit and committed with the code it hashes;
+`uv run plan-b eval verify-freeze` must pass, and a held-out `plan-b eval run` refuses to start
+otherwise. [`docs/EVALUATION.md`](EVALUATION.md), "Wave 3 freeze", lists what the manifest
+holds; in short:
+
+| Frozen | Value |
+| --- | --- |
+| Policies | P0 `rules/1.0.0` (event) and `pantry-rules/1.1.0` (pantry); P1 `tool-use/1.1.0` (prompt `tool_use.v3`); P2 `live/1.1.0` (`interpret.v1`, `choose_action.v1`, `choose_action_pantry.v1`); P3 `verify-all/1.1.0` with relevance rule `verify-all-relevance/1.0.0` |
+| Model | `anthropic/claude-sonnet-5.5` through OpenRouter (`https://openrouter.ai/api/v1`), one configuration for P1-P3 |
+| Generation | `max_tokens` 4096 on every call, no temperature (none of the model's endpoints accepts one), strict JSON schema output, `usage.include`, `provider.require_parameters` |
+| Seeds | 101, 202, 303 for P1-P3, recorded on every call; not sent (`seed_sent = false`: the model's endpoints refuse a seed), so the three trials are independent runs, not reproducible ones. Policy order seed 20261025 |
+| Caps | 48 tool calls and 8 model calls per episode (every failed call and retry counts); 0.50 USD per episode (the per-run spend cap); 900 s of wall time per episode |
+| Retry rules | one repair of a malformed reply; a provider failure is a visible wait retried at a later wake; a retryable rejection is re-read and retried a bounded number of times; P3 retries a failed source once |
+| Measured code | every file under `plan_b/` but the fixture data, manifests, development records, `api/`, `cli.py`, `scenarios/demos.py` and `evaluation/report.py`, plus `pyproject.toml` and `uv.lock`; the runtime (Python and the runtime dependencies' versions) |
+
+Once `freeze.json` exists, every file it hashes is frozen: a change to a measured file, a
+setting or the runtime is drift, and invalidates the freeze and any comparison made under it
+(`PEEAI_plan/waves/03_evidence_showcase.md`). The held-out cases are locked separately
+(`heldout.json`, `plan-b eval lock-heldout`) against this freeze.

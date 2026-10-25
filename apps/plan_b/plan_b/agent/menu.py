@@ -40,7 +40,8 @@ An apply that would change nothing (no changed activity, no hold) is never offer
 refuses it. Apply, hold and ask are offered only while the plan is in question: the keep
 candidate is not applicable (or not robust), or an unanswered material notice threatens it, or
 (consumable profiles) a pursuable candidate would leave less of a service target unfulfilled
-than the keep candidate (``stock_improvable``). Otherwise the menu is keep and wait (plus
+than the keep candidate, or would commit what the keep candidate's planned allocation only
+holds (``stock_improvable``). Otherwise the menu is keep and wait (plus
 releases), and a menu without a real choice needs no model call.
 
 Intents (``intent``) name the same choice independently of evaluation-scoped ids, so a menu can
@@ -816,7 +817,9 @@ def stock_improvable(
 ) -> bool:
     """Consumable profiles: whether a feasible candidate that can still be pursued (applicable
     now, a handoff it needs can be requested or is awaited, or its pool units can be held) would
-    leave less of a service target unfulfilled than the keep candidate."""
+    leave less of a service target unfulfilled than the keep candidate, or, while the keep
+    candidate's allocation rests only on holds (it still has required stock holds: nothing of
+    it is committed, and uncommitted stock serves nobody), would commit as much."""
     if view.stock is None:
         return False
     grant = own_grant(view, inputs.principal)
@@ -843,10 +846,23 @@ def stock_improvable(
             for rh in c.required_stock_holds
         )
 
+    uncommitted = bool(keep.required_stock_holds)
+
+    def better(c: CandidateResult) -> bool:
+        if unfulfilled(c) < unfulfilled(keep):
+            return True
+        return (
+            uncommitted
+            and c.candidate_id != keep.candidate_id
+            and c.applicable_now
+            and not keeps_the_plan(c)
+            and unfulfilled(c) <= unfulfilled(keep)
+        )
+
     return any(
         c.constraint_status == "feasible_under_assumptions"
         and eligible(c)
-        and unfulfilled(c) < unfulfilled(keep)
+        and better(c)
         and pursuable(c)
         for c in ev.candidates
     )

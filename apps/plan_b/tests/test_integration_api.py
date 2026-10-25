@@ -119,7 +119,7 @@ def test_cases_name_their_scenario_and_load_without_one(client: TestClient) -> N
     assert loaded.json()["mode_label"] == "Deterministic policy"
     # The board's "rules" choice is the profile's baseline.
     run = client.post("/api/moderator/policy/run", json={}, headers=_auth(mod))
-    assert run.status_code == 200 and run.json()["policy_id"] == "pantry-rules/1.0.0"
+    assert run.status_code == 200 and run.json()["policy_id"] == "pantry-rules/1.1.0"
     wrong = _load(client, mod, "skills_dev01", scenario_id="dev_fixture_01")
     assert wrong.status_code == 400 and wrong.json()["detail"]["code"] == "SCENARIO_MISMATCH"
     assert "dev_fixture_02" not in wrong.text
@@ -150,11 +150,11 @@ def test_moderator_switches_to_live_before_the_coordinator_acts(
     assert view["policy"] == "rules" and view["live_available"] is True
     assert view["model_id"] == REQUESTED_MODEL and view["locked"] is False
     chosen = c.post("/api/moderator/policy", json={"policy": "live"}, headers=_auth(mod)).json()
-    assert chosen["policy"] == "live" and chosen["policy_id"] == "live/1.0.0"
+    assert chosen["policy"] == "live" and chosen["policy_id"] == "live/1.1.0"
     assert chosen["label"] == f"Live agent · {REQUESTED_MODEL} (requested; no reply yet)"
     assert chosen["caps"]["max_tool_calls"] == 48 and chosen["caps"]["model_calls"] == 0
     run = c.post("/api/moderator/policy/run", json={}, headers=_auth(mod)).json()
-    assert run["policy_id"] == "live/1.0.0"
+    assert run["policy_id"] == "live/1.1.0"
     assert run["mode_label"] == f"Live agent · {RETURNED_MODEL}"
     assert all(
         d["details"]["policy_mode"]["label"] == f"Live agent · {RETURNED_MODEL}"
@@ -285,7 +285,7 @@ def test_api_config_reads_caps_and_builds_policies_without_calling_a_model(
         load_episode_caps({"PLAN_B_EPISODE_MAX_TOOL_CALLS": "many"})
     config = make_config(tmp_path)
     make = factory_for(caps, lambda: config)
-    assert make("rules", "pantry_continuity")().policy_id == "pantry-rules/1.0.0"
+    assert make("rules", "pantry_continuity")().policy_id == "pantry-rules/1.1.0"
     assert make("rules", "community_skills_exchange")().policy_id == "rules/1.0.0"
     live = make("live", "campus_showcase")()
     assert isinstance(live, LivePolicy) and live.usage["model_calls"] == 0

@@ -1,4 +1,4 @@
-"""The live policy ``live/1.0.0`` at the tool boundary, with scripted model replies.
+"""The live policy ``live/1.1.0`` at the tool boundary, with scripted model replies.
 
 Every run goes through the real store and executor (``Sandbox`` / ``run_case``); the model is
 the real provider with a scripted transport (``tests.test_agent_provider.FakeOpener``), so

@@ -19,8 +19,11 @@ staff attestations. One ``run`` is a bounded loop:
 5. Commit: hold exactly the units the chosen candidate still needs on the session pool,
    re-evaluate, and apply the stored candidate under the standing grant.
 6. When the best plan covers less than the target, record an ``infeasible`` decision with the
-   shortfall and the blocking checks; the target itself is never changed.
-7. Release own stock-transfer holds no pending handoff needs, and wait.
+   shortfall and the blocking checks; the target itself is never changed. Before the handoff
+   window opens, a shortfall that only a handoff could close is not reported yet.
+7. Release own stock-transfer holds no pending handoff needs, and wait: for the declared staff
+   response, and, while the handoff window is still ahead, until it opens (1.1.0: no state
+   change marks that moment, so it is a wake of its own).
 
 Memory lives on the instance (one per episode): the requests made, the status checks made and
 the state signature last decided on. Every choice comes from visible state and declared
@@ -48,10 +51,11 @@ from plan_b.domain.models import (
     PolicyRunResult,
     ToolEnvelope,
 )
+from plan_b.domain.stock import handoff_still_possible, handoff_window_opening
 from plan_b.domain.timeutil import local_label
 from plan_b.evaluation.policies.base import ToolClient, TransportLost
 
-POLICY_ID = "pantry-rules/1.0.0"
+POLICY_ID = "pantry-rules/1.1.0"  # 1.1.0: the handoff-window wake
 MAX_STATUS_ATTEMPTS = 2
 MAX_RECEIPT_LOOKUPS = 2
 MAX_CYCLES = 5
@@ -207,6 +211,10 @@ class PantryRulePolicy:
             view = self._refresh(run)
             self._release_unneeded(view, run)
             self._settled = self._signature(view)
+            # A handoff window that opens later is a wake of its own: no state change marks it.
+            opening = handoff_window_opening(view.pantry_parameters, run.at or view.clock)
+            if opening is not None and (self._wait is None or opening < self._wait):
+                self._wait = opening
         except _Stop as stop:
             if not self._stopped:
                 self._stopped = True
@@ -361,12 +369,12 @@ class PantryRulePolicy:
                 return step
             fallback = next((c for c in feasible if not c.stock_transfers), None)
             if fallback is None:
-                self._record_shortfall(run, ev, best, blocking=("stock_transfer",))
+                self._record_shortfall(view, run, ev, best, blocking=("stock_transfer",))
                 return "done"
             best = fallback
         if best.applicable_now:
             if not best.changed_activity_ids and not best.required_stock_holds:
-                self._record_shortfall(run, ev, best)
+                self._record_shortfall(view, run, ev, best)
                 self._record_once(
                     run,
                     ("keep", view.plan.plan_version),
@@ -426,6 +434,8 @@ class PantryRulePolicy:
                         need.activity_id,
                         need.quantity - need.held_quantity,
                     )
+                    if hold == "again":
+                        return "again"  # a retryable rejection: re-read and try again
                     self._asked[key] = hold.hold_id if hold is not None else None
                     if hold is None:
                         return None
@@ -571,7 +581,9 @@ class PantryRulePolicy:
         destination: str,
         activity: str,
         quantity: int,
-    ) -> HoldView | None:
+    ) -> HoldView | Literal["again"] | None:
+        """The transfer hold, ``"again"`` after a retryable rejection (the cycle re-reads the
+        state and tries again, as an apply does), or None when it was refused."""
         window = _window(best, activity)
         if window is None:
             return None
@@ -584,6 +596,8 @@ class PantryRulePolicy:
             "destination_resource_id": destination,
         }
         result = self._mutate(run, "hold_resource", arguments, expected_revision=run.revision or 0)
+        if result is not None and not result.applied and result.error_code in RETRYABLE:
+            return "again"
         if result is None or not result.applied:
             code = result.error_code if result is not None else "unknown"
             self._record_once(
@@ -612,6 +626,7 @@ class PantryRulePolicy:
 
     def _record_shortfall(
         self,
+        view: EventStateView,
         run: _Run,
         ev: EvaluationResult,
         chosen: CandidateResult,
@@ -619,7 +634,9 @@ class PantryRulePolicy:
         blocking: tuple[str, ...] = (),
     ) -> None:
         """Report a plan that covers less than the target, naming what blocks better
-        coverage. The target is unchanged."""
+        coverage. The target is unchanged. A shortfall that only a handoff could close is not
+        reported before the handoff window opens: the handoff can still be requested then."""
+        deadlines = {t.target_id: t.deadline for t in view.goal.service_targets}
         for coverage in chosen.service_coverage:
             if not coverage.unfulfilled_quantity:
                 continue
@@ -637,6 +654,11 @@ class PantryRulePolicy:
                 failed = [k.constraint_id for k in c.checks if k.status == "failed"]
                 named.update(failed or (["stock_transfer"] if c.stock_transfers else []))
             names = sorted(named) or ["stock_on_hand"]
+            early = handoff_still_possible(
+                view.pantry_parameters, run.at or view.clock, deadlines.get(coverage.target_id)
+            )
+            if early and "stock_transfer" in names:
+                continue
             self._record_once(
                 run,
                 ("shortfall", coverage.target_id, coverage.allocated_quantity),

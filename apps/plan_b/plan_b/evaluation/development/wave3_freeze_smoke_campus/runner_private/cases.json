@@ -1,0 +1,21 @@
+{
+ "cases": [
+  {
+   "achievable_on_time": null,
+   "actionable_record_ids": [],
+   "annotations": [],
+   "case_id": "dev01",
+   "case_ref": "dev01",
+   "condition": null,
+   "heldout": false,
+   "negative_control": false,
+   "negative_control_evidence": null,
+   "outcome_class": "goal",
+   "profile_id": "campus_showcase",
+   "requires_recovery": true,
+   "scenario_id": "dev_fixture_01",
+   "suite": "campus",
+   "target_quantity": null
+  }
+ ]
+}

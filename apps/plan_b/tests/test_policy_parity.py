@@ -4,8 +4,8 @@ Everything runs through the real store and executor; the models are the real pro
 with a scripted ``FakeOpener`` (``tests.test_agent_provider``), and every spend ledger lives in
 ``tmp_path``. Each test names, in a comment, the mutation of the code it catches.
 
-* parity: P0 (the profile's baseline), P1 ``tool-use/1.0.0``, P2 ``live/1.0.0`` and P3
-  ``verify-all/1.0.0``, each built and run once on a fresh episode of each suite behind a
+* parity: P0 (the profile's baseline), P1 ``tool-use/1.1.0``, P2 ``live/1.1.0`` and P3
+  ``verify-all/1.1.0``, each built and run once on a fresh episode of each suite behind a
   recording client, read the same coordinator grant at the same start state, get the same
   candidate set from every plain evaluation, and call only tools of that grant (P1's turn
   schema offers exactly the grant's tools; P2 and P3 stay within ``AGENT_TOOLS``);
@@ -56,7 +56,7 @@ from tests.conftest import Sandbox, at
 from tests.test_agent_provider import FakeOpener, schema_name
 from tests.test_live_workflow import SUITES, ToolScript, build, tool_state, tool_user, turn
 
-POLICY_IDS = {"P1": "tool-use/1.0.0", "P2": "live/1.0.0", "P3": "verify-all/1.0.0"}
+POLICY_IDS = {"P1": "tool-use/1.1.0", "P2": "live/1.1.0", "P3": "verify-all/1.1.0"}
 
 
 # ---------------------------------------------------------------------------------- clients
@@ -181,7 +181,7 @@ def test_each_policy_reads_the_same_grant_tools_and_candidates(
         factory: Callable[[], Policy]
         if name == "P0":
             factory = baseline_policy_factory(profile)
-            expected_id = "pantry-rules/1.0.0" if suite == "pantry" else "rules/1.0.0"
+            expected_id = "pantry-rules/1.1.0" if suite == "pantry" else "rules/1.0.0"
         else:
             built, opener = build(name, tmp_path / name)
             factory = serving(built)
@@ -258,7 +258,7 @@ def test_each_policy_reads_the_same_grant_tools_and_candidates(
 
 @pytest.mark.parametrize(
     ("choice", "policy_id"),
-    [("tool-use", "tool-use/1.0.0"), ("live", "live/1.0.0"), ("verify-all", "verify-all/1.0.0")],
+    [("tool-use", "tool-use/1.1.0"), ("live", "live/1.1.0"), ("verify-all", "verify-all/1.1.0")],
 )
 def test_a_restarted_host_keeps_each_model_policy_choice(
     db: Database, tmp_path: Path, choice: PolicyChoice, policy_id: str
@@ -528,7 +528,8 @@ def test_tool_use_caps_the_requested_wait_at_max_wait_minutes(db: Database, tmp_
         assert decision.kind == "wait" and decision.details["final_decision"] == "wait"
         assert decision.wait_until is not None
         assert decision.wait_until - decision.at == timedelta(minutes=expected), minutes
-        assert result.wait_until == decision.wait_until
+        # The run wakes at the requested time or earlier, at the shared wake schedule.
+        assert result.wait_until is not None and result.wait_until <= decision.wait_until
 
 
 def test_tool_use_an_invalid_tool_gets_one_repair_then_an_invalid_choice_wait(
@@ -602,8 +603,10 @@ def test_tool_use_idempotency_keys_carry_the_revision(db: Database, tmp_path: Pa
 
 def test_tool_use_max_turns_bounds_one_run(db: Database, tmp_path: Path) -> None:
     """A model that never ends its turn gets ``MAX_TURNS`` turn requests in one run, then the
-    run ends (well inside the model-call cap); the next wake continues with its own bound.
-    Catches: removing the per-run turn bound (only the model-call cap would stop it)."""
+    run ends (well inside the model-call cap) and asks to be woken at once. That wake is the
+    model's own (the continuation), so it is a model turn whatever the attention rule says
+    (the freeze audit), with its own bound. Catches: removing the per-run turn bound (only the
+    model-call cap would stop it)."""
     cap = 2 * MAX_TURNS + 3
 
     def script(body: dict[str, Any], n: int) -> Any:
@@ -617,6 +620,8 @@ def test_tool_use_max_turns_bounds_one_run(db: Database, tmp_path: Path) -> None
     assert len(client.of("get_action_receipt")) == MAX_TURNS
     assert first.status == "waiting"
     assert not [d for d in first.decisions if d.details.get("failure") == "model_call_cap"]
+    assert first.wait_until == sb.view().clock  # the turn bound asks for the next wake now
     second = policy.run(client)
-    assert len(turns_of(opener)) == 2 * MAX_TURNS
+    assert len(turns_of(opener)) == 2 * MAX_TURNS  # the continuation: its own bounded run
     assert second.status == "waiting"
+    assert not [d for d in second.decisions if d.details.get("failure") == "model_call_cap"]

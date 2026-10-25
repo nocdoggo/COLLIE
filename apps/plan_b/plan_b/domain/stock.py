@@ -566,6 +566,26 @@ class StaffFill:
     note: str
 
 
+def handoff_window_opening(pantry: PantryParameters | None, now: datetime) -> datetime | None:
+    """When the handoff window opens, while that is still ahead of ``now`` (else None). Every
+    coordinator policy (P0-P3) wakes then: a staff handoff can only be requested inside the
+    window, so a window that opens after a policy's last wake must not go unanswered. Public
+    configuration only."""
+    if pantry is None or now >= pantry.handoff_window.start:
+        return None
+    return pantry.handoff_window.start
+
+
+def handoff_still_possible(
+    pantry: PantryParameters | None, now: datetime, deadline: datetime | None
+) -> bool:
+    """Whether a handoff requested when the window opens, still ahead of ``now``, could
+    serve a target due at ``deadline``: the window opens before it. Only then does a policy
+    hold back a shortfall that only a handoff could close until the window opens."""
+    opening = handoff_window_opening(pantry, now)
+    return opening is not None and (deadline is None or opening < deadline)
+
+
 def handoff_fill(
     holds: Iterable[HoldView],
     *,

@@ -57,6 +57,7 @@ ISOLATED_MODULES = (
     "agent/__init__.py",
     "agent/config.py",
     "agent/interpret.py",
+    "agent/attention.py",
     "agent/menu.py",
     "agent/orchestrator.py",
     "agent/provider.py",

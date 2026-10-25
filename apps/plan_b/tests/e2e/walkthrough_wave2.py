@@ -385,9 +385,9 @@ def pantry_flow(
     report.check(
         "decision cards narrate the hold and the ask with the policy that ran",
         "Asked staff to hand off 16 units" in decisions
-        and "pantry-rules/1.0.0" in decisions
+        and "pantry-rules/1.1.0" in decisions
         and "Prepare" in decisions,
-        quote(decisions, "pantry-rules/1.0.0", "partner_stock"),
+        quote(decisions, "pantry-rules/1.1.0", "partner_stock"),
         flow=flow,
     )
     report.shot(mod, "w2_02_pantry_handoff_requested_full", full=True)

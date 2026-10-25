@@ -40,16 +40,14 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
+from plan_b.agent.attention import _EPOCH, _resources
 from plan_b.agent.config import ModelConfig, load_model_config
-from plan_b.agent.menu import own_grant
+from plan_b.agent.menu import MAX_STATUS_FAILURES, own_grant
 from plan_b.agent.orchestrator import (
-    _EPOCH,
     DEFAULT_MAX_MODEL_CALLS,
     DEFAULT_MAX_TOOL_CALLS,
-    MAX_STATUS_FAILURES,
     LivePolicy,
     _envelope_summary,
-    _resources,
     _Run,
     _status_text,
 )
@@ -61,7 +59,7 @@ from plan_b.agent.provider import (
 )
 from plan_b.domain.models import EventStateView, ObservationRecord
 
-POLICY_ID = "verify-all/1.0.0"
+POLICY_ID = "verify-all/1.1.0"
 RELEVANCE_RULE = "verify-all-relevance/1.0.0"
 MAX_VERIFY_ROUNDS = 3  # batches of checks per step (notices arriving during a batch)
 
@@ -207,8 +205,10 @@ def verify_all_policy_factory(
     max_model_calls: int = DEFAULT_MAX_MODEL_CALLS,
     max_tool_calls: int = DEFAULT_MAX_TOOL_CALLS,
     ledger_path: Path | None = None,
+    seed: int | None = None,
 ) -> Callable[[], VerifyAllPolicy]:
-    """As ``live_policy_factory``: one provider and spend guard per instance (episode)."""
+    """As ``live_policy_factory``: one provider and spend guard per instance (episode), and
+    the run's ``seed``."""
     cfg = config or load_model_config()
     ledger = SpendLedger(ledger_path or cfg.ledger_path)
 
@@ -219,7 +219,7 @@ def verify_all_policy_factory(
             max_total_usd=cfg.max_total_cost_usd,
             run_id=f"verify-all-{uuid.uuid4().hex[:12]}",
         )
-        provider = OpenAICompatibleProvider(cfg, guard, timeout_s=timeout_s)
+        provider = OpenAICompatibleProvider(cfg, guard, timeout_s=timeout_s, seed=seed)
         return VerifyAllPolicy(
             provider, max_model_calls=max_model_calls, max_tool_calls=max_tool_calls
         )

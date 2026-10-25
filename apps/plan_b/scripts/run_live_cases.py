@@ -15,7 +15,11 @@ temporary SQLite database. For each run, ``<dir>`` receives:
 * ``reports/live_<label>_outcome.public.json``: the public outcome summary (no predicates);
 * ``runner_private/live_<label>_outcome.runner.json``: the evaluator-side report with the case's
   predicates and expectation. Never feed it to a policy or the browser;
-* ``reports/live_<label>_run.json``: the run record: the outcome line, the model as requested
+* ``runner_private/live_<label>_run.private.json``: the evaluator-side part of the run record:
+  ``matches_expectation``, the full outcome line that carries it, the expected outcome and the
+  predicate results (Wave 3: the public run record no longer carries them, Wave 2 audit D4);
+* ``reports/live_<label>_run.json``: the public run record: the outcome line without
+  ``matches_expectation``, the model as requested
   and as returned, every model call's purpose, outcome, latency, tokens and cost, the spend
   ledger before and after, the coordinator's tool calls, every decision, the trace's
   verification, and the checks below.
@@ -84,6 +88,12 @@ def outcome_line(case_ref: str, report: Any) -> str:
         f"applied_plans={report.applied_plans} committed={report.committed_cents} "
         f"violations={len(report.violations)} matches_expectation={report.matches_expectation}"
     )
+
+
+def public_line(case_ref: str, report: Any) -> str:
+    """The outcome line without ``matches_expectation``, which, read with the public outcome,
+    reveals the case's private expected outcome."""
+    return outcome_line(case_ref, report).rsplit(" matches_expectation=", 1)[0]
 
 
 def _wall() -> str:
@@ -464,6 +474,23 @@ def run_one(case_ref: str, label: str, out: Path, policy: PolicyChoice = "live")
     (out / "runner_private" / f"live_{label}_outcome.runner.json").write_text(
         report.model_dump_json(indent=2) + "\n"
     )
+    (out / "runner_private" / f"live_{label}_run.private.json").write_text(
+        json.dumps(
+            {
+                "record": RECORD_VERSION,
+                "label": label,
+                "case_ref": case_ref,
+                "outcome_line": outcome_line(case_ref, report),
+                "matches_expectation": report.matches_expectation,
+                "expected_outcome": report.expected_outcome,
+                "predicates": [p.model_dump(mode="json") for p in report.predicates],
+            },
+            indent=1,
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
     agent_id = next(
         (t["actor_id"] for t in trace["tool_calls"] if t["actor_role"] == "coordinator_agent"),
         None,
@@ -473,8 +500,7 @@ def run_one(case_ref: str, label: str, out: Path, policy: PolicyChoice = "live")
     record |= {
         "policy_id": report.policy_id,
         "mode_label": report.mode_label,
-        "outcome_line": outcome_line(case_ref, report),
-        "matches_expectation": report.matches_expectation,
+        "outcome_line": public_line(case_ref, report),
         "outcome": public_summary(report),
         "episode_caps": report.episode_caps.model_dump(mode="json")
         if report.episode_caps
@@ -549,6 +575,10 @@ def main(argv: list[str] | None = None) -> int:
             continue
         model = record["model"]
         print(record["outcome_line"])
+        private = out / "runner_private" / f"live_{label}_run.private.json"
+        if private.is_file():
+            verdict = json.loads(private.read_text(encoding="utf-8"))["matches_expectation"]
+            print(f"  evaluator: matches_expectation={verdict} ({private.name})")
         returned = ", ".join(model["returned"]) or "none returned"
         print(
             f"  model {returned}; {model['calls']} model calls ({model['outcomes']});"

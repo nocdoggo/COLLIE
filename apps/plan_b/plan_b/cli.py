@@ -1,4 +1,5 @@
-"""Command line: serve the sandbox, run development cases, verify traces."""
+"""Command line: serve the sandbox, run development cases, verify traces, and the Wave 3
+evaluation (``plan-b eval``: freeze, lock-heldout, verify-freeze, run, report)."""
 
 from __future__ import annotations
 
@@ -130,6 +131,149 @@ def _verify(args: argparse.Namespace) -> int:
     return 0 if not problems else 1
 
 
+def _ints(values: list[str]) -> list[int]:
+    return [int(v) for item in values for v in item.split(",") if v.strip()]
+
+
+def _eval_freeze(args: argparse.Namespace) -> int:
+    from plan_b.evaluation import manifest
+
+    data = manifest.write_freeze(
+        Path(args.out), seeds=_ints(args.seeds), order_seed=args.order_seed
+    )
+    print(
+        f"wrote {args.out}: {len(data['files'])} measured files, files_sha256"
+        f" {data['files_sha256']}, seeds {data['seeds']}, order seed {data['order_seed']},"
+        f" model {data['model']['model_id']} via {data['model']['provider']}"
+    )
+    return 0
+
+
+def _eval_lock_heldout(args: argparse.Namespace) -> int:
+    from plan_b.evaluation import manifest
+    from plan_b.evaluation.run import RunRefused
+
+    try:
+        data = manifest.write_heldout(Path(args.out), freeze_path=Path(args.freeze))
+    except (manifest.FreezeError, RunRefused) as exc:
+        print(f"cannot lock the held-out suites: {exc}")
+        return 1
+    counts = ", ".join(f"{suite} {len(cases)}" for suite, cases in data["suites"].items())
+    print(
+        f"wrote {args.out}: {counts} cases; {len(data['files'])} files; locked {data['locked_at']}"
+    )
+    return 0
+
+
+def _eval_verify_freeze(args: argparse.Namespace) -> int:
+    from plan_b.evaluation import manifest
+
+    checks = [manifest.verify_freeze(Path(args.freeze))]
+    heldout = Path(args.heldout)
+    if heldout.is_file() or args.require_heldout:
+        checks.append(manifest.verify_heldout(heldout, freeze_path=Path(args.freeze)))
+    ok = True
+    for check in checks:
+        if check.ok:
+            print(f"{check.manifest}: verified ({check.detail})")
+            continue
+        ok = False
+        print(f"{check.manifest}: DRIFT ({len(check.drift)} problems)")
+        for line in check.drift:
+            print(f"  {line}")
+    if not ok:
+        print("FREEZE VERIFICATION FAILED: frozen files or settings differ from the manifest")
+    return 0 if ok else 1
+
+
+def _eval_run(args: argparse.Namespace) -> int:
+    from plan_b.evaluation import manifest
+    from plan_b.evaluation.run import RunRefused, run_evaluation
+
+    try:
+        summary = run_evaluation(
+            suite=args.suite,
+            cases=[c for item in args.cases for c in item.split(",") if c.strip()]
+            if args.cases
+            else None,
+            policies=[p for item in args.policies for p in item.split(",")],
+            seeds=_ints(args.seeds) if args.seeds else list(manifest.DEFAULT_SEEDS),
+            out=Path(args.out),
+            jobs=args.jobs,
+            order_seed=args.order_seed,
+            timeout_s=args.timeout,
+            policy_factory=args.policy_factory,
+            freeze_path=Path(args.freeze),
+            heldout_path=Path(args.heldout),
+        )
+    except RunRefused as exc:
+        print(f"run refused: {exc}")
+        return 2
+    print(
+        f"{summary.planned} planned, {summary.skipped} already finished, {summary.ran} run:"
+        f" {summary.statuses}"
+    )
+    return 0
+
+
+def _eval_report(args: argparse.Namespace) -> int:
+    from plan_b.evaluation.report import write_report
+
+    paths = write_report(Path(args.results), Path(args.out) if args.out else None)
+    for name, path in paths.items():
+        print(f"{name}: {path}")
+    return 0
+
+
+def _add_eval(sub: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
+    from plan_b.evaluation import manifest
+
+    ev = sub.add_parser("eval", help="the Wave 3 evaluation: freeze, run, report")
+    group = ev.add_subparsers(dest="eval_command", required=True)
+    freeze = group.add_parser("freeze", help="write the freeze manifest of the measured code")
+    freeze.add_argument("--out", default=str(manifest.FREEZE_PATH))
+    freeze.add_argument("--seeds", nargs="+", default=[str(s) for s in manifest.DEFAULT_SEEDS])
+    freeze.add_argument("--order-seed", type=int, default=manifest.DEFAULT_ORDER_SEED)
+    freeze.set_defaults(func=_eval_freeze)
+    lock = group.add_parser("lock-heldout", help="write the held-out suites' manifest")
+    lock.add_argument("--out", default=str(manifest.HELDOUT_PATH))
+    lock.add_argument("--freeze", default=str(manifest.FREEZE_PATH))
+    lock.set_defaults(func=_eval_lock_heldout)
+    verify = group.add_parser("verify-freeze", help="recompute the manifests; fail on any drift")
+    verify.add_argument("--freeze", default=str(manifest.FREEZE_PATH))
+    verify.add_argument("--heldout", default=str(manifest.HELDOUT_PATH))
+    verify.add_argument("--require-heldout", action="store_true")
+    verify.set_defaults(func=_eval_verify_freeze)
+    run = group.add_parser("run", help="run a suite's episodes (P1-P3 make paid model calls)")
+    run.add_argument("--suite", required=True, choices=("campus", "pantry"))
+    run.add_argument(
+        "--cases",
+        nargs="*",
+        default=None,
+        help="held-out case ids or refs (default: every held-out case of the suite), or"
+        " development case refs for a dry run",
+    )
+    run.add_argument("--policies", nargs="+", default=["P0,P1,P2,P3"])
+    run.add_argument("--seeds", nargs="+", default=None, help="default: the preregistered seeds")
+    run.add_argument("--jobs", type=int, default=1)
+    run.add_argument("--out", required=True, help="results directory (rerun it to resume)")
+    run.add_argument("--order-seed", type=int, default=None)
+    run.add_argument("--timeout", type=float, default=None, help="episode wall-time limit (s)")
+    run.add_argument(
+        "--policy-factory",
+        default=None,
+        metavar="MODULE:CALLABLE",
+        help="dry runs on development cases only: build P1-P3 around a scripted provider",
+    )
+    run.add_argument("--freeze", default=str(manifest.FREEZE_PATH))
+    run.add_argument("--heldout", default=str(manifest.HELDOUT_PATH))
+    run.set_defaults(func=_eval_run)
+    report = group.add_parser("report", help="write the results tables and figure")
+    report.add_argument("--results", required=True)
+    report.add_argument("--out", default=None, help="default: <results>/report")
+    report.set_defaults(func=_eval_report)
+
+
 def main(argv: list[str] | None = None) -> int:
     from plan_b.scenarios.policy_host import DEVELOPMENT_CAPS, POLICY_CHOICES
 
@@ -175,6 +319,7 @@ def main(argv: list[str] | None = None) -> int:
     verify = sub.add_parser("verify-trace", help="check a trace's integrity hashes")
     verify.add_argument("trace")
     verify.set_defaults(func=_verify)
+    _add_eval(sub)
     args = parser.parse_args(argv)
     return int(args.func(args))
 
