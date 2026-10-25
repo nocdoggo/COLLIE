@@ -170,8 +170,9 @@ def test_each_policy_reads_the_same_grant_tools_and_candidates(
     behind a recording client. Catches: a policy whose factory raises or builds another policy;
     a policy given another principal's session or grant, or a different start state; a policy
     whose evaluation sees a different candidate generation; P1's turn schema offering tools
-    outside the grant (or staff tools); P2/P3 calling a tool outside ``AGENT_TOOLS`` or the
-    grant; any policy calling a staff tool."""
+    outside the grant; P2/P3 calling a tool outside ``AGENT_TOOLS`` or the grant; any policy
+    calling a staff tool. No shipped grant lists a staff tool, so P1's staff-tool filter is
+    pinned in test_comparison_policy_fixes.py."""
     worlds: dict[str, tuple[Any, ...]] = {}
     candidate_sets: dict[str, set[frozenset[tuple[str, str]]]] = {}
     for name in ("P0", "P1", "P2", "P3"):

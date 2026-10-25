@@ -1073,7 +1073,13 @@ def _assess_stock(
                 f" {_t(cutoff)} cutoff"
             )
         if not ok:
-            transfer_problems.append(f"{why}: too late")
+            if held < need and stock.effective_at < pantry.handoff_window.start:
+                transfer_problems.append(
+                    f"{why}: too early, the handoff window opens at"
+                    f" {_t(pantry.handoff_window.start)}"
+                )
+            else:
+                transfer_problems.append(f"{why}: too late")
             continue
         transfer_notes.append(why)
         out.transfers.append(

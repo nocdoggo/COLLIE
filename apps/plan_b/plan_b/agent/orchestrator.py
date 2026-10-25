@@ -1686,6 +1686,7 @@ class LivePolicy:
                 + f"; only a staff-recorded receipt moves stock. Plan v{view.plan.plan_version} "
                 "is unchanged.",
                 candidate_refs=(best.candidate_id,),
+                wait_until=self._handoff_wake(view, self._now(view)),
                 details={"evaluation_id": ev.evaluation_id, "chosen_by": "server"},
             )
             return
@@ -2171,11 +2172,19 @@ class LivePolicy:
             self._wake = wake
         if wake is not None:
             times.append(wake)
-        for _, task in awaited_handoffs(view, self._principal, now):
-            due = task.respond_after if task.respond_after > now else task.cutoff
-            if due > now:
-                times.append(due)
+        handoff = self._handoff_wake(view, now)
+        if handoff is not None:
+            times.append(handoff)
         return min(times) if times else None
+
+    def _handoff_wake(self, view: EventStateView, now: datetime) -> datetime | None:
+        """The earliest wake an awaited staff handoff owes: its ``respond_after``, then its
+        cutoff."""
+        dues = [
+            task.respond_after if task.respond_after > now else task.cutoff
+            for _, task in awaited_handoffs(view, self._principal, now)
+        ]
+        return min((due for due in dues if due > now), default=None)
 
     def _deadline_watch(self, view: EventStateView, now: datetime) -> _Watch | None:
         """Earliest not-started activity relying on expected equipment: wake at

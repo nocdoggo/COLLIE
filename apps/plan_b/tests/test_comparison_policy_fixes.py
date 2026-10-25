@@ -6,8 +6,10 @@ mutation is never narrated from a stale state; the live pantry policy reports a 
 the baseline does, records a reconciled handoff as the ask it was and releases a handoff hold
 staff are done with; P3 checks every update (including one that arrives during its checks)
 under P2's retry bound and settles after its checks; and a restarted host keeps the episode's
-model-call cap. Everything runs through the real store, executor and runner; nothing reaches
-the network.
+model-call cap. The final audit added two: a handoff requested before its window opens is
+checked as too early, not too late, and P1's turn tools drop a staff tool even when a grant
+lists one. Everything runs through the real store, executor and runner; nothing reaches the
+network.
 """
 
 from __future__ import annotations
@@ -338,6 +340,47 @@ def test_no_shortfall_is_reported_before_the_handoff_window_opens(
         result = run_with(db, "pantry_dev01", policy)
         assert result.report.goal_complete is True, kind
         assert not [d for d in result.history.decisions if d.kind == "infeasible"], kind
+
+
+def test_a_handoff_before_its_window_opens_is_checked_as_too_early(
+    db: Database, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    # Every policy reads this check; P1 reads its text directly.
+    _pantry_variant(monkeypatch, tmp_path, window_start="2026-11-09T12:40:00-05:00")
+    env = PantrySandbox(db).evaluate()
+    assert env.data is not None
+    details = [
+        check["detail"]
+        for c in env.data["candidates"]
+        if c["label"].startswith("Hand off partner_stock")
+        for check in c["checks"]
+        if check["constraint_id"] == "stock_transfer" and check["status"] == "failed"
+    ]
+    assert details
+    assert all("too early, the handoff window opens at 12:40" in d for d in details)
+    assert not any("too late" in d for d in details)
+
+
+def test_tool_use_never_offers_a_staff_tool_its_grant_lists(db: Database, tmp_path: Path) -> None:
+    # No shipped coordinator grant lists a staff tool, so the parity tests cannot reach this.
+    view = PantrySandbox(db).view()
+    own = own_grant(view, "agent_demo")
+    assert own is not None
+    staff = ("record_stock_receipt", "record_distribution")
+    widened = own.model_copy(
+        update={
+            "grant": own.grant.model_copy(
+                update={"allowed_tools": (*own.grant.allowed_tools, *staff)}
+            )
+        }
+    )
+    grants = tuple(widened if g is own else g for g in view.grants)
+    policy, _ = build("P1", tmp_path)
+    assert isinstance(policy, ToolUsePolicy)
+    policy._principal = "agent_demo"
+    tools = policy._tools(view.model_copy(update={"grants": grants}))
+    assert tools == tuple(own.grant.allowed_tools)
+    assert not set(staff) & set(tools)
 
 
 def test_a_stale_release_of_a_closed_handoff_is_retried(

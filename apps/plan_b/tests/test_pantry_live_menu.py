@@ -506,6 +506,7 @@ def test_with_every_other_option_spent_the_policy_waits_for_the_staff_handoff(
     ]
     assert len(waits) == 1
     assert waits[0].details["chosen_by"] == "server" and task.hold_id in waits[0].summary
+    assert waits[0].wait_until == task.respond_after
     assert result.status == "waiting" and result.wait_until == task.respond_after
 
 
