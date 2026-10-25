@@ -132,7 +132,10 @@ export function HoldsAndCommitments({ view }: { view: EventStateView }) {
                 <p>
                   <strong>{look.resourceLabel(h.resource_id)}</strong> for{" "}
                   {look.activityLabel(h.activity_id)}{" "}
-                  <StatusBadge label={HOLD_STATUS_LABEL[h.effective_status] ?? HOLD_STATUS_LABEL.active} />
+                  <StatusBadge label={HOLD_STATUS_LABEL[h.effective_status] ?? HOLD_STATUS_LABEL.active} />{" "}
+                  <code className="code" data-hold-id={h.hold_id}>
+                    {h.hold_id}
+                  </code>
                   {h.status !== h.effective_status ? (
                     <span className="muted"> (stored as {h.status}; effective at the current clock)</span>
                   ) : null}

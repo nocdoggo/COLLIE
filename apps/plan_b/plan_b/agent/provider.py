@@ -102,6 +102,9 @@ class CallRecord:
     error: str | None = None
     consumed_tool_call_ids: tuple[str, ...] = ()
     prompt_id: str | None = None
+    # Generation settings of the request (the response format is always strict JSON schema).
+    provider: str | None = None
+    max_tokens: int | None = None
 
     def as_dict(self) -> dict[str, Any]:
         out = asdict(self)
@@ -594,6 +597,8 @@ class OpenAICompatibleProvider:
             error=error,
             consumed_tool_call_ids=request.consumed_tool_call_ids,
             prompt_id=request.prompt_id,
+            provider=self.config.provider,
+            max_tokens=request.max_tokens,
         )
 
     def _usage_record(
@@ -645,6 +650,8 @@ class OpenAICompatibleProvider:
             generation_id=str(generation)[:200] if isinstance(generation, str) else None,
             consumed_tool_call_ids=request.consumed_tool_call_ids,
             prompt_id=request.prompt_id,
+            provider=self.config.provider,
+            max_tokens=request.max_tokens,
         )
 
 

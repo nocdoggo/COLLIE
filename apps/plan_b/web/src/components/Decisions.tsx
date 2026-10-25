@@ -62,8 +62,12 @@ export function Transitions({ view }: { view: EventStateView }) {
               <li key={`${t.revision}-${t.cause_kind}-${t.cause_ref ?? ""}`}>
                 <span className="feed-time">
                   <When iso={t.at} text={fmtTime(t.at, tz)} />
-                </span>{" "}
-                <strong>r{t.revision}</strong> <span className="muted">{t.cause_kind}</span> {t.summary}
+                </span>
+                {/* One cell beside the time: the list is a two-column grid. */}
+                <span>
+                  <strong>r{t.revision}</strong> <span className="muted">{t.cause_kind.replace(/_/g, " ")}</span> ·{" "}
+                  {t.summary}
+                </span>
               </li>
             ))}
           </ol>

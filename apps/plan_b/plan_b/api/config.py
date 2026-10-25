@@ -80,11 +80,15 @@ def live_availability(loader: ConfigLoader = load_model_config) -> LiveAvailabil
 
 
 def factory_for(caps: EpisodeCaps, loader: ConfigLoader = load_model_config) -> FactoryFor:
-    """``rules`` gives the profile's deterministic baseline; ``live`` reads the endpoint
-    configuration when the policy is selected (``ModelConfigError`` when it is missing)."""
+    """``rules`` gives the profile's deterministic baseline; a model-driven choice (``tool-use``,
+    ``live``/``selective``, ``verify-all``) reads the endpoint configuration when the policy is
+    selected (``ModelConfigError`` when it is missing, or when its key file is not present, as
+    ``live_availability`` reports; the key itself is not read here)."""
 
     def make(choice: PolicyChoice, profile_id: str) -> Callable[[], Policy]:
-        config = loader() if choice == "live" else None
+        config = loader() if choice != "rules" else None
+        if config is not None and not config.public()["key_file_present"]:
+            raise ModelConfigError("the configured key file is not present")
         return policy_factory_for(choice, profile_id, caps=caps, live_config=config)
 
     return make

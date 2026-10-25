@@ -46,13 +46,13 @@ def _run_case(args: argparse.Namespace) -> int:
         print(f"invalid caps: {exc}")
         return 2
     live_config = None
-    if args.policy == "live":
+    if args.policy != "rules":
         from plan_b.agent.config import ModelConfigError, load_model_config
 
         try:
             live_config = load_model_config()  # server-side; the key itself is not read here
         except ModelConfigError as exc:
-            print(f"the live policy is not configured: {exc}")
+            print(f"the {args.policy} policy is not configured: {exc}")
             return 2
     cases = available_cases() if args.case == "all" else [args.case]
     out = Path(args.out) if args.out else None
@@ -131,7 +131,7 @@ def _verify(args: argparse.Namespace) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    from plan_b.scenarios.policy_host import DEVELOPMENT_CAPS
+    from plan_b.scenarios.policy_host import DEVELOPMENT_CAPS, POLICY_CHOICES
 
     parser = argparse.ArgumentParser(prog="plan-b")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -147,10 +147,12 @@ def main(argv: list[str] | None = None) -> int:
     run.add_argument("--out", default=None, help="write traces and reports under this directory")
     run.add_argument(
         "--policy",
-        choices=("rules", "live"),
+        choices=POLICY_CHOICES,
         default="rules",
-        help="rules: the profile's deterministic baseline (default); live: the live agent"
-        " (paid model calls; needs the model endpoint configuration)",
+        help="rules: the profile's deterministic baseline, P0 (default); tool-use: the"
+        " tool-using model baseline, P1; live or selective: the live agent, P2; verify-all: the"
+        " verify-all ablation, P3 (the model-driven ones make paid model calls and need the"
+        " model endpoint configuration)",
     )
     run.add_argument(
         "--max-episode-tool-calls",
@@ -162,7 +164,8 @@ def main(argv: list[str] | None = None) -> int:
         "--max-episode-model-calls",
         type=int,
         default=DEVELOPMENT_CAPS.max_model_calls,
-        help="per-episode model-call cap of the live policy (development value: %(default)s)",
+        help="per-episode model-call cap of the model-driven policies (development value:"
+        " %(default)s)",
     )
     run.set_defaults(func=_run_case)
     demo = sub.add_parser("demo-rejections", help="executed run exercising rejected actions")

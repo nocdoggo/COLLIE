@@ -1,0 +1,944 @@
+{
+ "results": "plan_b.development_results/1.0.0",
+ "kind": "development runs (one trial each; not the held-out evaluation; no comparison)",
+ "evidence": "PEEAI_plan/handoffs/wave_2/evidence",
+ "runs": [
+  {
+   "label": "p1-tool-use_dev01",
+   "policy": "tool-use",
+   "policy_id": "tool-use/1.0.0",
+   "case_ref": "dev01",
+   "status": "superseded",
+   "superseded_by": "p1-tool-use_dev01_r2",
+   "superseded_reason": "superseded by the prompt change, not by its outcome: it ran under prompt tool_use.v1 with a 1536-token turn budget, and the shipped P1 uses tool_use.v2 and 4096 tokens (the fix of p1-tool-use_pantry_dev01); rerun once under the shipped prompt and kept as recorded.",
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "matches_expectation": true,
+   "outcome_line": "dev01: goal_complete=True infeasibility_reported=False applied_plans=1 committed=0 violations=0 matches_expectation=True",
+   "error": null,
+   "model_calls": 7,
+   "model_calls_by_purpose": {
+    "tool_turn": 7
+   },
+   "tool_calls": 21,
+   "caps_reached": [],
+   "cost_usd": 0.204338,
+   "prompts": [
+    "tool_use.v1"
+   ],
+   "model_requested": "anthropic/claude-sonnet-5.5",
+   "model_returned": [
+    "anthropic/claude-sonnet-5.5"
+   ],
+   "started_at": "2026-10-25T06:29:30Z",
+   "run_record": "reports/live_p1-tool-use_dev01_run.json",
+   "trace_file": "traces/live_p1-tool-use_dev01_trace.json",
+   "trace_sha256": "38849c8e6a6a850b664a98d2fa6a72569a5c27d401c28712eee892aaf56aee3f",
+   "trace_verify": "intact",
+   "steps": [
+    "16:42 verify (model): Checked projector delivery_eta: delayed, expected, reported ETA 17:25 (obs_0001).",
+    "16:43 commit (model): Applied candidate cand_0002_dc26f35f (report rpt_0002_dc26f35f), revision 4 -> 5: Applied Swap demonstrations and skills exchange as plan v2",
+    "16:43 keep (model): The tool-use agent ended its turn with 'keep' at revision 5: plan v2 stands; latest evaluation eval_0003 at revision 5: 3 feasible, 1 applicable now.",
+    "17:07 verify (model): Checked projector delivery_eta: delayed, expected, reported ETA 17:25 (obs_0001).",
+    "17:07 keep (model): The tool-use agent ended its turn with 'keep' at revision 8: plan v2 stands; latest evaluation eval_0004 at revision 8: 2 feasible, 1 applicable now.",
+    "17:20 keep (model): The tool-use agent ended its turn with 'keep' at revision 11: plan v2 stands; latest evaluation eval_0005 at revision 11: 1 feasible, 1 applicable now.",
+    "17:24 keep (model): The tool-use agent ended its turn with 'keep' at revision 12: plan v2 stands; latest evaluation eval_0006 at revision 12: 1 feasible, 1 applicable now."
+   ],
+   "what_happened": "The model checked the projector (delayed, ETA 17:25), applied the free swap of demonstrations and skills exchange at 16:43 (revision 4 to 5), checked the projector once more at 17:07 and otherwise kept plan v2; every activity completed at $0."
+  },
+  {
+   "label": "p1-tool-use_dev01_r2",
+   "policy": "tool-use",
+   "policy_id": "tool-use/1.0.0",
+   "case_ref": "dev01",
+   "status": "recorded",
+   "superseded_by": null,
+   "superseded_reason": null,
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "matches_expectation": true,
+   "outcome_line": "dev01: goal_complete=True infeasibility_reported=False applied_plans=1 committed=0 violations=0 matches_expectation=True",
+   "error": null,
+   "model_calls": 8,
+   "model_calls_by_purpose": {
+    "tool_turn": 8
+   },
+   "tool_calls": 22,
+   "caps_reached": [
+    "model_calls"
+   ],
+   "cost_usd": 0.240806,
+   "prompts": [
+    "tool_use.v2"
+   ],
+   "model_requested": "anthropic/claude-sonnet-5.5",
+   "model_returned": [
+    "anthropic/claude-sonnet-5.5"
+   ],
+   "started_at": "2026-10-25T07:11:09Z",
+   "run_record": "reports/live_p1-tool-use_dev01_r2_run.json",
+   "trace_file": "traces/live_p1-tool-use_dev01_r2_trace.json",
+   "trace_sha256": "75808e3265485c884fb70048388e6ef8f2c8fc226e05081600bc66ba6538a461",
+   "trace_verify": "intact",
+   "steps": [
+    "16:42 verify (model): Checked projector delivery_eta: delayed, expected, reported ETA 17:25 (obs_0001).",
+    "16:44 verify (model): Checked backup_projector availability: available, available (obs_0002).",
+    "16:45 commit (model): Applied candidate cand_0002_dc26f35f (report rpt_0002_dc26f35f), revision 5 -> 6: Applied Swap demonstrations and skills exchange as plan v2",
+    "16:45 keep (model): The tool-use agent ended its turn with 'keep' at revision 6: plan v2 stands; latest evaluation eval_0003 at revision 6: 3 feasible, 1 applicable now.",
+    "17:07 verify (model): Checked projector delivery_eta: delayed, expected, reported ETA 17:25 (obs_0001).",
+    "17:07 keep (model): The tool-use agent ended its turn with 'keep' at revision 9: plan v2 stands; latest evaluation eval_0004 at revision 9: 2 feasible, 1 applicable now.",
+    "17:22 verify (model): Checked projector delivery_eta: delayed, expected, reported ETA 17:25 (obs_0001, stale record).",
+    "17:22 keep (model): The tool-use agent ended its turn with 'keep' at revision 12: plan v2 stands; latest evaluation eval_0005 at revision 12: 1 feasible, 1 applicable now.",
+    "17:24 keep (model): The tool-use agent ended its turn with 'keep' at revision 13: plan v2 stands; latest evaluation eval_0006 at revision 13: 1 feasible, 1 applicable now.",
+    "17:24 stop (host): Episode cap reached: 8 of 8 model calls used (development-phase caps). The coordinator policy is not woken again in this episode; the accepted plan and every commitment stay as they are."
+   ],
+   "what_happened": "Under prompt tool_use.v2 the model checked the projector (delayed, ETA 17:25) at 16:42 and the backup projector (available) at 16:44, applied the free swap of demonstrations and skills exchange at 16:45 (revision 5 to 6), checked the projector again at 17:07 and 17:22 and kept plan v2; its eighth model call, a 'keep' at 17:24, reached the cap with the new plan in place and no spend."
+  },
+  {
+   "label": "p1-tool-use_dev02",
+   "policy": "tool-use",
+   "policy_id": "tool-use/1.0.0",
+   "case_ref": "dev02",
+   "status": "superseded",
+   "superseded_by": "p1-tool-use_dev02_r2",
+   "superseded_reason": "superseded by the prompt change, not by its outcome: it ran under prompt tool_use.v1 with a 1536-token turn budget, and the shipped P1 uses tool_use.v2 and 4096 tokens (the fix of p1-tool-use_pantry_dev01); rerun once under the shipped prompt and kept as recorded.",
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "matches_expectation": true,
+   "outcome_line": "dev02: goal_complete=True infeasibility_reported=False applied_plans=1 committed=3500 violations=0 matches_expectation=True",
+   "error": null,
+   "model_calls": 8,
+   "model_calls_by_purpose": {
+    "tool_turn": 8
+   },
+   "tool_calls": 24,
+   "caps_reached": [
+    "model_calls"
+   ],
+   "cost_usd": 0.239974,
+   "prompts": [
+    "tool_use.v1"
+   ],
+   "model_requested": "anthropic/claude-sonnet-5.5",
+   "model_returned": [
+    "anthropic/claude-sonnet-5.5"
+   ],
+   "started_at": "2026-10-25T06:30:12Z",
+   "run_record": "reports/live_p1-tool-use_dev02_run.json",
+   "trace_file": "traces/live_p1-tool-use_dev02_trace.json",
+   "trace_sha256": "90ed32860d0bf947df9d619ade15950b8908857f19868c3ad6f2a626f56318b6",
+   "trace_verify": "intact",
+   "steps": [
+    "16:42 verify (model): Checked projector delivery_eta: delayed, expected, reported ETA 17:45 (obs_0001).",
+    "16:43 prepare (model): Held backup_projector for demonstrations: Held backup_projector for demonstrations until 16:53 (3500 cents reserved, 0 cents fee)",
+    "16:45 verify (model): Checked backup_projector availability: available, available (obs_0002).",
+    "16:45 ask (model): Asked the organizer to raise max_total_committed_cents of grant_coordinator_demo from 0 to 3500 cents so candidate cand_0003_f5fc676f can commit backup_projector.",
+    "16:48 commit (model): Applied candidate cand_0004_f5fc676f (report rpt_0004_f5fc676f), revision 7 -> 8: Applied Use backup_projector instead of projector for demonstrations as plan v2",
+    "16:48 keep (model): The tool-use agent ended its turn with 'keep' at revision 8: plan v2 stands; latest evaluation eval_0005 at revision 8: 2 feasible, 1 applicable now.",
+    "17:02 keep (model): The tool-use agent ended its turn with 'keep' at revision 11: plan v2 stands; latest evaluation eval_0006 at revision 11: 2 feasible, 1 applicable now.",
+    "17:25 keep (model): The tool-use agent ended its turn with 'keep' at revision 14: plan v2 stands; latest evaluation eval_0007 at revision 14: 1 feasible, 1 applicable now.",
+    "17:44 keep (model): The tool-use agent ended its turn with 'keep' at revision 17: plan v2 stands; latest evaluation eval_0008 at revision 17: 1 feasible, 1 applicable now.",
+    "17:44 stop (host): Episode cap reached: 8 of 8 model calls used (development-phase caps). The coordinator policy is not woken again in this episode; the accepted plan and every commitment stay as they are."
+   ],
+   "what_happened": "The model checked the projector (ETA 17:45), held the backup projector at 16:43, checked the backup's availability, asked the organizer to raise the committed limit from 0 to 3500 and applied the paid substitution at 16:48; it then spent its remaining model calls confirming 'keep' after each check-in and the arrival notice, and reached the 8-call cap at 17:44 with the new plan already in place."
+  },
+  {
+   "label": "p1-tool-use_dev02_r2",
+   "policy": "tool-use",
+   "policy_id": "tool-use/1.0.0",
+   "case_ref": "dev02",
+   "status": "recorded",
+   "superseded_by": null,
+   "superseded_reason": null,
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "matches_expectation": true,
+   "outcome_line": "dev02: goal_complete=True infeasibility_reported=False applied_plans=1 committed=3500 violations=0 matches_expectation=True",
+   "error": null,
+   "model_calls": 8,
+   "model_calls_by_purpose": {
+    "tool_turn": 8
+   },
+   "tool_calls": 24,
+   "caps_reached": [
+    "model_calls"
+   ],
+   "cost_usd": 0.242514,
+   "prompts": [
+    "tool_use.v2"
+   ],
+   "model_requested": "anthropic/claude-sonnet-5.5",
+   "model_returned": [
+    "anthropic/claude-sonnet-5.5"
+   ],
+   "started_at": "2026-10-25T07:11:46Z",
+   "run_record": "reports/live_p1-tool-use_dev02_r2_run.json",
+   "trace_file": "traces/live_p1-tool-use_dev02_r2_trace.json",
+   "trace_sha256": "d717f875a2f5f0d0f03971fb2b09400a2f25c7c9f3420dedfdc415ea578a29d1",
+   "trace_verify": "intact",
+   "steps": [
+    "16:42 verify (model): Checked projector delivery_eta: delayed, expected, reported ETA 17:45 (obs_0001).",
+    "16:44 verify (model): Checked backup_projector availability: available, available (obs_0002).",
+    "16:45 prepare (model): Held backup_projector for demonstrations: Held backup_projector for demonstrations until 16:55 (3500 cents reserved, 0 cents fee)",
+    "16:45 ask (model): Asked the organizer to raise max_total_committed_cents of grant_coordinator_demo from 0 to 3500 cents so candidate cand_0003_f5fc676f can commit backup_projector.",
+    "16:48 commit (model): Applied candidate cand_0004_f5fc676f (report rpt_0004_f5fc676f), revision 7 -> 8: Applied Use backup_projector instead of projector for demonstrations as plan v2",
+    "16:48 keep (model): The tool-use agent ended its turn with 'keep' at revision 8: plan v2 stands; latest evaluation eval_0005 at revision 8: 2 feasible, 1 applicable now.",
+    "17:02 keep (model): The tool-use agent ended its turn with 'keep' at revision 11: plan v2 stands; latest evaluation eval_0006 at revision 11: 2 feasible, 1 applicable now.",
+    "17:25 keep (model): The tool-use agent ended its turn with 'keep' at revision 14: plan v2 stands; latest evaluation eval_0007 at revision 14: 1 feasible, 1 applicable now.",
+    "17:44 keep (model): The tool-use agent ended its turn with 'keep' at revision 17: plan v2 stands; latest evaluation eval_0008 at revision 17: 1 feasible, 1 applicable now.",
+    "17:44 stop (host): Episode cap reached: 8 of 8 model calls used (development-phase caps). The coordinator policy is not woken again in this episode; the accepted plan and every commitment stay as they are."
+   ],
+   "what_happened": "Under prompt tool_use.v2 the model checked the projector (ETA 17:45) at 16:42 and the backup's availability at 16:44, held the backup projector at 16:45, asked the organizer to raise the committed limit from 0 to 3500 and applied the paid substitution at 16:48 (revision 7 to 8); it then confirmed 'keep' at 16:48, 17:02, 17:25 and 17:44, and the eighth model call reached the cap at 17:44 with the new plan already in place."
+  },
+  {
+   "label": "p1-tool-use_dev04",
+   "policy": "tool-use",
+   "policy_id": "tool-use/1.0.0",
+   "case_ref": "dev04",
+   "status": "superseded",
+   "superseded_by": "p1-tool-use_dev04_r2",
+   "superseded_reason": "superseded by the prompt change, not by its outcome: it ran under prompt tool_use.v1 with a 1536-token turn budget, and the shipped P1 uses tool_use.v2 and 4096 tokens (the fix of p1-tool-use_pantry_dev01); rerun once under the shipped prompt and kept as recorded.",
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "matches_expectation": true,
+   "outcome_line": "dev04: goal_complete=True infeasibility_reported=False applied_plans=0 committed=0 violations=0 matches_expectation=True",
+   "error": null,
+   "model_calls": 7,
+   "model_calls_by_purpose": {
+    "tool_turn": 7
+   },
+   "tool_calls": 20,
+   "caps_reached": [],
+   "cost_usd": 0.1949,
+   "prompts": [
+    "tool_use.v1"
+   ],
+   "model_requested": "anthropic/claude-sonnet-5.5",
+   "model_returned": [
+    "anthropic/claude-sonnet-5.5"
+   ],
+   "started_at": "2026-10-25T06:30:48Z",
+   "run_record": "reports/live_p1-tool-use_dev04_run.json",
+   "trace_file": "traces/live_p1-tool-use_dev04_trace.json",
+   "trace_sha256": "616f9531d65931f386daf166a136824c36cf6335581c7bc4557d3cb1f50759ec",
+   "trace_verify": "intact",
+   "steps": [
+    "16:42 verify (model): Checked projector delivery_eta: on_schedule, expected, reported ETA 16:58 (obs_0001).",
+    "16:42 keep (model): The tool-use agent ended its turn with 'keep' at revision 4: plan v1 stands; latest evaluation eval_0002 at revision 4: 4 feasible, 2 applicable now.",
+    "16:44 inapplicable (model): The tool-use agent ended its turn with 'inapplicable' at revision 5: plan v1 stands; latest evaluation eval_0003 at revision 5: 4 feasible, 2 applicable now.",
+    "16:47 keep (model): The tool-use agent ended its turn with 'keep' at revision 6: plan v1 stands; latest evaluation eval_0004 at revision 6: 4 feasible, 2 applicable now.",
+    "16:58 keep (model): The tool-use agent ended its turn with 'keep' at revision 8: plan v1 stands; latest evaluation eval_0005 at revision 8: 3 feasible, 2 applicable now.",
+    "17:06 keep (model): The tool-use agent ended its turn with 'keep' at revision 10: plan v1 stands; latest evaluation eval_0006 at revision 10: 3 feasible, 2 applicable now.",
+    "17:25 keep (model): The tool-use agent ended its turn with 'keep' at revision 13: plan v1 stands; latest evaluation eval_0007 at revision 13: 1 feasible, 1 applicable now."
+   ],
+   "what_happened": "The model checked the projector (on schedule, ETA 16:58) and kept plan v1, ended its 16:44 turn 'inapplicable' on the stale P09 reminder and kept the plan to the end: no hold, no plan change, no spend."
+  },
+  {
+   "label": "p1-tool-use_dev04_r2",
+   "policy": "tool-use",
+   "policy_id": "tool-use/1.0.0",
+   "case_ref": "dev04",
+   "status": "recorded",
+   "superseded_by": null,
+   "superseded_reason": null,
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "matches_expectation": true,
+   "outcome_line": "dev04: goal_complete=True infeasibility_reported=False applied_plans=0 committed=0 violations=0 matches_expectation=True",
+   "error": null,
+   "model_calls": 6,
+   "model_calls_by_purpose": {
+    "tool_turn": 6
+   },
+   "tool_calls": 20,
+   "caps_reached": [],
+   "cost_usd": 0.176082,
+   "prompts": [
+    "tool_use.v2"
+   ],
+   "model_requested": "anthropic/claude-sonnet-5.5",
+   "model_returned": [
+    "anthropic/claude-sonnet-5.5"
+   ],
+   "started_at": "2026-10-25T07:12:24Z",
+   "run_record": "reports/live_p1-tool-use_dev04_r2_run.json",
+   "trace_file": "traces/live_p1-tool-use_dev04_r2_trace.json",
+   "trace_sha256": "7ea79810f2d340e19f3ae03606e52422329670491807a42312d4cc2d4a472945",
+   "trace_verify": "intact",
+   "steps": [
+    "16:42 verify (model): Checked projector delivery_eta: on_schedule, expected, reported ETA 16:58 (obs_0001).",
+    "16:44 verify (model): Checked backup_projector availability: available, available (obs_0003).",
+    "16:44 keep (model): The tool-use agent ended its turn with 'keep' at revision 6: plan v1 stands; latest evaluation eval_0002 at revision 6: 4 feasible, 2 applicable now.",
+    "16:47 inapplicable (model): The tool-use agent ended its turn with 'inapplicable' at revision 7: plan v1 stands; latest evaluation eval_0003 at revision 7: 4 feasible, 2 applicable now.",
+    "16:58 keep (model): The tool-use agent ended its turn with 'keep' at revision 9: plan v1 stands; latest evaluation eval_0004 at revision 9: 3 feasible, 2 applicable now.",
+    "17:06 keep (model): The tool-use agent ended its turn with 'keep' at revision 11: plan v1 stands; latest evaluation eval_0005 at revision 11: 3 feasible, 2 applicable now.",
+    "17:25 keep (model): The tool-use agent ended its turn with 'keep' at revision 14: plan v1 stands; latest evaluation eval_0006 at revision 14: 1 feasible, 1 applicable now."
+   ],
+   "what_happened": "Under prompt tool_use.v2 the model checked the projector (on schedule, ETA 16:58) at 16:42 and the backup projector (available) at 16:44 and kept plan v1, ended its 16:47 turn 'inapplicable' on the stale P09 reminder and its forwarded copy, and kept plan v1 at 16:58, 17:06 and 17:25: no hold, no plan change, no spend, 6 model calls and no cap reached."
+  },
+  {
+   "label": "p1-tool-use_pantry_dev01",
+   "policy": "tool-use",
+   "policy_id": "tool-use/1.0.0",
+   "case_ref": "pantry_dev01",
+   "status": "superseded",
+   "superseded_by": "p1-tool-use_pantry_dev01_r2",
+   "superseded_reason": "a defect in our P1 harness, not the model's judgment: prompt tool_use.v1 never said which window a hold covers (the activity's window in the candidate, not the handoff window), and the 1536-token turn budget left too little room once the model's reasoning tokens (up to 1134 here) were counted. Fixed by prompt tool_use.v2 and a 4096-token turn budget, with tests/test_tool_use_hold_window.py.",
+   "goal_complete": false,
+   "infeasibility_reported": false,
+   "matches_expectation": false,
+   "outcome_line": "pantry_dev01: goal_complete=False infeasibility_reported=False applied_plans=0 committed=0 violations=0 matches_expectation=False",
+   "error": null,
+   "model_calls": 8,
+   "model_calls_by_purpose": {
+    "tool_turn": 8
+   },
+   "tool_calls": 15,
+   "caps_reached": [
+    "model_calls"
+   ],
+   "cost_usd": 0.26454,
+   "prompts": [
+    "tool_use.v1"
+   ],
+   "model_requested": "anthropic/claude-sonnet-5.5",
+   "model_returned": [
+    "anthropic/claude-sonnet-5.5"
+   ],
+   "started_at": "2026-10-25T06:31:12Z",
+   "run_record": "reports/live_p1-tool-use_pantry_dev01_run.json",
+   "trace_file": "traces/live_p1-tool-use_pantry_dev01_trace.json",
+   "trace_sha256": "8e9c4bc16157432492f9666c42007b02de9dde221bcfcbc6db085c491fa65bda",
+   "trace_verify": "intact",
+   "steps": [
+    "12:31 wait (model): hold_resource was rejected (INVALID_REQUEST); Plan v1 is unchanged.",
+    "12:32 wait (model): hold_resource was rejected (CONSTRAINT_VIOLATION); Plan v1 is unchanged.",
+    "12:33 wait (model): hold_resource was rejected (CONSTRAINT_VIOLATION); Plan v1 is unchanged.",
+    "12:33 wait (model): hold_resource was rejected (INVALID_REQUEST); Plan v1 is unchanged.",
+    "12:34 wait (model): hold_resource was rejected (CONSTRAINT_VIOLATION); Plan v1 is unchanged.",
+    "12:34 wait (model): hold_resource was rejected (INVALID_REQUEST); Plan v1 is unchanged.",
+    "12:35 stop (server): Stopped for this episode: the model-call cap of 8 for this episode is spent. No further action is taken; the accepted plan and every commitment stay as they are.",
+    "12:35 stop (host): Episode cap reached: 8 of 8 model calls used (development-phase caps). The coordinator policy is not woken again in this episode; the accepted plan and every commitment stay as they are."
+   ],
+   "what_happened": "Failed: the model sent six staff-handoff holds of the 16 partner kits and the executor refused each (a service target on a transfer hold, the 12:30-12:50 handoff window instead of the distribution window, then arguments without an activity); two replies were cut off at the 1536-token limit and the 8-call cap was reached at 12:35, so nothing was held or committed and 0 of 40 kits were distributed, with stock conserved."
+  },
+  {
+   "label": "p1-tool-use_pantry_dev01_r2",
+   "policy": "tool-use",
+   "policy_id": "tool-use/1.0.0",
+   "case_ref": "pantry_dev01",
+   "status": "recorded",
+   "superseded_by": null,
+   "superseded_reason": null,
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "matches_expectation": true,
+   "outcome_line": "pantry_dev01: goal_complete=True infeasibility_reported=False applied_plans=1 committed=0 violations=0 matches_expectation=True",
+   "error": null,
+   "model_calls": 6,
+   "model_calls_by_purpose": {
+    "tool_turn": 6
+   },
+   "tool_calls": 18,
+   "caps_reached": [],
+   "cost_usd": 0.15995,
+   "prompts": [
+    "tool_use.v2"
+   ],
+   "model_requested": "anthropic/claude-sonnet-5.5",
+   "model_returned": [
+    "anthropic/claude-sonnet-5.5"
+   ],
+   "started_at": "2026-10-25T06:42:39Z",
+   "run_record": "reports/live_p1-tool-use_pantry_dev01_r2_run.json",
+   "trace_file": "traces/live_p1-tool-use_pantry_dev01_r2_trace.json",
+   "trace_sha256": "36c1b4686b9c91d72ab804f7f001d14afe2f5a0dac4d473051b05170e1415959",
+   "trace_verify": "intact",
+   "steps": [
+    "12:31 ask (model): Asked staff for a handoff from partner_stock into pantry_stock: hold hold_0001 (the local staff task) reserves 16 units and moves nothing; only a staff-recorded receipt moves stock.",
+    "12:31 wait (model): The tool-use agent ended its turn with 'wait' at revision 4: plan v1 stands; latest evaluation eval_0002 at revision 4: 3 feasible, 0 applicable now; it looks again at 12:33.",
+    "12:34 prepare (model): Held pantry_stock for distribution: Held 40 standard_kit of pantry_stock for target kits_40 until 13:04; available 40 -> 0",
+    "12:35 commit (model): Applied candidate cand_0004_0e7eb095 (report rpt_0004_0e7eb095), revision 6 -> 7: Applied Allocate pantry_stock to kits_40 (distribution) as plan v2",
+    "12:35 keep (model): The tool-use agent ended its turn with 'keep' at revision 7: plan v2 stands; latest evaluation eval_0005 at revision 7: 4 feasible, 4 applicable now.",
+    "13:40 keep (model): The tool-use agent ended its turn with 'keep' at revision 15: plan v2 stands; latest evaluation eval_0006 at revision 15: 4 feasible, 4 applicable now."
+   ],
+   "what_happened": "Under prompt tool_use.v2 the model held the 16 partner kits for the staff handoff at 12:31 (recorded as an ask), waited for the labeled staff simulator's receipt at 12:33 (24/16 to 40/0), held the 40 pantry kits at 12:34 and applied the allocation at 12:35; staff distributed 40 of 40 on time at 13:40, with no rejected call."
+  },
+  {
+   "label": "p1-tool-use_skills_dev01",
+   "policy": "tool-use",
+   "policy_id": "tool-use/1.0.0",
+   "case_ref": "skills_dev01",
+   "status": "superseded",
+   "superseded_by": "p1-tool-use_skills_dev01_r2",
+   "superseded_reason": "superseded by the prompt change, not by its outcome: it ran under prompt tool_use.v1 with a 1536-token turn budget, and the shipped P1 uses tool_use.v2 and 4096 tokens (the fix of p1-tool-use_pantry_dev01); rerun once under the shipped prompt and kept as recorded.",
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "matches_expectation": true,
+   "outcome_line": "skills_dev01: goal_complete=True infeasibility_reported=False applied_plans=1 committed=0 violations=0 matches_expectation=True",
+   "error": null,
+   "model_calls": 8,
+   "model_calls_by_purpose": {
+    "tool_turn": 8
+   },
+   "tool_calls": 21,
+   "caps_reached": [
+    "model_calls"
+   ],
+   "cost_usd": 0.25344,
+   "prompts": [
+    "tool_use.v1"
+   ],
+   "model_requested": "anthropic/claude-sonnet-5.5",
+   "model_returned": [
+    "anthropic/claude-sonnet-5.5"
+   ],
+   "started_at": "2026-10-25T06:32:27Z",
+   "run_record": "reports/live_p1-tool-use_skills_dev01_run.json",
+   "trace_file": "traces/live_p1-tool-use_skills_dev01_trace.json",
+   "trace_sha256": "7bc83b49ca217b14d4aaec4ccd7b19b3d46a10ebc16c341cb117a95aa8de6353",
+   "trace_verify": "intact",
+   "steps": [
+    "09:22 verify (model): Checked learning_kit delivery_eta: unknown (STATUS_UNKNOWN); the status stays unverified.",
+    "09:24 verify (model): Checked backup_learning_kit availability: unknown (STATUS_UNKNOWN); the status stays unverified.",
+    "09:26 verify (model): Checked learning_kit delivery_eta: unknown (STATUS_UNKNOWN); the status stays unverified.",
+    "09:28 verify (model): Checked backup_learning_kit availability: unknown (STATUS_UNKNOWN); the status stays unverified.",
+    "09:28 keep (model): The tool-use agent ended its turn with 'keep' at revision 1: plan v1 stands; latest evaluation eval_0001 at revision 1: 3 feasible, 3 applicable now.",
+    "09:45 keep (model): The tool-use agent ended its turn with 'keep' at revision 3: plan v1 stands; latest evaluation eval_0002 at revision 3: 3 feasible, 3 applicable now.",
+    "09:50 keep (model): The tool-use agent ended its turn with 'keep' at revision 5: plan v1 stands; latest evaluation eval_0003 at revision 5: 3 feasible, 3 applicable now.",
+    "09:55 keep (model): The tool-use agent ended its turn with 'keep' at revision 6: plan v1 stands; latest evaluation eval_0004 at revision 6: 3 feasible, 3 applicable now.",
+    "10:06 commit (model): Applied candidate cand_0005_b7ee3104 (report rpt_0005_b7ee3104), revision 8 -> 9: Applied Swap practice and peer exchange as plan v2",
+    "10:06 keep (model): The tool-use agent ended its turn with 'keep' at revision 9: plan v2 stands; latest evaluation eval_0006 at revision 9: 2 feasible, 2 applicable now.",
+    "10:06 stop (host): Episode cap reached: 8 of 8 model calls used (development-phase caps). The coordinator policy is not woken again in this episode; the accepted plan and every commitment stay as they are."
+   ],
+   "what_happened": "The model checked the learning kit and its backup twice each (every answer STATUS_UNKNOWN) and kept plan v1, then applied the swap of practice and peer exchange at 10:06 after the peer lead's check-in; its eighth model call, a 'keep' right after, reached the cap at 10:06 with the new plan in place."
+  },
+  {
+   "label": "p1-tool-use_skills_dev01_r2",
+   "policy": "tool-use",
+   "policy_id": "tool-use/1.0.0",
+   "case_ref": "skills_dev01",
+   "status": "recorded",
+   "superseded_by": null,
+   "superseded_reason": null,
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "matches_expectation": true,
+   "outcome_line": "skills_dev01: goal_complete=True infeasibility_reported=False applied_plans=1 committed=0 violations=0 matches_expectation=True",
+   "error": null,
+   "model_calls": 8,
+   "model_calls_by_purpose": {
+    "tool_turn": 8
+   },
+   "tool_calls": 20,
+   "caps_reached": [
+    "model_calls"
+   ],
+   "cost_usd": 0.253878,
+   "prompts": [
+    "tool_use.v2"
+   ],
+   "model_requested": "anthropic/claude-sonnet-5.5",
+   "model_returned": [
+    "anthropic/claude-sonnet-5.5"
+   ],
+   "started_at": "2026-10-25T07:12:48Z",
+   "run_record": "reports/live_p1-tool-use_skills_dev01_r2_run.json",
+   "trace_file": "traces/live_p1-tool-use_skills_dev01_r2_trace.json",
+   "trace_sha256": "8793c7a33f3bde11188e4929f63751309b99bbd6a52f672afac6239110205f04",
+   "trace_verify": "intact",
+   "steps": [
+    "09:22 verify (model): Checked learning_kit delivery_eta: unknown (STATUS_UNKNOWN); the status stays unverified.",
+    "09:24 verify (model): Checked learning_kit delivery_eta: unknown (STATUS_UNKNOWN); the status stays unverified.",
+    "09:26 verify (model): Checked backup_learning_kit availability: unknown (STATUS_UNKNOWN); the status stays unverified.",
+    "09:26 keep (model): The tool-use agent ended its turn with 'keep' at revision 1: plan v1 stands; latest evaluation eval_0001 at revision 1: 3 feasible, 3 applicable now.",
+    "09:45 keep (model): The tool-use agent ended its turn with 'keep' at revision 3: plan v1 stands; latest evaluation eval_0002 at revision 3: 3 feasible, 3 applicable now.",
+    "09:50 keep (model): The tool-use agent ended its turn with 'keep' at revision 5: plan v1 stands; latest evaluation eval_0003 at revision 5: 3 feasible, 3 applicable now.",
+    "09:55 keep (model): The tool-use agent ended its turn with 'keep' at revision 6: plan v1 stands; latest evaluation eval_0004 at revision 6: 3 feasible, 3 applicable now.",
+    "10:06 commit (model): Applied candidate cand_0005_b7ee3104 (report rpt_0005_b7ee3104), revision 8 -> 9: Applied Swap practice and peer exchange as plan v2",
+    "10:06 keep (model): The tool-use agent ended its turn with 'keep' at revision 9: plan v2 stands; latest evaluation eval_0006 at revision 9: 2 feasible, 2 applicable now.",
+    "10:06 stop (host): Episode cap reached: 8 of 8 model calls used (development-phase caps). The coordinator policy is not woken again in this episode; the accepted plan and every commitment stay as they are."
+   ],
+   "what_happened": "Under prompt tool_use.v2 the model checked the learning kit twice (09:22, 09:24) and the backup learning kit once (09:26), every answer STATUS_UNKNOWN, and kept plan v1 through the check-ins and the kit's arrival record (09:45-09:55); after the peer lead's check-in it applied the swap of practice and peer exchange at 10:06 (revision 8 to 9), and its eighth model call, a 'keep' right after, reached the cap at 10:06 with the new plan in place."
+  },
+  {
+   "label": "p2-live_dev01",
+   "policy": "live",
+   "policy_id": "live/1.0.0",
+   "case_ref": "dev01",
+   "status": "recorded",
+   "superseded_by": null,
+   "superseded_reason": null,
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "matches_expectation": true,
+   "outcome_line": "dev01: goal_complete=True infeasibility_reported=False applied_plans=1 committed=0 violations=0 matches_expectation=True",
+   "error": null,
+   "model_calls": 3,
+   "model_calls_by_purpose": {
+    "choose_action": 2,
+    "interpret": 1
+   },
+   "tool_calls": 24,
+   "caps_reached": [],
+   "cost_usd": 0.03662,
+   "prompts": [
+    "choose_action.v1",
+    "interpret.v1"
+   ],
+   "model_requested": "anthropic/claude-sonnet-5.5",
+   "model_returned": [
+    "anthropic/claude-sonnet-5.5"
+   ],
+   "started_at": "2026-10-25T06:33:02Z",
+   "run_record": "reports/live_p2-live_dev01_run.json",
+   "trace_file": "traces/live_p2-live_dev01_trace.json",
+   "trace_sha256": "ca3bf92af0bc9b6faa1926fca077fdf7d4327595d6de0875f5f370b7f66f38af",
+   "trace_verify": "intact",
+   "steps": [
+    "16:42 verify (model): Checked projector delivery_eta: delayed, expected, reported ETA 17:25 (obs_0001); notice obs_notice_01 corroborated.",
+    "16:43 commit (model): Applied Swap demonstrations and skills exchange (cand_0002_dc26f35f, report rpt_0002_dc26f35f): changed demonstrations, skills_exchange, additional committed 0 cents, revision 4 -> 5; the current plan fails arrival_assumptions."
+   ],
+   "what_happened": "The model queried the projector (delayed, ETA 17:25); the next model call consumed that result and applied the free swap at 16:43, and the server kept plan v2 to the end."
+  },
+  {
+   "label": "p2-live_dev02",
+   "policy": "live",
+   "policy_id": "live/1.0.0",
+   "case_ref": "dev02",
+   "status": "recorded",
+   "superseded_by": null,
+   "superseded_reason": null,
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "matches_expectation": true,
+   "outcome_line": "dev02: goal_complete=True infeasibility_reported=False applied_plans=1 committed=3500 violations=0 matches_expectation=True",
+   "error": null,
+   "model_calls": 6,
+   "model_calls_by_purpose": {
+    "choose_action": 5,
+    "interpret": 1
+   },
+   "tool_calls": 32,
+   "caps_reached": [],
+   "cost_usd": 0.07613,
+   "prompts": [
+    "choose_action.v1",
+    "interpret.v1"
+   ],
+   "model_requested": "anthropic/claude-sonnet-5.5",
+   "model_returned": [
+    "anthropic/claude-sonnet-5.5"
+   ],
+   "started_at": "2026-10-25T06:33:15Z",
+   "run_record": "reports/live_p2-live_dev02_run.json",
+   "trace_file": "traces/live_p2-live_dev02_trace.json",
+   "trace_sha256": "fd06e4b7e7643e56d48690c1cd1388d20c01e7297044c4b0c3bd463c923aca13",
+   "trace_verify": "intact",
+   "steps": [
+    "16:42 verify (model): Checked projector delivery_eta: delayed, expected, reported ETA 17:45 (obs_0001); notice obs_notice_01 corroborated.",
+    "16:44 verify (model): Checked backup_projector availability: available, available (obs_0002).",
+    "16:45 prepare (model): Held backup_projector for demonstrations (hold hold_0001, expires 16:55) to keep Use backup_projector instead of projector for demonstrations open; reserved 3500 cents, refundable on release or expiry.",
+    "16:45 ask (model): Asked the organizer to raise max_total_committed_cents of grant_coordinator_demo from 0 to 3500 cents so Use backup_projector instead of projector for demonstrations can be applied; hold hold_0001 keeps the option open until 16:55.",
+    "16:48 commit (model): Applied Use backup_projector instead of projector for demonstrations (cand_0005_f5fc676f, report rpt_0005_f5fc676f): changed demonstrations, additional committed 3500 cents, revision 7 -> 8; the current plan fails arrival_assumptions."
+   ],
+   "what_happened": "The model queried the projector (ETA 17:45) and the backup's availability, held the backup at 16:45, asked the organizer to raise the committed limit from 0 to 3500, and applied the paid substitution at 16:48 after the scripted organizer's answer."
+  },
+  {
+   "label": "p2-live_dev04",
+   "policy": "live",
+   "policy_id": "live/1.0.0",
+   "case_ref": "dev04",
+   "status": "recorded",
+   "superseded_by": null,
+   "superseded_reason": null,
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "matches_expectation": true,
+   "outcome_line": "dev04: goal_complete=True infeasibility_reported=False applied_plans=0 committed=0 violations=0 matches_expectation=True",
+   "error": null,
+   "model_calls": 3,
+   "model_calls_by_purpose": {
+    "choose_action": 1,
+    "interpret": 2
+   },
+   "tool_calls": 25,
+   "caps_reached": [],
+   "cost_usd": 0.02979,
+   "prompts": [
+    "choose_action.v1",
+    "interpret.v1"
+   ],
+   "model_requested": "anthropic/claude-sonnet-5.5",
+   "model_returned": [
+    "anthropic/claude-sonnet-5.5"
+   ],
+   "started_at": "2026-10-25T06:33:39Z",
+   "run_record": "reports/live_p2-live_dev04_run.json",
+   "trace_file": "traces/live_p2-live_dev04_trace.json",
+   "trace_sha256": "b73171ed9c9bd85be29898f91450132dbf4c5942a09662663a5a89968653a679",
+   "trace_verify": "intact",
+   "steps": [
+    "16:42 verify (model): Checked projector delivery_eta: on_schedule, expected, reported ETA 16:58 (obs_0001); notice obs_notice_01 contradicted."
+   ],
+   "what_happened": "The model queried the projector (on schedule, ETA 16:58) and the server kept plan v1; the stale P09 reminder was recorded inapplicable (P09 is not the booking P17, 29 October is not the event date) and its forwarded copy duplicate, with no hold, change or spend."
+  },
+  {
+   "label": "p2-live_pantry_dev01",
+   "policy": "live",
+   "policy_id": "live/1.0.0",
+   "case_ref": "pantry_dev01",
+   "status": "recorded",
+   "superseded_by": null,
+   "superseded_reason": null,
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "matches_expectation": true,
+   "outcome_line": "pantry_dev01: goal_complete=True infeasibility_reported=False applied_plans=1 committed=0 violations=0 matches_expectation=True",
+   "error": null,
+   "model_calls": 4,
+   "model_calls_by_purpose": {
+    "choose_action": 4
+   },
+   "tool_calls": 21,
+   "caps_reached": [],
+   "cost_usd": 0.045208,
+   "prompts": [
+    "choose_action_pantry.v1"
+   ],
+   "model_requested": "anthropic/claude-sonnet-5.5",
+   "model_returned": [
+    "anthropic/claude-sonnet-5.5"
+   ],
+   "started_at": "2026-10-25T06:33:50Z",
+   "run_record": "reports/live_p2-live_pantry_dev01_run.json",
+   "trace_file": "traces/live_p2-live_pantry_dev01_trace.json",
+   "trace_sha256": "909bd4a71cefe0bd66408bf67320d1fd7627877a89ad8d695dd7d7666cc82c44",
+   "trace_verify": "intact",
+   "steps": [
+    "12:31 ask (model): Asked staff to hand off 16 units from partner_stock into pantry_stock: hold hold_0001 on partner_stock (the local staff task, expires 12:50) reserves them and moves nothing; only a staff-recorded receipt moves stock; their response is due at 12:33.",
+    "12:31 wait (model): Chose to wait: Change nothing now; look again until 12:33. Plan v1 is unchanged.",
+    "12:34 prepare (model): Held 40 units of pantry_stock for kits_40 (distribution) (hold hold_0002, expires 13:04) so Allocate pantry_stock to kits_40 (distribution) can be applied; a hold reserves units and serves nobody.",
+    "12:35 commit (model): Applied Allocate pantry_stock to kits_40 (distribution) (cand_0004_0e7eb095, report rpt_0004_0e7eb095): changed distribution, additional committed 0 cents, revision 6 -> 7; it covers 40 of 40 kits_40 on time, its stock holds are now committed allocations, and only a staff-recorded distribution serves anyone."
+   ],
+   "what_happened": "The model asked staff for the 16-kit handoff at 12:31 (a stock_transfer hold), waited for the labeled staff simulator's receipt at 12:33 (24/16 to 40/0), held the 40 pantry kits at 12:34 and applied the allocation at 12:35; staff distributed 40 of 40 on time at 13:40 and S20 stayed 20 unreceived."
+  },
+  {
+   "label": "p2-live_skills_dev01",
+   "policy": "live",
+   "policy_id": "live/1.0.0",
+   "case_ref": "skills_dev01",
+   "status": "recorded",
+   "superseded_by": null,
+   "superseded_reason": null,
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "matches_expectation": true,
+   "outcome_line": "skills_dev01: goal_complete=True infeasibility_reported=False applied_plans=1 committed=0 violations=0 matches_expectation=True",
+   "error": null,
+   "model_calls": 2,
+   "model_calls_by_purpose": {
+    "choose_action": 1,
+    "interpret": 1
+   },
+   "tool_calls": 25,
+   "caps_reached": [],
+   "cost_usd": 0.017474,
+   "prompts": [
+    "choose_action.v1",
+    "interpret.v1"
+   ],
+   "model_requested": "anthropic/claude-sonnet-5.5",
+   "model_returned": [
+    "anthropic/claude-sonnet-5.5"
+   ],
+   "started_at": "2026-10-25T06:34:07Z",
+   "run_record": "reports/live_p2-live_skills_dev01_run.json",
+   "trace_file": "traces/live_p2-live_skills_dev01_trace.json",
+   "trace_sha256": "7112d5da205e6f8190a6ea218196dd7062352a54c52ec2c99ec9233571d45edf",
+   "trace_verify": "intact",
+   "steps": [
+    "10:06 commit (model): Applied Swap practice and peer exchange (cand_0007_b7ee3104, report rpt_0007_b7ee3104): changed practice, peer_exchange, additional committed 0 cents, revision 8 -> 9; the current plan fails participant_availability."
+   ],
+   "what_happened": "The server kept plan v1 until the peer lead's check-in made it fail participant_availability; the model then applied the free swap of practice and peer exchange at 10:06."
+  },
+  {
+   "label": "p3-verify-all_dev01",
+   "policy": "verify-all",
+   "policy_id": "verify-all/1.0.0",
+   "case_ref": "dev01",
+   "status": "recorded",
+   "superseded_by": null,
+   "superseded_reason": null,
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "matches_expectation": true,
+   "outcome_line": "dev01: goal_complete=True infeasibility_reported=False applied_plans=1 committed=0 violations=0 matches_expectation=True",
+   "error": null,
+   "model_calls": 2,
+   "model_calls_by_purpose": {
+    "choose_action": 1,
+    "interpret": 1
+   },
+   "tool_calls": 24,
+   "caps_reached": [],
+   "cost_usd": 0.019768,
+   "prompts": [
+    "choose_action.v1",
+    "interpret.v1"
+   ],
+   "model_requested": "anthropic/claude-sonnet-5.5",
+   "model_returned": [
+    "anthropic/claude-sonnet-5.5"
+   ],
+   "started_at": "2026-10-25T06:34:17Z",
+   "run_record": "reports/live_p3-verify-all_dev01_run.json",
+   "trace_file": "traces/live_p3-verify-all_dev01_trace.json",
+   "trace_sha256": "02923c8f43bf2443437e45b3f201297cdc8834cdaa1551234587e443d98935bd",
+   "trace_verify": "intact",
+   "steps": [
+    "16:42 verify (server): Verify-all check of projector delivery_eta (subject of unanswered notice obs_notice_01): delayed, expected, reported ETA 17:25 (obs_0001).",
+    "16:44 verify (server): Verify-all check of backup_projector availability (approved substitute of projector (obs_notice_01)): available, available (obs_0002).",
+    "16:45 commit (model): Applied Swap demonstrations and skills exchange (cand_0001_dc26f35f, report rpt_0001_dc26f35f): changed demonstrations, skills_exchange, additional committed 0 cents, revision 5 -> 6; the current plan fails arrival_assumptions."
+   ],
+   "what_happened": "Before the first choice the server checked the projector (delayed, ETA 17:25) and its approved substitute (available) under the relevance rule; the model then applied the free swap at 16:45."
+  },
+  {
+   "label": "p3-verify-all_dev02",
+   "policy": "verify-all",
+   "policy_id": "verify-all/1.0.0",
+   "case_ref": "dev02",
+   "status": "recorded",
+   "superseded_by": null,
+   "superseded_reason": null,
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "matches_expectation": true,
+   "outcome_line": "dev02: goal_complete=True infeasibility_reported=False applied_plans=1 committed=3500 violations=0 matches_expectation=True",
+   "error": null,
+   "model_calls": 4,
+   "model_calls_by_purpose": {
+    "choose_action": 3,
+    "interpret": 1
+   },
+   "tool_calls": 29,
+   "caps_reached": [],
+   "cost_usd": 0.047568,
+   "prompts": [
+    "choose_action.v1",
+    "interpret.v1"
+   ],
+   "model_requested": "anthropic/claude-sonnet-5.5",
+   "model_returned": [
+    "anthropic/claude-sonnet-5.5"
+   ],
+   "started_at": "2026-10-25T06:34:25Z",
+   "run_record": "reports/live_p3-verify-all_dev02_run.json",
+   "trace_file": "traces/live_p3-verify-all_dev02_trace.json",
+   "trace_sha256": "c9163ee2aedec60f612f5a6762babe38aae44324f8a4efa02882141acdef7ac5",
+   "trace_verify": "intact",
+   "steps": [
+    "16:42 verify (server): Verify-all check of projector delivery_eta (subject of unanswered notice obs_notice_01): delayed, expected, reported ETA 17:45 (obs_0001).",
+    "16:44 verify (server): Verify-all check of backup_projector availability (approved substitute of projector (obs_notice_01)): available, available (obs_0002).",
+    "16:45 prepare (model): Held backup_projector for demonstrations (hold hold_0001, expires 16:55) to keep Use backup_projector instead of projector for demonstrations open; reserved 3500 cents, refundable on release or expiry.",
+    "16:45 ask (model): Asked the organizer to raise max_total_committed_cents of grant_coordinator_demo from 0 to 3500 cents so Use backup_projector instead of projector for demonstrations can be applied; hold hold_0001 keeps the option open until 16:55.",
+    "16:48 commit (model): Applied Use backup_projector instead of projector for demonstrations (cand_0003_f5fc676f, report rpt_0003_f5fc676f): changed demonstrations, additional committed 3500 cents, revision 7 -> 8; the current plan fails arrival_assumptions."
+   ],
+   "what_happened": "The server checked the projector (ETA 17:45) and the backup (available); the model held the backup at 16:45, asked the organizer to raise the committed limit to 3500 and applied the paid substitution at 16:48."
+  },
+  {
+   "label": "p3-verify-all_dev04",
+   "policy": "verify-all",
+   "policy_id": "verify-all/1.0.0",
+   "case_ref": "dev04",
+   "status": "recorded",
+   "superseded_by": null,
+   "superseded_reason": null,
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "matches_expectation": true,
+   "outcome_line": "dev04: goal_complete=True infeasibility_reported=False applied_plans=0 committed=0 violations=0 matches_expectation=True",
+   "error": null,
+   "model_calls": 2,
+   "model_calls_by_purpose": {
+    "interpret": 2
+   },
+   "tool_calls": 24,
+   "caps_reached": [],
+   "cost_usd": 0.014974,
+   "prompts": [
+    "interpret.v1"
+   ],
+   "model_requested": "anthropic/claude-sonnet-5.5",
+   "model_returned": [
+    "anthropic/claude-sonnet-5.5"
+   ],
+   "started_at": "2026-10-25T06:34:42Z",
+   "run_record": "reports/live_p3-verify-all_dev04_run.json",
+   "trace_file": "traces/live_p3-verify-all_dev04_trace.json",
+   "trace_sha256": "cbf084684a3c1cbb9a9a14bb4cf559943d3f75aa5d54875c8635080085e459ac",
+   "trace_verify": "intact",
+   "steps": [
+    "16:42 verify (server): Verify-all check of projector delivery_eta (subject of unanswered notice obs_notice_01): on_schedule, expected, reported ETA 16:58 (obs_0001).",
+    "16:44 verify (server): Verify-all check of backup_projector availability (approved substitute of projector (obs_notice_01)): available, available (obs_0003)."
+   ],
+   "what_happened": "The server checked the projector (on schedule, ETA 16:58) and the backup (available), recorded the stale P09 reminder inapplicable and its copy duplicate, and kept plan v1; the model was called only to read the notices (2 calls)."
+  },
+  {
+   "label": "p3-verify-all_pantry_dev01",
+   "policy": "verify-all",
+   "policy_id": "verify-all/1.0.0",
+   "case_ref": "pantry_dev01",
+   "status": "recorded",
+   "superseded_by": null,
+   "superseded_reason": null,
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "matches_expectation": true,
+   "outcome_line": "pantry_dev01: goal_complete=True infeasibility_reported=False applied_plans=1 committed=0 violations=0 matches_expectation=True",
+   "error": null,
+   "model_calls": 4,
+   "model_calls_by_purpose": {
+    "choose_action": 4
+   },
+   "tool_calls": 24,
+   "caps_reached": [],
+   "cost_usd": 0.043494,
+   "prompts": [
+    "choose_action_pantry.v1"
+   ],
+   "model_requested": "anthropic/claude-sonnet-5.5",
+   "model_returned": [
+    "anthropic/claude-sonnet-5.5"
+   ],
+   "started_at": "2026-10-25T06:34:50Z",
+   "run_record": "reports/live_p3-verify-all_pantry_dev01_run.json",
+   "trace_file": "traces/live_p3-verify-all_pantry_dev01_trace.json",
+   "trace_sha256": "3d3bd2b6c49a12e96a6a930b9e970dcba4700853385649040ee3caf43e76c0ed",
+   "trace_verify": "intact",
+   "steps": [
+    "12:32 verify (server): Verify-all check of pantry_stock shipment_eta (pool of a stock option for kits_40 (supply gap)): delayed, expected, reported ETA 14:10 (obs_0001).",
+    "12:34 verify (server): Verify-all check of partner_stock availability (pool of a stock option for kits_40 (supply gap)): available, available (obs_0002).",
+    "12:35 ask (model): Asked staff to hand off 16 units from partner_stock into pantry_stock: hold hold_0001 on partner_stock (the local staff task, expires 12:50) reserves them and moves nothing; only a staff-recorded receipt moves stock; their response is due at 12:37.",
+    "12:35 wait (model): Chose to wait: Change nothing now; look again until 12:37. Plan v1 is unchanged.",
+    "12:38 prepare (model): Held 40 units of pantry_stock for kits_40 (distribution) (hold hold_0002, expires 13:08) so Allocate pantry_stock to kits_40 (distribution) can be applied; a hold reserves units and serves nobody.",
+    "12:39 commit (model): Applied Allocate pantry_stock to kits_40 (distribution) (cand_0004_0e7eb095, report rpt_0004_0e7eb095): changed distribution, additional committed 0 cents, revision 8 -> 9; it covers 40 of 40 kits_40 on time, its stock holds are now committed allocations, and only a staff-recorded distribution serves anyone."
+   ],
+   "what_happened": "The server checked the delayed shipment (ETA 14:10) and the partner pool (available); the model asked staff for the 16-kit handoff at 12:35, waited for the receipt at 12:37 (24/16 to 40/0), held 40 pantry kits at 12:38 and applied the allocation at 12:39; 40 of 40 were distributed on time."
+  },
+  {
+   "label": "p3-verify-all_skills_dev01",
+   "policy": "verify-all",
+   "policy_id": "verify-all/1.0.0",
+   "case_ref": "skills_dev01",
+   "status": "recorded",
+   "superseded_by": null,
+   "superseded_reason": null,
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "matches_expectation": true,
+   "outcome_line": "skills_dev01: goal_complete=True infeasibility_reported=False applied_plans=1 committed=0 violations=0 matches_expectation=True",
+   "error": null,
+   "model_calls": 2,
+   "model_calls_by_purpose": {
+    "choose_action": 1,
+    "interpret": 1
+   },
+   "tool_calls": 28,
+   "caps_reached": [],
+   "cost_usd": 0.018392,
+   "prompts": [
+    "choose_action.v1",
+    "interpret.v1"
+   ],
+   "model_requested": "anthropic/claude-sonnet-5.5",
+   "model_returned": [
+    "anthropic/claude-sonnet-5.5"
+   ],
+   "started_at": "2026-10-25T06:35:07Z",
+   "run_record": "reports/live_p3-verify-all_skills_dev01_run.json",
+   "trace_file": "traces/live_p3-verify-all_skills_dev01_trace.json",
+   "trace_sha256": "3ad5a13edfe190836b9c28937597dcdac73eee1efde23e34a54a06827b23bd27",
+   "trace_verify": "intact",
+   "steps": [
+    "09:22 verify (server): Verify-all check of backup_learning_kit availability (subject of unanswered notice obs_community_offer_01): unknown (STATUS_UNKNOWN); the status stays unverified.",
+    "09:24 verify (server): Verify-all check of backup_learning_kit availability (subject of unanswered notice obs_community_offer_01): unknown (STATUS_UNKNOWN); the status stays unverified.",
+    "10:06 commit (model): Applied Swap practice and peer exchange (cand_0007_b7ee3104, report rpt_0007_b7ee3104): changed practice, peer_exchange, additional committed 0 cents, revision 8 -> 9; the current plan fails participant_availability."
+   ],
+   "what_happened": "The server checked the backup learning kit twice (STATUS_UNKNOWN, then the one bounded retry) and kept plan v1; after the peer lead's check-in the model applied the swap of practice and peer exchange at 10:06."
+  }
+ ],
+ "p0_reference": [
+  {
+   "label": "p0_dev01",
+   "policy": "rules",
+   "policy_id": "rules/1.0.0",
+   "case_ref": "dev01",
+   "status": "deterministic baseline (reports/checks.json)",
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "matches_expectation": true,
+   "model_calls": 0,
+   "tool_calls": 22,
+   "cost_usd": 0.0,
+   "trace_file": null
+  },
+  {
+   "label": "p0_dev02",
+   "policy": "rules",
+   "policy_id": "rules/1.0.0",
+   "case_ref": "dev02",
+   "status": "deterministic baseline (reports/checks.json)",
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "matches_expectation": true,
+   "model_calls": 0,
+   "tool_calls": 30,
+   "cost_usd": 0.0,
+   "trace_file": null
+  },
+  {
+   "label": "p0_dev04",
+   "policy": "rules",
+   "policy_id": "rules/1.0.0",
+   "case_ref": "dev04",
+   "status": "deterministic baseline (reports/checks.json)",
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "matches_expectation": true,
+   "model_calls": 0,
+   "tool_calls": 24,
+   "cost_usd": 0.0,
+   "trace_file": null
+  },
+  {
+   "label": "p0_pantry_dev01",
+   "policy": "rules",
+   "policy_id": "pantry-rules/1.0.0",
+   "case_ref": "pantry_dev01",
+   "status": "deterministic baseline (reports/checks.json)",
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "matches_expectation": true,
+   "model_calls": 0,
+   "tool_calls": 22,
+   "cost_usd": 0.0,
+   "trace_file": "traces/pantry_dev01_trace.json"
+  },
+  {
+   "label": "p0_skills_dev01",
+   "policy": "rules",
+   "policy_id": "rules/1.0.0",
+   "case_ref": "skills_dev01",
+   "status": "deterministic baseline (reports/checks.json)",
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "matches_expectation": true,
+   "model_calls": 0,
+   "tool_calls": 24,
+   "cost_usd": 0.0,
+   "trace_file": "traces/skills_dev01_trace.json"
+  }
+ ],
+ "spend_usd": 2.57984
+}

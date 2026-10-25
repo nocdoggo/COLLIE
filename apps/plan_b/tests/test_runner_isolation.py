@@ -34,8 +34,10 @@ FORBIDDEN_FOR_POLICY_AND_PLANNER = (
     "plan_b.evaluation.export_trace",
 )
 ISOLATED_MODULES = (
+    "evaluation/policies/__init__.py",
     "evaluation/policies/parser.py",
     "evaluation/policies/rules.py",
+    "evaluation/policies/pantry_rules.py",
     "evaluation/policies/base.py",
     "domain/candidates.py",
     "domain/constraints.py",
@@ -45,20 +47,56 @@ ISOLATED_MODULES = (
     "domain/adapters/campus_outcome.py",
     "domain/adapters/outcome.py",
     "domain/adapters/registry.py",
+    "domain/adapters/pantry.py",
     "domain/projection.py",
     "domain/readiness.py",
+    "domain/stock.py",
+    "domain/timeutil.py",
+    # The model-driven policies (Wave 2): everything under agent/ except the G-LLM gate, which
+    # is a harness like the runner (it creates its own temporary episode through the store).
+    "agent/__init__.py",
+    "agent/config.py",
+    "agent/interpret.py",
+    "agent/menu.py",
+    "agent/orchestrator.py",
+    "agent/provider.py",
+    "agent/prompts/__init__.py",
+    "agent/policies/__init__.py",
+    "agent/policies/selective.py",
+    "agent/policies/tool_use.py",
+    "agent/policies/verify_all.py",
 )
+# Modules whose own job is file or network I/O (the provider's spend ledger, its lock file and
+# its HTTP transport): the import rule and the private-path checks still apply; only the
+# literal ``open(`` check does not.
+FILE_IO_MODULES = frozenset({"agent/provider.py"})
+# Harnesses outside the rule (they create their own episodes through the store).
+HARNESS_MODULES = frozenset({"agent/gate.py"})
 
 
-def _imports(path: Path) -> set[str]:
-    tree = ast.parse(path.read_text())
+def _imports(path: Path, source: str | None = None) -> set[str]:
+    """Every module a file names in an import: absolute and relative ones (resolved against its
+    package), and each name a ``from`` import binds (``from plan_b import store`` names
+    ``plan_b.store``)."""
+    tree = ast.parse(path.read_text() if source is None else source)
+    package = ["plan_b", *path.relative_to(PKG).parent.parts]
     out: set[str] = set()
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
             out.update(a.name for a in node.names)
-        elif isinstance(node, ast.ImportFrom) and node.module:
-            out.add(node.module)
+        elif isinstance(node, ast.ImportFrom):
+            parts = package[: len(package) - node.level + 1] if node.level else []
+            base = ".".join([*parts, *([node.module] if node.module else [])])
+            out.add(base)
+            out.update(f"{base}.{a.name}" for a in node.names)
     return out
+
+
+def test_the_import_rule_resolves_relative_and_from_imports() -> None:
+    probe = PKG / "agent" / "policies" / "probe.py"  # never written: the source is given
+    source = "from plan_b import store\nfrom ...scenarios import runner\nfrom .. import menu\n"
+    imports = _imports(probe, source)
+    assert {"plan_b.store", "plan_b.scenarios.runner", "plan_b.agent.menu"} <= imports
 
 
 @pytest.mark.parametrize("module", ISOLATED_MODULES)
@@ -72,7 +110,20 @@ def test_policy_and_planner_cannot_reach_private_input(module: str) -> None:
     ]
     assert bad == [], f"{module} imports {bad}"
     text = path.read_text()
-    assert "PrivateCase" not in text and "scenarios/private" not in text and "open(" not in text
+    assert "PrivateCase" not in text and "scenarios/private" not in text
+    assert "import_module" not in text and "__import__" not in text
+    assert module in FILE_IO_MODULES or "open(" not in text
+
+
+def test_every_policy_module_is_covered_by_the_isolation_rule() -> None:
+    covered = sorted(
+        str(p.relative_to(PKG))
+        for d in ("agent", "evaluation/policies")
+        for p in (PKG / d).rglob("*.py")
+        if "__pycache__" not in p.parts
+    )
+    missing = set(covered) - set(ISOLATED_MODULES) - HARNESS_MODULES
+    assert missing == set(), sorted(missing)
 
 
 def test_leak_checker_detects_planted_leaks() -> None:

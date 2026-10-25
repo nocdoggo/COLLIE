@@ -21,9 +21,27 @@ carries the exact tool, arguments and expectations the server will send; the mod
   (while the plan is in question, also one that no eligible feasible candidate binds);
 * ``wait``: no action until the stated time.
 
-Apply, hold and ask are offered only while the plan is in question: the keep candidate is not
-applicable (or not robust), or an unanswered material notice threatens it. Otherwise the menu is
-keep and wait (plus releases), and a menu without a real choice needs no model call.
+Consumable profiles (runtime 1.1.0, the pantry) add two stock options, built from the pantry
+adapter's own candidates and the visible stock state, exactly as the deterministic baseline
+reads them:
+
+* ``handoff:<source>:<destination>:<quantity>``: ask staff for a handoff. The option holds the
+  candidate's outstanding transfer units on the alternate pool (``purpose: stock_transfer``);
+  that hold is the local staff task, and only a staff-recorded receipt moves stock. Offered once
+  per (source, destination) pair, inside the handoff window, while the source has the units;
+* ``hold:<pool>:<target>:<quantity>``: hold the units a candidate without pending transfers
+  still needs on its pool for the target (``hold_resource`` with a quantity), when the pool has
+  them available. ``apply:<candidate_id>`` then commits them as allocations.
+
+Staff-only tools (``record_stock_receipt``, ``record_distribution``) are never an option: the
+agent asks for the handoff, and the committed allocation is what staff distribute.
+
+An apply that would change nothing (no changed activity, no hold) is never offered: the executor
+refuses it. Apply, hold and ask are offered only while the plan is in question: the keep
+candidate is not applicable (or not robust), or an unanswered material notice threatens it, or
+(consumable profiles) a pursuable candidate would leave less of a service target unfulfilled
+than the keep candidate (``stock_improvable``). Otherwise the menu is keep and wait (plus
+releases), and a menu without a real choice needs no model call.
 
 Intents (``intent``) name the same choice independently of evaluation-scoped ids, so a menu can
 be compared across evaluations.
@@ -42,9 +60,14 @@ from plan_b.domain.models import (
     EvaluationResult,
     EventStateView,
     GrantView,
+    HandoffTaskView,
     HoldResourceArgs,
+    HoldView,
     QueryStatusArgs,
     ReleaseHoldArgs,
+    RequiredStockHold,
+    StockTransferNeed,
+    TimeWindow,
 )
 from plan_b.domain.timeutil import local_label
 
@@ -56,7 +79,14 @@ ASK_REASON_LIMIT = 400
 NOT_STARTED = ("planned", "ready")
 
 MenuAction = Literal[
-    "keep", "wait", "query_status", "hold_resource", "apply_plan", "ask", "release_hold"
+    "keep",
+    "wait",
+    "query_status",
+    "hold_resource",
+    "apply_plan",
+    "ask",
+    "release_hold",
+    "request_handoff",
 ]
 
 
@@ -78,6 +108,9 @@ class MenuOption:
     activity_id: str | None = None
     authorization_request: AuthorizationRequest | None = None
     wait_until: datetime | None = None
+    quantity: int | None = None  # consumable holds and handoffs
+    service_target_id: str | None = None
+    destination_resource_id: str | None = None
 
     def for_model(self) -> dict[str, Any]:
         return {"option_id": self.option_id, "action": self.action, "summary": self.summary}
@@ -186,6 +219,10 @@ def build_menu(view: EventStateView, ev: EvaluationResult, inputs: MenuInputs) -
                 options.extend(_apply_options(view, ev, eligible))
             if "hold_resource" in allowed:
                 options.extend(_hold_options(view, ev, grant, inputs, scope, eligible, keep_ok))
+                if view.stock is not None:
+                    options.extend(
+                        _stock_options(view, ev, grant, inputs, scope, eligible, keep_ok)
+                    )
             options.extend(_ask_options(view, ev, grant, inputs, eligible))
         if "release_hold" in allowed:
             options.extend(_release_options(view, ev, inputs, eligible))
@@ -274,6 +311,8 @@ def _apply_options(view: EventStateView, ev: EvaluationResult, eligible: Any) ->
             break
         if not c.applicable_now or c.candidate_id == ev.keep_candidate_id or not eligible(c):
             continue
+        if keeps_the_plan(c):
+            continue  # the executor refuses it: keeping a plan needs no mutation
         out.append(
             MenuOption(
                 option_id=f"apply:{c.candidate_id}",
@@ -462,13 +501,14 @@ def _ask_options(
 def _release_options(
     view: EventStateView, ev: EvaluationResult, inputs: MenuInputs, eligible: Any
 ) -> list[MenuOption]:
-    bound = {
-        rh.bound_hold_id
+    feasible = [
+        c
         for c in ev.candidates
         if c.constraint_status == "feasible_under_assumptions" and eligible(c)
-        for rh in c.required_holds
-        if rh.bound_hold_id
-    }
+    ]
+    bound = {rh.bound_hold_id for c in feasible for rh in c.required_holds if rh.bound_hold_id}
+    bound |= {h for c in feasible for rsh in c.required_stock_holds for h in rsh.bound_hold_ids}
+    bound |= {h for c in feasible for need in c.stock_transfers for h in need.bound_hold_ids}
     out: list[MenuOption] = []
     for hold in view.holds:
         if hold.actor_id != inputs.principal or hold.effective_status != "active":
@@ -506,6 +546,315 @@ def _release_options(
             )
         )
     return out
+
+
+def _stock_options(
+    view: EventStateView,
+    ev: EvaluationResult,
+    grant: GrantView,
+    inputs: MenuInputs,
+    scope: set[str],
+    eligible: Any,
+    keep_ok: bool,
+) -> list[MenuOption]:
+    """Handoff requests and quantity holds that keep a feasible stock candidate open, in the
+    candidates' rank order (the same candidates ``hold_candidates`` names)."""
+    activities = set(grant.grant.activity_ids)
+    out: list[MenuOption] = []
+    seen: set[str] = set()
+    for c in hold_candidates(ev, eligible, keep_ok):
+        if len(out) >= MAX_HOLD_OPTIONS:
+            break
+        covers = coverage_text(c)
+        for need in c.stock_transfers:
+            quantity = handoff_quantity(view, inputs, scope, activities, need)
+            window = _activity_window(c, need.activity_id)
+            intent = f"handoff:{need.source_resource_id}:{need.destination_resource_id}:{quantity}"
+            if not quantity or window is None or intent in seen:
+                continue
+            seen.add(intent)
+            params = view.pantry_parameters
+            latency = f"about {params.handoff_duration_minutes} min" if params else "later"
+            closes = (
+                "; the handoff window closes "
+                f"{local_label(params.handoff_window.end, view.timezone)}"
+                if params
+                else ""
+            )
+            out.append(
+                MenuOption(
+                    option_id=intent,
+                    action="request_handoff",
+                    intent=intent,
+                    summary=f"Ask staff to hand off {quantity} units from {need.source_resource_id}"
+                    f" into {need.destination_resource_id}: holds them on "
+                    f"{need.source_resource_id} (purpose stock_transfer, the local staff task) to "
+                    f"keep {c.label} ({c.candidate_id}, {covers}) open; staff respond after "
+                    f"{latency}{closes}. Only a staff-recorded receipt moves stock.",
+                    tool="hold_resource",
+                    arguments=HoldResourceArgs(
+                        resource_id=need.source_resource_id,
+                        activity_id=need.activity_id,
+                        window=window,
+                        quantity=quantity,
+                        purpose="stock_transfer",
+                        destination_resource_id=need.destination_resource_id,
+                    ).model_dump(mode="json"),
+                    expected_revision=ev.revision,
+                    candidate_id=c.candidate_id,
+                    signature=c.signature,
+                    resource_id=need.source_resource_id,
+                    activity_id=need.activity_id,
+                    quantity=quantity,
+                    service_target_id=need.service_target_id,
+                    destination_resource_id=need.destination_resource_id,
+                )
+            )
+        if c.stock_transfers:
+            continue  # its own pool holds come after the handoff
+        for rh in c.required_stock_holds:
+            quantity = stock_hold_quantity(view, scope, activities, rh)
+            window = _activity_window(c, rh.activity_id)
+            intent = f"hold:{rh.resource_id}:{rh.service_target_id}:{quantity}"
+            if not quantity or window is None or intent in seen:
+                continue
+            seen.add(intent)
+            out.append(
+                MenuOption(
+                    option_id=intent,
+                    action="hold_resource",
+                    intent=intent,
+                    summary=f"Hold {quantity} units of {rh.resource_id} for {rh.service_target_id}"
+                    f" ({rh.activity_id}) so {c.label} ({c.candidate_id}, {covers}) can be "
+                    f"applied: {rh.held_quantity} of the {rh.quantity} it needs are held now. A "
+                    "hold reserves units and serves nobody.",
+                    tool="hold_resource",
+                    arguments=HoldResourceArgs(
+                        resource_id=rh.resource_id,
+                        activity_id=rh.activity_id,
+                        window=window,
+                        quantity=quantity,
+                        service_target_id=rh.service_target_id,
+                    ).model_dump(mode="json"),
+                    expected_revision=ev.revision,
+                    candidate_id=c.candidate_id,
+                    signature=c.signature,
+                    resource_id=rh.resource_id,
+                    activity_id=rh.activity_id,
+                    quantity=quantity,
+                    service_target_id=rh.service_target_id,
+                )
+            )
+    return out
+
+
+def handoff_quantity(
+    view: EventStateView,
+    inputs: MenuInputs,
+    scope: set[str],
+    activities: set[str],
+    need: StockTransferNeed,
+) -> int:
+    """Units a handoff request for ``need`` would hold now, 0 when none can be requested: one
+    request per (source, destination) pair, inside the handoff window (a staff answer must be
+    possible before it closes), within scope, and no more than the source has available."""
+    params = view.pantry_parameters
+    quantity = need.quantity - need.held_quantity
+    if params is None or quantity <= 0:
+        return 0
+    if need.source_resource_id not in scope or need.destination_resource_id not in scope:
+        return 0
+    if need.activity_id not in activities:
+        return 0
+    if own_transfer_holds(view, inputs.principal, need):
+        return 0
+    effective = inputs.now + timedelta(minutes=view.tool_durations_minutes.get("hold_resource", 0))
+    answer = effective + timedelta(minutes=params.handoff_duration_minutes)
+    if effective < params.handoff_window.start or answer >= params.handoff_window.end:
+        return 0
+    if need.handoff_cutoff is not None and answer >= need.handoff_cutoff:
+        return 0
+    return quantity if quantity <= available_quantity(view, need.source_resource_id) else 0
+
+
+def stock_hold_quantity(
+    view: EventStateView, scope: set[str], activities: set[str], rh: RequiredStockHold
+) -> int:
+    """Units still to hold for ``rh``, 0 when it is bound, out of scope or not available."""
+    quantity = rh.quantity - rh.held_quantity
+    if rh.bound_hold_ids or quantity <= 0:
+        return 0
+    if rh.resource_id not in scope or rh.activity_id not in activities:
+        return 0
+    return quantity if quantity <= available_quantity(view, rh.resource_id) else 0
+
+
+def available_quantity(view: EventStateView, resource_id: str) -> int:
+    stock = view.stock
+    if stock is None:
+        return 0
+    return next((b.available_quantity for b in stock.balances if b.resource_id == resource_id), 0)
+
+
+def own_transfer_holds(
+    view: EventStateView, principal: str, need: StockTransferNeed
+) -> list[HoldView]:
+    """This principal's stock-transfer holds (any status) for the need's pool pair."""
+    return [
+        h
+        for h in view.holds
+        if h.consumable
+        and h.actor_id == principal
+        and h.purpose == "stock_transfer"
+        and h.resource_id == need.source_resource_id
+        and h.destination_resource_id == need.destination_resource_id
+    ]
+
+
+def handoff_task(view: EventStateView, hold_id: str) -> HandoffTaskView | None:
+    if view.stock is None:
+        return None
+    return next((t for t in view.stock.handoff_tasks if t.hold_id == hold_id), None)
+
+
+def awaited_handoffs(
+    view: EventStateView, principal: str, now: datetime
+) -> list[tuple[HoldView, HandoffTaskView]]:
+    """Own live stock-transfer holds whose staff task is still open before its cutoff."""
+    out: list[tuple[HoldView, HandoffTaskView]] = []
+    for h in view.holds:
+        if not h.consumable or h.actor_id != principal or h.purpose != "stock_transfer":
+            continue
+        task = handoff_task(view, h.hold_id)
+        if (
+            h.effective_status == "active"
+            and task is not None
+            and task.status == "open"
+            and now < task.cutoff
+        ):
+            out.append((h, task))
+    return out
+
+
+@dataclass(frozen=True)
+class Shortfall:
+    """A target the kept plan covers only in part, read as the deterministic pantry baseline
+    reads it: what blocks better coverage (the failed checks of candidates that would allocate
+    more, ``stock_transfer`` for one that waits on a handoff, else ``stock_on_hand``)."""
+
+    target_id: str
+    target_quantity: int
+    covered_quantity: int
+    shortfall_quantity: int
+    blocking_constraints: tuple[str, ...]
+    better: tuple[CandidateResult, ...]  # candidates that would allocate more
+
+    def details(self) -> dict[str, Any]:
+        return {
+            "target_id": self.target_id,
+            "covered_quantity": self.covered_quantity,
+            "shortfall_quantity": self.shortfall_quantity,
+            "blocking_constraints": list(self.blocking_constraints),
+        }
+
+
+def shortfalls(ev: EvaluationResult) -> list[Shortfall]:
+    """The keep candidate's under-covered service targets (consumable profiles)."""
+    keep = next((c for c in ev.candidates if c.candidate_id == ev.keep_candidate_id), None)
+    out: list[Shortfall] = []
+    for coverage in keep.service_coverage if keep is not None else ():
+        if not coverage.unfulfilled_quantity:
+            continue
+        better = tuple(
+            c
+            for c in ev.candidates
+            if any(
+                x.target_id == coverage.target_id
+                and x.allocated_quantity > coverage.allocated_quantity
+                for x in c.service_coverage
+            )
+        )
+        named: set[str] = set()
+        for c in better:
+            failed = [k.constraint_id for k in c.checks if k.status == "failed"]
+            named.update(failed or (["stock_transfer"] if c.stock_transfers else []))
+        out.append(
+            Shortfall(
+                target_id=coverage.target_id,
+                target_quantity=coverage.target_quantity,
+                covered_quantity=coverage.allocated_quantity,
+                shortfall_quantity=coverage.unfulfilled_quantity,
+                blocking_constraints=tuple(sorted(named) or ["stock_on_hand"]),
+                better=better,
+            )
+        )
+    return out
+
+
+def keeps_the_plan(c: CandidateResult) -> bool:
+    """A candidate that changes no activity and needs no hold: applying it is a no-op the
+    executor refuses (``UNSUPPORTED_ACTION``), as the deterministic baselines know."""
+    return not c.changed_activity_ids and not c.required_holds and not c.required_stock_holds
+
+
+def unfulfilled(c: CandidateResult) -> int:
+    return sum(s.unfulfilled_quantity for s in c.service_coverage)
+
+
+def coverage_text(c: CandidateResult) -> str:
+    return (
+        "; ".join(
+            f"covers {s.on_time_quantity} of {s.target_quantity} {s.target_id} on time"
+            for s in c.service_coverage
+        )
+        or "no service target"
+    )
+
+
+def stock_improvable(
+    view: EventStateView, ev: EvaluationResult, inputs: MenuInputs, eligible: Any
+) -> bool:
+    """Consumable profiles: whether a feasible candidate that can still be pursued (applicable
+    now, a handoff it needs can be requested or is awaited, or its pool units can be held) would
+    leave less of a service target unfulfilled than the keep candidate."""
+    if view.stock is None:
+        return False
+    grant = own_grant(view, inputs.principal)
+    keep = next((c for c in ev.candidates if c.candidate_id == ev.keep_candidate_id), None)
+    if grant is None or keep is None:
+        return False
+    scope, activities = set(grant.grant.resource_ids), set(grant.grant.activity_ids)
+    awaited = {
+        (h.resource_id, h.destination_resource_id)
+        for h, _ in awaited_handoffs(view, inputs.principal, inputs.now)
+    }
+
+    def pursuable(c: CandidateResult) -> bool:
+        if c.applicable_now:
+            return not keeps_the_plan(c)
+        if c.stock_transfers:
+            return all(
+                handoff_quantity(view, inputs, scope, activities, need) > 0
+                or (need.source_resource_id, need.destination_resource_id) in awaited
+                for need in c.stock_transfers
+            )
+        return all(
+            rh.bound_hold_ids or stock_hold_quantity(view, scope, activities, rh) > 0
+            for rh in c.required_stock_holds
+        )
+
+    return any(
+        c.constraint_status == "feasible_under_assumptions"
+        and eligible(c)
+        and unfulfilled(c) < unfulfilled(keep)
+        and pursuable(c)
+        for c in ev.candidates
+    )
+
+
+def _activity_window(c: CandidateResult, activity_id: str) -> TimeWindow | None:
+    a = next((a for a in c.assignments if a.activity_id == activity_id), None)
+    return TimeWindow(start=a.start, end=a.end) if a is not None else None
 
 
 def ask_reason(

@@ -1163,10 +1163,6 @@ textarea {
   background: var(--surface);
 }
 
-.mode-live.policy-live {
-  background: var(--replay-bg);
-}
-
 .mode-note {
   font-weight: 500;
 }
@@ -1203,10 +1199,19 @@ textarea {
 }
 
 .model-figures {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 0.25rem 1rem;
   margin: 0.25rem 0;
+}
+
+.model-figures > div {
+  flex: 1 1 6rem;
+}
+
+/* The returned model id gets the widest cell, so it does not break mid-name on a projector. */
+.model-figures > div:first-child {
+  flex: 2 1 15rem;
 }
 
 .model-figures dt {
@@ -1238,7 +1243,7 @@ textarea {
 
 .counter-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
   gap: 0.5rem;
   margin: 0.5rem 0;
 }
@@ -1258,6 +1263,10 @@ textarea {
 
 .counter dd {
   margin: 0;
+}
+
+.counter .sub {
+  font-size: 0.8rem;
 }
 
 .counter-value {

@@ -4,8 +4,9 @@ Endpoints are synchronous (FastAPI runs them in a thread pool); every write uses
 ``BEGIN IMMEDIATE`` transaction, so concurrent requests serialize at SQLite.
 
 The moderator chooses each episode's coordinator policy (``rules``: the profile's deterministic
-baseline; ``live``: the live agent) when loading it or before its coordinator first acts.
-Selecting the live policy reads its endpoint configuration on the server and calls no model.
+baseline, P0; ``tool-use``: P1; ``live`` or ``selective``: the live agent, P2; ``verify-all``: P3)
+when loading it or before its coordinator first acts. Selecting a model-driven policy reads its
+endpoint configuration on the server and calls no model.
 """
 
 from __future__ import annotations
@@ -16,7 +17,7 @@ import re
 import secrets
 from collections.abc import Callable, Iterable
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any
 
 from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse
@@ -41,6 +42,7 @@ from plan_b.scenarios.policy_host import (
     PolicyChoice,
     PolicyHost,
     PolicyLockedError,
+    canonical_choice,
 )
 from plan_b.scenarios.runner import tick_loop
 from plan_b.store import repo
@@ -76,11 +78,11 @@ class CodeBody(_Body):
 class EpisodeBody(_Body):
     scenario_id: str | None = None  # default: the case's own public scenario
     case_ref: str
-    policy: Literal["rules", "live"] = "rules"
+    policy: PolicyChoice = "rules"
 
 
 class PolicySelectBody(_Body):
-    policy: Literal["rules", "live"]
+    policy: PolicyChoice
 
 
 class SessionBody(_Body):
@@ -159,6 +161,14 @@ def create_app(
     app.state.db = db
     app.state.host = host
 
+    @app.exception_handler(ModelConfigError)
+    def model_not_configured(request: Request, exc: ModelConfigError) -> JSONResponse:
+        # A restarted server resolves a model-driven episode's policy from its decisions; without
+        # the endpoint configuration that is the same described 400 as a selection, never a 500.
+        return JSONResponse(
+            {"detail": {"code": "MODEL_NOT_CONFIGURED", "message": str(exc)}}, status_code=400
+        )
+
     def session_of(authorization: str | None) -> Session:
         with db.read() as conn:
             try:
@@ -187,7 +197,7 @@ def create_app(
 
     def factory(choice: PolicyChoice, profile_id: str) -> Callable[[], Policy]:
         try:
-            return factories(choice, profile_id)
+            return factories(canonical_choice(choice), profile_id)
         except ModelConfigError as exc:
             raise HTTPException(
                 status_code=400,
@@ -346,7 +356,7 @@ def create_app(
                     " scenario_id to load the case's own",
                 },
             )
-        # A live policy's configuration is checked before anything is reset.
+        # A model-driven policy's configuration is checked before anything is reset.
         chosen = factory(body.policy, load_public_scenario(scenario_id).profile_id)
         with db.write() as conn:
             closing = [
@@ -365,7 +375,7 @@ def create_app(
             "scenario_id": scenario_id,
             "clock": ep.clock.strftime("%Y-%m-%dT%H:%M:%SZ"),
             "revision": ep.revision,
-            "policy": body.policy,
+            "policy": canonical_choice(body.policy),
             "mode_label": host.mode_label(episode_id),
         }
 
@@ -471,6 +481,7 @@ def create_app(
     def run(body: RunBody, authorization: str | None = Header(default=None)) -> dict[str, Any]:
         moderator(authorization)
         episode_id = current_episode()
+        host.policy(episode_id)  # resolved (its configuration checked) before the clock moves
         runs = tick_loop(
             db, host, episode_id, minutes=body.minutes, run_policy=body.policy, actors=None
         )

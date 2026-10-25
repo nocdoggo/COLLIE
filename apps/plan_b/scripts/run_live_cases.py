@@ -1,11 +1,14 @@
-"""Recorded live runs: development cases under the live coordinator ``live/1.0.0``.
+"""Recorded live runs: development cases under a model-driven coordinator.
 
 Usage (from apps/plan_b; PAID: every run makes real model calls):
 
-    uv run python scripts/run_live_cases.py --out <dir> CASE [CASE ...]
+    uv run python scripts/run_live_cases.py --out <dir> [--policy POLICY] CASE [CASE ...]
 
-Each case runs once through ``run_case(policy="live")`` under the development episode caps, on
-a fresh episode in its own temporary SQLite database. For each run, ``<dir>`` receives:
+``--policy`` is one of the model-driven choices of ``run_case``: ``tool-use`` (P1,
+``tool-use/1.0.0``), ``live`` or its alias ``selective`` (P2, ``live/1.0.0``, the default) or
+``verify-all`` (P3, ``verify-all/1.0.0``). Each case runs once through
+``run_case(policy=...)`` under the development episode caps, on a fresh episode in its own
+temporary SQLite database. For each run, ``<dir>`` receives:
 
 * ``traces/live_<label>_trace.json``: the exported sanitized trace, verified with the same
   checks as ``plan-b verify-trace`` and never edited afterwards;
@@ -17,14 +20,16 @@ a fresh episode in its own temporary SQLite database. For each run, ``<dir>`` re
   ledger before and after, the coordinator's tool calls, every decision, the trace's
   verification, and the checks below.
 
-The label is the case ref, or ``--label`` for a further run of the same case; a label whose
-files exist is refused, so a recorded run is never overwritten. A failed run is recorded like
-any other.
+The label is the case ref when ``--policy`` is not given (the Wave 2 recorded runs), else
+``<tag>_<case ref>`` with the policy's tag (``p1-tool-use``, ``p2-live``, ``p3-verify-all``), or
+``--label`` for a further run of the same case; a label whose files exist is refused, so a
+recorded run is never overwritten. A failed run is recorded like any other.
 
 Checks, computed from the persisted records and the trace (never from model text):
 
-* ``useful_tool_calls``: model-chosen queries, holds, releases and applies that succeeded, with
-  the later model calls that consumed their result;
+* ``useful_tool_calls``: model-chosen queries, holds (handoff requests included), releases and
+  applies, with their outcome and the later model calls that consumed their result (P2 and P3
+  choose a menu option; P1 names the tool itself);
 * ``validated_actions``: the coordinator's applied ``apply_plan`` receipts, each with its stored
   candidate and report, the evaluation's revision and goal version, and whether the candidate was
   feasible and applicable when evaluated;
@@ -51,13 +56,24 @@ import time
 from collections import Counter
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from plan_b.scenarios.policy_host import PolicyChoice
 
 APP = Path(__file__).resolve().parents[1]
 REPO = APP.parents[1]
 RECORD_VERSION = "plan_b.live_run/1.0.0"
-ACTION_PREFIXES = ("query", "hold", "release", "apply")
+ACTION_PREFIXES = ("query", "hold", "handoff", "release", "apply")
+# P1 names tools, not menu options: the same actions by tool.
+TOOL_ACTIONS = {
+    "query_status": "query",
+    "hold_resource": "hold",
+    "release_hold": "release",
+    "apply_plan": "apply",
+}
 NOTICE_KINDS = ("notice", "resource_offer", "policy")
+POLICY_TAGS = {"tool-use": "p1-tool-use", "live": "p2-live", "verify-all": "p3-verify-all"}
 
 
 def outcome_line(case_ref: str, report: Any) -> str:
@@ -103,6 +119,16 @@ def _choice(decision: dict[str, Any]) -> dict[str, Any]:
     return choice if isinstance(choice, dict) else {}
 
 
+def _action(decision: dict[str, Any]) -> str:
+    """The model-chosen action of a decision: the menu option (P2, P3) or, for P1, the tool it
+    called; empty for a decision without one."""
+    option = str(_choice(decision).get("option_id") or "")
+    if option:
+        return option
+    tool = decision["details"].get("tool")
+    return tool if isinstance(tool, str) else ""
+
+
 def _frame_at(frames: list[dict[str, Any]], revision: int) -> dict[str, Any] | None:
     """The last frame whose revision is at most ``revision``."""
     found = None
@@ -137,9 +163,11 @@ def analyze(trace: dict[str, Any], agent_id: str | None) -> dict[str, Any]:
 
     useful = []
     for d in decisions:
-        choice = _choice(d)
-        option = str(choice.get("option_id", ""))
-        if d["details"].get("chosen_by") != "model" or option.split(":")[0] not in ACTION_PREFIXES:
+        option = _action(d)
+        head = option.split(":")[0]
+        if d["details"].get("chosen_by") != "model" or (
+            head not in ACTION_PREFIXES and head not in TOOL_ACTIONS
+        ):
             continue
         for ref in d["tool_call_refs"]:
             t = by_call.get(ref)
@@ -354,6 +382,9 @@ def decision_log(decisions: list[dict[str, Any]]) -> list[dict[str, Any]]:
             "kind": d["kind"],
             "chosen_by": d["details"].get("chosen_by"),
             "option_id": _choice(d).get("option_id"),
+            "tool": d["details"].get("tool"),
+            "final_decision": d["details"].get("final_decision"),
+            "verify_all": d["details"].get("verify_all"),
             "rationale_untrusted": _choice(d).get("rationale_untrusted"),
             "failure": d["details"].get("failure"),
             "mode_label": (d["details"].get("policy_mode") or {}).get("label"),
@@ -367,7 +398,16 @@ def decision_log(decisions: list[dict[str, Any]]) -> list[dict[str, Any]]:
     ]
 
 
-def run_one(case_ref: str, label: str, out: Path) -> dict[str, Any]:
+def public_message(exc: BaseException, tmp: str) -> str:
+    """An exception's text for the run record, with local paths as placeholders: an error
+    from the ledger or the database names its file."""
+    text = str(exc)
+    for local, placeholder in ((tmp, "<tmp>"), (str(REPO), "<repo>"), (str(Path.home()), "~")):
+        text = text.replace(local, placeholder)
+    return text[:300]
+
+
+def run_one(case_ref: str, label: str, out: Path, policy: PolicyChoice = "live") -> dict[str, Any]:
     from plan_b.agent.config import load_model_config
     from plan_b.evaluation.export_trace import build_trace, verify_trace_bytes, write_trace
     from plan_b.evaluation.scoring import public_summary
@@ -383,9 +423,9 @@ def run_one(case_ref: str, label: str, out: Path) -> dict[str, Any]:
     with tempfile.TemporaryDirectory(prefix="plan_b_live_") as tmp:
         db = Database(Path(tmp) / "live.sqlite3")
         try:
-            result = run_case(db, case_ref, policy="live", caps=caps, live_config=config)
+            result = run_case(db, case_ref, policy=policy, caps=caps, live_config=config)
         except Exception as exc:  # noqa: BLE001 - recorded, never hidden
-            error = {"type": type(exc).__name__, "message": str(exc)[:300]}
+            error = {"type": type(exc).__name__, "message": public_message(exc, tmp)}
             result = None
         trace = None
         if result is not None:
@@ -395,7 +435,7 @@ def run_one(case_ref: str, label: str, out: Path) -> dict[str, Any]:
         "record": RECORD_VERSION,
         "label": label,
         "case_ref": case_ref,
-        "policy": "live",
+        "policy": policy,
         "started_at": started,
         "finished_at": _wall(),
         "wall_seconds": round(time.monotonic() - t0, 1),
@@ -466,16 +506,27 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="scripts/run_live_cases.py", description=__doc__)
     parser.add_argument("cases", nargs="+", help="case refs (dev01, dev04, skills_dev01, ...)")
     parser.add_argument("--out", required=True, help="evidence directory (created if missing)")
+    parser.add_argument(
+        "--policy",
+        default=None,
+        choices=("tool-use", "live", "selective", "verify-all"),
+        help="the model-driven policy (default live; see above)",
+    )
     parser.add_argument("--label", default=None, help="file label for a single case's run")
     args = parser.parse_args(argv)
     if args.label and len(args.cases) != 1:
         parser.error("--label names one case's run")
+    from plan_b.scenarios.policy_host import canonical_choice
+
+    policy = canonical_choice(args.policy or "live")
     out = Path(args.out).resolve()
     for sub in ("reports", "traces", "runner_private"):
         (out / sub).mkdir(parents=True, exist_ok=True)
     ok = True
     for case_ref in args.cases:
-        label = args.label or case_ref
+        label = args.label or (
+            case_ref if args.policy is None else f"{POLICY_TAGS[policy]}_{case_ref}"
+        )
         taken = [
             p
             for p in (
@@ -488,7 +539,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"{label}: already recorded ({taken[0].name}); choose another --label")
             ok = False
             continue
-        record = run_one(case_ref, label, out)
+        record = run_one(case_ref, label, out, policy)
         (out / "reports" / f"live_{label}_run.json").write_text(
             json.dumps(record, indent=1, sort_keys=True) + "\n", encoding="utf-8"
         )

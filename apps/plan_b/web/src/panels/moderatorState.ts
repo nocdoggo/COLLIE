@@ -91,22 +91,43 @@ export function joinCodePreview(code: string): string {
 /** What a policy run button says for the selected policy. */
 export const RUN_POLICY_LABEL: Record<PolicyChoice, string> = {
   rules: "Run deterministic policy",
+  "tool-use": "Run tool-use agent",
   live: "Run live agent",
+  "verify-all": "Run verify-all agent",
 };
+
+/** The mode label of each model-driven choice, before the server names the returned model. */
+export const MODEL_CHOICE_LABEL: Record<Exclude<PolicyChoice, "rules">, string> = {
+  "tool-use": "Tool-use agent",
+  live: "Live agent",
+  "verify-all": "Verify-all agent",
+};
+
+/** The policy id each choice runs (the server's `policy_id` wins when it sent one). */
+export const CHOICE_POLICY_ID: Record<Exclude<PolicyChoice, "rules">, string> = {
+  "tool-use": "tool-use/1.0.0",
+  live: "live/1.0.0",
+  "verify-all": "verify-all/1.0.0",
+};
+
+/** "<policy label> · <model id>" for a model-driven choice; "Live agent · …" for the live agent. */
+export function modelChoiceLabel(choice: Exclude<PolicyChoice, "rules">, modelId: string | null): string {
+  return choice === "live" ? liveAgentLabel(modelId) : `${MODEL_CHOICE_LABEL[choice]} · ${modelId ?? "model not reported yet"}`;
+}
 
 /** The selection a server setting describes; its model id is the configured one. */
 export function selectionOf(setting: EpisodePolicy & { readonly model_id?: string | null }): PolicySelection {
   return {
     choice: setting.policy,
-    modelId: setting.policy === "live" ? (setting.model_id ?? null) : null,
+    modelId: setting.policy !== "rules" ? (setting.model_id ?? null) : null,
     label: setting.label ?? null,
   };
 }
 
-/** "Deterministic policy" or "Live agent · <model id>" for a setting (the server's label first). */
+/** "Deterministic policy" or "<policy label> · <model id>" for a setting (the server's label first). */
 export function settingLabel(setting: PolicySetting): string {
   if (typeof setting.label === "string" && setting.label.length > 0) return setting.label;
-  return setting.policy === "live" ? liveAgentLabel(setting.model_id ?? null) : DETERMINISTIC_POLICY_LABEL;
+  return setting.policy !== "rules" ? modelChoiceLabel(setting.policy, setting.model_id ?? null) : DETERMINISTIC_POLICY_LABEL;
 }
 
 /**

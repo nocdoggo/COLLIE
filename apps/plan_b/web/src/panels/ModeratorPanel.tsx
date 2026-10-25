@@ -21,12 +21,15 @@ import type {
   UtcIso,
 } from "../types";
 import {
+  CHOICE_POLICY_ID,
+  MODEL_CHOICE_LABEL,
   RUN_POLICY_LABEL,
   actionHeadline,
   clockOutcome,
   isEarlierResult,
   joinCodePreview,
   knownActiveEpisode,
+  modelChoiceLabel,
   policyOutcome,
   resetNeedsConfirmation,
   scenarioOfCase,
@@ -82,6 +85,14 @@ function EarlierNote({ revision, view }: { revision: number | undefined; view: E
   return <p className="muted small">Earlier result: the board now shows revision {view.revision}.</p>;
 }
 
+/** "Live agent", "Tool-use agent", "Verify-all agent" or "Deterministic policy" for a run's policy id. */
+function runPolicyLabel(policyId: string): string {
+  if (isLivePolicyId(policyId)) return LIVE_AGENT_LABEL;
+  if (policyId.startsWith("tool-use/")) return MODEL_CHOICE_LABEL["tool-use"];
+  if (policyId.startsWith("verify-all/")) return MODEL_CHOICE_LABEL["verify-all"];
+  return DETERMINISTIC_POLICY_LABEL;
+}
+
 /** One policy run; `headline` (the stamped action) replaces the plain status line. */
 function PolicyRunSummary({ run, tz, headline }: { run: PolicyRunResult; tz: string | null; headline?: string }) {
   return (
@@ -89,7 +100,7 @@ function PolicyRunSummary({ run, tz, headline }: { run: PolicyRunResult; tz: str
       <p>
         {headline !== undefined ? <strong>{headline}</strong> : null}
         {headline !== undefined ? " · " : ""}
-        {isLivePolicyId(run.policy_id) ? LIVE_AGENT_LABEL : DETERMINISTIC_POLICY_LABEL} <Code>{run.policy_id}</Code>
+        {runPolicyLabel(run.policy_id)} <Code>{run.policy_id}</Code>
         {headline !== undefined ? "." : `: ${policyOutcome(run, tz)}.`}
         {run.note ? ` ${run.note}` : ""}
       </p>
@@ -130,9 +141,19 @@ function PolicySwitch({
       hint: "The documented rule baseline for this event's profile. No model call.",
     },
     {
+      value: "tool-use",
+      label: setting !== null ? modelChoiceLabel("tool-use", setting.model_id ?? null) : MODEL_CHOICE_LABEL["tool-use"],
+      hint: "P1: a model chooses tools and arguments itself; the executor checks every call. Each run makes paid model calls; selecting makes none.",
+    },
+    {
       value: "live",
       label: setting !== null ? liveAgentLabel(setting.model_id ?? null) : LIVE_AGENT_LABEL,
-      hint: "A model chooses among the server's checked options. Each run makes paid model calls; selecting makes none.",
+      hint: "P2, selective: a model chooses among the server's checked options. Each run makes paid model calls; selecting makes none.",
+    },
+    {
+      value: "verify-all",
+      label: setting !== null ? modelChoiceLabel("verify-all", setting.model_id ?? null) : MODEL_CHOICE_LABEL["verify-all"],
+      hint: "P3: every relevant status check first, then the live agent's options. Each run makes paid model calls; selecting makes none.",
     },
   ];
   return (
@@ -145,7 +166,7 @@ function PolicySwitch({
             name="coordinator-policy"
             value={o.value}
             checked={choice === o.value}
-            disabled={(o.value === "live" && liveOff && choice !== "live") || (setting?.locked === true && choice !== o.value)}
+            disabled={(o.value !== "rules" && liveOff && choice !== o.value) || (setting?.locked === true && choice !== o.value)}
             onChange={() => onChoose(o.value)}
           />
           <span>
@@ -523,14 +544,14 @@ export function ModeratorPanel({
           view={view}
           onChoose={(choice) =>
             void act(
-              choice === "live" ? "Select the live agent" : "Select the deterministic policy",
+              choice === "rules" ? "Select the deterministic policy" : `Select the ${MODEL_CHOICE_LABEL[choice].toLowerCase()}`,
               () => moderatorApi.setPolicy(session, choice),
               (next) => adoptSetting(next),
             )
           }
         />
         <p className="small muted">
-          Runs <Code>{setting?.policy_id ?? (setting?.policy === "live" ? "live/1.0.0" : DETERMINISTIC_POLICY_ID)}</Code>{" "}
+          Runs <Code>{setting?.policy_id ?? (setting !== null && setting.policy !== "rules" ? CHOICE_POLICY_ID[setting.policy] : DETERMINISTIC_POLICY_ID)}</Code>{" "}
           once until it waits. It acts only through the coordinator&apos;s own grant.
         </p>
         <button

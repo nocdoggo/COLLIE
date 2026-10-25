@@ -296,7 +296,10 @@ export function liveAgentLabel(modelId: string | null): string {
   return `${LIVE_AGENT_LABEL} · ${modelId ?? "model not reported yet"}`;
 }
 
-/** Live-policy decisions carry policy ids "live/<version>"; every other policy is deterministic. */
+/**
+ * Live-agent (P2) decisions carry policy ids "live/<version>". P1 (`tool-use/`) and P3
+ * (`verify-all/`) are model-driven too: components/policyMode.ts `modelPolicyLabel` covers all three.
+ */
 export function isLivePolicyId(policyId: string): boolean {
   return policyId.startsWith("live/");
 }

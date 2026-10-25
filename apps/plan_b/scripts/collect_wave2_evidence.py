@@ -10,8 +10,8 @@ Runs the checks and the development cases with the deterministic baselines, and 
 
 * ``reports/checks.json``: every command, working directory, exit code, duration and summary
   (ruff, format, mypy, pytest with a JUnit XML, web typecheck/build/test/lint, CLI runs, trace
-  verification, both browser walkthroughs, the scans below), plus the pytest and web test
-  counts, each development case's result line and the recorded live runs;
+  verification, both browser walkthroughs, the demo storyboard, the scans below), plus the
+  pytest and web test counts, each development case's result line and the recorded live runs;
 * ``reports/m2_focused_tests.json``: each mandatory M2 check of ``waves/02_adaptation.md`` with
   the focused tests that cover it and each test's JUnit outcome from the same pytest run;
 * ``reports/pantry_accounting.json``: the stock and service counters of every frame of the
@@ -27,6 +27,8 @@ Runs the checks and the development cases with the deterministic baselines, and 
   ``reports/rejected_actions_steps.json``;
 * ``screenshots/``: the Wave 2 walkthrough's screenshots (256-colour PNGs, join links masked)
   and both walkthroughs' JSON reports;
+* ``storyboard/``: the frames of the demo story (``tests/e2e/storyboard.py``, written there
+  directly, as ``DEMO.md`` links them) and its ``storyboard_report.json``;
 * ``runner_private/``: runner-side outcome reports *with* predicates and expectations.
 
 ``--live`` copies previously recorded live runs (``live_*`` files of its ``reports``,
@@ -37,7 +39,8 @@ are recorded once by ``scripts/run_live_cases.py`` and kept as they are.
 Local paths are written as placeholders and the scans of ``scripts/collect_evidence.py`` apply to
 every text file written, the copied live runs included. A further scan refuses credential-shaped
 text (an OpenRouter key prefix or a bearer token) without reading any key. Nothing here reads
-credentials or makes network calls; the walkthroughs use a local server on 127.0.0.1.
+credentials or makes network calls; the walkthroughs and the storyboard use a local server on
+127.0.0.1.
 """
 
 from __future__ import annotations
@@ -48,6 +51,7 @@ import os
 import platform
 import re
 import shutil
+import socket
 import subprocess
 import sys
 import tempfile
@@ -105,6 +109,14 @@ M2_CHECKS: dict[str, list[tuple[str, str]]] = {
         ("test_integration_policy", r"test_failed_calls_count_and_a_run_never_exceeds"),
         ("test_integration_policy", r"test_a_reached_model_cap_stops_waking_the_live_policy"),
         ("test_integration_api", r"test_board_runs_stop_at_the_episode_cap"),
+        # The same failure classes for P1, P2 and P3 (scripted transports).
+        ("test_live_workflow", r"test_unusable_output_after_one_repair_is_a_visible_wait"),
+        ("test_live_workflow", r"test_a_tool_or_option_outside_what_is_offered_is_refused"),
+        ("test_live_workflow", r"test_an_unknown_entity_stays_unresolved_or_rejected"),
+        ("test_live_workflow", r"test_caps_and_the_spend_guard_stop_each_policy"),
+        ("test_live_workflow", r"test_provider_timeouts_and_errors_are_visible_waits"),
+        ("test_live_workflow", r"test_a_stale_revision_is_rejected_then_re_evaluated"),
+        ("test_live_workflow", r"test_a_lost_mutation_response_is_reconciled"),
     ],
     "Community workflow": [
         ("test_community_skills_exchange", r"test_fixture_loads_through_the_campus_adapter"),
@@ -171,8 +183,29 @@ M2_CHECKS: dict[str, list[tuple[str, str]]] = {
         ("test_integration_policy", r"test_mode_labels_name_the_policy_that_ran"),
         ("test_integration_policy", r"test_selection_locks_once_the_coordinator_acted"),
         ("test_runner_isolation", r"test_"),
+        # P0-P3: the same grant, tools and candidates; each suite end to end; the live pantry
+        # options; P3's relevance rule; the shortfall report as P0 makes it.
+        ("test_policy_parity", r"test_each_policy_reads_the_same_grant_tools_and_candidates"),
+        ("test_policy_parity", r"test_a_restarted_host_keeps_each_model_policy_choice"),
+        ("test_live_workflow", r"test_policy_choices_name_p0_to_p3_and_their_labels"),
+        ("test_live_workflow", r"test_p0_to_p3_get_the_same_candidates_grant_and_tools"),
+        ("test_live_workflow", r"test_p1_to_p3_complete_each_suite_end_to_end"),
+        ("test_live_workflow", r"test_the_live_policy_completes_pantry_dev01_as_the_baseline"),
+        ("test_live_workflow", r"test_the_live_pantry_menu_offers_stock_options"),
+        ("test_live_workflow", r"test_verify_all_"),
+        ("test_pantry_live_menu", r"test_"),
+        ("test_comparison_policy_fixes", r"test_the_live_pantry_policy_reports_a_shortfall"),
+        ("test_comparison_policy_fixes", r"test_a_tool_use_shortfall_report_names_what_blocks"),
+        ("test_comparison_policy_fixes", r"test_verify_all_"),
+        ("test_tool_use_hold_window", r"test_"),
     ],
 }
+
+
+def free_port() -> int:
+    with socket.socket() as s:
+        s.bind(("127.0.0.1", 0))
+        return int(s.getsockname()[1])
 
 
 def junit_cases(path: Path) -> list[dict[str, str]]:
@@ -468,7 +501,11 @@ def live_summary(record: dict[str, Any]) -> dict[str, Any]:
     model = record.get("model", {})
     return {
         "label": record["label"],
+        "policy": record.get("policy"),
+        "policy_id": record.get("policy_id"),
+        "case_ref": record.get("case_ref"),
         "outcome_line": record.get("outcome_line"),
+        "matches_expectation": record.get("matches_expectation"),
         "error": record.get("error"),
         "model_requested": model.get("requested"),
         "model_returned": model.get("returned"),
@@ -477,6 +514,23 @@ def live_summary(record: dict[str, Any]) -> dict[str, Any]:
         "run_cost_usd": record["ledger"]["run_cost_usd"],
         "trace": record.get("trace", {}).get("verify"),
     }
+
+
+def live_by_policy(runs: list[dict[str, Any]]) -> dict[str, Any]:
+    """The recorded live runs per policy id: runs, how many match their expectation, model
+    calls, tool calls and spend. Development runs only: one trial each, no comparison."""
+    out: dict[str, Any] = {}
+    for r in runs:
+        p = out.setdefault(
+            r.get("policy_id") or "(none)",
+            {"runs": 0, "matching": 0, "model_calls": 0, "tool_calls": 0, "cost_usd": 0.0},
+        )
+        p["runs"] += 1
+        p["matching"] += 1 if r.get("matches_expectation") else 0
+        p["model_calls"] += r.get("model_calls") or 0
+        p["tool_calls"] += r.get("tool_calls") or 0
+        p["cost_usd"] = round(p["cost_usd"] + (r.get("run_cost_usd") or 0.0), 8)
+    return out
 
 
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
@@ -500,7 +554,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     if email and email.casefold() in {word.casefold() for word in allowed}:
         print("--allow-identifier cannot exempt the git user.email", file=sys.stderr)
         return 2
-    for sub in ("reports", "traces", "screenshots", "runner_private"):
+    for sub in ("reports", "traces", "screenshots", "storyboard", "runner_private"):
         (out / sub).mkdir(parents=True, exist_ok=True)
     work = Path(tempfile.mkdtemp(prefix="planb_w2_evidence_"))
     try:
@@ -648,6 +702,15 @@ def collect(
             checks,
             "browser walkthrough, Wave 2 (Playwright, Chromium)",
         )
+        # The storyboard re-encodes and masks its own frames; DEMO.md links them in storyboard/.
+        ce.run(
+            uv
+            + ["python", "tests/e2e/storyboard.py", "--out", str(out / "storyboard")]
+            + ["--port", str(free_port())],
+            APP,
+            checks,
+            "demo storyboard (Playwright, Chromium)",
+        )
         for shot in sorted(shots1.glob("*.json")):
             shutil.copy2(shot, out / "screenshots" / shot.name)
         for shot in sorted(shots2.glob("*")):
@@ -728,6 +791,7 @@ def collect(
         "web_test_counts": ce.tap_counts(web_tests.stdout),
         "case_outcomes": outcomes,
         "live_runs": live_runs,
+        "live_runs_by_policy": live_by_policy(live_runs),
         "checks": checks,
     }
 

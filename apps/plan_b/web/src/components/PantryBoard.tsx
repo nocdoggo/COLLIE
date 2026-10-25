@@ -86,16 +86,16 @@ export function ServiceTargetCard({ service, view }: { service: ServiceProgressV
       <dl className="counter-grid">
         <Counter
           id="supply_gap"
-          label="Pantry-controlled supply gap"
+          label="Supply shortfall"
           value={fmtQuantity(service.supply_gap_quantity, unit)}
-          note="Still lacking on hand for the remaining target. A recorded receipt closes it; expected units do not."
+          note="Pantry-controlled supply gap. Only a staff receipt closes it; expected units never do."
           tone={service.supply_gap_quantity > 0 ? "warn" : "ok"}
         />
         <Counter
           id="unfulfilled"
-          label="Unfulfilled service target"
+          label="Service deficit"
           value={fmtQuantity(service.unfulfilled_quantity, unit)}
-          note="Original target minus distribution recorded on time. Holds, plans and receipts never reduce it."
+          note="Unfulfilled target. Only kits distributed on time reduce it; holds, plans and receipts never do."
           tone={service.unfulfilled_quantity > 0 ? "bad" : "ok"}
         />
         <Counter
@@ -109,14 +109,14 @@ export function ServiceTargetCard({ service, view }: { service: ServiceProgressV
           id="committed"
           label="Committed, not yet distributed"
           value={fmtQuantity(service.committed_quantity, unit)}
-          note="Reserved by the applied plan; serves nobody until staff record a distribution."
+          note="Reserved by the applied plan; serves nobody until distributed."
           tone="neutral"
         />
         <Counter
           id="capacity"
-          label="Staffed capacity so far"
+          label="Can still be distributed now"
           value={fmtQuantity(service.capacity_quantity, unit)}
-          note={`${service.qualified_minutes} staffed minutes with committed stock, minus what is already distributed.`}
+          note={`Staffed throughput so far (${service.qualified_minutes} staffed minutes with committed stock) minus ${fmtQuantity(service.distributed_quantity, unit)} already distributed.`}
           tone="neutral"
         />
       </dl>
@@ -184,7 +184,7 @@ export function PantryBoard({ view }: { view: EventStateView }) {
     <Section
       id="pantry-board"
       title="Stock and service"
-      subtitle="Fictional kits. Physical receipt and distribution are staff attestations; the coordinator agent cannot record them."
+      subtitle="Fictional pantry sandbox: fictional kits, stock and staff. Physical receipt and distribution are staff attestations; the coordinator agent cannot record them."
     >
       {stock.service.length === 0 ? (
         <Empty>No service target is defined.</Empty>

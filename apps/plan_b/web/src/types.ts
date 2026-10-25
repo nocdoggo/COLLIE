@@ -1127,8 +1127,12 @@ export interface DecisionChoice {
   readonly consumed_tool_call_ids: readonly string[];
 }
 
-/** Which coordinator policy a moderator selects: the deterministic baseline or the live agent. */
-export type PolicyChoice = "rules" | "live";
+/**
+ * Which coordinator policy a moderator selects: the deterministic baseline (P0), the tool-using
+ * model baseline (P1), the live agent (P2, the selective controller; the server also accepts
+ * "selective" and answers "live") or the verify-all ablation (P3).
+ */
+export type PolicyChoice = "rules" | "tool-use" | "live" | "verify-all";
 
 export interface PolicyRunResult {
   readonly policy_id: string;

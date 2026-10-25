@@ -27,6 +27,18 @@ after ``PROVIDER_RETRY``), a stale revision (re-read and re-evaluate, at most
 ``MAX_STALE_RETRIES`` per run) and a lost mutation response (reconciled with
 ``get_action_receipt`` and the original key, ``reconcile`` when it cannot be established).
 
+On a consumable (pantry) profile the menu also offers the stock options of ``menu``: a staff
+handoff request (a ``stock_transfer`` hold, the local staff task), a quantity hold on a pool and
+the apply of a stored stock candidate; the choice prompt is then ``choose_action_pantry.v1``.
+The policy never calls a staff-only tool: staff record receipts and distributions. As the
+deterministic baseline does, the server releases an own handoff hold once its staff task is no
+longer open, and reports a kept plan that covers only part of a target as ``infeasible``
+(naming what blocks better coverage) once nothing pursuable covers more.
+
+Subclasses keep this downstream logic and change one step: ``_verify_first`` runs before each
+decision step (the verify-all ablation, ``agent/policies/verify_all.py``, requests every relevant
+status check there). Decisions and results carry the instance's ``policy_id``.
+
 Every decision cites the observation, candidate, report, receipt and tool-call ids it rests
 on. Its ``details.model`` records the requested model and, for each model call attributed to
 it, the returned model id, latency, token usage and cost; ``details.chosen_by`` says whether the
@@ -58,9 +70,14 @@ from plan_b.agent.menu import (
     MenuOption,
     OpenAsk,
     VerifyNeed,
+    awaited_handoffs,
     build_menu,
+    coverage_text,
+    handoff_task,
     hold_candidates,
     own_grant,
+    shortfalls,
+    stock_improvable,
 )
 from plan_b.agent.prompts import Prompt, load_prompt
 from plan_b.agent.provider import (
@@ -91,6 +108,7 @@ from plan_b.domain.models import (
     ObservationRecord,
     PolicyDecision,
     PolicyRunResult,
+    ReleaseHoldArgs,
     ResourceView,
     Strict,
     ToolEnvelope,
@@ -101,6 +119,7 @@ from plan_b.evaluation.policies.parser import normalize_text
 
 POLICY_ID = "live/1.0.0"
 CHOOSE_PROMPT = "choose_action.v1"
+PANTRY_CHOOSE_PROMPT = "choose_action_pantry.v1"  # consumable profiles: the stock options
 CHOOSE_SCHEMA_NAME = "plan_b_menu_choice"
 DEFAULT_MAX_MODEL_CALLS = 8
 DEFAULT_MAX_TOOL_CALLS = 32
@@ -318,6 +337,13 @@ class _Run:
 # ---------------------------------------------------------------------------------- policy
 
 
+def resume_spend(provider: ModelProvider, spent_usd: float) -> None:
+    """Seed a rebuilt instance's spend guard with the episode's recorded model spend."""
+    guard = getattr(provider, "guard", None)
+    if isinstance(guard, SpendGuard):
+        guard.run_spent_usd = max(guard.run_spent_usd, spent_usd)
+
+
 class LivePolicy:
     """``live/1.0.0``: the model chooses among server-built options; the server executes."""
 
@@ -336,6 +362,7 @@ class LivePolicy:
         self.max_model_calls = max_model_calls
         self.max_tool_calls = max_tool_calls
         self._choose_prompt: Prompt = load_prompt(CHOOSE_PROMPT)
+        self._profile_checked = False
         self._interpret_prompt: Prompt = load_prompt(INTERPRET_PROMPT)
         self._seq = 0
         self._model_calls = 0
@@ -347,6 +374,7 @@ class LivePolicy:
         self._pending_interps: list[LiveInterpretation] = []
         self._pending_results: list[dict[str, Any]] = []
         self._recorded: set[tuple[Any, ...]] = set()
+        self._release_failed: set[str] = set()  # stock-transfer holds whose release was rejected
         self._open_ask: OpenAsk | None = None
         self._hold_counts: dict[tuple[str, str, int], int] = {}
         self._own_keys: dict[str, str] = {}
@@ -373,6 +401,14 @@ class LivePolicy:
             "max_tool_calls": self.max_tool_calls,
             "cost_usd": round(self._cost_usd, 8),
         }
+
+    def resume_usage(self, model_calls: int, tool_calls: int, spent_usd: float = 0.0) -> None:
+        """A rebuilt instance (a restarted server) continues the episode's recorded counters
+        and model spend, so the per-episode caps, the USD one included, hold across the
+        restart."""
+        self._model_calls = max(self._model_calls, model_calls)
+        self._tool_calls = max(self._tool_calls, tool_calls)
+        resume_spend(self._provider, spent_usd)
 
     # ------------------------------------------------------------------ entry point
 
@@ -408,7 +444,7 @@ class LivePolicy:
     ) -> PolicyRunResult:
         notes = [*run.notes, note] if note else run.notes
         return PolicyRunResult(
-            policy_id=POLICY_ID,
+            policy_id=self.policy_id,
             status=status,
             decisions=tuple(run.decisions),
             tool_calls=run.calls,
@@ -436,6 +472,7 @@ class LivePolicy:
         stale = 0
         try:
             for _ in range(MAX_STEPS):
+                view = self._verify_first(view, run)
                 decided = (view.revision, view.goal.version)
                 step = self._step(view, run, woke_watch)
                 woke_watch = False
@@ -479,6 +516,10 @@ class LivePolicy:
             code = envelope.error.code if envelope.error is not None else envelope.status
             raise _Stop(f"the state read was {envelope.status} ({code})")
         view = EventStateView.model_validate(envelope.data)
+        if not self._profile_checked:
+            self._profile_checked = True
+            if view.stock is not None:
+                self._choose_prompt = load_prompt(PANTRY_CHOOSE_PROMPT)
         grant = own_grant(view, self._principal)
         if view.episode_status == "closed":
             raise _Stop("the episode is closed")
@@ -679,7 +720,105 @@ class LivePolicy:
 
     # ------------------------------------------------------------------ one step
 
+    def _verify_first(self, view: EventStateView, run: _Run) -> EventStateView:
+        """Runs before each decision step, ahead of the point the step settles on; returns the
+        state to decide on. The selective policy verifies only through the menu, so it changes
+        nothing here."""
+        return view
+
+    def _release_closed_handoffs(self, view: EventStateView, run: _Run) -> bool:
+        """Consumable profiles: release own live stock-transfer holds whose staff task is no
+        longer open (staff answered it, or its cutoff passed), as the deterministic baseline
+        does; such a hold reserves units no staff handoff will move. Chosen by the server, with
+        no model call. True when a release changed the state."""
+        now = self._now(view)
+        released = False
+        for hold in view.holds:
+            if (
+                not hold.consumable
+                or hold.actor_id != self._principal
+                or hold.purpose != "stock_transfer"
+                or hold.effective_status != "active"
+                or hold.hold_id in self._release_failed
+                or run.mutations_blocked
+            ):
+                continue
+            task = handoff_task(view, hold.hold_id)
+            if task is not None and task.status == "open" and now < task.cutoff:
+                continue
+            why = f"its staff task is {task.status}" if task is not None else "it has no staff task"
+            arguments = ReleaseHoldArgs(
+                hold_id=hold.hold_id,
+                reason=f"Released: {why}; no staff handoff will move these units.",
+            ).model_dump(mode="json")
+            result = self._mutate(
+                run, "release_hold", arguments, expected_revision=self._revision or view.revision
+            )
+            if result is None:
+                return released
+            details = {"chosen_by": "server", "hold_id": hold.hold_id}
+            if result.applied and result.receipt is not None:
+                released = True
+                self._record(
+                    run,
+                    "release",
+                    f"Released hold {hold.hold_id} ({hold.remaining_quantity} units of "
+                    f"{hold.resource_id}): {why}, so no staff handoff will move these units. "
+                    "Releasing creates no stock.",
+                    receipt_refs=(result.receipt.receipt_id,),
+                    tool_call_refs=result.call_ids,
+                    details=details,
+                )
+                continue
+            if result.error_code not in RETRYABLE_REJECTIONS:
+                self._release_failed.add(hold.hold_id)  # a stale one is retried next step
+            self._record(
+                run,
+                "wait",
+                f"release_hold of {hold.hold_id} was rejected ({result.error_code}); the hold is "
+                "unchanged.",
+                receipt_refs=(result.receipt.receipt_id,) if result.receipt is not None else (),
+                tool_call_refs=result.call_ids,
+                details=details | {"error_code": result.error_code},
+            )
+        return released
+
+    def _record_shortfall(self, view: EventStateView, run: _Run, evaluated: _Evaluated) -> None:
+        """Consumable profiles, once the plan is not in question: a kept plan that covers less
+        than a service target, with nothing pursuable that covers more (``stock_improvable``),
+        no handoff awaited and none that could still open, is reported as the deterministic
+        baseline reports it (``infeasible``, naming what blocks better coverage). The target is
+        unchanged."""
+        ev = evaluated.ev
+        keep = _candidate(ev, ev.keep_candidate_id)
+        now = self._now(view)
+        params = view.pantry_parameters
+        if keep is None or awaited_handoffs(view, self._principal, now):
+            return
+        for short in shortfalls(ev):
+            if (
+                params is not None
+                and now < params.handoff_window.start
+                and "stock_transfer" in short.blocking_constraints
+            ):
+                continue  # a handoff can still be requested once the window opens
+            names = ", ".join(short.blocking_constraints)
+            self._record_once(
+                run,
+                ("shortfall", short.target_id, short.covered_quantity),
+                "infeasible",
+                f"No declared option covers the {short.target_quantity}-unit target "
+                f"{short.target_id} with confirmed stock: plan v{view.plan.plan_version} "
+                f"covers {short.covered_quantity}, leaving {short.shortfall_quantity} "
+                f"unfulfilled. Blocking: {names}. The target is unchanged.",
+                candidate_refs=(keep.candidate_id,),
+                details={"chosen_by": "server", "evaluation_id": ev.evaluation_id}
+                | short.details(),
+            )
+
     def _step(self, view: EventStateView, run: _Run, woke: bool) -> Step:
+        if view.stock is not None and self._release_closed_handoffs(view, run):
+            return "refresh"
         claims = self._claims(view)
         open_claims = [c for c in claims if self._answer(view, c) is None]
         material = [c for c in open_claims if self._material(view, c)]
@@ -701,6 +840,16 @@ class LivePolicy:
             if c.is_claim and not c.hearsay and not self._verification_failed(view, c)
         ]
         in_question = not keep_ok or bool(threatening)
+        eligible = evaluated.eligible
+        if not in_question and stock_improvable(
+            view,
+            ev,
+            MenuInputs(principal=self._principal, now=self._now(view)),
+            lambda c: eligible is None or c.signature in eligible,
+        ):
+            in_question = True  # a pursuable stock candidate leaves less unfulfilled
+        if view.stock is not None and not in_question:
+            self._record_shortfall(view, run, evaluated)
         verify = self._verify_needs(view, evaluated, material, woke, keep_ok, in_question)
         inputs = MenuInputs(
             principal=self._principal,
@@ -873,6 +1022,8 @@ class LivePolicy:
                         reason=f"{c.label} needs {rh.resource_id}, whose availability rests "
                         "only on the catalog",
                     )
+        if view.stock is not None and in_question:
+            self._stock_verify_needs(view, needs)
         watch = self._watch
         if woke and watch is not None:
             res = resources.get(watch.resource_id)
@@ -894,6 +1045,51 @@ class LivePolicy:
                     f"{watch.activity_id} at {self._t(_start_of(view, watch.activity_id), view)}",
                 )
         return needs
+
+    def _stock_verify_needs(self, view: EventStateView, needs: dict[str, VerifyNeed]) -> None:
+        """Consumable profiles: an outstanding expected shipment whose status was never
+        answered, and, while a supply gap exists, a declared transfer source (a handoff request
+        would rest on its availability). A successful check at any time answers either."""
+        stock = view.stock
+        assert stock is not None
+        resources = _resources(view)
+        for shipment in stock.expected_shipments:
+            rid = shipment.shipment.destination_resource_id
+            res = resources.get(rid)
+            if (
+                shipment.outstanding_quantity
+                and shipment.status_observation_id is None
+                and res is not None
+                and rid not in needs
+                and _has_source(view, res)
+            ):
+                needs[rid] = VerifyNeed(
+                    entity_id=rid,
+                    since=_EPOCH,
+                    reason=f"expected shipment {shipment.shipment.shipment_id} "
+                    f"({shipment.outstanding_quantity} units) has no status answer; expected "
+                    "units count only after a staff-recorded receipt",
+                )
+        gap = sum(s.supply_gap_quantity for s in stock.service)
+        if not gap:
+            return
+        for option in view.stock_options:
+            source = option.source_resource_id
+            res = resources.get(source or "")
+            if (
+                option.option != "transfer_stock"
+                or source is None
+                or res is None
+                or source in needs
+                or not _has_source(view, res)
+            ):
+                continue
+            needs[source] = VerifyNeed(
+                entity_id=source,
+                since=_EPOCH,
+                reason=f"a staff handoff from {source} into {option.resource_id} would close the "
+                f"supply gap of {gap} units; its availability has no status answer",
+            )
 
     # ------------------------------------------------------------------ model choice
 
@@ -1073,6 +1269,8 @@ class LivePolicy:
             return self._after_apply(view, run, evaluated, option, result, base)
         if option.action == "hold_resource":
             return self._after_hold(view, run, ev, option, result, base)
+        if option.action == "request_handoff":
+            return self._after_handoff(view, run, ev, option, result, base)
         return self._after_release(view, run, option, result, base)
 
     def _query(
@@ -1179,6 +1377,11 @@ class LivePolicy:
                 [ch.constraint_id for ch in keep.checks if ch.status == "failed"] if keep else []
             )
             why = f"; the current plan fails {', '.join(failed)}" if failed else ""
+            if target.service_coverage:
+                why += (
+                    f"; it {coverage_text(target)}, its stock holds are now committed "
+                    "allocations, and only a staff-recorded distribution serves anyone"
+                )
             robust = f"; {evaluated.robust_note}" if evaluated.robust_note else ""
             self._record(
                 run,
@@ -1233,6 +1436,20 @@ class LivePolicy:
                 self._hold_counts[count_key] = self._hold_counts.get(count_key, 0) + 1
             hold = _hold_from(result)
             expiry = f", expires {self._t(hold.expires_at, view)}" if hold else ""
+            if option.quantity is not None:
+                self._record(
+                    run,
+                    "prepare",
+                    f"Held {option.quantity} units of {rid} for {option.service_target_id} "
+                    f"({aid}){f' (hold {hold.hold_id}{expiry})' if hold else ''} so {label} can "
+                    "be applied; a hold reserves units and serves nobody.",
+                    candidate_refs=_ids([option.candidate_id]),
+                    receipt_refs=(result.receipt.receipt_id,),
+                    tool_call_refs=result.call_ids,
+                    details=base
+                    | {"hold_id": hold.hold_id if hold else None, "quantity": option.quantity},
+                )
+                return "refresh"
             self._record(
                 run,
                 "prepare",
@@ -1250,6 +1467,70 @@ class LivePolicy:
             run,
             "prepare",
             f"Hold of {rid} for {aid} was rejected ({result.error_code}); no reservation was made.",
+            candidate_refs=_ids([option.candidate_id]),
+            receipt_refs=(result.receipt.receipt_id,) if result.receipt is not None else (),
+            tool_call_refs=result.call_ids,
+            details=base | {"error_code": result.error_code, "outcome": "rejected"},
+        )
+        return "refresh"
+
+    def _after_handoff(
+        self,
+        view: EventStateView,
+        run: _Run,
+        ev: EvaluationResult,
+        option: MenuOption,
+        result: _Mutation,
+        base: dict[str, Any],
+    ) -> Step:
+        """A staff handoff request: the stock-transfer hold is the local staff task. Only a
+        staff-recorded receipt moves stock; the agent never records one."""
+        source, destination = option.resource_id or "", option.destination_resource_id or ""
+        hold = _hold_from(result)
+        if result.applied and result.receipt is not None and hold is None:
+            # A reconciled response carries the receipt, not the hold: find it by its receipt.
+            receipt_id = result.receipt.receipt_id
+            view = self._refresh(run)
+            hold = next((h for h in view.holds if h.created_receipt_id == receipt_id), None)
+        if result.applied and result.receipt is not None and hold is not None:
+            task = handoff_task(view, hold.hold_id)
+            params = view.pantry_parameters
+            due = (
+                task.respond_after
+                if task is not None
+                else hold.created_at + timedelta(minutes=params.handoff_duration_minutes)
+                if params is not None
+                else None
+            )
+            self._record(
+                run,
+                "ask",
+                f"Asked staff to hand off {option.quantity} units from {source} into "
+                f"{destination}: hold {hold.hold_id} on {source} (the local staff task, expires "
+                f"{self._t(hold.expires_at, view)}) reserves them and moves nothing; only a "
+                "staff-recorded receipt moves stock"
+                + (f"; their response is due at {self._t(due, view)}" if due else "")
+                + ".",
+                candidate_refs=_ids([option.candidate_id]),
+                receipt_refs=(result.receipt.receipt_id,),
+                tool_call_refs=result.call_ids,
+                wait_until=due,
+                details=base
+                | {
+                    "ask": "stock_handoff",
+                    "hold_id": hold.hold_id,
+                    "quantity": option.quantity,
+                    "source_resource_id": source,
+                    "destination_resource_id": destination,
+                },
+            )
+            return "refresh"
+        run.rejected_intents.add(option.intent)
+        self._record(
+            run,
+            "prepare",
+            f"The handoff request for {option.quantity} units of {source} was rejected "
+            f"({result.error_code}); no reservation was made and no staff task exists.",
             candidate_refs=_ids([option.candidate_id]),
             receipt_refs=(result.receipt.receipt_id,) if result.receipt is not None else (),
             tool_call_refs=result.call_ids,
@@ -1389,6 +1670,25 @@ class LivePolicy:
                 self._record_infeasible(view, run, ev, refs)
             return
         best = feasible[0]
+        awaited = awaited_handoffs(view, self._principal, self._now(view))
+        if awaited:
+            tasks = sorted(awaited, key=lambda ht: ht[1].respond_after)
+            self._record_once(
+                run,
+                ("wait", "handoff", tuple(h.hold_id for h, _ in tasks), view.plan.plan_version),
+                "wait",
+                "Waiting for staff to record the handoff for "
+                + ", ".join(
+                    f"{h.hold_id} ({t.remaining_quantity} units of {t.source_resource_id}; due "
+                    f"{self._t(t.respond_after, view)}, cutoff {self._t(t.cutoff, view)})"
+                    for h, t in tasks
+                )
+                + f"; only a staff-recorded receipt moves stock. Plan v{view.plan.plan_version} "
+                "is unchanged.",
+                candidate_refs=(best.candidate_id,),
+                details={"evaluation_id": ev.evaluation_id, "chosen_by": "server"},
+            )
+            return
         ask = self._open_ask
         if ask is not None and ask.signature == best.signature:
             holds = {h.hold_id: h for h in view.holds}
@@ -1466,6 +1766,9 @@ class LivePolicy:
                         f"{rid} is {res.status} ({res.status_basis.replace('_', ' ')}{eta}) for "
                         f"{a.activity_id} at {self._t(a.start, view)}"
                     )
+        kept_c = _candidate(ev, option.candidate_id)
+        if kept_c is not None and kept_c.service_coverage:
+            parts.append(f"it {coverage_text(kept_c)}")
         claims = self._claims(view)
         for claim in claims:
             answer = self._answer(view, claim)
@@ -1645,7 +1948,7 @@ class LivePolicy:
         run.decisions.append(
             PolicyDecision(
                 decision_id=f"dec_{self._seq:04d}",
-                policy_id=POLICY_ID,
+                policy_id=self.policy_id,
                 at=self._at,
                 revision=self._revision,
                 kind=kind,
@@ -1815,6 +2118,7 @@ class LivePolicy:
                     ev.infeasibility.model_dump(mode="json") if ev.infeasibility else None
                 ),
             },
+            **({"stock": _stock_context(view, self._principal)} if view.stock else {}),
             "robustness": robust,
             "open_authorization_request": (
                 self._open_ask.request.model_dump(mode="json") if self._open_ask else None
@@ -1867,6 +2171,10 @@ class LivePolicy:
             self._wake = wake
         if wake is not None:
             times.append(wake)
+        for _, task in awaited_handoffs(view, self._principal, now):
+            due = task.respond_after if task.respond_after > now else task.cutoff
+            if due > now:
+                times.append(due)
         return min(times) if times else None
 
     def _deadline_watch(self, view: EventStateView, now: datetime) -> _Watch | None:
@@ -1908,7 +2216,8 @@ def live_policy_factory(
     ledger_path: Path | None = None,
 ) -> Callable[[], LivePolicy]:
     """A ``policy_factory`` for ``PolicyHost`` / ``run_case``: each instance (one episode) gets
-    its own provider and spend guard, so the per-run cap is a per-episode cap. Raises
+    its own provider and spend guard, so the per-run cap is a per-episode cap (a rebuilt instance
+    resumes the episode's recorded spend through ``resume_usage``). Raises
     ``ModelConfigError`` now when the endpoint is not configured."""
     cfg = config or load_model_config()
     ledger = SpendLedger(ledger_path or cfg.ledger_path)
@@ -2026,8 +2335,120 @@ def _known_ids(view: EventStateView, evaluated: _Evaluated, menu: Menu) -> set[s
     return known
 
 
-def _candidate_context(c: CandidateResult) -> dict[str, Any]:
+def _stock_context(view: EventStateView, principal: str) -> dict[str, Any]:
+    """Consumable stock as the model sees it: balances, service counters, staff tasks."""
+    stock = view.stock
+    assert stock is not None
+    params = view.pantry_parameters
+
+    def t(value: datetime) -> str:
+        return local_label(value, view.timezone)
+
     return {
+        "balances": [
+            {
+                "resource_id": b.resource_id,
+                "unit": b.unit,
+                "on_hand": b.on_hand_quantity,
+                "reserved": b.reserved_quantity,
+                "available": b.available_quantity,
+                "expected_not_stock": b.expected_quantity,
+            }
+            for b in stock.balances
+        ],
+        "service": [
+            {
+                "target_id": s.target_id,
+                "target": s.target_quantity,
+                "original_target": s.original_quantity,
+                "deadline_local": t(s.deadline),
+                "distributed_on_time": s.on_time_quantity,
+                "committed_undistributed": s.committed_quantity,
+                "supply_gap": s.supply_gap_quantity,
+                "unfulfilled": s.unfulfilled_quantity,
+            }
+            for s in stock.service
+        ],
+        "expected_shipments": [
+            {
+                "shipment_id": e.shipment.shipment_id,
+                "destination": e.shipment.destination_resource_id,
+                "outstanding": e.outstanding_quantity,
+                "reported_eta_local": t(e.reported_eta) if e.reported_eta else None,
+            }
+            for e in stock.expected_shipments
+        ],
+        "staff_handoff_tasks": [
+            {
+                "hold_id": h.hold_id,
+                "source": h.source_resource_id,
+                "destination": h.destination_resource_id,
+                "requested": h.requested_quantity,
+                "remaining": h.remaining_quantity,
+                "respond_after_local": t(h.respond_after),
+                "cutoff_local": t(h.cutoff),
+                "status": h.status,
+            }
+            for h in stock.handoff_tasks
+        ],
+        "own_stock_holds": [
+            {
+                "hold_id": h.hold_id,
+                "resource_id": h.resource_id,
+                "purpose": h.purpose,
+                "remaining": h.remaining_quantity,
+                "status": h.effective_status,
+                "expires_local": t(h.expires_at),
+            }
+            for h in view.holds
+            if h.consumable and h.actor_id == principal
+        ],
+        "handoff": (
+            {
+                "window_local": f"{t(params.handoff_window.start)}-{t(params.handoff_window.end)}",
+                "staff_response_minutes": params.handoff_duration_minutes,
+                "service_rate_units_per_minute": params.service_rate_units_per_minute,
+            }
+            if params is not None
+            else None
+        ),
+    }
+
+
+def _candidate_context(c: CandidateResult) -> dict[str, Any]:
+    stock: dict[str, Any] = {}
+    if c.service_coverage:
+        stock = {
+            "required_stock_holds": [
+                {
+                    "resource_id": h.resource_id,
+                    "activity_id": h.activity_id,
+                    "service_target_id": h.service_target_id,
+                    "quantity": h.quantity,
+                    "held": h.held_quantity,
+                }
+                for h in c.required_stock_holds
+            ],
+            "stock_transfers": [
+                {
+                    "source": n.source_resource_id,
+                    "destination": n.destination_resource_id,
+                    "activity_id": n.activity_id,
+                    "quantity": n.quantity,
+                    "held": n.held_quantity,
+                }
+                for n in c.stock_transfers
+            ],
+            "service_coverage": [
+                {
+                    "target_id": s.target_id,
+                    "on_time": s.on_time_quantity,
+                    "unfulfilled": s.unfulfilled_quantity,
+                }
+                for s in c.service_coverage
+            ],
+        }
+    return stock | {
         "candidate_id": c.candidate_id,
         "report_id": c.report_id,
         "label": c.label,

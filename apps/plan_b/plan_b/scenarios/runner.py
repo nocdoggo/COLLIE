@@ -10,9 +10,10 @@ to do. Minute ticks, rather than jumps to private event times, keep wake-up timi
 hidden events.
 
 ``run_case`` chooses the coordinator policy by name: ``rules`` is the profile's deterministic
-baseline, ``live`` the live coordinator. Every policy runs under the same per-episode caps
-(``EpisodeCaps``, recorded in the outcome report); once a cap is reached the policy is not woken
-again.
+baseline (P0), ``tool-use`` the tool-using model baseline (P1), ``live`` or ``selective`` the live
+coordinator (P2) and ``verify-all`` its verify-all ablation (P3). Every policy runs under the same
+per-episode caps (``EpisodeCaps``, recorded in the outcome report); once a cap is reached the
+policy is not woken again.
 """
 
 from __future__ import annotations
@@ -477,9 +478,10 @@ def run_case(
 ) -> RunResult:
     """Run one private case to the hard end. The public scenario is the case's own unless
     ``scenario_id`` names it explicitly (a mismatch fails validation). ``policy`` chooses the
-    coordinator: ``rules`` (the profile's deterministic baseline) or ``live`` (the live policy,
-    its endpoint configuration read server-side; this makes paid model calls). An explicit
-    ``policy_factory`` (tests) takes precedence. Every policy runs under ``caps``."""
+    coordinator: ``rules`` (the profile's deterministic baseline) or a model-driven policy,
+    ``tool-use``, ``live`` (alias ``selective``) or ``verify-all``, whose endpoint configuration
+    is read server-side (these make paid model calls). An explicit ``policy_factory`` (tests)
+    takes precedence. Every policy runs under ``caps``."""
     from plan_b.evaluation.scoring import score_episode
 
     case: PrivateCase = load_case(case_ref)

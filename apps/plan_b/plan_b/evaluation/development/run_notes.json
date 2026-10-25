@@ -1,0 +1,72 @@
+{
+ "p1-tool-use_dev01": {
+  "what_happened": "The model checked the projector (delayed, ETA 17:25), applied the free swap of demonstrations and skills exchange at 16:43 (revision 4 to 5), checked the projector once more at 17:07 and otherwise kept plan v2; every activity completed at $0.",
+  "superseded_by": "p1-tool-use_dev01_r2",
+  "reason": "superseded by the prompt change, not by its outcome: it ran under prompt tool_use.v1 with a 1536-token turn budget, and the shipped P1 uses tool_use.v2 and 4096 tokens (the fix of p1-tool-use_pantry_dev01); rerun once under the shipped prompt and kept as recorded."
+ },
+ "p1-tool-use_dev01_r2": {
+  "what_happened": "Under prompt tool_use.v2 the model checked the projector (delayed, ETA 17:25) at 16:42 and the backup projector (available) at 16:44, applied the free swap of demonstrations and skills exchange at 16:45 (revision 5 to 6), checked the projector again at 17:07 and 17:22 and kept plan v2; its eighth model call, a 'keep' at 17:24, reached the cap with the new plan in place and no spend."
+ },
+ "p1-tool-use_dev02": {
+  "what_happened": "The model checked the projector (ETA 17:45), held the backup projector at 16:43, checked the backup's availability, asked the organizer to raise the committed limit from 0 to 3500 and applied the paid substitution at 16:48; it then spent its remaining model calls confirming 'keep' after each check-in and the arrival notice, and reached the 8-call cap at 17:44 with the new plan already in place.",
+  "superseded_by": "p1-tool-use_dev02_r2",
+  "reason": "superseded by the prompt change, not by its outcome: it ran under prompt tool_use.v1 with a 1536-token turn budget, and the shipped P1 uses tool_use.v2 and 4096 tokens (the fix of p1-tool-use_pantry_dev01); rerun once under the shipped prompt and kept as recorded."
+ },
+ "p1-tool-use_dev02_r2": {
+  "what_happened": "Under prompt tool_use.v2 the model checked the projector (ETA 17:45) at 16:42 and the backup's availability at 16:44, held the backup projector at 16:45, asked the organizer to raise the committed limit from 0 to 3500 and applied the paid substitution at 16:48 (revision 7 to 8); it then confirmed 'keep' at 16:48, 17:02, 17:25 and 17:44, and the eighth model call reached the cap at 17:44 with the new plan already in place."
+ },
+ "p1-tool-use_dev04": {
+  "what_happened": "The model checked the projector (on schedule, ETA 16:58) and kept plan v1, ended its 16:44 turn 'inapplicable' on the stale P09 reminder and kept the plan to the end: no hold, no plan change, no spend.",
+  "superseded_by": "p1-tool-use_dev04_r2",
+  "reason": "superseded by the prompt change, not by its outcome: it ran under prompt tool_use.v1 with a 1536-token turn budget, and the shipped P1 uses tool_use.v2 and 4096 tokens (the fix of p1-tool-use_pantry_dev01); rerun once under the shipped prompt and kept as recorded."
+ },
+ "p1-tool-use_dev04_r2": {
+  "what_happened": "Under prompt tool_use.v2 the model checked the projector (on schedule, ETA 16:58) at 16:42 and the backup projector (available) at 16:44 and kept plan v1, ended its 16:47 turn 'inapplicable' on the stale P09 reminder and its forwarded copy, and kept plan v1 at 16:58, 17:06 and 17:25: no hold, no plan change, no spend, 6 model calls and no cap reached."
+ },
+ "p1-tool-use_pantry_dev01": {
+  "what_happened": "Failed: the model sent six staff-handoff holds of the 16 partner kits and the executor refused each (a service target on a transfer hold, the 12:30-12:50 handoff window instead of the distribution window, then arguments without an activity); two replies were cut off at the 1536-token limit and the 8-call cap was reached at 12:35, so nothing was held or committed and 0 of 40 kits were distributed, with stock conserved.",
+  "superseded_by": "p1-tool-use_pantry_dev01_r2",
+  "reason": "a defect in our P1 harness, not the model's judgment: prompt tool_use.v1 never said which window a hold covers (the activity's window in the candidate, not the handoff window), and the 1536-token turn budget left too little room once the model's reasoning tokens (up to 1134 here) were counted. Fixed by prompt tool_use.v2 and a 4096-token turn budget, with tests/test_tool_use_hold_window.py."
+ },
+ "p1-tool-use_pantry_dev01_r2": {
+  "what_happened": "Under prompt tool_use.v2 the model held the 16 partner kits for the staff handoff at 12:31 (recorded as an ask), waited for the labeled staff simulator's receipt at 12:33 (24/16 to 40/0), held the 40 pantry kits at 12:34 and applied the allocation at 12:35; staff distributed 40 of 40 on time at 13:40, with no rejected call."
+ },
+ "p1-tool-use_skills_dev01": {
+  "what_happened": "The model checked the learning kit and its backup twice each (every answer STATUS_UNKNOWN) and kept plan v1, then applied the swap of practice and peer exchange at 10:06 after the peer lead's check-in; its eighth model call, a 'keep' right after, reached the cap at 10:06 with the new plan in place.",
+  "superseded_by": "p1-tool-use_skills_dev01_r2",
+  "reason": "superseded by the prompt change, not by its outcome: it ran under prompt tool_use.v1 with a 1536-token turn budget, and the shipped P1 uses tool_use.v2 and 4096 tokens (the fix of p1-tool-use_pantry_dev01); rerun once under the shipped prompt and kept as recorded."
+ },
+ "p1-tool-use_skills_dev01_r2": {
+  "what_happened": "Under prompt tool_use.v2 the model checked the learning kit twice (09:22, 09:24) and the backup learning kit once (09:26), every answer STATUS_UNKNOWN, and kept plan v1 through the check-ins and the kit's arrival record (09:45-09:55); after the peer lead's check-in it applied the swap of practice and peer exchange at 10:06 (revision 8 to 9), and its eighth model call, a 'keep' right after, reached the cap at 10:06 with the new plan in place."
+ },
+ "p2-live_dev01": {
+  "what_happened": "The model queried the projector (delayed, ETA 17:25); the next model call consumed that result and applied the free swap at 16:43, and the server kept plan v2 to the end."
+ },
+ "p2-live_dev02": {
+  "what_happened": "The model queried the projector (ETA 17:45) and the backup's availability, held the backup at 16:45, asked the organizer to raise the committed limit from 0 to 3500, and applied the paid substitution at 16:48 after the scripted organizer's answer."
+ },
+ "p2-live_dev04": {
+  "what_happened": "The model queried the projector (on schedule, ETA 16:58) and the server kept plan v1; the stale P09 reminder was recorded inapplicable (P09 is not the booking P17, 29 October is not the event date) and its forwarded copy duplicate, with no hold, change or spend."
+ },
+ "p2-live_pantry_dev01": {
+  "what_happened": "The model asked staff for the 16-kit handoff at 12:31 (a stock_transfer hold), waited for the labeled staff simulator's receipt at 12:33 (24/16 to 40/0), held the 40 pantry kits at 12:34 and applied the allocation at 12:35; staff distributed 40 of 40 on time at 13:40 and S20 stayed 20 unreceived."
+ },
+ "p2-live_skills_dev01": {
+  "what_happened": "The server kept plan v1 until the peer lead's check-in made it fail participant_availability; the model then applied the free swap of practice and peer exchange at 10:06."
+ },
+ "p3-verify-all_dev01": {
+  "what_happened": "Before the first choice the server checked the projector (delayed, ETA 17:25) and its approved substitute (available) under the relevance rule; the model then applied the free swap at 16:45."
+ },
+ "p3-verify-all_dev02": {
+  "what_happened": "The server checked the projector (ETA 17:45) and the backup (available); the model held the backup at 16:45, asked the organizer to raise the committed limit to 3500 and applied the paid substitution at 16:48."
+ },
+ "p3-verify-all_dev04": {
+  "what_happened": "The server checked the projector (on schedule, ETA 16:58) and the backup (available), recorded the stale P09 reminder inapplicable and its copy duplicate, and kept plan v1; the model was called only to read the notices (2 calls)."
+ },
+ "p3-verify-all_pantry_dev01": {
+  "what_happened": "The server checked the delayed shipment (ETA 14:10) and the partner pool (available); the model asked staff for the 16-kit handoff at 12:35, waited for the receipt at 12:37 (24/16 to 40/0), held 40 pantry kits at 12:38 and applied the allocation at 12:39; 40 of 40 were distributed on time."
+ },
+ "p3-verify-all_skills_dev01": {
+  "what_happened": "The server checked the backup learning kit twice (STATUS_UNKNOWN, then the one bounded retry) and kept plan v1; after the peer lead's check-in the model applied the swap of practice and peer exchange at 10:06."
+ }
+}

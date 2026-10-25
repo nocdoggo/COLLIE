@@ -11,10 +11,11 @@ decisions that carry them (the live policy attributes every provider call to a d
 gets at most the remaining tool budget. Once a cap is reached the policy is not woken again and
 the host records one ``stop`` decision that says so.
 
-The host also knows which policy an episode runs: ``rules`` (the profile's deterministic
-baseline) or ``live`` (the live coordinator). Every stored decision is stamped with
-``details.policy_mode``: the mode label ("Deterministic policy" or "Live agent · <returned model
-id>") and the caps it ran under.
+The host also knows which policy an episode runs, by the evaluation plan's names: ``rules``
+(P0, the profile's deterministic baseline), ``tool-use`` (P1, ``tool-use/1.0.0``), ``live`` or
+its alias ``selective`` (P2, ``live/1.0.0``) and ``verify-all`` (P3, ``verify-all/1.0.0``). Every
+stored decision is stamped with ``details.policy_mode``: the mode label ("Deterministic policy",
+or "<policy label> · <returned model id>", e.g. "Live agent · …") and the caps it ran under.
 """
 
 from __future__ import annotations
@@ -36,10 +37,20 @@ if TYPE_CHECKING:
     from plan_b.agent.config import ModelConfig
 
 COORDINATOR_ROLE = "coordinator_agent"
-PolicyChoice = Literal["rules", "live"]
-POLICY_CHOICES: tuple[PolicyChoice, ...] = ("rules", "live")
+PolicyChoice = Literal["rules", "tool-use", "live", "selective", "verify-all"]
+POLICY_CHOICES: tuple[PolicyChoice, ...] = ("rules", "tool-use", "live", "selective", "verify-all")
+# ``selective`` names P2 as the evaluation plan does; the host stores it as ``live``.
+POLICY_ALIASES: dict[str, PolicyChoice] = {"selective": "live"}
 DETERMINISTIC_LABEL = "Deterministic policy"
 LIVE_LABEL = "Live agent"
+TOOL_USE_LABEL = "Tool-use agent"
+VERIFY_ALL_LABEL = "Verify-all agent"
+# Model-driven policies: (policy id prefix, the choice that selects it, its mode label).
+MODEL_POLICIES: tuple[tuple[str, PolicyChoice, str], ...] = (
+    ("tool-use/", "tool-use", TOOL_USE_LABEL),
+    ("live/", "live", LIVE_LABEL),
+    ("verify-all/", "verify-all", VERIFY_ALL_LABEL),
+)
 CAP_FAILURES = {"tool_calls": "tool_call_cap", "model_calls": "model_call_cap"}
 
 
@@ -47,7 +58,9 @@ CAP_FAILURES = {"tool_calls": "tool_call_cap", "model_calls": "model_call_cap"}
 class EpisodeCaps:
     """Per-episode caps for every coordinator policy. The defaults are the Wave 2
     development-phase values that Wave 3 freezes: 48 tool calls (the rule baselines use 19-30
-    in the development cases) and 8 model calls (only the live policy calls a model)."""
+    in the development cases) and 8 model calls (only the model-driven policies, P1-P3, call
+    a model). A rebuilt policy (a restarted server) continues the episode's recorded counters
+    and model spend (``resume_usage``)."""
 
     max_tool_calls: int = 48
     max_model_calls: int = 8
@@ -99,6 +112,13 @@ def baseline_policy_factory(profile_id: str) -> Callable[[], Policy]:
     return default_policy_factory
 
 
+def canonical_choice(choice: str) -> PolicyChoice:
+    """The stored name of a choice (``selective`` is ``live``); raises on an unknown one."""
+    if choice not in POLICY_CHOICES:
+        raise ValueError(f"unknown policy {choice!r}; choose one of {', '.join(POLICY_CHOICES)}")
+    return POLICY_ALIASES.get(choice, choice)
+
+
 def live_factory(
     caps: EpisodeCaps = DEVELOPMENT_CAPS, config: ModelConfig | None = None
 ) -> Callable[[], Policy]:
@@ -113,6 +133,29 @@ def live_factory(
     )
 
 
+def tool_use_factory(
+    caps: EpisodeCaps = DEVELOPMENT_CAPS, config: ModelConfig | None = None
+) -> Callable[[], Policy]:
+    """P1, the tool-using model baseline (``tool-use/1.0.0``), under the same caps and the same
+    server-side endpoint configuration as the live coordinator."""
+    from plan_b.agent.policies.tool_use import tool_use_policy_factory
+
+    return tool_use_policy_factory(
+        config, max_model_calls=caps.max_model_calls, max_tool_calls=caps.max_tool_calls
+    )
+
+
+def verify_all_factory(
+    caps: EpisodeCaps = DEVELOPMENT_CAPS, config: ModelConfig | None = None
+) -> Callable[[], Policy]:
+    """P3, the verify-all ablation (``verify-all/1.0.0``), under the same caps and endpoint."""
+    from plan_b.agent.policies.verify_all import verify_all_policy_factory
+
+    return verify_all_policy_factory(
+        config, max_model_calls=caps.max_model_calls, max_tool_calls=caps.max_tool_calls
+    )
+
+
 def policy_factory_for(
     choice: PolicyChoice,
     profile_id: str,
@@ -120,27 +163,45 @@ def policy_factory_for(
     caps: EpisodeCaps = DEVELOPMENT_CAPS,
     live_config: ModelConfig | None = None,
 ) -> Callable[[], Policy]:
+    """``rules`` is the profile's deterministic baseline (P0); the model-driven choices share
+    the endpoint configuration, read server-side (``ModelConfigError`` when it is missing)."""
+    choice = canonical_choice(choice)
     if choice == "rules":
         return baseline_policy_factory(profile_id)
-    if choice == "live":
-        return live_factory(caps, live_config)
-    raise ValueError(f"unknown policy {choice!r}; choose one of {', '.join(POLICY_CHOICES)}")
+    if choice == "tool-use":
+        return tool_use_factory(caps, live_config)
+    if choice == "verify-all":
+        return verify_all_factory(caps, live_config)
+    return live_factory(caps, live_config)
 
 
 def is_live(policy_id: str) -> bool:
+    """The live coordinator (P2) itself."""
     return policy_id.startswith("live/")
 
 
+def is_model_driven(policy_id: str) -> bool:
+    """P1, P2 or P3: a policy whose decisions carry model calls."""
+    return any(policy_id.startswith(prefix) for prefix, _, _ in MODEL_POLICIES)
+
+
+def choice_of(policy_id: str) -> PolicyChoice:
+    """The selection that runs ``policy_id`` (``rules`` for the deterministic baselines)."""
+    return next((c for prefix, c, _ in MODEL_POLICIES if policy_id.startswith(prefix)), "rules")
+
+
 def mode_label(policy_id: str, model_id: str | None, requested_model: str | None = None) -> str:
-    """ "Deterministic policy", or "Live agent · <model id as returned by the provider>"; before
-    the first reply the configured model is named and marked as requested."""
-    if not is_live(policy_id):
+    """ "Deterministic policy", or "<policy label> · <model id as returned by the provider>"
+    ("Live agent", "Tool-use agent" or "Verify-all agent"); before the first reply the
+    configured model is named and marked as requested."""
+    label = next((lbl for prefix, _, lbl in MODEL_POLICIES if policy_id.startswith(prefix)), None)
+    if label is None:
         return DETERMINISTIC_LABEL
     if model_id:
-        return f"{LIVE_LABEL} · {model_id}"
+        return f"{label} · {model_id}"
     if requested_model:
-        return f"{LIVE_LABEL} · {requested_model} (requested; no reply yet)"
-    return LIVE_LABEL
+        return f"{label} · {requested_model} (requested; no reply yet)"
+    return label
 
 
 def returned_model_id(decision: PolicyDecision) -> str | None:
@@ -158,10 +219,22 @@ def _model_calls(decision: PolicyDecision) -> int:
     return len(calls) if isinstance(calls, list) else 0
 
 
+def _model_spend(decision: PolicyDecision) -> float:
+    model = decision.details.get("model")
+    calls = model.get("calls") if isinstance(model, dict) else None
+    if not isinstance(calls, list):
+        return 0.0
+    return sum(
+        float(c["cost_usd"])
+        for c in calls
+        if isinstance(c, dict) and isinstance(c.get("cost_usd"), int | float)
+    )
+
+
 class PolicyHost:
     """``policy_factory`` serves every episode without a selection. With ``factory_for`` the
-    host can select ``rules`` or ``live`` per episode (``select``), and an episode whose stored
-    decisions came from the live policy keeps it after a restart."""
+    host can select a policy per episode (``select``), and an episode whose stored decisions
+    came from a model-driven policy keeps it after a restart."""
 
     def __init__(
         self,
@@ -189,8 +262,9 @@ class PolicyHost:
         factory: Callable[[], Policy] | None = None,
     ) -> None:
         """Choose the episode's policy. Allowed only before its coordinator has acted, so one
-        episode never mixes two policies' memory or caps. Building a live factory reads the
-        endpoint configuration and raises ``ModelConfigError`` when it is missing."""
+        episode never mixes two policies' memory or caps. Building a model-driven factory reads
+        the endpoint configuration and raises ``ModelConfigError`` when it is missing."""
+        choice = canonical_choice(choice)
         if factory is None:
             if self._factory_for is None:
                 raise ValueError("this host has no per-episode policy factories")
@@ -209,7 +283,7 @@ class PolicyHost:
             return self._tool_calls(conn, episode_id) > 0 or bool(repo.decisions(conn, episode_id))
 
     def choice(self, episode_id: str) -> PolicyChoice:
-        return "live" if is_live(self.policy(episode_id).policy_id) else "rules"
+        return choice_of(self.policy(episode_id).policy_id)
 
     def _profile(self, episode_id: str) -> str:
         with self._db.read() as conn:
@@ -226,8 +300,8 @@ class PolicyHost:
         # decisions came from; an episode without decisions runs its deterministic baseline.
         with self._db.read() as conn:
             decisions = repo.decisions(conn, episode_id)
-        live = bool(decisions) and is_live(decisions[-1].policy_id)
-        return self._factory_for("live" if live else "rules", self._profile(episode_id))
+        choice = choice_of(decisions[-1].policy_id) if decisions else "rules"
+        return self._factory_for(choice, self._profile(episode_id))
 
     def policy(self, episode_id: str) -> Policy:
         with self._lock:
@@ -235,6 +309,13 @@ class PolicyHost:
         if found is not None:
             return found
         made = self._factory_of(episode_id)()
+        used = self.usage(episode_id)
+        resume = getattr(made, "resume_usage", None)
+        if callable(resume) and (used.model_calls or used.tool_calls):
+            with self._db.read() as conn:
+                spent = sum(_model_spend(d) for d in repo.decisions(conn, episode_id))
+            # A restart continues the episode's caps: its calls and its model spend.
+            resume(used.model_calls, used.tool_calls, spent)
         with self._lock:
             return self._policies.setdefault(episode_id, made)
 
@@ -433,7 +514,7 @@ class PolicyHost:
         for d in result.decisions:
             latest = returned_model_id(d) or latest
             mode = {
-                "policy": "live" if is_live(d.policy_id) else "rules",
+                "policy": choice_of(d.policy_id),
                 "label": mode_label(d.policy_id, latest, requested),
                 "caps": self.caps.as_dict(),
             }

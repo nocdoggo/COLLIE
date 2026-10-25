@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 import tempfile
 from datetime import UTC, datetime
@@ -51,6 +52,10 @@ NOTICE_ID = "obs_notice_01"
 GATE_MAX_MODEL_CALLS = 6
 GATE_MAX_TOOL_CALLS = 16
 TOOL_ACTIONS = ("query_status", "hold_resource", "apply_plan", "release_hold")
+# Removed from a recorded exception's text: credential-shaped tokens, then absolute local paths
+# (an error from the ledger or the temporary database names its file). URLs keep their paths.
+_SECRET_TEXT = re.compile(r"(?i)\bbearer\s+[^\s'\";,]+|\bsk-[A-Za-z0-9_-]{8,}")
+_LOCAL_PATH = re.compile(r"(?<![\w.:/~])~?/[^\s'\";,]+")
 
 
 def run_gate(
@@ -113,7 +118,7 @@ def run_gate(
                 "note": result.note,
             }
         except Exception as exc:  # noqa: BLE001 - recorded as a gate failure, never a pass
-            error = {"type": type(exc).__name__, "message": str(exc)[:300]}
+            error = {"type": type(exc).__name__, "message": public_message(exc)}
         history = episode_history(db, episode_id)
     record["error"] = error
     record.update(_evidence(history.decisions, history.tool_calls, policy))
@@ -130,6 +135,13 @@ def run_gate(
     record["reasons"] = reasons
     record["finished_at"] = _wall()
     return record
+
+
+def public_message(exc: BaseException) -> str:
+    """An exception's text for the gate record: no credential-shaped token and no local path,
+    cut to 300 characters."""
+    text = _SECRET_TEXT.sub("<redacted>", str(exc))
+    return _LOCAL_PATH.sub("<path>", text)[:300]
 
 
 def _evidence(

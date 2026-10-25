@@ -67,6 +67,16 @@ export function openHandoffs(stock: ConsumableStateView) {
   );
 }
 
+/**
+ * The receipt source the form shows, by option key (`hold:<id>` or `shipment:<id>`). A source
+ * staff picked stays chosen while it is still receivable. Otherwise the form shows the first open
+ * handoff, or nothing: an expected shipment is recorded only when staff pick it, so recording a
+ * handoff never moves the form on to a shipment that has not arrived.
+ */
+export function receiptChoiceKey(keys: readonly string[], choice: string): string {
+  return keys.includes(choice) ? choice : (keys.find((k) => k.startsWith("hold:")) ?? "");
+}
+
 /** record_stock_receipt arguments for the chosen source, or why they cannot be sent. */
 export function receiptArguments(
   view: EventStateView,
@@ -150,7 +160,8 @@ function ReceiptForm({
       source: { kind: "shipment", shipmentId: e.shipment.shipment_id } as ReceiptSource,
     })),
   ];
-  const chosen = options.find((o) => o.key === choice) ?? options[0];
+  const chosenKey = receiptChoiceKey(options.map((o) => o.key), choice);
+  const chosen = options.find((o) => o.key === chosenKey);
   const source = chosen?.source ?? null;
   const task = source?.kind === "handoff" ? tasks.find((t) => t.hold_id === source.holdId) : undefined;
   const shipment =
@@ -201,7 +212,8 @@ function ReceiptForm({
         <>
           <label className="field">
             <span>What arrived</span>
-            <select value={chosen?.key ?? ""} onChange={(e) => setChoice(e.target.value)}>
+            <select value={chosenKey} onChange={(e) => setChoice(e.target.value)}>
+              {chosen === undefined ? <option value="">Choose what arrived</option> : null}
               {tasks.map((t) => (
                 <option key={t.hold_id} value={`hold:${t.hold_id}`}>
                   {`Handoff ${t.hold_id}: ${t.remaining_quantity} from ${look.resourceLabel(t.source_resource_id)} into ${look.resourceLabel(t.destination_resource_id)}`}

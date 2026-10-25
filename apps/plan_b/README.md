@@ -8,11 +8,14 @@ change is needed, or explains the unresolved constraint when recovery is impossi
 Every action is a real mutation of the local SQLite store and nothing else. No university
 booking, purchase, delivery, or message is made. By default the coordinator is a documented
 deterministic rule policy (`rules/1.0.0`, and `pantry-rules/1.0.0` for the pantry profile).
-Wave 2 adds an optional **live agent** (`live/1.0.0`) that interprets notices and chooses among
-server-built options with a language model; it makes **paid** model calls and is off unless
-selected. Wave 2 also adds a second event configuration (a community skills exchange), a pantry
-profile with consumable stock and staff-only attestations, participant check-ins and resource
-offers, and per-episode caps for every policy.
+Wave 2 adds three optional model-driven policies, the P1-P3 of the evaluation plan: the **live
+agent** (`live/1.0.0`, P2) interprets notices and chooses among server-built options with a
+language model, including the pantry's stock options; the **tool-use agent** (`tool-use/1.0.0`,
+P1) calls the tools itself; the **verify-all agent** (`verify-all/1.0.0`, P3) is P2 with every
+relevant status check made first. They make **paid** model calls and are off unless selected.
+Wave 2 also adds a second event configuration (a community skills exchange), a pantry profile
+with consumable stock and staff-only attestations, participant check-ins and resource offers,
+and per-episode caps for every policy.
 
 Contract: [docs/RUNTIME_CONTRACT.md](docs/RUNTIME_CONTRACT.md) (runtime 1.1.0). Planning source:
 [`PEEAI_plan/`](../../PEEAI_plan/README.md). Audit packets:
@@ -35,7 +38,7 @@ uv sync --all-groups --locked     # Python deps into apps/plan_b/.venv
 (cd web && npm ci && npm run build)   # browser app into web/dist
 ```
 
-After installation nothing needs network access, except the optional live agent (below).
+After installation nothing needs network access, except the optional model-driven policies (below).
 
 ## Run the sandbox
 
@@ -90,10 +93,9 @@ The case list names each case's scenario, and **Load episode** loads it on its o
   kits), advance to 13:40 and record the distribution (40 on time; the counters read 0/0; the 20
   expected kits stay unreceived). `pantry_dev02` hands off only 10 of 16 kits and ends with a
   disclosed 6-kit shortfall.
-* **Policy switch.** Under **Policy for this episode** the moderator chooses **Deterministic
-  policy** or **Live agent · <model id>** before the coordinator first acts; the button then reads
-  **Run deterministic policy** or **Run live agent**. Selecting the live agent calls no model;
-  running it does (paid). Every decision card names the policy that ran, and a live card shows the
+* **Policy switch.** Under **Policy for this episode** the moderator chooses the deterministic
+  policy or a model-driven one (tool-use, live or verify-all agent) before the coordinator first
+  acts. Selecting a model-driven policy calls no model; running it does (paid). Every decision card names the policy that ran, and a live card shows the
   model id as returned, latency, tokens, cost and the episode's usage against its caps, with the
   model's rationale labelled as untrusted text.
 
@@ -105,10 +107,11 @@ uv run plan-b verify-trace var/out/traces/dev01_trace.json
 uv run plan-b serve --replay-dir var/out/traces   # replay them; board exports in var/traces are always listed
 ```
 
-`plan-b run-case <case|all> [--policy rules|live] [--max-episode-tool-calls N]
-[--max-episode-model-calls N]` runs development cases on their own scenarios. Every policy runs
-under the per-episode caps (development values: 48 tool calls, 8 model calls); once one is reached
-the policy records a `stop` and is not woken again. `--policy live` makes paid model calls.
+`plan-b run-case <case|all> [--policy rules|tool-use|live|selective|verify-all]
+[--max-episode-tool-calls N] [--max-episode-model-calls N]` runs development cases on their own
+scenarios (`selective` is an alias of `live`). Every policy runs under the per-episode caps
+(development values: 48 tool calls, 8 model calls); once one is reached the policy records a
+`stop` and is not woken again. Every policy except `rules` makes paid model calls.
 
 | Case | Scenario | What it exercises | Deterministic outcome |
 | --- | --- | --- | --- |
@@ -118,30 +121,40 @@ the policy records a `stop` and is not woken again. `--policy live` makes paid m
 | pantry_dev01 | `dev_fixture_03` | target 40 kits, pantry 24, partner 16, a 20-kit shipment delayed past the session | hold 16, staff handoff (40/0), commit 40, 40 distributed on time; S20 stays 20 unreceived |
 | pantry_dev02 | `dev_fixture_03` | staff hands off only 10 of the 16 held kits | 34 distributed, a disclosed 6-kit shortfall against the unchanged target 40 |
 
-### Live agent (optional, paid)
+### Model-driven policies (optional, paid)
 
-The live agent needs an OpenAI-compatible endpoint (OpenRouter by default). Its configuration is
+The tool-use, live and verify-all agents need an OpenAI-compatible endpoint (for example
+OpenRouter; `PLAN_B_MODEL_PROVIDER`, `PLAN_B_MODEL_BASE_URL` and `PLAN_B_MODEL_KEY_FILE` have no
+defaults). Its configuration is
 read server-side from the environment, else from `.local/keys/model_endpoint.env` at the
 repository root; see [`.env.example`](.env.example) for the names (`PLAN_B_MODEL_PROVIDER`,
 `PLAN_B_MODEL_BASE_URL`, `PLAN_B_MODEL_KEY_FILE`, `PLAN_B_MODEL_ID`,
 `PLAN_B_MODEL_MAX_RUN_COST_USD`, `PLAN_B_MODEL_MAX_TOTAL_COST_USD`). The key lives only in the
 key file (mode 0600, ignored by git); the provider reads it per call and sends it only in the
 `Authorization` header. It never reaches the browser, a trace, a log or a decision. A spend guard
-refuses any call that could exceed the per-run (per-episode) cap or the cumulative cap of the
-ledger `var/model_spend.json`, which records every call.
+refuses any call that could exceed the per-run (per-episode) cap, which a restarted server
+resumes from the episode's recorded spend, or the cumulative cap of the ledger
+`var/model_spend.json`, which records every call.
 
 ```bash
 uv run python -m plan_b.agent.gate --out <file>                 # the G-LLM gate on a fresh dev01 episode (paid)
 uv run plan-b run-case dev01 --policy live --db var/live.sqlite3 --out var/live_out   # paid
 uv run python scripts/run_live_cases.py --out <dir> dev01 dev04 # recorded live runs with their records (paid)
+uv run python scripts/run_live_cases.py --out <dir> --policy tool-use dev01   # the same for P1 (or verify-all, live)
+uv run python scripts/write_development_results.py --evidence <evidence dir>  # the development results table (no model call)
 ```
 
-`scripts/run_live_cases.py` runs each case once under the live policy, exports and verifies the
-trace, and writes a run record: the outcome line, the model as requested and as returned, every
+`scripts/run_live_cases.py` runs each case once under the chosen policy (`live` by default),
+exports and verifies the trace, and writes a run record: the outcome line, the model as requested and as returned, every
 model call's latency, tokens and cost, the ledger before and after, the tool calls, the decisions,
 and checks computed from the trace (useful tool calls, validated actions, fresh-state agreement,
-the response to each notice). A recorded run is never overwritten. Live runs are evidence of one
-run, not reproducible artifacts: replay is the reproducible form.
+the response to each notice). With `--policy`, the files are named after the policy
+(`live_p1-tool-use_<case>`, `live_p2-live_<case>`, `live_p3-verify-all_<case>`). A recorded run is
+never overwritten. Live runs are evidence of one run, not reproducible artifacts: replay is the
+reproducible form. `scripts/write_development_results.py` reads the recorded P1-P3 runs from the
+evidence directory and writes `plan_b/evaluation/development/development_runs.json` and its
+`README.md` table, with one sentence per run (from `run_notes.json`, read from each trace). These
+are development runs: one trial each, and no comparison between policies.
 
 `plan-b verify-trace` checks the frame, chain and content hashes, the algorithm label
 (`sha256`), `kind`, `trace_version`, and that the last frame's revision equals the final
@@ -192,9 +205,9 @@ uv run mypy
 | `plan_b/tools/` | The single executor, per-tool handlers (stock and staff tools in `stock.py`), in-process client |
 | `plan_b/world/` | Private world (status trajectories, timed events) and the leak checker |
 | `plan_b/scenarios/` | Public fixtures (campus, skills exchange, pantry), private development cases, policy host with episode caps, runner |
-| `plan_b/evaluation/` | Deterministic rule policies (campus and pantry) and parser, state-based scoring, trace export |
-| `plan_b/agent/` | Live agent (Wave 2): endpoint configuration, provider and spend ledger, interpretation, closed action menu, orchestrator, prompts, the G-LLM gate |
+| `plan_b/evaluation/` | Deterministic rule policies (campus and pantry) and parser, state-based scoring, trace export; `development/` holds the recorded development runs of P1-P3 |
+| `plan_b/agent/` | Model-driven policies (Wave 2): endpoint configuration, provider and spend ledger, interpretation, closed action menu, the live orchestrator (P2), `policies/` (P1 tool-use, P2 selective, P3 verify-all), prompts, the G-LLM gate |
 | `plan_b/api/` | FastAPI application, policy configuration, participation view |
 | `web/` | React + TypeScript board and replay |
-| `scripts/` | Evidence collectors, the Wave 1 manifest writer, recorded live runs |
+| `scripts/` | Evidence collectors, the Wave 1 manifest writer, recorded live runs, the development results writer |
 | `tests/` | Focused tests against the real store and executor |

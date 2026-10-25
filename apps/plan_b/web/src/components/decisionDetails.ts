@@ -96,6 +96,32 @@ export function choiceOf(decision: PolicyDecision): DecisionChoice | null {
   };
 }
 
+/** One P1 (`tool-use/`) model turn: the tool calls it named, its decision and its rationale. */
+export interface ToolTurnChoice {
+  readonly model_call_id: string | null;
+  readonly decision: string | null;
+  readonly calls: readonly { readonly tool: string; readonly arguments_json: string }[];
+  readonly rationale_untrusted: string | null;
+  readonly cited_refs: readonly string[];
+}
+
+/** `details.choice` of a P1 turn (no menu option; the model named the tools), or null. */
+export function toolTurnOf(decision: PolicyDecision): ToolTurnChoice | null {
+  const c = objectOf(decision.details.choice);
+  if (c === null || stringOf(c.option_id) !== null || !Array.isArray(c.calls)) return null;
+  const calls = c.calls
+    .map(objectOf)
+    .filter((x): x is JsonObject => x !== null)
+    .map((x) => ({ tool: stringOf(x.tool) ?? "?", arguments_json: stringOf(x.arguments_json) ?? "{}" }));
+  return {
+    model_call_id: stringOf(c.model_call_id),
+    decision: stringOf(c.decision),
+    calls,
+    rationale_untrusted: stringOf(c.rationale_untrusted),
+    cited_refs: stringsOf(c.cited_refs),
+  };
+}
+
 /** "model" when a model call chose the action, "server" when the server recorded it alone. */
 export function chosenBy(decision: PolicyDecision): "model" | "server" | null {
   const by = decision.details.chosen_by;

@@ -3,8 +3,10 @@
 This is the interface of the Plan B sandbox: the Wave 1 deterministic campus core (contract
 1.0.0) and its additive Wave 2 extensions (contract 1.1.0). Wave 2 adds consumable stock and
 staff-only attestations for the pantry profile (sections 4, 15), resource offers (section 9), a
-second event configuration (section 1), the live coordinator policy (section 16), and
-per-episode caps and policy selection for every coordinator policy (section 17). The Pydantic models
+second event configuration (section 1), the live coordinator policy P2 with its pantry stock
+options (section 16), per-episode caps and policy selection for every coordinator policy
+(section 17), and the comparison policies P1 and P3 with the development runs (section 18). The
+Pydantic models
 in [`plan_b/domain/models.py`](../plan_b/domain/models.py) are the machine-readable form; this
 document gives their semantics. Where they disagree, fix the disagreement rather than choosing one.
 
@@ -20,7 +22,7 @@ delivery, or message is made.
 | Runtime contract | 1.1.0 | `models.RUNTIME_VERSION`, this file. Stored records keep the version they were written with: `PublicScenario`, `PrivateCase`, `ActionReceipt`, `ToolEnvelope` and `EventStateView` accept `1.0.0` and `1.1.0` (`models.RuntimeVersion`), and the campus fixtures remain 1.0.0 documents |
 | Trace format | 1.0.0 | `models.TRACE_VERSION`, section 13 (unchanged in Wave 2) |
 | Store schema | migrations `0001_initial.sql`, `0002_scheduled_actions.sql`, `0003_history_guards.sql`, `0004_consumable_stock.sql` (Wave 2) | `plan_b/store/migrations/` |
-| Live policy prompts | `interpret.v1`, `choose_action.v1` | `plan_b/agent/prompts/`; every live decision records each prompt's sha256 (section 16) |
+| Model policy prompts | P2 and P3: `interpret.v1`, `choose_action.v1`, and `choose_action_pantry.v1` on consumable profiles; P1: `tool_use.v2` (`tool_use.v1` is kept because the first recorded P1 development runs cite it) | `plan_b/agent/prompts/`; every model-driven decision records each prompt's sha256 (sections 16 and 18) |
 
 Planning objects set `additionalProperties: false`, so runtime records never add fields to them.
 Each runtime record *contains* the planning fields unchanged and adds runtime fields beside them.
@@ -148,8 +150,10 @@ All responses are JSON. Tool calls always return a `ToolEnvelope` body; the HTTP
 200 for any envelope produced after authentication (including business rejections), 401 for a
 missing/invalid/closed session, 403 when a moderator session calls an event tool, and 400 for
 a body that fails `ToolRequest` or argument validation. Other endpoints return FastAPI errors
-`{detail: {code, message}}`: 401 (no or bad session), 403 (not a moderator), 400 (bad input),
-404 (unknown replay), 409 `NO_EPISODE` (moderator state read before any episode is loaded).
+`{detail: {code, message}}`: 401 (no or bad session), 403 (not a moderator), 400 (bad input the
+handler detects, e.g. `UNKNOWN_ENTITY`, `SCENARIO_MISMATCH`, `MODEL_NOT_CONFIGURED`), 404 (unknown
+replay), 409 `NO_EPISODE` (moderator state read before any episode is loaded). A request body
+that fails validation gets FastAPI's 422, whose `detail` is a list, not `{code, message}`.
 
 | Method and path | Auth | Request → response |
 | --- | --- | --- |
@@ -160,7 +164,7 @@ a body that fails `ToolRequest` or argument validation. Other endpoints return F
 | `GET /api/state` | any session | → `EventStateView` for the caller (moderator: organizer-level visibility of the current episode) |
 | `POST /api/tools/{tool}` | event session | `ToolRequest` → `ToolEnvelope` |
 | `GET /api/moderator/cases` | moderator | → `[{case_ref, scenario_id, profile_id}]` (public ids only; no private descriptions) |
-| `POST /api/moderator/episodes` | moderator | `{case_ref, scenario_id?, policy?}` → `{episode_id, event_id, scenario_id, clock, revision, policy, mode_label}`; `scenario_id` defaults to the case's own (another one is 400 `SCENARIO_MISMATCH`); `policy` is `rules` (default; the profile's deterministic baseline) or `live` (400 `MODEL_NOT_CONFIGURED`, checked before anything is reset, when the endpoint configuration is missing); loads a clean episode and closes every other active episode (reset) |
+| `POST /api/moderator/episodes` | moderator | `{case_ref, scenario_id?, policy?}` → `{episode_id, event_id, scenario_id, clock, revision, policy, mode_label}`; `scenario_id` defaults to the case's own (another one is 400 `SCENARIO_MISMATCH`); `policy` is a `PolicyChoice` (section 17): `rules` (default; the profile's deterministic baseline), `tool-use`, `live` (alias `selective`, returned as `live`) or `verify-all`; a model-driven choice is refused with 400 `MODEL_NOT_CONFIGURED`, checked before anything is reset, when the endpoint configuration is missing or invalid or its key file is absent; loads a clean episode and closes every other active episode (reset) |
 | `GET /api/moderator/current` | moderator | → `{episode_id}` (null before the first load) |
 | `POST /api/moderator/sessions` | moderator | `{principal_id}` → `{join_code, join_path, principal_id, role, display_name}`; refuses `coordinator_agent`; codes are one-time and expire after 10 wall-clock minutes |
 | `POST /api/moderator/clock` | moderator | `{advance_minutes: 1..240}` → `{clock, revision, transitions}` |
@@ -879,13 +883,15 @@ decide from the visible state at their instant and are identical for every polic
 browser the simulator is off, and a human staff tab records directly (its latency is not
 enforced).
 
-**Cases and policies.** `run_case(db, case_ref, *, scenario_id=None, policy="rules"|"live",
+**Cases and policies.** `run_case(db, case_ref, *, scenario_id=None, policy="rules",
 policy_factory=None, caps=DEVELOPMENT_CAPS, live_config=None, max_tool_calls=16)` runs a case on
-its own `scenario_id` unless one is passed explicitly. `rules` is the profile's deterministic
-baseline (`policy_host.baseline_policy_factory`: `rules/1.0.0`, or `pantry-rules/1.0.0` for
-`pantry_continuity`); `live` is the live coordinator `live/1.0.0` (section 16), with its endpoint
-configuration read server-side. An explicit `policy_factory` (tests) takes precedence. The
-profile selects a policy and its declared rules, never a scripted outcome.
+its own `scenario_id` unless one is passed explicitly. `policy` is a `PolicyChoice`: `rules` is
+the profile's deterministic baseline, P0 (`policy_host.baseline_policy_factory`: `rules/1.0.0`,
+or `pantry-rules/1.0.0` for `pantry_continuity`); the model-driven choices are `tool-use` (P1,
+`tool-use/1.0.0`, section 18), `live` or its alias `selective` (P2, the live coordinator
+`live/1.0.0`, section 16) and `verify-all` (P3, `verify-all/1.0.0`, section 18), each with its
+endpoint configuration read server-side. An explicit `policy_factory` (tests) takes precedence.
+The profile selects a policy and its declared rules, never a scripted outcome.
 
 **Scoring.** `evaluation/scoring.py:score_episode(final, history, case)` scores from persisted,
 visible records only. It dispatches on `final.profile_id` to
@@ -935,8 +941,9 @@ values of the episode's recorded decisions: `null` when none were recorded (cloc
 participant actions only), the id when one policy decided, and the distinct ids sorted and
 joined with `,` when several did. `POST /api/moderator/export` derives it this way, and
 `plan-b run-case` records the id of the policy its runner ran. Decisions in traces carry
-`details.policy_mode.label`, which names the policy that ran ("Deterministic policy" or "Live
-agent · <model id as returned>", section 17). Live decisions also carry the model call records
+`details.policy_mode.label`, which names the policy that ran ("Deterministic policy", or
+"Tool-use agent · <model>", "Live agent · <model>" or "Verify-all agent · <model>" with the model
+id as returned, section 17). Live decisions also carry the model call records
 of section 16. Live traces are evidence of one run, not reproducible artifacts: model choices
 and the calls' wall-clock `started_at` vary between runs.
 
@@ -999,10 +1006,16 @@ observations and the public scenario's visible observations, which every episode
 start (the shipped fixtures use `projector_delivery_01`, public from 16:40 through
 `obs_notice_01`). `plan_b/world/leakcheck.py:private_markers` implements this.
 
-The live policy (section 16) builds its model inputs only from the tool envelopes it received, so
-the same rule covers what is sent to the model provider: `tests/test_agent_boundary.py` scans the
-model request bodies and the policy's envelopes for private markers, and applies the static
-import rule to `plan_b/agent/orchestrator.py`, `interpret.py`, `menu.py` and `prompts/`.
+The model-driven policies (sections 16 and 18) build their model inputs only from the tool
+envelopes they received, so the same rule covers what is sent to the model provider:
+`tests/test_agent_boundary.py` scans the model request bodies and the policy's envelopes for
+private markers. The static import rule lives in `tests/test_runner_isolation.py::ISOLATED_MODULES`.
+It covers every module of `plan_b/agent/` (the policies in `agent/policies/` included) except
+`agent/gate.py`, a harness that creates its own episode like the runner; `agent/provider.py` is
+exempt only from the literal `open(` check (its ledger, lock file and HTTP transport). It also
+covers the pantry rule policy, the pantry adapter and the stock modules. Relative and from-imports
+are resolved, and `import_module` and `__import__` are refused. A test fails when a new module
+under `agent/` or `evaluation/policies/` is left out.
 
 ## 15. Consumable stock (pantry profile)
 
@@ -1066,10 +1079,13 @@ rebuilt with `consumable`, `remaining_quantity`, `purpose`, `destination_resourc
 `service_target_id` and status `fulfilled`, and refuses DELETE, a status update once terminal,
 definition updates, a growing remainder and any remainder change once terminal.
 
-## 16. Live coordinator policy (`live/1.0.0`)
+## 16. Live coordinator policy (`live/1.0.0`, P2)
 
 `plan_b/agent/orchestrator.py:LivePolicy` implements the same `Policy` protocol as `rules/1.0.0`
-and sees only tool envelopes. One run:
+and sees only tool envelopes. It is P2, the selective policy of the evaluation plan;
+`agent/policies/selective.py` re-exports it (`SelectivePolicy`, `selective_policy_factory`), and
+its policy id stays `live/1.0.0`. It writes its own `policy_id` into decisions and results, so a
+subclass (P3, section 18) keeps its own id. One run:
 
 1. read the state (stop when the event is over, the episode is closed or the grant is invalid);
 2. interpret new notices with the model into planning `change_spec` records (prompt
@@ -1086,7 +1102,8 @@ and sees only tool envelopes. One run:
    outcome as a hypothesis, keeping only candidates feasible under both;
 4. build a closed menu (`plan_b/agent/menu.py`: keep, `query:<entity>:<fact>`,
    `hold:<resource>:<activity>:<window>`, `apply:<candidate_id>`, `ask:<candidate_id>`,
-   `release:<hold_id>`, wait) whose options carry the exact tool, arguments and expectations.
+   `release:<hold_id>`, wait, and on consumable profiles the stock options below) whose options
+   carry the exact tool, arguments and expectations.
    Queries are offered only for a stated reason (an unanswered material notice, the catalog-only
    availability of a resource a hold would be offered for, or a one-time deadline watch); apply,
    hold and ask only while the plan is in question; only tools in the grant's `allowed_tools`;
@@ -1100,14 +1117,51 @@ and sees only tool envelopes. One run:
 
 The policy only ever sends `get_event_state`, `get_action_receipt`, `evaluate_candidates`,
 `query_status`, `hold_resource`, `release_hold` and `apply_plan` (`AGENT_TOOLS`); anything else is
-refused before it reaches the client, and the executor refuses ungranted tools in any case. It
-has no stock-quantity options: on the pantry profile it can keep or wait but not hold or transfer
-stock (section 17 and the Wave 2 known limitations).
+refused before it reaches the client, and the executor refuses ungranted tools in any case.
+
+**Consumable profiles (the pantry).** The menu offers the pantry adapter's own stock candidates:
+
+* `handoff:<source>:<destination>:<qty>`: `hold_resource` with purpose `stock_transfer` on the
+  source pool for the destination pool, which is the local staff task. It is offered once per
+  (source, destination) pair, within the grant's scope and never above the source's available
+  units. It is offered only while a staff answer (now + hold duration + staff latency) still
+  lands inside the handoff window and before the need's cutoff. It is recorded as an `ask`
+  decision (`details.ask = "stock_handoff"`, with `hold_id`, `quantity`, `source_resource_id`
+  and `destination_resource_id`) that waits for the staff response;
+* `hold:<pool>:<target>:<qty>`: a quantity hold on a pool for a service target
+  (`service_target_id`), for the units a candidate with no pending transfer still needs, when
+  the pool has them available;
+* `apply:<candidate_id>` for a stock candidate. On every profile, an apply that would change
+  nothing (no changed activity, required hold or required stock hold: the executor's no-op rule,
+  `menu.keeps_the_plan`) is never offered.
+
+The plan stays in question (`menu.stock_improvable`) while a pursuable candidate leaves less of a
+target unfulfilled than keeping the plan. Pursuable means applicable now, a handoff that can be
+requested or is awaited, or units that can be held. The choice prompt is
+`choose_action_pantry.v1`; the model context gains a `stock` block and per-candidate stock
+fields; verification needs are an unanswered expected shipment and, while a supply gap exists,
+the transfer source. Commit and keep summaries state the coverage ("covers 40 of 40 kits_40 on
+time"). While a handoff is awaited the server records `wait` with a wake time (the staff task's
+`respond_after`, then its cutoff). Two server-chosen steps mirror `pantry-rules/1.0.0`:
+
+* at the start of each step, a `release` of the policy's own `stock_transfer` holds whose staff
+  task is no longer open or is past its cutoff (a stale rejection is retried on a later step);
+* once the plan is no longer in question, one `infeasible` decision per under-covered target
+  (`details.target_id`, `covered_quantity`, `shortfall_quantity`, `blocking_constraints`,
+  `evaluation_id`; `menu.shortfalls` reads the shortfall as P0 does). It is not recorded while a
+  handoff is awaited, nor before the handoff window opens while `stock_transfer` blocks better
+  coverage.
+
+No option names `record_stock_receipt` or `record_distribution`: only staff attest receipts and
+distributions. The recorded P2 development run of pantry_dev01 completed the canonical sequence
+with the real model (section 18).
 
 **Caps and failures.** One instance per episode, under the episode caps of section 17: 8 model
 calls and 48 tool calls through the host, counting failed calls, repairs, retries and receipt
-lookups (`LivePolicy` constructed directly defaults to 8 and 32). Failures are decisions, never
-invented successes:
+lookups (`LivePolicy` constructed directly defaults to 8 and 32). A host that rebuilds the
+policy for an episode with recorded usage, after a restart, continues its model- and tool-call
+counters and seeds its spend guard with the episode's recorded model spend (`resume_usage`), so
+the per-run USD cap stays a per-episode cap. Failures are decisions, never invented successes:
 
 | Failure | Decision | `details.failure` |
 | --- | --- | --- |
@@ -1124,8 +1178,8 @@ invented successes:
 tool-call ids it rests on; `details.evaluation_id` and `details.report_id` name the evaluation.
 `details.model` records the requested model, the model id as returned and, for each model call
 attributed to the decision, its purpose, outcome, latency, prompt, completion and reasoning
-tokens, cost and cost basis, plus the episode's usage counters; each call is attributed to exactly
-one decision. `details.choice` records the chosen option, the cited ids that name visible records
+tokens, cost and cost basis, its `provider` and `max_tokens`, plus the episode's usage counters;
+each call is attributed to exactly one decision. `details.choice` records the chosen option, the cited ids that name visible records
 (others are dropped), the menu, the consumed tool-call ids, and the model's rationale as
 `rationale_untrusted` (model text; label it as such wherever it is shown). `details.prompts` maps
 each prompt id to its sha256. Summaries are composed by the server from facts. Ask decisions
@@ -1145,11 +1199,13 @@ each call and sends the key only in the `Authorization` header; error text is sc
 absolute path).
 
 **Spend.** A spend guard refuses, before sending, a call whose upper-bound cost would exceed the
-per-run cap (per episode: each policy instance has its own guard) or the cumulative cap of the
+per-run cap (per episode: each policy instance has its own guard, and a rebuilt instance resumes
+the episode's recorded spend) or the cumulative cap of the
 ledger `apps/plan_b/var/model_spend.json` (gitignored, mode 0600, written atomically under a file
 lock; an unreadable ledger fails closed). The ledger records every call's model as requested and
-returned, tokens, cost, cost basis (`provider_usage`, `computed_from_prices` or
-`upper_bound_estimate`) and outcome.
+returned, tokens, cost, cost basis (`provider_usage`, `computed_from_prices`,
+`upper_bound_estimate`, `not_billed`, or `not_sent` for a call refused before sending, recorded
+at cost 0) and outcome.
 
 **G-LLM gate.** `uv run python -m plan_b.agent.gate --out <file>` runs one `LivePolicy` on a
 fresh dev01 episode in a temporary database (caps 6 model calls, 16 tool calls) and passes only
@@ -1174,18 +1230,124 @@ with 0 calls. Configurable through `run_case(caps=)`, `plan-b run-case
 rule baselines use 19-30 tool calls in the development cases; `OutcomeReport.episode_caps`
 records the caps and the usage.
 
-**Selection.** `rules` is the profile's deterministic baseline and `live` the live coordinator.
-`plan-b run-case <case|all> --policy rules|live` selects it on the command line; a missing or
-invalid live configuration prints a message and exits 2 before any database is created. The
-moderator chooses per episode, at load (`POST /api/moderator/episodes` `policy`) or later with
-`POST /api/moderator/policy`, but only before the episode's coordinator first calls a tool or
-records a decision (409 `POLICY_LOCKED` afterwards), so policies never mix within an episode.
-Selecting the live policy calls no model. After a server restart an episode whose last decision
-came from `live/*` keeps the live policy; one without decisions reverts to `rules`.
+**Selection** (`policy_host.PolicyChoice`, `POLICY_CHOICES`, `canonical_choice`). `rules` is the
+profile's deterministic baseline (P0). The model-driven choices are `tool-use` (P1,
+`tool-use/1.0.0`), `live` (P2, `live/1.0.0`; `selective` is an alias, stored as `live`) and
+`verify-all` (P3, `verify-all/1.0.0`); all three share the endpoint configuration and the caps.
+`plan-b run-case <case|all> --policy rules|tool-use|live|selective|verify-all` selects it on the
+command line; for a model choice, a missing or invalid endpoint configuration prints a message
+and exits 2 before any database is created. The moderator chooses per episode with the same
+names (422 otherwise; the response carries the canonical choice), at load
+(`POST /api/moderator/episodes` `policy`) or later with `POST /api/moderator/policy`, but only
+before the episode's coordinator first calls a tool or records a decision (409 `POLICY_LOCKED`
+afterwards), so policies never mix within an episode. Selecting a model policy calls no model; it
+is refused with 400 `MODEL_NOT_CONFIGURED` when the endpoint configuration is missing or invalid
+or the configured key file is absent (a presence check: the key is not read). After a server
+restart an episode keeps the policy of its last decision (`choice_of(policy_id)`) and continues
+its counters and its recorded model spend; one without decisions reverts to `rules`. A restart without the endpoint
+configuration answers 400 `MODEL_NOT_CONFIGURED`, and `/api/moderator/run` resolves the policy
+before it moves the clock.
 
 **Mode labels.** The host stamps every stored decision with `details.policy_mode = {policy,
-label, caps}`. The label is `Deterministic policy` or `Live agent · <model id returned by the
-provider>`; before the first reply it is the configured model marked `(requested; no reply yet)`.
+label, caps}`. The label is `Deterministic policy`, `Tool-use agent · <model>`, `Live agent ·
+<model>` or `Verify-all agent · <model>`, with the model id returned by the provider; before the
+first reply it is the configured model marked `(requested; no reply yet)`.
 `OutcomeReport.mode_label`, `GET /api/moderator/policy`, `GET /api/policy`, and the run and
 episode responses carry it. `EventStateView` has no label field: before an episode's first
 decision only the endpoints show it.
+
+## 18. Comparison policies P1 and P3, and the development runs
+
+P0-P3 are the four policies of `PEEAI_plan/08_evaluation.md`. P0 is the deterministic baseline
+(section 11) and P2 the live coordinator (section 16). All four run through `run_case`, the same
+`PolicyHost`, episode caps, scripted actors and labeled staff simulator, the same coordinator
+grant, tool vocabulary and executor, and the same planner candidates
+(`tests/test_policy_parity.py`, `tests/test_live_workflow.py`). P1-P3 use one endpoint, model id
+and set of caps, and record their prompts by sha256 on every decision. Their output-token limits
+differ, and each call records its own (`max_tokens`): P1 4096 per turn; P2 and P3 1024 per
+choice and 2048 per interpretation. Reasoning tokens count against each limit.
+
+**P1, the tool-using baseline** (`plan_b/agent/policies/tool_use.py`, `tool-use/1.0.0`, prompt
+`tool_use.v2`). There is no menu: each model turn returns strict JSON (schema
+`plan_b_tool_turn`) with `calls` (up to 3; each a `tool` from the grant's `allowed_tools` minus
+the staff tools, and `arguments_json`, a JSON object encoded as a string), `done`, a `decision`
+(`none`, `keep`, `wait`, `ask`, `infeasible`, `unresolved`, `inapplicable` or `duplicate`),
+`ask` (`candidate_id`, `resource_id`, `requested_value`, or null), `wait_minutes`, `rationale`
+and `cited_refs`. One run:
+
+1. read the state; stop when the event is over, the episode closed or the grant not valid;
+2. the attention rule: when nothing material changed since the model last decided and its wake
+   time has not passed, wait without a model call. Material means the plan version, the goal
+   version, the observations, the grants, holds, commitments, stock balances, staff tasks,
+   distributions and failed or cancelled activities; clock ticks and activity starts and
+   completions alone are not;
+3. at most 6 model turns. Each turn sees the state, the planner's current evaluation (read with
+   `evaluate_candidates` whenever the revision moved, as P2 reads it before each choice; the
+   model may also call it, with hypotheses), its previous calls' results and the visible
+   observations as quoted untrusted data. The calls run in order through the `ToolClient` with
+   key `tooluse-r<revision>-<tool>-<sha8(arguments)>` and the latest observed revision and goal
+   version. A turn with `done`, or with no calls, ends the run with its decision, unless its
+   calls brought news the model decided without (a status answer with a new observation, or a
+   rejection with a new receipt): then the next turn shows the results. After a sent mutation or check, or a lost
+   mutation, the next turn sees a fresh state (the model's own state read, when that was its
+   last call).
+
+The prompt covers the objective, source timestamps, the budget, the deadline, every tool's
+arguments, failure handling and preserving valid commitments. `tool_use.v2` adds what a hold's
+window is (the activity's window in the candidate held for, never the handoff window or the
+hold's lifetime) and how a `stock_transfer` hold follows a candidate's `stock_transfers` entry
+(no service target). A turn may produce up to 4096 tokens, the model's reasoning tokens
+included. Holds, applies, releases and checks are recorded from their receipts and envelopes with
+server-composed summaries; a `stock_transfer` hold is an `ask` (`details.ask =
+"stock_handoff"`). An `ask` decision becomes an `AuthorizationRequest` that the server builds and
+checks as the menu checks P2's: a feasible candidate of the latest evaluation short only of
+`committed_spend_limit`, one of its bookings, and `current < requested <= used + incremental`.
+Its request id is `authreq_r<rev>_<sig8>_<sha8(grant version, resource, value)>`, so a corrected
+ask is a new request. An `infeasible` end on a partial stock plan carries
+`details.blocking_constraints` and `details.shortfalls`. `details.choice` holds the model call id,
+the decision, the calls, `rationale_untrusted`, the cited ids that name visible records and the
+consumed tool-call ids.
+
+Failures, as for P2: malformed output, or a tool, decision or request outside what is offered,
+gets one repair and is then a `wait` (`malformed_output` or `invalid_choice`), refused before any
+call; a cap, the spend cap or missing configuration is `stop`; a provider timeout or error is a
+`wait` retried 2 minutes later; a rejected call is recorded with its error code and shown to the
+next turn (a stale one with `stale_revision`); a lost mutation response is reconciled with
+`get_action_receipt` and the original key (at most 2 lookups and one identical retry), then
+`reconcile`, and every later mutation of that run is refused with `lost_response`.
+
+**P3, the verify-all ablation** (`plan_b/agent/policies/verify_all.py`, `verify-all/1.0.0`). P2's
+downstream logic (interpretation, evaluation, the robustness rule, the closed menu and its
+execution, the same prompts) with one change. Before each decision step the server requests every
+due relevant status check, without asking the model which, and only then builds the menu. The
+relevance rule `verify-all-relevance/1.0.0` is fixed in the module docstring and names event and
+resource identifiers only:
+
+* the current unresolved update is the set of notices held as claims or verify-only notices about
+  this event (never `inapplicable`, `duplicate` or retracted) that no successful check of their
+  subject requested at or after their arrival has answered, plus, on a consumable profile, an
+  open supply gap;
+* its relevant resources are each such notice's subject, each approved substitute of that
+  subject, and for a supply gap every pool a declared stock option of the target names; a
+  resource named by several notices belongs to the latest one's arrival;
+* a relevant check is a (resource, fact) whose registered status source lists the resource, in
+  the grant's scope, for each fact both the source and the resource's terms declare, while
+  `query_status` is granted;
+* a check is due when no successful check of it was requested at or after the update's arrival
+  and fewer than 2 of this principal's checks of it failed since then (P2's bound); only the
+  remaining attempts are made, and nothing waits on a failed source.
+
+Notices that arrive during the checks join the update: the checks are recomputed after each
+batch, at most 3 batches per step (`MAX_VERIFY_ROUNDS`). Each check is a `verify` decision chosen
+by the server (`details.verify_all = {rule, why, attempt, max_attempts}`), and its result reaches
+the next model call. P3 settles after its own checks, so a quiet step makes no model call. Because
+P3's checks cost no model call, its model-call counts and P2's measure different things.
+
+**Development runs** (`scripts/run_live_cases.py --policy`, `scripts/write_development_results.py`,
+`plan_b/evaluation/development/`). One live trial each of P1, P2 and P3 on dev01, dev02, dev04,
+pantry_dev01 and skills_dev01, under the development caps, with `anthropic/claude-sonnet-5.5`
+through OpenRouter. The records, traces and evaluator-side reports are in
+`PEEAI_plan/handoffs/wave_2/evidence/` (`live_p1-tool-use_*`, `live_p2-live_*`,
+`live_p3-verify-all_*`); `plan_b/evaluation/development/README.md` tabulates them with one
+sentence per run read from its trace. They are development runs: not the held-out evaluation, no
+variance measured, and no comparison between policies is drawn from them.
