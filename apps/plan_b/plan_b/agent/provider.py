@@ -56,8 +56,18 @@ try:  # POSIX advisory lock so two local processes cannot interleave ledger upda
 except ImportError:  # pragma: no cover - non-POSIX hosts fall back to the in-process lock
     fcntl = None  # type: ignore[assignment]
 
-PROVIDER_VERSION = "plan_b.provider/1.1.0"  # 1.1.0: one output limit, seeds, recorded settings
+# 1.1.0: one output limit, seeds, recorded settings. 1.2.0: a rate-limit (HTTP 429) backoff.
+PROVIDER_VERSION = "plan_b.provider/1.2.0"
 DEFAULT_TIMEOUT_S = 90.0
+# Rate limits (1.2.0). OpenRouter limits this account to 20 requests per minute for the model,
+# one every 3 s. A 429 answer is waited out inside ``complete`` and the same request is sent
+# again: the first wait is RETRY_429_BASE_S (or the reply's Retry-After, if longer), doubled
+# per further 429 up to RETRY_429_MAX_DELAY_S, and the waits of one call never exceed
+# RETRY_429_MAX_WAIT_S of wall time. A 429 therefore uses no model call of the episode (the
+# caller sees one call); only a 429 that outlasts the bound reaches the caller, as before.
+RETRY_429_BASE_S = 3.0
+RETRY_429_MAX_DELAY_S = 20.0
+RETRY_429_MAX_WAIT_S = 60.0
 # The output-token limit of every model call of P1, P2 and P3 (interpretation, menu choice and
 # tool turn alike). Reasoning tokens count against it; 4096 is what P1 needed (W2-D11) and is
 # ample for the shorter replies.
@@ -139,6 +149,10 @@ class CallRecord:
     seed_sent: bool = False  # whether the request carried it as ``seed``
     seed_echo: int | None = None  # a ``seed`` the reply named, when it named one
     system_fingerprint: str | None = None  # the reply's backend fingerprint, when given
+    # Provider 1.2.0: HTTP 429 answers waited out inside this call before its final attempt
+    # (each one is its own ledger entry, not billed) and the wall time spent waiting.
+    rate_limit_retries: int = 0
+    rate_limit_wait_ms: int = 0
 
     def as_dict(self) -> dict[str, Any]:
         out = asdict(self)
@@ -233,9 +247,17 @@ class ProviderTimeout(ProviderError):
 class ProviderHTTPError(ProviderError):
     kind = "http_status"
 
-    def __init__(self, message: str, *, status: int, record: CallRecord | None = None) -> None:
+    def __init__(
+        self,
+        message: str,
+        *,
+        status: int,
+        record: CallRecord | None = None,
+        retry_after_s: float | None = None,
+    ) -> None:
         super().__init__(message, record=record)
         self.status = status
+        self.retry_after_s = retry_after_s  # a Retry-After header in seconds, when given
 
 
 class ProviderTransportError(ProviderError):
@@ -565,6 +587,39 @@ class OpenAICompatibleProvider:
         self.timeout_s = timeout_s
         self.seed = seed
         self._opener = urllib.request.build_opener(_NoRedirect())
+        self._sleep = time.sleep  # replaced in tests
+        self._monotonic = time.monotonic
+
+    def complete(self, request: ModelRequest) -> ModelResponse:
+        """One model call: ``_attempt``, with HTTP 429 answers waited out and retried within
+        ``RETRY_429_MAX_WAIT_S`` of wall time (see ``RETRY_429_BASE_S``)."""
+        retries = 0
+        waited = 0.0
+        while True:
+            try:
+                response = self._attempt(request)
+            except ProviderHTTPError as exc:
+                if exc.status != 429:
+                    raise
+                delay = min(RETRY_429_BASE_S * 2**retries, RETRY_429_MAX_DELAY_S)
+                if exc.retry_after_s is not None:
+                    delay = max(delay, min(exc.retry_after_s, RETRY_429_MAX_DELAY_S))
+                if waited + delay > RETRY_429_MAX_WAIT_S:
+                    if exc.record is not None:
+                        exc.record = _rate_limited(exc.record, retries, waited)
+                    raise
+                t0 = self._monotonic()
+                self._sleep(delay)
+                waited += max(self._monotonic() - t0, delay)
+                retries += 1
+                continue
+            except ProviderError as exc:
+                if retries and exc.record is not None:
+                    exc.record = _rate_limited(exc.record, retries, waited)
+                raise
+            if retries:
+                response = replace(response, record=_rate_limited(response.record, retries, waited))
+            return response
 
     @property
     def sends_seed(self) -> bool:
@@ -601,7 +656,7 @@ class OpenAICompatibleProvider:
             body["provider"] = {"require_parameters": True}  # only routes honoring the schema
         return body
 
-    def complete(self, request: ModelRequest) -> ModelResponse:
+    def _attempt(self, request: ModelRequest) -> ModelResponse:
         data = json.dumps(self.body(request), ensure_ascii=False).encode("utf-8")
         bound = upper_bound_usd(self.config.model_id, len(data), request.max_tokens)
         started = _wall()
@@ -656,7 +711,10 @@ class OpenAICompatibleProvider:
             )
             self.guard.charge(record, provider=self.config.provider)
             raise ProviderHTTPError(
-                record.error or f"HTTP {exc.code}", status=exc.code, record=record
+                record.error or f"HTTP {exc.code}",
+                status=exc.code,
+                record=record,
+                retry_after_s=_retry_after(exc),
             ) from None
         except (urllib.error.URLError, http.client.HTTPException, OSError) as exc:
             reason = _scrub(str(getattr(exc, "reason", exc))[:ERROR_EXCERPT_CHARS], key)
@@ -903,6 +961,20 @@ def _excerpt(exc: urllib.error.HTTPError) -> str:
         return "(no readable body)"
     text = raw.decode("utf-8", errors="replace") if isinstance(raw, bytes) else ""
     return " ".join(text.split())[:ERROR_EXCERPT_CHARS] or "(empty body)"
+
+
+def _retry_after(exc: urllib.error.HTTPError) -> float | None:
+    """A Retry-After header given in seconds (an HTTP date is ignored)."""
+    value = exc.headers.get("Retry-After") if exc.headers is not None else None
+    try:
+        seconds = float(value) if value is not None else None
+    except ValueError:
+        return None
+    return seconds if seconds is not None and math.isfinite(seconds) and seconds >= 0 else None
+
+
+def _rate_limited(record: CallRecord, retries: int, waited_s: float) -> CallRecord:
+    return replace(record, rate_limit_retries=retries, rate_limit_wait_ms=round(waited_s * 1000))
 
 
 def _scrub(text: str, key: str) -> str:

@@ -1,7 +1,7 @@
-"""P2, the selective verify/prepare/commit controller: ``live/1.1.0``.
+"""P2, the selective verify/prepare/commit controller: ``live/1.2.0``.
 
 The policy is ``plan_b.agent.orchestrator.LivePolicy`` itself, re-exported here under the
-evaluation plan's name; its ``policy_id`` is ``live/1.1.0``. The model chooses one option of
+evaluation plan's name; its ``policy_id`` is ``live/1.2.0``. The model chooses one option of
 the server-built menu (``agent/menu.py``) per step, and queries are offered only for a stated
 verification need. ``agent/policies/verify_all.py`` (P3) keeps this downstream logic, menu
 included, and adds one step: before each decision step the server requests every relevant

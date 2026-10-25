@@ -1,0 +1,30 @@
+{
+  "artifact": "plan_b.eval_case",
+  "case_id": "C10",
+  "case_ref": "ev_j8p",
+  "suite": "campus",
+  "condition": "Plausible false delivery warning",
+  "outcome_class": "goal",
+  "negative_control": true,
+  "negative_control_evidence": "With a coordinator that changes nothing the original plan completes: the warning is false (order desk on schedule, ETA 17:48, records observed at 17:09 and 17:29; checked in at 17:47, before demonstrations at 18:00); the facilitator checks in at 17:33 and the presenter at 17:51 with windows covering their slots. Replayed by tests/test_heldout2_cases.py.",
+  "requires_recovery": false,
+  "actionable_record_ids": [],
+  "target_quantity": null,
+  "achievable_on_time": null,
+  "annotations": [
+    {
+      "source_record_id": "desk_relay_57",
+      "event_id": "e_gallery_w5",
+      "resource_id": "lent_projector",
+      "effective_time": "2026-12-03T18:20:00-05:00",
+      "claimed_change": "delay",
+      "source_id": "front_desk_line",
+      "booking_ref": null,
+      "unknown_fields": [
+        "booking_ref"
+      ],
+      "note": "Relayed anonymous call ('someone phoned', 'didn't leave a name'), hedged ('could be'); names no order."
+    }
+  ],
+  "note": "Designated negative control."
+}

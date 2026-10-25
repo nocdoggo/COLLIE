@@ -19,6 +19,12 @@ Two manifests live in ``evaluation/manifests/``:
   ``freeze.json``: authoring held-out cases cannot trip the code freeze, while the code that
   loads them stays frozen.
 
+A second held-out set gets its own case-scoped manifest (``plan-b eval lock-heldout --manifest
+heldout2.json --cases C09 ...``): it records ``case_scope`` (the evaluator case ids it locks)
+and covers only those cases' files (private case, evaluator data, public fixture), so editing
+another case's file is not drift for it. A manifest without ``case_scope`` (v1.1's
+``heldout.json``) keeps covering every file under both held-out directories.
+
 ``verify_freeze`` recomputes both and lists every drift (a changed, added or removed file, a
 changed setting). ``plan-b eval verify-freeze`` fails loudly on any drift, and the evaluation
 runner refuses to start a held-out run unless both manifests verify.
@@ -91,9 +97,14 @@ RETRY_RULES = (
     " against the tool-call cap.",
     "Malformed or schema-violating model output gets one repair attempt; after it the step is a"
     " visible wait or an unresolved reading, never an invented result.",
-    "A provider timeout, HTTP or transport failure is a visible wait, retried at a later wake.",
+    "A provider timeout, HTTP or transport failure is a visible wait, retried at a later wake."
+    " Policy 1.2: an HTTP 429 is first waited out inside the call (3 s doubling to 20 s, at"
+    " most 60 s of waiting per call) and uses no model call; only one that outlasts the bound is"
+    " such a failure.",
     "A rejected mutation (for example a stale revision) is re-read and re-evaluated a bounded"
-    " number of times; a lost mutation response is reconciled with its original idempotency key.",
+    " number of times; a lost mutation response is reconciled with its original idempotency key."
+    " Policy 1.2: P2 and P3 re-issue a choice rejected only as stale when the re-read menu still"
+    " offers the same intent and candidate, without a model call.",
     "P3 checks each relevant source once per unresolved update and retries a failed source once;"
     " it never waits for a failed source.",
     "A reached cap is one host-recorded stop decision; the policy is not woken again and the"
@@ -123,6 +134,15 @@ SETTING_WORDS = (
 
 class FreezeError(RuntimeError):
     """A manifest is missing, unreadable, or does not match the tree."""
+
+
+def manifest_path(value: str | Path) -> Path:
+    """A manifest given on the command line: a bare file name (no directory part) is a file in
+    ``MANIFEST_DIR``; anything else is a path as given."""
+    raw = str(value)
+    if os.sep in raw or "/" in raw or (os.altsep and os.altsep in raw):
+        return Path(raw)
+    return MANIFEST_DIR / raw
 
 
 @dataclass
@@ -419,6 +439,7 @@ def settings(
 ) -> dict[str, Any]:
     """Every frozen setting except the file hashes."""
     from plan_b.agent.policies.verify_all import RELEVANCE_RULE
+    from plan_b.domain.constraints import PLANNER_VERSION
 
     seeds = [int(s) for s in seeds]
     if len(seeds) != 3 or len(set(seeds)) != 3:
@@ -439,6 +460,7 @@ def settings(
         "order_seed": int(order_seed),
         "policies": dict(POLICY_CHOICES),
         "policy_ids": policy_ids(),
+        "planner_version": PLANNER_VERSION,
         "prompts": prompts(),
         "model_response_cache": False,
         "runtime": runtime(),
@@ -499,6 +521,7 @@ SETTING_KEYS = (
     "p3_relevance_rule",
     "policies",
     "policy_ids",
+    "planner_version",
     "prompts",
     "model_response_cache",
     "runtime",
@@ -569,17 +592,65 @@ def _rel(path: Path) -> str:
         return absolute.as_posix()
 
 
-def compute_heldout(freeze_path: Path = FREEZE_PATH) -> dict[str, Any]:
+def select_cases(specs: list[Any], wanted: Iterable[str]) -> list[Any]:
+    """The held-out specs named by evaluator case id (``C09``) or case ref, in spec order.
+    An unknown, ambiguous or repeated name is refused."""
+    names = [w for w in wanted]
+    if len(set(names)) != len(names):
+        raise FreezeError("a case is named twice in --cases")
+    chosen: list[Any] = []
+    unknown: list[str] = []
+    for name in names:
+        hits = [s for s in specs if name in (s.case_id, s.case_ref)]
+        if not hits:
+            unknown.append(name)
+        elif len(hits) > 1:
+            raise FreezeError(f"case {name} names more than one held-out case")
+        elif hits[0] in chosen:
+            raise FreezeError(f"case {name} names {hits[0].case_id} a second time")
+        else:
+            chosen.append(hits[0])
+    if unknown:
+        known = ", ".join(sorted({s.case_id for s in specs})) or "none"
+        raise FreezeError(
+            f"unknown held-out case(s): {', '.join(unknown)}; the held-out cases are {known}"
+        )
+    if not chosen:
+        raise FreezeError("--cases names no case")
+    return [s for s in specs if s in chosen]
+
+
+def _scoped_files(recorded: dict[str, Any]) -> dict[str, str]:
+    """The current hashes of the files a case-scoped lock recorded (a missing one is absent)."""
+    found: dict[str, str] = {}
+    for rel in recorded.get("files", {}):
+        path = APP_DIR / rel
+        if path.is_symlink() or path.exists():
+            found[rel] = _entry_hash(path)
+    return dict(sorted(found.items()))
+
+
+def compute_heldout(
+    freeze_path: Path = FREEZE_PATH, cases: Iterable[str] | None = None
+) -> dict[str, Any]:
     """The held-out lock. Every case must load and validate through the runner's loader, and
     every designated negative control must pass the evaluator's replay: with a coordinator
     that changes nothing, its original plan completes the goal (``08_evaluation.md``: an
-    unnecessary change is counted where replay confirms the original plan stays feasible)."""
+    unnecessary change is counted where replay confirms the original plan stays feasible).
+
+    Given ``cases`` (evaluator case ids or case refs) the lock is case-scoped: it holds only
+    those cases, records them as ``case_scope``, and covers only their private case, evaluator
+    and public fixture files; its aggregate hashes are over exactly those files."""
     from plan_b.evaluation.run import heldout_specs, replay_original_plan
 
     freeze = load_manifest(freeze_path, FREEZE_ARTIFACT) if freeze_path.is_file() else None
     specs = heldout_specs()
     if not specs:
         raise FreezeError("no held-out case under scenarios/private/eval/")
+    scope = None
+    if cases is not None:
+        specs = select_cases(specs, cases)
+        scope = sorted(s.case_id for s in specs)
     suites: dict[str, list[dict[str, Any]]] = {}
     for spec in specs:
         replay = replay_original_plan(spec) if spec.negative_control else None
@@ -603,6 +674,25 @@ def compute_heldout(freeze_path: Path = FREEZE_PATH) -> dict[str, Any]:
                 "negative_control_replay": replay,
             }
         )
+    if scope is not None:
+        # Exactly the scoped cases' files: another case's file is outside this lock.
+        public = {_rel(s.public_file): _entry_hash(s.public_file) for s in specs}
+        private = {_rel(s.case_file): _entry_hash(s.case_file) for s in specs}
+        private |= {_rel(s.eval_file): _entry_hash(s.eval_file) for s in specs if s.eval_file}
+        files = dict(sorted((public | private).items()))
+        return {
+            "artifact": HELDOUT_ARTIFACT,
+            "protocol_version": PROTOCOL_VERSION,
+            "locked_at": _now(),
+            "case_scope": scope,
+            "freeze_files_sha256": freeze["files_sha256"] if freeze else None,
+            "freeze_sha256": manifest_digest(freeze_path) if freeze else None,
+            "suites": {k: sorted(v, key=lambda c: c["case_id"]) for k, v in sorted(suites.items())},
+            "files_sha256": tree_hash(files),
+            "public_files_sha256": tree_hash(public),
+            "private_files_sha256": tree_hash(private),
+            "files": files,
+        }
     files = heldout_files()
     # The public fixtures held-out cases use (development ones included) and the evaluator-only
     # files, each under its own aggregate: a reader with the public fixtures can check theirs.
@@ -623,15 +713,27 @@ def compute_heldout(freeze_path: Path = FREEZE_PATH) -> dict[str, Any]:
     }
 
 
-def write_heldout(path: Path = HELDOUT_PATH, freeze_path: Path = FREEZE_PATH) -> dict[str, Any]:
-    data = compute_heldout(freeze_path)
+def write_heldout(
+    path: Path = HELDOUT_PATH,
+    freeze_path: Path = FREEZE_PATH,
+    cases: Iterable[str] | None = None,
+) -> dict[str, Any]:
+    data = compute_heldout(freeze_path, cases)
     write_json(data, path)
     return data
 
 
+def case_scope(lock: dict[str, Any]) -> list[str] | None:
+    """The evaluator case ids a case-scoped lock covers, or None for a whole-directory lock."""
+    scope = lock.get("case_scope")
+    return [str(c) for c in scope] if isinstance(scope, list) else None
+
+
 def verify_heldout(path: Path = HELDOUT_PATH, freeze_path: Path | None = None) -> Verification:
     """Recompute the held-out files and check the lock against itself (its aggregate hash and
-    protocol version) and, given ``freeze_path``, against the freeze it was locked with."""
+    protocol version) and, given ``freeze_path``, against the freeze it was locked with. A
+    case-scoped lock recomputes exactly the files it recorded; a lock without ``case_scope``
+    recomputes every file under both held-out directories."""
     result = Verification(manifest=path.name, present=path.is_file())
     if not result.present:
         result.drift.append(f"no held-out manifest at {path.name}; run `plan-b eval lock-heldout`")
@@ -641,8 +743,16 @@ def verify_heldout(path: Path = HELDOUT_PATH, freeze_path: Path | None = None) -
     except FreezeError as exc:
         result.drift.append(str(exc))
         return result
-    current = heldout_files()
+    scope = case_scope(recorded)
+    if scope is None and "case_scope" in recorded:
+        result.drift.append("case_scope is not a list of case ids")
+    current = heldout_files() if scope is None else _scoped_files(recorded)
     result.drift += _compare(recorded.get("files", {}), current, "held-out file")
+    if scope is not None:
+        suites = recorded.get("suites", {}).values()
+        locked = sorted(c["case_id"] for cases in suites for c in cases)
+        if locked != sorted(scope):
+            result.drift.append("case_scope does not match the locked cases")
     if tree_hash(recorded.get("files", {})) != recorded.get("files_sha256"):
         result.drift.append("files_sha256 does not match the recorded held-out file hashes")
     if recorded.get("protocol_version") != PROTOCOL_VERSION:
@@ -658,4 +768,6 @@ def verify_heldout(path: Path = HELDOUT_PATH, freeze_path: Path | None = None) -
                     if not path_now.is_file() or file_hash(path_now) != case[f"{key}_sha256"]:
                         result.drift.append(f"{suite} {case['case_id']}: {key} file {rel} drifted")
     result.detail = {"files": len(current), "suites": sorted(recorded.get("suites", {}))}
+    if scope is not None:
+        result.detail["case_scope"] = sorted(scope)
     return result

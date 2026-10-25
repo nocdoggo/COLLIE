@@ -138,29 +138,45 @@ def _ints(values: list[str]) -> list[int]:
 def _eval_freeze(args: argparse.Namespace) -> int:
     from plan_b.evaluation import manifest
 
-    data = manifest.write_freeze(
-        Path(args.out), seeds=_ints(args.seeds), order_seed=args.order_seed
-    )
+    out = manifest.manifest_path(args.out)  # a bare name is a file in the manifests directory
+    data = manifest.write_freeze(out, seeds=_ints(args.seeds), order_seed=args.order_seed)
     print(
-        f"wrote {args.out}: {len(data['files'])} measured files, files_sha256"
+        f"wrote {out}: {len(data['files'])} measured files, files_sha256"
         f" {data['files_sha256']}, seeds {data['seeds']}, order seed {data['order_seed']},"
         f" model {data['model']['model_id']} via {data['model']['provider']}"
     )
     return 0
 
 
+def _case_names(values: list[str] | None) -> list[str] | None:
+    """``--cases`` values, comma- or space-separated; None when the flag was not given."""
+    if values is None:
+        return None
+    return [c for item in values for c in item.replace(",", " ").split()]
+
+
 def _eval_lock_heldout(args: argparse.Namespace) -> int:
     from plan_b.evaluation import manifest
     from plan_b.evaluation.run import RunRefused
 
+    out = manifest.manifest_path(args.manifest)
+    cases = _case_names(args.cases)
+    if cases is not None and not cases:
+        print("cannot lock the held-out suites: --cases names no case")
+        return 1
     try:
-        data = manifest.write_heldout(Path(args.out), freeze_path=Path(args.freeze))
+        data = manifest.write_heldout(
+            out, freeze_path=manifest.manifest_path(args.freeze), cases=cases
+        )
     except (manifest.FreezeError, RunRefused) as exc:
         print(f"cannot lock the held-out suites: {exc}")
         return 1
-    counts = ", ".join(f"{suite} {len(cases)}" for suite, cases in data["suites"].items())
+    counts = ", ".join(f"{suite} {len(locked)}" for suite, locked in data["suites"].items())
+    scope = data.get("case_scope")
+    scoped = f" (case scope {', '.join(scope)})" if scope else ""
     print(
-        f"wrote {args.out}: {counts} cases; {len(data['files'])} files; locked {data['locked_at']}"
+        f"wrote {out}: {counts} cases{scoped}; {len(data['files'])} files;"
+        f" locked {data['locked_at']}"
     )
     return 0
 
@@ -168,10 +184,11 @@ def _eval_lock_heldout(args: argparse.Namespace) -> int:
 def _eval_verify_freeze(args: argparse.Namespace) -> int:
     from plan_b.evaluation import manifest
 
-    checks = [manifest.verify_freeze(Path(args.freeze))]
-    heldout = Path(args.heldout)
+    freeze = manifest.manifest_path(args.freeze)
+    checks = [manifest.verify_freeze(freeze)]
+    heldout = manifest.manifest_path(args.heldout)
     if heldout.is_file() or args.require_heldout:
-        checks.append(manifest.verify_heldout(heldout, freeze_path=Path(args.freeze)))
+        checks.append(manifest.verify_heldout(heldout, freeze_path=freeze))
     ok = True
     for check in checks:
         if check.ok:
@@ -193,9 +210,7 @@ def _eval_run(args: argparse.Namespace) -> int:
     try:
         summary = run_evaluation(
             suite=args.suite,
-            cases=[c for item in args.cases for c in item.split(",") if c.strip()]
-            if args.cases
-            else None,
+            cases=_case_names(args.cases) or None,
             policies=[p for item in args.policies for p in item.split(",")],
             seeds=_ints(args.seeds) if args.seeds else list(manifest.DEFAULT_SEEDS),
             out=Path(args.out),
@@ -203,8 +218,8 @@ def _eval_run(args: argparse.Namespace) -> int:
             order_seed=args.order_seed,
             timeout_s=args.timeout,
             policy_factory=args.policy_factory,
-            freeze_path=Path(args.freeze),
-            heldout_path=Path(args.heldout),
+            freeze_path=manifest.manifest_path(args.freeze),
+            heldout_path=manifest.manifest_path(args.heldout),
         )
     except RunRefused as exc:
         print(f"run refused: {exc}")
@@ -217,9 +232,15 @@ def _eval_run(args: argparse.Namespace) -> int:
 
 
 def _eval_report(args: argparse.Namespace) -> int:
-    from plan_b.evaluation.report import write_report
+    from plan_b.evaluation.report import ReportRefused, write_report
 
-    paths = write_report(Path(args.results), Path(args.out) if args.out else None)
+    try:
+        paths = write_report(
+            Path(args.results), Path(args.out) if args.out else None, force=args.force
+        )
+    except ReportRefused as exc:
+        print(f"report refused: {exc}", file=sys.stderr)
+        return 2
     for name, path in paths.items():
         print(f"{name}: {path}")
     return 0
@@ -235,13 +256,27 @@ def _add_eval(sub: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
     freeze.add_argument("--seeds", nargs="+", default=[str(s) for s in manifest.DEFAULT_SEEDS])
     freeze.add_argument("--order-seed", type=int, default=manifest.DEFAULT_ORDER_SEED)
     freeze.set_defaults(func=_eval_freeze)
+    named = "a bare file name is a manifest in evaluation/manifests/"
     lock = group.add_parser("lock-heldout", help="write the held-out suites' manifest")
-    lock.add_argument("--out", default=str(manifest.HELDOUT_PATH))
-    lock.add_argument("--freeze", default=str(manifest.FREEZE_PATH))
+    lock.add_argument(
+        "--manifest",
+        "--out",
+        dest="manifest",
+        default=str(manifest.HELDOUT_PATH),
+        help=f"the held-out manifest to write ({named})",
+    )
+    lock.add_argument("--freeze", default=str(manifest.FREEZE_PATH), help=named)
+    lock.add_argument(
+        "--cases",
+        nargs="+",
+        default=None,
+        help="lock only these held-out cases (evaluator ids such as C09, or case refs; comma-"
+        " or space-separated): a case-scoped manifest that covers only their files",
+    )
     lock.set_defaults(func=_eval_lock_heldout)
     verify = group.add_parser("verify-freeze", help="recompute the manifests; fail on any drift")
-    verify.add_argument("--freeze", default=str(manifest.FREEZE_PATH))
-    verify.add_argument("--heldout", default=str(manifest.HELDOUT_PATH))
+    verify.add_argument("--freeze", default=str(manifest.FREEZE_PATH), help=named)
+    verify.add_argument("--heldout", default=str(manifest.HELDOUT_PATH), help=named)
     verify.add_argument("--require-heldout", action="store_true")
     verify.set_defaults(func=_eval_verify_freeze)
     run = group.add_parser("run", help="run a suite's episodes (P1-P3 make paid model calls)")
@@ -250,8 +285,9 @@ def _add_eval(sub: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
         "--cases",
         nargs="*",
         default=None,
-        help="held-out case ids or refs (default: every held-out case of the suite), or"
-        " development case refs for a dry run",
+        help="held-out case ids or refs (default: the case-scoped --heldout manifest's cases"
+        " of the suite, else every held-out case of the suite), or development case refs for a"
+        " dry run",
     )
     run.add_argument("--policies", nargs="+", default=["P0,P1,P2,P3"])
     run.add_argument("--seeds", nargs="+", default=None, help="default: the preregistered seeds")
@@ -265,12 +301,15 @@ def _add_eval(sub: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
         metavar="MODULE:CALLABLE",
         help="dry runs on development cases only: build P1-P3 around a scripted provider",
     )
-    run.add_argument("--freeze", default=str(manifest.FREEZE_PATH))
-    run.add_argument("--heldout", default=str(manifest.HELDOUT_PATH))
+    run.add_argument("--freeze", default=str(manifest.FREEZE_PATH), help=named)
+    run.add_argument("--heldout", default=str(manifest.HELDOUT_PATH), help=named)
     run.set_defaults(func=_eval_run)
     report = group.add_parser("report", help="write the results tables and figure")
     report.add_argument("--results", required=True)
     report.add_argument("--out", default=None, help="default: <results>/report")
+    report.add_argument(
+        "--force", action="store_true", help="replace an existing report that differs"
+    )
     report.set_defaults(func=_eval_report)
 
 

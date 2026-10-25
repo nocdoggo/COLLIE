@@ -1,4 +1,4 @@
-"""The live policy ``live/1.1.0`` at the tool boundary, with scripted model replies.
+"""The live policy ``live/1.2.0`` at the tool boundary, with scripted model replies.
 
 Every run goes through the real store and executor (``Sandbox`` / ``run_case``); the model is
 the real provider with a scripted transport (``tests.test_agent_provider.FakeOpener``), so
@@ -465,9 +465,38 @@ def test_stale_revision_is_refreshed_and_re_evaluated(sandbox: Sandbox, tmp_path
     assert applies[0].request_idempotency_key != applies[1].request_idempotency_key
 
 
+class _CheckInBeforeApply:
+    """The agent's client, with the facilitator checking in (a new revision) right before each
+    of the first ``times`` apply_plan calls, so each apply arrives stale."""
+
+    def __init__(self, sb: Sandbox, times: int) -> None:
+        self.inner = sb.agent
+        self.sb = sb
+        self.ends = ["18:00", "17:59", "17:58"][:times]
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self.inner, name)
+
+    def call(self, tool: str, **kw: Any) -> Any:
+        if tool == "apply_plan" and self.ends:
+            end = self.ends.pop(0)
+            env = self.sb.client("participant_facilitator").call(
+                "check_in",
+                arguments={
+                    "resource_id": "facilitator",
+                    "available": {"start": self.sb.clock().isoformat(), "end": at(end).isoformat()},
+                },
+                idempotency_key=f"ci-{end}",
+            )
+            assert env.status == "succeeded"
+        return self.inner.call(tool, **kw)
+
+
 def test_stale_revision_retries_are_bounded(sandbox: Sandbox, tmp_path: Path) -> None:
-    policy, _, _ = live(tmp_path, _stale_once(sandbox, 3))
-    result = policy.run(sandbox.agent)
+    """Policy 1.2: the server re-issues a choice rejected only as stale (no new model call);
+    a state that changes before every apply keeps rejecting it, and the re-reads are bounded."""
+    policy, _, _ = live(tmp_path)
+    result = policy.run(_CheckInBeforeApply(sandbox, 3))  # type: ignore[arg-type]
     assert failures(result.decisions).count("stale_revision") == 4  # three rejections + the bound
     assert "persisted" in result.decisions[-1].summary
     with sandbox.db.read() as conn:

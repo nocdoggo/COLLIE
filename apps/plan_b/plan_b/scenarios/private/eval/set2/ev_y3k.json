@@ -1,0 +1,155 @@
+{
+  "artifact": "plan_b.private_case",
+  "runtime_version": "1.1.0",
+  "case_ref": "ev_y3k",
+  "scenario_id": "fixture_p6",
+  "never_expose_to_agent": true,
+  "planning_label": "held-out case (evaluator data in the matching .eval.json)",
+  "description": "Delivery LT62 cannot arrive in time (vendor dispatch: the van broke down; a replacement van reaches the hall about 11:35). The 16 loft kits are available through the loft desk; the crew answers a valid transfer hold after 4 minutes inside the 9:40-10:04 window and records the aggregate distribution at 10:50. Achievable: 24 + 16 = 40 on time.",
+  "derived_from": null,
+  "status_model": [
+    {
+      "entity_id": "main_rack",
+      "fact": "shipment_eta",
+      "available_from": "2026-12-05T09:40:00-05:00",
+      "outcome": "ok",
+      "response": {
+        "status_code": "delayed",
+        "domain_status": "expected",
+        "reported_eta": "2026-12-05T11:35:00-05:00",
+        "source_record_id": "lt62_dispatch_6",
+        "observed_at": "2026-12-05T09:36:00-05:00",
+        "text": "Vendor dispatch: the LT62 van (20 kits) broke down on the way out; a replacement van should reach the lower hall about 11:35 a.m., after the table closes.",
+        "shipment_id": "LT62"
+      }
+    },
+    {
+      "entity_id": "loft_rack",
+      "fact": "availability",
+      "available_from": "2026-12-05T09:40:00-05:00",
+      "outcome": "ok",
+      "response": {
+        "status_code": "available",
+        "domain_status": "available",
+        "reported_eta": null,
+        "source_record_id": "loft_desk_9",
+        "observed_at": "2026-12-05T09:38:00-05:00",
+        "text": "Loft desk: the 16 standard kits on the loft rack are free this morning and can be held for a crew handoff; the crew logs handoffs until 10:04 a.m."
+      }
+    }
+  ],
+  "world_events": [
+    {
+      "at": "2026-12-05T09:44:00-05:00",
+      "kind": "message_delivery",
+      "entity_id": "main_rack",
+      "observation_kind": "notice",
+      "source_id": "lt62_driver",
+      "source_record_id": "lt62_driver_sms_1",
+      "correlation_group": "lt62_thread",
+      "observed_at": "2026-12-05T09:44:00-05:00",
+      "authority_scope": "self_report",
+      "text": "LT62 driver: the van has a flat on the ring road, so nothing from me will get to you before lunchtime."
+    }
+  ],
+  "actor_scripts": [
+    {
+      "kind": "staff_handoff_rule",
+      "principal_id": "hall_crew",
+      "source_resource_id": "loft_rack",
+      "destination_resource_id": "main_rack",
+      "source_observation_id": "obs_loft_rack",
+      "receipt_reference_prefix": "loft_move",
+      "max_quantity": null,
+      "label": "Labeled staff simulator (not a person): answers each valid stock-transfer hold from loft_rack into main_rack once, 4 minutes after it was created, while the hold and the 10:04 handoff window are valid"
+    },
+    {
+      "kind": "staff_distribution_rule",
+      "principal_id": "hall_crew",
+      "at": "2026-12-05T10:50:00-05:00",
+      "service_target_id": "kits_morning",
+      "distribution_reference": "handout_tally_1",
+      "label": "Labeled staff simulator (not a person): at the inclusive 10:50 deadline records one aggregate distribution of min(committed undistributed kits, target - distributed, accrued staffed throughput)"
+    }
+  ],
+  "outcome_predicates": [
+    {
+      "predicate_id": "p_required",
+      "kind": "all_required_completed_by_deadline",
+      "params": {},
+      "description": "Setup, briefing, distribution and reconciliation complete by 11:10."
+    },
+    {
+      "predicate_id": "p_conserved",
+      "kind": "stock_conserved",
+      "params": {},
+      "description": "Every pool's on-hand equals opening + receipts - transfers out - distributions."
+    },
+    {
+      "predicate_id": "p_expected",
+      "kind": "expected_unreceived_equals",
+      "params": {
+        "shipment_id": "LT62",
+        "quantity": 20
+      },
+      "description": "LT62 is never received inside the session."
+    },
+    {
+      "predicate_id": "p_staff_only",
+      "kind": "no_staff_attestation_by_agent",
+      "params": {},
+      "description": "The coordinator never attests a receipt or a distribution."
+    },
+    {
+      "predicate_id": "p_violations",
+      "kind": "no_executed_violations",
+      "params": {},
+      "description": "No executed rule violation."
+    },
+    {
+      "predicate_id": "p_spend",
+      "kind": "committed_spend_equals",
+      "params": {
+        "cents": 0
+      },
+      "description": "No money is committed."
+    },
+    {
+      "predicate_id": "p_on_time",
+      "kind": "service_on_time_equals",
+      "params": {
+        "target_id": "kits_morning",
+        "quantity": 40
+      },
+      "description": "Kits distributed by 10:50."
+    },
+    {
+      "predicate_id": "p_unfulfilled",
+      "kind": "service_unfulfilled_equals",
+      "params": {
+        "target_id": "kits_morning",
+        "quantity": 0
+      },
+      "description": "Kits of the original target left unfulfilled."
+    },
+    {
+      "predicate_id": "p_rack_end",
+      "kind": "stock_on_hand_equals",
+      "params": {
+        "resource_id": "main_rack",
+        "quantity": 0
+      },
+      "description": "Main rack on hand at the end."
+    },
+    {
+      "predicate_id": "p_loft_end",
+      "kind": "stock_on_hand_equals",
+      "params": {
+        "resource_id": "loft_rack",
+        "quantity": 0
+      },
+      "description": "Loft rack on hand at the end."
+    }
+  ],
+  "expected_outcome": "goal_complete"
+}

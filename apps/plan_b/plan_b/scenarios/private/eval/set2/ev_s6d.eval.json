@@ -1,0 +1,30 @@
+{
+  "artifact": "plan_b.eval_case",
+  "case_id": "C12",
+  "case_ref": "ev_s6d",
+  "suite": "campus",
+  "condition": "No feasible recovery under the authorized constraints",
+  "outcome_class": "infeasible",
+  "negative_control": false,
+  "negative_control_evidence": null,
+  "requires_recovery": false,
+  "actionable_record_ids": [],
+  "target_quantity": null,
+  "achievable_on_time": null,
+  "annotations": [
+    {
+      "source_record_id": "lab_note_640",
+      "event_id": "e_gallery_h3",
+      "resource_id": "lent_projector",
+      "effective_time": null,
+      "claimed_change": "unavailability",
+      "source_id": "lab_front_desk",
+      "booking_ref": "Q81",
+      "unknown_fields": [
+        "effective_time"
+      ],
+      "note": "The lender's own notice that the unit will not come."
+    }
+  ],
+  "note": "Infeasibility proof (tests/test_heldout2_cases.py): after the order desk's withdrawn record, every candidate of the frozen planner's enumeration (keep, swap, shifts, spare substitute and their combinations) is infeasible: candidates without the spare fail on the lent projector's status, and every candidate with the spare fails its 75-minute commitment cutoff (the latest demonstrations start, 18:10, has a 16:55 cutoff, before the 17:10 opening). The budget (9000) and the organizer's rule (3500) would allow the spare, so the blocker is its timing term, not money. Differs from C08 (budget) and from the development infeasible case (the backup booked elsewhere)."
+}

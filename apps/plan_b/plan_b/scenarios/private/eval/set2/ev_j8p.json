@@ -1,0 +1,163 @@
+{
+  "artifact": "plan_b.private_case",
+  "runtime_version": "1.0.0",
+  "case_ref": "ev_j8p",
+  "scenario_id": "fixture_w5",
+  "never_expose_to_agent": true,
+  "planning_label": "held-out case (evaluator data in the matching .eval.json)",
+  "description": "A plausible but false delivery warning: at 17:21 the front desk relays an anonymous call saying the projector could be 6:20 or later. The lab order desk keeps Q73 on schedule for 17:48 (records of 17:09 and 17:29) and it is checked in at 17:47, before its 18:00 slot. The facilitator checks in at 17:33 and the presenter at 17:51. Changing nothing completes the original plan.",
+  "derived_from": null,
+  "status_model": [
+    {
+      "entity_id": "lent_projector",
+      "fact": "delivery_eta",
+      "available_from": "2026-12-03T17:10:00-05:00",
+      "outcome": "ok",
+      "response": {
+        "status_code": "on_schedule",
+        "domain_status": "expected",
+        "reported_eta": "2026-12-03T17:48:00-05:00",
+        "source_record_id": "q73_desk_7",
+        "correlation_group": "q_order_delivery",
+        "observed_at": "2026-12-03T17:09:00-05:00",
+        "text": "Order Q73 is on its usual run; the van expects to reach the Gallery room at 5:48 p.m."
+      }
+    },
+    {
+      "entity_id": "lent_projector",
+      "fact": "delivery_eta",
+      "available_from": "2026-12-03T17:30:00-05:00",
+      "outcome": "ok",
+      "response": {
+        "status_code": "on_schedule",
+        "domain_status": "expected",
+        "reported_eta": "2026-12-03T17:48:00-05:00",
+        "source_record_id": "q73_desk_8",
+        "correlation_group": "q_order_delivery",
+        "observed_at": "2026-12-03T17:29:00-05:00",
+        "text": "Order Q73: the van is two stops away and still expects the Gallery room at 5:48 p.m."
+      }
+    },
+    {
+      "entity_id": "spare_projector",
+      "fact": "availability",
+      "available_from": "2026-12-03T17:10:00-05:00",
+      "outcome": "ok",
+      "response": {
+        "status_code": "available",
+        "domain_status": "available",
+        "reported_eta": null,
+        "source_record_id": "av_pool_w5_2",
+        "observed_at": "2026-12-03T17:06:00-05:00",
+        "text": "AV cart pool: the spare projector is free this evening. A free hold lasts up to 15 minutes; a booking costs 3500 cents and must be confirmed 25 minutes before use."
+      }
+    }
+  ],
+  "world_events": [
+    {
+      "at": "2026-12-03T17:21:00-05:00",
+      "kind": "message_delivery",
+      "entity_id": "lent_projector",
+      "observation_kind": "notice",
+      "source_id": "front_desk_line",
+      "source_record_id": "desk_relay_57",
+      "correlation_group": "desk_relay_thread",
+      "observed_at": "2026-12-03T17:21:00-05:00",
+      "authority_scope": "self_report",
+      "text": "Front desk passing this on: someone phoned about a projector drop-off for the Gallery and said the parkway is backed up for miles, so it could be 6:20 or later. They didn't leave a name."
+    },
+    {
+      "at": "2026-12-03T17:47:00-05:00",
+      "kind": "resource_arrival",
+      "entity_id": "lent_projector",
+      "observation_kind": "status",
+      "source_id": "gallery_dock",
+      "source_record_id": "door_log_q73_e",
+      "correlation_group": "q_order_delivery",
+      "observed_at": "2026-12-03T17:47:00-05:00",
+      "authority_scope": "resource_status",
+      "text": "Gallery loading door: projector from order Q73 checked in and powered on at 5:47 p.m.",
+      "new_status": "available"
+    }
+  ],
+  "actor_scripts": [
+    {
+      "kind": "participant_check_in",
+      "at": "2026-12-03T17:33:00-05:00",
+      "principal_id": "p_swap_facilitator",
+      "resource_id": "swap_facilitator",
+      "available_start": "2026-12-03T17:33:00-05:00",
+      "available_end": "2026-12-03T18:40:00-05:00"
+    },
+    {
+      "kind": "participant_check_in",
+      "at": "2026-12-03T17:51:00-05:00",
+      "principal_id": "p_demo_presenter",
+      "resource_id": "demo_presenter",
+      "available_start": "2026-12-03T17:51:00-05:00",
+      "available_end": "2026-12-03T18:40:00-05:00"
+    },
+    {
+      "kind": "organizer_authorization_rule",
+      "principal_id": "organizer_w5",
+      "target_grant_id": "grant_coordinator_w5",
+      "latency_minutes": 4,
+      "max_committed_cents": 3500,
+      "resource_ids": [
+        "spare_projector"
+      ]
+    }
+  ],
+  "outcome_predicates": [
+    {
+      "predicate_id": "p_required",
+      "kind": "all_required_completed_by_deadline",
+      "params": {},
+      "description": "All five required activities complete in the Gallery room by 6:40 p.m."
+    },
+    {
+      "predicate_id": "p_welcome",
+      "kind": "activity_started_at",
+      "params": {
+        "activity_id": "welcome",
+        "at": "2026-12-03T17:30:00-05:00"
+      },
+      "description": "The welcome starts at 5:30 p.m."
+    },
+    {
+      "predicate_id": "p_violations",
+      "kind": "no_executed_violations",
+      "params": {},
+      "description": "No resource, role, program or budget rule is violated in persisted records."
+    },
+    {
+      "predicate_id": "p_limits",
+      "kind": "committed_within_limits",
+      "params": {},
+      "description": "Committed money stays inside the active grant and the event budget."
+    },
+    {
+      "predicate_id": "p_arrival",
+      "kind": "no_equipment_start_before_arrival",
+      "params": {},
+      "description": "No equipment-dependent activity starts before the equipment is observed on site."
+    },
+    {
+      "predicate_id": "p_spend",
+      "kind": "committed_spend_equals",
+      "params": {
+        "cents": 0
+      },
+      "description": "Committed money."
+    },
+    {
+      "predicate_id": "p_plans",
+      "kind": "applied_plan_count",
+      "params": {
+        "count": 0
+      },
+      "description": "Applied plan changes."
+    }
+  ],
+  "expected_outcome": "goal_complete"
+}

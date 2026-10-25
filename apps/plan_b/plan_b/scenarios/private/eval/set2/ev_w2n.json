@@ -1,0 +1,128 @@
+{
+  "artifact": "plan_b.private_case",
+  "runtime_version": "1.0.0",
+  "case_ref": "ev_w2n",
+  "scenario_id": "fixture_w5",
+  "never_expose_to_agent": true,
+  "planning_label": "held-out case (evaluator data in the matching .eval.json)",
+  "description": "The skills exchange facilitator is late: at 17:24 the facilitator self-reports a bus taken out of service and an arrival at about 17:55, and checks in at 17:55 (until 18:40). The projector is on schedule (ETA 17:25) and checked in at 17:22; the presenter checks in at 17:31. Recovery: the permitted swap of the two middle activities before 17:40 (demonstrations 17:40-18:00, skills exchange 18:00-18:20).",
+  "derived_from": null,
+  "status_model": [
+    {
+      "entity_id": "lent_projector",
+      "fact": "delivery_eta",
+      "available_from": "2026-12-03T17:10:00-05:00",
+      "outcome": "ok",
+      "response": {
+        "status_code": "on_schedule",
+        "domain_status": "expected",
+        "reported_eta": "2026-12-03T17:25:00-05:00",
+        "source_record_id": "q73_desk_3",
+        "correlation_group": "q_order_delivery",
+        "observed_at": "2026-12-03T17:08:00-05:00",
+        "text": "Order Q73 is on schedule; the van expects to reach the Gallery room at 5:25 p.m."
+      }
+    },
+    {
+      "entity_id": "spare_projector",
+      "fact": "availability",
+      "available_from": "2026-12-03T17:10:00-05:00",
+      "outcome": "ok",
+      "response": {
+        "status_code": "available",
+        "domain_status": "available",
+        "reported_eta": null,
+        "source_record_id": "av_pool_w5_7",
+        "observed_at": "2026-12-03T17:05:00-05:00",
+        "text": "AV cart pool: the spare projector is free this evening. A free hold lasts up to 15 minutes; a booking costs 3500 cents and must be confirmed 25 minutes before use."
+      }
+    }
+  ],
+  "world_events": [
+    {
+      "at": "2026-12-03T17:22:00-05:00",
+      "kind": "resource_arrival",
+      "entity_id": "lent_projector",
+      "observation_kind": "status",
+      "source_id": "gallery_dock",
+      "source_record_id": "door_log_q73_a",
+      "correlation_group": "q_order_delivery",
+      "observed_at": "2026-12-03T17:22:00-05:00",
+      "authority_scope": "resource_status",
+      "text": "Gallery loading door: projector from order Q73 checked in and powered on at 5:22 p.m.",
+      "new_status": "available"
+    }
+  ],
+  "actor_scripts": [
+    {
+      "kind": "participant_observation",
+      "at": "2026-12-03T17:24:00-05:00",
+      "principal_id": "p_swap_facilitator",
+      "entity_id": "swap_facilitator",
+      "text": "Facilitator here: the bus I was on got taken out of service and I'm waiting for the next one. Realistically I'll reach the Gallery room at about 5:55.",
+      "client_record_id": "fac_note_2"
+    },
+    {
+      "kind": "participant_check_in",
+      "at": "2026-12-03T17:31:00-05:00",
+      "principal_id": "p_demo_presenter",
+      "resource_id": "demo_presenter",
+      "available_start": "2026-12-03T17:31:00-05:00",
+      "available_end": "2026-12-03T18:40:00-05:00"
+    },
+    {
+      "kind": "participant_check_in",
+      "at": "2026-12-03T17:55:00-05:00",
+      "principal_id": "p_swap_facilitator",
+      "resource_id": "swap_facilitator",
+      "available_start": "2026-12-03T17:55:00-05:00",
+      "available_end": "2026-12-03T18:40:00-05:00"
+    },
+    {
+      "kind": "organizer_authorization_rule",
+      "principal_id": "organizer_w5",
+      "target_grant_id": "grant_coordinator_w5",
+      "latency_minutes": 4,
+      "max_committed_cents": 3500,
+      "resource_ids": [
+        "spare_projector"
+      ]
+    }
+  ],
+  "outcome_predicates": [
+    {
+      "predicate_id": "p_required",
+      "kind": "all_required_completed_by_deadline",
+      "params": {},
+      "description": "All five required activities complete in the Gallery room by 6:40 p.m."
+    },
+    {
+      "predicate_id": "p_welcome",
+      "kind": "activity_started_at",
+      "params": {
+        "activity_id": "welcome",
+        "at": "2026-12-03T17:30:00-05:00"
+      },
+      "description": "The welcome starts at 5:30 p.m."
+    },
+    {
+      "predicate_id": "p_violations",
+      "kind": "no_executed_violations",
+      "params": {},
+      "description": "No resource, role, program or budget rule is violated in persisted records."
+    },
+    {
+      "predicate_id": "p_limits",
+      "kind": "committed_within_limits",
+      "params": {},
+      "description": "Committed money stays inside the active grant and the event budget."
+    },
+    {
+      "predicate_id": "p_arrival",
+      "kind": "no_equipment_start_before_arrival",
+      "params": {},
+      "description": "No equipment-dependent activity starts before the equipment is observed on site."
+    }
+  ],
+  "expected_outcome": "goal_complete"
+}

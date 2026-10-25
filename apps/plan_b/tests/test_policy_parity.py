@@ -4,8 +4,8 @@ Everything runs through the real store and executor; the models are the real pro
 with a scripted ``FakeOpener`` (``tests.test_agent_provider``), and every spend ledger lives in
 ``tmp_path``. Each test names, in a comment, the mutation of the code it catches.
 
-* parity: P0 (the profile's baseline), P1 ``tool-use/1.1.0``, P2 ``live/1.1.0`` and P3
-  ``verify-all/1.1.0``, each built and run once on a fresh episode of each suite behind a
+* parity: P0 (the profile's baseline), P1 ``tool-use/1.2.0``, P2 ``live/1.2.0`` and P3
+  ``verify-all/1.2.0``, each built and run once on a fresh episode of each suite behind a
   recording client, read the same coordinator grant at the same start state, get the same
   candidate set from every plain evaluation, and call only tools of that grant (P1's turn
   schema offers exactly the grant's tools; P2 and P3 stay within ``AGENT_TOOLS``);
@@ -56,7 +56,7 @@ from tests.conftest import Sandbox, at
 from tests.test_agent_provider import FakeOpener, schema_name
 from tests.test_live_workflow import SUITES, ToolScript, build, tool_state, tool_user, turn
 
-POLICY_IDS = {"P1": "tool-use/1.1.0", "P2": "live/1.1.0", "P3": "verify-all/1.1.0"}
+POLICY_IDS = {"P1": "tool-use/1.2.0", "P2": "live/1.2.0", "P3": "verify-all/1.2.0"}
 
 
 # ---------------------------------------------------------------------------------- clients
@@ -258,7 +258,7 @@ def test_each_policy_reads_the_same_grant_tools_and_candidates(
 
 @pytest.mark.parametrize(
     ("choice", "policy_id"),
-    [("tool-use", "tool-use/1.1.0"), ("live", "live/1.1.0"), ("verify-all", "verify-all/1.1.0")],
+    [("tool-use", "tool-use/1.2.0"), ("live", "live/1.2.0"), ("verify-all", "verify-all/1.2.0")],
 )
 def test_a_restarted_host_keeps_each_model_policy_choice(
     db: Database, tmp_path: Path, choice: PolicyChoice, policy_id: str

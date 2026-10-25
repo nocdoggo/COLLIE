@@ -86,7 +86,10 @@ def at(day: str, hhmm: str) -> datetime:
 
 @pytest.fixture(scope="module")
 def specs() -> dict[str, CaseSpec]:
-    return {s.case_id: s for s in heldout_specs()}
+    # The v1.1 protocol's twelve cases. The loader also finds a later set's cases (Wave 3b, in
+    # a subdirectory of eval/), which their own tests cover.
+    protocol = {**CASE_CLASSES["campus"], **CASE_CLASSES["pantry"]}
+    return {s.case_id: s for s in heldout_specs() if s.case_id in protocol}
 
 
 # ---------------------------------------------------------------------------------- the oracle

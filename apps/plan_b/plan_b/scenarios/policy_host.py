@@ -12,8 +12,8 @@ gets at most the remaining tool budget. Once a cap is reached the policy is not 
 the host records one ``stop`` decision that says so.
 
 The host also knows which policy an episode runs, by the evaluation plan's names: ``rules``
-(P0, the profile's deterministic baseline), ``tool-use`` (P1, ``tool-use/1.1.0``), ``live`` or
-its alias ``selective`` (P2, ``live/1.1.0``) and ``verify-all`` (P3, ``verify-all/1.1.0``). Every
+(P0, the profile's deterministic baseline), ``tool-use`` (P1, ``tool-use/1.2.0``), ``live`` or
+its alias ``selective`` (P2, ``live/1.2.0``) and ``verify-all`` (P3, ``verify-all/1.2.0``). Every
 stored decision is stamped with ``details.policy_mode``: the mode label ("Deterministic policy",
 or "<policy label> · <returned model id>", e.g. "Live agent · …") and the caps it ran under.
 """
@@ -125,7 +125,7 @@ def live_factory(
     *,
     seed: int | None = None,
 ) -> Callable[[], Policy]:
-    """The live coordinator (``live/1.1.0``) under the episode caps. Its endpoint configuration
+    """The live coordinator (``live/1.2.0``) under the episode caps. Its endpoint configuration
     is read now, server-side (environment, else ``.local/keys/model_endpoint.env``); the key is
     read only by the provider, per call. ``seed`` is the run's provider seed (recorded on every
     call). Raises ``ModelConfigError`` when the endpoint is not configured."""
@@ -145,7 +145,7 @@ def tool_use_factory(
     *,
     seed: int | None = None,
 ) -> Callable[[], Policy]:
-    """P1, the tool-using model baseline (``tool-use/1.1.0``), under the same caps, the same
+    """P1, the tool-using model baseline (``tool-use/1.2.0``), under the same caps, the same
     server-side endpoint configuration and the same seed handling as the live coordinator."""
     from plan_b.agent.policies.tool_use import tool_use_policy_factory
 
@@ -163,7 +163,7 @@ def verify_all_factory(
     *,
     seed: int | None = None,
 ) -> Callable[[], Policy]:
-    """P3, the verify-all ablation (``verify-all/1.1.0``), under the same caps, endpoint and
+    """P3, the verify-all ablation (``verify-all/1.2.0``), under the same caps, endpoint and
     seed handling."""
     from plan_b.agent.policies.verify_all import verify_all_policy_factory
 

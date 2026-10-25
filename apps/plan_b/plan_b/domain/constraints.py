@@ -50,6 +50,12 @@ from plan_b.domain.models import (
 from plan_b.domain.projection import effective_hold_status
 from plan_b.domain.timeutil import DISPLAY_TIMEZONE, local_label
 
+# The version of the shared checks and planner every policy uses, P0 included. 1.2.0 (Wave 3b): a
+# handoff from a pool checked unavailable is infeasible (adapters/pantry.py), and a person whose
+# reported or hypothetical ETA is after an activity's start fails participant availability.
+# The freeze records it, because P0's own policy ids did not change.
+PLANNER_VERSION = "plan_b.planner/1.2.0"
+
 CHECK_IDS = (
     "required_activities",
     "fixed_venue",
@@ -813,6 +819,16 @@ def _participant_availability(
     problems: list[str] = []
     entities: list[str] = []
     for a, rid in subject:
+        eta = ctx.resources[rid].reported_eta
+        if eta is not None and eta > a.start:
+            # A person's reported or hypothetical arrival after the start (runtime 1.2: a
+            # person's delay report reaches the planner as a hypothesis, as equipment's does).
+            origin = "hypothetical ETA" if rid in ctx.hypothesis_labels else "reported ETA"
+            problems.append(
+                f"{rid} {origin} {_t(eta)} is after {a.activity_id} starts at {_t(a.start)}"
+            )
+            entities.extend([rid, a.activity_id])
+            continue
         checkin = _latest_checkin(ctx, rid)
         if checkin is not None:
             if not checkin.available.contains(a.window):

@@ -88,6 +88,11 @@ CASE_CLASSES = {
     "pantry": {"T01": "target", "T02": "target", "T03": "partial", "T04": "partial"},
 }
 NEGATIVE_CONTROLS = frozenset({"C02", "C03", "C04"})
+# Wave 3b: a later held-out set uses later ids of the same form (C09 and up, T05 and up). The
+# table above stays the rule for the ids it names. A later id takes its outcome class and its
+# negative-control flag from its evaluator file, checked against its suite's classes, and a
+# negative control still needs its evidence and the original-plan replay at the lock.
+CASE_ID_FORMS = {"campus": re.compile(r"^C[0-9]{2}$"), "pantry": re.compile(r"^T[0-9]{2}$")}
 # Words that would reveal a condition; a held-out case ref or public scenario id must be opaque.
 REVEALING = (
     "alarm",
@@ -227,12 +232,13 @@ def _read_json(path: Path) -> Any:
 
 
 def heldout_public_fixtures(public_dir: Path | None = None) -> dict[str, Path]:
-    """``{scenario_id: file}`` of the public fixtures under ``scenarios/public/eval/``."""
+    """``{scenario_id: file}`` of the public fixtures under ``scenarios/public/eval/``, its
+    subdirectories included (a later held-out set may keep its files in one, Wave 3b)."""
     from plan_b.domain.fixtures import PUBLIC_SCENARIOS
 
     root = public_dir or mf.HELDOUT_PUBLIC_DIR
     found: dict[str, Path] = {}
-    for path in sorted(root.glob("*.json")) if root.is_dir() else []:
+    for path in sorted(root.rglob("*.json")) if root.is_dir() else []:
         data = _read_json(path)
         if not isinstance(data, dict) or data.get("artifact") != "plan_b.public_scenario":
             continue
@@ -257,7 +263,7 @@ def _public_file(scenario_id: str, heldout_public: dict[str, Path]) -> Path:
 def _opaque_problem(name: str, case_id: str) -> str | None:
     """Why an agent- or public-visible identifier is not opaque, or None."""
     low = name.lower()
-    if case_id.lower() in low or re.search(r"(^|[^a-z0-9])[ct]0[1-8]([^0-9]|$)", low):
+    if case_id.lower() in low or re.search(r"(^|[^a-z0-9])[ct][0-9]{2}([^0-9]|$)", low):
         return f"{name!r} names a case id"
     hit = next((w for w in REVEALING if w in low), None)
     return f"{name!r} contains the revealing word {hit!r}" if hit else None
@@ -274,8 +280,10 @@ def _world_digest(case: Any) -> str:
 def heldout_specs(
     private_dir: Path | None = None, public_dir: Path | None = None
 ) -> list[CaseSpec]:
-    """Every held-out case, validated the way the runner loads it. A private case without
-    evaluator data, or evaluator data without its case, is an error, never a silent omission."""
+    """Every held-out case, validated the way the runner loads it, in ``scenarios/private/eval/``
+    and its subdirectories (Wave 3b: a later set may keep its files in one). A private case
+    without evaluator data, evaluator data without its case, or a case ref used twice, is an
+    error, never a silent omission."""
     from plan_b.domain.models import PrivateCase, PublicScenario
     from plan_b.world.validate import validate_case
     from plan_b.world.world import available_cases
@@ -286,7 +294,7 @@ def heldout_specs(
     public = heldout_public_fixtures(public_dir)
     cases: dict[str, Path] = {}
     evals: dict[str, tuple[EvalCase, Path]] = {}
-    for path in sorted(root.glob("*.json")):
+    for path in sorted(root.rglob("*.json")):
         data = _read_json(path)
         artifact = data.get("artifact") if isinstance(data, dict) else None
         if path.name.endswith(EVAL_SUFFIX):
@@ -298,8 +306,12 @@ def heldout_specs(
                 raise RunRefused(
                     f"{path.name}: evaluator data must be named {ev.case_ref}.eval.json"
                 )
+            if ev.case_ref in evals:
+                raise RunRefused(f"{path.name}: case ref {ev.case_ref} has two evaluator files")
             evals[ev.case_ref] = (ev, path)
         elif artifact == "plan_b.private_case":
+            if path.stem in cases:
+                raise RunRefused(f"{path.name}: case ref {path.stem} has two case files")
             cases[path.stem] = path
     dev = set(available_cases())
     problems = [f"held-out case {r} has no evaluator data" for r in sorted(set(cases) - set(evals))]
@@ -337,15 +349,17 @@ def heldout_specs(
             raise RunRefused(
                 f"held-out case {ref}: suite or outcome class does not fit its profile"
             )
-        if CASE_CLASSES[suite].get(ev.case_id) != ev.outcome_class:
-            raise RunRefused(
-                f"held-out case {ref}: {ev.case_id} is not a {suite} case of the protocol with"
-                f" outcome class {ev.outcome_class}"
-            )
-        if ev.negative_control != (ev.case_id in NEGATIVE_CONTROLS):
-            raise RunRefused(
-                f"held-out case {ref}: the designated negative controls are C02, C03 and C04"
-            )
+        protocol = CASE_CLASSES[suite]
+        if ev.case_id in protocol or not CASE_ID_FORMS[suite].match(ev.case_id):
+            if protocol.get(ev.case_id) != ev.outcome_class:
+                raise RunRefused(
+                    f"held-out case {ref}: {ev.case_id} is not a {suite} case of the protocol"
+                    f" with outcome class {ev.outcome_class}"
+                )
+            if ev.negative_control != (ev.case_id in NEGATIVE_CONTROLS):
+                raise RunRefused(
+                    f"held-out case {ref}: the designated negative controls are C02, C03 and C04"
+                )
         if ev.negative_control and not (ev.negative_control_evidence or "").strip():
             raise RunRefused(
                 f"held-out case {ref}: a negative control states why its original plan stays"
@@ -705,6 +719,22 @@ class FrozenSettings:
     heldout: dict[str, Any] = field(default_factory=dict)
 
 
+def scoped_heldout_cases(heldout_path: Path, suite: str) -> list[str] | None:
+    """The default ``--cases`` of a held-out run under a case-scoped lock: the lock's cases of
+    ``suite``. None when the lock is missing, unreadable or not case-scoped (``check_frozen``
+    reports those), so the default stays every held-out case of the suite."""
+    try:
+        lock = mf.load_manifest(heldout_path, mf.HELDOUT_ARTIFACT)
+    except mf.FreezeError:
+        return None
+    if mf.case_scope(lock) is None:
+        return None
+    ids = [c["case_id"] for c in lock.get("suites", {}).get(suite, [])]
+    if not ids:
+        raise RunRefused(f"{heldout_path.name} locks no {suite} case")
+    return ids
+
+
 def check_frozen(
     *,
     specs: Sequence[CaseSpec],
@@ -728,12 +758,15 @@ def check_frozen(
     if lock.get("freeze_files_sha256") != freeze["files_sha256"] or lock.get(
         "freeze_sha256"
     ) != mf.manifest_digest(freeze_path):
-        problems.append("heldout.json was locked against a different freeze")
+        problems.append(f"{heldout_path.name} was locked against a different freeze")
     locked = {(s, c["case_ref"]): c for s, cases in lock["suites"].items() for c in cases}
     for spec in specs:
         entry = locked.get((spec.suite, spec.case_ref))
         if entry is None or entry["case_id"] != spec.case_id:
-            problems.append(f"case {spec.case_ref} is not in the held-out lock")
+            problems.append(
+                f"case {spec.case_ref} ({spec.case_id}) is not in the held-out lock"
+                f" {heldout_path.name}"
+            )
     if list(seeds) != list(freeze["seeds"]):
         problems.append(f"seeds {list(seeds)} are not the frozen {freeze['seeds']}")
     if int(order_seed) != int(freeze["order_seed"]):
@@ -815,6 +848,8 @@ def run_evaluation(
         not 1 <= len(seed_list) <= 3 or len(set(seed_list)) != len(seed_list)
     ):
         raise RunRefused("give one to three distinct seeds (the protocol preregisters three)")
+    if not cases:  # a case-scoped held-out lock names the default cases
+        cases = scoped_heldout_cases(heldout_path, suite)
     heldout, specs = resolve_cases(suite, cases)
     order = DEFAULT_ORDER_SEED if order_seed is None else int(order_seed)
     if heldout:

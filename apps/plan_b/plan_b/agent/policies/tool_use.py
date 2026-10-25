@@ -1,4 +1,4 @@
-"""P1, the ordinary tool-using model baseline: ``tool-use/1.1.0``.
+"""P1, the ordinary tool-using model baseline: ``tool-use/1.2.0``.
 
 A serious baseline in the sense of ``PEEAI_plan/08_evaluation.md``: the model reads the visible
 state and chooses tools and arguments itself, by strict JSON (``calls``: a tool name from the
@@ -72,7 +72,7 @@ from typing import Any, Literal
 from plan_b.agent.attention import AttentionMixin, _Evaluated, _Watch
 from plan_b.agent.config import ModelConfig, load_model_config
 from plan_b.agent.interpret import LiveInterpretation
-from plan_b.agent.menu import OpenAsk, ask_reason, own_grant, shortfalls
+from plan_b.agent.menu import Menu, OpenAsk, ask_reason, own_grant, shortfalls
 from plan_b.agent.orchestrator import (
     _candidate_context,
     _status_text,
@@ -115,7 +115,7 @@ from plan_b.domain.timeutil import local_label
 from plan_b.evaluation.policies.base import ToolClient, TransportLost
 from plan_b.evaluation.policies.parser import NOTICE_KINDS, normalize_text
 
-POLICY_ID = "tool-use/1.1.0"
+POLICY_ID = "tool-use/1.2.0"
 PROMPT_ID = "tool_use.v3"  # v3: when the server calls; v1 and v2 kept for the runs citing them
 SCHEMA_NAME = "plan_b_tool_turn"
 DEFAULT_MAX_MODEL_CALLS = 8
@@ -305,7 +305,7 @@ class _Outcome:
 
 
 class ToolUsePolicy(AttentionMixin):
-    """``tool-use/1.1.0``: the model picks tools and arguments; the executor validates. When a
+    """``tool-use/1.2.0``: the model picks tools and arguments; the executor validates. When a
     model turn is warranted is the server-side attention rule shared with P2 and P3
     (``agent/attention.py``)."""
 
@@ -335,6 +335,14 @@ class ToolUsePolicy(AttentionMixin):
         self._evaluation: EvaluationResult | None = None
         self._settled: str | None = None
         self._model_wake: datetime | None = None  # the model's wait_minutes, a retry, a bound
+        # Policy 1.2: whether _model_wake is the model's wait_minutes asked again on a state
+        # unchanged since its last wait (then the wake goes through the shared attention rule;
+        # a first wait, a retry and the turn bound's continuation are their own turn), the state
+        # digest of its last wait, and the menu the shared rule last offered.
+        self._wake_repeat = False
+        self._wait_digest: str | None = None
+        self._offered: Menu | None = None
+        self._ended_with: str | None = None
         self._halted: str | None = None
         # The shared attention rule's state (``AttentionMixin``). P1 keeps no interpretations.
         self._interps: dict[str, LiveInterpretation] = {}
@@ -445,12 +453,17 @@ class ToolUsePolicy(AttentionMixin):
         # A timed wake can change what the clock-dependent checks say (the handoff window, a
         # deadline watch) with no new revision: the evaluation is read again.
         timed = woke or woke_ask or woke_watch or woke_window
+        own_turn = woke and not self._wake_repeat
+        self._offered = None
+        self._ended_with = None
         try:
             # The shared attention rule: a new notice warrants a turn; otherwise only a state
             # whose decision menu offers an action does (P2's rule, ``agent/attention.py``). A
-            # wake the model asked for (its wait_minutes, a retry after a failed call, the turn
-            # bound's continuation) is its own turn, as P2's open claims keep it called.
-            if not fresh and not woke and not self._warranted(view, run, woke_watch, timed):
+            # retry after a failed call, the turn bound's continuation and a wake the model asked
+            # for (its wait_minutes) are their own turn. Policy 1.2: a wait asked again on a
+            # state unchanged since the model's last wait is not: it goes through the shared
+            # rule, so repeated waits on an unchanged state do not each cost a model call.
+            if not fresh and not own_turn and not self._warranted(view, run, woke_watch, timed):
                 self._settled = _digest(view)
                 return "waiting", self._next_wake(view, self._now(view))
             self._model_wake = None
@@ -474,6 +487,9 @@ class ToolUsePolicy(AttentionMixin):
             else:
                 run.notes.append(f"turn bound of {MAX_TURNS} reached; the next wake continues")
                 self._model_wake = self._now(view)
+                self._wake_repeat = False
+            if self._offered is not None and self._ended_with not in (None, "ask"):
+                self._note_declined(view, self._offered)
         except _Stop as stop:
             self._record(run, "stop", f"Stopped: {stop.reason}. No further action.")
             return "stopped", None
@@ -481,6 +497,7 @@ class ToolUsePolicy(AttentionMixin):
             what = "timed out" if failed.failure == "provider_timeout" else "failed"
             retry = self._now(view) + PROVIDER_RETRY
             self._model_wake = retry
+            self._wake_repeat = False
             self._record(
                 run,
                 "wait",
@@ -558,7 +575,8 @@ class ToolUsePolicy(AttentionMixin):
             return False
         evaluated = _Evaluated(ev=ev)
         menu = self._attend(view, run, evaluated, [], woke_watch)
-        if menu.needs_choice:
+        if menu.needs_choice and not self._declined_repeat(view, menu):
+            self._offered = menu
             return True
         self._record_default(view, run, evaluated, menu, [])
         run.read_refs = []
@@ -950,7 +968,11 @@ class ToolUsePolicy(AttentionMixin):
         if output.wait_minutes is not None and output.wait_minutes >= 1:
             wait_until = now + timedelta(minutes=min(output.wait_minutes, MAX_WAIT_MINUTES))
             self._model_wake = wait_until
+            digest = _digest(view)
+            self._wake_repeat = digest == self._wait_digest
+            self._wait_digest = digest
         decision = output.decision
+        self._ended_with = decision
         if decision == "infeasible":
             self._observe(view, run)  # its shortfall names the state it ends on
             refs = (*refs, *run.read_refs)

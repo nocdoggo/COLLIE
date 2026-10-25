@@ -92,11 +92,25 @@ def _distinct(results: dict[str, Any], *path: str) -> list[Any]:
     return seen
 
 
+def _policy_id_labels(records: list[dict[str, Any]], policies: list[str]) -> list[str]:
+    """``P0 rules/1.0.0`` style labels in the order of ``policies`` (P0 to P3), then any
+    policy not in that list, by name. A policy with several ids (profiles) lists each."""
+    ids: dict[str, list[str]] = {}
+    for r in records:
+        pid, label = r.get("policy_id"), r.get("policy")
+        if pid and label and pid not in ids.setdefault(label, []):
+            ids[label].append(pid)
+    order = [p for p in policies if p in ids] + sorted(p for p in ids if p not in policies)
+    return [f"{p} {pid}" for p in order for pid in sorted(ids[p])]
+
+
 def _manifest(results: dict[str, Any], metrics: dict[str, Any]) -> list[str]:
     plan = results["plan"]
     inv = _last_invocation(results)
     records = [e["record"] for e in results["episodes"] if e["record"]]
-    policy_ids = sorted({r.get("policy_id") for r in records if r.get("policy_id")})
+    # In P0 to P3 order, each id once, labelled with its policy (Wave 3 printed them sorted
+    # alphabetically, which did not match the P0-P3 list after them; KNOWN_LIMITATIONS 10).
+    policy_ids = _policy_id_labels(records, plan["policies"])
     models = sorted({m for r in records for m in (r.get("model") or {}).get("returned", [])})
     seed_passed = sorted({bool(r.get("seed_passed")) for r in records if r.get("seed") is not None})
     seed_fields = [f for r in records for f in (r.get("model") or {}).get("seed_fields", [])]
@@ -149,7 +163,7 @@ def _manifest(results: dict[str, Any], metrics: dict[str, Any]) -> list[str]:
         ),
         f"- Case IDs: {', '.join(ids)}" + ("" if plan["heldout"] else " (development fixtures)"),
         f"- Protocol version: {plan['protocol_version']}",
-        f"- Policy identifiers: {', '.join(policy_ids) or '—'} ({', '.join(plan['policies'])})",
+        f"- Policy identifiers: {', '.join(policy_ids) or '—'}",
         f"- Model identifier and serving configuration: {model_line}",
         f"- Measured code (prompts, parser, planner, adapters, tool registry):"
         f" freeze {('verified' if freeze.get('ok') else 'NOT verified')},"
@@ -788,19 +802,39 @@ def render_svg(metrics: dict[str, Any]) -> str:
     return "\n".join(out) + "\n"
 
 
-def write_report(results_dir: Path, out_dir: Path | None = None) -> dict[str, Path]:
+class ReportRefused(RuntimeError):
+    """An existing report would be overwritten with different content."""
+
+
+def write_report(
+    results_dir: Path, out_dir: Path | None = None, *, force: bool = False
+) -> dict[str, Path]:
+    """Write the report. An existing report file with different content (a recorded run's
+    report, say, re-rendered by later code) is never overwritten unless ``force`` is given."""
     results = load_results(results_dir)
     metrics = suite_metrics(results)
     target = out_dir or results_dir / REPORT_DIR
-    target.mkdir(parents=True, exist_ok=True)
     paths = {
         "metrics": target / "metrics.json",
         "markdown": target / "evaluation_results.md",
         "figure": target / "figure.svg",
     }
-    paths["metrics"].write_text(
-        json.dumps(metrics, indent=1, sort_keys=True) + "\n", encoding="utf-8"
-    )
-    paths["markdown"].write_text(render_markdown(results, metrics), encoding="utf-8")
-    paths["figure"].write_text(render_svg(metrics), encoding="utf-8")
+    texts = {
+        "metrics": json.dumps(metrics, indent=1, sort_keys=True) + "\n",
+        "markdown": render_markdown(results, metrics),
+        "figure": render_svg(metrics),
+    }
+    changed = [
+        p.name
+        for name, p in paths.items()
+        if p.is_file() and p.read_text(encoding="utf-8") != texts[name]
+    ]
+    if changed and not force:
+        raise ReportRefused(
+            f"{target} already holds a different report ({', '.join(changed)}); write it"
+            " elsewhere with --out, or pass --force to replace it"
+        )
+    target.mkdir(parents=True, exist_ok=True)
+    for name, p in paths.items():
+        p.write_text(texts[name], encoding="utf-8")
     return paths

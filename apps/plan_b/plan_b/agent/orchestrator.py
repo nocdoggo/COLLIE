@@ -119,7 +119,7 @@ from plan_b.domain.timeutil import local_label
 from plan_b.evaluation.policies.base import ToolClient, TransportLost
 from plan_b.evaluation.policies.parser import normalize_text
 
-POLICY_ID = "live/1.1.0"
+POLICY_ID = "live/1.2.0"
 CHOOSE_PROMPT = "choose_action.v1"
 PANTRY_CHOOSE_PROMPT = "choose_action_pantry.v1"  # consumable profiles: the stock options
 CHOOSE_SCHEMA_NAME = "plan_b_menu_choice"
@@ -266,6 +266,9 @@ class _Run:
     mutations_blocked: bool = False
     rejected_intents: set[str] = field(default_factory=set)
     retry_at: datetime | None = None
+    # Policy 1.2: the model's choice whose mutation was rejected only as stale (its intent,
+    # candidate signature and the call that chose it), re-issued on the re-read state.
+    stale_choice: tuple[str, str | None, Any, Any] | None = None
 
     def call(
         self,
@@ -699,7 +702,16 @@ class LivePolicy(AttentionMixin):
         if evaluated is None:
             return "done"
         menu = self._attend(view, run, evaluated, material, woke, frozenset(run.rejected_intents))
-        if not menu.needs_choice:
+        retry, run.stale_choice = run.stale_choice, None
+        if retry is not None:
+            # Policy 1.2: a choice rejected only as stale is re-issued by the server when the
+            # re-read state still offers the same option (intent and candidate signature): the
+            # model's choice stands and no model call is spent on the retry.
+            again = next((o for o in menu.options if (o.intent, o.signature) == retry[:2]), None)
+            if again is not None:
+                run.notes.append(f"re-issued {again.option_id} after a stale rejection")
+                return self._execute(view, run, evaluated, menu, again, retry[2], retry[3])
+        if not menu.needs_choice or self._declined_repeat(view, menu):
             self._record_default(view, run, evaluated, menu, claims)
             return "done"
         choice = self._choose(
@@ -923,6 +935,8 @@ class LivePolicy(AttentionMixin):
         choice = self._choice_details(view, evaluated, menu, option, output, response)
         self._pending_results.clear()  # consumed by this call
         cited = tuple(choice["cited_refs"])
+        if option.action in ("keep", "wait"):
+            self._note_declined(view, menu)
         if option.action == "keep":
             self._record_keep(view, run, evaluated, option, choice, chosen_by="model")
             return "done"
@@ -974,6 +988,7 @@ class LivePolicy(AttentionMixin):
                 tool_call_refs=result.call_ids,
                 details=base | {"failure": "stale_revision", "error_code": code},
             )
+            run.stale_choice = (option.intent, option.signature, output, response)
             return "stale"
         if option.action == "apply_plan":
             return self._after_apply(view, run, evaluated, option, result, base)

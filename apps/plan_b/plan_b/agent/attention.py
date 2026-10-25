@@ -15,12 +15,15 @@ all. A model call is warranted when
 The plan is in question when the keep candidate is not applicable (or not robust), when an
 unanswered material notice threatens it, or, on a consumable profile, when a pursuable stock
 candidate leaves less of a service target unfulfilled. A notice is material when it concerns
-equipment a not-started activity of the active plan uses before its claimed ETA (any use, for
-a cancellation, no ETA, or a verify-only notice). Status answers, arrival records and check-ins
-are typed evidence: they warrant a model call only through the evaluation (a plan that stops
-working, a candidate that becomes applicable). Otherwise the server records what the state
-determines (keep, a shortfall, infeasible, undecided, or a wait for staff or the organizer)
-with ``chosen_by = "server"``, once per state.
+equipment or (policy 1.2) a person that a not-started activity of the active plan uses before
+its claimed ETA (any use, for a cancellation, no ETA, or a verify-only notice). Status
+answers, arrival records and check-ins are typed evidence: they warrant a model call only
+through the evaluation (a plan that stops working, a candidate that becomes applicable).
+Otherwise the server records what the state determines (keep, a shortfall, infeasible,
+undecided, or a wait for staff or the organizer) with ``chosen_by = "server"``, once per
+state. Policy 1.2: a menu whose acting options the model already passed on (P2/P3: it chose
+wait or keep; P1: it ended its turn without an ask) in the same state (revision, goal
+version) is not offered again (``_declined_repeat``).
 
 Every policy wakes at its deadline watch (expected equipment ahead of a not-started activity:
 the earlier of start - 5 min and reported ETA + 1 min; a status check is offered once per
@@ -72,6 +75,9 @@ NOT_STARTED = ("planned", "ready")
 DEADLINE_LEAD = timedelta(minutes=5)
 ETA_GRACE = timedelta(minutes=1)
 ASK_LEAD = timedelta(minutes=1)
+# Resource kinds whose delay or cancellation notices can put the plan in question (1.1:
+# equipment only; 1.2 adds people, so a person's late-arrival report reaches the planner).
+MATERIAL_KINDS = ("equipment", "person")
 _EPOCH = datetime(2000, 1, 1, tzinfo=UTC)
 
 
@@ -110,6 +116,20 @@ class AttentionMixin:
     _recorded: set[tuple[Any, ...]]
     _pending_calls: list[CallRecord]
     _at: datetime | None
+
+    # Policy 1.2: the acting options the model last passed on (it chose wait or keep), with the
+    # state it passed in. The same options in the same state do not warrant another call.
+    _declined: tuple[Any, ...] | None = None
+
+    def _declined_repeat(self, view: EventStateView, menu: Menu) -> bool:
+        """Whether the model already passed on exactly these acting options in this state
+        (same revision, goal version and option intents). Calling it again would repeat a
+        call that made no progress, so the server records the default instead (policy 1.2,
+        shared by P1, P2 and P3). Any state change, a new notice included, ends the repeat."""
+        return self._declined is not None and self._declined == _menu_key(view, menu)
+
+    def _note_declined(self, view: EventStateView, menu: Menu) -> None:
+        self._declined = _menu_key(view, menu)
 
     def _record(
         self,
@@ -262,10 +282,12 @@ class AttentionMixin:
         return sum(1 for c in since if c.actor_id == self._principal) >= MAX_STATUS_FAILURES
 
     def _material(self, view: EventStateView, interp: LiveInterpretation) -> bool:
-        """Whether the notice concerns equipment a not-started activity of the active plan
-        uses before its claimed ETA (any use, for a cancellation, no ETA, or verify-only)."""
+        """Whether the notice concerns equipment or a person (policy 1.2: a person's own delay
+        report is as material as an equipment delay) that a not-started activity of the active
+        plan uses before its claimed ETA (any use, for a cancellation, no ETA, or
+        verify-only)."""
         res = _resources(view).get(interp.subject_resource_id or "")
-        if res is None or res.definition.kind != "equipment":
+        if res is None or res.definition.kind not in MATERIAL_KINDS:
             return False
         lifecycles = _lifecycles(view)
         eta = interp.claimed_eta if interp.is_claim else None
@@ -759,6 +781,11 @@ class AttentionMixin:
 
 
 # ---------------------------------------------------------------------------------- helpers
+
+
+def _menu_key(view: EventStateView, menu: Menu) -> tuple[Any, ...]:
+    acting = sorted(o.intent for o in menu.options if o.action not in ("keep", "wait"))
+    return (view.revision, view.goal.version, tuple(acting))
 
 
 def _ids(values: Any) -> tuple[str, ...]:

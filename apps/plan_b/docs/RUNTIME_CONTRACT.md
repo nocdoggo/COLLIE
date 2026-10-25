@@ -1519,3 +1519,67 @@ Once `freeze.json` exists, every file it hashes is frozen: a change to a measure
 setting or the runtime is drift, and invalidates the freeze and any comparison made under it
 (`PEEAI_plan/waves/03_evidence_showcase.md`). The held-out cases are locked separately
 (`heldout.json`, `plan-b eval lock-heldout`) against this freeze.
+
+## 21. Policy 1.2 (Wave 3b): fixes of the post-release defects
+
+Policy 1.2 fixes the defects that `evaluation/results/wave3_heldout_20261025T1625Z/FAILURES.md`
+and `PEEAI_plan/handoffs/wave_3/KNOWN_LIMITATIONS.md` name. That run stays the evaluation of
+record of 1.1. Its 12 held-out cases are spent: a run of 1.2 on them is a post-hoc diagnostic
+rerun and is labelled so. Only cases locked before the first 1.2 model call can give a new
+held-out result.
+
+| Item | 1.1 behavior | 1.2 behavior | Where |
+| --- | --- | --- | --- |
+| Ids | P1 `tool-use/1.1.0`, P2 `live/1.1.0`, P3 `verify-all/1.1.0` | P1 `tool-use/1.2.0`, P2 `live/1.2.0`, P3 `verify-all/1.2.0`. P0 keeps `rules/1.0.0` and `pantry-rules/1.1.0` (its code is unchanged). Prompts are unchanged, so their ids stay | `agent/orchestrator.py`, `agent/policies/` |
+| Unavailable pool | A status check that reports an alternate pool `unavailable` left its handoff ranked `feasible_under_assumptions` and requestable in the menu | The planner fails the candidate's `stock_transfer` check ("reported unavailable") unless the handoff is already held, and `handoff_quantity` offers no handoff from such a pool. `stock_improvable` then no longer keeps the plan in question, so the call-free shortfall report is not withheld | `domain/adapters/pantry.py`, `agent/menu.py` |
+| A person's delay | Only equipment notices were material, and `participant_availability` read only check-ins and the declared window | A notice about a person a not-started activity uses is material (`MATERIAL_KINDS`). Without a status source its verification fails at once, so the claimed ETA reaches the planner as a hypothesis. `participant_availability` fails when a person's reported or hypothetical ETA is after the activity's start | `agent/attention.py`, `domain/constraints.py` |
+| Repeated non-progress calls | Every wake the P1 model asked for was its own turn. P2 and P3 could be asked again on the same menu at a timed wake | Shared rule (`AttentionMixin._declined_repeat`): when the model passed on a menu (P2 and P3 chose wait or keep, P1 ended its turn without an ask), the same acting options in the same state (revision, goal version) do not warrant another call. A P1 wake from its own `wait_minutes` is its own turn the first time, but a wait asked again on a state unchanged since the model's last wait goes through the shared rule. A retry after a failed call and the turn bound's continuation stay their own turns. On dev01, a scripted P1 that only ever waits makes 4 model calls, against 8 (the cap) with both rules off | `agent/attention.py`, `agent/orchestrator.py`, `agent/policies/tool_use.py` |
+| Stale rejection | After `REVISION_CONFLICT` (or another retryable rejection) the state was re-read and the model chose again | P2 and P3 re-issue the rejected option when the re-read menu still offers the same intent with the same candidate signature. The model's choice stands and no model call is spent. The re-reads stay bounded by `MAX_STALE_RETRIES` | `agent/orchestrator.py` |
+| HTTP 429 | A rate-limit answer was a failed model call, retried at a later wake | `OpenAICompatibleProvider.complete` waits and sends the same request again: 3 s first (or the reply's `Retry-After`, if longer), doubled per further 429 up to 20 s, at most 60 s of waiting per call (`RETRY_429_*`). Each 429 is its own unbilled ledger entry. The caller sees one call, so a 429 uses no model call of the episode. The final record carries `rate_limit_retries` and `rate_limit_wait_ms`. A 429 that outlasts the bound reaches the caller as before. Provider version `plan_b.provider/1.2.0` | `agent/provider.py` |
+| Report | The "Policy identifiers" line was sorted alphabetically | The line lists `P0 <id>`, `P1 <id>`, `P2 <id>`, `P3 <id>` in that order | `evaluation/report.py` |
+
+Equal treatment is unchanged. P1, P2 and P3 keep one model, one output limit (4096 tokens) and
+the same caps (48 tool calls and 8 model calls per episode, 0.50 USD per run, 900 s per
+episode). No cap changed. The 429 wait adds at most 60 s to a call's wall time, so an episode
+whose every call is rate limited for the full bound can reach the 900 s episode timeout. Run
+one LLM episode at a time (`--jobs 1`).
+
+The planner changes are shared code, so P0 reads them too. On the development cases P0's
+outputs are unchanged: `plan-b run-case all` before and after the change gives the same 27
+files once each run's random episode ids and the hashes that cover them are masked. P0 can
+differ from 1.1 only on a case where an alternate pool is checked unavailable or a person has a
+reported ETA. P0's policy ids (`rules/1.0.0`, `pantry-rules/1.1.0`) stay, because its own code
+did not change and its development outputs are unchanged. The shared planner carries its own
+version instead: `PLANNER_VERSION = "plan_b.planner/1.2.0"` in `domain/constraints.py`, which
+the freeze records as `planner_version` and `verify-freeze` checks like the other settings. A
+P0 result under the v1.2 freeze is therefore a result of `rules/1.0.0` or `pantry-rules/1.1.0`
+on planner 1.2.0, not on the 1.1 planner.
+
+Known limits of 1.2, found by the `audit2` audit before the freeze and left as frozen. The
+audit changed no policy behavior. The auditor had already seen the fresh held-out cases, and a
+change by the auditor would break the rule that whoever changes policies never sees them.
+
+- A person's delay hypothesis outlives a later check-in. `orchestrator._hypotheses` keeps the
+  claimed ETA while the claim's verification has failed, and a check-in is not a status, so it
+  never answers the claim. `_participant_availability` reads the ETA before the check-in. A
+  person who reports a delay and then checks in on time still fails the check until the
+  activity starts, for P2 and P3 alike (P1 writes its own hypotheses).
+- The declined-menu key is (revision, goal version, acting intents) and holds no time. When
+  only the clock moves, a timed wake (the deadline watch, a passed ETA, an ask's expiry) with
+  the same acting options gets the server's default record, not a model call. This is the
+  trade-off named above, and it reaches the deadline watch too.
+- P1 notes a declined menu with the view after its own turn, so the key can pair a new
+  revision with the menu offered before the turn. This mostly makes the rule miss, not
+  over-suppress.
+- A stale re-issue is recorded as the model's choice (`chosen_by` `model`) with the earlier
+  call's id, and only a run note marks it. Metrics that count model choices count it twice.
+- A `Retry-After` above 20 s is cut to 20 s, and the 60 s bound counts waiting only, not the
+  time of each attempt.
+
+Tests: `tests/test_w3b_policy_fixes.py` (a synthetic pantry_dev01 variant whose partner desk
+reports the kits booked elsewhere, a person hypothesis on the development fixture, the declined
+menu rule, P1's repeated waits on dev01, the 429 backoff, the stale re-issue on the dev01
+sandbox, the report order). `tests/test_w3b_heldout2_harness.py` covers the second held-out
+set's harness.
+`tests/test_agent_boundary.py::test_stale_revision_retries_are_bounded` now makes every apply
+stale at the tool boundary, since 1.2 re-issues the choice without asking the model.

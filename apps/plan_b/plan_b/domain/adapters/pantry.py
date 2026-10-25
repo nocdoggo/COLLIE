@@ -256,6 +256,13 @@ class _Stock:
             own += sum(h.remaining_quantity or 0 for h in self.own_holds(pool, target, activity))
         return self.on_hand(pool) - self.reserved(pool) + own
 
+    def unavailable(self, pool: str) -> bool:
+        """Whether the pool's latest status (a status check or report) says unavailable."""
+        return any(
+            r.definition.resource_id == pool and r.status == "unavailable"
+            for r in self.snapshot.resources
+        )
+
     def transferable(self, source: str, destination: str) -> int:
         """Units of an alternate pool that could still be handed off into ``destination``: free
         units plus those the actor's own transfer holds already reserve for it."""
@@ -1055,6 +1062,13 @@ def _assess_stock(
             continue
         held_holds = stock.own_transfers(source, pool)
         held = sum(h.remaining_quantity or 0 for h in held_holds)
+        if held < need and stock.unavailable(source):
+            # Policy 1.2 (post-release fix): a pool whose latest status says unavailable is
+            # not a handoff that can still be requested.
+            transfer_problems.append(
+                f"{source} is reported unavailable: a handoff from it cannot be requested"
+            )
+            continue
         cutoff = pantry.handoff_window.end if pantry is not None else None
         if pantry is None or cutoff is None:
             transfer_problems.append("no staff handoff timing is declared")

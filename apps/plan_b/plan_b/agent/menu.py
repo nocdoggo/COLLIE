@@ -658,7 +658,8 @@ def handoff_quantity(
 ) -> int:
     """Units a handoff request for ``need`` would hold now, 0 when none can be requested: one
     request per (source, destination) pair, inside the handoff window (a staff answer must be
-    possible before it closes), within scope, and no more than the source has available."""
+    possible before it closes), within scope, from a source not reported unavailable, and no
+    more than the source has available."""
     params = view.pantry_parameters
     quantity = need.quantity - need.held_quantity
     if params is None or quantity <= 0:
@@ -669,6 +670,8 @@ def handoff_quantity(
         return 0
     if own_transfer_holds(view, inputs.principal, need):
         return 0
+    if source_unavailable(view, need.source_resource_id):
+        return 0
     effective = inputs.now + timedelta(minutes=view.tool_durations_minutes.get("hold_resource", 0))
     answer = effective + timedelta(minutes=params.handoff_duration_minutes)
     if effective < params.handoff_window.start or answer >= params.handoff_window.end:
@@ -676,6 +679,15 @@ def handoff_quantity(
     if need.handoff_cutoff is not None and answer >= need.handoff_cutoff:
         return 0
     return quantity if quantity <= available_quantity(view, need.source_resource_id) else 0
+
+
+def source_unavailable(view: EventStateView, resource_id: str) -> bool:
+    """Whether a pool's latest status says unavailable (policy 1.2): no handoff from it is
+    requestable, whatever its unit count says."""
+    return any(
+        r.definition.resource_id == resource_id and r.status == "unavailable"
+        for r in view.resources
+    )
 
 
 def stock_hold_quantity(

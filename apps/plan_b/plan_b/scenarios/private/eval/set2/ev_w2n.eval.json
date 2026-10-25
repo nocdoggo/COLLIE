@@ -1,0 +1,32 @@
+{
+  "artifact": "plan_b.eval_case",
+  "case_id": "C11",
+  "case_ref": "ev_w2n",
+  "suite": "campus",
+  "condition": "Volunteer late, with a subsequent check-in",
+  "outcome_class": "goal",
+  "negative_control": false,
+  "negative_control_evidence": null,
+  "requires_recovery": true,
+  "actionable_record_ids": [
+    "fac_note_2"
+  ],
+  "target_quantity": null,
+  "achievable_on_time": null,
+  "annotations": [
+    {
+      "source_record_id": "fac_note_2",
+      "event_id": "e_gallery_w5",
+      "resource_id": "swap_facilitator",
+      "effective_time": "2026-12-03T17:55:00-05:00",
+      "claimed_change": "delay",
+      "source_id": "p_swap_facilitator",
+      "booking_ref": null,
+      "unknown_fields": [
+        "booking_ref"
+      ],
+      "note": "Self-report of the person's own arrival time."
+    }
+  ],
+  "note": "Permitted path: apply the swap before 17:40 (the facilitator's declared arrival covers 18:00-18:20); the 17:55 check-in covers the revised slot. A double shift (skills exchange +10, demonstrations +10) would start the skills exchange at 17:50, before the declared arrival. As in C06, the check-in confirms the swap rather than revising it, and no hold is placed or released (person resources cannot be held). Differs from C06: the late person is the skills exchange facilitator, whose slot is first, so the swap moves the demonstrations earlier."
+}

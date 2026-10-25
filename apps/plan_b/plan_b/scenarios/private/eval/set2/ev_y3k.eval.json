@@ -1,0 +1,32 @@
+{
+  "artifact": "plan_b.eval_case",
+  "case_id": "T05",
+  "case_ref": "ev_y3k",
+  "suite": "pantry",
+  "condition": "Primary 20-kit shipment cannot arrive by the deadline; the alternate 16 can be verified, reserved and physically received in time",
+  "outcome_class": "target",
+  "negative_control": false,
+  "negative_control_evidence": null,
+  "requires_recovery": true,
+  "actionable_record_ids": [
+    "rack_count_4"
+  ],
+  "target_quantity": 40,
+  "achievable_on_time": 40,
+  "annotations": [
+    {
+      "source_record_id": "lt62_driver_sms_1",
+      "event_id": "e_lower_hall_05",
+      "resource_id": "main_rack",
+      "effective_time": null,
+      "claimed_change": "delay",
+      "source_id": "lt62_driver",
+      "booking_ref": "LT62",
+      "unknown_fields": [
+        "effective_time"
+      ],
+      "note": "Vague ('before lunchtime'); no exact time."
+    }
+  ],
+  "note": "Permitted path: transfer hold of 16 loft kits inside 9:40-10:04, crew handoff after 4 minutes, hold and commit 40 main rack kits; 40 distributed at 10:50."
+}

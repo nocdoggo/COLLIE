@@ -1,0 +1,50 @@
+{
+  "artifact": "plan_b.eval_case",
+  "case_id": "T06",
+  "case_ref": "ev_u5b",
+  "suite": "pantry",
+  "condition": "Stale or wrong-source receipt claim before physical delivery; authoritative receipt after the deadline",
+  "outcome_class": "partial",
+  "negative_control": false,
+  "negative_control_evidence": null,
+  "requires_recovery": false,
+  "actionable_record_ids": [],
+  "target_quantity": 40,
+  "achievable_on_time": 24,
+  "annotations": [
+    {
+      "source_record_id": "sales_rep_txt_88",
+      "event_id": "e_lower_hall_05",
+      "resource_id": "main_rack",
+      "effective_time": "2026-12-05T09:31:00-05:00",
+      "claimed_change": "availability",
+      "source_id": "vendor_sales",
+      "booking_ref": "LT62",
+      "unknown_fields": [],
+      "note": "Receipt claim from the vendor's sales rep, who does not record receipts; cites a tracking scan, not a crew count."
+    },
+    {
+      "source_record_id": "portal_pod_0805",
+      "event_id": "e_lower_hall_05",
+      "resource_id": "main_rack",
+      "effective_time": "2026-12-05T08:05:00-05:00",
+      "claimed_change": "availability",
+      "source_id": "vendor_portal",
+      "booking_ref": "LT62",
+      "unknown_fields": [],
+      "note": "Auto-generated proof of delivery dated 8:05 a.m. (observed_at 08:05), before any arrival."
+    },
+    {
+      "source_record_id": "door_sheet_2211",
+      "event_id": "e_lower_hall_05",
+      "resource_id": "main_rack",
+      "effective_time": "2026-12-05T11:02:00-05:00",
+      "claimed_change": "availability",
+      "source_id": "loading_door",
+      "booking_ref": "LT62",
+      "unknown_fields": [],
+      "note": "The loading door's sign-off of LT62 at 11:02, after the 10:50 deadline; no crew receipt follows in the session."
+    }
+  ],
+  "note": "Achievable limit 24 by 10:50: the loft hold is refused all window, LT62's authoritative ETA is 11:02 and only the crew can record a receipt (none is scheduled), so only the 24 main rack kits can be committed. Adaptation (as T03): the frozen simulator has no external-receipt actor, so the post-deadline arrival is the dispatch ETA of 11:02 plus the loading door's 11:02 sign-off message, and no stock credit occurs in the session."
+}

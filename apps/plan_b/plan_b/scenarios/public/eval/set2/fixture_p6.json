@@ -1,0 +1,620 @@
+{
+  "artifact": "plan_b.public_scenario",
+  "runtime_version": "1.1.0",
+  "scenario_id": "fixture_p6",
+  "profile_id": "pantry_continuity",
+  "fictional": true,
+  "timezone": "America/New_York",
+  "event_id": "e_lower_hall_05",
+  "derived_from": null,
+  "goal": {
+    "goal_id": "g_lower_hall_05",
+    "description": "Hand out 40 standard kits at the lower hall table by 10:50 a.m. without using stock that is not physically on the rack and without changing the target.",
+    "required_activity_ids": [
+      "setup",
+      "briefing",
+      "distribution",
+      "reconciliation"
+    ],
+    "public_start": "2026-12-05T10:10:00-05:00",
+    "hard_end": "2026-12-05T11:10:00-05:00",
+    "budget_cents": 0,
+    "attendance_target": 14,
+    "fixed_venue_id": "lower_hall",
+    "priorities": [
+      "preserve_stock_and_authority_constraints",
+      "minimize_unfulfilled_kits",
+      "preserve_service_deadline",
+      "minimize_unnecessary_changes_and_queries"
+    ],
+    "version": 1,
+    "preference_preset": "balanced",
+    "objective_weights": {
+      "start_shift_per_minute": 1,
+      "changed_activity": 10,
+      "spend_per_100_cents": 4,
+      "optional_activity_removed": 1000,
+      "participant_notification": 5
+    },
+    "accessibility_requirements": [],
+    "program_concurrency": 1,
+    "service_targets": [
+      {
+        "target_id": "kits_morning",
+        "unit": "standard_kit",
+        "quantity": 40,
+        "deadline": "2026-12-05T10:50:00-05:00",
+        "activity_id": "distribution"
+      }
+    ]
+  },
+  "activities": [
+    {
+      "activity_id": "setup",
+      "label": "Prepare a fictional handout table",
+      "duration_minutes": 10,
+      "window": {
+        "start": "2026-12-05T09:50:00-05:00",
+        "end": "2026-12-05T10:00:00-05:00"
+      },
+      "predecessors": [],
+      "required_resources": [
+        "lower_hall",
+        "table_crew"
+      ],
+      "required": true
+    },
+    {
+      "activity_id": "briefing",
+      "label": "Confirm stock and crew roles",
+      "duration_minutes": 10,
+      "window": {
+        "start": "2026-12-05T10:00:00-05:00",
+        "end": "2026-12-05T10:10:00-05:00"
+      },
+      "predecessors": [
+        "setup"
+      ],
+      "required_resources": [
+        "lower_hall",
+        "table_crew"
+      ],
+      "required": true
+    },
+    {
+      "activity_id": "distribution",
+      "label": "Record aggregate kit distribution",
+      "duration_minutes": 40,
+      "window": {
+        "start": "2026-12-05T10:10:00-05:00",
+        "end": "2026-12-05T10:50:00-05:00"
+      },
+      "predecessors": [
+        "briefing"
+      ],
+      "required_resources": [
+        "lower_hall",
+        "table_crew",
+        "main_rack"
+      ],
+      "required": true
+    },
+    {
+      "activity_id": "reconciliation",
+      "label": "Reconcile receipts and remaining stock",
+      "duration_minutes": 20,
+      "window": {
+        "start": "2026-12-05T10:50:00-05:00",
+        "end": "2026-12-05T11:10:00-05:00"
+      },
+      "predecessors": [
+        "distribution"
+      ],
+      "required_resources": [
+        "lower_hall",
+        "table_crew"
+      ],
+      "required": true
+    }
+  ],
+  "resources": [
+    {
+      "resource_id": "lower_hall",
+      "label": "Lower hall (the main rack and the loft rack are both here)",
+      "kind": "space",
+      "capacity": 14,
+      "window": {
+        "start": "2026-12-05T09:40:00-05:00",
+        "end": "2026-12-05T11:10:00-05:00"
+      },
+      "initial_status": "available",
+      "source_ref": "obs_lower_hall",
+      "capabilities": [
+        "distribution_station"
+      ],
+      "approved_substitute_ids": [],
+      "terms": {
+        "booking_required": false,
+        "commitment_cost_cents": 0,
+        "reserved_exposure_cents": 0,
+        "terms_source_ref": "catalog_p6"
+      }
+    },
+    {
+      "resource_id": "table_crew",
+      "label": "Table crew on duty",
+      "kind": "person",
+      "capacity": 1,
+      "window": {
+        "start": "2026-12-05T09:40:00-05:00",
+        "end": "2026-12-05T11:10:00-05:00"
+      },
+      "initial_status": "available",
+      "source_ref": "obs_hall_crew",
+      "capabilities": [
+        "receipt_attestation",
+        "aggregate_distribution",
+        "40_kits_per_40_minutes"
+      ],
+      "approved_substitute_ids": [],
+      "terms": {
+        "booking_required": false,
+        "commitment_cost_cents": 0,
+        "reserved_exposure_cents": 0,
+        "terms_source_ref": "catalog_p6"
+      }
+    },
+    {
+      "resource_id": "main_rack",
+      "label": "Main rack of standard kits",
+      "kind": "supply",
+      "capacity": 100,
+      "window": {
+        "start": "2026-12-05T09:40:00-05:00",
+        "end": "2026-12-05T11:10:00-05:00"
+      },
+      "initial_status": "available",
+      "source_ref": "obs_main_rack",
+      "capabilities": [
+        "standard_kit"
+      ],
+      "approved_substitute_ids": [],
+      "terms": {
+        "booking_required": false,
+        "commitment_cost_cents": 0,
+        "reserved_exposure_cents": 0,
+        "hold_max_minutes": 35,
+        "refundable_on_release": true,
+        "status_source_id": "vendor_dispatch",
+        "queryable_facts": [
+          "shipment_eta"
+        ],
+        "terms_source_ref": "catalog_p6"
+      },
+      "consumable_stock": {
+        "unit": "standard_kit",
+        "on_hand_quantity": 24,
+        "reserved_quantity": 0,
+        "distributed_quantity": 0,
+        "expected_quantity": 20
+      }
+    },
+    {
+      "resource_id": "loft_rack",
+      "label": "Loft rack of standard kits, same hall",
+      "kind": "supply",
+      "capacity": 100,
+      "window": {
+        "start": "2026-12-05T09:40:00-05:00",
+        "end": "2026-12-05T11:10:00-05:00"
+      },
+      "initial_status": "available",
+      "source_ref": "obs_loft_rack",
+      "capabilities": [
+        "standard_kit"
+      ],
+      "approved_substitute_ids": [],
+      "terms": {
+        "booking_required": false,
+        "commitment_cost_cents": 0,
+        "reserved_exposure_cents": 0,
+        "hold_max_minutes": 20,
+        "refundable_on_release": true,
+        "status_source_id": "loft_desk",
+        "queryable_facts": [
+          "availability"
+        ],
+        "terms_source_ref": "obs_loft_rack"
+      },
+      "consumable_stock": {
+        "unit": "standard_kit",
+        "on_hand_quantity": 16,
+        "reserved_quantity": 0,
+        "distributed_quantity": 0,
+        "expected_quantity": 0
+      }
+    }
+  ],
+  "initial_state": {
+    "event_id": "e_lower_hall_05",
+    "revision": 3,
+    "clock": "2026-12-05T09:40:00-05:00",
+    "committed_cents": 0,
+    "reserved_cents": 0,
+    "assignments": [
+      {
+        "activity_id": "setup",
+        "start": "2026-12-05T09:50:00-05:00",
+        "end": "2026-12-05T10:00:00-05:00",
+        "resource_ids": [
+          "lower_hall",
+          "table_crew"
+        ]
+      },
+      {
+        "activity_id": "briefing",
+        "start": "2026-12-05T10:00:00-05:00",
+        "end": "2026-12-05T10:10:00-05:00",
+        "resource_ids": [
+          "lower_hall",
+          "table_crew"
+        ]
+      },
+      {
+        "activity_id": "distribution",
+        "start": "2026-12-05T10:10:00-05:00",
+        "end": "2026-12-05T10:50:00-05:00",
+        "resource_ids": [
+          "lower_hall",
+          "table_crew",
+          "main_rack"
+        ],
+        "consumable_allocations": [
+          {
+            "resource_id": "main_rack",
+            "quantity": 24,
+            "service_target_id": "kits_morning"
+          }
+        ]
+      },
+      {
+        "activity_id": "reconciliation",
+        "start": "2026-12-05T10:50:00-05:00",
+        "end": "2026-12-05T11:10:00-05:00",
+        "resource_ids": [
+          "lower_hall",
+          "table_crew"
+        ]
+      }
+    ],
+    "lifecycle": [],
+    "checked_in": [
+      {
+        "principal_id": "hall_crew",
+        "resource_id": "table_crew",
+        "at": "2026-12-05T09:40:00-05:00",
+        "available": {
+          "start": "2026-12-05T09:40:00-05:00",
+          "end": "2026-12-05T11:10:00-05:00"
+        },
+        "source_ref": "initial_state_p6"
+      }
+    ],
+    "service_progress": [
+      {
+        "target_id": "kits_morning",
+        "distributed_quantity": 0
+      }
+    ],
+    "expected_shipments": [
+      {
+        "shipment_id": "LT62",
+        "destination_resource_id": "main_rack",
+        "quantity": 20,
+        "received_quantity": 0,
+        "expected_at": "2026-12-05T10:05:00-05:00",
+        "source_ref": "obs_main_rack"
+      }
+    ]
+  },
+  "visible_observations": [
+    {
+      "observation_id": "obs_lower_hall",
+      "event_id": "e_lower_hall_05",
+      "entity_id": "lower_hall",
+      "kind": "status",
+      "source_id": "hall_crew",
+      "source_record_id": "hall_note_3",
+      "correlation_group": "obs_lower_hall",
+      "observed_at": "2026-12-05T09:40:00-05:00",
+      "received_at": "2026-12-05T09:40:00-05:00",
+      "valid_window": {
+        "start": "2026-12-05T09:40:00-05:00",
+        "end": "2026-12-05T11:10:00-05:00"
+      },
+      "authority_scope": "resource_status",
+      "text": "The lower hall is booked for the morning table, and both kit racks are in it. The limit of 14 counts people in the hall at once, not households.",
+      "supersedes": []
+    },
+    {
+      "observation_id": "obs_hall_crew",
+      "event_id": "e_lower_hall_05",
+      "entity_id": "table_crew",
+      "kind": "status",
+      "source_id": "hall_crew",
+      "source_record_id": "crew_sign_in_3",
+      "correlation_group": "obs_hall_crew",
+      "observed_at": "2026-12-05T09:40:00-05:00",
+      "received_at": "2026-12-05T09:40:00-05:00",
+      "valid_window": {
+        "start": "2026-12-05T09:40:00-05:00",
+        "end": "2026-12-05T11:10:00-05:00"
+      },
+      "authority_scope": "resource_status",
+      "text": "Table crew signed in for the morning. The crew can hand out up to 40 standard kits across the 40-minute table.",
+      "supersedes": []
+    },
+    {
+      "observation_id": "obs_main_rack",
+      "event_id": "e_lower_hall_05",
+      "entity_id": "main_rack",
+      "kind": "status",
+      "source_id": "hall_crew",
+      "source_record_id": "rack_count_4",
+      "correlation_group": "obs_main_rack",
+      "observed_at": "2026-12-05T09:40:00-05:00",
+      "received_at": "2026-12-05T09:40:00-05:00",
+      "valid_window": {
+        "start": "2026-12-05T09:40:00-05:00",
+        "end": "2026-12-05T11:10:00-05:00"
+      },
+      "authority_scope": "resource_status",
+      "text": "Crew count: 24 standard kits on the main rack. Delivery LT62 (20 kits) is booked for about 10:05 a.m.; none of it is on the rack yet. Ask vendor dispatch for its current status.",
+      "supersedes": []
+    },
+    {
+      "observation_id": "obs_loft_rack",
+      "event_id": "e_lower_hall_05",
+      "entity_id": "loft_rack",
+      "kind": "status",
+      "source_id": "loft_keeper",
+      "source_record_id": "loft_listing_2",
+      "correlation_group": "obs_loft_rack",
+      "observed_at": "2026-12-05T09:40:00-05:00",
+      "received_at": "2026-12-05T09:40:00-05:00",
+      "valid_window": {
+        "start": "2026-12-05T09:40:00-05:00",
+        "end": "2026-12-05T11:10:00-05:00"
+      },
+      "authority_scope": "resource_status",
+      "text": "The loft rack in this hall lists 16 standard kits. Holds go through the loft desk, and the crew must log any handoff before those kits can be used.",
+      "supersedes": []
+    }
+  ],
+  "principals": [
+    {
+      "principal_id": "coordinator_p6",
+      "role": "coordinator_agent",
+      "display_name": "Coordinator agent",
+      "speaks_for_resource_ids": [],
+      "grant_id": "grant_coordinator_p6"
+    },
+    {
+      "principal_id": "hall_crew",
+      "role": "participant",
+      "display_name": "Hall crew (simulated)",
+      "speaks_for_resource_ids": [
+        "table_crew"
+      ],
+      "grant_id": "grant_hall_crew"
+    },
+    {
+      "principal_id": "loft_keeper",
+      "role": "participant",
+      "display_name": "Loft rack keeper (simulated)",
+      "speaks_for_resource_ids": [
+        "loft_rack"
+      ],
+      "grant_id": "grant_loft_keeper"
+    }
+  ],
+  "authority_grants": [
+    {
+      "grant_id": "grant_coordinator_p6",
+      "event_id": "e_lower_hall_05",
+      "principal_id": "coordinator_p6",
+      "principal_role": "coordinator_agent",
+      "allowed_tools": [
+        "get_event_state",
+        "list_resources",
+        "query_status",
+        "evaluate_candidates",
+        "hold_resource",
+        "release_hold",
+        "apply_plan",
+        "get_action_receipt"
+      ],
+      "resource_ids": [
+        "lower_hall",
+        "table_crew",
+        "main_rack",
+        "loft_rack"
+      ],
+      "activity_ids": [
+        "setup",
+        "briefing",
+        "distribution",
+        "reconciliation"
+      ],
+      "max_total_committed_cents": 0,
+      "max_total_reserved_cents": 0,
+      "expires_at": "2026-12-05T11:10:00-05:00",
+      "review_required_for": []
+    },
+    {
+      "grant_id": "grant_hall_crew",
+      "event_id": "e_lower_hall_05",
+      "principal_id": "hall_crew",
+      "principal_role": "participant",
+      "allowed_tools": [
+        "get_event_state",
+        "query_status",
+        "hold_resource",
+        "release_hold",
+        "apply_plan",
+        "record_stock_receipt",
+        "record_distribution",
+        "submit_observation",
+        "get_action_receipt"
+      ],
+      "resource_ids": [
+        "lower_hall",
+        "table_crew",
+        "main_rack",
+        "loft_rack"
+      ],
+      "activity_ids": [
+        "setup",
+        "briefing",
+        "distribution",
+        "reconciliation"
+      ],
+      "max_total_committed_cents": 0,
+      "max_total_reserved_cents": 0,
+      "expires_at": "2026-12-05T11:10:00-05:00",
+      "review_required_for": []
+    },
+    {
+      "grant_id": "grant_loft_keeper",
+      "event_id": "e_lower_hall_05",
+      "principal_id": "loft_keeper",
+      "principal_role": "participant",
+      "allowed_tools": [
+        "get_event_state",
+        "submit_observation",
+        "get_action_receipt"
+      ],
+      "resource_ids": [
+        "loft_rack"
+      ],
+      "activity_ids": [],
+      "max_total_committed_cents": 0,
+      "max_total_reserved_cents": 0,
+      "expires_at": "2026-12-05T11:10:00-05:00",
+      "review_required_for": []
+    }
+  ],
+  "status_sources": [
+    {
+      "source_id": "vendor_dispatch",
+      "label": "Kit vendor dispatch for lower hall deliveries (simulated)",
+      "entity_ids": [
+        "main_rack"
+      ],
+      "facts": [
+        "shipment_eta"
+      ],
+      "freshness_minutes": 30
+    },
+    {
+      "source_id": "loft_desk",
+      "label": "Loft rack desk (simulated)",
+      "entity_ids": [
+        "loft_rack"
+      ],
+      "facts": [
+        "availability"
+      ],
+      "freshness_minutes": 30
+    }
+  ],
+  "planning": {
+    "edit_templates": [
+      {
+        "template": "keep"
+      }
+    ],
+    "max_combined_edits": 1,
+    "candidate_cap": 16,
+    "tie_breaks": [
+      "objective_total",
+      "changed_activities",
+      "additional_committed_cents",
+      "candidate_signature"
+    ]
+  },
+  "tool_durations_minutes": {
+    "get_event_state": 0,
+    "get_action_receipt": 0,
+    "list_resources": 0,
+    "query_status": 2,
+    "evaluate_candidates": 0,
+    "hold_resource": 1,
+    "release_hold": 1,
+    "apply_plan": 1,
+    "check_in": 0,
+    "submit_observation": 0,
+    "update_goal": 0,
+    "update_grant": 0,
+    "record_stock_receipt": 0,
+    "record_distribution": 0
+  },
+  "declared_assumptions": [
+    {
+      "assumption_id": "a_synthetic",
+      "description": "Kits, crew, racks and times are invented for this sandbox; no real food bank data or recipients are modeled.",
+      "basis": "scenario_design",
+      "source_ref": "fixture_spec_p6"
+    },
+    {
+      "assumption_id": "a_kits",
+      "description": "Every unit is one identical, preassembled standard kit. Distribution is recorded as an aggregate count by the crew only.",
+      "basis": "scenario_design",
+      "source_ref": "fixture_spec_p6"
+    },
+    {
+      "assumption_id": "a_plan",
+      "description": "The starting plan allocates the 24 main rack kits to the 40-kit target; the remaining 16 are not yet covered by any stock.",
+      "basis": "scenario_design",
+      "source_ref": "fixture_spec_p6"
+    },
+    {
+      "assumption_id": "a_handoff",
+      "description": "Kits from the loft rack count only after a hold through the loft desk and a crew-logged handoff, which takes about 4 minutes, between 9:40 and 10:04 a.m. Expected delivery kits count only after the crew logs their receipt.",
+      "basis": "scenario_design",
+      "source_ref": "fixture_spec_p6"
+    }
+  ],
+  "fixture_extensions": [],
+  "pantry_parameters": {
+    "service_activity_id": "distribution",
+    "staff_resource_id": "table_crew",
+    "service_rate_units_per_minute": 1,
+    "handoff_duration_minutes": 4,
+    "handoff_window": {
+      "start": "2026-12-05T09:40:00-05:00",
+      "end": "2026-12-05T10:04:00-05:00"
+    }
+  },
+  "stock_options": [
+    {
+      "option": "allocate_stock",
+      "activity_id": "distribution",
+      "service_target_id": "kits_morning",
+      "resource_id": "main_rack"
+    },
+    {
+      "option": "transfer_stock",
+      "activity_id": "distribution",
+      "service_target_id": "kits_morning",
+      "resource_id": "main_rack",
+      "source_resource_id": "loft_rack"
+    },
+    {
+      "option": "await_shipment",
+      "activity_id": "distribution",
+      "service_target_id": "kits_morning",
+      "resource_id": "main_rack"
+    }
+  ]
+}

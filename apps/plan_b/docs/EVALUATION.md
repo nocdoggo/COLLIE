@@ -409,3 +409,98 @@ measured file, so a results directory at `plan_b/evaluation/results/` would make
 - **These held-out cases are spent.** Their designs are described by id in the results. Any
   later policy or prompt revision needs a newly authored and locked held-out set, and a new
   freeze.
+
+## Second held-out set (v1.2 harness)
+
+The v1.1 held-out cases are spent. A second held-out set is locked in its own manifest, which
+records the cases it covers, so the two sets never share a lock.
+
+**Commands.** A bare file name such as `heldout2.json` or `freeze_v1_2.json` names a file in
+`plan_b/evaluation/manifests/`. A value with a directory part is a path as given.
+
+```bash
+cd apps/plan_b
+uv run plan-b eval freeze --out freeze_v1_2.json
+uv run plan-b eval lock-heldout --manifest heldout2.json --freeze freeze_v1_2.json --cases <case ids>
+uv run plan-b eval verify-freeze --freeze freeze_v1_2.json --heldout heldout2.json --require-heldout
+uv run plan-b eval run --suite campus --freeze freeze_v1_2.json --heldout heldout2.json --out <results dir>
+```
+
+- **Lock.** `lock-heldout --cases` takes evaluator case ids (`C09`) or case refs, separated by
+  commas or spaces. It writes a case-scoped manifest. The manifest records `case_scope`, the
+  sorted evaluator case ids, and for each case the hashes of its private case file, its
+  evaluator file and its public fixture. `files`, `files_sha256`, `public_files_sha256` and
+  `private_files_sha256` cover exactly those files. The files of other cases are outside the
+  lock. An unknown or repeated case is refused with a message and nothing is written. `--out`
+  still works as another name for `--manifest`. Without `--cases` the command writes a
+  whole-directory lock, as in v1.1.
+- **Verify.** `verify-freeze` with a case-scoped manifest recomputes exactly the files that
+  manifest records. An edit to another case's file, or a new file in the held-out directories,
+  is not drift for it. A changed or removed scoped file is drift, and so is a `case_scope` that
+  no longer matches the locked cases. A manifest without `case_scope` keeps the v1.1 behavior
+  and covers every file under `scenarios/private/eval/` and `scenarios/public/eval/`.
+- **Run.** `eval run` with a case-scoped `--heldout` manifest runs that manifest's cases of the
+  suite when `--cases` is not given. It refuses a held-out case the manifest does not lock. It
+  refuses to start on any drift of either manifest, or when the held-out manifest was locked
+  against a different freeze. `plan.json` binds the digest of both manifests, so a resume under
+  another manifest is refused. Each episode process still checks the whole held-out directories
+  against the state the run started under, so editing any held-out file during a run stops it.
+- **The v1.1 manifests.** `freeze.json` and `heldout.json` stay in
+  `plan_b/evaluation/manifests/` as historical records and are not rewritten. They verify at
+  their commits: `freeze.json` at `3de5962` and `heldout.json` at `49e62b5`. HEAD no longer
+  matches `freeze.json`, by design, because policy v1.2 changed measured files. `heldout.json`
+  is a whole-directory lock, so it also reports added files at HEAD once the second set's files
+  are in the held-out directories. Check either one from a clean checkout of its commit.
+- **Later case ids.** The protocol table in `evaluation/run.py` (`CASE_CLASSES`,
+  `NEGATIVE_CONTROLS`) stays the rule for C01 to C08 and T01 to T04. A later id of the same
+  form (`C` or `T` and two digits, for example C09 or T05) takes its outcome class and its
+  negative-control flag from its evaluator file. The class must be one of its suite's classes,
+  a negative control still needs its evidence, and the lock still replays its original plan.
+  Any other id is refused. The opacity check now refuses any `c` or `t` with two digits in an
+  agent-visible identifier, not only C01 to C08 and T01 to T04.
+- **Subdirectories.** The loader (`run.heldout_specs`, `run.heldout_public_fixtures`) also
+  reads `scenarios/private/eval/` and `scenarios/public/eval/` subdirectories, so a later set
+  may keep its files in its own subdirectory. A case ref or a public scenario id that appears
+  twice anywhere in the tree is refused. Every held-out file under these trees is still loaded
+  and validated, so a broken file of either set stops a lock or a run of the other.
+- **Reports.** `eval report` never replaces an existing report file with different content.
+  Re-rendering a recorded run with later report code (the v1.1 run of record, say, whose
+  policy id line 1.2 orders differently) is refused unless `--out` names another directory or
+  `--force` is given. The same content again is not a change.
+- **The evaluator note.** `scenarios/private/eval/README_set2.md` describes the second set but
+  is not one of its case files, so `heldout2.json` does not cover it. Its edits are not drift.
+
+## Policy 1.2 (Wave 3b)
+
+Policy 1.2 (P1 `tool-use/1.2.0`, P2 `live/1.2.0`, P3 `verify-all/1.2.0`) fixes the defects
+that the Wave 3 results name. [`RUNTIME_CONTRACT.md`](RUNTIME_CONTRACT.md) section 21 lists each
+fix, where it lives and its test. In short: a pool checked unavailable is no handoff option, a
+person's delay reaches the planner, the model is not called again on a menu it already passed
+on in the same state, a choice rejected only as stale is re-issued without a model call, an
+HTTP 429 is waited out inside the call, and the report lists policy ids in P0 to P3 order. P0's
+own code and ids are unchanged, but it shares the planner, so the first two fixes reach it too.
+The freeze therefore records `planner_version` (`plan_b.planner/1.2.0`), and a P0 result under
+`freeze_v1_2.json` is P0 on planner 1.2.0. Its development outputs (`plan-b run-case all`) are
+unchanged. The caps, the model and the output limit are the same for P1, P2
+and P3 as in 1.1.
+
+**Audit before the freeze (`audit2`).** The audit found five limits of 1.2 (a person's
+delay hypothesis outlives a later check-in, the declined-menu key holds no time, P1's declined
+key uses the view after its turn, a stale re-issue reads as a model choice, and a long
+`Retry-After` is cut to 20 s). [`RUNTIME_CONTRACT.md`](RUNTIME_CONTRACT.md) section 21 lists
+them. They are frozen as they are. The auditor had seen the fresh cases, so a behavior change
+by the auditor would have broken the isolation of the second held-out set.
+
+**What 1.2 results may claim.** The run `wave3_heldout_20261025T1625Z` stays the evaluation
+of record of 1.1 and is never edited or relabelled. Its 12 held-out cases (C01 to C08, T01 to
+T04) are spent, because the fixes were made after reading their failures. A run of 1.2 on them
+is a post-hoc diagnostic rerun. Its results directory and every table built from it must say
+so, and it is never called held-out. Only cases authored and locked (a case-scoped manifest,
+above) before the first 1.2 model call, and never seen by whoever changed the policies, can
+give a new held-out result. Results stay descriptive counts.
+
+**Development smoke (2026-10-25).** `plan-b eval run --suite campus --cases dev02 --policies
+P1,P2,P3 --seeds 101 --jobs 1` and the same for `--suite pantry --cases pantry_dev01`: all six
+episodes `completed` with the goal met and no violation. Model calls: dev02 P1 5, P2 6, P3 4,
+pantry_dev01 P1 4, P2 4, P3 4. Cost 0.483 USD. No call was rate limited. These are development
+cases, and the smoke is a check that 1.2 runs, not a result.

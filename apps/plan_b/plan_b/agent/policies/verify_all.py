@@ -59,7 +59,7 @@ from plan_b.agent.provider import (
 )
 from plan_b.domain.models import EventStateView, ObservationRecord
 
-POLICY_ID = "verify-all/1.1.0"
+POLICY_ID = "verify-all/1.2.0"
 RELEVANCE_RULE = "verify-all-relevance/1.0.0"
 MAX_VERIFY_ROUNDS = 3  # batches of checks per step (notices arriving during a batch)
 

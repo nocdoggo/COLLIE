@@ -150,11 +150,11 @@ def test_moderator_switches_to_live_before_the_coordinator_acts(
     assert view["policy"] == "rules" and view["live_available"] is True
     assert view["model_id"] == REQUESTED_MODEL and view["locked"] is False
     chosen = c.post("/api/moderator/policy", json={"policy": "live"}, headers=_auth(mod)).json()
-    assert chosen["policy"] == "live" and chosen["policy_id"] == "live/1.1.0"
+    assert chosen["policy"] == "live" and chosen["policy_id"] == "live/1.2.0"
     assert chosen["label"] == f"Live agent · {REQUESTED_MODEL} (requested; no reply yet)"
     assert chosen["caps"]["max_tool_calls"] == 48 and chosen["caps"]["model_calls"] == 0
     run = c.post("/api/moderator/policy/run", json={}, headers=_auth(mod)).json()
-    assert run["policy_id"] == "live/1.1.0"
+    assert run["policy_id"] == "live/1.2.0"
     assert run["mode_label"] == f"Live agent · {RETURNED_MODEL}"
     assert all(
         d["details"]["policy_mode"]["label"] == f"Live agent · {RETURNED_MODEL}"

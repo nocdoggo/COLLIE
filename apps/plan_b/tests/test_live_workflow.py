@@ -1,7 +1,7 @@
 """The live workflow of the model-driven comparison policies (W2.5), with scripted models.
 
-P1 ``tool-use/1.1.0``, P2 ``live/1.1.0`` (``agent/policies/selective.py``) and P3
-``verify-all/1.1.0`` run through the real store, executor, runner and staff simulator; the model
+P1 ``tool-use/1.2.0``, P2 ``live/1.2.0`` (``agent/policies/selective.py``) and P3
+``verify-all/1.2.0`` run through the real store, executor, runner and staff simulator; the model
 is the real provider client with a scripted transport (``tests.test_agent_provider``), so
 nothing reaches the network. Covered:
 
@@ -309,17 +309,17 @@ def test_policy_choices_name_p0_to_p3_and_their_labels() -> None:
     assert canonical_choice("selective") == "live" and canonical_choice("tool-use") == "tool-use"
     with pytest.raises(ValueError):
         canonical_choice("oracle")
-    assert selective.SelectivePolicy is LivePolicy and selective.POLICY_ID == "live/1.1.0"
+    assert selective.SelectivePolicy is LivePolicy and selective.POLICY_ID == "live/1.2.0"
     for policy_id, choice, label in (
-        ("tool-use/1.1.0", "tool-use", "Tool-use agent · m/x"),
-        ("live/1.1.0", "live", "Live agent · m/x"),
-        ("verify-all/1.1.0", "verify-all", "Verify-all agent · m/x"),
+        ("tool-use/1.2.0", "tool-use", "Tool-use agent · m/x"),
+        ("live/1.2.0", "live", "Live agent · m/x"),
+        ("verify-all/1.2.0", "verify-all", "Verify-all agent · m/x"),
         ("rules/1.0.0", "rules", "Deterministic policy"),
         ("pantry-rules/1.1.0", "rules", "Deterministic policy"),
     ):
         assert choice_of(policy_id) == choice
         assert mode_label(policy_id, "m/x") == label
-    assert mode_label("verify-all/1.1.0", None, "m/req") == (
+    assert mode_label("verify-all/1.2.0", None, "m/req") == (
         "Verify-all agent · m/req (requested; no reply yet)"
     )
 
@@ -332,10 +332,10 @@ def test_every_model_choice_builds_its_policy_from_the_endpoint_config(tmp_path:
     }
     assert built == {
         "rules": "rules/1.0.0",
-        "tool-use": "tool-use/1.1.0",
-        "live": "live/1.1.0",
-        "selective": "live/1.1.0",
-        "verify-all": "verify-all/1.1.0",
+        "tool-use": "tool-use/1.2.0",
+        "live": "live/1.2.0",
+        "selective": "live/1.2.0",
+        "verify-all": "verify-all/1.2.0",
     }
     assert policy_factory_for("rules", "pantry_continuity")().policy_id == "pantry-rules/1.1.0"
 
@@ -600,7 +600,7 @@ def test_verify_all_checks_every_relevant_source_once_before_choosing(
     assert {r["tool"] for r in first["last_tool_results"]} == {"query_status"}
     assert not any(i.startswith("query:") for i in menu_ids(choices[0]))
     commit = next(d for d in result.decisions if d.kind == "commit")
-    assert commit.policy_id == "verify-all/1.1.0"
+    assert commit.policy_id == "verify-all/1.2.0"
     # Checked once each: nothing is asked again in later runs.
     again = policy.run(sandbox.agent)
     assert not [d for d in again.decisions if d.details.get("verify_all")]
@@ -1013,10 +1013,10 @@ def test_tool_use_ask_is_built_and_checked_by_the_server(db: Database, tmp_path:
 @pytest.mark.parametrize(
     ("choice", "stored", "policy_id", "label"),
     [
-        ("tool-use", "tool-use", "tool-use/1.1.0", "Tool-use agent"),
-        ("selective", "live", "live/1.1.0", "Live agent"),
-        ("live", "live", "live/1.1.0", "Live agent"),
-        ("verify-all", "verify-all", "verify-all/1.1.0", "Verify-all agent"),
+        ("tool-use", "tool-use", "tool-use/1.2.0", "Tool-use agent"),
+        ("selective", "live", "live/1.2.0", "Live agent"),
+        ("live", "live", "live/1.2.0", "Live agent"),
+        ("verify-all", "verify-all", "verify-all/1.2.0", "Verify-all agent"),
     ],
 )
 def test_the_moderator_selects_each_model_policy_by_name(

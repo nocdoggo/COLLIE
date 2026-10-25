@@ -1,0 +1,32 @@
+{
+  "artifact": "plan_b.eval_case",
+  "case_id": "C09",
+  "case_ref": "ev_r4h",
+  "suite": "campus",
+  "condition": "Genuine projector delivery delay",
+  "outcome_class": "goal",
+  "negative_control": false,
+  "negative_control_evidence": null,
+  "requires_recovery": true,
+  "actionable_record_ids": [
+    "van_txt_3082"
+  ],
+  "target_quantity": null,
+  "achievable_on_time": null,
+  "annotations": [
+    {
+      "source_record_id": "van_txt_3082",
+      "event_id": "e_gallery_w5",
+      "resource_id": "lent_projector",
+      "effective_time": null,
+      "claimed_change": "delay",
+      "source_id": "q73_van",
+      "booking_ref": "Q73",
+      "unknown_fields": [
+        "effective_time"
+      ],
+      "note": "States lateness ('won't make your six o'clock slot', 'a few minutes after') without an exact time."
+    }
+  ],
+  "note": "Permitted path: query the order desk (ETA 18:08), apply the +10 shift of the demonstrations before 18:00; they run 18:10-18:30 after the 18:07 check-in and the closing keeps 18:30. A spare booking for 18:00, approved before the 17:35 cutoff, is also permitted. The swap is not (the projector cannot be there at 17:40)."
+}
