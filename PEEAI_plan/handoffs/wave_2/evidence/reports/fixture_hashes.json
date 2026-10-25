@@ -31,7 +31,10 @@
   "planning_schema": "02fa4a3b7c0e4947893fe7be8a146bc4c8bac4e1910d9258a08871791fef8a66",
   "prompts": {
     "choose_action.v1.txt": "d82725c25cc976d303dd4b36ad4f36556f4ad5c168b6674e1ac59abfbfd25b8d",
-    "interpret.v1.txt": "147d6c1cb253545af8de61a99958c3430e329f4369c228e5142bef97598556e4"
+    "choose_action_pantry.v1.txt": "1b0c1cc1305a944d516609e3c7a17d17818d664e41b43201abb38e929d58e48a",
+    "interpret.v1.txt": "147d6c1cb253545af8de61a99958c3430e329f4369c228e5142bef97598556e4",
+    "tool_use.v1.txt": "189709ae324fe24feed61fe6d38434925f85431179dbe3795e7b48a8567a1d34",
+    "tool_use.v2.txt": "77f8fa810f3b5153eea1e14602ba24d30c9ec501d11d4b7cb1e83fef041d82cd"
   },
   "lockfiles": {
     "apps/plan_b/uv.lock": "95b8337fea6818cf0fe290a5df4d0187258a7392f9624bac769b68f974128803",

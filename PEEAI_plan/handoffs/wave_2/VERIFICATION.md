@@ -15,17 +15,21 @@ built, P2 (`live/1.0.0`) gained the pantry's stock options, and one development 
 P2 and P3 was recorded on five cases (section 1b, section 4). The M2 table (section 3) is
 updated: "Future comparison parity" is now passed, and the live pantry result is the P2 run
 `live_p2-live_pantry_dev01`. The audit step then reran P1's four `tool_use.v1` runs under the
-shipped `tool_use.v2` and fixed what its five auditors confirmed (section 1c). Sections 1 and 2
-still describe the regeneration from `fd04d48`; the integration step regenerates
-`reports/checks.json` from a clean checkout of the finishing commit.
+shipped `tool_use.v2` and fixed what its five auditors confirmed (section 1c). The integration
+step closed two last audit items, committed the finishing work (`9158793`, the app, and
+`c4f7cd9`, the packet) and regenerated the evidence from a clean checkout of `c4f7cd9`
+(sections 1, 1d and 2).
 
 ## 1. How the evidence was produced
 
-Two scripts produced it on 2026-10-24. The recorded live runs were made once from the working
-tree, after every Wave 2 worker had finished. The rest of the evidence was then regenerated from
-a fresh, clean checkout of the packet commit `fd04d48`, after the integrator's commits.
-`environment.json` records `git_head = fd04d48…` and `app_tree_clean = true`. The collector made
-no paid call: it copied the recorded live runs and verified each live trace again.
+Two scripts produced it. The recorded live runs were each made once from a working tree: the 8
+Wave 2 runs on 2026-10-24, after every Wave 2 worker had finished, and the 20 P1–P3 development
+runs on 2026-10-25 (sections 1b and 1c). The rest of the evidence was then regenerated on
+2026-10-25 from a fresh, clean checkout of the packet commit `c4f7cd9`, after the integration
+step's commits (the 2026-10-24 regeneration used `fd04d48` in the same way). `environment.json`
+records `git_head = c4f7cd9…` and `app_tree_clean = true`. The collector made no paid call: it
+copied the 28 recorded live runs and verified each live trace again, and the ledger file was
+byte-identical before and after.
 
 A clean checkout has no `.local/` directory, so the regeneration passed the non-secret endpoint
 settings of `.local/keys/model_endpoint.env` as environment variables (`PLAN_B_MODEL_PROVIDER`,
@@ -42,8 +46,10 @@ PLAN_B_MODEL_MAX_TOTAL_COST_USD=8.00 uv run python scripts/run_live_cases.py --o
 PLAN_B_MODEL_MAX_TOTAL_COST_USD=8.00 uv run python scripts/run_live_cases.py --out <live> skills_dev01
 PLAN_B_MODEL_MAX_TOTAL_COST_USD=8.00 uv run python scripts/run_live_cases.py --out <live> skills_dev02 pantry_dev01
 PLAN_B_MODEL_MAX_TOTAL_COST_USD=8.00 uv run python scripts/run_live_cases.py --out <live> dev05 dev06
-# 2. Every check, the deterministic cases, both walkthroughs and the scans (no paid call),
-#    from a clean checkout of fd04d48 (git worktree, uv sync --all-groups --locked, npm ci)
+#    (the P1-P3 development runs and reruns: sections 1b and 1c)
+# 2. Every check, the deterministic cases, both walkthroughs, the storyboard and the scans
+#    (no paid call), from a clean checkout of c4f7cd9 (git worktree, uv sync --all-groups
+#    --locked, npm ci, the ledger copied into the worktree's var/)
 uv run python scripts/collect_wave2_evidence.py --out <empty dir> \
     --live ../../PEEAI_plan/handoffs/wave_2/evidence \
     --gate ../../PEEAI_plan/handoffs/wave_2/evidence/reports/g_llm_gate.json
@@ -61,7 +67,7 @@ exited 0. Its temporary directory was removed.
 | Browser | Playwright 1.64.1, headless Chromium |
 | SQLite | 3.50.3 |
 | Model | `anthropic/claude-sonnet-5.5` through OpenRouter, requested and returned on every call |
-| Prompts | `interpret.v1`, `choose_action.v1` (sha256 in `reports/fixture_hashes.json` and on every live decision) |
+| Prompts | `interpret.v1`, `choose_action.v1`, `choose_action_pantry.v1`, `tool_use.v1`, `tool_use.v2` (sha256 in `reports/fixture_hashes.json` and on every live decision) |
 | Episode caps | 48 tool calls, 8 model calls, phase `development` |
 | Spend caps | 0.50 USD per episode; 8.00 USD cumulative over the ledger (this step's limit) |
 
@@ -175,8 +181,51 @@ Results:
   printed file names only; see KNOWN_LIMITATIONS); no credential, host name, user name or
   absolute path in the packet or the results; no private truth in browser-visible files,
   replays or public reports; all 31 evidence traces `intact`.
-* **Not run here:** the full collector from a clean checkout (the integration step), and any
-  further browser run of a model-driven policy.
+* **Not run here:** the full collector from a clean checkout (the integration step, section 1d),
+  and any further browser run of a model-driven policy.
+
+### 1d. Integration step: two last fixes, the commits and the clean regeneration (2026-10-25)
+
+The run coordinator added two small audit items, both fixed with focused tests and checked by
+reverting each fix (the new tests then failed):
+
+* **D2:** `agent/gate.py` now records a raised exception's class and a sanitized message:
+  credential-shaped tokens become `<redacted>` and local paths `<path>`, cut to 300 characters
+  (`tests/test_gate_error_text.py`, 2 tests).
+* **E3:** after a handoff receipt, the staff receipt form no longer falls back to the S20
+  shipment. A source staff picked stays chosen while it is receivable; otherwise the form shows
+  the next open handoff, or nothing until staff pick one (`web/tests/staff_receipt.test.ts`,
+  2 tests).
+
+```bash
+cd apps/plan_b
+# 1. the battery on the working tree, after both fixes
+uv run ruff check; uv run ruff format --check; uv run mypy
+uv run pytest -q -o addopts= -p no:cacheprovider --junitxml=<scratch>/junit.xml
+(cd web && npm run typecheck && npm test && npm run build && npm run lint)
+uv run plan-b run-case all --db <scratch>/runs.sqlite3 --out <scratch>/out   # + verify-trace on each
+uv run python tests/e2e/walkthrough.py --out <scratch>/wt1
+uv run python tests/e2e/walkthrough_wave2.py --out <scratch>/wt2
+uv run python tests/e2e/storyboard.py --out <scratch>/sb --port 8791
+# 2. commit 9158793 (apps/plan_b) and c4f7cd9 (this packet), explicit paths, no trailers
+# 3. the clean regeneration (section 1), into an empty directory that then replaced evidence/
+git worktree add --detach <scratch>/clean HEAD    # c4f7cd9
+uv run python scripts/collect_wave2_evidence.py --out <empty> \
+    --live ../../PEEAI_plan/handoffs/wave_2/evidence \
+    --gate ../../PEEAI_plan/handoffs/wave_2/evidence/reports/g_llm_gate.json
+```
+
+Step 1 was all green: ruff and format clean (115 files), mypy clean (70 source files), 764
+Python tests passed, web typecheck clean, 392 web tests passed, build and boundary lint passed;
+`run-case all` exited 0 with 9 lines, all `matches_expectation=True`, identical to the Wave 2
+evidence lines and, for dev01–dev06, to Wave 1; the 9 traces `intact`; walkthroughs 41/41 and
+30/30; storyboard 32/32. Before each commit a script compared every staged file with the key
+file and searched for credential shapes, local paths, the host and user names and attribution
+text, printing file names only: nothing was found. The collector in step 3 printed
+`all checks passed` (56 checks, section 2) and exited 0. Its output has the same 182 files as
+the evidence it replaced. Apart from the regenerated reports, screenshots and storyboard, only
+episode ids differ in the deterministic outcomes and traces. The copied live runs are
+byte-identical. The worktree was removed afterwards.
 
 ## 2. Commands and results
 
@@ -186,12 +235,12 @@ and `<evidence>` is `PEEAI_plan/handoffs/wave_2/evidence`.
 | # | Check | Command (from `apps/plan_b`) | Exit | Result |
 | --- | --- | --- | --- | --- |
 | 1 | Lint | `uv run ruff check .` | 0 | All checks passed |
-| 2 | Format | `uv run ruff format --check .` | 0 | 100 files already formatted |
-| 3 | Types | `uv run mypy` | 0 | no issues in 65 source files |
+| 2 | Format | `uv run ruff format --check .` | 0 | 115 files already formatted |
+| 3 | Types | `uv run mypy` | 0 | no issues in 70 source files |
 | 4 | Web typecheck | `npm run typecheck` (web/) | 0 | `tsc --noEmit` clean |
-| 5 | Web build | `npm run build` (web/) | 0 | JS 318.86 kB (94.90 kB gzip) |
-| 6 | Python tests | `uv run pytest -o addopts= -q -p no:cacheprovider --junitxml=…` | 0 | **634 passed, 0 failed, 0 skipped** (1 warning: Starlette's httpx deprecation) |
-| 7 | Web tests | `npm test` (web/) | 0 | **379 passed**, 0 failed |
+| 5 | Web build | `npm run build` (web/) | 0 | JS 322.18 kB (95.84 kB gzip) |
+| 6 | Python tests | `uv run pytest -o addopts= -q -p no:cacheprovider --junitxml=…` | 0 | **764 passed, 0 failed, 0 skipped** (1 warning: Starlette's httpx deprecation) |
+| 7 | Web tests | `npm test` (web/) | 0 | **392 passed**, 0 failed |
 | 8 | Web boundary lint | `npm run lint` (web/) | 0 | 25 read-only modules, 40 sources, dist bundle scanned |
 | 9 | Development cases | `uv run plan-b run-case all --db <work>/runs.sqlite3 --out <work>/out` | 0 | 9/9 `matches_expectation=True`, `violations=0` (section 4) |
 | 10 | Rejections | `uv run plan-b demo-rejections --db <work>/demo.sqlite3 --out <work>/out` | 0 | all 20 steps got their expected result; 7 rejected receipts, 2 attempts without receipt, `violations=0` (`reports/rejected_actions_steps.json`) |
@@ -201,9 +250,10 @@ and `<evidence>` is `PEEAI_plan/handoffs/wave_2/evidence`.
 | 23 | M2 focused tests | the M2 checks mapped to their tests in row 6's JUnit report | 0 | every mapped test passed (section 3) |
 | 24 | Browser, Wave 1 | `uv run python tests/e2e/walkthrough.py --out <work>/shots1` | 0 | **41/41 checks passed** |
 | 25 | Browser, Wave 2 | `uv run python tests/e2e/walkthrough_wave2.py --out <work>/shots2` | 0 | **30/30 checks passed** (pantry staff flow, community check-in and offer, policy switch) |
-| 26–33 | Live trace integrity | `uv run plan-b verify-trace <evidence>/traces/live_<case>_trace.json` | 0 | all 8 recorded live traces `intact` |
-| 34 | Credential scan | every text file written: an OpenRouter key prefix, a bearer token | 0 | none found (no key was read for this scan) |
-| 35 | Identifier scan | every text file written: host name, user name, git email, local paths | 0 | none found |
+| 26 | Demo storyboard | `uv run python tests/e2e/storyboard.py --out <evidence-out>/storyboard --port <free>` | 0 | **32/32 checks passed**, 24 frames (`storyboard/`) |
+| 27–54 | Live trace integrity | `uv run plan-b verify-trace <evidence>/traces/live_<label>_trace.json` | 0 | all 28 recorded live traces `intact` (8 Wave 2 runs, 20 P1–P3 development runs) |
+| 55 | Credential scan | every text file written: an OpenRouter key prefix, a bearer token | 0 | none found in 145 text files (no key was read for this scan) |
+| 56 | Identifier scan | every text file written: host name, user name, git email, local paths | 0 | none found in 146 text files |
 
 pytest ran after the web build, so the bundle-privacy test scanned the real bundle. The JUnit
 report is `reports/pytest_junit.xml`, with its host name replaced and its timestamp removed.
@@ -212,9 +262,10 @@ report is `reports/pytest_junit.xml`, with its host name replaced and its timest
 
 The checks are the "Mandatory M2 checks" of `PEEAI_plan/waves/02_adaptation.md`. Test paths are
 relative to `apps/plan_b/tests/`. `reports/m2_focused_tests.json` lists every mapped test with
-its outcome in the row-6 run (the `fd04d48` regeneration, before P1-P3 and their tests existed).
-The finishing rows' counts below come from the audit step's full run (section 1c), mapped with
-the collector's own `m2_focused`; the integration step records them in that file.
+its outcome in the row-6 run (the clean regeneration from `c4f7cd9`, 764 tests). Its counts are
+those of the audit step's full run (section 1c) cited below: live campus 8, bounded failure 57,
+community 40, pantry core 15, stock and service 7, quantity 10, staff boundary 11 and comparison
+parity 101, all passed.
 
 | M2 check | Recorded outcome | Evidence |
 | --- | --- | --- |
@@ -556,8 +607,11 @@ returned `anthropic/claude-sonnet-5.5`, with cost basis `provider_usage`.
 | Audit step's browser checks: one press of **Run live agent**, and the fallback check | 3 + 1 | 0.03655 + 0 |
 | **ledger total** | **136** | **2.91545** |
 
-`reports/model_spend_summary.json` in this packet still shows the 26 calls of the `fd04d48`
-regeneration. The integration step's collector run rewrites it from the ledger.
+`reports/model_spend_summary.json` was rewritten from the ledger by the integration step's
+collector run: 136 entries, 2.91545 USD, and its 30 run ids sum to the ledger total. The two run
+ids no run record names (`live-e1ac750a5aaf`, 3 calls, 0.03655 USD, and `live-7974806e5fdb`, the
+$0 transport entry) are the audit step's browser checks, labelled "not a recorded run". The
+integration step made no model call.
 
 * **Key check:** one read-only `GET /api/v1/key`, made before the live runs, reported limit 50,
   remaining 49.96491 and usage 0.03509. That usage equals the ledger total at that time.

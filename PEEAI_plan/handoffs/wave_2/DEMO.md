@@ -439,9 +439,10 @@ board), with no speaking. A human presenter still needs three uninterrupted time
 (09's preflight), including one forced provider failure if the live mode is used.
 
 Run: `uv run python tests/e2e/storyboard.py --port 8791` (default `--out`), finished 2026-10-25T07:49Z. Result:
-**32/32 checks passed**, exit 0. The step checks are in `storyboard_report.json`. The integration step's collector run
-rewrites `evidence/storyboard/` (the frames keep their names, so the links here still resolve);
-its report then holds that run's own timings, which differ by tenths of a second from this
+**32/32 checks passed**, exit 0. The integration step's collector run, from a clean checkout of
+`c4f7cd9`, then rewrote `evidence/storyboard/` (32/32 again, 24 frames, 40.9 s of app work in
+its segments; the frames keep their names, so the links here resolve). Its `storyboard_report.json`
+holds that run's own step checks and timings, which differ by tenths of a second from this
 table, the record of the 07:49Z run. The closing
 checks found no model call (5 episodes, only `rules/1.0.0` and `pantry-rules/1.0.0` decided), no
 page error, no horizontal overflow at 1536 px, and no join code or session token in the visible

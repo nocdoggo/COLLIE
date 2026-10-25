@@ -1,8 +1,8 @@
 {
   "ledger": "apps/plan_b/var/model_spend.json",
-  "total_cost_usd": 0.29906,
-  "calls": 26,
-  "sum_of_runs_usd": 0.29906,
+  "total_cost_usd": 2.91545,
+  "calls": 136,
+  "sum_of_runs_usd": 2.91545,
   "runs": {
     "gate-2026-10-24T14:02:39Z": {
       "label": "G-LLM gate",
@@ -85,6 +85,247 @@
       "label": "live run dev06",
       "calls": 3,
       "cost_usd": 0.038896,
+      "outcomes": {
+        "ok": 3
+      },
+      "models_returned": [
+        "anthropic/claude-sonnet-5.5"
+      ]
+    },
+    "tool-use-ca2e9ffa85fc": {
+      "label": "live run p1-tool-use_dev01",
+      "calls": 7,
+      "cost_usd": 0.204338,
+      "outcomes": {
+        "ok": 7
+      },
+      "models_returned": [
+        "anthropic/claude-sonnet-5.5"
+      ]
+    },
+    "tool-use-ecca2cdce73e": {
+      "label": "live run p1-tool-use_dev02",
+      "calls": 8,
+      "cost_usd": 0.239974,
+      "outcomes": {
+        "ok": 8
+      },
+      "models_returned": [
+        "anthropic/claude-sonnet-5.5"
+      ]
+    },
+    "tool-use-dfb248e068bb": {
+      "label": "live run p1-tool-use_dev04",
+      "calls": 7,
+      "cost_usd": 0.1949,
+      "outcomes": {
+        "ok": 7
+      },
+      "models_returned": [
+        "anthropic/claude-sonnet-5.5"
+      ]
+    },
+    "tool-use-6bfd2f44d805": {
+      "label": "live run p1-tool-use_pantry_dev01",
+      "calls": 8,
+      "cost_usd": 0.26454,
+      "outcomes": {
+        "ok": 6,
+        "malformed_json": 2
+      },
+      "models_returned": [
+        "anthropic/claude-sonnet-5.5"
+      ]
+    },
+    "tool-use-19f2082a1352": {
+      "label": "live run p1-tool-use_skills_dev01",
+      "calls": 8,
+      "cost_usd": 0.25344,
+      "outcomes": {
+        "ok": 8
+      },
+      "models_returned": [
+        "anthropic/claude-sonnet-5.5"
+      ]
+    },
+    "live-129c14cfe25f": {
+      "label": "live run p2-live_dev01",
+      "calls": 3,
+      "cost_usd": 0.03662,
+      "outcomes": {
+        "ok": 3
+      },
+      "models_returned": [
+        "anthropic/claude-sonnet-5.5"
+      ]
+    },
+    "live-309080ba725d": {
+      "label": "live run p2-live_dev02",
+      "calls": 6,
+      "cost_usd": 0.07613,
+      "outcomes": {
+        "ok": 6
+      },
+      "models_returned": [
+        "anthropic/claude-sonnet-5.5"
+      ]
+    },
+    "live-73a9c00e6f37": {
+      "label": "live run p2-live_dev04",
+      "calls": 3,
+      "cost_usd": 0.02979,
+      "outcomes": {
+        "ok": 3
+      },
+      "models_returned": [
+        "anthropic/claude-sonnet-5.5"
+      ]
+    },
+    "live-12de3de5a2bf": {
+      "label": "live run p2-live_pantry_dev01",
+      "calls": 4,
+      "cost_usd": 0.045208,
+      "outcomes": {
+        "ok": 4
+      },
+      "models_returned": [
+        "anthropic/claude-sonnet-5.5"
+      ]
+    },
+    "live-a8a590de4304": {
+      "label": "live run p2-live_skills_dev01",
+      "calls": 2,
+      "cost_usd": 0.017474,
+      "outcomes": {
+        "ok": 2
+      },
+      "models_returned": [
+        "anthropic/claude-sonnet-5.5"
+      ]
+    },
+    "verify-all-3e46e24ef366": {
+      "label": "live run p3-verify-all_dev01",
+      "calls": 2,
+      "cost_usd": 0.019768,
+      "outcomes": {
+        "ok": 2
+      },
+      "models_returned": [
+        "anthropic/claude-sonnet-5.5"
+      ]
+    },
+    "verify-all-26dba10a26e5": {
+      "label": "live run p3-verify-all_dev02",
+      "calls": 4,
+      "cost_usd": 0.047568,
+      "outcomes": {
+        "ok": 4
+      },
+      "models_returned": [
+        "anthropic/claude-sonnet-5.5"
+      ]
+    },
+    "verify-all-fc87fc892869": {
+      "label": "live run p3-verify-all_dev04",
+      "calls": 2,
+      "cost_usd": 0.014974,
+      "outcomes": {
+        "ok": 2
+      },
+      "models_returned": [
+        "anthropic/claude-sonnet-5.5"
+      ]
+    },
+    "verify-all-bb4d69187709": {
+      "label": "live run p3-verify-all_pantry_dev01",
+      "calls": 4,
+      "cost_usd": 0.043494,
+      "outcomes": {
+        "ok": 4
+      },
+      "models_returned": [
+        "anthropic/claude-sonnet-5.5"
+      ]
+    },
+    "verify-all-aebf653caa42": {
+      "label": "live run p3-verify-all_skills_dev01",
+      "calls": 2,
+      "cost_usd": 0.018392,
+      "outcomes": {
+        "ok": 2
+      },
+      "models_returned": [
+        "anthropic/claude-sonnet-5.5"
+      ]
+    },
+    "tool-use-682ceddbab4d": {
+      "label": "live run p1-tool-use_pantry_dev01_r2",
+      "calls": 6,
+      "cost_usd": 0.15995,
+      "outcomes": {
+        "ok": 6
+      },
+      "models_returned": [
+        "anthropic/claude-sonnet-5.5"
+      ]
+    },
+    "tool-use-3b01eb71ad51": {
+      "label": "live run p1-tool-use_dev01_r2",
+      "calls": 8,
+      "cost_usd": 0.240806,
+      "outcomes": {
+        "ok": 8
+      },
+      "models_returned": [
+        "anthropic/claude-sonnet-5.5"
+      ]
+    },
+    "tool-use-5770ca37eaba": {
+      "label": "live run p1-tool-use_dev02_r2",
+      "calls": 8,
+      "cost_usd": 0.242514,
+      "outcomes": {
+        "ok": 8
+      },
+      "models_returned": [
+        "anthropic/claude-sonnet-5.5"
+      ]
+    },
+    "tool-use-82d8211147da": {
+      "label": "live run p1-tool-use_dev04_r2",
+      "calls": 6,
+      "cost_usd": 0.176082,
+      "outcomes": {
+        "ok": 6
+      },
+      "models_returned": [
+        "anthropic/claude-sonnet-5.5"
+      ]
+    },
+    "tool-use-b2abc420a23c": {
+      "label": "live run p1-tool-use_skills_dev01_r2",
+      "calls": 8,
+      "cost_usd": 0.253878,
+      "outcomes": {
+        "ok": 8
+      },
+      "models_returned": [
+        "anthropic/claude-sonnet-5.5"
+      ]
+    },
+    "live-7974806e5fdb": {
+      "label": "not a recorded run",
+      "calls": 1,
+      "cost_usd": 0.0,
+      "outcomes": {
+        "transport": 1
+      },
+      "models_returned": []
+    },
+    "live-e1ac750a5aaf": {
+      "label": "not a recorded run",
+      "calls": 3,
+      "cost_usd": 0.03655,
       "outcomes": {
         "ok": 3
       },

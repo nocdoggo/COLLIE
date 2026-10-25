@@ -21,7 +21,7 @@ evaluation or comparative claim. It is **not community validation**.
 | --- | --- |
 | Branch | `hackathon/peeaai-plan` (local; nothing pushed) |
 | Base | `d6b9256` (the Wave 1 packet) |
-| Implementation | `bf71e43` (the app, committed by the integrator from the tree the evidence describes); this packet is the commit after it. The finishing step (2026-10-25: P1, P3, the pantry stock options of P2, the development runs, the demo runbook, and the audit step's P1 reruns and fixes) is committed by its integration step as `9158793` (the app) and the packet commit after it |
+| Implementation | `bf71e43` (the app, committed by the integrator from the tree the evidence describes); this packet is the commit after it. The finishing step (2026-10-25: P1, P3, the pantry stock options of P2, the development runs, the demo runbook, and the audit step's P1 reruns and fixes) is committed by its integration step as `9158793` (the app) and `c4f7cd9` (this packet); the evidence is regenerated from a clean checkout of `c4f7cd9` in the commit after it |
 | Runtime contract | 1.1.0 ([`apps/plan_b/docs/RUNTIME_CONTRACT.md`](../../../apps/plan_b/docs/RUNTIME_CONTRACT.md); sections 15–18 are new) |
 | Trace format | 1.0.0 (unchanged) |
 | Model | `anthropic/claude-sonnet-5.5` via OpenRouter (requested and returned on every call) |
@@ -48,31 +48,30 @@ was not built. The details are in [VERIFICATION.md](VERIFICATION.md), sections 1
 | Staff boundary | Pass |
 | Future comparison parity | Pass: P0–P3 read the same grant, tools and candidates and run through one executor (parity tests); P1–P3 ran end to end with the real model with recorded prompts (20 development runs, 15 current) |
 
-The checks behind the first version of this table come from a clean checkout of `fd04d48` on
-2026-10-24 (`scripts/collect_wave2_evidence.py`; every command exited 0). The finishing step's
-rows ("Future comparison parity" and the P1–P3 pantry runs) rest on its working-tree runs (below
-and VERIFICATION.md sections 1b and 1c), which the integration step records:
+The checks behind this table come from a clean checkout of the packet commit `c4f7cd9` on
+2026-10-25 (`scripts/collect_wave2_evidence.py`; all 56 checks exited 0; VERIFICATION.md
+sections 1, 1d and 2):
 
-* **Python:** 634 tests passed, 0 skipped.
-* **Web:** 379 tests passed; typecheck, build and boundary lint passed (25 read-only modules).
+* **Python:** 764 tests passed, 0 skipped.
+* **Web:** 392 tests passed; typecheck, build and boundary lint passed (25 read-only modules).
 * **Linters:** ruff, ruff format and mypy are clean.
 * **Development cases:** `plan-b run-case all` printed 9 lines, all `matches_expectation=True`,
   and the dev01–dev06 lines are byte-identical to the Wave 1 evidence.
-* **Traces:** all 10 deterministic and 8 live traces are `intact`.
-* **Browser:** both walkthroughs passed, 41/41 (Wave 1) and 30/30 (Wave 2), in Chromium.
+* **Traces:** all 10 deterministic and 28 recorded live traces are `intact`.
+* **Browser:** both walkthroughs passed, 41/41 (Wave 1) and 30/30 (Wave 2), and the demo
+  storyboard 32/32, in Chromium.
+* **M2 focused tests:** every mapped test passed (parity 101, bounded failure 57).
 * **Scans:** the credential-pattern and identifier scans found nothing.
 
-The recorded live runs were made once, before the commit. The rest of the evidence was
-regenerated from the clean checkout, with no paid call (VERIFICATION.md, section 1).
-`environment.json` records `app_tree_clean: true`.
+The recorded live runs were made once each, from working trees: the 8 Wave 2 runs before the
+first commit, and the 20 P1–P3 development runs (15 current, all matching; 5 superseded P1 runs
+under `tool_use.v1`) in the finishing and audit steps (VERIFICATION.md, sections 1b and 1c). The
+rest of the evidence was regenerated from the clean checkout, with no paid call.
+`environment.json` records `git_head = c4f7cd9…` and `app_tree_clean: true`. The same battery
+also passed on the working tree before the integration step's commits (section 1d). The first
+version of this packet was regenerated the same way from `fd04d48` on 2026-10-24.
 
-**The finishing step** ran from its working tree (VERIFICATION.md, sections 1b and 1c). The 20
-P1–P3 development runs (15 current, all matching; 5 superseded P1 runs under `tool_use.v1`) all
-have `intact` traces. The audit step's battery is in section 1c. The collector's live-run part was checked in isolation. The web checks, the
-walkthroughs and a full collector run from a clean checkout belong to the integration step,
-which regenerates `reports/checks.json`.
-
-Before committing, the integrator re-ran the full battery on the tree that `bf71e43` commits,
+For the first version, the integrator re-ran the full battery on the tree that `bf71e43` commits,
 with the same results: ruff, ruff format and mypy clean; 634 Python tests passed; web
 typecheck, 379 tests, build and lint passed; `run-case all` printed 9 matching lines with the
 dev01–dev06 lines identical to Wave 1, and all 9 traces verified `intact`; both walkthroughs
@@ -156,7 +155,3 @@ The browser demos for the skills exchange, the pantry staff flow and the policy 
 * **Run held-out evaluation** with repeated live trials of P1–P3 and P0 once per case.
 * **Store `AuthorizationRequest` state explicitly.**
 * **Optionally, the MBTA adapter (W2.4).**
-* **The integration step of the finishing work:** commit it, then regenerate the evidence from a
-  clean checkout of that commit (`scripts/collect_wave2_evidence.py`, which now copies and
-  summarizes the P1–P3 runs and writes the storyboard into `evidence/storyboard/`) and run the
-  web checks and both walkthroughs.

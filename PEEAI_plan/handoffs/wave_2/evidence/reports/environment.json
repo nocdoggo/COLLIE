@@ -6,7 +6,7 @@
   "npm": "11.15.0",
   "playwright": "Version 1.64.1",
   "sqlite": "3.50.3",
-  "git_head": "fd04d488375647ddcaa202e3d729d0e5debf533c",
+  "git_head": "c4f7cd9714b482934d60b246c4d2c4b7d81c60aa",
   "git_branch": "(detached HEAD)",
   "app_tree_clean": true
 }

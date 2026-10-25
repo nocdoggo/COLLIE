@@ -166,7 +166,9 @@ model calls**, phase `development`, for every coordinator policy (`policy_host.E
   commit). After the commits it was regenerated from a fresh worktree of `fd04d48`, as Wave 1's
   was, so `environment.json` records `app_tree_clean: true`. The regeneration made no paid call:
   the recorded live runs were copied and re-verified. The non-secret endpoint settings were
-  passed as environment variables, because a clean checkout has no `.local/`.
+  passed as environment variables, because a clean checkout has no `.local/`. The integration
+  step of the finishing work regenerated it the same way from a clean checkout of `c4f7cd9`,
+  with the 28 recorded live runs and the demo storyboard (VERIFICATION section 1d).
 * **The collector checks that the five Wave 1 case lines are unchanged**, against the Wave 1
   evidence's `checks.json`.
 * **Each M2 check is mapped to its focused tests** in the same pytest run's JUnit report. A
