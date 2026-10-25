@@ -1,6 +1,9 @@
 # Local application credentials (never commit key contents)
 /.local/keys/
 
+# Local clone of the Overleaf poster template (its own git repository, kept for reference only)
+/poster_template/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
