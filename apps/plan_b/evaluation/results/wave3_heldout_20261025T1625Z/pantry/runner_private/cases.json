@@ -1,0 +1,217 @@
+{
+ "cases": [
+  {
+   "achievable_on_time": 40,
+   "actionable_record_ids": [
+    "shelf_count_1"
+   ],
+   "annotations": [
+    {
+     "booking_ref": "SH31",
+     "claimed_change": "delay",
+     "effective_time": null,
+     "event_id": "e_annex_14",
+     "note": "Hedged ('may not'); no new time.",
+     "resource_id": "shelf_stock",
+     "source_id": "sh31_carrier",
+     "source_record_id": "sh31_carrier_note_1",
+     "unknown_fields": [
+      "effective_time"
+     ]
+    }
+   ],
+   "case_id": "T01",
+   "case_ref": "hp_4ra",
+   "condition": "Primary 20-kit shipment cannot arrive by the deadline; the alternate 16 can be verified, reserved and physically received in time",
+   "heldout": true,
+   "negative_control": false,
+   "negative_control_evidence": null,
+   "outcome_class": "target",
+   "profile_id": "pantry_continuity",
+   "requires_recovery": true,
+   "scenario_id": "fixture_n4",
+   "suite": "pantry",
+   "target_quantity": 40
+  },
+  {
+   "achievable_on_time": 34,
+   "actionable_record_ids": [],
+   "annotations": [
+    {
+     "booking_ref": null,
+     "claimed_change": "unavailability",
+     "effective_time": null,
+     "event_id": "e_annex_14",
+     "note": "Six kits not moved; states no time.",
+     "resource_id": "neighbor_stock",
+     "source_id": "annex_crew_desk",
+     "source_record_id": "crew_note_seal",
+     "unknown_fields": [
+      "booking_ref",
+      "effective_time"
+     ]
+    }
+   ],
+   "case_id": "T04",
+   "case_ref": "hp_g9m",
+   "condition": "Alternate source physically supplies only 10 of the 16 requested kits and no permitted source can fill the remainder in time",
+   "heldout": true,
+   "negative_control": false,
+   "negative_control_evidence": null,
+   "outcome_class": "partial",
+   "profile_id": "pantry_continuity",
+   "requires_recovery": false,
+   "scenario_id": "fixture_n4",
+   "suite": "pantry",
+   "target_quantity": 40
+  },
+  {
+   "achievable_on_time": 40,
+   "actionable_record_ids": [
+    "shelf_count_1"
+   ],
+   "annotations": [
+    {
+     "booking_ref": "R-208",
+     "claimed_change": "availability",
+     "effective_time": "2026-11-14T16:00:00-05:00",
+     "event_id": "e_annex_14",
+     "note": "Offer of 16 kits; one hold requested.",
+     "resource_id": "neighbor_stock",
+     "source_id": "neighbor_steward",
+     "source_record_id": "nbr_msg_0334",
+     "unknown_fields": []
+    },
+    {
+     "booking_ref": "R-208",
+     "claimed_change": "availability",
+     "effective_time": "2026-11-14T16:00:00-05:00",
+     "event_id": "e_annex_14",
+     "note": "Same logical request R-208 re-sent under another message id.",
+     "resource_id": "neighbor_stock",
+     "source_id": "volunteer_desk",
+     "source_record_id": "vol_fwd_208",
+     "unknown_fields": []
+    },
+    {
+     "booking_ref": null,
+     "claimed_change": "availability",
+     "effective_time": "2026-11-14T16:30:00-05:00",
+     "event_id": "e_annex_14",
+     "note": "Asks to book the same 16 consumable kits again for a later slot.",
+     "resource_id": "neighbor_stock",
+     "source_id": "volunteer_desk",
+     "source_record_id": "vol_msg_slot2",
+     "unknown_fields": [
+      "booking_ref"
+     ]
+    },
+    {
+     "booking_ref": "R-208",
+     "claimed_change": "availability",
+     "effective_time": null,
+     "event_id": "e_annex_14",
+     "note": "First receipt claim for R-208 by a non-crew source.",
+     "resource_id": "shelf_stock",
+     "source_id": "neighbor_steward",
+     "source_record_id": "nbr_msg_0344",
+     "unknown_fields": [
+      "effective_time"
+     ]
+    },
+    {
+     "booking_ref": null,
+     "claimed_change": "availability",
+     "effective_time": null,
+     "event_id": "e_annex_14",
+     "note": "Adversarial quantities: 64 on hand, -6 reservation, 2.5 per household.",
+     "resource_id": "shelf_stock",
+     "source_id": "front_table",
+     "source_record_id": "front_count_9",
+     "unknown_fields": [
+      "booking_ref",
+      "effective_time"
+     ]
+    },
+    {
+     "booking_ref": "R-208",
+     "claimed_change": "availability",
+     "effective_time": null,
+     "event_id": "e_annex_14",
+     "note": "The same receipt claim sent again by the non-crew source, to be counted twice.",
+     "resource_id": "shelf_stock",
+     "source_id": "neighbor_steward",
+     "source_record_id": "nbr_receipt_208",
+     "unknown_fields": [
+      "effective_time"
+     ]
+    }
+   ],
+   "case_id": "T02",
+   "case_ref": "hp_k2e",
+   "condition": "Feasible alternate supply plus duplicate request ids, repeated receipts, requests for the same stock in separate time slots and adversarial quantity messages",
+   "heldout": true,
+   "negative_control": false,
+   "negative_control_evidence": null,
+   "outcome_class": "target",
+   "profile_id": "pantry_continuity",
+   "requires_recovery": true,
+   "scenario_id": "fixture_n4",
+   "suite": "pantry",
+   "target_quantity": 40
+  },
+  {
+   "achievable_on_time": 24,
+   "actionable_record_ids": [],
+   "annotations": [
+    {
+     "booking_ref": "SH31",
+     "claimed_change": "availability",
+     "effective_time": null,
+     "event_id": "e_annex_14",
+     "note": "Receipt claim from a source that does not record receipts; claims 44 kits.",
+     "resource_id": "shelf_stock",
+     "source_id": "neighbor_steward",
+     "source_record_id": "nbr_msg_sh31",
+     "unknown_fields": [
+      "effective_time"
+     ]
+    },
+    {
+     "booking_ref": "SH31",
+     "claimed_change": "availability",
+     "effective_time": "2026-11-07T15:20:00-05:00",
+     "event_id": "e_annex_14",
+     "note": "Forwarded note dated Nov 7 (observed_at Nov 7): another day's receipt.",
+     "resource_id": "shelf_stock",
+     "source_id": "volunteer_desk",
+     "source_record_id": "vol_fwd_rcpt_1107",
+     "unknown_fields": []
+    },
+    {
+     "booking_ref": "SH31",
+     "claimed_change": "availability",
+     "effective_time": "2026-11-14T16:50:00-05:00",
+     "event_id": "e_annex_14",
+     "note": "The dock's sign-off of SH31 at 16:50, after the 16:40 deadline; no crew receipt follows in the session.",
+     "resource_id": "shelf_stock",
+     "source_id": "annex_dock",
+     "source_record_id": "annex_dock_0412",
+     "unknown_fields": []
+    }
+   ],
+   "case_id": "T03",
+   "case_ref": "hp_v7s",
+   "condition": "Stale or wrong-source receipt claim before physical delivery; authoritative receipt after the deadline",
+   "heldout": true,
+   "negative_control": false,
+   "negative_control_evidence": null,
+   "outcome_class": "partial",
+   "profile_id": "pantry_continuity",
+   "requires_recovery": false,
+   "scenario_id": "fixture_n4",
+   "suite": "pantry",
+   "target_quantity": 40
+  }
+ ]
+}

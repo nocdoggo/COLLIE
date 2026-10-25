@@ -260,9 +260,11 @@ with every file it hashes; `uv run plan-b eval verify-freeze` passes on the comm
 covers 76 measured files, `files_sha256`
 `7d41fada702f2172c39a968bb6a2a1d72b6cac4e6d23cb047133d47ce373596f`. Every file it hashes is now
 frozen: a change to one, to a recorded setting or to the runtime is drift, invalidates the
-freeze and any comparison made under it, and makes a held-out run refuse to start. No
-`heldout.json` exists yet: the held-out cases are authored and locked against this freeze
-afterwards (`plan-b eval lock-heldout`).
+freeze and any comparison made under it, and makes a held-out run refuse to start. The freeze
+commit is `3de5962`; `git_head_at_freeze` names its parent because the manifest is written
+before it is committed, so the freeze is identified by `files_sha256` and that commit. No
+`heldout.json` existed at the freeze: the held-out cases were authored and locked against it
+afterwards (see "Wave 3 held-out lock and run").
 
 **What is frozen.** The policies P0 `rules/1.0.0` and `pantry-rules/1.1.0`, P1 `tool-use/1.1.0`
 (prompt `tool_use.v3`), P2 `live/1.1.0` (`interpret.v1`, `choose_action.v1`,
@@ -356,3 +358,54 @@ separate interpretation step and records no structured reading (its extraction l
 billed (no completion is returned); a provider timeout's or crash's model calls are only in the
 spend ledger; temperature is the provider's default and seeds are not sent, so trials vary.
 
+## Wave 3 held-out lock and run
+
+**The lock.** `uv run plan-b eval lock-heldout` wrote `plan_b/evaluation/manifests/heldout.json`
+on 2026-10-25 (`locked_at` 2026-10-25T16:16:24Z), against this `freeze.json` byte for byte. It
+was committed as `49e62b5`: 12 cases (campus C01-C08, pantry T01-T04) and 28 files, with
+`files_sha256` `86ea09c089d2ea3bcd936eca6535de773847095e248f78b6434fa44200685055`. It covers the
+private cases and evaluator files in `scenarios/private/eval/` and their 3 public fixtures in
+`scenarios/public/eval/`. The negative controls C02-C04 were replayed at lock time with a
+coordinator that changes nothing, and their original plan completes. The case audit's fixes are
+recorded in `scenarios/private/eval/README.md` ("Case audit before the lock"), and
+`tests/test_heldout_cases.py` runs the evaluator oracle and the leak check over every case.
+
+**The run.** Run `wave3_heldout_20261025T1625Z` is the full protocol, run once from a clean
+worktree of `49e62b5`: campus 80 of 80 episodes and pantry 40 of 40, all four policies, the
+frozen seeds and order, `--jobs 1`. Its records, traces, reports and failure analysis are in
+`apps/plan_b/evaluation/results/wave3_heldout_20261025T1625Z/` (`README.md` there for the counts,
+integrity facts and disclosures; `FAILURES.md` for every non-success episode). That directory is
+outside the package on purpose. Everything under `plan_b/` except `manifest.EXCLUDED` is a
+measured file, so a results directory at `plan_b/evaluation/results/` would make
+`verify-freeze` fail ("measured file added").
+
+- **Integrity.** Every invocation recorded the freeze and the lock as verified, `git_head`
+  `49e62b5` and a clean app tree. The first held-out model call was at 16:22:46Z, after the
+  lock. All 482 reported model calls returned `anthropic/claude-sonnet-5.5`, with identical
+  recorded settings and distinct provider generation ids. `plan-b eval report` reproduces both
+  reports byte for byte from the committed records. An independent recomputation by the post-run
+  audit (audit_eval) matched every count, denominator and metric.
+- **Voided attempt 1.** The first attempt (`--jobs 8`) hit the provider account's limit of 20
+  requests per minute: 692 of its 732 calls were HTTP 429. Each 429 used one of an episode's 8
+  model calls, so it capped the LLM episodes within seconds. It was declared void before the
+  reported attempt began, and is kept and disclosed in `attempt1_rate_limited/`. Under this
+  page's status rules its episodes would have been capped outcomes, so voiding it was a departure
+  from those rules, recorded with its reason.
+- **Reporting.** The suites are reported separately, as episode counts with their denominators
+  and per case. The case is the statistical unit (8 campus, 4 pantry); the three seeds are
+  repeated trials within a case. No significance test or composite score is computed.
+- **Findings of the evaluation in frozen code** (not fixed, no rerun; see `FAILURES.md` there):
+  - A pool checked as `unavailable` stays a ranked, requestable handoff option for the planner
+    and the P2/P3 menu, and the shared attention rule withholds the shortfall report while that
+    handoff still looks possible. This is the earliest broken stage of the six T03 P2/P3
+    failures.
+  - A provider error, including an HTTP 429, uses one model call with no wall-clock backoff.
+    No reported episode had a provider error.
+  - P1's single prompt has no pantry-specific partial-fulfillment guidance, while P2/P3's
+    `choose_action_pantry.v1` has it. Pantry partial-class differences are not attributable to
+    the controller alone.
+  - The report formatter lists the policy ids alphabetically next to P0-P3 (erratum in the
+    run's `README.md`; `report.py` is not frozen and is to be fixed after release).
+- **These held-out cases are spent.** Their designs are described by id in the results. Any
+  later policy or prompt revision needs a newly authored and locked held-out set, and a new
+  freeze.

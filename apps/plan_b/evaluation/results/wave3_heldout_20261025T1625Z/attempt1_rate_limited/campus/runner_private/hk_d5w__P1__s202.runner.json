@@ -1,0 +1,217 @@
+{
+ "actor_log": [
+  {
+   "action_id": "act_002",
+   "due_at": "2026-11-12T23:33:00Z",
+   "envelope_status": "succeeded",
+   "error_code": null,
+   "executed_at": "2026-11-12T23:33:00Z",
+   "fill_rule": null,
+   "note": null,
+   "principal_id": "p_exchange_facilitator",
+   "receipt_id": "rcpt_0001",
+   "receipt_status": "applied",
+   "status": "done",
+   "tool": "check_in"
+  },
+  {
+   "action_id": "act_001",
+   "due_at": "2026-11-12T23:37:00Z",
+   "envelope_status": "succeeded",
+   "error_code": null,
+   "executed_at": "2026-11-12T23:37:00Z",
+   "fill_rule": null,
+   "note": null,
+   "principal_id": "p_demo_lead",
+   "receipt_id": "rcpt_0002",
+   "receipt_status": "applied",
+   "status": "done",
+   "tool": "check_in"
+  }
+ ],
+ "case_id": "C03",
+ "case_ref": "hk_d5w",
+ "expected_class": "goal",
+ "expected_outcome": "goal_complete",
+ "key": "hk_d5w__P1__s202",
+ "matches_expectation": true,
+ "predicates": [
+  {
+   "detail": "all required activities completed by the deadline",
+   "kind": "all_required_completed_by_deadline",
+   "passed": true,
+   "predicate_id": "p_required"
+  },
+  {
+   "detail": "welcome started at 18:30; expected 18:30",
+   "kind": "activity_started_at",
+   "passed": true,
+   "predicate_id": "p_welcome"
+  },
+  {
+   "detail": "no violations",
+   "kind": "no_executed_violations",
+   "passed": true,
+   "predicate_id": "p_violations"
+  },
+  {
+   "detail": "committed spend within grant and budget",
+   "kind": "committed_within_limits",
+   "passed": true,
+   "predicate_id": "p_limits"
+  },
+  {
+   "detail": "no equipment-dependent start before arrival",
+   "kind": "no_equipment_start_before_arrival",
+   "passed": true,
+   "predicate_id": "p_arrival"
+  },
+  {
+   "detail": "committed 0 cents; expected 0",
+   "kind": "committed_spend_equals",
+   "passed": true,
+   "predicate_id": "p_spend"
+  },
+  {
+   "detail": "0 applied plan changes; expected 0",
+   "kind": "applied_plan_count",
+   "passed": true,
+   "predicate_id": "p_plans"
+  }
+ ],
+ "record": "plan_b.eval_episode_private/1.0.0",
+ "report": {
+  "activities": [
+   {
+    "activity_id": "setup",
+    "completed_at": "2026-11-12T23:20:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-12T23:00:00Z"
+   },
+   {
+    "activity_id": "welcome",
+    "completed_at": "2026-11-12T23:40:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-12T23:30:00Z"
+   },
+   {
+    "activity_id": "demonstrations",
+    "completed_at": "2026-11-13T00:00:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-12T23:40:00Z"
+   },
+   {
+    "activity_id": "skills_exchange",
+    "completed_at": "2026-11-13T00:20:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-13T00:00:00Z"
+   },
+   {
+    "activity_id": "closing",
+    "completed_at": "2026-11-13T00:30:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-13T00:20:00Z"
+   }
+  ],
+  "applied_plans": 0,
+  "case_ref": "hk_d5w",
+  "changed_assignments": 0,
+  "committed_cents": 0,
+  "duplicate_records_rejected": 0,
+  "episode_caps": {
+   "max_model_calls": 8,
+   "max_tool_calls": 48,
+   "model_calls": 8,
+   "phase": "frozen",
+   "reached": [
+    "model_calls"
+   ],
+   "tool_calls": 18
+  },
+  "episode_id": "ep_1baf58b5a160",
+  "expected_outcome": "goal_complete",
+  "failed_status_queries": 0,
+  "final_clock": "2026-11-13T00:30:00Z",
+  "final_revision": 22,
+  "goal_complete": true,
+  "holds": {
+   "active_at_end": 0,
+   "committed": 0,
+   "created": 0,
+   "expired": 0,
+   "fulfilled": 0,
+   "released": 0
+  },
+  "infeasibility_reported": false,
+  "matches_expectation": true,
+  "mode_label": "Tool-use agent \u00b7 anthropic/claude-sonnet-5.5 (requested; no reply yet)",
+  "policy_id": "tool-use/1.1.0",
+  "predicates": [
+   {
+    "detail": "all required activities completed by the deadline",
+    "kind": "all_required_completed_by_deadline",
+    "passed": true,
+    "predicate_id": "p_required"
+   },
+   {
+    "detail": "welcome started at 18:30; expected 18:30",
+    "kind": "activity_started_at",
+    "passed": true,
+    "predicate_id": "p_welcome"
+   },
+   {
+    "detail": "no violations",
+    "kind": "no_executed_violations",
+    "passed": true,
+    "predicate_id": "p_violations"
+   },
+   {
+    "detail": "committed spend within grant and budget",
+    "kind": "committed_within_limits",
+    "passed": true,
+    "predicate_id": "p_limits"
+   },
+   {
+    "detail": "no equipment-dependent start before arrival",
+    "kind": "no_equipment_start_before_arrival",
+    "passed": true,
+    "predicate_id": "p_arrival"
+   },
+   {
+    "detail": "committed 0 cents; expected 0",
+    "kind": "committed_spend_equals",
+    "passed": true,
+    "predicate_id": "p_spend"
+   },
+   {
+    "detail": "0 applied plan changes; expected 0",
+    "kind": "applied_plan_count",
+    "passed": true,
+    "predicate_id": "p_plans"
+   }
+  ],
+  "recovery_delay_minutes": null,
+  "rejected_attempts_without_receipt": 0,
+  "rejected_receipts": 0,
+  "report_version": "1.0.0",
+  "reserved_cents_at_end": 0,
+  "scenario_id": "fixture_k7",
+  "service": [],
+  "staff_confirmations": 0,
+  "status_queries": 0,
+  "stock": [],
+  "unnecessary_reservations": 0,
+  "violations": []
+ },
+ "status": "capped"
+}

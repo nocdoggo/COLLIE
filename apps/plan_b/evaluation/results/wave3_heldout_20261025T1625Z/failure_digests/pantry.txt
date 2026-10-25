@@ -1,0 +1,327 @@
+====================================================================================================
+hp_k2e__P3__s101  T02 class=target status=capped policy=P3 seed=101
+  failure_reasons=['original target not met by the deadline'] caps=['model_calls'] decided_by=None infeas_reported=False goal=False
+  model outcomes={'ok': 8} calls=8 failed=0 usd=0.084628
+  failed predicates: [('p_on_time', 'kit_target_a: 0 on time; expected 40'), ('p_unfulfilled', 'kit_target_a: 40 unfulfilled; expected 0'), ('p_shelf_end', 'shelf_stock: 40 on hand; expected 0')]
+  extraction: [('nbr_msg_0334', 'correct', []), ('vol_fwd_208', 'abstained', []), ('vol_msg_slot2', 'abstained', []), ('nbr_msg_0344', 'correct', []), ('front_count_9', 'not_recorded', []), ('nbr_receipt_208', 'not_recorded', [])]
+  record errors: {'stale_revision': 1, 'model_call_cap': 2}  invalid_attempts={'by_code': {'REVISION_CONFLICT': 1}, 'by_tool': {'apply_plan': 1}, 'count': 1}
+  pantry: {"conservation_failures": 0, "credit_findings": [], "duplicate_attempts_blocked": 0, "duplicate_or_unauthorized_credits": 0, "receipt_integrity_ok": true, "receipt_integrity_problems": [], "staff_confirmations": 1, "targets": [{"attained": false, "current_target": 40, "distributed": 0, "late": 0, "on_time": 0, "original_target": 40, "service_deficit": 40, "supply_shortfall": 0, "target_id": "kit_target_a"}], "unnecessary_reservations": 1}
+  churn={'altered_assignments': 0, 'committed_revisions': 0, 'previously_valid_altered': 0, 'total': 0} recovery={'delay_minutes': 90, 'horizon_minutes': 90, 'note': 'unrecovered: a failure, recorded with the horizon', 'recovered': False, 'required': True, 'update_at': '2026-11-14T20:30:00+00:00'}
+   dec_0001 20:32 verify      by=server | Verify-all check of shelf_stock shipment_eta (pool of a stock option for kit_target_a (supply gap)): delayed, expected, reported ETA 17:05 (obs_0001).
+   dec_0002 20:34 verify      by=server | Verify-all check of neighbor_stock availability (pool of a stock option for kit_target_a (supply gap)): available, available (obs_0003).
+   dec_0003 20:36 verify      by=server | Verify-all check of neighbor_stock availability (subject of unanswered notice obs_0002): available, available (obs_0003).
+   dec_0004 20:37 ask         by=model | Asked staff to hand off 16 units from neighbor_stock into shelf_stock: hold hold_0001 on neighbor_stock (the local staff task, expires 15:52) reserves them and moves nothing; only a staff-recorded receipt moves stock; their response is due at 15:40.
+   dec_0005 20:37 wait        by=model | Chose to wait: Change nothing now; look again until 15:40. Plan v1 is unchanged.
+   dec_0006 20:39 unresolved  by=server | Notice obs_0004 leaves whether request R-208 was received or acted on, whether the neighbor kits may be held, current status of neighbor_stock unresolved. No plan change. It names neighbor_stock, so the only step it can prompt is a status check; no hypothesis,
+   dec_0007 20:41 verify      by=server | Verify-all check of neighbor_stock availability (subject of unanswered notice obs_0004): available, available (obs_0003).
+   dec_0008 20:42 prepare     by=model | Held 40 units of shelf_stock for kit_target_a (distribution) (hold hold_0002, expires 16:12) so Hand off neighbor_stock into shelf_stock for kit_target_a (distribution) can be applied; a hold reserves units and serves nobody.
+   dec_0009 20:43 wait        failure=stale_revision by=model | apply_plan for apply:cand_0004_2d4f61bd was rejected as stale (REVISION_CONFLICT) at revision 11; the state is re-read and the candidates re-evaluated.
+   dec_0010 20:43 unresolved  by=server | Notice obs_0005 leaves whether the kits will be back on the shelf, whether 4:30 means 16:30 on the event date, current status of neighbor_stock, booking authority unresolved. No plan change. It names neighbor_stock, so the only step it can prompt is a status c
+   dec_0011 20:45 verify      by=server | Verify-all check of neighbor_stock availability (subject of unanswered notice obs_0005): available, available (obs_0003).
+   dec_0012 20:47 verify      by=server | Verify-all check of shelf_stock shipment_eta (subject of unanswered notice obs_0006): delayed, expected, reported ETA 17:05 (obs_0001).
+   dec_0013 20:47 stop        failure=model_call_cap by=server | Stopped for this episode: the model-call cap of 8 for this episode is spent. No further model-chosen action is taken; the accepted plan and every commitment stay as they are.
+   dec_0014 20:47 stop        failure=model_call_cap | Episode cap reached: 8 of 8 model calls used (frozen-phase caps). The coordinator policy is not woken again in this episode; the accepted plan and every commitment stay as they are.
+  rejected tool calls: [(20, '20:42', 'apply_plan', 'REVISION_CONFLICT')]
+  receipts: [('20:37', 'coordinator_n4', 'hold_resource', 'applied', 'Held 16 standard_kit of neighbor_stock for a staff handoff into shelf_stock until 15:52; available 16 -> 0'), ('20:40', 'annex_crew', 'record_stock_receipt', 'applied', 'Recorded handoff xfer_001: 16 standard_kit moved from neighbor_stock to shelf_stock; hold hold_0001 has 0 left'), ('20:42', 'coordinator_n4', 'hold_resource', 'applied', 'Held 40 standard_kit of shelf_stock for target kit_target_a until 16:12; available 40 -> 0'), ('20:43', 'coordinator_n4', 'apply_plan', 'rejected', 'Rejected: expected revision 11 but the event is at revision 12')]
+====================================================================================================
+hp_k2e__P3__s202  T02 class=target status=capped policy=P3 seed=202
+  failure_reasons=['original target not met by the deadline'] caps=['model_calls'] decided_by=None infeas_reported=False goal=False
+  model outcomes={'ok': 8} calls=8 failed=0 usd=0.086648
+  failed predicates: [('p_on_time', 'kit_target_a: 0 on time; expected 40'), ('p_unfulfilled', 'kit_target_a: 40 unfulfilled; expected 0'), ('p_shelf_end', 'shelf_stock: 40 on hand; expected 0')]
+  extraction: [('nbr_msg_0334', 'correct', []), ('vol_fwd_208', 'abstained', []), ('vol_msg_slot2', 'abstained', []), ('nbr_msg_0344', 'correct', []), ('front_count_9', 'not_recorded', []), ('nbr_receipt_208', 'not_recorded', [])]
+  record errors: {'stale_revision': 1, 'model_call_cap': 2}  invalid_attempts={'by_code': {'REVISION_CONFLICT': 1}, 'by_tool': {'apply_plan': 1}, 'count': 1}
+  pantry: {"conservation_failures": 0, "credit_findings": [], "duplicate_attempts_blocked": 0, "duplicate_or_unauthorized_credits": 0, "receipt_integrity_ok": true, "receipt_integrity_problems": [], "staff_confirmations": 1, "targets": [{"attained": false, "current_target": 40, "distributed": 0, "late": 0, "on_time": 0, "original_target": 40, "service_deficit": 40, "supply_shortfall": 0, "target_id": "kit_target_a"}], "unnecessary_reservations": 1}
+  churn={'altered_assignments': 0, 'committed_revisions': 0, 'previously_valid_altered': 0, 'total': 0} recovery={'delay_minutes': 90, 'horizon_minutes': 90, 'note': 'unrecovered: a failure, recorded with the horizon', 'recovered': False, 'required': True, 'update_at': '2026-11-14T20:30:00+00:00'}
+   dec_0001 20:32 verify      by=server | Verify-all check of shelf_stock shipment_eta (pool of a stock option for kit_target_a (supply gap)): delayed, expected, reported ETA 17:05 (obs_0001).
+   dec_0002 20:34 verify      by=server | Verify-all check of neighbor_stock availability (pool of a stock option for kit_target_a (supply gap)): available, available (obs_0003).
+   dec_0003 20:36 verify      by=server | Verify-all check of neighbor_stock availability (subject of unanswered notice obs_0002): available, available (obs_0003).
+   dec_0004 20:37 ask         by=model | Asked staff to hand off 16 units from neighbor_stock into shelf_stock: hold hold_0001 on neighbor_stock (the local staff task, expires 15:52) reserves them and moves nothing; only a staff-recorded receipt moves stock; their response is due at 15:40.
+   dec_0005 20:37 wait        by=model | Chose to wait: Change nothing now; look again until 15:40. Plan v1 is unchanged.
+   dec_0006 20:39 unresolved  by=server | Notice obs_0004 leaves whether request R-208 was received or approved, current status of neighbor_stock, whether the neighbor shelf kits may be held unresolved. No plan change. It names neighbor_stock, so the only step it can prompt is a status check; no hypot
+   dec_0007 20:41 verify      by=server | Verify-all check of neighbor_stock availability (subject of unanswered notice obs_0004): available, available (obs_0003).
+   dec_0008 20:42 prepare     by=model | Held 40 units of shelf_stock for kit_target_a (distribution) (hold hold_0002, expires 16:12) so Hand off neighbor_stock into shelf_stock for kit_target_a (distribution) can be applied; a hold reserves units and serves nobody.
+   dec_0009 20:43 wait        failure=stale_revision by=model | apply_plan for apply:cand_0004_2d4f61bd was rejected as stale (REVISION_CONFLICT) at revision 11; the state is re-read and the candidates re-evaluated.
+   dec_0010 20:43 unresolved  by=server | Notice obs_0005 leaves current neighbor_stock status, whether the 16 kits are booked for the first table, whether kits will be returned before the second slot, 4:30 slot AM/PM and date unresolved. No plan change. It names neighbor_stock, so the only step it ca
+   dec_0011 20:45 verify      by=server | Verify-all check of neighbor_stock availability (subject of unanswered notice obs_0005): available, available (obs_0003).
+   dec_0012 20:47 verify      by=server | Verify-all check of shelf_stock shipment_eta (subject of unanswered notice obs_0006): delayed, expected, reported ETA 17:05 (obs_0001).
+   dec_0013 20:47 stop        failure=model_call_cap by=server | Stopped for this episode: the model-call cap of 8 for this episode is spent. No further model-chosen action is taken; the accepted plan and every commitment stay as they are.
+   dec_0014 20:47 stop        failure=model_call_cap | Episode cap reached: 8 of 8 model calls used (frozen-phase caps). The coordinator policy is not woken again in this episode; the accepted plan and every commitment stay as they are.
+  rejected tool calls: [(20, '20:42', 'apply_plan', 'REVISION_CONFLICT')]
+  receipts: [('20:37', 'coordinator_n4', 'hold_resource', 'applied', 'Held 16 standard_kit of neighbor_stock for a staff handoff into shelf_stock until 15:52; available 16 -> 0'), ('20:40', 'annex_crew', 'record_stock_receipt', 'applied', 'Recorded handoff xfer_001: 16 standard_kit moved from neighbor_stock to shelf_stock; hold hold_0001 has 0 left'), ('20:42', 'coordinator_n4', 'hold_resource', 'applied', 'Held 40 standard_kit of shelf_stock for target kit_target_a until 16:12; available 40 -> 0'), ('20:43', 'coordinator_n4', 'apply_plan', 'rejected', 'Rejected: expected revision 11 but the event is at revision 12')]
+====================================================================================================
+hp_k2e__P3__s303  T02 class=target status=capped policy=P3 seed=303
+  failure_reasons=['original target not met by the deadline'] caps=['model_calls'] decided_by=None infeas_reported=False goal=False
+  model outcomes={'ok': 8} calls=8 failed=0 usd=0.083418
+  failed predicates: [('p_on_time', 'kit_target_a: 0 on time; expected 40'), ('p_unfulfilled', 'kit_target_a: 40 unfulfilled; expected 0'), ('p_shelf_end', 'shelf_stock: 40 on hand; expected 0')]
+  extraction: [('nbr_msg_0334', 'correct', []), ('vol_fwd_208', 'abstained', []), ('vol_msg_slot2', 'abstained', []), ('nbr_msg_0344', 'correct', []), ('front_count_9', 'not_recorded', []), ('nbr_receipt_208', 'not_recorded', [])]
+  record errors: {'stale_revision': 1, 'model_call_cap': 2}  invalid_attempts={'by_code': {'REVISION_CONFLICT': 1}, 'by_tool': {'apply_plan': 1}, 'count': 1}
+  pantry: {"conservation_failures": 0, "credit_findings": [], "duplicate_attempts_blocked": 0, "duplicate_or_unauthorized_credits": 0, "receipt_integrity_ok": true, "receipt_integrity_problems": [], "staff_confirmations": 1, "targets": [{"attained": false, "current_target": 40, "distributed": 0, "late": 0, "on_time": 0, "original_target": 40, "service_deficit": 40, "supply_shortfall": 0, "target_id": "kit_target_a"}], "unnecessary_reservations": 1}
+  churn={'altered_assignments': 0, 'committed_revisions': 0, 'previously_valid_altered': 0, 'total': 0} recovery={'delay_minutes': 90, 'horizon_minutes': 90, 'note': 'unrecovered: a failure, recorded with the horizon', 'recovered': False, 'required': True, 'update_at': '2026-11-14T20:30:00+00:00'}
+   dec_0001 20:32 verify      by=server | Verify-all check of shelf_stock shipment_eta (pool of a stock option for kit_target_a (supply gap)): delayed, expected, reported ETA 17:05 (obs_0001).
+   dec_0002 20:34 verify      by=server | Verify-all check of neighbor_stock availability (pool of a stock option for kit_target_a (supply gap)): available, available (obs_0003).
+   dec_0003 20:36 verify      by=server | Verify-all check of neighbor_stock availability (subject of unanswered notice obs_0002): available, available (obs_0003).
+   dec_0004 20:37 ask         by=model | Asked staff to hand off 16 units from neighbor_stock into shelf_stock: hold hold_0001 on neighbor_stock (the local staff task, expires 15:52) reserves them and moves nothing; only a staff-recorded receipt moves stock; their response is due at 15:40.
+   dec_0005 20:37 wait        by=model | Chose to wait: Change nothing now; look again until 15:40. Plan v1 is unchanged.
+   dec_0006 20:39 unresolved  by=server | Notice obs_0004 leaves whether the hold on neighbor kits is approved or in place, current status of request R-208, whether the first request was received unresolved. No plan change. It names neighbor_stock, so the only step it can prompt is a status check; no 
+   dec_0007 20:41 verify      by=server | Verify-all check of neighbor_stock availability (subject of unanswered notice obs_0004): available, available (obs_0003).
+   dec_0008 20:42 prepare     by=model | Held 40 units of shelf_stock for kit_target_a (distribution) (hold hold_0002, expires 16:12) so Hand off neighbor_stock into shelf_stock for kit_target_a (distribution) can be applied; a hold reserves units and serves nobody.
+   dec_0009 20:43 wait        failure=stale_revision by=model | apply_plan for apply:cand_0004_2d4f61bd was rejected as stale (REVISION_CONFLICT) at revision 11; the state is re-read and the candidates re-evaluated.
+   dec_0010 20:43 unresolved  by=server | Notice obs_0005 leaves whether the kits will be returned after the first table, whether a second pickup slot is approved, which date the 4:30 slot refers to, current neighbor_stock status unresolved. No plan change. It names neighbor_stock, so the only step it
+   dec_0011 20:45 verify      by=server | Verify-all check of neighbor_stock availability (subject of unanswered notice obs_0005): available, available (obs_0003).
+   dec_0012 20:47 verify      by=server | Verify-all check of shelf_stock shipment_eta (subject of unanswered notice obs_0006): delayed, expected, reported ETA 17:05 (obs_0001).
+   dec_0013 20:47 stop        failure=model_call_cap by=server | Stopped for this episode: the model-call cap of 8 for this episode is spent. No further model-chosen action is taken; the accepted plan and every commitment stay as they are.
+   dec_0014 20:47 stop        failure=model_call_cap | Episode cap reached: 8 of 8 model calls used (frozen-phase caps). The coordinator policy is not woken again in this episode; the accepted plan and every commitment stay as they are.
+  rejected tool calls: [(20, '20:42', 'apply_plan', 'REVISION_CONFLICT')]
+  receipts: [('20:37', 'coordinator_n4', 'hold_resource', 'applied', 'Held 16 standard_kit of neighbor_stock for a staff handoff into shelf_stock until 15:52; available 16 -> 0'), ('20:40', 'annex_crew', 'record_stock_receipt', 'applied', 'Recorded handoff xfer_001: 16 standard_kit moved from neighbor_stock to shelf_stock; hold hold_0001 has 0 left'), ('20:42', 'coordinator_n4', 'hold_resource', 'applied', 'Held 40 standard_kit of shelf_stock for target kit_target_a until 16:12; available 40 -> 0'), ('20:43', 'coordinator_n4', 'apply_plan', 'rejected', 'Rejected: expected revision 11 but the event is at revision 12')]
+====================================================================================================
+hp_v7s__P1__s101  T03 class=partial status=completed policy=P1 seed=101
+  failure_reasons=['on-time fulfillment differs from the achievable quantity'] caps=[] decided_by=model infeas_reported=True goal=False
+  model outcomes={'ok': 7} calls=7 failed=0 usd=0.211532
+  failed predicates: [('p_on_time', 'kit_target_a: 0 on time; expected 24'), ('p_unfulfilled', 'kit_target_a: 40 unfulfilled; expected 16'), ('p_shelf_end', 'shelf_stock: 24 on hand; expected 0')]
+  extraction: [('nbr_msg_sh31', 'not_recorded', []), ('vol_fwd_rcpt_1107', 'not_recorded', []), ('annex_dock_0412', 'not_recorded', [])]
+  record errors: {}  invalid_attempts={'by_code': {'RESOURCE_UNAVAILABLE': 1}, 'by_tool': {'hold_resource': 1}, 'count': 1}
+  pantry: {"conservation_failures": 0, "credit_findings": [], "duplicate_attempts_blocked": 0, "duplicate_or_unauthorized_credits": 0, "receipt_integrity_ok": true, "receipt_integrity_problems": [], "staff_confirmations": 0, "targets": [{"attained": false, "current_target": 40, "distributed": 0, "late": 0, "on_time": 0, "original_target": 40, "service_deficit": 40, "supply_shortfall": 16, "target_id": "kit_target_a"}], "unnecessary_reservations": 0}
+  churn={'altered_assignments': 0, 'committed_revisions': 0, 'previously_valid_altered': 0, 'total': 0} recovery=None
+   dec_0001 20:31 wait        by=model | hold_resource was rejected (RESOURCE_UNAVAILABLE); Plan v1 is unchanged.
+   dec_0002 20:33 verify      by=model | Checked neighbor_stock availability: booked_elsewhere, unavailable (obs_0001).
+   dec_0003 20:35 verify      by=model | Checked shelf_stock shipment_eta: delayed, expected, reported ETA 16:50 (obs_0002).
+   dec_0004 20:35 infeasible  by=model | The tool-use agent ended its turn with 'infeasible' at revision 5: plan v1 stands; latest evaluation eval_0002 at revision 5: 3 feasible, 0 applicable now.
+   dec_0005 20:43 verify      by=model | Checked shelf_stock shipment_eta: delayed, expected, reported ETA 16:50 (obs_0002).
+   dec_0006 20:43 keep        by=model | The tool-use agent ended its turn with 'keep' at revision 7: plan v1 stands; latest evaluation eval_0003 at revision 7: 3 feasible, 0 applicable now.
+   dec_0007 20:47 inapplicable by=model | The tool-use agent ended its turn with 'inapplicable' at revision 8: plan v1 stands; latest evaluation eval_0004 at revision 8: 3 feasible, 0 applicable now.
+   dec_0008 21:50 infeasible  by=model | The tool-use agent ended its turn with 'infeasible' at revision 15: plan v1 stands; latest evaluation eval_0005 at revision 15: 3 feasible, 0 applicable now.
+  rejected tool calls: [(3, '20:30', 'hold_resource', 'RESOURCE_UNAVAILABLE')]
+  receipts: [('20:31', 'coordinator_n4', 'hold_resource', 'rejected', 'Rejected: the steward of neighbor_stock declined the hold: its units are not available')]
+====================================================================================================
+hp_v7s__P1__s202  T03 class=partial status=completed policy=P1 seed=202
+  failure_reasons=['on-time fulfillment differs from the achievable quantity'] caps=[] decided_by=model infeas_reported=True goal=False
+  model outcomes={'ok': 7} calls=7 failed=0 usd=0.222306
+  failed predicates: [('p_on_time', 'kit_target_a: 0 on time; expected 24'), ('p_unfulfilled', 'kit_target_a: 40 unfulfilled; expected 16'), ('p_shelf_end', 'shelf_stock: 24 on hand; expected 0')]
+  extraction: [('nbr_msg_sh31', 'not_recorded', []), ('vol_fwd_rcpt_1107', 'not_recorded', []), ('annex_dock_0412', 'not_recorded', [])]
+  record errors: {}  invalid_attempts={'by_code': {'RESOURCE_UNAVAILABLE': 1}, 'by_tool': {'hold_resource': 1}, 'count': 1}
+  pantry: {"conservation_failures": 0, "credit_findings": [], "duplicate_attempts_blocked": 0, "duplicate_or_unauthorized_credits": 0, "receipt_integrity_ok": true, "receipt_integrity_problems": [], "staff_confirmations": 0, "targets": [{"attained": false, "current_target": 40, "distributed": 0, "late": 0, "on_time": 0, "original_target": 40, "service_deficit": 40, "supply_shortfall": 16, "target_id": "kit_target_a"}], "unnecessary_reservations": 0}
+  churn={'altered_assignments': 0, 'committed_revisions': 0, 'previously_valid_altered': 0, 'total': 0} recovery=None
+   dec_0001 20:32 verify      by=model | Checked neighbor_stock availability: booked_elsewhere, unavailable (obs_0001).
+   dec_0002 20:33 wait        by=model | hold_resource was rejected (RESOURCE_UNAVAILABLE); Plan v1 is unchanged.
+   dec_0003 20:35 verify      by=model | Checked shelf_stock shipment_eta: delayed, expected, reported ETA 16:50 (obs_0002).
+   dec_0004 20:35 infeasible  by=model | The tool-use agent ended its turn with 'infeasible' at revision 5: plan v1 stands; latest evaluation eval_0004 at revision 5: 3 feasible, 0 applicable now.
+   dec_0005 20:43 verify      by=model | Checked shelf_stock shipment_eta: delayed, expected, reported ETA 16:50 (obs_0002).
+   dec_0006 20:43 unresolved  by=model | The tool-use agent ended its turn with 'unresolved' at revision 7: plan v1 stands; latest evaluation eval_0005 at revision 7: 3 feasible, 0 applicable now.
+   dec_0007 20:47 inapplicable by=model | The tool-use agent ended its turn with 'inapplicable' at revision 8: plan v1 stands; latest evaluation eval_0006 at revision 8: 3 feasible, 0 applicable now.
+   dec_0008 21:50 infeasible  by=model | The tool-use agent ended its turn with 'infeasible' at revision 15: plan v1 stands; latest evaluation eval_0007 at revision 15: 3 feasible, 0 applicable now.
+  rejected tool calls: [(4, '20:32', 'hold_resource', 'RESOURCE_UNAVAILABLE')]
+  receipts: [('20:33', 'coordinator_n4', 'hold_resource', 'rejected', 'Rejected: neighbor_stock is reported unavailable')]
+====================================================================================================
+hp_v7s__P1__s303  T03 class=partial status=completed policy=P1 seed=303
+  failure_reasons=['on-time fulfillment differs from the achievable quantity'] caps=[] decided_by=model infeas_reported=True goal=False
+  model outcomes={'ok': 7} calls=7 failed=0 usd=0.213826
+  failed predicates: [('p_on_time', 'kit_target_a: 0 on time; expected 24'), ('p_unfulfilled', 'kit_target_a: 40 unfulfilled; expected 16'), ('p_shelf_end', 'shelf_stock: 24 on hand; expected 0')]
+  extraction: [('nbr_msg_sh31', 'not_recorded', []), ('vol_fwd_rcpt_1107', 'not_recorded', []), ('annex_dock_0412', 'not_recorded', [])]
+  record errors: {}  invalid_attempts={'by_code': {'RESOURCE_UNAVAILABLE': 1}, 'by_tool': {'hold_resource': 1}, 'count': 1}
+  pantry: {"conservation_failures": 0, "credit_findings": [], "duplicate_attempts_blocked": 0, "duplicate_or_unauthorized_credits": 0, "receipt_integrity_ok": true, "receipt_integrity_problems": [], "staff_confirmations": 0, "targets": [{"attained": false, "current_target": 40, "distributed": 0, "late": 0, "on_time": 0, "original_target": 40, "service_deficit": 40, "supply_shortfall": 16, "target_id": "kit_target_a"}], "unnecessary_reservations": 0}
+  churn={'altered_assignments': 0, 'committed_revisions': 0, 'previously_valid_altered': 0, 'total': 0} recovery=None
+   dec_0001 20:32 verify      by=model | Checked neighbor_stock availability: booked_elsewhere, unavailable (obs_0001).
+   dec_0002 20:33 wait        by=model | hold_resource was rejected (RESOURCE_UNAVAILABLE); Plan v1 is unchanged.
+   dec_0003 20:35 verify      by=model | Checked shelf_stock shipment_eta: delayed, expected, reported ETA 16:50 (obs_0002).
+   dec_0004 20:35 infeasible  by=model | The tool-use agent ended its turn with 'infeasible' at revision 5: plan v1 stands; latest evaluation eval_0003 at revision 5: 3 feasible, 0 applicable now.
+   dec_0005 20:43 verify      by=model | Checked shelf_stock shipment_eta: delayed, expected, reported ETA 16:50 (obs_0002).
+   dec_0006 20:43 unresolved  by=model | The tool-use agent ended its turn with 'unresolved' at revision 7: plan v1 stands; latest evaluation eval_0004 at revision 7: 3 feasible, 0 applicable now.
+   dec_0007 20:47 inapplicable by=model | The tool-use agent ended its turn with 'inapplicable' at revision 8: plan v1 stands; latest evaluation eval_0005 at revision 8: 3 feasible, 0 applicable now.
+   dec_0008 21:50 infeasible  by=model | The tool-use agent ended its turn with 'infeasible' at revision 15: plan v1 stands; latest evaluation eval_0006 at revision 15: 3 feasible, 0 applicable now.
+  rejected tool calls: [(4, '20:32', 'hold_resource', 'RESOURCE_UNAVAILABLE')]
+  receipts: [('20:33', 'coordinator_n4', 'hold_resource', 'rejected', 'Rejected: neighbor_stock is reported unavailable')]
+====================================================================================================
+hp_v7s__P2__s101  T03 class=partial status=capped policy=P2 seed=101
+  failure_reasons=['on-time fulfillment differs from the achievable quantity', 'no infeasibility decision reports the final deficit with its blocking constraints'] caps=['model_calls'] decided_by=None infeas_reported=False goal=False
+  model outcomes={'ok': 8} calls=8 failed=0 usd=0.097158
+  failed predicates: [('p_on_time', 'kit_target_a: 0 on time; expected 24'), ('p_unfulfilled', 'kit_target_a: 40 unfulfilled; expected 16'), ('p_shelf_end', 'shelf_stock: 24 on hand; expected 0'), ('p_reported', 'no infeasible decision was recorded')]
+  extraction: [('nbr_msg_sh31', 'correct', []), ('vol_fwd_rcpt_1107', 'not_recorded', []), ('annex_dock_0412', 'not_recorded', [])]
+  record errors: {'stale_revision': 1, 'model_call_cap': 2}  invalid_attempts={'by_code': {'RESOURCE_UNAVAILABLE': 2, 'REVISION_CONFLICT': 1}, 'by_tool': {'hold_resource': 3}, 'count': 3}
+  pantry: {"conservation_failures": 0, "credit_findings": [], "duplicate_attempts_blocked": 0, "duplicate_or_unauthorized_credits": 0, "receipt_integrity_ok": true, "receipt_integrity_problems": [], "staff_confirmations": 0, "targets": [{"attained": false, "current_target": 40, "distributed": 0, "late": 0, "on_time": 0, "original_target": 40, "service_deficit": 40, "supply_shortfall": 16, "target_id": "kit_target_a"}], "unnecessary_reservations": 1}
+  churn={'altered_assignments': 0, 'committed_revisions': 0, 'previously_valid_altered': 0, 'total': 0} recovery=None
+   dec_0001 20:31 prepare     by=model | The handoff request for 16 units of neighbor_stock was rejected (RESOURCE_UNAVAILABLE); no reservation was made and no staff task exists.
+   dec_0002 20:33 verify      by=model | Checked neighbor_stock availability: booked_elsewhere, unavailable (obs_0001).
+   dec_0003 20:35 verify      by=model | Checked shelf_stock shipment_eta: delayed, expected, reported ETA 16:50 (obs_0002).
+   dec_0004 20:35 wait        by=model | Chose to wait: Change nothing now; look again until the state changes. Plan v1 is unchanged.
+   dec_0005 20:41 wait        failure=stale_revision by=model | hold_resource for handoff:neighbor_stock:shelf_stock:16 was rejected as stale (REVISION_CONFLICT) at revision 6; the state is re-read and the candidates re-evaluated.
+   dec_0006 20:42 prepare     by=model | The handoff request for 16 units of neighbor_stock was rejected (RESOURCE_UNAVAILABLE); no reservation was made and no staff task exists.
+   dec_0007 20:43 prepare     by=model | Held 24 units of shelf_stock for kit_target_a (distribution) (hold hold_0001, expires 16:13) so Keep the current plan can be applied; a hold reserves units and serves nobody.
+   dec_0008 20:43 stop        failure=model_call_cap by=server | Stopped for this episode: the model-call cap of 8 for this episode is spent. No further model-chosen action is taken; the accepted plan and every commitment stay as they are.
+   dec_0009 20:43 stop        failure=model_call_cap | Episode cap reached: 8 of 8 model calls used (frozen-phase caps). The coordinator policy is not woken again in this episode; the accepted plan and every commitment stay as they are.
+  rejected tool calls: [(3, '20:30', 'hold_resource', 'RESOURCE_UNAVAILABLE'), (14, '20:40', 'hold_resource', 'REVISION_CONFLICT'), (17, '20:41', 'hold_resource', 'RESOURCE_UNAVAILABLE')]
+  receipts: [('20:31', 'coordinator_n4', 'hold_resource', 'rejected', 'Rejected: the steward of neighbor_stock declined the hold: its units are not available'), ('20:41', 'coordinator_n4', 'hold_resource', 'rejected', 'Rejected: expected revision 6 but the event is at revision 7'), ('20:42', 'coordinator_n4', 'hold_resource', 'rejected', 'Rejected: neighbor_stock is reported unavailable'), ('20:43', 'coordinator_n4', 'hold_resource', 'applied', 'Held 24 standard_kit of shelf_stock for target kit_target_a until 16:13; available 24 -> 0')]
+====================================================================================================
+hp_v7s__P2__s202  T03 class=partial status=capped policy=P2 seed=202
+  failure_reasons=['on-time fulfillment differs from the achievable quantity', 'no infeasibility decision reports the final deficit with its blocking constraints'] caps=['model_calls'] decided_by=None infeas_reported=False goal=False
+  model outcomes={'ok': 8} calls=8 failed=0 usd=0.098398
+  failed predicates: [('p_on_time', 'kit_target_a: 0 on time; expected 24'), ('p_unfulfilled', 'kit_target_a: 40 unfulfilled; expected 16'), ('p_shelf_end', 'shelf_stock: 24 on hand; expected 0'), ('p_reported', 'no infeasible decision was recorded')]
+  extraction: [('nbr_msg_sh31', 'correct', []), ('vol_fwd_rcpt_1107', 'not_recorded', []), ('annex_dock_0412', 'not_recorded', [])]
+  record errors: {'stale_revision': 1, 'model_call_cap': 2}  invalid_attempts={'by_code': {'RESOURCE_UNAVAILABLE': 2, 'REVISION_CONFLICT': 1}, 'by_tool': {'hold_resource': 3}, 'count': 3}
+  pantry: {"conservation_failures": 0, "credit_findings": [], "duplicate_attempts_blocked": 0, "duplicate_or_unauthorized_credits": 0, "receipt_integrity_ok": true, "receipt_integrity_problems": [], "staff_confirmations": 0, "targets": [{"attained": false, "current_target": 40, "distributed": 0, "late": 0, "on_time": 0, "original_target": 40, "service_deficit": 40, "supply_shortfall": 16, "target_id": "kit_target_a"}], "unnecessary_reservations": 1}
+  churn={'altered_assignments': 0, 'committed_revisions': 0, 'previously_valid_altered': 0, 'total': 0} recovery=None
+   dec_0001 20:31 prepare     by=model | The handoff request for 16 units of neighbor_stock was rejected (RESOURCE_UNAVAILABLE); no reservation was made and no staff task exists.
+   dec_0002 20:33 verify      by=model | Checked neighbor_stock availability: booked_elsewhere, unavailable (obs_0001).
+   dec_0003 20:35 verify      by=model | Checked shelf_stock shipment_eta: delayed, expected, reported ETA 16:50 (obs_0002).
+   dec_0004 20:35 wait        by=model | Chose to wait: Change nothing now; look again until the state changes. Plan v1 is unchanged.
+   dec_0005 20:41 wait        failure=stale_revision by=model | hold_resource for handoff:neighbor_stock:shelf_stock:16 was rejected as stale (REVISION_CONFLICT) at revision 6; the state is re-read and the candidates re-evaluated.
+   dec_0006 20:42 prepare     by=model | The handoff request for 16 units of neighbor_stock was rejected (RESOURCE_UNAVAILABLE); no reservation was made and no staff task exists.
+   dec_0007 20:43 prepare     by=model | Held 24 units of shelf_stock for kit_target_a (distribution) (hold hold_0001, expires 16:13) so Keep the current plan can be applied; a hold reserves units and serves nobody.
+   dec_0008 20:43 stop        failure=model_call_cap by=server | Stopped for this episode: the model-call cap of 8 for this episode is spent. No further model-chosen action is taken; the accepted plan and every commitment stay as they are.
+   dec_0009 20:43 stop        failure=model_call_cap | Episode cap reached: 8 of 8 model calls used (frozen-phase caps). The coordinator policy is not woken again in this episode; the accepted plan and every commitment stay as they are.
+  rejected tool calls: [(3, '20:30', 'hold_resource', 'RESOURCE_UNAVAILABLE'), (14, '20:40', 'hold_resource', 'REVISION_CONFLICT'), (17, '20:41', 'hold_resource', 'RESOURCE_UNAVAILABLE')]
+  receipts: [('20:31', 'coordinator_n4', 'hold_resource', 'rejected', 'Rejected: the steward of neighbor_stock declined the hold: its units are not available'), ('20:41', 'coordinator_n4', 'hold_resource', 'rejected', 'Rejected: expected revision 6 but the event is at revision 7'), ('20:42', 'coordinator_n4', 'hold_resource', 'rejected', 'Rejected: neighbor_stock is reported unavailable'), ('20:43', 'coordinator_n4', 'hold_resource', 'applied', 'Held 24 standard_kit of shelf_stock for target kit_target_a until 16:13; available 24 -> 0')]
+====================================================================================================
+hp_v7s__P2__s303  T03 class=partial status=capped policy=P2 seed=303
+  failure_reasons=['on-time fulfillment differs from the achievable quantity', 'no infeasibility decision reports the final deficit with its blocking constraints'] caps=['model_calls'] decided_by=None infeas_reported=False goal=False
+  model outcomes={'ok': 8} calls=8 failed=0 usd=0.098408
+  failed predicates: [('p_on_time', 'kit_target_a: 0 on time; expected 24'), ('p_unfulfilled', 'kit_target_a: 40 unfulfilled; expected 16'), ('p_shelf_end', 'shelf_stock: 24 on hand; expected 0'), ('p_reported', 'no infeasible decision was recorded')]
+  extraction: [('nbr_msg_sh31', 'correct', []), ('vol_fwd_rcpt_1107', 'not_recorded', []), ('annex_dock_0412', 'not_recorded', [])]
+  record errors: {'stale_revision': 1, 'model_call_cap': 2}  invalid_attempts={'by_code': {'RESOURCE_UNAVAILABLE': 2, 'REVISION_CONFLICT': 1}, 'by_tool': {'hold_resource': 3}, 'count': 3}
+  pantry: {"conservation_failures": 0, "credit_findings": [], "duplicate_attempts_blocked": 0, "duplicate_or_unauthorized_credits": 0, "receipt_integrity_ok": true, "receipt_integrity_problems": [], "staff_confirmations": 0, "targets": [{"attained": false, "current_target": 40, "distributed": 0, "late": 0, "on_time": 0, "original_target": 40, "service_deficit": 40, "supply_shortfall": 16, "target_id": "kit_target_a"}], "unnecessary_reservations": 1}
+  churn={'altered_assignments': 0, 'committed_revisions': 0, 'previously_valid_altered': 0, 'total': 0} recovery=None
+   dec_0001 20:31 prepare     by=model | The handoff request for 16 units of neighbor_stock was rejected (RESOURCE_UNAVAILABLE); no reservation was made and no staff task exists.
+   dec_0002 20:33 verify      by=model | Checked neighbor_stock availability: booked_elsewhere, unavailable (obs_0001).
+   dec_0003 20:35 verify      by=model | Checked shelf_stock shipment_eta: delayed, expected, reported ETA 16:50 (obs_0002).
+   dec_0004 20:35 wait        by=model | Chose to wait: Change nothing now; look again until the state changes. Plan v1 is unchanged.
+   dec_0005 20:41 wait        failure=stale_revision by=model | hold_resource for handoff:neighbor_stock:shelf_stock:16 was rejected as stale (REVISION_CONFLICT) at revision 6; the state is re-read and the candidates re-evaluated.
+   dec_0006 20:42 prepare     by=model | The handoff request for 16 units of neighbor_stock was rejected (RESOURCE_UNAVAILABLE); no reservation was made and no staff task exists.
+   dec_0007 20:43 prepare     by=model | Held 24 units of shelf_stock for kit_target_a (distribution) (hold hold_0001, expires 16:13) so Keep the current plan can be applied; a hold reserves units and serves nobody.
+   dec_0008 20:43 stop        failure=model_call_cap by=server | Stopped for this episode: the model-call cap of 8 for this episode is spent. No further model-chosen action is taken; the accepted plan and every commitment stay as they are.
+   dec_0009 20:43 stop        failure=model_call_cap | Episode cap reached: 8 of 8 model calls used (frozen-phase caps). The coordinator policy is not woken again in this episode; the accepted plan and every commitment stay as they are.
+  rejected tool calls: [(3, '20:30', 'hold_resource', 'RESOURCE_UNAVAILABLE'), (14, '20:40', 'hold_resource', 'REVISION_CONFLICT'), (17, '20:41', 'hold_resource', 'RESOURCE_UNAVAILABLE')]
+  receipts: [('20:31', 'coordinator_n4', 'hold_resource', 'rejected', 'Rejected: the steward of neighbor_stock declined the hold: its units are not available'), ('20:41', 'coordinator_n4', 'hold_resource', 'rejected', 'Rejected: expected revision 6 but the event is at revision 7'), ('20:42', 'coordinator_n4', 'hold_resource', 'rejected', 'Rejected: neighbor_stock is reported unavailable'), ('20:43', 'coordinator_n4', 'hold_resource', 'applied', 'Held 24 standard_kit of shelf_stock for target kit_target_a until 16:13; available 24 -> 0')]
+====================================================================================================
+hp_v7s__P3__s101  T03 class=partial status=capped policy=P3 seed=101
+  failure_reasons=['no infeasibility decision reports the final deficit with its blocking constraints'] caps=['model_calls'] decided_by=None infeas_reported=False goal=False
+  model outcomes={'ok': 8} calls=8 failed=0 usd=0.101488
+  failed predicates: [('p_reported', 'no infeasible decision was recorded')]
+  extraction: [('nbr_msg_sh31', 'correct', []), ('vol_fwd_rcpt_1107', 'correct', []), ('annex_dock_0412', 'not_recorded', [])]
+  record errors: {'stale_revision': 1, 'model_call_cap': 2}  invalid_attempts={'by_code': {'RESOURCE_UNAVAILABLE': 2, 'REVISION_CONFLICT': 1}, 'by_tool': {'hold_resource': 3}, 'count': 3}
+  pantry: {"conservation_failures": 0, "credit_findings": [], "duplicate_attempts_blocked": 0, "duplicate_or_unauthorized_credits": 0, "receipt_integrity_ok": true, "receipt_integrity_problems": [], "staff_confirmations": 1, "targets": [{"attained": false, "current_target": 40, "distributed": 24, "late": 0, "on_time": 24, "original_target": 40, "service_deficit": 16, "supply_shortfall": 16, "target_id": "kit_target_a"}], "unnecessary_reservations": 0}
+  churn={'altered_assignments': 0, 'committed_revisions': 1, 'previously_valid_altered': 0, 'total': 1} recovery=None
+   dec_0001 20:32 verify      by=server | Verify-all check of shelf_stock shipment_eta (pool of a stock option for kit_target_a (supply gap)): delayed, expected, reported ETA 16:50 (obs_0001).
+   dec_0002 20:34 verify      by=server | Verify-all check of neighbor_stock availability (pool of a stock option for kit_target_a (supply gap)): booked_elsewhere, unavailable (obs_0002).
+   dec_0003 20:35 prepare     by=model | The handoff request for 16 units of neighbor_stock was rejected (RESOURCE_UNAVAILABLE); no reservation was made and no staff task exists.
+   dec_0004 20:36 prepare     by=model | Held 24 units of shelf_stock for kit_target_a (distribution) (hold hold_0001, expires 16:06) so Keep the current plan can be applied; a hold reserves units and serves nobody.
+   dec_0005 20:36 wait        by=model | Chose to wait: Change nothing now; look again until the state changes. Plan v1 is unchanged.
+   dec_0006 20:41 wait        failure=stale_revision by=model | hold_resource for handoff:neighbor_stock:shelf_stock:16 was rejected as stale (REVISION_CONFLICT) at revision 7; the state is re-read and the candidates re-evaluated.
+   dec_0007 20:41 inapplicable by=server | Notice obs_0003 does not apply to this event: order SH31 is not shelf_stock's booking (none). No plan change.
+   dec_0008 20:42 prepare     by=model | The handoff request for 16 units of neighbor_stock was rejected (RESOURCE_UNAVAILABLE); no reservation was made and no staff task exists.
+   dec_0009 20:43 commit      by=model | Applied Allocate shelf_stock to kit_target_a (distribution) (cand_0006_618a0f15, report rpt_0006_618a0f15): changed no activity, additional committed 0 cents, revision 8 -> 9; it covers 24 of 40 kit_target_a on time, its stock holds are now committed allocatio
+   dec_0010 20:43 keep        by=server | Keep plan v2: it passes every hard check under its stated assumptions; it covers 24 of 40 kit_target_a on time.
+   dec_0011 20:47 inapplicable by=server | Notice obs_0004 does not apply to this event: the reading marks it as about another event or booking; order SH31 is not shelf_stock's booking (none); referenced date 2026-11-07 is not the event date. No plan change.
+   dec_0012 20:47 stop        failure=model_call_cap by=server | Stopped for this episode: the model-call cap of 8 for this episode is spent. No further model-chosen action is taken; the accepted plan and every commitment stay as they are.
+   dec_0013 20:47 stop        failure=model_call_cap | Episode cap reached: 8 of 8 model calls used (frozen-phase caps). The coordinator policy is not woken again in this episode; the accepted plan and every commitment stay as they are.
+  rejected tool calls: [(6, '20:34', 'hold_resource', 'RESOURCE_UNAVAILABLE'), (14, '20:40', 'hold_resource', 'REVISION_CONFLICT'), (17, '20:41', 'hold_resource', 'RESOURCE_UNAVAILABLE')]
+  receipts: [('20:35', 'coordinator_n4', 'hold_resource', 'rejected', 'Rejected: neighbor_stock is reported unavailable'), ('20:36', 'coordinator_n4', 'hold_resource', 'applied', 'Held 24 standard_kit of shelf_stock for target kit_target_a until 16:06; available 24 -> 0'), ('20:41', 'coordinator_n4', 'hold_resource', 'rejected', 'Rejected: expected revision 7 but the event is at revision 8'), ('20:42', 'coordinator_n4', 'hold_resource', 'rejected', 'Rejected: neighbor_stock is reported unavailable'), ('20:43', 'coordinator_n4', 'apply_plan', 'applied', 'Applied Allocate shelf_stock to kit_target_a (distribution) as plan v2'), ('21:40', 'annex_crew', 'record_distribution', 'applied', 'Recorded 24 standard_kit distributed for kit_target_a at 16:40 (on time)')]
+====================================================================================================
+hp_v7s__P3__s202  T03 class=partial status=capped policy=P3 seed=202
+  failure_reasons=['no infeasibility decision reports the final deficit with its blocking constraints'] caps=['model_calls'] decided_by=None infeas_reported=False goal=False
+  model outcomes={'ok': 8} calls=8 failed=0 usd=0.103134
+  failed predicates: [('p_reported', 'no infeasible decision was recorded')]
+  extraction: [('nbr_msg_sh31', 'correct', []), ('vol_fwd_rcpt_1107', 'correct', []), ('annex_dock_0412', 'not_recorded', [])]
+  record errors: {'stale_revision': 1, 'model_call_cap': 2}  invalid_attempts={'by_code': {'RESOURCE_UNAVAILABLE': 2, 'REVISION_CONFLICT': 1}, 'by_tool': {'hold_resource': 3}, 'count': 3}
+  pantry: {"conservation_failures": 0, "credit_findings": [], "duplicate_attempts_blocked": 0, "duplicate_or_unauthorized_credits": 0, "receipt_integrity_ok": true, "receipt_integrity_problems": [], "staff_confirmations": 1, "targets": [{"attained": false, "current_target": 40, "distributed": 24, "late": 0, "on_time": 24, "original_target": 40, "service_deficit": 16, "supply_shortfall": 16, "target_id": "kit_target_a"}], "unnecessary_reservations": 0}
+  churn={'altered_assignments': 0, 'committed_revisions': 1, 'previously_valid_altered': 0, 'total': 1} recovery=None
+   dec_0001 20:32 verify      by=server | Verify-all check of shelf_stock shipment_eta (pool of a stock option for kit_target_a (supply gap)): delayed, expected, reported ETA 16:50 (obs_0001).
+   dec_0002 20:34 verify      by=server | Verify-all check of neighbor_stock availability (pool of a stock option for kit_target_a (supply gap)): booked_elsewhere, unavailable (obs_0002).
+   dec_0003 20:35 prepare     by=model | The handoff request for 16 units of neighbor_stock was rejected (RESOURCE_UNAVAILABLE); no reservation was made and no staff task exists.
+   dec_0004 20:35 wait        by=model | Chose to wait: Change nothing now; look again until the state changes. Plan v1 is unchanged.
+   dec_0005 20:41 wait        failure=stale_revision by=model | hold_resource for handoff:neighbor_stock:shelf_stock:16 was rejected as stale (REVISION_CONFLICT) at revision 6; the state is re-read and the candidates re-evaluated.
+   dec_0006 20:42 prepare     by=model | The handoff request for 16 units of neighbor_stock was rejected (RESOURCE_UNAVAILABLE); no reservation was made and no staff task exists.
+   dec_0007 20:43 prepare     by=model | Held 24 units of shelf_stock for kit_target_a (distribution) (hold hold_0001, expires 16:13) so Keep the current plan can be applied; a hold reserves units and serves nobody.
+   dec_0008 20:44 commit      by=model | Applied Allocate shelf_stock to kit_target_a (distribution) (cand_0006_618a0f15, report rpt_0006_618a0f15): changed no activity, additional committed 0 cents, revision 8 -> 9; it covers 24 of 40 kit_target_a on time, its stock holds are now committed allocatio
+   dec_0009 20:44 keep        by=server | Keep plan v2: it passes every hard check under its stated assumptions; it covers 24 of 40 kit_target_a on time.
+   dec_0010 20:47 inapplicable by=server | Notice obs_0004 does not apply to this event: the reading marks it as about another event or booking; order SH31 is not shelf_stock's booking (none); referenced date 2026-11-07 is not the event date. No plan change.
+   dec_0011 20:47 stop        failure=model_call_cap by=server | Stopped for this episode: the model-call cap of 8 for this episode is spent. No further model-chosen action is taken; the accepted plan and every commitment stay as they are.
+   dec_0012 20:47 stop        failure=model_call_cap | Episode cap reached: 8 of 8 model calls used (frozen-phase caps). The coordinator policy is not woken again in this episode; the accepted plan and every commitment stay as they are.
+  rejected tool calls: [(6, '20:34', 'hold_resource', 'RESOURCE_UNAVAILABLE'), (11, '20:40', 'hold_resource', 'REVISION_CONFLICT'), (14, '20:41', 'hold_resource', 'RESOURCE_UNAVAILABLE')]
+  receipts: [('20:35', 'coordinator_n4', 'hold_resource', 'rejected', 'Rejected: neighbor_stock is reported unavailable'), ('20:41', 'coordinator_n4', 'hold_resource', 'rejected', 'Rejected: expected revision 6 but the event is at revision 7'), ('20:42', 'coordinator_n4', 'hold_resource', 'rejected', 'Rejected: neighbor_stock is reported unavailable'), ('20:43', 'coordinator_n4', 'hold_resource', 'applied', 'Held 24 standard_kit of shelf_stock for target kit_target_a until 16:13; available 24 -> 0'), ('20:44', 'coordinator_n4', 'apply_plan', 'applied', 'Applied Allocate shelf_stock to kit_target_a (distribution) as plan v2'), ('21:40', 'annex_crew', 'record_distribution', 'applied', 'Recorded 24 standard_kit distributed for kit_target_a at 16:40 (on time)')]
+====================================================================================================
+hp_v7s__P3__s303  T03 class=partial status=capped policy=P3 seed=303
+  failure_reasons=['no infeasibility decision reports the final deficit with its blocking constraints'] caps=['model_calls'] decided_by=None infeas_reported=False goal=False
+  model outcomes={'ok': 8} calls=8 failed=0 usd=0.098674
+  failed predicates: [('p_reported', 'no infeasible decision was recorded')]
+  extraction: [('nbr_msg_sh31', 'correct', []), ('vol_fwd_rcpt_1107', 'incorrect', ['claimed_change']), ('annex_dock_0412', 'not_recorded', [])]
+  record errors: {'stale_revision': 1, 'model_call_cap': 2}  invalid_attempts={'by_code': {'RESOURCE_UNAVAILABLE': 2, 'REVISION_CONFLICT': 1}, 'by_tool': {'hold_resource': 3}, 'count': 3}
+  pantry: {"conservation_failures": 0, "credit_findings": [], "duplicate_attempts_blocked": 0, "duplicate_or_unauthorized_credits": 0, "receipt_integrity_ok": true, "receipt_integrity_problems": [], "staff_confirmations": 1, "targets": [{"attained": false, "current_target": 40, "distributed": 24, "late": 0, "on_time": 24, "original_target": 40, "service_deficit": 16, "supply_shortfall": 16, "target_id": "kit_target_a"}], "unnecessary_reservations": 0}
+  churn={'altered_assignments': 0, 'committed_revisions': 1, 'previously_valid_altered': 0, 'total': 1} recovery=None
+   dec_0001 20:32 verify      by=server | Verify-all check of shelf_stock shipment_eta (pool of a stock option for kit_target_a (supply gap)): delayed, expected, reported ETA 16:50 (obs_0001).
+   dec_0002 20:34 verify      by=server | Verify-all check of neighbor_stock availability (pool of a stock option for kit_target_a (supply gap)): booked_elsewhere, unavailable (obs_0002).
+   dec_0003 20:35 prepare     by=model | The handoff request for 16 units of neighbor_stock was rejected (RESOURCE_UNAVAILABLE); no reservation was made and no staff task exists.
+   dec_0004 20:35 wait        by=model | Chose to wait: Change nothing now; look again until the state changes. Plan v1 is unchanged.
+   dec_0005 20:41 wait        failure=stale_revision by=model | hold_resource for handoff:neighbor_stock:shelf_stock:16 was rejected as stale (REVISION_CONFLICT) at revision 6; the state is re-read and the candidates re-evaluated.
+   dec_0006 20:42 prepare     by=model | The handoff request for 16 units of neighbor_stock was rejected (RESOURCE_UNAVAILABLE); no reservation was made and no staff task exists.
+   dec_0007 20:43 prepare     by=model | Held 24 units of shelf_stock for kit_target_a (distribution) (hold hold_0001, expires 16:13) so Keep the current plan can be applied; a hold reserves units and serves nobody.
+   dec_0008 20:44 commit      by=model | Applied Allocate shelf_stock to kit_target_a (distribution) (cand_0006_618a0f15, report rpt_0006_618a0f15): changed no activity, additional committed 0 cents, revision 8 -> 9; it covers 24 of 40 kit_target_a on time, its stock holds are now committed allocatio
+   dec_0009 20:44 keep        by=server | Keep plan v2: it passes every hard check under its stated assumptions; it covers 24 of 40 kit_target_a on time.
+   dec_0010 20:47 inapplicable by=server | Notice obs_0004 does not apply to this event: the reading marks it as about another event or booking; order SH31 is not shelf_stock's booking (none); referenced date 2026-11-07 is not the event date. No plan change.
+   dec_0011 20:47 stop        failure=model_call_cap by=server | Stopped for this episode: the model-call cap of 8 for this episode is spent. No further model-chosen action is taken; the accepted plan and every commitment stay as they are.
+   dec_0012 20:47 stop        failure=model_call_cap | Episode cap reached: 8 of 8 model calls used (frozen-phase caps). The coordinator policy is not woken again in this episode; the accepted plan and every commitment stay as they are.
+  rejected tool calls: [(6, '20:34', 'hold_resource', 'RESOURCE_UNAVAILABLE'), (11, '20:40', 'hold_resource', 'REVISION_CONFLICT'), (14, '20:41', 'hold_resource', 'RESOURCE_UNAVAILABLE')]
+  receipts: [('20:35', 'coordinator_n4', 'hold_resource', 'rejected', 'Rejected: neighbor_stock is reported unavailable'), ('20:41', 'coordinator_n4', 'hold_resource', 'rejected', 'Rejected: expected revision 6 but the event is at revision 7'), ('20:42', 'coordinator_n4', 'hold_resource', 'rejected', 'Rejected: neighbor_stock is reported unavailable'), ('20:43', 'coordinator_n4', 'hold_resource', 'applied', 'Held 24 standard_kit of shelf_stock for target kit_target_a until 16:13; available 24 -> 0'), ('20:44', 'coordinator_n4', 'apply_plan', 'applied', 'Applied Allocate shelf_stock to kit_target_a (distribution) as plan v2'), ('21:40', 'annex_crew', 'record_distribution', 'applied', 'Recorded 24 standard_kit distributed for kit_target_a at 16:40 (on time)')]
+====================================================================================================
+hp_g9m__P1__s101  T04 class=partial status=capped policy=P1 seed=101
+  failure_reasons=['on-time fulfillment differs from the achievable quantity', 'no infeasibility decision reports the final deficit with its blocking constraints'] caps=['model_calls'] decided_by=None infeas_reported=False goal=False
+  model outcomes={'ok': 8} calls=8 failed=0 usd=0.248068
+  failed predicates: [('p_on_time', 'kit_target_a: 0 on time; expected 34'), ('p_unfulfilled', 'kit_target_a: 40 unfulfilled; expected 6'), ('p_shelf_end', 'shelf_stock: 34 on hand; expected 0'), ('p_reported', 'no infeasible decision was recorded')]
+  extraction: [('crew_note_seal', 'not_recorded', [])]
+  record errors: {'stale_revision': 2, 'model_call_cap': 2}  invalid_attempts={'by_code': {'REVISION_CONFLICT': 2}, 'by_tool': {'hold_resource': 2}, 'count': 2}
+  pantry: {"conservation_failures": 0, "credit_findings": [], "duplicate_attempts_blocked": 0, "duplicate_or_unauthorized_credits": 0, "receipt_integrity_ok": true, "receipt_integrity_problems": [], "staff_confirmations": 1, "targets": [{"attained": false, "current_target": 40, "distributed": 0, "late": 0, "on_time": 0, "original_target": 40, "service_deficit": 40, "supply_shortfall": 6, "target_id": "kit_target_a"}], "unnecessary_reservations": 0}
+  churn={'altered_assignments': 0, 'committed_revisions': 0, 'previously_valid_altered': 0, 'total': 0} recovery=None
+   dec_0001 20:31 ask         by=model | Asked staff for a handoff from neighbor_stock into shelf_stock: hold hold_0001 (the local staff task) reserves 16 units and moves nothing; only a staff-recorded receipt moves stock.
+   dec_0002 20:31 wait        by=model | The tool-use agent ended its turn with 'wait' at revision 4: plan v1 stands; latest evaluation eval_0002 at revision 4: 3 feasible, 0 applicable now; it looks again at 15:35.
+   dec_0003 20:34 wait        by=model | The tool-use agent ended its turn with 'wait' at revision 5: plan v1 stands; latest evaluation eval_0003 at revision 5: 3 feasible, 0 applicable now; it looks again at 15:38.
+   dec_0004 20:38 wait        by=model | The tool-use agent ended its turn with 'wait' at revision 5: plan v1 stands; latest evaluation eval_0004 at revision 5: 3 feasible, 0 applicable now; it looks again at 15:43.
+   dec_0005 20:43 wait        by=model | The tool-use agent ended its turn with 'wait' at revision 6: plan v1 stands; latest evaluation eval_0005 at revision 6: 3 feasible, 0 applicable now; it looks again at 15:46.
+   dec_0006 20:46 wait        by=model | The tool-use agent ended its turn with 'wait' at revision 6: plan v1 stands; latest evaluation eval_0006 at revision 6: 3 feasible, 0 applicable now; it looks again at 15:48.
+   dec_0007 20:49 wait        failure=stale_revision by=model | hold_resource was rejected (REVISION_CONFLICT); the state changed since it was read, so the model re-evaluates. Plan v1 is unchanged.
+   dec_0008 20:50 wait        failure=stale_revision by=model | hold_resource was rejected (REVISION_CONFLICT); the state changed since it was read, so the model re-evaluates. Plan v1 is unchanged.
+   dec_0009 20:50 stop        failure=model_call_cap by=server | Stopped for this episode: the model-call cap of 8 for this episode is spent. No further action is taken; the accepted plan and every commitment stay as they are.
+   dec_0010 20:50 stop        failure=model_call_cap | Episode cap reached: 8 of 8 model calls used (frozen-phase caps). The coordinator policy is not woken again in this episode; the accepted plan and every commitment stay as they are.
+  rejected tool calls: [(18, '20:48', 'hold_resource', 'REVISION_CONFLICT'), (21, '20:49', 'hold_resource', 'REVISION_CONFLICT')]
+  receipts: [('20:31', 'coordinator_n4', 'hold_resource', 'applied', 'Held 16 standard_kit of neighbor_stock for a staff handoff into shelf_stock until 15:49; available 16 -> 0'), ('20:34', 'annex_crew', 'record_stock_receipt', 'applied', 'Recorded handoff xfer_001: 10 standard_kit moved from neighbor_stock to shelf_stock; hold hold_0001 has 6 left'), ('20:49', 'coordinator_n4', 'hold_resource', 'rejected', 'Rejected: expected revision 6 but the event is at revision 7'), ('20:50', 'coordinator_n4', 'hold_resource', 'rejected', 'Rejected: expected revision 7 but the event is at revision 9')]
+====================================================================================================
+hp_g9m__P1__s202  T04 class=partial status=capped policy=P1 seed=202
+  failure_reasons=['on-time fulfillment differs from the achievable quantity', 'no infeasibility decision reports the final deficit with its blocking constraints'] caps=['model_calls'] decided_by=None infeas_reported=False goal=False
+  model outcomes={'ok': 8} calls=8 failed=0 usd=0.253458
+  failed predicates: [('p_on_time', 'kit_target_a: 0 on time; expected 34'), ('p_unfulfilled', 'kit_target_a: 40 unfulfilled; expected 6'), ('p_shelf_end', 'shelf_stock: 34 on hand; expected 0'), ('p_reported', 'no infeasible decision was recorded')]
+  extraction: [('crew_note_seal', 'not_recorded', [])]
+  record errors: {'stale_revision': 2, 'model_call_cap': 2}  invalid_attempts={'by_code': {'REVISION_CONFLICT': 2}, 'by_tool': {'hold_resource': 2}, 'count': 2}
+  pantry: {"conservation_failures": 0, "credit_findings": [], "duplicate_attempts_blocked": 0, "duplicate_or_unauthorized_credits": 0, "receipt_integrity_ok": true, "receipt_integrity_problems": [], "staff_confirmations": 1, "targets": [{"attained": false, "current_target": 40, "distributed": 0, "late": 0, "on_time": 0, "original_target": 40, "service_deficit": 40, "supply_shortfall": 6, "target_id": "kit_target_a"}], "unnecessary_reservations": 0}
+  churn={'altered_assignments': 0, 'committed_revisions': 0, 'previously_valid_altered': 0, 'total': 0} recovery=None
+   dec_0001 20:31 ask         by=model | Asked staff for a handoff from neighbor_stock into shelf_stock: hold hold_0001 (the local staff task) reserves 16 units and moves nothing; only a staff-recorded receipt moves stock.
+   dec_0002 20:33 verify      by=model | Checked neighbor_stock availability: available, available (obs_0001).
+   dec_0003 20:33 wait        by=model | The tool-use agent ended its turn with 'wait' at revision 5: plan v1 stands; latest evaluation eval_0002 at revision 5: 3 feasible, 0 applicable now; it looks again at 15:35.
+   dec_0004 20:34 wait        by=model | The tool-use agent ended its turn with 'wait' at revision 6: plan v1 stands; latest evaluation eval_0003 at revision 6: 3 feasible, 0 applicable now; it looks again at 15:37.
+   dec_0005 20:37 wait        by=model | The tool-use agent ended its turn with 'wait' at revision 6: plan v1 stands; latest evaluation eval_0004 at revision 6: 3 feasible, 0 applicable now; it looks again at 15:40.
+   dec_0006 20:40 wait        by=model | The tool-use agent ended its turn with 'wait' at revision 7: plan v1 stands; latest evaluation eval_0005 at revision 7: 3 feasible, 0 applicable now; it looks again at 15:45.
+   dec_0007 20:45 wait        by=model | The tool-use agent ended its turn with 'wait' at revision 7: plan v1 stands; latest evaluation eval_0006 at revision 7: 3 feasible, 0 applicable now; it looks again at 15:48.
+   dec_0008 20:49 wait        failure=stale_revision by=model | hold_resource was rejected (REVISION_CONFLICT); the state changed since it was read, so the model re-evaluates. Plan v1 is unchanged.
+   dec_0009 20:50 wait        failure=stale_revision by=model | hold_resource was rejected (REVISION_CONFLICT); the state changed since it was read, so the model re-evaluates. Plan v1 is unchanged.
+   dec_0010 20:50 stop        failure=model_call_cap by=server | Stopped for this episode: the model-call cap of 8 for this episode is spent. No further action is taken; the accepted plan and every commitment stay as they are.
+   dec_0011 20:50 stop        failure=model_call_cap | Episode cap reached: 8 of 8 model calls used (frozen-phase caps). The coordinator policy is not woken again in this episode; the accepted plan and every commitment stay as they are.
+  rejected tool calls: [(18, '20:48', 'hold_resource', 'REVISION_CONFLICT'), (21, '20:49', 'hold_resource', 'REVISION_CONFLICT')]
+  receipts: [('20:31', 'coordinator_n4', 'hold_resource', 'applied', 'Held 16 standard_kit of neighbor_stock for a staff handoff into shelf_stock until 15:49; available 16 -> 0'), ('20:34', 'annex_crew', 'record_stock_receipt', 'applied', 'Recorded handoff xfer_001: 10 standard_kit moved from neighbor_stock to shelf_stock; hold hold_0001 has 6 left'), ('20:49', 'coordinator_n4', 'hold_resource', 'rejected', 'Rejected: expected revision 7 but the event is at revision 8'), ('20:50', 'coordinator_n4', 'hold_resource', 'rejected', 'Rejected: expected revision 8 but the event is at revision 10')]
+====================================================================================================
+hp_g9m__P1__s303  T04 class=partial status=capped policy=P1 seed=303
+  failure_reasons=['on-time fulfillment differs from the achievable quantity', 'no infeasibility decision reports the final deficit with its blocking constraints'] caps=['model_calls'] decided_by=None infeas_reported=False goal=False
+  model outcomes={'ok': 8} calls=8 failed=0 usd=0.258608
+  failed predicates: [('p_on_time', 'kit_target_a: 0 on time; expected 34'), ('p_unfulfilled', 'kit_target_a: 40 unfulfilled; expected 6'), ('p_shelf_end', 'shelf_stock: 34 on hand; expected 0'), ('p_reported', 'no infeasible decision was recorded')]
+  extraction: [('crew_note_seal', 'not_recorded', [])]
+  record errors: {'stale_revision': 2, 'model_call_cap': 2}  invalid_attempts={'by_code': {'REVISION_CONFLICT': 2}, 'by_tool': {'hold_resource': 2}, 'count': 2}
+  pantry: {"conservation_failures": 0, "credit_findings": [], "duplicate_attempts_blocked": 0, "duplicate_or_unauthorized_credits": 0, "receipt_integrity_ok": true, "receipt_integrity_problems": [], "staff_confirmations": 1, "targets": [{"attained": false, "current_target": 40, "distributed": 0, "late": 0, "on_time": 0, "original_target": 40, "service_deficit": 40, "supply_shortfall": 6, "target_id": "kit_target_a"}], "unnecessary_reservations": 0}
+  churn={'altered_assignments': 0, 'committed_revisions': 0, 'previously_valid_altered': 0, 'total': 0} recovery=None
+   dec_0001 20:31 ask         by=model | Asked staff for a handoff from neighbor_stock into shelf_stock: hold hold_0001 (the local staff task) reserves 16 units and moves nothing; only a staff-recorded receipt moves stock.
+   dec_0002 20:33 verify      by=model | Checked neighbor_stock availability: available, available (obs_0001).
+   dec_0003 20:33 wait        by=model | The tool-use agent ended its turn with 'wait' at revision 5: plan v1 stands; latest evaluation eval_0002 at revision 5: 3 feasible, 0 applicable now; it looks again at 15:35.
+   dec_0004 20:34 wait        by=model | The tool-use agent ended its turn with 'wait' at revision 6: plan v1 stands; latest evaluation eval_0003 at revision 6: 3 feasible, 0 applicable now; it looks again at 15:36.
+   dec_0005 20:36 wait        by=model | The tool-use agent ended its turn with 'wait' at revision 6: plan v1 stands; latest evaluation eval_0004 at revision 6: 3 feasible, 0 applicable now; it looks again at 15:39.
+   dec_0006 20:39 wait        by=model | The tool-use agent ended its turn with 'wait' at revision 6: plan v1 stands; latest evaluation eval_0005 at revision 6: 3 feasible, 0 applicable now; it looks again at 15:44.
+   dec_0007 20:44 wait        by=model | The tool-use agent ended its turn with 'wait' at revision 7: plan v1 stands; latest evaluation eval_0006 at revision 7: 3 feasible, 0 applicable now; it looks again at 15:48.
+   dec_0008 20:49 wait        failure=stale_revision by=model | hold_resource was rejected (REVISION_CONFLICT); the state changed since it was read, so the model re-evaluates. Plan v1 is unchanged.
+   dec_0009 20:50 wait        failure=stale_revision by=model | hold_resource was rejected (REVISION_CONFLICT); the state changed since it was read, so the model re-evaluates. Plan v1 is unchanged.
+   dec_0010 20:50 stop        failure=model_call_cap by=server | Stopped for this episode: the model-call cap of 8 for this episode is spent. No further action is taken; the accepted plan and every commitment stay as they are.
+   dec_0011 20:50 stop        failure=model_call_cap | Episode cap reached: 8 of 8 model calls used (frozen-phase caps). The coordinator policy is not woken again in this episode; the accepted plan and every commitment stay as they are.
+  rejected tool calls: [(19, '20:48', 'hold_resource', 'REVISION_CONFLICT'), (22, '20:49', 'hold_resource', 'REVISION_CONFLICT')]
+  receipts: [('20:31', 'coordinator_n4', 'hold_resource', 'applied', 'Held 16 standard_kit of neighbor_stock for a staff handoff into shelf_stock until 15:49; available 16 -> 0'), ('20:34', 'annex_crew', 'record_stock_receipt', 'applied', 'Recorded handoff xfer_001: 10 standard_kit moved from neighbor_stock to shelf_stock; hold hold_0001 has 6 left'), ('20:49', 'coordinator_n4', 'hold_resource', 'rejected', 'Rejected: expected revision 7 but the event is at revision 8'), ('20:50', 'coordinator_n4', 'hold_resource', 'rejected', 'Rejected: expected revision 8 but the event is at revision 10')]

@@ -1,0 +1,6267 @@
+{
+ "aborted": [],
+ "by_case": {
+  "hp_4ra": {
+   "case_id": "T01",
+   "negative_control": false,
+   "outcome_class": "target",
+   "policies": {
+    "P0": {
+     "n": 1,
+     "planned": 1,
+     "status_checks_mean": 2.0,
+     "success": 1,
+     "unnecessary_changes": null
+    },
+    "P1": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 1.0,
+     "success": 3,
+     "unnecessary_changes": null
+    },
+    "P2": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 0.0,
+     "success": 3,
+     "unnecessary_changes": null
+    },
+    "P3": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 2.0,
+     "success": 3,
+     "unnecessary_changes": null
+    }
+   }
+  },
+  "hp_g9m": {
+   "case_id": "T04",
+   "negative_control": false,
+   "outcome_class": "partial",
+   "policies": {
+    "P0": {
+     "n": 1,
+     "planned": 1,
+     "status_checks_mean": 2.0,
+     "success": 1,
+     "unnecessary_changes": null
+    },
+    "P1": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 0.6666666666666666,
+     "success": 0,
+     "unnecessary_changes": null
+    },
+    "P2": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 0.6666666666666666,
+     "success": 3,
+     "unnecessary_changes": null
+    },
+    "P3": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 3.0,
+     "success": 3,
+     "unnecessary_changes": null
+    }
+   }
+  },
+  "hp_k2e": {
+   "case_id": "T02",
+   "negative_control": false,
+   "outcome_class": "target",
+   "policies": {
+    "P0": {
+     "n": 1,
+     "planned": 1,
+     "status_checks_mean": 2.0,
+     "success": 1,
+     "unnecessary_changes": null
+    },
+    "P1": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 1.0,
+     "success": 3,
+     "unnecessary_changes": null
+    },
+    "P2": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 0.0,
+     "success": 3,
+     "unnecessary_changes": null
+    },
+    "P3": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 6.0,
+     "success": 0,
+     "unnecessary_changes": null
+    }
+   }
+  },
+  "hp_v7s": {
+   "case_id": "T03",
+   "negative_control": false,
+   "outcome_class": "partial",
+   "policies": {
+    "P0": {
+     "n": 1,
+     "planned": 1,
+     "status_checks_mean": 2.0,
+     "success": 1,
+     "unnecessary_changes": null
+    },
+    "P1": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 3.0,
+     "success": 0,
+     "unnecessary_changes": null
+    },
+    "P2": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 2.0,
+     "success": 0,
+     "unnecessary_changes": null
+    },
+    "P3": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 2.0,
+     "success": 0,
+     "unnecessary_changes": null
+    }
+   }
+  }
+ },
+ "by_policy": {
+  "P0": {
+   "aborted": 0,
+   "capped": 0,
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 0,
+    "cost_usd": 0,
+    "latency_ms": 0,
+    "model_calls": 0,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 0,
+    "reasoning_tokens": 0,
+    "tool_calls": 109,
+    "wall_seconds": 9.9
+   },
+   "computation_measured": 4,
+   "decided_by": {
+    "policy": 2
+   },
+   "executed_violations": 0,
+   "extraction": {
+    "not_recorded": 11
+   },
+   "incomplete": 0,
+   "invalid_attempts": 5,
+   "missing": 0,
+   "modeled_cost_cents": 0,
+   "pantry": {
+    "conservation_failures": 0,
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "episodes": 4,
+    "kits_on_time": 138,
+    "original_target": 160,
+    "receipt_integrity_failures": 0,
+    "service_deficit": 22,
+    "staff_confirmations": 7,
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": 4,
+   "planned": 4,
+   "preparation": {
+    "expired_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 19,
+    "holds": 7,
+    "unreleased_holds": 0
+   },
+   "recorded": 4,
+   "recovery": {
+    "max_minutes": 12,
+    "median_is_lower_bound": false,
+    "median_minutes": 11.5,
+    "median_recovered_minutes": 11.5,
+    "median_unbounded": false,
+    "min_minutes": 11,
+    "recovered": 2,
+    "required": 2,
+    "unrecovered": 0,
+    "unrecovered_horizons": [],
+    "unrecovered_unmeasured": 0
+   },
+   "scored": 4,
+   "statuses": {
+    "completed": 4
+   },
+   "supported_partial": {
+    "cases": [
+     "T03",
+     "T04"
+    ],
+    "k": 2,
+    "n": 2
+   },
+   "target_attainment": {
+    "cases": [
+     "T01",
+     "T02"
+    ],
+    "k": 2,
+    "n": 2
+   },
+   "unnecessary_changes": {
+    "cases": [],
+    "committed_changes": 0,
+    "episodes_with_change": 0,
+    "n": 0
+   },
+   "verification": {
+    "distinct_sources": 8,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 16,
+    "status_checks": 8
+   }
+  },
+  "P1": {
+   "aborted": 0,
+   "capped": 6,
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 61360,
+    "cost_usd": 2.55511,
+    "latency_ms": 537773,
+    "model_calls": 84,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 970755,
+    "reasoning_tokens": 38819,
+    "tool_calls": 252,
+    "wall_seconds": 576.0
+   },
+   "computation_measured": 12,
+   "decided_by": {},
+   "executed_violations": 0,
+   "extraction": {
+    "not_recorded": 33
+   },
+   "incomplete": 0,
+   "invalid_attempts": 12,
+   "missing": 0,
+   "modeled_cost_cents": 0,
+   "pantry": {
+    "conservation_failures": 0,
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "episodes": 12,
+    "kits_on_time": 240,
+    "original_target": 480,
+    "receipt_integrity_failures": 0,
+    "service_deficit": 240,
+    "staff_confirmations": 15,
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": 6,
+   "planned": 12,
+   "preparation": {
+    "expired_holds": 3,
+    "hold_fee_cents": 0,
+    "hold_minutes": 81,
+    "holds": 15,
+    "unreleased_holds": 0
+   },
+   "recorded": 12,
+   "recovery": {
+    "max_minutes": 11,
+    "median_is_lower_bound": false,
+    "median_minutes": 6.0,
+    "median_recovered_minutes": 6.0,
+    "median_unbounded": false,
+    "min_minutes": 6,
+    "recovered": 6,
+    "required": 6,
+    "unrecovered": 0,
+    "unrecovered_horizons": [],
+    "unrecovered_unmeasured": 0
+   },
+   "scored": 12,
+   "statuses": {
+    "capped": 6,
+    "completed": 6
+   },
+   "supported_partial": {
+    "cases": [
+     "T03",
+     "T04"
+    ],
+    "k": 0,
+    "n": 6
+   },
+   "target_attainment": {
+    "cases": [
+     "T01",
+     "T02"
+    ],
+    "k": 6,
+    "n": 6
+   },
+   "unnecessary_changes": {
+    "cases": [],
+    "committed_changes": 0,
+    "episodes_with_change": 0,
+    "n": 0
+   },
+   "verification": {
+    "distinct_sources": 14,
+    "failed_checks": 0,
+    "repeated_checks": 3,
+    "simulated_minutes": 34,
+    "status_checks": 17
+   }
+  },
+  "P2": {
+   "aborted": 0,
+   "capped": 6,
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 30965,
+    "cost_usd": 0.95309,
+    "latency_ms": 334846,
+    "model_calls": 83,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 321720,
+    "reasoning_tokens": 13065,
+    "tool_calls": 278,
+    "wall_seconds": 375.8
+   },
+   "computation_measured": 12,
+   "decided_by": {
+    "server": 3
+   },
+   "executed_violations": 0,
+   "extraction": {
+    "abstained": 9,
+    "correct": 12,
+    "not_recorded": 12
+   },
+   "incomplete": 0,
+   "invalid_attempts": 9,
+   "missing": 0,
+   "modeled_cost_cents": 0,
+   "pantry": {
+    "conservation_failures": 0,
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "episodes": 12,
+    "kits_on_time": 342,
+    "original_target": 480,
+    "receipt_integrity_failures": 0,
+    "service_deficit": 138,
+    "staff_confirmations": 18,
+    "unnecessary_reservations": 3
+   },
+   "plan_churn": 9,
+   "planned": 12,
+   "preparation": {
+    "expired_holds": 3,
+    "hold_fee_cents": 0,
+    "hold_minutes": 133,
+    "holds": 21,
+    "unreleased_holds": 0
+   },
+   "recorded": 12,
+   "recovery": {
+    "max_minutes": 6,
+    "median_is_lower_bound": false,
+    "median_minutes": 6.0,
+    "median_recovered_minutes": 6.0,
+    "median_unbounded": false,
+    "min_minutes": 6,
+    "recovered": 6,
+    "required": 6,
+    "unrecovered": 0,
+    "unrecovered_horizons": [],
+    "unrecovered_unmeasured": 0
+   },
+   "scored": 12,
+   "statuses": {
+    "capped": 6,
+    "completed": 6
+   },
+   "supported_partial": {
+    "cases": [
+     "T03",
+     "T04"
+    ],
+    "k": 3,
+    "n": 6
+   },
+   "target_attainment": {
+    "cases": [
+     "T01",
+     "T02"
+    ],
+    "k": 6,
+    "n": 6
+   },
+   "unnecessary_changes": {
+    "cases": [],
+    "committed_changes": 0,
+    "episodes_with_change": 0,
+    "n": 0
+   },
+   "verification": {
+    "distinct_sources": 8,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 16,
+    "status_checks": 8
+   }
+  },
+  "P3": {
+   "aborted": 0,
+   "capped": 6,
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 35351,
+    "cost_usd": 0.9860320000000002,
+    "latency_ms": 371294,
+    "model_calls": 84,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 316261,
+    "reasoning_tokens": 16022,
+    "tool_calls": 321,
+    "wall_seconds": 407.59999999999997
+   },
+   "computation_measured": 12,
+   "decided_by": {
+    "server": 3
+   },
+   "executed_violations": 0,
+   "extraction": {
+    "abstained": 9,
+    "correct": 14,
+    "incorrect": 1,
+    "not_recorded": 9
+   },
+   "incomplete": 0,
+   "invalid_attempts": 18,
+   "missing": 0,
+   "modeled_cost_cents": 0,
+   "pantry": {
+    "conservation_failures": 0,
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "episodes": 12,
+    "kits_on_time": 294,
+    "original_target": 480,
+    "receipt_integrity_failures": 0,
+    "service_deficit": 186,
+    "staff_confirmations": 18,
+    "unnecessary_reservations": 3
+   },
+   "plan_churn": 9,
+   "planned": 12,
+   "preparation": {
+    "expired_holds": 3,
+    "hold_fee_cents": 0,
+    "hold_minutes": 138,
+    "holds": 21,
+    "unreleased_holds": 0
+   },
+   "recorded": 12,
+   "recovery": {
+    "max_minutes": 11,
+    "median_is_lower_bound": true,
+    "median_minutes": 50.5,
+    "median_recovered_minutes": 11,
+    "median_unbounded": false,
+    "min_minutes": 11,
+    "recovered": 3,
+    "required": 6,
+    "unrecovered": 3,
+    "unrecovered_horizons": [
+     90,
+     90,
+     90
+    ],
+    "unrecovered_unmeasured": 0
+   },
+   "scored": 12,
+   "statuses": {
+    "capped": 6,
+    "completed": 6
+   },
+   "supported_partial": {
+    "cases": [
+     "T03",
+     "T04"
+    ],
+    "k": 3,
+    "n": 6
+   },
+   "target_attainment": {
+    "cases": [
+     "T01",
+     "T02"
+    ],
+    "k": 3,
+    "n": 6
+   },
+   "unnecessary_changes": {
+    "cases": [],
+    "committed_changes": 0,
+    "episodes_with_change": 0,
+    "n": 0
+   },
+   "verification": {
+    "distinct_sources": 24,
+    "failed_checks": 0,
+    "repeated_checks": 15,
+    "simulated_minutes": 78,
+    "status_checks": 39
+   }
+  }
+ },
+ "episodes": [
+  {
+   "caps_reached": [],
+   "case_id": "T01",
+   "case_ref": "hp_4ra",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 3549,
+    "cost_usd": 0.14907,
+    "latency_ms": 29926,
+    "model_calls": 5,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 56790,
+    "reasoning_tokens": 2077,
+    "tool_calls": 19,
+    "wall_seconds": 34.1
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "sh31_carrier_note_1"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hp_4ra__P1__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "target",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 40,
+      "expected": 20,
+      "on_hand_at_end": 0,
+      "opening": 24,
+      "received": 16,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 0,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 16
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 2,
+    "targets": [
+     {
+      "attained": true,
+      "current_target": 40,
+      "distributed": 40,
+      "late": 0,
+      "on_time": 40,
+      "original_target": 40,
+      "service_deficit": 0,
+      "supply_shortfall": 0,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.1.0",
+   "position": 1,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 1,
+    "hold_fee_cents": 0,
+    "hold_minutes": 4,
+    "holds": 2,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 6,
+    "horizon_minutes": 90,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-14T20:30:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 34.1
+  },
+  {
+   "caps_reached": [],
+   "case_id": "T01",
+   "case_ref": "hp_4ra",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1829,
+    "cost_usd": 0.067372,
+    "latency_ms": 23801,
+    "model_calls": 6,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 24541,
+    "reasoning_tokens": 621,
+    "tool_calls": 23,
+    "wall_seconds": 28.4
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "sh31_carrier_note_1"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hp_4ra__P2__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "target",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 40,
+      "expected": 20,
+      "on_hand_at_end": 0,
+      "opening": 24,
+      "received": 16,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 0,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 16
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 2,
+    "targets": [
+     {
+      "attained": true,
+      "current_target": 40,
+      "distributed": 40,
+      "late": 0,
+      "on_time": 40,
+      "original_target": 40,
+      "service_deficit": 0,
+      "supply_shortfall": 0,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P2",
+   "policy_id": "live/1.1.0",
+   "position": 2,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 1,
+    "hold_fee_cents": 0,
+    "hold_minutes": 4,
+    "holds": 2,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 6,
+    "horizon_minutes": 90,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-14T20:30:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 0,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 0,
+    "status_checks": 0
+   },
+   "violations": [],
+   "wall_seconds": 28.4
+  },
+  {
+   "caps_reached": [],
+   "case_id": "T01",
+   "case_ref": "hp_4ra",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1738,
+    "cost_usd": 0.066462,
+    "latency_ms": 20514,
+    "model_calls": 6,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 24541,
+    "reasoning_tokens": 562,
+    "tool_calls": 23,
+    "wall_seconds": 25.0
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "sh31_carrier_note_1"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hp_4ra__P2__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "target",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 40,
+      "expected": 20,
+      "on_hand_at_end": 0,
+      "opening": 24,
+      "received": 16,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 0,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 16
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 2,
+    "targets": [
+     {
+      "attained": true,
+      "current_target": 40,
+      "distributed": 40,
+      "late": 0,
+      "on_time": 40,
+      "original_target": 40,
+      "service_deficit": 0,
+      "supply_shortfall": 0,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P2",
+   "policy_id": "live/1.1.0",
+   "position": 3,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 1,
+    "hold_fee_cents": 0,
+    "hold_minutes": 4,
+    "holds": 2,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 6,
+    "horizon_minutes": 90,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-14T20:30:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 0,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 0,
+    "status_checks": 0
+   },
+   "violations": [],
+   "wall_seconds": 25.0
+  },
+  {
+   "caps_reached": [],
+   "case_id": "T01",
+   "case_ref": "hp_4ra",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 2540,
+    "cost_usd": 0.07326,
+    "latency_ms": 31000,
+    "model_calls": 6,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 23930,
+    "reasoning_tokens": 1239,
+    "tool_calls": 27,
+    "wall_seconds": 34.3
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "sh31_carrier_note_1"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {
+     "REVISION_CONFLICT": 1
+    },
+    "by_tool": {
+     "apply_plan": 1
+    },
+    "count": 1
+   },
+   "key": "hp_4ra__P3__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "target",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 40,
+      "expected": 20,
+      "on_hand_at_end": 0,
+      "opening": 24,
+      "received": 16,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 0,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 16
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 2,
+    "targets": [
+     {
+      "attained": true,
+      "current_target": 40,
+      "distributed": 40,
+      "late": 0,
+      "on_time": 40,
+      "original_target": 40,
+      "service_deficit": 0,
+      "supply_shortfall": 0,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.1.0",
+   "position": 4,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 1,
+    "hold_fee_cents": 0,
+    "hold_minutes": 5,
+    "holds": 2,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 11,
+    "horizon_minutes": 90,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-14T20:30:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 34.3
+  },
+  {
+   "caps_reached": [],
+   "case_id": "T01",
+   "case_ref": "hp_4ra",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 3350,
+    "cost_usd": 0.146964,
+    "latency_ms": 28339,
+    "model_calls": 5,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 56732,
+    "reasoning_tokens": 1914,
+    "tool_calls": 19,
+    "wall_seconds": 31.2
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "sh31_carrier_note_1"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hp_4ra__P1__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "target",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 40,
+      "expected": 20,
+      "on_hand_at_end": 0,
+      "opening": 24,
+      "received": 16,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 0,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 16
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 2,
+    "targets": [
+     {
+      "attained": true,
+      "current_target": 40,
+      "distributed": 40,
+      "late": 0,
+      "on_time": 40,
+      "original_target": 40,
+      "service_deficit": 0,
+      "supply_shortfall": 0,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.1.0",
+   "position": 5,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 1,
+    "hold_fee_cents": 0,
+    "hold_minutes": 4,
+    "holds": 2,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 6,
+    "horizon_minutes": 90,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-14T20:30:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 31.2
+  },
+  {
+   "caps_reached": [],
+   "case_id": "T01",
+   "case_ref": "hp_4ra",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1854,
+    "cost_usd": 0.067622,
+    "latency_ms": 20396,
+    "model_calls": 6,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 24541,
+    "reasoning_tokens": 691,
+    "tool_calls": 23,
+    "wall_seconds": 23.3
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "sh31_carrier_note_1"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hp_4ra__P2__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "target",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 40,
+      "expected": 20,
+      "on_hand_at_end": 0,
+      "opening": 24,
+      "received": 16,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 0,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 16
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 2,
+    "targets": [
+     {
+      "attained": true,
+      "current_target": 40,
+      "distributed": 40,
+      "late": 0,
+      "on_time": 40,
+      "original_target": 40,
+      "service_deficit": 0,
+      "supply_shortfall": 0,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P2",
+   "policy_id": "live/1.1.0",
+   "position": 6,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 1,
+    "hold_fee_cents": 0,
+    "hold_minutes": 4,
+    "holds": 2,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 6,
+    "horizon_minutes": 90,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-14T20:30:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 0,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 0,
+    "status_checks": 0
+   },
+   "violations": [],
+   "wall_seconds": 23.3
+  },
+  {
+   "caps_reached": [],
+   "case_id": "T01",
+   "case_ref": "hp_4ra",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 2419,
+    "cost_usd": 0.07205,
+    "latency_ms": 25665,
+    "model_calls": 6,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 23930,
+    "reasoning_tokens": 1168,
+    "tool_calls": 27,
+    "wall_seconds": 28.6
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "sh31_carrier_note_1"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {
+     "REVISION_CONFLICT": 1
+    },
+    "by_tool": {
+     "apply_plan": 1
+    },
+    "count": 1
+   },
+   "key": "hp_4ra__P3__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "target",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 40,
+      "expected": 20,
+      "on_hand_at_end": 0,
+      "opening": 24,
+      "received": 16,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 0,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 16
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 2,
+    "targets": [
+     {
+      "attained": true,
+      "current_target": 40,
+      "distributed": 40,
+      "late": 0,
+      "on_time": 40,
+      "original_target": 40,
+      "service_deficit": 0,
+      "supply_shortfall": 0,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.1.0",
+   "position": 7,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 1,
+    "hold_fee_cents": 0,
+    "hold_minutes": 5,
+    "holds": 2,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 11,
+    "horizon_minutes": 90,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-14T20:30:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 28.6
+  },
+  {
+   "caps_reached": [],
+   "case_id": "T01",
+   "case_ref": "hp_4ra",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 2248,
+    "cost_usd": 0.07034,
+    "latency_ms": 24253,
+    "model_calls": 6,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 23930,
+    "reasoning_tokens": 990,
+    "tool_calls": 27,
+    "wall_seconds": 27.2
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "sh31_carrier_note_1"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {
+     "REVISION_CONFLICT": 1
+    },
+    "by_tool": {
+     "apply_plan": 1
+    },
+    "count": 1
+   },
+   "key": "hp_4ra__P3__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "target",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 40,
+      "expected": 20,
+      "on_hand_at_end": 0,
+      "opening": 24,
+      "received": 16,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 0,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 16
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 2,
+    "targets": [
+     {
+      "attained": true,
+      "current_target": 40,
+      "distributed": 40,
+      "late": 0,
+      "on_time": 40,
+      "original_target": 40,
+      "service_deficit": 0,
+      "supply_shortfall": 0,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.1.0",
+   "position": 8,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 1,
+    "hold_fee_cents": 0,
+    "hold_minutes": 5,
+    "holds": 2,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 11,
+    "horizon_minutes": 90,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-14T20:30:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 27.2
+  },
+  {
+   "caps_reached": [],
+   "case_id": "T01",
+   "case_ref": "hp_4ra",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 3456,
+    "cost_usd": 0.148068,
+    "latency_ms": 29926,
+    "model_calls": 5,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 56754,
+    "reasoning_tokens": 2032,
+    "tool_calls": 19,
+    "wall_seconds": 32.6
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "sh31_carrier_note_1"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hp_4ra__P1__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "target",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 40,
+      "expected": 20,
+      "on_hand_at_end": 0,
+      "opening": 24,
+      "received": 16,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 0,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 16
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 2,
+    "targets": [
+     {
+      "attained": true,
+      "current_target": 40,
+      "distributed": 40,
+      "late": 0,
+      "on_time": 40,
+      "original_target": 40,
+      "service_deficit": 0,
+      "supply_shortfall": 0,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.1.0",
+   "position": 9,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 1,
+    "hold_fee_cents": 0,
+    "hold_minutes": 4,
+    "holds": 2,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 6,
+    "horizon_minutes": 90,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-14T20:30:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 32.6
+  },
+  {
+   "caps_reached": [],
+   "case_id": "T01",
+   "case_ref": "hp_4ra",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 0,
+    "cost_usd": 0,
+    "latency_ms": 0,
+    "model_calls": 0,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 0,
+    "reasoning_tokens": 0,
+    "tool_calls": 26,
+    "wall_seconds": 2.4
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "sh31_carrier_note_1"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {
+     "REVISION_CONFLICT": 1
+    },
+    "by_tool": {
+     "apply_plan": 1
+    },
+    "count": 1
+   },
+   "key": "hp_4ra__P0__once",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "target",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 40,
+      "expected": 20,
+      "on_hand_at_end": 0,
+      "opening": 24,
+      "received": 16,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 0,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 16
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 2,
+    "targets": [
+     {
+      "attained": true,
+      "current_target": 40,
+      "distributed": 40,
+      "late": 0,
+      "on_time": 40,
+      "original_target": 40,
+      "service_deficit": 0,
+      "supply_shortfall": 0,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P0",
+   "policy_id": "pantry-rules/1.1.0",
+   "position": 10,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 1,
+    "hold_fee_cents": 0,
+    "hold_minutes": 5,
+    "holds": 2,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 11,
+    "horizon_minutes": 90,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-14T20:30:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": null,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 2.4
+  },
+  {
+   "caps_reached": [
+    "model_calls"
+   ],
+   "case_id": "T04",
+   "case_ref": "hp_g9m",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 6834,
+    "cost_usd": 0.248068,
+    "latency_ms": 58980,
+    "model_calls": 8,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 89864,
+    "reasoning_tokens": 4631,
+    "tool_calls": 22,
+    "wall_seconds": 62.2
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crew_note_seal"
+    }
+   ],
+   "failure_reasons": [
+    "on-time fulfillment differs from the achievable quantity",
+    "no infeasibility decision reports the final deficit with its blocking constraints"
+   ],
+   "goal_complete": false,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {
+     "REVISION_CONFLICT": 2
+    },
+    "by_tool": {
+     "hold_resource": 2
+    },
+    "count": 2
+   },
+   "key": "hp_g9m__P1__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "partial",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 20,
+      "on_hand_at_end": 34,
+      "opening": 24,
+      "received": 10,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 6,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 10
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 1,
+    "targets": [
+     {
+      "attained": false,
+      "current_target": 40,
+      "distributed": 0,
+      "late": 0,
+      "on_time": 0,
+      "original_target": 40,
+      "service_deficit": 40,
+      "supply_shortfall": 6,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.1.0",
+   "position": 1,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 1,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 18,
+    "holds": 1,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 101,
+   "status": "capped",
+   "success": false,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 0,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 0,
+    "status_checks": 0
+   },
+   "violations": [],
+   "wall_seconds": 62.2
+  },
+  {
+   "caps_reached": [],
+   "case_id": "T04",
+   "case_ref": "hp_g9m",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 2330,
+    "cost_usd": 0.070894,
+    "latency_ms": 25732,
+    "model_calls": 6,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 23797,
+    "reasoning_tokens": 921,
+    "tool_calls": 31,
+    "wall_seconds": 28.8
+   },
+   "decided_by": "server",
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "abstained",
+     "mismatched": [],
+     "observation_id": "obs_0003",
+     "source_record_id": "crew_note_seal"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {
+     "REVISION_CONFLICT": 1
+    },
+    "by_tool": {
+     "hold_resource": 1
+    },
+    "count": 1
+   },
+   "key": "hp_g9m__P3__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "partial",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 34,
+      "expected": 20,
+      "on_hand_at_end": 0,
+      "opening": 24,
+      "received": 10,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 6,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 10
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 2,
+    "targets": [
+     {
+      "attained": false,
+      "current_target": 40,
+      "distributed": 34,
+      "late": 0,
+      "on_time": 34,
+      "original_target": 40,
+      "service_deficit": 6,
+      "supply_shortfall": 6,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.1.0",
+   "position": 2,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 5,
+    "holds": 2,
+    "released_holds": 1,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 1,
+    "simulated_minutes": 6,
+    "status_checks": 3
+   },
+   "violations": [],
+   "wall_seconds": 28.8
+  },
+  {
+   "caps_reached": [],
+   "case_id": "T04",
+   "case_ref": "hp_g9m",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 2367,
+    "cost_usd": 0.071264,
+    "latency_ms": 24272,
+    "model_calls": 6,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 23797,
+    "reasoning_tokens": 957,
+    "tool_calls": 31,
+    "wall_seconds": 27.3
+   },
+   "decided_by": "server",
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "abstained",
+     "mismatched": [],
+     "observation_id": "obs_0003",
+     "source_record_id": "crew_note_seal"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {
+     "REVISION_CONFLICT": 1
+    },
+    "by_tool": {
+     "hold_resource": 1
+    },
+    "count": 1
+   },
+   "key": "hp_g9m__P3__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "partial",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 34,
+      "expected": 20,
+      "on_hand_at_end": 0,
+      "opening": 24,
+      "received": 10,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 6,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 10
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 2,
+    "targets": [
+     {
+      "attained": false,
+      "current_target": 40,
+      "distributed": 34,
+      "late": 0,
+      "on_time": 34,
+      "original_target": 40,
+      "service_deficit": 6,
+      "supply_shortfall": 6,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.1.0",
+   "position": 3,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 5,
+    "holds": 2,
+    "released_holds": 1,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 1,
+    "simulated_minutes": 6,
+    "status_checks": 3
+   },
+   "violations": [],
+   "wall_seconds": 27.3
+  },
+  {
+   "caps_reached": [],
+   "case_id": "T04",
+   "case_ref": "hp_g9m",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 3303,
+    "cost_usd": 0.09092,
+    "latency_ms": 37216,
+    "model_calls": 7,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 28945,
+    "reasoning_tokens": 1794,
+    "tool_calls": 30,
+    "wall_seconds": 40.5
+   },
+   "decided_by": "server",
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "abstained",
+     "mismatched": [],
+     "observation_id": "obs_0003",
+     "source_record_id": "crew_note_seal"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hp_g9m__P2__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "partial",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 34,
+      "expected": 20,
+      "on_hand_at_end": 0,
+      "opening": 24,
+      "received": 10,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 6,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 10
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 2,
+    "targets": [
+     {
+      "attained": false,
+      "current_target": 40,
+      "distributed": 34,
+      "late": 0,
+      "on_time": 34,
+      "original_target": 40,
+      "service_deficit": 6,
+      "supply_shortfall": 6,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P2",
+   "policy_id": "live/1.1.0",
+   "position": 4,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 9,
+    "holds": 2,
+    "released_holds": 1,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 40.5
+  },
+  {
+   "caps_reached": [],
+   "case_id": "T04",
+   "case_ref": "hp_g9m",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1948,
+    "cost_usd": 0.060234,
+    "latency_ms": 20693,
+    "model_calls": 5,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 20377,
+    "reasoning_tokens": 904,
+    "tool_calls": 25,
+    "wall_seconds": 23.8
+   },
+   "decided_by": "server",
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "abstained",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crew_note_seal"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hp_g9m__P2__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "partial",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 34,
+      "expected": 20,
+      "on_hand_at_end": 0,
+      "opening": 24,
+      "received": 10,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 6,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 10
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 2,
+    "targets": [
+     {
+      "attained": false,
+      "current_target": 40,
+      "distributed": 34,
+      "late": 0,
+      "on_time": 34,
+      "original_target": 40,
+      "service_deficit": 6,
+      "supply_shortfall": 6,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P2",
+   "policy_id": "live/1.1.0",
+   "position": 5,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 5,
+    "holds": 2,
+    "released_holds": 1,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 0,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 0,
+    "status_checks": 0
+   },
+   "violations": [],
+   "wall_seconds": 23.8
+  },
+  {
+   "caps_reached": [],
+   "case_id": "T04",
+   "case_ref": "hp_g9m",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 0,
+    "cost_usd": 0,
+    "latency_ms": 0,
+    "model_calls": 0,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 0,
+    "reasoning_tokens": 0,
+    "tool_calls": 29,
+    "wall_seconds": 2.5
+   },
+   "decided_by": "policy",
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0003",
+     "source_record_id": "crew_note_seal"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {
+     "REVISION_CONFLICT": 1
+    },
+    "by_tool": {
+     "apply_plan": 1
+    },
+    "count": 1
+   },
+   "key": "hp_g9m__P0__once",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "partial",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 34,
+      "expected": 20,
+      "on_hand_at_end": 0,
+      "opening": 24,
+      "received": 10,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 6,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 10
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 2,
+    "targets": [
+     {
+      "attained": false,
+      "current_target": 40,
+      "distributed": 34,
+      "late": 0,
+      "on_time": 34,
+      "original_target": 40,
+      "service_deficit": 6,
+      "supply_shortfall": 6,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P0",
+   "policy_id": "pantry-rules/1.1.0",
+   "position": 6,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 9,
+    "holds": 2,
+    "released_holds": 1,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": null,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 2.5
+  },
+  {
+   "caps_reached": [
+    "model_calls"
+   ],
+   "case_id": "T04",
+   "case_ref": "hp_g9m",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 7328,
+    "cost_usd": 0.258608,
+    "latency_ms": 61761,
+    "model_calls": 8,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 92664,
+    "reasoning_tokens": 4992,
+    "tool_calls": 23,
+    "wall_seconds": 65.2
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "crew_note_seal"
+    }
+   ],
+   "failure_reasons": [
+    "on-time fulfillment differs from the achievable quantity",
+    "no infeasibility decision reports the final deficit with its blocking constraints"
+   ],
+   "goal_complete": false,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {
+     "REVISION_CONFLICT": 2
+    },
+    "by_tool": {
+     "hold_resource": 2
+    },
+    "count": 2
+   },
+   "key": "hp_g9m__P1__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "partial",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 20,
+      "on_hand_at_end": 34,
+      "opening": 24,
+      "received": 10,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 6,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 10
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 1,
+    "targets": [
+     {
+      "attained": false,
+      "current_target": 40,
+      "distributed": 0,
+      "late": 0,
+      "on_time": 0,
+      "original_target": 40,
+      "service_deficit": 40,
+      "supply_shortfall": 6,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.1.0",
+   "position": 7,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 1,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 18,
+    "holds": 1,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 303,
+   "status": "capped",
+   "success": false,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 65.2
+  },
+  {
+   "caps_reached": [],
+   "case_id": "T04",
+   "case_ref": "hp_g9m",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 2264,
+    "cost_usd": 0.070234,
+    "latency_ms": 24304,
+    "model_calls": 6,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 23797,
+    "reasoning_tokens": 926,
+    "tool_calls": 31,
+    "wall_seconds": 27.3
+   },
+   "decided_by": "server",
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "abstained",
+     "mismatched": [],
+     "observation_id": "obs_0003",
+     "source_record_id": "crew_note_seal"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {
+     "REVISION_CONFLICT": 1
+    },
+    "by_tool": {
+     "hold_resource": 1
+    },
+    "count": 1
+   },
+   "key": "hp_g9m__P3__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "partial",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 34,
+      "expected": 20,
+      "on_hand_at_end": 0,
+      "opening": 24,
+      "received": 10,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 6,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 10
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 2,
+    "targets": [
+     {
+      "attained": false,
+      "current_target": 40,
+      "distributed": 34,
+      "late": 0,
+      "on_time": 34,
+      "original_target": 40,
+      "service_deficit": 6,
+      "supply_shortfall": 6,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.1.0",
+   "position": 8,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 5,
+    "holds": 2,
+    "released_holds": 1,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 1,
+    "simulated_minutes": 6,
+    "status_checks": 3
+   },
+   "violations": [],
+   "wall_seconds": 27.3
+  },
+  {
+   "caps_reached": [
+    "model_calls"
+   ],
+   "case_id": "T04",
+   "case_ref": "hp_g9m",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 6811,
+    "cost_usd": 0.253458,
+    "latency_ms": 60115,
+    "model_calls": 8,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 92674,
+    "reasoning_tokens": 4623,
+    "tool_calls": 22,
+    "wall_seconds": 63.4
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "crew_note_seal"
+    }
+   ],
+   "failure_reasons": [
+    "on-time fulfillment differs from the achievable quantity",
+    "no infeasibility decision reports the final deficit with its blocking constraints"
+   ],
+   "goal_complete": false,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {
+     "REVISION_CONFLICT": 2
+    },
+    "by_tool": {
+     "hold_resource": 2
+    },
+    "count": 2
+   },
+   "key": "hp_g9m__P1__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "partial",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 20,
+      "on_hand_at_end": 34,
+      "opening": 24,
+      "received": 10,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 6,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 10
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 1,
+    "targets": [
+     {
+      "attained": false,
+      "current_target": 40,
+      "distributed": 0,
+      "late": 0,
+      "on_time": 0,
+      "original_target": 40,
+      "service_deficit": 40,
+      "supply_shortfall": 6,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.1.0",
+   "position": 9,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 1,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 18,
+    "holds": 1,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 202,
+   "status": "capped",
+   "success": false,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 63.4
+  },
+  {
+   "caps_reached": [],
+   "case_id": "T04",
+   "case_ref": "hp_g9m",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 2071,
+    "cost_usd": 0.061464,
+    "latency_ms": 21869,
+    "model_calls": 5,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 20377,
+    "reasoning_tokens": 990,
+    "tool_calls": 25,
+    "wall_seconds": 24.9
+   },
+   "decided_by": "server",
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "abstained",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crew_note_seal"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hp_g9m__P2__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "partial",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 34,
+      "expected": 20,
+      "on_hand_at_end": 0,
+      "opening": 24,
+      "received": 10,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 6,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 10
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 2,
+    "targets": [
+     {
+      "attained": false,
+      "current_target": 40,
+      "distributed": 34,
+      "late": 0,
+      "on_time": 34,
+      "original_target": 40,
+      "service_deficit": 6,
+      "supply_shortfall": 6,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P2",
+   "policy_id": "live/1.1.0",
+   "position": 10,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 5,
+    "holds": 2,
+    "released_holds": 1,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 0,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 0,
+    "status_checks": 0
+   },
+   "violations": [],
+   "wall_seconds": 24.9
+  },
+  {
+   "caps_reached": [
+    "model_calls"
+   ],
+   "case_id": "T02",
+   "case_ref": "hp_k2e",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 5291,
+    "cost_usd": 0.24426,
+    "latency_ms": 45828,
+    "model_calls": 8,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 95675,
+    "reasoning_tokens": 2913,
+    "tool_calls": 23,
+    "wall_seconds": 48.8
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "nbr_msg_0334"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0003",
+     "source_record_id": "vol_fwd_208"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0004",
+     "source_record_id": "vol_msg_slot2"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0005",
+     "source_record_id": "nbr_msg_0344"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0006",
+     "source_record_id": "front_count_9"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0007",
+     "source_record_id": "nbr_receipt_208"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {
+     "CANDIDATE_STALE": 1,
+     "REVISION_CONFLICT": 2
+    },
+    "by_tool": {
+     "apply_plan": 3
+    },
+    "count": 3
+   },
+   "key": "hp_k2e__P1__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "target",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 40,
+      "expected": 20,
+      "on_hand_at_end": 0,
+      "opening": 24,
+      "received": 16,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 0,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 16
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 2,
+    "targets": [
+     {
+      "attained": true,
+      "current_target": 40,
+      "distributed": 40,
+      "late": 0,
+      "on_time": 40,
+      "original_target": 40,
+      "service_deficit": 0,
+      "supply_shortfall": 0,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.1.0",
+   "position": 1,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 1,
+    "hold_fee_cents": 0,
+    "hold_minutes": 7,
+    "holds": 2,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 11,
+    "horizon_minutes": 90,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-14T20:30:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 101,
+   "status": "capped",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 48.8
+  },
+  {
+   "caps_reached": [
+    "model_calls"
+   ],
+   "case_id": "T02",
+   "case_ref": "hp_k2e",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 2805,
+    "cost_usd": 0.083418,
+    "latency_ms": 31913,
+    "model_calls": 8,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 27684,
+    "reasoning_tokens": 851,
+    "tool_calls": 24,
+    "wall_seconds": 34.8
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "nbr_msg_0334"
+    },
+    {
+     "label": "abstained",
+     "mismatched": [],
+     "observation_id": "obs_0004",
+     "source_record_id": "vol_fwd_208"
+    },
+    {
+     "label": "abstained",
+     "mismatched": [],
+     "observation_id": "obs_0005",
+     "source_record_id": "vol_msg_slot2"
+    },
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0006",
+     "source_record_id": "nbr_msg_0344"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0007",
+     "source_record_id": "front_count_9"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0008",
+     "source_record_id": "nbr_receipt_208"
+    }
+   ],
+   "failure_reasons": [
+    "original target not met by the deadline"
+   ],
+   "goal_complete": false,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {
+     "REVISION_CONFLICT": 1
+    },
+    "by_tool": {
+     "apply_plan": 1
+    },
+    "count": 1
+   },
+   "key": "hp_k2e__P3__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "target",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 20,
+      "on_hand_at_end": 40,
+      "opening": 24,
+      "received": 16,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 0,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 16
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 1,
+    "targets": [
+     {
+      "attained": false,
+      "current_target": 40,
+      "distributed": 0,
+      "late": 0,
+      "on_time": 0,
+      "original_target": 40,
+      "service_deficit": 40,
+      "supply_shortfall": 0,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 1
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.1.0",
+   "position": 2,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 1,
+    "fulfilled_holds": 1,
+    "hold_fee_cents": 0,
+    "hold_minutes": 33,
+    "holds": 2,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 90,
+    "horizon_minutes": 90,
+    "note": "unrecovered: a failure, recorded with the horizon",
+    "recovered": false,
+    "required": true,
+    "update_at": "2026-11-14T20:30:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 303,
+   "status": "capped",
+   "success": false,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 4,
+    "simulated_minutes": 12,
+    "status_checks": 6
+   },
+   "violations": [],
+   "wall_seconds": 34.8
+  },
+  {
+   "caps_reached": [],
+   "case_id": "T02",
+   "case_ref": "hp_k2e",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 0,
+    "cost_usd": 0,
+    "latency_ms": 0,
+    "model_calls": 0,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 0,
+    "reasoning_tokens": 0,
+    "tool_calls": 32,
+    "wall_seconds": 2.6
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "nbr_msg_0334"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0004",
+     "source_record_id": "vol_fwd_208"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0005",
+     "source_record_id": "vol_msg_slot2"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0006",
+     "source_record_id": "nbr_msg_0344"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0007",
+     "source_record_id": "front_count_9"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0008",
+     "source_record_id": "nbr_receipt_208"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {
+     "REVISION_CONFLICT": 2
+    },
+    "by_tool": {
+     "hold_resource": 2
+    },
+    "count": 2
+   },
+   "key": "hp_k2e__P0__once",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "target",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 40,
+      "expected": 20,
+      "on_hand_at_end": 0,
+      "opening": 24,
+      "received": 16,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 0,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 16
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 2,
+    "targets": [
+     {
+      "attained": true,
+      "current_target": 40,
+      "distributed": 40,
+      "late": 0,
+      "on_time": 40,
+      "original_target": 40,
+      "service_deficit": 0,
+      "supply_shortfall": 0,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P0",
+   "policy_id": "pantry-rules/1.1.0",
+   "position": 3,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 1,
+    "hold_fee_cents": 0,
+    "hold_minutes": 4,
+    "holds": 2,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 12,
+    "horizon_minutes": 90,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-14T20:30:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": null,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 2.6
+  },
+  {
+   "caps_reached": [
+    "model_calls"
+   ],
+   "case_id": "T02",
+   "case_ref": "hp_k2e",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 2642,
+    "cost_usd": 0.081924,
+    "latency_ms": 28767,
+    "model_calls": 8,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 27752,
+    "reasoning_tokens": 683,
+    "tool_calls": 21,
+    "wall_seconds": 32.1
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "nbr_msg_0334"
+    },
+    {
+     "label": "abstained",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "vol_fwd_208"
+    },
+    {
+     "label": "abstained",
+     "mismatched": [],
+     "observation_id": "obs_0003",
+     "source_record_id": "vol_msg_slot2"
+    },
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0004",
+     "source_record_id": "nbr_msg_0344"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0005",
+     "source_record_id": "front_count_9"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0006",
+     "source_record_id": "nbr_receipt_208"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hp_k2e__P2__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "target",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 40,
+      "expected": 20,
+      "on_hand_at_end": 0,
+      "opening": 24,
+      "received": 16,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 0,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 16
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 2,
+    "targets": [
+     {
+      "attained": true,
+      "current_target": 40,
+      "distributed": 40,
+      "late": 0,
+      "on_time": 40,
+      "original_target": 40,
+      "service_deficit": 0,
+      "supply_shortfall": 0,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P2",
+   "policy_id": "live/1.1.0",
+   "position": 4,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 1,
+    "hold_fee_cents": 0,
+    "hold_minutes": 4,
+    "holds": 2,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 6,
+    "horizon_minutes": 90,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-14T20:30:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 303,
+   "status": "capped",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 0,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 0,
+    "status_checks": 0
+   },
+   "violations": [],
+   "wall_seconds": 32.1
+  },
+  {
+   "caps_reached": [
+    "model_calls"
+   ],
+   "case_id": "T02",
+   "case_ref": "hp_k2e",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 3128,
+    "cost_usd": 0.086648,
+    "latency_ms": 31872,
+    "model_calls": 8,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 27684,
+    "reasoning_tokens": 1145,
+    "tool_calls": 24,
+    "wall_seconds": 34.7
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "nbr_msg_0334"
+    },
+    {
+     "label": "abstained",
+     "mismatched": [],
+     "observation_id": "obs_0004",
+     "source_record_id": "vol_fwd_208"
+    },
+    {
+     "label": "abstained",
+     "mismatched": [],
+     "observation_id": "obs_0005",
+     "source_record_id": "vol_msg_slot2"
+    },
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0006",
+     "source_record_id": "nbr_msg_0344"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0007",
+     "source_record_id": "front_count_9"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0008",
+     "source_record_id": "nbr_receipt_208"
+    }
+   ],
+   "failure_reasons": [
+    "original target not met by the deadline"
+   ],
+   "goal_complete": false,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {
+     "REVISION_CONFLICT": 1
+    },
+    "by_tool": {
+     "apply_plan": 1
+    },
+    "count": 1
+   },
+   "key": "hp_k2e__P3__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "target",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 20,
+      "on_hand_at_end": 40,
+      "opening": 24,
+      "received": 16,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 0,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 16
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 1,
+    "targets": [
+     {
+      "attained": false,
+      "current_target": 40,
+      "distributed": 0,
+      "late": 0,
+      "on_time": 0,
+      "original_target": 40,
+      "service_deficit": 40,
+      "supply_shortfall": 0,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 1
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.1.0",
+   "position": 5,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 1,
+    "fulfilled_holds": 1,
+    "hold_fee_cents": 0,
+    "hold_minutes": 33,
+    "holds": 2,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 90,
+    "horizon_minutes": 90,
+    "note": "unrecovered: a failure, recorded with the horizon",
+    "recovered": false,
+    "required": true,
+    "update_at": "2026-11-14T20:30:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 202,
+   "status": "capped",
+   "success": false,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 4,
+    "simulated_minutes": 12,
+    "status_checks": 6
+   },
+   "violations": [],
+   "wall_seconds": 34.7
+  },
+  {
+   "caps_reached": [
+    "model_calls"
+   ],
+   "case_id": "T02",
+   "case_ref": "hp_k2e",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 2690,
+    "cost_usd": 0.082404,
+    "latency_ms": 28931,
+    "model_calls": 8,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 27752,
+    "reasoning_tokens": 831,
+    "tool_calls": 21,
+    "wall_seconds": 32.4
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "nbr_msg_0334"
+    },
+    {
+     "label": "abstained",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "vol_fwd_208"
+    },
+    {
+     "label": "abstained",
+     "mismatched": [],
+     "observation_id": "obs_0003",
+     "source_record_id": "vol_msg_slot2"
+    },
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0004",
+     "source_record_id": "nbr_msg_0344"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0005",
+     "source_record_id": "front_count_9"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0006",
+     "source_record_id": "nbr_receipt_208"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hp_k2e__P2__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "target",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 40,
+      "expected": 20,
+      "on_hand_at_end": 0,
+      "opening": 24,
+      "received": 16,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 0,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 16
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 2,
+    "targets": [
+     {
+      "attained": true,
+      "current_target": 40,
+      "distributed": 40,
+      "late": 0,
+      "on_time": 40,
+      "original_target": 40,
+      "service_deficit": 0,
+      "supply_shortfall": 0,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P2",
+   "policy_id": "live/1.1.0",
+   "position": 6,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 1,
+    "hold_fee_cents": 0,
+    "hold_minutes": 4,
+    "holds": 2,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 6,
+    "horizon_minutes": 90,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-14T20:30:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 101,
+   "status": "capped",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 0,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 0,
+    "status_checks": 0
+   },
+   "violations": [],
+   "wall_seconds": 32.4
+  },
+  {
+   "caps_reached": [
+    "model_calls"
+   ],
+   "case_id": "T02",
+   "case_ref": "hp_k2e",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 2926,
+    "cost_usd": 0.084628,
+    "latency_ms": 30914,
+    "model_calls": 8,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 27684,
+    "reasoning_tokens": 1017,
+    "tool_calls": 24,
+    "wall_seconds": 33.9
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "nbr_msg_0334"
+    },
+    {
+     "label": "abstained",
+     "mismatched": [],
+     "observation_id": "obs_0004",
+     "source_record_id": "vol_fwd_208"
+    },
+    {
+     "label": "abstained",
+     "mismatched": [],
+     "observation_id": "obs_0005",
+     "source_record_id": "vol_msg_slot2"
+    },
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0006",
+     "source_record_id": "nbr_msg_0344"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0007",
+     "source_record_id": "front_count_9"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0008",
+     "source_record_id": "nbr_receipt_208"
+    }
+   ],
+   "failure_reasons": [
+    "original target not met by the deadline"
+   ],
+   "goal_complete": false,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {
+     "REVISION_CONFLICT": 1
+    },
+    "by_tool": {
+     "apply_plan": 1
+    },
+    "count": 1
+   },
+   "key": "hp_k2e__P3__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "target",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 20,
+      "on_hand_at_end": 40,
+      "opening": 24,
+      "received": 16,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 0,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 16
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 1,
+    "targets": [
+     {
+      "attained": false,
+      "current_target": 40,
+      "distributed": 0,
+      "late": 0,
+      "on_time": 0,
+      "original_target": 40,
+      "service_deficit": 40,
+      "supply_shortfall": 0,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 1
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.1.0",
+   "position": 7,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 1,
+    "fulfilled_holds": 1,
+    "hold_fee_cents": 0,
+    "hold_minutes": 33,
+    "holds": 2,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 90,
+    "horizon_minutes": 90,
+    "note": "unrecovered: a failure, recorded with the horizon",
+    "recovered": false,
+    "required": true,
+    "update_at": "2026-11-14T20:30:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 101,
+   "status": "capped",
+   "success": false,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 4,
+    "simulated_minutes": 12,
+    "status_checks": 6
+   },
+   "violations": [],
+   "wall_seconds": 33.9
+  },
+  {
+   "caps_reached": [
+    "model_calls"
+   ],
+   "case_id": "T02",
+   "case_ref": "hp_k2e",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 4677,
+    "cost_usd": 0.229508,
+    "latency_ms": 42325,
+    "model_calls": 8,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 91369,
+    "reasoning_tokens": 2702,
+    "tool_calls": 21,
+    "wall_seconds": 45.5
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "nbr_msg_0334"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0003",
+     "source_record_id": "vol_fwd_208"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0004",
+     "source_record_id": "vol_msg_slot2"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0005",
+     "source_record_id": "nbr_msg_0344"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0006",
+     "source_record_id": "front_count_9"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0007",
+     "source_record_id": "nbr_receipt_208"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hp_k2e__P1__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "target",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 40,
+      "expected": 20,
+      "on_hand_at_end": 0,
+      "opening": 24,
+      "received": 16,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 0,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 16
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 2,
+    "targets": [
+     {
+      "attained": true,
+      "current_target": 40,
+      "distributed": 40,
+      "late": 0,
+      "on_time": 40,
+      "original_target": 40,
+      "service_deficit": 0,
+      "supply_shortfall": 0,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.1.0",
+   "position": 8,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 1,
+    "hold_fee_cents": 0,
+    "hold_minutes": 4,
+    "holds": 2,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 6,
+    "horizon_minutes": 90,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-14T20:30:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 202,
+   "status": "capped",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 45.5
+  },
+  {
+   "caps_reached": [
+    "model_calls"
+   ],
+   "case_id": "T02",
+   "case_ref": "hp_k2e",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 4683,
+    "cost_usd": 0.229442,
+    "latency_ms": 43342,
+    "model_calls": 8,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 91306,
+    "reasoning_tokens": 2688,
+    "tool_calls": 21,
+    "wall_seconds": 46.8
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "nbr_msg_0334"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0003",
+     "source_record_id": "vol_fwd_208"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0004",
+     "source_record_id": "vol_msg_slot2"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0005",
+     "source_record_id": "nbr_msg_0344"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0006",
+     "source_record_id": "front_count_9"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0007",
+     "source_record_id": "nbr_receipt_208"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hp_k2e__P1__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "target",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 40,
+      "expected": 20,
+      "on_hand_at_end": 0,
+      "opening": 24,
+      "received": 16,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 0,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 16
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 2,
+    "targets": [
+     {
+      "attained": true,
+      "current_target": 40,
+      "distributed": 40,
+      "late": 0,
+      "on_time": 40,
+      "original_target": 40,
+      "service_deficit": 0,
+      "supply_shortfall": 0,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.1.0",
+   "position": 9,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 1,
+    "hold_fee_cents": 0,
+    "hold_minutes": 4,
+    "holds": 2,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 6,
+    "horizon_minutes": 90,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-14T20:30:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 303,
+   "status": "capped",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 46.8
+  },
+  {
+   "caps_reached": [
+    "model_calls"
+   ],
+   "case_id": "T02",
+   "case_ref": "hp_k2e",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 2522,
+    "cost_usd": 0.080724,
+    "latency_ms": 26779,
+    "model_calls": 8,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 27752,
+    "reasoning_tokens": 647,
+    "tool_calls": 21,
+    "wall_seconds": 30.1
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "nbr_msg_0334"
+    },
+    {
+     "label": "abstained",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "vol_fwd_208"
+    },
+    {
+     "label": "abstained",
+     "mismatched": [],
+     "observation_id": "obs_0003",
+     "source_record_id": "vol_msg_slot2"
+    },
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0004",
+     "source_record_id": "nbr_msg_0344"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0005",
+     "source_record_id": "front_count_9"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0006",
+     "source_record_id": "nbr_receipt_208"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hp_k2e__P2__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "target",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 40,
+      "expected": 20,
+      "on_hand_at_end": 0,
+      "opening": 24,
+      "received": 16,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 0,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 16
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 2,
+    "targets": [
+     {
+      "attained": true,
+      "current_target": 40,
+      "distributed": 40,
+      "late": 0,
+      "on_time": 40,
+      "original_target": 40,
+      "service_deficit": 0,
+      "supply_shortfall": 0,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P2",
+   "policy_id": "live/1.1.0",
+   "position": 10,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 1,
+    "hold_fee_cents": 0,
+    "hold_minutes": 4,
+    "holds": 2,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 6,
+    "horizon_minutes": 90,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-14T20:30:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 202,
+   "status": "capped",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 0,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 0,
+    "status_checks": 0
+   },
+   "violations": [],
+   "wall_seconds": 30.1
+  },
+  {
+   "caps_reached": [
+    "model_calls"
+   ],
+   "case_id": "T03",
+   "case_ref": "hp_v7s",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 3895,
+    "cost_usd": 0.098674,
+    "latency_ms": 37682,
+    "model_calls": 8,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 29862,
+    "reasoning_tokens": 2013,
+    "tool_calls": 25,
+    "wall_seconds": 40.7
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0003",
+     "source_record_id": "nbr_msg_sh31"
+    },
+    {
+     "label": "incorrect",
+     "mismatched": [
+      "claimed_change"
+     ],
+     "observation_id": "obs_0004",
+     "source_record_id": "vol_fwd_rcpt_1107"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0005",
+     "source_record_id": "annex_dock_0412"
+    }
+   ],
+   "failure_reasons": [
+    "no infeasibility decision reports the final deficit with its blocking constraints"
+   ],
+   "goal_complete": false,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {
+     "RESOURCE_UNAVAILABLE": 2,
+     "REVISION_CONFLICT": 1
+    },
+    "by_tool": {
+     "hold_resource": 3
+    },
+    "count": 3
+   },
+   "key": "hp_v7s__P3__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "partial",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 24,
+      "expected": 20,
+      "on_hand_at_end": 0,
+      "opening": 24,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 16,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 0
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 1,
+    "targets": [
+     {
+      "attained": false,
+      "current_target": 40,
+      "distributed": 24,
+      "late": 0,
+      "on_time": 24,
+      "original_target": 40,
+      "service_deficit": 16,
+      "supply_shortfall": 16,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.1.0",
+   "position": 1,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 1,
+    "holds": 1,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 303,
+   "status": "capped",
+   "success": false,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 40.7
+  },
+  {
+   "caps_reached": [],
+   "case_id": "T03",
+   "case_ref": "hp_v7s",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 0,
+    "cost_usd": 0,
+    "latency_ms": 0,
+    "model_calls": 0,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 0,
+    "reasoning_tokens": 0,
+    "tool_calls": 22,
+    "wall_seconds": 2.4
+   },
+   "decided_by": "policy",
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0003",
+     "source_record_id": "nbr_msg_sh31"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0004",
+     "source_record_id": "vol_fwd_rcpt_1107"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0005",
+     "source_record_id": "annex_dock_0412"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {
+     "RESOURCE_UNAVAILABLE": 1
+    },
+    "by_tool": {
+     "hold_resource": 1
+    },
+    "count": 1
+   },
+   "key": "hp_v7s__P0__once",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "partial",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 24,
+      "expected": 20,
+      "on_hand_at_end": 0,
+      "opening": 24,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 16,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 0
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 1,
+    "targets": [
+     {
+      "attained": false,
+      "current_target": 40,
+      "distributed": 24,
+      "late": 0,
+      "on_time": 24,
+      "original_target": 40,
+      "service_deficit": 16,
+      "supply_shortfall": 16,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P0",
+   "policy_id": "pantry-rules/1.1.0",
+   "position": 2,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 1,
+    "holds": 1,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": null,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 2.4
+  },
+  {
+   "caps_reached": [],
+   "case_id": "T03",
+   "case_ref": "hp_v7s",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 5499,
+    "cost_usd": 0.222306,
+    "latency_ms": 48293,
+    "model_calls": 7,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 83658,
+    "reasoning_tokens": 3703,
+    "tool_calls": 22,
+    "wall_seconds": 51.4
+   },
+   "decided_by": "model",
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0003",
+     "source_record_id": "nbr_msg_sh31"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0004",
+     "source_record_id": "vol_fwd_rcpt_1107"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0005",
+     "source_record_id": "annex_dock_0412"
+    }
+   ],
+   "failure_reasons": [
+    "on-time fulfillment differs from the achievable quantity"
+   ],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {
+     "RESOURCE_UNAVAILABLE": 1
+    },
+    "by_tool": {
+     "hold_resource": 1
+    },
+    "count": 1
+   },
+   "key": "hp_v7s__P1__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "partial",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 20,
+      "on_hand_at_end": 24,
+      "opening": 24,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 16,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 0
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 0,
+    "targets": [
+     {
+      "attained": false,
+      "current_target": 40,
+      "distributed": 0,
+      "late": 0,
+      "on_time": 0,
+      "original_target": 40,
+      "service_deficit": 40,
+      "supply_shortfall": 16,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.1.0",
+   "position": 3,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 202,
+   "status": "completed",
+   "success": false,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 1,
+    "simulated_minutes": 6,
+    "status_checks": 3
+   },
+   "violations": [],
+   "wall_seconds": 51.4
+  },
+  {
+   "caps_reached": [
+    "model_calls"
+   ],
+   "case_id": "T03",
+   "case_ref": "hp_v7s",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 4341,
+    "cost_usd": 0.103134,
+    "latency_ms": 40235,
+    "model_calls": 8,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 29862,
+    "reasoning_tokens": 2516,
+    "tool_calls": 25,
+    "wall_seconds": 43.4
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0003",
+     "source_record_id": "nbr_msg_sh31"
+    },
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0004",
+     "source_record_id": "vol_fwd_rcpt_1107"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0005",
+     "source_record_id": "annex_dock_0412"
+    }
+   ],
+   "failure_reasons": [
+    "no infeasibility decision reports the final deficit with its blocking constraints"
+   ],
+   "goal_complete": false,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {
+     "RESOURCE_UNAVAILABLE": 2,
+     "REVISION_CONFLICT": 1
+    },
+    "by_tool": {
+     "hold_resource": 3
+    },
+    "count": 3
+   },
+   "key": "hp_v7s__P3__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "partial",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 24,
+      "expected": 20,
+      "on_hand_at_end": 0,
+      "opening": 24,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 16,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 0
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 1,
+    "targets": [
+     {
+      "attained": false,
+      "current_target": 40,
+      "distributed": 24,
+      "late": 0,
+      "on_time": 24,
+      "original_target": 40,
+      "service_deficit": 16,
+      "supply_shortfall": 16,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.1.0",
+   "position": 4,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 1,
+    "holds": 1,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 202,
+   "status": "capped",
+   "success": false,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 43.4
+  },
+  {
+   "caps_reached": [
+    "model_calls"
+   ],
+   "case_id": "T03",
+   "case_ref": "hp_v7s",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 3373,
+    "cost_usd": 0.097158,
+    "latency_ms": 35433,
+    "model_calls": 8,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 31714,
+    "reasoning_tokens": 1714,
+    "tool_calls": 22,
+    "wall_seconds": 38.5
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0003",
+     "source_record_id": "nbr_msg_sh31"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0004",
+     "source_record_id": "vol_fwd_rcpt_1107"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0005",
+     "source_record_id": "annex_dock_0412"
+    }
+   ],
+   "failure_reasons": [
+    "on-time fulfillment differs from the achievable quantity",
+    "no infeasibility decision reports the final deficit with its blocking constraints"
+   ],
+   "goal_complete": false,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {
+     "RESOURCE_UNAVAILABLE": 2,
+     "REVISION_CONFLICT": 1
+    },
+    "by_tool": {
+     "hold_resource": 3
+    },
+    "count": 3
+   },
+   "key": "hp_v7s__P2__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "partial",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 20,
+      "on_hand_at_end": 24,
+      "opening": 24,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 16,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 0
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 0,
+    "targets": [
+     {
+      "attained": false,
+      "current_target": 40,
+      "distributed": 0,
+      "late": 0,
+      "on_time": 0,
+      "original_target": 40,
+      "service_deficit": 40,
+      "supply_shortfall": 16,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 1
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P2",
+   "policy_id": "live/1.1.0",
+   "position": 5,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 1,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 30,
+    "holds": 1,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 101,
+   "status": "capped",
+   "success": false,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 38.5
+  },
+  {
+   "caps_reached": [
+    "model_calls"
+   ],
+   "case_id": "T03",
+   "case_ref": "hp_v7s",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 4088,
+    "cost_usd": 0.101488,
+    "latency_ms": 43452,
+    "model_calls": 8,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 30304,
+    "reasoning_tokens": 2279,
+    "tool_calls": 25,
+    "wall_seconds": 46.6
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0003",
+     "source_record_id": "nbr_msg_sh31"
+    },
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0004",
+     "source_record_id": "vol_fwd_rcpt_1107"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0005",
+     "source_record_id": "annex_dock_0412"
+    }
+   ],
+   "failure_reasons": [
+    "no infeasibility decision reports the final deficit with its blocking constraints"
+   ],
+   "goal_complete": false,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {
+     "RESOURCE_UNAVAILABLE": 2,
+     "REVISION_CONFLICT": 1
+    },
+    "by_tool": {
+     "hold_resource": 3
+    },
+    "count": 3
+   },
+   "key": "hp_v7s__P3__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "partial",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 24,
+      "expected": 20,
+      "on_hand_at_end": 0,
+      "opening": 24,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 16,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 0
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 1,
+    "targets": [
+     {
+      "attained": false,
+      "current_target": 40,
+      "distributed": 24,
+      "late": 0,
+      "on_time": 24,
+      "original_target": 40,
+      "service_deficit": 16,
+      "supply_shortfall": 16,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.1.0",
+   "position": 6,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 7,
+    "holds": 1,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 101,
+   "status": "capped",
+   "success": false,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 46.6
+  },
+  {
+   "caps_reached": [],
+   "case_id": "T03",
+   "case_ref": "hp_v7s",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 4852,
+    "cost_usd": 0.211532,
+    "latency_ms": 43430,
+    "model_calls": 7,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 81506,
+    "reasoning_tokens": 3199,
+    "tool_calls": 20,
+    "wall_seconds": 46.4
+   },
+   "decided_by": "model",
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0003",
+     "source_record_id": "nbr_msg_sh31"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0004",
+     "source_record_id": "vol_fwd_rcpt_1107"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0005",
+     "source_record_id": "annex_dock_0412"
+    }
+   ],
+   "failure_reasons": [
+    "on-time fulfillment differs from the achievable quantity"
+   ],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {
+     "RESOURCE_UNAVAILABLE": 1
+    },
+    "by_tool": {
+     "hold_resource": 1
+    },
+    "count": 1
+   },
+   "key": "hp_v7s__P1__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "partial",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 20,
+      "on_hand_at_end": 24,
+      "opening": 24,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 16,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 0
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 0,
+    "targets": [
+     {
+      "attained": false,
+      "current_target": 40,
+      "distributed": 0,
+      "late": 0,
+      "on_time": 0,
+      "original_target": 40,
+      "service_deficit": 40,
+      "supply_shortfall": 16,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.1.0",
+   "position": 7,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 101,
+   "status": "completed",
+   "success": false,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 1,
+    "simulated_minutes": 6,
+    "status_checks": 3
+   },
+   "violations": [],
+   "wall_seconds": 46.4
+  },
+  {
+   "caps_reached": [
+    "model_calls"
+   ],
+   "case_id": "T03",
+   "case_ref": "hp_v7s",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 3498,
+    "cost_usd": 0.098408,
+    "latency_ms": 35302,
+    "model_calls": 8,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 31714,
+    "reasoning_tokens": 1834,
+    "tool_calls": 22,
+    "wall_seconds": 38.5
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0003",
+     "source_record_id": "nbr_msg_sh31"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0004",
+     "source_record_id": "vol_fwd_rcpt_1107"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0005",
+     "source_record_id": "annex_dock_0412"
+    }
+   ],
+   "failure_reasons": [
+    "on-time fulfillment differs from the achievable quantity",
+    "no infeasibility decision reports the final deficit with its blocking constraints"
+   ],
+   "goal_complete": false,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {
+     "RESOURCE_UNAVAILABLE": 2,
+     "REVISION_CONFLICT": 1
+    },
+    "by_tool": {
+     "hold_resource": 3
+    },
+    "count": 3
+   },
+   "key": "hp_v7s__P2__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "partial",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 20,
+      "on_hand_at_end": 24,
+      "opening": 24,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 16,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 0
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 0,
+    "targets": [
+     {
+      "attained": false,
+      "current_target": 40,
+      "distributed": 0,
+      "late": 0,
+      "on_time": 0,
+      "original_target": 40,
+      "service_deficit": 40,
+      "supply_shortfall": 16,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 1
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P2",
+   "policy_id": "live/1.1.0",
+   "position": 8,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 1,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 30,
+    "holds": 1,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 303,
+   "status": "capped",
+   "success": false,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 38.5
+  },
+  {
+   "caps_reached": [],
+   "case_id": "T03",
+   "case_ref": "hp_v7s",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 5030,
+    "cost_usd": 0.213826,
+    "latency_ms": 45508,
+    "model_calls": 7,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 81763,
+    "reasoning_tokens": 3345,
+    "tool_calls": 21,
+    "wall_seconds": 48.4
+   },
+   "decided_by": "model",
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0003",
+     "source_record_id": "nbr_msg_sh31"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0004",
+     "source_record_id": "vol_fwd_rcpt_1107"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0005",
+     "source_record_id": "annex_dock_0412"
+    }
+   ],
+   "failure_reasons": [
+    "on-time fulfillment differs from the achievable quantity"
+   ],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {
+     "RESOURCE_UNAVAILABLE": 1
+    },
+    "by_tool": {
+     "hold_resource": 1
+    },
+    "count": 1
+   },
+   "key": "hp_v7s__P1__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "partial",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 20,
+      "on_hand_at_end": 24,
+      "opening": 24,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 16,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 0
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 0,
+    "targets": [
+     {
+      "attained": false,
+      "current_target": 40,
+      "distributed": 0,
+      "late": 0,
+      "on_time": 0,
+      "original_target": 40,
+      "service_deficit": 40,
+      "supply_shortfall": 16,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 0
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.1.0",
+   "position": 9,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 303,
+   "status": "completed",
+   "success": false,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 1,
+    "simulated_minutes": 6,
+    "status_checks": 3
+   },
+   "violations": [],
+   "wall_seconds": 48.4
+  },
+  {
+   "caps_reached": [
+    "model_calls"
+   ],
+   "case_id": "T03",
+   "case_ref": "hp_v7s",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 3497,
+    "cost_usd": 0.098398,
+    "latency_ms": 35145,
+    "model_calls": 8,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 31714,
+    "reasoning_tokens": 1794,
+    "tool_calls": 22,
+    "wall_seconds": 38.3
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0003",
+     "source_record_id": "nbr_msg_sh31"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0004",
+     "source_record_id": "vol_fwd_rcpt_1107"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0005",
+     "source_record_id": "annex_dock_0412"
+    }
+   ],
+   "failure_reasons": [
+    "on-time fulfillment differs from the achievable quantity",
+    "no infeasibility decision reports the final deficit with its blocking constraints"
+   ],
+   "goal_complete": false,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {
+     "RESOURCE_UNAVAILABLE": 2,
+     "REVISION_CONFLICT": 1
+    },
+    "by_tool": {
+     "hold_resource": 3
+    },
+    "count": 3
+   },
+   "key": "hp_v7s__P2__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "partial",
+   "pantry": {
+    "conservation_failures": 0,
+    "credit_findings": [],
+    "duplicate_attempts_blocked": 0,
+    "duplicate_or_unauthorized_credits": 0,
+    "pools": [
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 20,
+      "on_hand_at_end": 24,
+      "opening": 24,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "shelf_stock",
+      "transferred_out": 0
+     },
+     {
+      "conserved": true,
+      "distributed": 0,
+      "expected": 0,
+      "on_hand_at_end": 16,
+      "opening": 16,
+      "received": 0,
+      "reserved_at_end": 0,
+      "resource_id": "neighbor_stock",
+      "transferred_out": 0
+     }
+    ],
+    "receipt_integrity_ok": true,
+    "receipt_integrity_problems": [],
+    "staff_confirmations": 0,
+    "targets": [
+     {
+      "attained": false,
+      "current_target": 40,
+      "distributed": 0,
+      "late": 0,
+      "on_time": 0,
+      "original_target": 40,
+      "service_deficit": 40,
+      "supply_shortfall": 16,
+      "target_id": "kit_target_a"
+     }
+    ],
+    "unnecessary_reservations": 1
+   },
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P2",
+   "policy_id": "live/1.1.0",
+   "position": 10,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 1,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 30,
+    "holds": 1,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 202,
+   "status": "capped",
+   "success": false,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 38.3
+  }
+ ],
+ "heldout": true,
+ "missing": [],
+ "policies": [
+  "P0",
+  "P1",
+  "P2",
+  "P3"
+ ],
+ "seeds": [
+  101,
+  202,
+  303
+ ],
+ "suite": "pantry",
+ "version": "plan_b.eval_metrics/1.0.0"
+}

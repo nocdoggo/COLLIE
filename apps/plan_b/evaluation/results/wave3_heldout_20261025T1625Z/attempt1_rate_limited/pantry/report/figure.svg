@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="358" viewBox="0 0 820 358" role="img" aria-labelledby="ttl dsc">
+<title id="ttl">Outcome met and status checks, per case and policy</title>
+<desc id="dsc">For each case, one bar per policy: on the left the share of recorded episodes that met the case's outcome class (labelled met/recorded), on the right the mean number of status checks per scored episode.</desc>
+<style>svg{font-family:system-ui,-apple-system,'Segoe UI',sans-serif}:root{--bg:#fcfcfb;--ink:#0b0b0b;--ink2:#52514e;--grid:#e4e3df;--P0:#2a78d6;--P1:#eb6834;--P2:#1baf7a;--P3:#eda100}@media (prefers-color-scheme: dark){:root{--bg:#1a1a19;--ink:#f0efec;--ink2:#c3c2b7;--grid:#383835;--P0:#3987e5;--P1:#d95926;--P2:#199e70;--P3:#c98500}}.bg{fill:var(--bg)}.t{fill:var(--ink);font-size:12px}.s{fill:var(--ink2);font-size:11px}.h{fill:var(--ink);font-size:14px;font-weight:600}.g{stroke:var(--grid);stroke-width:1}.P0{fill:var(--P0)}.P1{fill:var(--P1)}.P2{fill:var(--P2)}.P3{fill:var(--P3)}</style>
+<rect class="bg" fill="#fcfcfb" x="0" y="0" width="820" height="358"/>
+<text class="h" fill="#0b0b0b" x="206" y="22">Episodes meeting the case outcome</text>
+<text class="h" fill="#0b0b0b" x="536" y="22">Status checks per episode (mean)</text>
+<rect class="P0" fill="#2a78d6" x="206" y="34" width="10" height="10" rx="2"/>
+<text class="s" fill="#52514e" x="220" y="43">P0 rules</text>
+<rect class="P1" fill="#eb6834" x="294" y="34" width="10" height="10" rx="2"/>
+<text class="s" fill="#52514e" x="308" y="43">P1 tool use</text>
+<rect class="P2" fill="#1baf7a" x="403" y="34" width="10" height="10" rx="2"/>
+<text class="s" fill="#52514e" x="417" y="43">P2 selective</text>
+<rect class="P3" fill="#eda100" x="519" y="34" width="10" height="10" rx="2"/>
+<text class="s" fill="#52514e" x="533" y="43">P3 verify-all</text>
+<line class="g" stroke="#e4e3df" x1="206.0" y1="70" x2="206.0" y2="328"/>
+<text class="s" fill="#52514e" x="206.0" y="344" text-anchor="middle">0%</text>
+<line class="g" stroke="#e4e3df" x1="336.0" y1="70" x2="336.0" y2="328"/>
+<text class="s" fill="#52514e" x="336.0" y="344" text-anchor="middle">50%</text>
+<line class="g" stroke="#e4e3df" x1="466.0" y1="70" x2="466.0" y2="328"/>
+<text class="s" fill="#52514e" x="466.0" y="344" text-anchor="middle">100%</text>
+<line class="g" stroke="#e4e3df" x1="536.0" y1="70" x2="536.0" y2="328"/>
+<text class="s" fill="#52514e" x="536.0" y="344" text-anchor="middle">0</text>
+<line class="g" stroke="#e4e3df" x1="666.0" y1="70" x2="666.0" y2="328"/>
+<text class="s" fill="#52514e" x="666.0" y="344" text-anchor="middle">1</text>
+<line class="g" stroke="#e4e3df" x1="796.0" y1="70" x2="796.0" y2="328"/>
+<text class="s" fill="#52514e" x="796.0" y="344" text-anchor="middle">2</text>
+<text class="t" fill="#0b0b0b" x="16" y="105.0">T01</text>
+<text class="s" fill="#52514e" x="16" y="118.0">Original target met</text>
+<rect class="P0" fill="#2a78d6" x="206" y="78" width="260.0" height="10" rx="2"><title>T01 P0 rules: 1/1 met</title></rect>
+<text class="s" fill="#52514e" x="470.0" y="87">1/1</text>
+<rect class="P0" fill="#2a78d6" x="536" y="78" width="260.0" height="10" rx="2"><title>T01 P0 rules: 2.00 status checks per episode</title></rect>
+<text class="s" fill="#52514e" x="800.0" y="87">2</text>
+<text class="s" fill="#52514e" x="210.0" y="99">0/3</text>
+<text class="s" fill="#52514e" x="540.0" y="99">0</text>
+<text class="s" fill="#52514e" x="210.0" y="111">0/3</text>
+<text class="s" fill="#52514e" x="540.0" y="111">0</text>
+<text class="s" fill="#52514e" x="210.0" y="123">0/3</text>
+<rect class="P3" fill="#eda100" x="536" y="114" width="260.0" height="10" rx="2"><title>T01 P3 verify-all: 2.00 status checks per episode</title></rect>
+<text class="s" fill="#52514e" x="800.0" y="123">2</text>
+<text class="t" fill="#0b0b0b" x="16" y="165.0">T04</text>
+<text class="s" fill="#52514e" x="16" y="178.0">Supported partial fulfillment</text>
+<rect class="P0" fill="#2a78d6" x="206" y="138" width="260.0" height="10" rx="2"><title>T04 P0 rules: 1/1 met</title></rect>
+<text class="s" fill="#52514e" x="470.0" y="147">1/1</text>
+<rect class="P0" fill="#2a78d6" x="536" y="138" width="260.0" height="10" rx="2"><title>T04 P0 rules: 2.00 status checks per episode</title></rect>
+<text class="s" fill="#52514e" x="800.0" y="147">2</text>
+<text class="s" fill="#52514e" x="210.0" y="159">0/3</text>
+<text class="s" fill="#52514e" x="540.0" y="159">0</text>
+<text class="s" fill="#52514e" x="210.0" y="171">0/3</text>
+<text class="s" fill="#52514e" x="540.0" y="171">0</text>
+<text class="s" fill="#52514e" x="210.0" y="183">0/3</text>
+<rect class="P3" fill="#eda100" x="536" y="174" width="260.0" height="10" rx="2"><title>T04 P3 verify-all: 2.00 status checks per episode</title></rect>
+<text class="s" fill="#52514e" x="800.0" y="183">2</text>
+<text class="t" fill="#0b0b0b" x="16" y="225.0">T02</text>
+<text class="s" fill="#52514e" x="16" y="238.0">Original target met</text>
+<rect class="P0" fill="#2a78d6" x="206" y="198" width="260.0" height="10" rx="2"><title>T02 P0 rules: 1/1 met</title></rect>
+<text class="s" fill="#52514e" x="470.0" y="207">1/1</text>
+<rect class="P0" fill="#2a78d6" x="536" y="198" width="260.0" height="10" rx="2"><title>T02 P0 rules: 2.00 status checks per episode</title></rect>
+<text class="s" fill="#52514e" x="800.0" y="207">2</text>
+<text class="s" fill="#52514e" x="210.0" y="219">0/3</text>
+<text class="s" fill="#52514e" x="540.0" y="219">0</text>
+<text class="s" fill="#52514e" x="210.0" y="231">0/3</text>
+<text class="s" fill="#52514e" x="540.0" y="231">0</text>
+<text class="s" fill="#52514e" x="210.0" y="243">0/3</text>
+<rect class="P3" fill="#eda100" x="536" y="234" width="260.0" height="10" rx="2"><title>T02 P3 verify-all: 2.00 status checks per episode</title></rect>
+<text class="s" fill="#52514e" x="800.0" y="243">2</text>
+<text class="t" fill="#0b0b0b" x="16" y="285.0">T03</text>
+<text class="s" fill="#52514e" x="16" y="298.0">Supported partial fulfillment</text>
+<rect class="P0" fill="#2a78d6" x="206" y="258" width="260.0" height="10" rx="2"><title>T03 P0 rules: 1/1 met</title></rect>
+<text class="s" fill="#52514e" x="470.0" y="267">1/1</text>
+<rect class="P0" fill="#2a78d6" x="536" y="258" width="260.0" height="10" rx="2"><title>T03 P0 rules: 2.00 status checks per episode</title></rect>
+<text class="s" fill="#52514e" x="800.0" y="267">2</text>
+<text class="s" fill="#52514e" x="210.0" y="279">0/3</text>
+<text class="s" fill="#52514e" x="540.0" y="279">0</text>
+<text class="s" fill="#52514e" x="210.0" y="291">0/3</text>
+<text class="s" fill="#52514e" x="540.0" y="291">0</text>
+<text class="s" fill="#52514e" x="210.0" y="303">0/3</text>
+<rect class="P3" fill="#eda100" x="536" y="294" width="260.0" height="10" rx="2"><title>T03 P3 verify-all: 2.00 status checks per episode</title></rect>
+<text class="s" fill="#52514e" x="800.0" y="303">2</text>
+</svg>

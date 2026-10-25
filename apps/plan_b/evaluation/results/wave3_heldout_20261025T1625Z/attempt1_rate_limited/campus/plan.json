@@ -1,0 +1,778 @@
+{
+ "artifact": "plan_b.eval_run_plan",
+ "case_refs": [
+  "hk_7vd",
+  "hk_b3t",
+  "hk_d5w",
+  "hk_f6k",
+  "hk_m2q",
+  "hk_q8n",
+  "hk_x9j",
+  "hk_z1c"
+ ],
+ "created_at": "2026-10-25T16:22:46Z",
+ "dry_run": false,
+ "episode_caps": {
+  "max_model_calls": 8,
+  "max_tool_calls": 48,
+  "phase": "frozen"
+ },
+ "episode_timeout_s": 900.0,
+ "episodes": [
+  {
+   "case_ref": "hk_7vd",
+   "choice": "live",
+   "key": "hk_7vd__P2__s202",
+   "policy": "P2",
+   "position": 1,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hk_7vd",
+   "choice": "tool-use",
+   "key": "hk_7vd__P1__s202",
+   "policy": "P1",
+   "position": 2,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hk_7vd",
+   "choice": "rules",
+   "key": "hk_7vd__P0__once",
+   "policy": "P0",
+   "position": 3,
+   "seed": null,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_7vd",
+   "choice": "verify-all",
+   "key": "hk_7vd__P3__s303",
+   "policy": "P3",
+   "position": 4,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hk_7vd",
+   "choice": "live",
+   "key": "hk_7vd__P2__s303",
+   "policy": "P2",
+   "position": 5,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hk_7vd",
+   "choice": "tool-use",
+   "key": "hk_7vd__P1__s303",
+   "policy": "P1",
+   "position": 6,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hk_7vd",
+   "choice": "verify-all",
+   "key": "hk_7vd__P3__s202",
+   "policy": "P3",
+   "position": 7,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hk_7vd",
+   "choice": "verify-all",
+   "key": "hk_7vd__P3__s101",
+   "policy": "P3",
+   "position": 8,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_7vd",
+   "choice": "tool-use",
+   "key": "hk_7vd__P1__s101",
+   "policy": "P1",
+   "position": 9,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_7vd",
+   "choice": "live",
+   "key": "hk_7vd__P2__s101",
+   "policy": "P2",
+   "position": 10,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_b3t",
+   "choice": "verify-all",
+   "key": "hk_b3t__P3__s101",
+   "policy": "P3",
+   "position": 1,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_b3t",
+   "choice": "live",
+   "key": "hk_b3t__P2__s303",
+   "policy": "P2",
+   "position": 2,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hk_b3t",
+   "choice": "live",
+   "key": "hk_b3t__P2__s101",
+   "policy": "P2",
+   "position": 3,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_b3t",
+   "choice": "rules",
+   "key": "hk_b3t__P0__once",
+   "policy": "P0",
+   "position": 4,
+   "seed": null,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_b3t",
+   "choice": "tool-use",
+   "key": "hk_b3t__P1__s303",
+   "policy": "P1",
+   "position": 5,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hk_b3t",
+   "choice": "live",
+   "key": "hk_b3t__P2__s202",
+   "policy": "P2",
+   "position": 6,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hk_b3t",
+   "choice": "verify-all",
+   "key": "hk_b3t__P3__s303",
+   "policy": "P3",
+   "position": 7,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hk_b3t",
+   "choice": "verify-all",
+   "key": "hk_b3t__P3__s202",
+   "policy": "P3",
+   "position": 8,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hk_b3t",
+   "choice": "tool-use",
+   "key": "hk_b3t__P1__s202",
+   "policy": "P1",
+   "position": 9,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hk_b3t",
+   "choice": "tool-use",
+   "key": "hk_b3t__P1__s101",
+   "policy": "P1",
+   "position": 10,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_d5w",
+   "choice": "rules",
+   "key": "hk_d5w__P0__once",
+   "policy": "P0",
+   "position": 1,
+   "seed": null,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_d5w",
+   "choice": "tool-use",
+   "key": "hk_d5w__P1__s101",
+   "policy": "P1",
+   "position": 2,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_d5w",
+   "choice": "tool-use",
+   "key": "hk_d5w__P1__s303",
+   "policy": "P1",
+   "position": 3,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hk_d5w",
+   "choice": "live",
+   "key": "hk_d5w__P2__s101",
+   "policy": "P2",
+   "position": 4,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_d5w",
+   "choice": "live",
+   "key": "hk_d5w__P2__s303",
+   "policy": "P2",
+   "position": 5,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hk_d5w",
+   "choice": "verify-all",
+   "key": "hk_d5w__P3__s202",
+   "policy": "P3",
+   "position": 6,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hk_d5w",
+   "choice": "verify-all",
+   "key": "hk_d5w__P3__s303",
+   "policy": "P3",
+   "position": 7,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hk_d5w",
+   "choice": "live",
+   "key": "hk_d5w__P2__s202",
+   "policy": "P2",
+   "position": 8,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hk_d5w",
+   "choice": "verify-all",
+   "key": "hk_d5w__P3__s101",
+   "policy": "P3",
+   "position": 9,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_d5w",
+   "choice": "tool-use",
+   "key": "hk_d5w__P1__s202",
+   "policy": "P1",
+   "position": 10,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hk_f6k",
+   "choice": "verify-all",
+   "key": "hk_f6k__P3__s101",
+   "policy": "P3",
+   "position": 1,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_f6k",
+   "choice": "live",
+   "key": "hk_f6k__P2__s303",
+   "policy": "P2",
+   "position": 2,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hk_f6k",
+   "choice": "live",
+   "key": "hk_f6k__P2__s101",
+   "policy": "P2",
+   "position": 3,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_f6k",
+   "choice": "tool-use",
+   "key": "hk_f6k__P1__s101",
+   "policy": "P1",
+   "position": 4,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_f6k",
+   "choice": "rules",
+   "key": "hk_f6k__P0__once",
+   "policy": "P0",
+   "position": 5,
+   "seed": null,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_f6k",
+   "choice": "verify-all",
+   "key": "hk_f6k__P3__s303",
+   "policy": "P3",
+   "position": 6,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hk_f6k",
+   "choice": "live",
+   "key": "hk_f6k__P2__s202",
+   "policy": "P2",
+   "position": 7,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hk_f6k",
+   "choice": "tool-use",
+   "key": "hk_f6k__P1__s303",
+   "policy": "P1",
+   "position": 8,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hk_f6k",
+   "choice": "tool-use",
+   "key": "hk_f6k__P1__s202",
+   "policy": "P1",
+   "position": 9,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hk_f6k",
+   "choice": "verify-all",
+   "key": "hk_f6k__P3__s202",
+   "policy": "P3",
+   "position": 10,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hk_m2q",
+   "choice": "tool-use",
+   "key": "hk_m2q__P1__s303",
+   "policy": "P1",
+   "position": 1,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hk_m2q",
+   "choice": "live",
+   "key": "hk_m2q__P2__s101",
+   "policy": "P2",
+   "position": 2,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_m2q",
+   "choice": "verify-all",
+   "key": "hk_m2q__P3__s101",
+   "policy": "P3",
+   "position": 3,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_m2q",
+   "choice": "live",
+   "key": "hk_m2q__P2__s303",
+   "policy": "P2",
+   "position": 4,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hk_m2q",
+   "choice": "verify-all",
+   "key": "hk_m2q__P3__s202",
+   "policy": "P3",
+   "position": 5,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hk_m2q",
+   "choice": "live",
+   "key": "hk_m2q__P2__s202",
+   "policy": "P2",
+   "position": 6,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hk_m2q",
+   "choice": "rules",
+   "key": "hk_m2q__P0__once",
+   "policy": "P0",
+   "position": 7,
+   "seed": null,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_m2q",
+   "choice": "verify-all",
+   "key": "hk_m2q__P3__s303",
+   "policy": "P3",
+   "position": 8,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hk_m2q",
+   "choice": "tool-use",
+   "key": "hk_m2q__P1__s101",
+   "policy": "P1",
+   "position": 9,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_m2q",
+   "choice": "tool-use",
+   "key": "hk_m2q__P1__s202",
+   "policy": "P1",
+   "position": 10,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hk_q8n",
+   "choice": "live",
+   "key": "hk_q8n__P2__s101",
+   "policy": "P2",
+   "position": 1,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_q8n",
+   "choice": "tool-use",
+   "key": "hk_q8n__P1__s202",
+   "policy": "P1",
+   "position": 2,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hk_q8n",
+   "choice": "verify-all",
+   "key": "hk_q8n__P3__s202",
+   "policy": "P3",
+   "position": 3,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hk_q8n",
+   "choice": "verify-all",
+   "key": "hk_q8n__P3__s101",
+   "policy": "P3",
+   "position": 4,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_q8n",
+   "choice": "tool-use",
+   "key": "hk_q8n__P1__s101",
+   "policy": "P1",
+   "position": 5,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_q8n",
+   "choice": "rules",
+   "key": "hk_q8n__P0__once",
+   "policy": "P0",
+   "position": 6,
+   "seed": null,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_q8n",
+   "choice": "verify-all",
+   "key": "hk_q8n__P3__s303",
+   "policy": "P3",
+   "position": 7,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hk_q8n",
+   "choice": "live",
+   "key": "hk_q8n__P2__s202",
+   "policy": "P2",
+   "position": 8,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hk_q8n",
+   "choice": "live",
+   "key": "hk_q8n__P2__s303",
+   "policy": "P2",
+   "position": 9,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hk_q8n",
+   "choice": "tool-use",
+   "key": "hk_q8n__P1__s303",
+   "policy": "P1",
+   "position": 10,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hk_x9j",
+   "choice": "verify-all",
+   "key": "hk_x9j__P3__s202",
+   "policy": "P3",
+   "position": 1,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hk_x9j",
+   "choice": "tool-use",
+   "key": "hk_x9j__P1__s101",
+   "policy": "P1",
+   "position": 2,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_x9j",
+   "choice": "live",
+   "key": "hk_x9j__P2__s202",
+   "policy": "P2",
+   "position": 3,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hk_x9j",
+   "choice": "rules",
+   "key": "hk_x9j__P0__once",
+   "policy": "P0",
+   "position": 4,
+   "seed": null,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_x9j",
+   "choice": "live",
+   "key": "hk_x9j__P2__s303",
+   "policy": "P2",
+   "position": 5,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hk_x9j",
+   "choice": "tool-use",
+   "key": "hk_x9j__P1__s202",
+   "policy": "P1",
+   "position": 6,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hk_x9j",
+   "choice": "live",
+   "key": "hk_x9j__P2__s101",
+   "policy": "P2",
+   "position": 7,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_x9j",
+   "choice": "verify-all",
+   "key": "hk_x9j__P3__s303",
+   "policy": "P3",
+   "position": 8,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hk_x9j",
+   "choice": "verify-all",
+   "key": "hk_x9j__P3__s101",
+   "policy": "P3",
+   "position": 9,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_x9j",
+   "choice": "tool-use",
+   "key": "hk_x9j__P1__s303",
+   "policy": "P1",
+   "position": 10,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hk_z1c",
+   "choice": "live",
+   "key": "hk_z1c__P2__s303",
+   "policy": "P2",
+   "position": 1,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hk_z1c",
+   "choice": "tool-use",
+   "key": "hk_z1c__P1__s202",
+   "policy": "P1",
+   "position": 2,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hk_z1c",
+   "choice": "verify-all",
+   "key": "hk_z1c__P3__s303",
+   "policy": "P3",
+   "position": 3,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hk_z1c",
+   "choice": "verify-all",
+   "key": "hk_z1c__P3__s202",
+   "policy": "P3",
+   "position": 4,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hk_z1c",
+   "choice": "live",
+   "key": "hk_z1c__P2__s101",
+   "policy": "P2",
+   "position": 5,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_z1c",
+   "choice": "verify-all",
+   "key": "hk_z1c__P3__s101",
+   "policy": "P3",
+   "position": 6,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_z1c",
+   "choice": "tool-use",
+   "key": "hk_z1c__P1__s303",
+   "policy": "P1",
+   "position": 7,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hk_z1c",
+   "choice": "rules",
+   "key": "hk_z1c__P0__once",
+   "policy": "P0",
+   "position": 8,
+   "seed": null,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_z1c",
+   "choice": "tool-use",
+   "key": "hk_z1c__P1__s101",
+   "policy": "P1",
+   "position": 9,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hk_z1c",
+   "choice": "live",
+   "key": "hk_z1c__P2__s202",
+   "policy": "P2",
+   "position": 10,
+   "seed": 202,
+   "trial": 2
+  }
+ ],
+ "freeze_sha256": "2d880c3f93c1fad57dd77007b4ac4232c7aae30e41449d958e5b9a31423c280b",
+ "heldout": true,
+ "heldout_files_sha256": "86ea09c089d2ea3bcd936eca6535de773847095e248f78b6434fa44200685055",
+ "heldout_sha256": "d475a3b3012c175ee45650913b259bed28922bf03e374a8f698fe28fce325eb4",
+ "measured_files_sha256": "7d41fada702f2172c39a968bb6a2a1d72b6cac4e6d23cb047133d47ce373596f",
+ "model": {
+  "base_url": "https://openrouter.ai/api/v1",
+  "max_run_cost_usd": 0.5,
+  "model_id": "anthropic/claude-sonnet-5.5",
+  "provider": "openrouter"
+ },
+ "model_response_cache": false,
+ "order_over": [
+  "P0",
+  "P1",
+  "P2",
+  "P3"
+ ],
+ "order_seed": 20261025,
+ "policies": [
+  "P0",
+  "P1",
+  "P2",
+  "P3"
+ ],
+ "policy_factory": null,
+ "policy_subset": false,
+ "protocol_version": "plan_b.eval_protocol/1.0.0",
+ "seeds": [
+  101,
+  202,
+  303
+ ],
+ "start_method": "spawn",
+ "suite": "campus"
+}

@@ -1,0 +1,414 @@
+{
+ "artifact": "plan_b.eval_run_plan",
+ "case_refs": [
+  "hp_4ra",
+  "hp_g9m",
+  "hp_k2e",
+  "hp_v7s"
+ ],
+ "created_at": "2026-10-25T16:23:13Z",
+ "dry_run": false,
+ "episode_caps": {
+  "max_model_calls": 8,
+  "max_tool_calls": 48,
+  "phase": "frozen"
+ },
+ "episode_timeout_s": 900.0,
+ "episodes": [
+  {
+   "case_ref": "hp_4ra",
+   "choice": "tool-use",
+   "key": "hp_4ra__P1__s101",
+   "policy": "P1",
+   "position": 1,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hp_4ra",
+   "choice": "live",
+   "key": "hp_4ra__P2__s303",
+   "policy": "P2",
+   "position": 2,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hp_4ra",
+   "choice": "live",
+   "key": "hp_4ra__P2__s202",
+   "policy": "P2",
+   "position": 3,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hp_4ra",
+   "choice": "verify-all",
+   "key": "hp_4ra__P3__s202",
+   "policy": "P3",
+   "position": 4,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hp_4ra",
+   "choice": "tool-use",
+   "key": "hp_4ra__P1__s303",
+   "policy": "P1",
+   "position": 5,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hp_4ra",
+   "choice": "live",
+   "key": "hp_4ra__P2__s101",
+   "policy": "P2",
+   "position": 6,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hp_4ra",
+   "choice": "verify-all",
+   "key": "hp_4ra__P3__s101",
+   "policy": "P3",
+   "position": 7,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hp_4ra",
+   "choice": "verify-all",
+   "key": "hp_4ra__P3__s303",
+   "policy": "P3",
+   "position": 8,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hp_4ra",
+   "choice": "tool-use",
+   "key": "hp_4ra__P1__s202",
+   "policy": "P1",
+   "position": 9,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hp_4ra",
+   "choice": "rules",
+   "key": "hp_4ra__P0__once",
+   "policy": "P0",
+   "position": 10,
+   "seed": null,
+   "trial": 1
+  },
+  {
+   "case_ref": "hp_g9m",
+   "choice": "tool-use",
+   "key": "hp_g9m__P1__s101",
+   "policy": "P1",
+   "position": 1,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hp_g9m",
+   "choice": "verify-all",
+   "key": "hp_g9m__P3__s202",
+   "policy": "P3",
+   "position": 2,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hp_g9m",
+   "choice": "verify-all",
+   "key": "hp_g9m__P3__s303",
+   "policy": "P3",
+   "position": 3,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hp_g9m",
+   "choice": "live",
+   "key": "hp_g9m__P2__s202",
+   "policy": "P2",
+   "position": 4,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hp_g9m",
+   "choice": "live",
+   "key": "hp_g9m__P2__s101",
+   "policy": "P2",
+   "position": 5,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hp_g9m",
+   "choice": "rules",
+   "key": "hp_g9m__P0__once",
+   "policy": "P0",
+   "position": 6,
+   "seed": null,
+   "trial": 1
+  },
+  {
+   "case_ref": "hp_g9m",
+   "choice": "tool-use",
+   "key": "hp_g9m__P1__s303",
+   "policy": "P1",
+   "position": 7,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hp_g9m",
+   "choice": "verify-all",
+   "key": "hp_g9m__P3__s101",
+   "policy": "P3",
+   "position": 8,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hp_g9m",
+   "choice": "tool-use",
+   "key": "hp_g9m__P1__s202",
+   "policy": "P1",
+   "position": 9,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hp_g9m",
+   "choice": "live",
+   "key": "hp_g9m__P2__s303",
+   "policy": "P2",
+   "position": 10,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hp_k2e",
+   "choice": "tool-use",
+   "key": "hp_k2e__P1__s101",
+   "policy": "P1",
+   "position": 1,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hp_k2e",
+   "choice": "verify-all",
+   "key": "hp_k2e__P3__s303",
+   "policy": "P3",
+   "position": 2,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hp_k2e",
+   "choice": "rules",
+   "key": "hp_k2e__P0__once",
+   "policy": "P0",
+   "position": 3,
+   "seed": null,
+   "trial": 1
+  },
+  {
+   "case_ref": "hp_k2e",
+   "choice": "live",
+   "key": "hp_k2e__P2__s303",
+   "policy": "P2",
+   "position": 4,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hp_k2e",
+   "choice": "verify-all",
+   "key": "hp_k2e__P3__s202",
+   "policy": "P3",
+   "position": 5,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hp_k2e",
+   "choice": "live",
+   "key": "hp_k2e__P2__s101",
+   "policy": "P2",
+   "position": 6,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hp_k2e",
+   "choice": "verify-all",
+   "key": "hp_k2e__P3__s101",
+   "policy": "P3",
+   "position": 7,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hp_k2e",
+   "choice": "tool-use",
+   "key": "hp_k2e__P1__s202",
+   "policy": "P1",
+   "position": 8,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hp_k2e",
+   "choice": "tool-use",
+   "key": "hp_k2e__P1__s303",
+   "policy": "P1",
+   "position": 9,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hp_k2e",
+   "choice": "live",
+   "key": "hp_k2e__P2__s202",
+   "policy": "P2",
+   "position": 10,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hp_v7s",
+   "choice": "verify-all",
+   "key": "hp_v7s__P3__s303",
+   "policy": "P3",
+   "position": 1,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hp_v7s",
+   "choice": "rules",
+   "key": "hp_v7s__P0__once",
+   "policy": "P0",
+   "position": 2,
+   "seed": null,
+   "trial": 1
+  },
+  {
+   "case_ref": "hp_v7s",
+   "choice": "tool-use",
+   "key": "hp_v7s__P1__s202",
+   "policy": "P1",
+   "position": 3,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hp_v7s",
+   "choice": "verify-all",
+   "key": "hp_v7s__P3__s202",
+   "policy": "P3",
+   "position": 4,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "hp_v7s",
+   "choice": "live",
+   "key": "hp_v7s__P2__s101",
+   "policy": "P2",
+   "position": 5,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hp_v7s",
+   "choice": "verify-all",
+   "key": "hp_v7s__P3__s101",
+   "policy": "P3",
+   "position": 6,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hp_v7s",
+   "choice": "tool-use",
+   "key": "hp_v7s__P1__s101",
+   "policy": "P1",
+   "position": 7,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "hp_v7s",
+   "choice": "live",
+   "key": "hp_v7s__P2__s303",
+   "policy": "P2",
+   "position": 8,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hp_v7s",
+   "choice": "tool-use",
+   "key": "hp_v7s__P1__s303",
+   "policy": "P1",
+   "position": 9,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "hp_v7s",
+   "choice": "live",
+   "key": "hp_v7s__P2__s202",
+   "policy": "P2",
+   "position": 10,
+   "seed": 202,
+   "trial": 2
+  }
+ ],
+ "freeze_sha256": "2d880c3f93c1fad57dd77007b4ac4232c7aae30e41449d958e5b9a31423c280b",
+ "heldout": true,
+ "heldout_files_sha256": "86ea09c089d2ea3bcd936eca6535de773847095e248f78b6434fa44200685055",
+ "heldout_sha256": "d475a3b3012c175ee45650913b259bed28922bf03e374a8f698fe28fce325eb4",
+ "measured_files_sha256": "7d41fada702f2172c39a968bb6a2a1d72b6cac4e6d23cb047133d47ce373596f",
+ "model": {
+  "base_url": "https://openrouter.ai/api/v1",
+  "max_run_cost_usd": 0.5,
+  "model_id": "anthropic/claude-sonnet-5.5",
+  "provider": "openrouter"
+ },
+ "model_response_cache": false,
+ "order_over": [
+  "P0",
+  "P1",
+  "P2",
+  "P3"
+ ],
+ "order_seed": 20261025,
+ "policies": [
+  "P0",
+  "P1",
+  "P2",
+  "P3"
+ ],
+ "policy_factory": null,
+ "policy_subset": false,
+ "protocol_version": "plan_b.eval_protocol/1.0.0",
+ "seeds": [
+  101,
+  202,
+  303
+ ],
+ "start_method": "spawn",
+ "suite": "pantry"
+}

@@ -1,0 +1,182 @@
+{
+ "case_ref": "hk_f6k",
+ "choice": "tool-use",
+ "dry_run": false,
+ "episode_caps": {
+  "max_model_calls": 8,
+  "max_tool_calls": 48,
+  "model_calls": 6,
+  "phase": "frozen",
+  "reached": [],
+  "tool_calls": 33
+ },
+ "errors": [
+  {
+   "decision_id": "dec_0005",
+   "decision_kind": "wait",
+   "failure": "stale_revision",
+   "kind": "decision_failure",
+   "recorded_by": "policy"
+  }
+ ],
+ "finished_at": "2026-10-25T16:38:47Z",
+ "key": "hk_f6k__P1__s202",
+ "measured_files_sha256": "7d41fada702f2172c39a968bb6a2a1d72b6cac4e6d23cb047133d47ce373596f",
+ "mode_label": "Tool-use agent \u00b7 anthropic/claude-sonnet-5.5",
+ "model": {
+  "by_purpose": {
+   "tool_turn": 6
+  },
+  "calls": 6,
+  "completion_tokens": 5656,
+  "cost_basis": [
+   "provider_usage"
+  ],
+  "cost_usd": 0.227014,
+  "failed": 0,
+  "latency_ms": 47582,
+  "max_tokens": [
+   4096
+  ],
+  "outcomes": {
+   "ok": 6
+  },
+  "prompt_tokens": 85227,
+  "reasoning_tokens": 3788,
+  "retries": 0,
+  "returned": [
+   "anthropic/claude-sonnet-5.5"
+  ],
+  "seed_fields": [
+   {
+    "seed": 202,
+    "seed_echo": null,
+    "seed_sent": false
+   }
+  ]
+ },
+ "model_source": "provider",
+ "order_position": 9,
+ "outcome": {
+  "activities": [
+   {
+    "activity_id": "setup",
+    "completed_at": "2026-11-12T23:20:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-12T23:00:00Z"
+   },
+   {
+    "activity_id": "welcome",
+    "completed_at": "2026-11-12T23:40:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-12T23:30:00Z"
+   },
+   {
+    "activity_id": "demonstrations",
+    "completed_at": "2026-11-13T00:20:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-13T00:00:00Z"
+   },
+   {
+    "activity_id": "skills_exchange",
+    "completed_at": "2026-11-13T00:00:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-12T23:40:00Z"
+   },
+   {
+    "activity_id": "closing",
+    "completed_at": "2026-11-13T00:30:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-13T00:20:00Z"
+   }
+  ],
+  "applied_plans": 1,
+  "changed_assignments": 2,
+  "committed_cents": 2800,
+  "duplicate_records_rejected": 0,
+  "episode_caps": {
+   "max_model_calls": 8,
+   "max_tool_calls": 48,
+   "model_calls": 6,
+   "phase": "frozen",
+   "reached": [],
+   "tool_calls": 33
+  },
+  "episode_id": "ep_d8cb3d39f788",
+  "failed_status_queries": 2,
+  "final_clock": "2026-11-13T00:30:00Z",
+  "final_revision": 26,
+  "goal_complete": true,
+  "holds": {
+   "active_at_end": 0,
+   "committed": 1,
+   "created": 1,
+   "expired": 0,
+   "fulfilled": 0,
+   "released": 0
+  },
+  "infeasibility_reported": false,
+  "mode_label": "Tool-use agent \u00b7 anthropic/claude-sonnet-5.5",
+  "policy_id": "tool-use/1.1.0",
+  "recovery_delay_minutes": 12,
+  "rejected_attempts_without_receipt": 0,
+  "rejected_receipts": 1,
+  "report_version": "1.0.0",
+  "reserved_cents_at_end": 0,
+  "scenario_id": "fixture_k7",
+  "service": [],
+  "staff_confirmations": 0,
+  "status_queries": 3,
+  "stock": [],
+  "unnecessary_reservations": 0,
+  "violations": []
+ },
+ "policy": "P1",
+ "policy_id": "tool-use/1.1.0",
+ "record": "plan_b.eval_episode/1.0.0",
+ "seed": 202,
+ "seed_passed": true,
+ "started_at": "2026-10-25T16:37:56Z",
+ "status": "completed",
+ "suite": "campus",
+ "tool_calls": {
+  "by_status": {
+   "rejected": 1,
+   "succeeded": 30,
+   "unavailable": 2
+  },
+  "by_tool": {
+   "apply_plan": 1,
+   "evaluate_candidates": 11,
+   "get_event_state": 16,
+   "hold_resource": 2,
+   "query_status": 3
+  },
+  "rejected": [
+   {
+    "call_id": "call_00012",
+    "error_code": "REVISION_CONFLICT",
+    "tool": "hold_resource"
+   }
+  ],
+  "total": 33
+ },
+ "trace": {
+  "bytes": 3693163,
+  "file": "trace.json.gz",
+  "sha256": "d01cf6733eafbb44dd3f979f5a5647da129be2d94b8e5c6ed50672279f939831",
+  "verify": "intact"
+ },
+ "trial": 2,
+ "wall_seconds": 50.7
+}

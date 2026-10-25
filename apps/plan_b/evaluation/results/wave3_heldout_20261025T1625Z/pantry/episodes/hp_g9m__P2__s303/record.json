@@ -1,0 +1,192 @@
+{
+ "case_ref": "hp_g9m",
+ "choice": "live",
+ "dry_run": false,
+ "episode_caps": {
+  "max_model_calls": 8,
+  "max_tool_calls": 48,
+  "model_calls": 5,
+  "phase": "frozen",
+  "reached": [],
+  "tool_calls": 25
+ },
+ "errors": [],
+ "finished_at": "2026-10-25T16:59:06Z",
+ "key": "hp_g9m__P2__s303",
+ "measured_files_sha256": "7d41fada702f2172c39a968bb6a2a1d72b6cac4e6d23cb047133d47ce373596f",
+ "mode_label": "Live agent \u00b7 anthropic/claude-sonnet-5.5",
+ "model": {
+  "by_purpose": {
+   "choose_action": 4,
+   "interpret": 1
+  },
+  "calls": 5,
+  "completion_tokens": 2071,
+  "cost_basis": [
+   "provider_usage"
+  ],
+  "cost_usd": 0.061464,
+  "failed": 0,
+  "latency_ms": 21869,
+  "max_tokens": [
+   4096
+  ],
+  "outcomes": {
+   "ok": 5
+  },
+  "prompt_tokens": 20377,
+  "reasoning_tokens": 990,
+  "retries": 0,
+  "returned": [
+   "anthropic/claude-sonnet-5.5"
+  ],
+  "seed_fields": [
+   {
+    "seed": 303,
+    "seed_echo": null,
+    "seed_sent": false
+   }
+  ]
+ },
+ "model_source": "provider",
+ "order_position": 10,
+ "outcome": {
+  "activities": [
+   {
+    "activity_id": "setup",
+    "completed_at": "2026-11-14T20:50:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-14T20:40:00Z"
+   },
+   {
+    "activity_id": "briefing",
+    "completed_at": "2026-11-14T21:00:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-14T20:50:00Z"
+   },
+   {
+    "activity_id": "distribution",
+    "completed_at": "2026-11-14T21:40:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-14T21:00:00Z"
+   },
+   {
+    "activity_id": "reconciliation",
+    "completed_at": "2026-11-14T22:00:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-14T21:40:00Z"
+   }
+  ],
+  "applied_plans": 1,
+  "changed_assignments": 0,
+  "committed_cents": 0,
+  "duplicate_records_rejected": 0,
+  "episode_caps": {
+   "max_model_calls": 8,
+   "max_tool_calls": 48,
+   "model_calls": 5,
+   "phase": "frozen",
+   "reached": [],
+   "tool_calls": 25
+  },
+  "episode_id": "ep_7d0166d589be",
+  "failed_status_queries": 0,
+  "final_clock": "2026-11-14T22:00:00Z",
+  "final_revision": 22,
+  "goal_complete": false,
+  "holds": {
+   "active_at_end": 0,
+   "committed": 1,
+   "created": 2,
+   "expired": 0,
+   "fulfilled": 0,
+   "released": 1
+  },
+  "infeasibility_reported": true,
+  "mode_label": "Live agent \u00b7 anthropic/claude-sonnet-5.5",
+  "policy_id": "live/1.1.0",
+  "recovery_delay_minutes": null,
+  "rejected_attempts_without_receipt": 0,
+  "rejected_receipts": 0,
+  "report_version": "1.0.0",
+  "reserved_cents_at_end": 0,
+  "scenario_id": "fixture_n4",
+  "service": [
+   {
+    "attained": false,
+    "distributed_quantity": 34,
+    "late_quantity": 0,
+    "on_time_quantity": 34,
+    "original_quantity": 40,
+    "supply_gap_quantity": 6,
+    "target_id": "kit_target_a",
+    "unfulfilled_quantity": 6,
+    "unit": "standard_kit"
+   }
+  ],
+  "staff_confirmations": 2,
+  "status_queries": 0,
+  "stock": [
+   {
+    "closing_on_hand_quantity": 0,
+    "conserved": true,
+    "distributed_quantity": 34,
+    "expected_unreceived_quantity": 20,
+    "opening_quantity": 24,
+    "received_quantity": 10,
+    "resource_id": "shelf_stock",
+    "transferred_out_quantity": 0
+   },
+   {
+    "closing_on_hand_quantity": 6,
+    "conserved": true,
+    "distributed_quantity": 0,
+    "expected_unreceived_quantity": 0,
+    "opening_quantity": 16,
+    "received_quantity": 0,
+    "resource_id": "neighbor_stock",
+    "transferred_out_quantity": 10
+   }
+  ],
+  "unnecessary_reservations": 0,
+  "violations": []
+ },
+ "policy": "P2",
+ "policy_id": "live/1.1.0",
+ "record": "plan_b.eval_episode/1.0.0",
+ "seed": 303,
+ "seed_passed": true,
+ "started_at": "2026-10-25T16:58:41Z",
+ "status": "completed",
+ "suite": "pantry",
+ "tool_calls": {
+  "by_status": {
+   "succeeded": 25
+  },
+  "by_tool": {
+   "apply_plan": 1,
+   "evaluate_candidates": 10,
+   "get_event_state": 11,
+   "hold_resource": 2,
+   "release_hold": 1
+  },
+  "rejected": [],
+  "total": 25
+ },
+ "trace": {
+  "bytes": 2030795,
+  "file": "trace.json.gz",
+  "sha256": "addcc75073002c8c59fdf24553464d70017d719798daecb9184c2fa8cba052c1",
+  "verify": "intact"
+ },
+ "trial": 3,
+ "wall_seconds": 24.9
+}
