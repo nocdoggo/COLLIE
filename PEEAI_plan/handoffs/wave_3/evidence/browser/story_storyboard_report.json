@@ -9,7 +9,7 @@
   "paths": "deterministic policies, role tabs and recorded replays; no model call",
   "passed": true,
   "planned_seconds": 420,
-  "automated_run_seconds": 41.4,
+  "automated_run_seconds": 43.1,
   "segments": [
     {
       "segment": "showcase",
@@ -31,7 +31,7 @@
         "story_02_current_plan.png",
         "story_03_agent_authority.png"
       ],
-      "automated_seconds": 1.0,
+      "automated_seconds": 1.1,
       "passed": true
     },
     {
@@ -69,7 +69,7 @@
         "story_10_organizer_approves.png",
         "story_11_paid_backup_committed.png"
       ],
-      "automated_seconds": 10.3,
+      "automated_seconds": 9.9,
       "passed": true
     },
     {
@@ -96,7 +96,7 @@
         "story_17_community_replanned.png",
         "story_18_resource_offer.png"
       ],
-      "automated_seconds": 7.7,
+      "automated_seconds": 7.8,
       "passed": true
     },
     {
@@ -111,7 +111,7 @@
         "story_22_kits_committed.png",
         "story_23_distributed.png"
       ],
-      "automated_seconds": 7.8,
+      "automated_seconds": 9.6,
       "passed": true
     },
     {
@@ -161,7 +161,7 @@
         }
       ],
       "started_s": 4.4,
-      "seconds": 0.5
+      "seconds": 0.6
     },
     {
       "step": 3,
@@ -178,7 +178,7 @@
           "story_step": 3
         }
       ],
-      "started_s": 4.9,
+      "started_s": 5.0,
       "seconds": 0.5
     },
     {
@@ -196,7 +196,7 @@
           "story_step": 4
         }
       ],
-      "started_s": 5.4,
+      "started_s": 5.5,
       "seconds": 0.4
     },
     {
@@ -214,7 +214,7 @@
           "story_step": 5
         }
       ],
-      "started_s": 5.8,
+      "started_s": 5.9,
       "seconds": 0.9
     },
     {
@@ -232,7 +232,7 @@
           "story_step": 6
         }
       ],
-      "started_s": 6.7,
+      "started_s": 6.8,
       "seconds": 0.5
     },
     {
@@ -250,7 +250,7 @@
           "story_step": 7
         }
       ],
-      "started_s": 7.2,
+      "started_s": 7.3,
       "seconds": 0.5
     },
     {
@@ -274,7 +274,7 @@
           "story_step": 8
         }
       ],
-      "started_s": 7.7,
+      "started_s": 7.8,
       "seconds": 5.9
     },
     {
@@ -292,7 +292,7 @@
           "story_step": 9
         }
       ],
-      "started_s": 13.6,
+      "started_s": 13.7,
       "seconds": 5.2
     },
     {
@@ -310,8 +310,8 @@
           "story_step": 10
         }
       ],
-      "started_s": 18.8,
-      "seconds": 1.3
+      "started_s": 18.9,
+      "seconds": 0.9
     },
     {
       "step": 11,
@@ -328,7 +328,7 @@
           "story_step": 11
         }
       ],
-      "started_s": 20.1,
+      "started_s": 19.8,
       "seconds": 3.8
     },
     {
@@ -358,7 +358,7 @@
           "story_step": 12
         }
       ],
-      "started_s": 23.9,
+      "started_s": 23.6,
       "seconds": 0.8
     },
     {
@@ -376,7 +376,7 @@
           "story_step": 13
         }
       ],
-      "started_s": 24.7,
+      "started_s": 24.4,
       "seconds": 0.5
     },
     {
@@ -394,8 +394,8 @@
           "story_step": 14
         }
       ],
-      "started_s": 25.2,
-      "seconds": 0.7
+      "started_s": 24.9,
+      "seconds": 0.8
     },
     {
       "step": 15,
@@ -418,8 +418,8 @@
           "story_step": 15
         }
       ],
-      "started_s": 25.9,
-      "seconds": 1.1
+      "started_s": 25.7,
+      "seconds": 1.0
     },
     {
       "step": 16,
@@ -436,7 +436,7 @@
           "story_step": 16
         }
       ],
-      "started_s": 27.0,
+      "started_s": 26.7,
       "seconds": 1.9
     },
     {
@@ -454,7 +454,7 @@
           "story_step": 17
         }
       ],
-      "started_s": 28.9,
+      "started_s": 28.6,
       "seconds": 5.1
     },
     {
@@ -472,8 +472,8 @@
           "story_step": 18
         }
       ],
-      "started_s": 34.0,
-      "seconds": 0.7
+      "started_s": 33.7,
+      "seconds": 0.8
     },
     {
       "step": 19,
@@ -490,7 +490,7 @@
           "story_step": 19
         }
       ],
-      "started_s": 34.7,
+      "started_s": 34.5,
       "seconds": 1.8
     },
     {
@@ -508,8 +508,8 @@
           "story_step": 20
         }
       ],
-      "started_s": 36.5,
-      "seconds": 1.1
+      "started_s": 36.3,
+      "seconds": 1.0
     },
     {
       "step": 21,
@@ -526,8 +526,8 @@
           "story_step": 21
         }
       ],
-      "started_s": 37.6,
-      "seconds": 1.2
+      "started_s": 37.3,
+      "seconds": 1.3
     },
     {
       "step": 22,
@@ -544,8 +544,8 @@
           "story_step": 22
         }
       ],
-      "started_s": 38.8,
-      "seconds": 0.8
+      "started_s": 38.6,
+      "seconds": 0.9
     },
     {
       "step": 23,
@@ -562,8 +562,8 @@
           "story_step": 23
         }
       ],
-      "started_s": 39.6,
-      "seconds": 2.9
+      "started_s": 39.5,
+      "seconds": 4.6
     },
     {
       "step": 24,
@@ -604,7 +604,7 @@
           "story_step": 24
         }
       ],
-      "started_s": 42.5,
+      "started_s": 44.1,
       "seconds": 0.5
     }
   ],

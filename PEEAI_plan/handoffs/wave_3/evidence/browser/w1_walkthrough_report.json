@@ -127,7 +127,7 @@
     {
       "check": "the executed run is exported as a trace on the server",
       "passed": true,
-      "detail": "ep_dfbc2e508293_rev24.json",
+      "detail": "ep_b88884e05c71_rev24.json",
       "workflow_step": 7
     },
     {
@@ -157,7 +157,7 @@
     {
       "check": "replay opened after the reset shows the pre-reset episode",
       "passed": true,
-      "detail": "replayed ep_dfbc2e508293; live ep_4c3720dfde9f",
+      "detail": "replayed ep_b88884e05c71; live ep_ee21d2337a7f",
       "workflow_step": 7
     },
     {

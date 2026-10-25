@@ -22,21 +22,21 @@
     },
     "passed": true
   },
-  "total_seconds": 134.3,
+  "total_seconds": 133.4,
   "rehearsals": [
     {
       "rehearsal": 1,
       "forced_provider_failure": false,
-      "seconds": 42.2,
+      "seconds": 40.4,
       "segments_seconds": {
         "showcase": 1.9,
         "commitments": 1.0,
         "delay": 2.3,
         "stale": 5.9,
-        "backup": 9.9,
-        "live": 3.2,
-        "community": 7.7,
-        "pantry": 9.8,
+        "backup": 10.1,
+        "live": 3.1,
+        "community": 7.8,
+        "pantry": 7.8,
         "close": 0.3
       },
       "forced_failure_checks": 0,
@@ -736,15 +736,15 @@
     {
       "rehearsal": 2,
       "forced_provider_failure": true,
-      "seconds": 43.8,
+      "seconds": 45.2,
       "segments_seconds": {
         "live": 6.3,
-        "showcase": 1.8,
-        "commitments": 1.1,
-        "delay": 2.2,
-        "stale": 6.0,
-        "backup": 9.9,
-        "community": 6.5,
+        "showcase": 1.9,
+        "commitments": 1.0,
+        "delay": 2.3,
+        "stale": 5.9,
+        "backup": 10.0,
+        "community": 7.8,
         "pantry": 9.7,
         "close": 0.3
       },
@@ -1510,16 +1510,16 @@
     {
       "rehearsal": 3,
       "forced_provider_failure": false,
-      "seconds": 40.8,
+      "seconds": 40.5,
       "segments_seconds": {
         "showcase": 1.9,
         "commitments": 1.0,
         "delay": 2.3,
         "stale": 6.0,
-        "backup": 10.5,
-        "live": 3.1,
-        "community": 7.2,
-        "pantry": 8.3,
+        "backup": 9.9,
+        "live": 3.2,
+        "community": 7.8,
+        "pantry": 7.9,
         "close": 0.3
       },
       "forced_failure_checks": 0,

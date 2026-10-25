@@ -5,7 +5,7 @@
   "node": "v22.19.0",
   "npm": "11.15.0",
   "playwright": "Version 1.64.1",
-  "git_head": "c052338c9aa8fbf10b82116050766b84b1e1af87",
-  "git_branch": "hackathon/peeaai-plan",
-  "app_tree_clean": false
+  "git_head": "3442874b4caf836fb081ea7b2d7d004821bfc0fa",
+  "git_branch": "(detached HEAD)",
+  "app_tree_clean": true
 }

@@ -2,10 +2,10 @@
   "kind": "plan_b local release package build (not hosted, not submitted)",
   "manifest": "apps/plan_b/release/manifest.json",
   "manifest_sha256": "b5529026c73405d6c0dbaf58448b714d699a8a24d2a591a821859a851ec59f24",
-  "git_head": "c052338c9aa8fbf10b82116050766b84b1e1af87",
-  "tree_clean": false,
+  "git_head": "3442874b4caf836fb081ea7b2d7d004821bfc0fa",
+  "tree_clean": true,
   "files": 615,
-  "bytes": 59613420,
+  "bytes": 59623985,
   "excluded_by_reason": {
     "build caches and installed packages": 71,
     "evaluator records with predicates and expected outcomes": 231,

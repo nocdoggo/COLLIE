@@ -115,7 +115,7 @@
       "command": "uv run mypy",
       "cwd": "apps/plan_b",
       "exit_code": 0,
-      "seconds": 0.1,
+      "seconds": 2.9,
       "summary": [
         "Success: no issues found in 90 source files"
       ]
@@ -143,7 +143,7 @@
         "dist/index.html                   0.67 kB \u2502 gzip:  0.37 kB",
         "dist/assets/index-DXixtv9L.css   17.47 kB \u2502 gzip:  4.49 kB",
         "dist/assets/index-BTplwhRi.js   322.66 kB \u2502 gzip: 95.99 kB",
-        "\u2713 built in 647ms"
+        "\u2713 built in 641ms"
       ]
     },
     {
@@ -151,14 +151,14 @@
       "command": "uv run pytest -o addopts= -q -p no:cacheprovider --junitxml=<evidence>/reports/pytest_junit.xml",
       "cwd": "apps/plan_b",
       "exit_code": 0,
-      "seconds": 556.6,
+      "seconds": 561.8,
       "summary": [
         ".venv/lib/python3.12/site-packages/fastapi/testclient.py:1",
         "  <repo>/apps/plan_b/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.",
         "    from starlette.testclient import TestClient as TestClient  # noqa",
         "-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html",
         "- generated xml file: <evidence>/reports/pytest_junit.xml -",
-        "896 passed, 1 warning in 556.09s (0:09:16)"
+        "896 passed, 1 warning in 561.10s (0:09:21)"
       ]
     },
     {
@@ -166,14 +166,14 @@
       "command": "npm test",
       "cwd": "apps/plan_b/web",
       "exit_code": 0,
-      "seconds": 25.1,
+      "seconds": 25.0,
       "summary": [
         "# pass 396",
         "# fail 0",
         "# cancelled 0",
         "# skipped 0",
         "# todo 0",
-        "# duration_ms 24972.024265"
+        "# duration_ms 24923.722312"
       ]
     },
     {
@@ -193,7 +193,7 @@
       "command": "uv run plan-b run-case all --db <work>/runs.sqlite3 --out <work>/out",
       "cwd": "apps/plan_b",
       "exit_code": 0,
-      "seconds": 25.9,
+      "seconds": 25.5,
       "summary": [
         "dev05: goal_complete=False infeasibility_reported=True applied_plans=0 committed=0 violations=0 matches_expectation=True",
         "dev06: goal_complete=True infeasibility_reported=False applied_plans=1 committed=0 violations=0 matches_expectation=True",
@@ -229,7 +229,7 @@
       "command": "uv run plan-b eval report --results <repo>/apps/plan_b/evaluation/results/wave3_heldout_20261025T1625Z/campus --out <work>/report/campus",
       "cwd": "apps/plan_b",
       "exit_code": 0,
-      "seconds": 8.5,
+      "seconds": 8.6,
       "summary": [
         "metrics: <work>/report/campus/metrics.json",
         "markdown: <work>/report/campus/evaluation_results.md",
@@ -263,13 +263,13 @@
       "command": "uv run python scripts/build_release.py --out <work>/release",
       "cwd": "apps/plan_b",
       "exit_code": 0,
-      "seconds": 38.7,
+      "seconds": 39.8,
       "summary": [
         "[ok] the board's index.html is served from the packaged bundle",
         "[ok] the server lists every packaged replay",
         "[ok] each replay is served byte for byte",
         "[ok] verify-trace passes on every packaged replay (run from the package)",
-        "615 files, 59613420 bytes; excluded {'build caches and installed packages': 71, 'evaluator records with predicates and expected outcomes': 231, 'evaluator-only held-out cases (messages, timings, predicates, expectations)': 25}",
+        "615 files, 59623985 bytes; excluded {'build caches and installed packages': 71, 'evaluator records with predicates and expected outcomes': 231, 'evaluator-only held-out cases (messages, timings, predicates, expectations)': 25}",
         "release package built"
       ]
     },
@@ -278,7 +278,7 @@
       "command": "uv run python tests/e2e/walkthrough.py --out <work>/browser/w1",
       "cwd": "apps/plan_b",
       "exit_code": 0,
-      "seconds": 73.3,
+      "seconds": 73.5,
       "summary": [
         "PASS no horizontal overflow at 1920px",
         "PASS no horizontal overflow at 1280px",
@@ -293,7 +293,7 @@
       "command": "uv run python tests/e2e/walkthrough_wave2.py --out <work>/browser/w2",
       "cwd": "apps/plan_b",
       "exit_code": 0,
-      "seconds": 23.9,
+      "seconds": 23.4,
       "summary": [
         "PASS no horizontal overflow at 1920px",
         "PASS no horizontal overflow at 1280px",
@@ -305,10 +305,10 @@
     },
     {
       "name": "demo storyboard (Playwright, Chromium)",
-      "command": "uv run python tests/e2e/storyboard.py --out <work>/browser/story --port 38827",
+      "command": "uv run python tests/e2e/storyboard.py --out <work>/browser/story --port 35695",
       "cwd": "apps/plan_b",
       "exit_code": 0,
-      "seconds": 43.1,
+      "seconds": 44.8,
       "summary": [
         "PASS the replay list holds the recorded traces the runbook opens - 31 traces",
         "PASS no model call in the story: every decision of its 5 episodes came from a deterministic policy, and the selection stayed deterministic - {\"episodes\": 5, \"policies\": [\"pantry-rules/1.1.0\", \"rules/1.0.0\"], \"caps\": {\"phase\": \"development\", \"max_tool_calls\": 48, \"max_model_calls\": 8, \"tool_calls\": 21, \"model_calls\": 0, \"reached\": []}}",
@@ -323,7 +323,7 @@
       "command": "uv run python tests/e2e/keyboard.py --out <work>/browser/keyboard",
       "cwd": "apps/plan_b",
       "exit_code": 0,
-      "seconds": 16.3,
+      "seconds": 16.2,
       "summary": [
         "PASS two signed-in views agree on the revision and the receipts - revision 6 / 6; headers 'STATE REVISION\\n6' / 'STATE REVISION\\n6'",
         "PASS the pantry stock and service board is reached by keyboard - 'Stock and service' moves focus to 'pantry-board'; 2 Tab stops inside",
@@ -338,13 +338,13 @@
       "command": "uv run python tests/e2e/rehearsal.py --out <evidence>/rehearsal",
       "cwd": "apps/plan_b",
       "exit_code": 0,
-      "seconds": 134.4,
+      "seconds": 133.5,
       "summary": [
         "PASS no page errors - 0 page errors: []",
         "PASS no join code or session token in the visible text at any frame - 24 frames; 4 join codes, 5 session tokens and the moderator code checked; 6 join links masked; exposed: []",
         "PASS the results figure opens with its title - Outcome met and status checks, per case and policy",
         "PASS the figure is the committed report's (commit c052338) - e738e76635007fa6 against e738e76635007fa6",
-        "rehearsal 3: passed in 40.8 s (34/34 checks)",
+        "rehearsal 3: passed in 40.5 s (34/34 checks)",
         "3/3 rehearsals passed; same receipts and final states: True; expected outcomes: True; repository ledger unchanged: True"
       ]
     },

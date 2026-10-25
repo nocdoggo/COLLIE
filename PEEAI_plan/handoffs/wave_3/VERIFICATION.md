@@ -19,24 +19,27 @@ placeholder key file.
 ## Collector run (the packet's `evidence/`)
 
 Command: `uv run python scripts/collect_wave3_evidence.py --out <empty dir>`, then copied over
-`evidence/`. The story audit regenerated it after its fixes (to `rehearsal.py`,
-`build_release.py`, `release/manifest.json`, the submission items and this packet). It ran from
-the working tree, so `environment.json` records `app_tree_clean: false` and git head `c052338`.
-Exit 0, **all checks passed**, read from `evidence/reports/checks.json`. The collector's ruff and
-mypy stages ran before the audit's last `build_release.py` edit. `ruff check` and
-`ruff format --check` passed on the edited file separately (mypy's scope does not include
-`scripts/`).
+`evidence/`. The integrate step ran it from a clean checkout of `3442874`, the submission
+commit after this packet's: `git worktree add --detach <scratch>/clean HEAD`, then
+`uv sync --all-groups --locked` and `npm ci`, with the repository ledger copied into the
+worktree's `var/`. `PLAN_B_MODEL_KEY_FILE` named the main checkout's key file by its absolute
+path, for the presence check only. No model call was made. `environment.json` records
+`app_tree_clean: true` and git head `3442874`, and the worktree was still clean afterwards.
+Exit 0, **all checks passed** (20 of 20), read from `evidence/reports/checks.json`. The results
+summary, the Wave 1 parity record and the recomputation record are byte-identical to the story
+audit's working-tree run. Only timings and provenance changed. The ledger's sha256 was the same
+before and after.
 
 | Check | Result |
 | --- | --- |
 | `ruff check` / `ruff format --check` / `mypy` | All checks passed / 139 files already formatted / no issues in 90 source files |
 | web typecheck, build, tests, boundary lint | 0 / built / **396/396** / "Boundary check passed: 25 read-only modules, 40 sources, dist bundle scanned." |
-| pytest (JUnit) | **896 passed**, 0 failures, 0 errors, 0 skipped (556 s) |
+| pytest (JUnit) | **896 passed**, 0 failures, 0 errors, 0 skipped (562 s) |
 | `plan-b run-case all` | 9 case lines, all `matches_expectation=True`. Cases dev01, dev02, dev04, dev05 and dev06 are identical to the Wave 1 evidence (`reports/wave1_parity.json`) |
 | `plan-b eval verify-freeze --require-heldout` | freeze.json verified, and heldout.json verified (28 files) |
 | `plan-b eval report` on the committed raw records, campus and pantry | both reports (metrics.json, evaluation_results.md, figure.svg) **identical byte for byte** to the committed `report/` (`reports/results_recomputed.json`) |
 | results summary | `reports/results_summary.json`. Campus met/recorded: P0 6/8, P1 24/24, P2 18/24, P3 21/24. Cases with all trials met 6/8/6/7. Pantry: 4/4, 6/12, 9/12, 6/12. Cases 4/2/3/2. These are the numbers `SHOWCASE.md` and `CLAIMS.md` cite |
-| `scripts/build_release.py` | 14/14 checks. 615 files, 59,613,420 bytes (`.env.example` added, and the scan widened to .xml, .log, .csv, .sh, PDFs and more key and path shapes). Excluded: 71 cache files, 231 evaluator records, 25 held-out case files. Served and replayed from the package (`release/release_report.json`) |
+| `scripts/build_release.py` | 14/14 checks. 615 files, 59,623,985 bytes, tree clean (`.env.example` added, and the scan widened to .xml, .log, .csv, .sh, PDFs and more key and path shapes). Excluded: 71 cache files, 231 evaluator records, 25 held-out case files. Served and replayed from the package (`release/release_report.json`) |
 | walkthrough.py / walkthrough_wave2.py / storyboard.py / keyboard.py | **41/41**, **30/30**, **32/32**, **19/19** (`browser/`) |
 | rehearsal.py | **3/3** rehearsals. Identical receipts and final states. Expected outcomes held. Repository ledger unchanged (`rehearsal/rehearsal_report.json`, see REHEARSALS.md) |
 | evidence credential pattern scan / identifier scan | 13 text files, no key prefix or bearer token / 14 text files, no host name, user name, git email or local path |
@@ -48,5 +51,4 @@ not touched by any W3.4 run: the forced failure used a temporary ledger.
 
 - The held-out evaluation itself. That is W3.2's, committed in `c052338`. Only its reports were
   recomputed.
-- A clean-checkout run of the collector. The integrate step does it.
 - Any human rehearsal (pending, see REHEARSALS.md).

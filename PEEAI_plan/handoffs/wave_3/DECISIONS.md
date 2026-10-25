@@ -43,5 +43,5 @@ Taken by the automated `story` worker under the 75-minute time box. No human has
     the `scripts/run_live_cases.py` docstring. `scripts/` is not in freeze.json (checked), so
     this changes no frozen file. Recorded Wave 2 traces keep their 1.0.0 ids, as both texts now
     say.
-11. **The evidence directory is filled by the collector.** In this working tree it was run once
-    to check it. The integrate step regenerates it from a clean checkout.
+11. **The evidence directory is filled by the collector.** It was first run on the working tree
+    to check it. The integrate step then regenerated it from a clean checkout of `3442874`.
