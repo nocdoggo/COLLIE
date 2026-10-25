@@ -1,0 +1,29 @@
+{
+  "artifact": "plan_b.eval_case",
+  "case_id": "C08",
+  "case_ref": "hk_z1c",
+  "suite": "campus",
+  "condition": "No feasible recovery under the authorized constraints",
+  "outcome_class": "infeasible",
+  "negative_control": false,
+  "negative_control_evidence": null,
+  "requires_recovery": false,
+  "actionable_record_ids": [],
+  "target_quantity": null,
+  "achievable_on_time": null,
+  "annotations": [
+    {
+      "source_record_id": "crr_msg_1101",
+      "event_id": "e_hall_r2",
+      "resource_id": "loan_projector",
+      "effective_time": null,
+      "claimed_change": "unavailability",
+      "source_id": "p58_courier_desk",
+      "booking_ref": "P58",
+      "unknown_fields": [
+        "effective_time"
+      ]
+    }
+  ],
+  "note": "Infeasibility proof (tests/test_heldout_cases.py): after the order desk's cancelled record, every candidate of the frozen planner's enumeration (keep, swap, shifts, standby substitute and their combinations) is infeasible, and a standby hold is refused at any time because its 4600-cent exposure exceeds the 4000-cent event budget."
+}

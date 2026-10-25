@@ -122,7 +122,7 @@ def test_fixture_data_and_excluded_files_cannot_trip_the_freeze(tree: Path, tmp_
     _flip_one_byte(tree / "plan_b" / "scenarios" / "private" / "dev01.json")
     _flip_one_byte(tree / "plan_b" / "scenarios" / "public" / "campus_showcase.json")
     held = tree / "plan_b" / "scenarios" / "private" / "eval"
-    held.mkdir()
+    held.mkdir(exist_ok=True)
     (held / "x.json").write_text("{}\n")
     _flip_one_byte(tree / "plan_b" / "evaluation" / "report.py")
     _flip_one_byte(tree / "plan_b" / "cli.py")

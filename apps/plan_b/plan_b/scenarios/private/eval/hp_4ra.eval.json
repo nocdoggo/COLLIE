@@ -1,0 +1,32 @@
+{
+  "artifact": "plan_b.eval_case",
+  "case_id": "T01",
+  "case_ref": "hp_4ra",
+  "suite": "pantry",
+  "condition": "Primary 20-kit shipment cannot arrive by the deadline; the alternate 16 can be verified, reserved and physically received in time",
+  "outcome_class": "target",
+  "negative_control": false,
+  "negative_control_evidence": null,
+  "requires_recovery": true,
+  "actionable_record_ids": [
+    "shelf_count_1"
+  ],
+  "target_quantity": 40,
+  "achievable_on_time": 40,
+  "annotations": [
+    {
+      "source_record_id": "sh31_carrier_note_1",
+      "event_id": "e_annex_14",
+      "resource_id": "shelf_stock",
+      "effective_time": null,
+      "claimed_change": "delay",
+      "source_id": "sh31_carrier",
+      "booking_ref": "SH31",
+      "unknown_fields": [
+        "effective_time"
+      ],
+      "note": "Hedged ('may not'); no new time."
+    }
+  ],
+  "note": "Permitted path: transfer hold of 16 neighbor kits, crew handoff after 3 minutes, hold and commit 40 shelf kits; 40 distributed at 16:40."
+}

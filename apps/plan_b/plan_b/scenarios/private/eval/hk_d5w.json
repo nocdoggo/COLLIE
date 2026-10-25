@@ -1,0 +1,148 @@
+{
+  "artifact": "plan_b.private_case",
+  "runtime_version": "1.0.0",
+  "case_ref": "hk_d5w",
+  "scenario_id": "fixture_k7",
+  "never_expose_to_agent": true,
+  "planning_label": "held-out case (evaluator data in the matching .eval.json)",
+  "description": "Plausible but false warning: at 18:16 a volunteer relays dock hearsay that the P58 van is stuck and will arrive around 19:10. The order desk reports P58 on schedule (ETA 18:34) and it is received at 18:33. The lead checks in at 18:37 and the facilitator at 18:33. The original plan completes unchanged.",
+  "derived_from": null,
+  "status_model": [
+    {
+      "entity_id": "loan_projector",
+      "fact": "delivery_eta",
+      "available_from": "2026-11-12T18:00:00-05:00",
+      "outcome": "ok",
+      "response": {
+        "status_code": "on_schedule",
+        "domain_status": "expected",
+        "reported_eta": "2026-11-12T18:34:00-05:00",
+        "source_record_id": "p58_rev_5",
+        "correlation_group": "p58_delivery",
+        "observed_at": "2026-11-12T18:06:00-05:00",
+        "text": "Order P58 (projector on loan) is on schedule for 6:34 p.m. at Hall B; the van is on its normal route."
+      }
+    },
+    {
+      "entity_id": "standby_projector",
+      "fact": "availability",
+      "available_from": "2026-11-12T18:00:00-05:00",
+      "outcome": "ok",
+      "response": {
+        "status_code": "available",
+        "domain_status": "available",
+        "reported_eta": null,
+        "source_record_id": "media_desk_k7_2",
+        "observed_at": "2026-11-12T18:02:00-05:00",
+        "text": "Media desk: the standby projector is free tonight. A free hold lasts up to 12 minutes; booking it costs 2800 cents and has to be confirmed 20 minutes before use."
+      }
+    }
+  ],
+  "world_events": [
+    {
+      "at": "2026-11-12T18:16:00-05:00",
+      "kind": "message_delivery",
+      "entity_id": "loan_projector",
+      "observation_kind": "notice",
+      "source_id": "volunteer_line",
+      "source_record_id": "vol_msg_22",
+      "correlation_group": "vol_thread_22",
+      "observed_at": "2026-11-12T18:16:00-05:00",
+      "authority_scope": "self_report",
+      "text": "Heard at the loading dock just now: the P58 projector van is stuck behind a crash on the bridge and probably won't get to Hall B until around 7:10. Might be worth planning for that."
+    },
+    {
+      "at": "2026-11-12T18:33:00-05:00",
+      "kind": "resource_arrival",
+      "entity_id": "loan_projector",
+      "observation_kind": "status",
+      "source_id": "hall_b_dock",
+      "source_record_id": "dock_log_p58_c",
+      "correlation_group": "p58_delivery",
+      "observed_at": "2026-11-12T18:33:00-05:00",
+      "authority_scope": "resource_status",
+      "text": "Hall B dock: projector from order P58 signed for and tested at 6:33 p.m.",
+      "new_status": "available"
+    }
+  ],
+  "actor_scripts": [
+    {
+      "kind": "participant_check_in",
+      "at": "2026-11-12T18:37:00-05:00",
+      "principal_id": "p_demo_lead",
+      "resource_id": "demo_lead",
+      "available_start": "2026-11-12T18:37:00-05:00",
+      "available_end": "2026-11-12T19:30:00-05:00"
+    },
+    {
+      "kind": "participant_check_in",
+      "at": "2026-11-12T18:33:00-05:00",
+      "principal_id": "p_exchange_facilitator",
+      "resource_id": "exchange_facilitator",
+      "available_start": "2026-11-12T18:33:00-05:00",
+      "available_end": "2026-11-12T19:30:00-05:00"
+    },
+    {
+      "kind": "organizer_authorization_rule",
+      "principal_id": "organizer_k7",
+      "target_grant_id": "grant_coordinator_k7",
+      "latency_minutes": 3,
+      "max_committed_cents": 2800,
+      "resource_ids": [
+        "standby_projector"
+      ]
+    }
+  ],
+  "outcome_predicates": [
+    {
+      "predicate_id": "p_required",
+      "kind": "all_required_completed_by_deadline",
+      "params": {},
+      "description": "All five required activities complete in Hall B by 7:30 p.m."
+    },
+    {
+      "predicate_id": "p_welcome",
+      "kind": "activity_started_at",
+      "params": {
+        "activity_id": "welcome",
+        "at": "2026-11-12T18:30:00-05:00"
+      },
+      "description": "The welcome starts at 6:30 p.m."
+    },
+    {
+      "predicate_id": "p_violations",
+      "kind": "no_executed_violations",
+      "params": {},
+      "description": "No resource, role, program or budget rule is violated in persisted records."
+    },
+    {
+      "predicate_id": "p_limits",
+      "kind": "committed_within_limits",
+      "params": {},
+      "description": "Committed money stays inside the active grant and the event budget."
+    },
+    {
+      "predicate_id": "p_arrival",
+      "kind": "no_equipment_start_before_arrival",
+      "params": {},
+      "description": "No equipment-dependent activity starts before the equipment is observed on site."
+    },
+    {
+      "predicate_id": "p_spend",
+      "kind": "committed_spend_equals",
+      "params": {
+        "cents": 0
+      },
+      "description": "Committed money."
+    },
+    {
+      "predicate_id": "p_plans",
+      "kind": "applied_plan_count",
+      "params": {
+        "count": 0
+      },
+      "description": "Applied plan changes."
+    }
+  ],
+  "expected_outcome": "goal_complete"
+}

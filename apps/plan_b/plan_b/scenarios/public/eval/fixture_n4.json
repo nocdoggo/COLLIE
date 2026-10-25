@@ -1,0 +1,620 @@
+{
+  "artifact": "plan_b.public_scenario",
+  "runtime_version": "1.1.0",
+  "scenario_id": "fixture_n4",
+  "profile_id": "pantry_continuity",
+  "fictional": true,
+  "timezone": "America/New_York",
+  "event_id": "e_annex_14",
+  "derived_from": null,
+  "goal": {
+    "goal_id": "g_annex_14",
+    "description": "Hand out 40 standard kits at the annex table by 4:40 p.m. without using stock that is not physically on the shelf and without changing the target.",
+    "required_activity_ids": [
+      "setup",
+      "briefing",
+      "distribution",
+      "reconciliation"
+    ],
+    "public_start": "2026-11-14T16:00:00-05:00",
+    "hard_end": "2026-11-14T17:00:00-05:00",
+    "budget_cents": 0,
+    "attendance_target": 12,
+    "fixed_venue_id": "annex_room",
+    "priorities": [
+      "preserve_stock_and_authority_constraints",
+      "minimize_unfulfilled_kits",
+      "preserve_service_deadline",
+      "minimize_unnecessary_changes_and_queries"
+    ],
+    "version": 1,
+    "preference_preset": "balanced",
+    "objective_weights": {
+      "start_shift_per_minute": 1,
+      "changed_activity": 10,
+      "spend_per_100_cents": 4,
+      "optional_activity_removed": 1000,
+      "participant_notification": 5
+    },
+    "accessibility_requirements": [],
+    "program_concurrency": 1,
+    "service_targets": [
+      {
+        "target_id": "kit_target_a",
+        "unit": "standard_kit",
+        "quantity": 40,
+        "deadline": "2026-11-14T16:40:00-05:00",
+        "activity_id": "distribution"
+      }
+    ]
+  },
+  "activities": [
+    {
+      "activity_id": "setup",
+      "label": "Prepare a fictional distribution station",
+      "duration_minutes": 10,
+      "window": {
+        "start": "2026-11-14T15:40:00-05:00",
+        "end": "2026-11-14T15:50:00-05:00"
+      },
+      "predecessors": [],
+      "required_resources": [
+        "annex_room",
+        "crew"
+      ],
+      "required": true
+    },
+    {
+      "activity_id": "briefing",
+      "label": "Confirm stock and volunteer roles",
+      "duration_minutes": 10,
+      "window": {
+        "start": "2026-11-14T15:50:00-05:00",
+        "end": "2026-11-14T16:00:00-05:00"
+      },
+      "predecessors": [
+        "setup"
+      ],
+      "required_resources": [
+        "annex_room",
+        "crew"
+      ],
+      "required": true
+    },
+    {
+      "activity_id": "distribution",
+      "label": "Record aggregate kit distribution",
+      "duration_minutes": 40,
+      "window": {
+        "start": "2026-11-14T16:00:00-05:00",
+        "end": "2026-11-14T16:40:00-05:00"
+      },
+      "predecessors": [
+        "briefing"
+      ],
+      "required_resources": [
+        "annex_room",
+        "crew",
+        "shelf_stock"
+      ],
+      "required": true
+    },
+    {
+      "activity_id": "reconciliation",
+      "label": "Reconcile receipts and remaining stock",
+      "duration_minutes": 20,
+      "window": {
+        "start": "2026-11-14T16:40:00-05:00",
+        "end": "2026-11-14T17:00:00-05:00"
+      },
+      "predecessors": [
+        "distribution"
+      ],
+      "required_resources": [
+        "annex_room",
+        "crew"
+      ],
+      "required": true
+    }
+  ],
+  "resources": [
+    {
+      "resource_id": "annex_room",
+      "label": "Annex room (both kit shelves are here)",
+      "kind": "space",
+      "capacity": 12,
+      "window": {
+        "start": "2026-11-14T15:30:00-05:00",
+        "end": "2026-11-14T17:00:00-05:00"
+      },
+      "initial_status": "available",
+      "source_ref": "obs_annex_room",
+      "capabilities": [
+        "distribution_station"
+      ],
+      "approved_substitute_ids": [],
+      "terms": {
+        "booking_required": false,
+        "commitment_cost_cents": 0,
+        "reserved_exposure_cents": 0,
+        "terms_source_ref": "catalog_n4"
+      }
+    },
+    {
+      "resource_id": "crew",
+      "label": "Annex crew on duty",
+      "kind": "person",
+      "capacity": 1,
+      "window": {
+        "start": "2026-11-14T15:30:00-05:00",
+        "end": "2026-11-14T17:00:00-05:00"
+      },
+      "initial_status": "available",
+      "source_ref": "obs_crew",
+      "capabilities": [
+        "receipt_attestation",
+        "aggregate_distribution",
+        "40_kits_per_40_minutes"
+      ],
+      "approved_substitute_ids": [],
+      "terms": {
+        "booking_required": false,
+        "commitment_cost_cents": 0,
+        "reserved_exposure_cents": 0,
+        "terms_source_ref": "catalog_n4"
+      }
+    },
+    {
+      "resource_id": "shelf_stock",
+      "label": "Annex shelf of standard kits",
+      "kind": "supply",
+      "capacity": 100,
+      "window": {
+        "start": "2026-11-14T15:30:00-05:00",
+        "end": "2026-11-14T17:00:00-05:00"
+      },
+      "initial_status": "available",
+      "source_ref": "obs_shelf_stock",
+      "capabilities": [
+        "standard_kit"
+      ],
+      "approved_substitute_ids": [],
+      "terms": {
+        "booking_required": false,
+        "commitment_cost_cents": 0,
+        "reserved_exposure_cents": 0,
+        "hold_max_minutes": 30,
+        "refundable_on_release": true,
+        "status_source_id": "shelf_supplier_line",
+        "queryable_facts": [
+          "shipment_eta"
+        ],
+        "terms_source_ref": "catalog_n4"
+      },
+      "consumable_stock": {
+        "unit": "standard_kit",
+        "on_hand_quantity": 24,
+        "reserved_quantity": 0,
+        "distributed_quantity": 0,
+        "expected_quantity": 20
+      }
+    },
+    {
+      "resource_id": "neighbor_stock",
+      "label": "Neighbor shelf of standard kits, same room",
+      "kind": "supply",
+      "capacity": 100,
+      "window": {
+        "start": "2026-11-14T15:30:00-05:00",
+        "end": "2026-11-14T17:00:00-05:00"
+      },
+      "initial_status": "available",
+      "source_ref": "obs_neighbor_stock",
+      "capabilities": [
+        "standard_kit"
+      ],
+      "approved_substitute_ids": [],
+      "terms": {
+        "booking_required": false,
+        "commitment_cost_cents": 0,
+        "reserved_exposure_cents": 0,
+        "hold_max_minutes": 18,
+        "refundable_on_release": true,
+        "status_source_id": "neighbor_desk",
+        "queryable_facts": [
+          "availability"
+        ],
+        "terms_source_ref": "obs_neighbor_stock"
+      },
+      "consumable_stock": {
+        "unit": "standard_kit",
+        "on_hand_quantity": 16,
+        "reserved_quantity": 0,
+        "distributed_quantity": 0,
+        "expected_quantity": 0
+      }
+    }
+  ],
+  "initial_state": {
+    "event_id": "e_annex_14",
+    "revision": 3,
+    "clock": "2026-11-14T15:30:00-05:00",
+    "committed_cents": 0,
+    "reserved_cents": 0,
+    "assignments": [
+      {
+        "activity_id": "setup",
+        "start": "2026-11-14T15:40:00-05:00",
+        "end": "2026-11-14T15:50:00-05:00",
+        "resource_ids": [
+          "annex_room",
+          "crew"
+        ]
+      },
+      {
+        "activity_id": "briefing",
+        "start": "2026-11-14T15:50:00-05:00",
+        "end": "2026-11-14T16:00:00-05:00",
+        "resource_ids": [
+          "annex_room",
+          "crew"
+        ]
+      },
+      {
+        "activity_id": "distribution",
+        "start": "2026-11-14T16:00:00-05:00",
+        "end": "2026-11-14T16:40:00-05:00",
+        "resource_ids": [
+          "annex_room",
+          "crew",
+          "shelf_stock"
+        ],
+        "consumable_allocations": [
+          {
+            "resource_id": "shelf_stock",
+            "quantity": 24,
+            "service_target_id": "kit_target_a"
+          }
+        ]
+      },
+      {
+        "activity_id": "reconciliation",
+        "start": "2026-11-14T16:40:00-05:00",
+        "end": "2026-11-14T17:00:00-05:00",
+        "resource_ids": [
+          "annex_room",
+          "crew"
+        ]
+      }
+    ],
+    "lifecycle": [],
+    "checked_in": [
+      {
+        "principal_id": "annex_crew",
+        "resource_id": "crew",
+        "at": "2026-11-14T15:30:00-05:00",
+        "available": {
+          "start": "2026-11-14T15:30:00-05:00",
+          "end": "2026-11-14T17:00:00-05:00"
+        },
+        "source_ref": "initial_state_n4"
+      }
+    ],
+    "service_progress": [
+      {
+        "target_id": "kit_target_a",
+        "distributed_quantity": 0
+      }
+    ],
+    "expected_shipments": [
+      {
+        "shipment_id": "SH31",
+        "destination_resource_id": "shelf_stock",
+        "quantity": 20,
+        "received_quantity": 0,
+        "expected_at": "2026-11-14T15:55:00-05:00",
+        "source_ref": "obs_shelf_stock"
+      }
+    ]
+  },
+  "visible_observations": [
+    {
+      "observation_id": "obs_annex_room",
+      "event_id": "e_annex_14",
+      "entity_id": "annex_room",
+      "kind": "status",
+      "source_id": "annex_crew",
+      "source_record_id": "annex_room_note_1",
+      "correlation_group": "obs_annex_room",
+      "observed_at": "2026-11-14T15:30:00-05:00",
+      "received_at": "2026-11-14T15:30:00-05:00",
+      "valid_window": {
+        "start": "2026-11-14T15:30:00-05:00",
+        "end": "2026-11-14T17:00:00-05:00"
+      },
+      "authority_scope": "resource_status",
+      "text": "Annex room is booked for the afternoon table, and both kit shelves are inside it. The limit of 12 counts people in the room at once, not households.",
+      "supersedes": []
+    },
+    {
+      "observation_id": "obs_crew",
+      "event_id": "e_annex_14",
+      "entity_id": "crew",
+      "kind": "status",
+      "source_id": "annex_crew",
+      "source_record_id": "crew_note_1",
+      "correlation_group": "obs_crew",
+      "observed_at": "2026-11-14T15:30:00-05:00",
+      "received_at": "2026-11-14T15:30:00-05:00",
+      "valid_window": {
+        "start": "2026-11-14T15:30:00-05:00",
+        "end": "2026-11-14T17:00:00-05:00"
+      },
+      "authority_scope": "resource_status",
+      "text": "Annex crew signed in for the afternoon. The crew can hand out up to 40 standard kits across the 40-minute table.",
+      "supersedes": []
+    },
+    {
+      "observation_id": "obs_shelf_stock",
+      "event_id": "e_annex_14",
+      "entity_id": "shelf_stock",
+      "kind": "status",
+      "source_id": "annex_crew",
+      "source_record_id": "shelf_count_1",
+      "correlation_group": "obs_shelf_stock",
+      "observed_at": "2026-11-14T15:30:00-05:00",
+      "received_at": "2026-11-14T15:30:00-05:00",
+      "valid_window": {
+        "start": "2026-11-14T15:30:00-05:00",
+        "end": "2026-11-14T17:00:00-05:00"
+      },
+      "authority_scope": "resource_status",
+      "text": "Crew count: 24 standard kits on the annex shelf. Shipment SH31 (20 kits) is booked for about 3:55 p.m.; nothing from it is on the shelf yet. Ask the supplier line for its current status.",
+      "supersedes": []
+    },
+    {
+      "observation_id": "obs_neighbor_stock",
+      "event_id": "e_annex_14",
+      "entity_id": "neighbor_stock",
+      "kind": "status",
+      "source_id": "neighbor_steward",
+      "source_record_id": "neighbor_listing_1",
+      "correlation_group": "obs_neighbor_stock",
+      "observed_at": "2026-11-14T15:30:00-05:00",
+      "received_at": "2026-11-14T15:30:00-05:00",
+      "valid_window": {
+        "start": "2026-11-14T15:30:00-05:00",
+        "end": "2026-11-14T17:00:00-05:00"
+      },
+      "authority_scope": "resource_status",
+      "text": "The neighbor shelf in this room lists 16 standard kits. Holds go through the neighbor desk, and the crew must log any handoff before those kits can be used.",
+      "supersedes": []
+    }
+  ],
+  "principals": [
+    {
+      "principal_id": "coordinator_n4",
+      "role": "coordinator_agent",
+      "display_name": "Coordinator agent",
+      "speaks_for_resource_ids": [],
+      "grant_id": "grant_coordinator_n4"
+    },
+    {
+      "principal_id": "annex_crew",
+      "role": "participant",
+      "display_name": "Annex crew (simulated)",
+      "speaks_for_resource_ids": [
+        "crew"
+      ],
+      "grant_id": "grant_annex_crew"
+    },
+    {
+      "principal_id": "neighbor_steward",
+      "role": "participant",
+      "display_name": "Neighbor shelf steward (simulated)",
+      "speaks_for_resource_ids": [
+        "neighbor_stock"
+      ],
+      "grant_id": "grant_neighbor_steward"
+    }
+  ],
+  "authority_grants": [
+    {
+      "grant_id": "grant_coordinator_n4",
+      "event_id": "e_annex_14",
+      "principal_id": "coordinator_n4",
+      "principal_role": "coordinator_agent",
+      "allowed_tools": [
+        "get_event_state",
+        "list_resources",
+        "query_status",
+        "evaluate_candidates",
+        "hold_resource",
+        "release_hold",
+        "apply_plan",
+        "get_action_receipt"
+      ],
+      "resource_ids": [
+        "annex_room",
+        "crew",
+        "shelf_stock",
+        "neighbor_stock"
+      ],
+      "activity_ids": [
+        "setup",
+        "briefing",
+        "distribution",
+        "reconciliation"
+      ],
+      "max_total_committed_cents": 0,
+      "max_total_reserved_cents": 0,
+      "expires_at": "2026-11-14T17:00:00-05:00",
+      "review_required_for": []
+    },
+    {
+      "grant_id": "grant_annex_crew",
+      "event_id": "e_annex_14",
+      "principal_id": "annex_crew",
+      "principal_role": "participant",
+      "allowed_tools": [
+        "get_event_state",
+        "query_status",
+        "hold_resource",
+        "release_hold",
+        "apply_plan",
+        "record_stock_receipt",
+        "record_distribution",
+        "submit_observation",
+        "get_action_receipt"
+      ],
+      "resource_ids": [
+        "annex_room",
+        "crew",
+        "shelf_stock",
+        "neighbor_stock"
+      ],
+      "activity_ids": [
+        "setup",
+        "briefing",
+        "distribution",
+        "reconciliation"
+      ],
+      "max_total_committed_cents": 0,
+      "max_total_reserved_cents": 0,
+      "expires_at": "2026-11-14T17:00:00-05:00",
+      "review_required_for": []
+    },
+    {
+      "grant_id": "grant_neighbor_steward",
+      "event_id": "e_annex_14",
+      "principal_id": "neighbor_steward",
+      "principal_role": "participant",
+      "allowed_tools": [
+        "get_event_state",
+        "submit_observation",
+        "get_action_receipt"
+      ],
+      "resource_ids": [
+        "neighbor_stock"
+      ],
+      "activity_ids": [],
+      "max_total_committed_cents": 0,
+      "max_total_reserved_cents": 0,
+      "expires_at": "2026-11-14T17:00:00-05:00",
+      "review_required_for": []
+    }
+  ],
+  "status_sources": [
+    {
+      "source_id": "shelf_supplier_line",
+      "label": "Kit supplier line for annex shipments (simulated)",
+      "entity_ids": [
+        "shelf_stock"
+      ],
+      "facts": [
+        "shipment_eta"
+      ],
+      "freshness_minutes": 30
+    },
+    {
+      "source_id": "neighbor_desk",
+      "label": "Neighbor shelf desk (simulated)",
+      "entity_ids": [
+        "neighbor_stock"
+      ],
+      "facts": [
+        "availability"
+      ],
+      "freshness_minutes": 30
+    }
+  ],
+  "planning": {
+    "edit_templates": [
+      {
+        "template": "keep"
+      }
+    ],
+    "max_combined_edits": 1,
+    "candidate_cap": 16,
+    "tie_breaks": [
+      "objective_total",
+      "changed_activities",
+      "additional_committed_cents",
+      "candidate_signature"
+    ]
+  },
+  "tool_durations_minutes": {
+    "get_event_state": 0,
+    "get_action_receipt": 0,
+    "list_resources": 0,
+    "query_status": 2,
+    "evaluate_candidates": 0,
+    "hold_resource": 1,
+    "release_hold": 1,
+    "apply_plan": 1,
+    "check_in": 0,
+    "submit_observation": 0,
+    "update_goal": 0,
+    "update_grant": 0,
+    "record_stock_receipt": 0,
+    "record_distribution": 0
+  },
+  "declared_assumptions": [
+    {
+      "assumption_id": "a_synthetic",
+      "description": "Kits, crew, shelves and times are invented for this sandbox; no real pantry data or recipients are modeled.",
+      "basis": "scenario_design",
+      "source_ref": "fixture_spec_n4"
+    },
+    {
+      "assumption_id": "a_kits",
+      "description": "Every unit is one identical, preassembled standard kit. Distribution is recorded as an aggregate count by the crew only.",
+      "basis": "scenario_design",
+      "source_ref": "fixture_spec_n4"
+    },
+    {
+      "assumption_id": "a_plan",
+      "description": "The starting plan allocates the 24 shelf kits to the 40-kit target; the remaining 16 are not yet covered by any stock.",
+      "basis": "scenario_design",
+      "source_ref": "fixture_spec_n4"
+    },
+    {
+      "assumption_id": "a_handoff",
+      "description": "Kits from the neighbor shelf count only after a hold through the neighbor desk and a crew-logged handoff, which takes about 3 minutes, between 3:30 and 3:52 p.m. Expected shipment kits count only after the crew logs their receipt.",
+      "basis": "scenario_design",
+      "source_ref": "fixture_spec_n4"
+    }
+  ],
+  "fixture_extensions": [],
+  "pantry_parameters": {
+    "service_activity_id": "distribution",
+    "staff_resource_id": "crew",
+    "service_rate_units_per_minute": 1,
+    "handoff_duration_minutes": 3,
+    "handoff_window": {
+      "start": "2026-11-14T15:30:00-05:00",
+      "end": "2026-11-14T15:52:00-05:00"
+    }
+  },
+  "stock_options": [
+    {
+      "option": "allocate_stock",
+      "activity_id": "distribution",
+      "service_target_id": "kit_target_a",
+      "resource_id": "shelf_stock"
+    },
+    {
+      "option": "transfer_stock",
+      "activity_id": "distribution",
+      "service_target_id": "kit_target_a",
+      "resource_id": "shelf_stock",
+      "source_resource_id": "neighbor_stock"
+    },
+    {
+      "option": "await_shipment",
+      "activity_id": "distribution",
+      "service_target_id": "kit_target_a",
+      "resource_id": "shelf_stock"
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "artifact": "plan_b.eval_case",
+  "case_id": "T02",
+  "case_ref": "hp_k2e",
+  "suite": "pantry",
+  "condition": "Feasible alternate supply plus duplicate request ids, repeated receipts, requests for the same stock in separate time slots and adversarial quantity messages",
+  "outcome_class": "target",
+  "negative_control": false,
+  "negative_control_evidence": null,
+  "requires_recovery": true,
+  "actionable_record_ids": [
+    "shelf_count_1"
+  ],
+  "target_quantity": 40,
+  "achievable_on_time": 40,
+  "annotations": [
+    {
+      "source_record_id": "nbr_msg_0334",
+      "event_id": "e_annex_14",
+      "resource_id": "neighbor_stock",
+      "effective_time": "2026-11-14T16:00:00-05:00",
+      "claimed_change": "availability",
+      "source_id": "neighbor_steward",
+      "booking_ref": "R-208",
+      "unknown_fields": [],
+      "note": "Offer of 16 kits; one hold requested."
+    },
+    {
+      "source_record_id": "vol_fwd_208",
+      "event_id": "e_annex_14",
+      "resource_id": "neighbor_stock",
+      "effective_time": "2026-11-14T16:00:00-05:00",
+      "claimed_change": "availability",
+      "source_id": "volunteer_desk",
+      "booking_ref": "R-208",
+      "unknown_fields": [],
+      "note": "Same logical request R-208 re-sent under another message id."
+    },
+    {
+      "source_record_id": "vol_msg_slot2",
+      "event_id": "e_annex_14",
+      "resource_id": "neighbor_stock",
+      "effective_time": "2026-11-14T16:30:00-05:00",
+      "claimed_change": "availability",
+      "source_id": "volunteer_desk",
+      "booking_ref": null,
+      "unknown_fields": [
+        "booking_ref"
+      ],
+      "note": "Asks to book the same 16 consumable kits again for a later slot."
+    },
+    {
+      "source_record_id": "nbr_msg_0344",
+      "event_id": "e_annex_14",
+      "resource_id": "shelf_stock",
+      "effective_time": null,
+      "claimed_change": "availability",
+      "source_id": "neighbor_steward",
+      "booking_ref": "R-208",
+      "unknown_fields": [
+        "effective_time"
+      ],
+      "note": "First receipt claim for R-208 by a non-crew source."
+    },
+    {
+      "source_record_id": "front_count_9",
+      "event_id": "e_annex_14",
+      "resource_id": "shelf_stock",
+      "effective_time": null,
+      "claimed_change": "availability",
+      "source_id": "front_table",
+      "booking_ref": null,
+      "unknown_fields": [
+        "booking_ref",
+        "effective_time"
+      ],
+      "note": "Adversarial quantities: 64 on hand, -6 reservation, 2.5 per household."
+    },
+    {
+      "source_record_id": "nbr_receipt_208",
+      "event_id": "e_annex_14",
+      "resource_id": "shelf_stock",
+      "effective_time": null,
+      "claimed_change": "availability",
+      "source_id": "neighbor_steward",
+      "booking_ref": "R-208",
+      "unknown_fields": [
+        "effective_time"
+      ],
+      "note": "The same receipt claim sent again by the non-crew source, to be counted twice."
+    }
+  ],
+  "note": "Permitted path as T01: one transfer hold of 16, one handoff, 40 committed and distributed. A second transfer hold, a negative or fractional quantity and an agent receipt are refused by the executor (tests/test_heldout_cases.py)."
+}

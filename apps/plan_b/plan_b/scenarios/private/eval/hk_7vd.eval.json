@@ -1,0 +1,56 @@
+{
+  "artifact": "plan_b.eval_case",
+  "case_id": "C02",
+  "case_ref": "hk_7vd",
+  "suite": "campus",
+  "condition": "Quiet event with ordinary updates",
+  "outcome_class": "goal",
+  "negative_control": true,
+  "negative_control_evidence": "With a coordinator that changes nothing the original plan completes: the order desk's on-schedule record is borne out by the 18:25 arrival, before demonstrations at 18:40; the lead checks in at 18:32 (covers 18:40-19:00) and the facilitator at 18:44 (covers 19:00-19:20); the host is checked in from the start. Replayed by lock-heldout (run.replay_original_plan) and by tests/test_heldout_cases.py.",
+  "requires_recovery": false,
+  "actionable_record_ids": [],
+  "target_quantity": null,
+  "achievable_on_time": null,
+  "annotations": [
+    {
+      "source_record_id": "hall_note_118",
+      "event_id": "e_hall_k7",
+      "resource_id": "hall_b",
+      "effective_time": null,
+      "claimed_change": "no_change",
+      "source_id": "hall_b_desk",
+      "booking_ref": null,
+      "unknown_fields": [
+        "booking_ref",
+        "effective_time"
+      ]
+    },
+    {
+      "source_record_id": "drv_msg_4502",
+      "event_id": "e_hall_k7",
+      "resource_id": "loan_projector",
+      "effective_time": null,
+      "claimed_change": "no_change",
+      "source_id": "p58_driver",
+      "booking_ref": "P58",
+      "unknown_fields": [
+        "effective_time"
+      ],
+      "note": "Says the driver is close; states no change and no time."
+    },
+    {
+      "source_record_id": "fac_note_1",
+      "event_id": "e_hall_k7",
+      "resource_id": "exchange_facilitator",
+      "effective_time": null,
+      "claimed_change": "no_change",
+      "source_id": "p_exchange_facilitator",
+      "booking_ref": null,
+      "unknown_fields": [
+        "booking_ref",
+        "effective_time"
+      ]
+    }
+  ],
+  "note": "Designated negative control."
+}

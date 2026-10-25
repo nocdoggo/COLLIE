@@ -1,0 +1,28 @@
+{
+  "artifact": "plan_b.eval_case",
+  "case_id": "C03",
+  "case_ref": "hk_d5w",
+  "suite": "campus",
+  "condition": "Plausible false delivery warning",
+  "outcome_class": "goal",
+  "negative_control": true,
+  "negative_control_evidence": "With a coordinator that changes nothing the original plan completes: the warning is false (order desk on schedule, ETA 18:34; received 18:33, before demonstrations at 18:40); the lead checks in at 18:37 and the facilitator at 18:33 with windows covering their slots. Replayed by lock-heldout and by tests/test_heldout_cases.py.",
+  "requires_recovery": false,
+  "actionable_record_ids": [],
+  "target_quantity": null,
+  "achievable_on_time": null,
+  "annotations": [
+    {
+      "source_record_id": "vol_msg_22",
+      "event_id": "e_hall_k7",
+      "resource_id": "loan_projector",
+      "effective_time": "2026-11-12T19:10:00-05:00",
+      "claimed_change": "delay",
+      "source_id": "volunteer_line",
+      "booking_ref": "P58",
+      "unknown_fields": [],
+      "note": "Second-hand ('heard at the loading dock'), hedged ('probably', 'around')."
+    }
+  ],
+  "note": "Designated negative control."
+}

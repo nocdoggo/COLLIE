@@ -1,0 +1,661 @@
+{
+  "artifact": "plan_b.public_scenario",
+  "runtime_version": "1.0.0",
+  "scenario_id": "fixture_k7",
+  "profile_id": "campus_showcase",
+  "fictional": true,
+  "timezone": "America/New_York",
+  "event_id": "e_hall_k7",
+  "derived_from": null,
+  "goal": {
+    "goal_id": "goal_hall_k7",
+    "description": "Open Hall B at 6:30 p.m., run the welcome, the demonstrations, the skills exchange and the closing, finish by 7:30 p.m., and keep spending inside the contingency budget.",
+    "required_activity_ids": [
+      "setup",
+      "welcome",
+      "demonstrations",
+      "skills_exchange",
+      "closing"
+    ],
+    "public_start": "2026-11-12T18:30:00-05:00",
+    "hard_end": "2026-11-12T19:30:00-05:00",
+    "budget_cents": 12000,
+    "attendance_target": 60,
+    "fixed_venue_id": "hall_b",
+    "priorities": [
+      "satisfy hard constraints",
+      "complete required activities",
+      "minimize disruption and unnecessary cost",
+      "minimize verification burden"
+    ],
+    "version": 1,
+    "preference_preset": "balanced",
+    "objective_weights": {
+      "start_shift_per_minute": 1,
+      "changed_activity": 10,
+      "spend_per_100_cents": 4,
+      "optional_activity_removed": 1000,
+      "participant_notification": 5
+    },
+    "accessibility_requirements": [],
+    "program_concurrency": 1
+  },
+  "activities": [
+    {
+      "activity_id": "setup",
+      "label": "Prepare the event",
+      "duration_minutes": 20,
+      "window": {
+        "start": "2026-11-12T18:00:00-05:00",
+        "end": "2026-11-12T18:30:00-05:00"
+      },
+      "predecessors": [],
+      "required_resources": [
+        "hall_b"
+      ],
+      "required": true,
+      "program": true
+    },
+    {
+      "activity_id": "welcome",
+      "label": "Welcome",
+      "duration_minutes": 10,
+      "window": {
+        "start": "2026-11-12T18:30:00-05:00",
+        "end": "2026-11-12T18:40:00-05:00"
+      },
+      "predecessors": [
+        "setup"
+      ],
+      "required_resources": [
+        "hall_b",
+        "evening_host"
+      ],
+      "required": true,
+      "program": true
+    },
+    {
+      "activity_id": "demonstrations",
+      "label": "Community demonstrations",
+      "duration_minutes": 20,
+      "window": {
+        "start": "2026-11-12T18:40:00-05:00",
+        "end": "2026-11-12T19:20:00-05:00"
+      },
+      "predecessors": [
+        "welcome"
+      ],
+      "required_resources": [
+        "hall_b",
+        "loan_projector",
+        "demo_lead"
+      ],
+      "required": true,
+      "program": true
+    },
+    {
+      "activity_id": "skills_exchange",
+      "label": "Skills exchange",
+      "duration_minutes": 20,
+      "window": {
+        "start": "2026-11-12T18:40:00-05:00",
+        "end": "2026-11-12T19:20:00-05:00"
+      },
+      "predecessors": [
+        "welcome"
+      ],
+      "required_resources": [
+        "hall_b",
+        "exchange_facilitator"
+      ],
+      "required": true,
+      "program": true
+    },
+    {
+      "activity_id": "closing",
+      "label": "Closing",
+      "duration_minutes": 10,
+      "window": {
+        "start": "2026-11-12T19:20:00-05:00",
+        "end": "2026-11-12T19:30:00-05:00"
+      },
+      "predecessors": [
+        "demonstrations",
+        "skills_exchange"
+      ],
+      "required_resources": [
+        "hall_b",
+        "evening_host"
+      ],
+      "required": true,
+      "program": true
+    }
+  ],
+  "resources": [
+    {
+      "resource_id": "hall_b",
+      "label": "Community hall B (fixed venue)",
+      "kind": "space",
+      "capacity": 80,
+      "window": {
+        "start": "2026-11-12T18:00:00-05:00",
+        "end": "2026-11-12T19:30:00-05:00"
+      },
+      "source_ref": "catalog_k7",
+      "capabilities": [
+        "hall_b"
+      ],
+      "approved_substitute_ids": [],
+      "initial_status": "available",
+      "terms": {
+        "booking_required": false,
+        "commitment_cost_cents": 0,
+        "reserved_exposure_cents": 0,
+        "terms_source_ref": "catalog_k7"
+      }
+    },
+    {
+      "resource_id": "loan_projector",
+      "label": "Projector on loan, order P58 (delivery)",
+      "kind": "equipment",
+      "capacity": 1,
+      "window": {
+        "start": "2026-11-12T18:30:00-05:00",
+        "end": "2026-11-12T19:30:00-05:00"
+      },
+      "source_ref": "catalog_k7",
+      "capabilities": [
+        "projection"
+      ],
+      "approved_substitute_ids": [
+        "standby_projector"
+      ],
+      "initial_status": "expected",
+      "terms": {
+        "booking_required": false,
+        "commitment_cost_cents": 0,
+        "reserved_exposure_cents": 0,
+        "booking_ref": "P58",
+        "status_source_id": "loan_supplier_status",
+        "queryable_facts": [
+          "delivery_eta"
+        ],
+        "terms_source_ref": "catalog_k7"
+      }
+    },
+    {
+      "resource_id": "standby_projector",
+      "label": "Standby projector from the media desk",
+      "kind": "equipment",
+      "capacity": 1,
+      "window": {
+        "start": "2026-11-12T18:15:00-05:00",
+        "end": "2026-11-12T19:30:00-05:00"
+      },
+      "source_ref": "catalog_k7",
+      "capabilities": [
+        "projection"
+      ],
+      "approved_substitute_ids": [],
+      "initial_status": "available",
+      "terms": {
+        "booking_required": true,
+        "commitment_cost_cents": 2800,
+        "hold_fee_cents": 0,
+        "reserved_exposure_cents": 2800,
+        "hold_max_minutes": 12,
+        "commitment_cutoff_minutes_before_use": 20,
+        "refundable_on_release": true,
+        "cancellation_supported": false,
+        "status_source_id": "standby_desk",
+        "queryable_facts": [
+          "availability"
+        ],
+        "terms_source_ref": "catalog_k7"
+      }
+    },
+    {
+      "resource_id": "evening_host",
+      "label": "Evening host",
+      "kind": "person",
+      "capacity": 1,
+      "window": {
+        "start": "2026-11-12T18:00:00-05:00",
+        "end": "2026-11-12T19:30:00-05:00"
+      },
+      "source_ref": "catalog_k7",
+      "capabilities": [
+        "evening_host"
+      ],
+      "approved_substitute_ids": [],
+      "initial_status": "available",
+      "terms": {
+        "booking_required": false,
+        "commitment_cost_cents": 0,
+        "reserved_exposure_cents": 0,
+        "terms_source_ref": "catalog_k7"
+      }
+    },
+    {
+      "resource_id": "demo_lead",
+      "label": "Demonstrations lead (volunteer)",
+      "kind": "person",
+      "capacity": 1,
+      "window": {
+        "start": "2026-11-12T18:30:00-05:00",
+        "end": "2026-11-12T19:30:00-05:00"
+      },
+      "source_ref": "catalog_k7",
+      "capabilities": [
+        "demo_lead"
+      ],
+      "approved_substitute_ids": [],
+      "initial_status": "available",
+      "terms": {
+        "booking_required": false,
+        "commitment_cost_cents": 0,
+        "reserved_exposure_cents": 0,
+        "terms_source_ref": "catalog_k7"
+      }
+    },
+    {
+      "resource_id": "exchange_facilitator",
+      "label": "Skills exchange facilitator (volunteer)",
+      "kind": "person",
+      "capacity": 1,
+      "window": {
+        "start": "2026-11-12T18:30:00-05:00",
+        "end": "2026-11-12T19:30:00-05:00"
+      },
+      "source_ref": "catalog_k7",
+      "capabilities": [
+        "exchange_facilitator"
+      ],
+      "approved_substitute_ids": [],
+      "initial_status": "available",
+      "terms": {
+        "booking_required": false,
+        "commitment_cost_cents": 0,
+        "reserved_exposure_cents": 0,
+        "terms_source_ref": "catalog_k7"
+      }
+    }
+  ],
+  "initial_state": {
+    "event_id": "e_hall_k7",
+    "revision": 3,
+    "clock": "2026-11-12T18:10:00-05:00",
+    "committed_cents": 0,
+    "reserved_cents": 0,
+    "assignments": [
+      {
+        "activity_id": "setup",
+        "start": "2026-11-12T18:00:00-05:00",
+        "end": "2026-11-12T18:20:00-05:00",
+        "resource_ids": [
+          "hall_b"
+        ]
+      },
+      {
+        "activity_id": "welcome",
+        "start": "2026-11-12T18:30:00-05:00",
+        "end": "2026-11-12T18:40:00-05:00",
+        "resource_ids": [
+          "hall_b",
+          "evening_host"
+        ]
+      },
+      {
+        "activity_id": "demonstrations",
+        "start": "2026-11-12T18:40:00-05:00",
+        "end": "2026-11-12T19:00:00-05:00",
+        "resource_ids": [
+          "hall_b",
+          "loan_projector",
+          "demo_lead"
+        ]
+      },
+      {
+        "activity_id": "skills_exchange",
+        "start": "2026-11-12T19:00:00-05:00",
+        "end": "2026-11-12T19:20:00-05:00",
+        "resource_ids": [
+          "hall_b",
+          "exchange_facilitator"
+        ]
+      },
+      {
+        "activity_id": "closing",
+        "start": "2026-11-12T19:20:00-05:00",
+        "end": "2026-11-12T19:30:00-05:00",
+        "resource_ids": [
+          "hall_b",
+          "evening_host"
+        ]
+      }
+    ],
+    "lifecycle": [
+      {
+        "activity_id": "setup",
+        "state": "started",
+        "at": "2026-11-12T18:00:00-05:00",
+        "source_ref": "initial_state_k7"
+      }
+    ],
+    "checked_in": [
+      {
+        "principal_id": "p_evening_host",
+        "resource_id": "evening_host",
+        "at": "2026-11-12T18:10:00-05:00",
+        "available": {
+          "start": "2026-11-12T18:00:00-05:00",
+          "end": "2026-11-12T19:30:00-05:00"
+        },
+        "source_ref": "initial_state_k7"
+      }
+    ]
+  },
+  "visible_observations": [],
+  "principals": [
+    {
+      "principal_id": "coordinator_k7",
+      "role": "coordinator_agent",
+      "display_name": "Coordinator agent",
+      "speaks_for_resource_ids": [],
+      "grant_id": "grant_coordinator_k7"
+    },
+    {
+      "principal_id": "organizer_k7",
+      "role": "organizer",
+      "display_name": "Hall B organizer",
+      "speaks_for_resource_ids": [],
+      "grant_id": "grant_organizer_k7"
+    },
+    {
+      "principal_id": "p_evening_host",
+      "role": "participant",
+      "display_name": "Evening host",
+      "speaks_for_resource_ids": [
+        "evening_host"
+      ],
+      "grant_id": "grant_evening_host"
+    },
+    {
+      "principal_id": "p_demo_lead",
+      "role": "participant",
+      "display_name": "Demonstrations lead",
+      "speaks_for_resource_ids": [
+        "demo_lead"
+      ],
+      "grant_id": "grant_demo_lead"
+    },
+    {
+      "principal_id": "p_exchange_facilitator",
+      "role": "participant",
+      "display_name": "Skills exchange facilitator",
+      "speaks_for_resource_ids": [
+        "exchange_facilitator"
+      ],
+      "grant_id": "grant_exchange_facilitator"
+    }
+  ],
+  "authority_grants": [
+    {
+      "grant_id": "grant_coordinator_k7",
+      "event_id": "e_hall_k7",
+      "principal_role": "coordinator_agent",
+      "allowed_tools": [
+        "get_event_state",
+        "list_resources",
+        "query_status",
+        "evaluate_candidates",
+        "hold_resource",
+        "release_hold",
+        "apply_plan",
+        "get_action_receipt"
+      ],
+      "resource_ids": [
+        "hall_b",
+        "loan_projector",
+        "standby_projector",
+        "evening_host",
+        "demo_lead",
+        "exchange_facilitator"
+      ],
+      "activity_ids": [
+        "setup",
+        "welcome",
+        "demonstrations",
+        "skills_exchange",
+        "closing"
+      ],
+      "max_total_committed_cents": 0,
+      "max_total_reserved_cents": 2800,
+      "expires_at": "2026-11-12T19:30:00-05:00",
+      "review_required_for": [
+        "increase committed spending",
+        "change fixed venue",
+        "remove a required activity"
+      ],
+      "principal_id": "coordinator_k7"
+    },
+    {
+      "grant_id": "grant_exchange_facilitator",
+      "event_id": "e_hall_k7",
+      "principal_id": "p_exchange_facilitator",
+      "principal_role": "participant",
+      "allowed_tools": [
+        "get_event_state",
+        "check_in",
+        "submit_observation",
+        "get_action_receipt"
+      ],
+      "resource_ids": [
+        "exchange_facilitator"
+      ],
+      "activity_ids": [
+        "skills_exchange"
+      ],
+      "max_total_committed_cents": 0,
+      "max_total_reserved_cents": 0,
+      "expires_at": "2026-11-12T19:30:00-05:00",
+      "review_required_for": [
+        "change another participant record",
+        "change plan or organizer goal"
+      ]
+    },
+    {
+      "grant_id": "grant_demo_lead",
+      "event_id": "e_hall_k7",
+      "principal_id": "p_demo_lead",
+      "principal_role": "participant",
+      "allowed_tools": [
+        "get_event_state",
+        "check_in",
+        "submit_observation",
+        "get_action_receipt"
+      ],
+      "resource_ids": [
+        "demo_lead"
+      ],
+      "activity_ids": [
+        "demonstrations"
+      ],
+      "max_total_committed_cents": 0,
+      "max_total_reserved_cents": 0,
+      "expires_at": "2026-11-12T19:30:00-05:00",
+      "review_required_for": [
+        "change another participant record",
+        "change plan or organizer goal"
+      ]
+    },
+    {
+      "grant_id": "grant_evening_host",
+      "event_id": "e_hall_k7",
+      "principal_id": "p_evening_host",
+      "principal_role": "participant",
+      "allowed_tools": [
+        "get_event_state",
+        "check_in",
+        "submit_observation",
+        "get_action_receipt"
+      ],
+      "resource_ids": [
+        "evening_host"
+      ],
+      "activity_ids": [
+        "welcome",
+        "closing"
+      ],
+      "max_total_committed_cents": 0,
+      "max_total_reserved_cents": 0,
+      "expires_at": "2026-11-12T19:30:00-05:00",
+      "review_required_for": [
+        "change another participant record",
+        "change plan or organizer goal"
+      ]
+    },
+    {
+      "grant_id": "grant_organizer_k7",
+      "event_id": "e_hall_k7",
+      "principal_id": "organizer_k7",
+      "principal_role": "organizer",
+      "allowed_tools": [
+        "get_event_state",
+        "get_action_receipt",
+        "list_resources",
+        "evaluate_candidates",
+        "submit_observation",
+        "update_goal",
+        "update_grant"
+      ],
+      "resource_ids": [
+        "hall_b",
+        "loan_projector",
+        "standby_projector",
+        "evening_host",
+        "demo_lead",
+        "exchange_facilitator"
+      ],
+      "activity_ids": [
+        "setup",
+        "welcome",
+        "demonstrations",
+        "skills_exchange",
+        "closing"
+      ],
+      "max_total_committed_cents": 12000,
+      "max_total_reserved_cents": 12000,
+      "expires_at": "2026-11-12T19:30:00-05:00",
+      "review_required_for": [
+        "change fixed venue",
+        "remove a required activity"
+      ]
+    }
+  ],
+  "status_sources": [
+    {
+      "source_id": "loan_supplier_status",
+      "label": "Loan supplier order desk (simulated)",
+      "entity_ids": [
+        "loan_projector"
+      ],
+      "facts": [
+        "delivery_eta"
+      ],
+      "freshness_minutes": 20
+    },
+    {
+      "source_id": "standby_desk",
+      "label": "Media desk for the standby projector (simulated)",
+      "entity_ids": [
+        "standby_projector"
+      ],
+      "facts": [
+        "availability"
+      ],
+      "freshness_minutes": 20
+    }
+  ],
+  "planning": {
+    "edit_templates": [
+      {
+        "template": "keep"
+      },
+      {
+        "template": "swap",
+        "activity_ids": [
+          "demonstrations",
+          "skills_exchange"
+        ]
+      },
+      {
+        "template": "shift",
+        "activity_id": "demonstrations",
+        "offsets_minutes": [
+          -5,
+          5
+        ]
+      },
+      {
+        "template": "shift",
+        "activity_id": "skills_exchange",
+        "offsets_minutes": [
+          -5,
+          5
+        ]
+      },
+      {
+        "template": "substitute",
+        "activity_id": "demonstrations",
+        "resource_id": "loan_projector",
+        "substitute_ids": [
+          "standby_projector"
+        ]
+      }
+    ],
+    "max_combined_edits": 2,
+    "candidate_cap": 64,
+    "tie_breaks": [
+      "objective_total",
+      "changed_activities",
+      "additional_committed_cents",
+      "candidate_signature"
+    ]
+  },
+  "tool_durations_minutes": {
+    "get_event_state": 0,
+    "get_action_receipt": 0,
+    "list_resources": 0,
+    "query_status": 2,
+    "evaluate_candidates": 0,
+    "hold_resource": 1,
+    "release_hold": 1,
+    "apply_plan": 1,
+    "check_in": 0,
+    "submit_observation": 0,
+    "update_goal": 0,
+    "update_grant": 0
+  },
+  "declared_assumptions": [
+    {
+      "assumption_id": "a_hall",
+      "description": "Hall B runs one program activity at a time; its 80-seat capacity is checked separately from that rule.",
+      "basis": "scenario_design",
+      "source_ref": "catalog_k7"
+    },
+    {
+      "assumption_id": "a_synthetic",
+      "description": "People, prices, orders and times are invented for this sandbox. Nothing about future deliveries is known to the coordinator.",
+      "basis": "scenario_design",
+      "source_ref": "catalog_k7"
+    },
+    {
+      "assumption_id": "a_standby",
+      "description": "A hold on the standby projector is free, lasts up to 12 minutes and reserves 2800 cents of budget; booking it costs 2800 cents and must be confirmed 20 minutes before use.",
+      "basis": "scenario_design",
+      "source_ref": "catalog_k7"
+    }
+  ],
+  "fixture_extensions": []
+}

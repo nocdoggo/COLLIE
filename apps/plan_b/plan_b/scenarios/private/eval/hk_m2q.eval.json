@@ -1,0 +1,32 @@
+{
+  "artifact": "plan_b.eval_case",
+  "case_id": "C01",
+  "case_ref": "hk_m2q",
+  "suite": "campus",
+  "condition": "Genuine projector delivery delay",
+  "outcome_class": "goal",
+  "negative_control": false,
+  "negative_control_evidence": null,
+  "requires_recovery": true,
+  "actionable_record_ids": [
+    "drv_msg_4471"
+  ],
+  "target_quantity": null,
+  "achievable_on_time": null,
+  "annotations": [
+    {
+      "source_record_id": "drv_msg_4471",
+      "event_id": "e_hall_k7",
+      "resource_id": "loan_projector",
+      "effective_time": null,
+      "claimed_change": "delay",
+      "source_id": "p58_driver",
+      "booking_ref": "P58",
+      "unknown_fields": [
+        "effective_time"
+      ],
+      "note": "States lateness ('not by 6:30', 'just before 7') without an exact time."
+    }
+  ],
+  "note": "Permitted path: query the order desk (ETA 18:57), apply the swap before 18:40; demonstrations run 19:00-19:20 after the 18:56 arrival. A standby booking for 18:40, approved before the 18:20 cutoff, is also permitted."
+}

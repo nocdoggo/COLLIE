@@ -1,0 +1,52 @@
+{
+  "artifact": "plan_b.eval_case",
+  "case_id": "T03",
+  "case_ref": "hp_v7s",
+  "suite": "pantry",
+  "condition": "Stale or wrong-source receipt claim before physical delivery; authoritative receipt after the deadline",
+  "outcome_class": "partial",
+  "negative_control": false,
+  "negative_control_evidence": null,
+  "requires_recovery": false,
+  "actionable_record_ids": [],
+  "target_quantity": 40,
+  "achievable_on_time": 24,
+  "annotations": [
+    {
+      "source_record_id": "nbr_msg_sh31",
+      "event_id": "e_annex_14",
+      "resource_id": "shelf_stock",
+      "effective_time": null,
+      "claimed_change": "availability",
+      "source_id": "neighbor_steward",
+      "booking_ref": "SH31",
+      "unknown_fields": [
+        "effective_time"
+      ],
+      "note": "Receipt claim from a source that does not record receipts; claims 44 kits."
+    },
+    {
+      "source_record_id": "vol_fwd_rcpt_1107",
+      "event_id": "e_annex_14",
+      "resource_id": "shelf_stock",
+      "effective_time": "2026-11-07T15:20:00-05:00",
+      "claimed_change": "availability",
+      "source_id": "volunteer_desk",
+      "booking_ref": "SH31",
+      "unknown_fields": [],
+      "note": "Forwarded note dated Nov 7 (observed_at Nov 7): another day's receipt."
+    },
+    {
+      "source_record_id": "annex_dock_0412",
+      "event_id": "e_annex_14",
+      "resource_id": "shelf_stock",
+      "effective_time": "2026-11-14T16:50:00-05:00",
+      "claimed_change": "availability",
+      "source_id": "annex_dock",
+      "booking_ref": "SH31",
+      "unknown_fields": [],
+      "note": "The dock's sign-off of SH31 at 16:50, after the 16:40 deadline; no crew receipt follows in the session."
+    }
+  ],
+  "note": "Achievable limit 24 by 16:40: the neighbor hold is refused all window, SH31's authoritative ETA is 16:50 and only the crew can record a receipt (none is scheduled), so only the 24 shelf kits can be committed. Adaptation: the frozen simulator has no external-receipt actor, so the post-deadline arrival is the supplier line's 16:50 ETA plus the dock's 16:50 sign-off message, and no stock credit occurs in the session."
+}

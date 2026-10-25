@@ -1,0 +1,31 @@
+{
+  "artifact": "plan_b.eval_case",
+  "case_id": "T04",
+  "case_ref": "hp_g9m",
+  "suite": "pantry",
+  "condition": "Alternate source physically supplies only 10 of the 16 requested kits and no permitted source can fill the remainder in time",
+  "outcome_class": "partial",
+  "negative_control": false,
+  "negative_control_evidence": null,
+  "requires_recovery": false,
+  "actionable_record_ids": [],
+  "target_quantity": 40,
+  "achievable_on_time": 34,
+  "annotations": [
+    {
+      "source_record_id": "crew_note_seal",
+      "event_id": "e_annex_14",
+      "resource_id": "neighbor_stock",
+      "effective_time": null,
+      "claimed_change": "unavailability",
+      "source_id": "annex_crew_desk",
+      "booking_ref": null,
+      "unknown_fields": [
+        "booking_ref",
+        "effective_time"
+      ],
+      "note": "Six kits not moved; states no time."
+    }
+  ],
+  "note": "Achievable limit 34 by 16:40: the crew confirms 10 of the 16 held kits, the residual 6 stay on the transfer hold until it expires, SH31 is rebooked after the session, so 24 + 10 can be committed; deficit 6."
+}

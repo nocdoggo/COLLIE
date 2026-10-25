@@ -1,0 +1,146 @@
+{
+  "artifact": "plan_b.private_case",
+  "runtime_version": "1.0.0",
+  "case_ref": "hk_f6k",
+  "scenario_id": "fixture_k7",
+  "never_expose_to_agent": true,
+  "planning_label": "held-out case (evaluator data in the matching .eval.json)",
+  "description": "Verification unavailable: the order desk answers 'unavailable' all evening for P58's delivery ETA. At 18:13 the courier desk says its tracking is down and the earliest it can promise is about 19:05. P58 is received at 19:09, too late for either demonstrations slot. The facilitator checks in at 18:26 and the lead at 18:31. The standby projector is free; the organizer approves an in-bounds request after 3 minutes. Recovery: hold the standby for 19:00-19:20, ask, then apply swap + standby before the 18:40 cutoff.",
+  "derived_from": null,
+  "status_model": [
+    {
+      "entity_id": "loan_projector",
+      "fact": "delivery_eta",
+      "available_from": "2026-11-12T18:00:00-05:00",
+      "outcome": "unavailable",
+      "response": null
+    },
+    {
+      "entity_id": "standby_projector",
+      "fact": "availability",
+      "available_from": "2026-11-12T18:00:00-05:00",
+      "outcome": "ok",
+      "response": {
+        "status_code": "available",
+        "domain_status": "available",
+        "reported_eta": null,
+        "source_record_id": "media_desk_k7_7",
+        "observed_at": "2026-11-12T18:02:00-05:00",
+        "text": "Media desk: the standby projector is free tonight. A free hold lasts up to 12 minutes; booking it costs 2800 cents and has to be confirmed 20 minutes before use."
+      }
+    },
+    {
+      "entity_id": "standby_projector",
+      "fact": "availability",
+      "available_from": "2026-11-12T18:20:00-05:00",
+      "outcome": "ok",
+      "response": {
+        "status_code": "available",
+        "domain_status": "available",
+        "reported_eta": null,
+        "source_record_id": "media_desk_k7_8",
+        "observed_at": "2026-11-12T18:20:00-05:00",
+        "text": "Media desk: the standby projector has no booking tonight. Holds last up to 12 minutes; a booking costs 2800 cents and has to be confirmed 20 minutes before use."
+      }
+    }
+  ],
+  "world_events": [
+    {
+      "at": "2026-11-12T18:13:00-05:00",
+      "kind": "message_delivery",
+      "entity_id": "loan_projector",
+      "observation_kind": "notice",
+      "source_id": "p58_courier_desk",
+      "source_record_id": "crr_msg_1012",
+      "correlation_group": "p58_courier_thread",
+      "observed_at": "2026-11-12T18:13:00-05:00",
+      "authority_scope": "self_report",
+      "text": "Courier desk: our tracking screen is down this evening and the P58 driver has not called in since leaving the depot. The earliest we can promise the projector at Hall B is about 7:05 p.m."
+    },
+    {
+      "at": "2026-11-12T19:09:00-05:00",
+      "kind": "resource_arrival",
+      "entity_id": "loan_projector",
+      "observation_kind": "status",
+      "source_id": "hall_b_dock",
+      "source_record_id": "dock_log_p58_g",
+      "correlation_group": "p58_delivery",
+      "observed_at": "2026-11-12T19:09:00-05:00",
+      "authority_scope": "resource_status",
+      "text": "Hall B dock: projector from order P58 signed for at 7:09 p.m.",
+      "new_status": "available"
+    }
+  ],
+  "actor_scripts": [
+    {
+      "kind": "participant_check_in",
+      "at": "2026-11-12T18:26:00-05:00",
+      "principal_id": "p_exchange_facilitator",
+      "resource_id": "exchange_facilitator",
+      "available_start": "2026-11-12T18:26:00-05:00",
+      "available_end": "2026-11-12T19:30:00-05:00"
+    },
+    {
+      "kind": "participant_check_in",
+      "at": "2026-11-12T18:31:00-05:00",
+      "principal_id": "p_demo_lead",
+      "resource_id": "demo_lead",
+      "available_start": "2026-11-12T18:31:00-05:00",
+      "available_end": "2026-11-12T19:30:00-05:00"
+    },
+    {
+      "kind": "organizer_authorization_rule",
+      "principal_id": "organizer_k7",
+      "target_grant_id": "grant_coordinator_k7",
+      "latency_minutes": 3,
+      "max_committed_cents": 2800,
+      "resource_ids": [
+        "standby_projector"
+      ]
+    }
+  ],
+  "outcome_predicates": [
+    {
+      "predicate_id": "p_required",
+      "kind": "all_required_completed_by_deadline",
+      "params": {},
+      "description": "All five required activities complete in Hall B by 7:30 p.m."
+    },
+    {
+      "predicate_id": "p_welcome",
+      "kind": "activity_started_at",
+      "params": {
+        "activity_id": "welcome",
+        "at": "2026-11-12T18:30:00-05:00"
+      },
+      "description": "The welcome starts at 6:30 p.m."
+    },
+    {
+      "predicate_id": "p_violations",
+      "kind": "no_executed_violations",
+      "params": {},
+      "description": "No resource, role, program or budget rule is violated in persisted records."
+    },
+    {
+      "predicate_id": "p_limits",
+      "kind": "committed_within_limits",
+      "params": {},
+      "description": "Committed money stays inside the active grant and the event budget."
+    },
+    {
+      "predicate_id": "p_arrival",
+      "kind": "no_equipment_start_before_arrival",
+      "params": {},
+      "description": "No equipment-dependent activity starts before the equipment is observed on site."
+    },
+    {
+      "predicate_id": "p_spend",
+      "kind": "committed_spend_equals",
+      "params": {
+        "cents": 2800
+      },
+      "description": "Committed money."
+    }
+  ],
+  "expected_outcome": "goal_complete"
+}

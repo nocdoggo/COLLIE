@@ -1,0 +1,30 @@
+{
+  "artifact": "plan_b.eval_case",
+  "case_id": "C07",
+  "case_ref": "hk_f6k",
+  "suite": "campus",
+  "condition": "Relevant verification service unavailable",
+  "outcome_class": "goal",
+  "negative_control": false,
+  "negative_control_evidence": null,
+  "requires_recovery": true,
+  "actionable_record_ids": [
+    "crr_msg_1012"
+  ],
+  "target_quantity": null,
+  "achievable_on_time": null,
+  "annotations": [
+    {
+      "source_record_id": "crr_msg_1012",
+      "event_id": "e_hall_k7",
+      "resource_id": "loan_projector",
+      "effective_time": "2026-11-12T19:05:00-05:00",
+      "claimed_change": "delay",
+      "source_id": "p58_courier_desk",
+      "booking_ref": "P58",
+      "unknown_fields": [],
+      "note": "Gives an earliest arrival of about 7:05 p.m.; the order desk cannot confirm it."
+    }
+  ],
+  "note": "Permitted path: the status check fails (bounded), hold the standby for demonstrations 19:00-19:20, ask the organizer (2800 cents, in bounds), apply swap + standby before the 18:40 cutoff."
+}
