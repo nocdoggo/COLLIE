@@ -1,0 +1,227 @@
+{
+ "artifact": "plan_b.eval_freeze",
+ "episode_caps": {
+  "max_model_calls": 8,
+  "max_tool_calls": 48
+ },
+ "episode_timeout_s": 900,
+ "excluded": [
+  "plan_b/scenarios/public/",
+  "plan_b/scenarios/private/",
+  "plan_b/evaluation/manifests/",
+  "plan_b/evaluation/development/",
+  "plan_b/api/",
+  "plan_b/cli.py",
+  "plan_b/scenarios/demos.py",
+  "plan_b/evaluation/report.py"
+ ],
+ "files": {
+  "plan_b/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "plan_b/agent/__init__.py": "f914fab4bff43d43ead97328392b1b9fc6a8edec08f5bf1b0fa435597a220e8f",
+  "plan_b/agent/attention.py": "7154f5d76df7e32ebc8fc8b4b034808f9122c2a5bbc9e1fca68d2cb6b3a86d86",
+  "plan_b/agent/config.py": "dc783f80164f9fe9e09b421592589bcc9d037c9769cd1535d353a499fd64b431",
+  "plan_b/agent/gate.py": "99653a1b6d4c4108b3e5129d9e1ae28226d1463a441c8e81d96188e276965ef4",
+  "plan_b/agent/interpret.py": "5460e5ea1ae016cd1a1184d8dc75f39c867b1b6b626edbd2c2ac6ab801d60705",
+  "plan_b/agent/menu.py": "e40d3ca8d7134af63f86cbbeca9b82e76e88a3c8fbc80342f2bd4e635b1e9637",
+  "plan_b/agent/orchestrator.py": "89dde3de309724dc9ddfe9136308ae28651cac2afb175e74cbd9062648e44e81",
+  "plan_b/agent/policies/__init__.py": "7c4a947da45adfb0b13057348a758591dbbd3db5bb10a7a5acd28e5da2b6f303",
+  "plan_b/agent/policies/selective.py": "081d8de68ef8825a8e2a5e3222e9c53c680987702a9f1f44a049312ada5555c3",
+  "plan_b/agent/policies/tool_use.py": "0cf97d61ae518a872e5f223a231e78ae8e90faa77fc45fcfc2c329ba16851e29",
+  "plan_b/agent/policies/verify_all.py": "684a0f655227bb3278346e0a16e0f49ed16116661a5e5a89250bb7c29bab503c",
+  "plan_b/agent/prompts/__init__.py": "16fb199cf4afafd1af8e2e1d3c8b536cf88458af1b0bcbbb27641d3ed2affbe3",
+  "plan_b/agent/prompts/choose_action.v1.txt": "d82725c25cc976d303dd4b36ad4f36556f4ad5c168b6674e1ac59abfbfd25b8d",
+  "plan_b/agent/prompts/choose_action_pantry.v1.txt": "1b0c1cc1305a944d516609e3c7a17d17818d664e41b43201abb38e929d58e48a",
+  "plan_b/agent/prompts/interpret.v1.txt": "147d6c1cb253545af8de61a99958c3430e329f4369c228e5142bef97598556e4",
+  "plan_b/agent/prompts/tool_use.v1.txt": "189709ae324fe24feed61fe6d38434925f85431179dbe3795e7b48a8567a1d34",
+  "plan_b/agent/prompts/tool_use.v2.txt": "77f8fa810f3b5153eea1e14602ba24d30c9ec501d11d4b7cb1e83fef041d82cd",
+  "plan_b/agent/prompts/tool_use.v3.txt": "07254aa874ac92b0b315139c88b76ad63bd95594f72feb23391c89e263ee188f",
+  "plan_b/agent/provider.py": "6c9397ac065889e3da046d5ea62c0c4677170b19c18f4176d6098e2ddcf11f75",
+  "plan_b/domain/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "plan_b/domain/adapters/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "plan_b/domain/adapters/base.py": "f9a09c0717931a6ab6a07140bbd1245bc88f53008d30679951e5e2f87d8a97ee",
+  "plan_b/domain/adapters/campus.py": "12b380aec4b5c367599ec244a92b6f62554ecb4d22525adc56e069d6e48050ca",
+  "plan_b/domain/adapters/campus_outcome.py": "5a137632f4b1b52f5a3a5eb548c79d9e59e4bf93cc7fc2f03baa5d4024090bc3",
+  "plan_b/domain/adapters/outcome.py": "03ee3027853ab42aaf95f1b272b1a93a89081115f83c92ca563c344aae762bb2",
+  "plan_b/domain/adapters/pantry.py": "828f37b8d44982943c603be228a1e8991b7f1161ee6de0bc5d9ba07e9503107b",
+  "plan_b/domain/adapters/registry.py": "d06949f0d56fc5af729989b06303cbf533b0965f5cc4254763fd6544f6b60343",
+  "plan_b/domain/candidates.py": "2b787b7144cfc200695ff36dd129e3a0cd52becf84c1071c692ba48062ea67c6",
+  "plan_b/domain/clock.py": "6e6bf7bf95200d11b244276678ce4121bb94bde2b799a27bb453b53753ce4180",
+  "plan_b/domain/constraints.py": "b333063bfd4f08b4cef2ee3894c71cd2e5d70d7e02ae8c582fd63a52dff54d33",
+  "plan_b/domain/digest.py": "bf6fb958951fe5ea76f1cd665c45c7c7bf70b046188f29ceb719b087d01e950b",
+  "plan_b/domain/fixtures.py": "41be34c473b5e1e21ae38ce7b360c6c96873839a60f15b84be42b951395bff30",
+  "plan_b/domain/models.py": "fc7768b174889894176d90342d7fb1de5178598768e557497cce87ffc0196b8d",
+  "plan_b/domain/objective.py": "5340ff4d34a084d6268cfd7a43f9a2b5671bf8df0475ecffba2ec967fc107bb2",
+  "plan_b/domain/planning_map.py": "362191303f03757bddac282c9e77f6f8c0c61aa47c5ff9fcd78897f600ea27a2",
+  "plan_b/domain/projection.py": "89adabcb29d0effaac989dea646e5cb93cfedbb52641a87910c31c3b99c63796",
+  "plan_b/domain/readiness.py": "66962fb5b7c65840d0c40fec221c98fa5671887c883844b258a8f1a93bca0e94",
+  "plan_b/domain/stock.py": "5de4304d99a68cf1538b76dc2fb480b295b78d0b98af94d194071b9177ae5492",
+  "plan_b/domain/timeutil.py": "e4e56581966406b30331abefb9996d474817d2b4944e09d7b48f93256b46dd06",
+  "plan_b/evaluation/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "plan_b/evaluation/export_trace.py": "5b84879ae7bbb842ab24c224690aa9110f7e627e3401556546bb3b4b35e1a226",
+  "plan_b/evaluation/manifest.py": "e00c147681634d2e6483c2583a39c3ebe2d2405d4227031a2ce2113557348be2",
+  "plan_b/evaluation/metrics.py": "1faee3a324a258e78db3456495e67813129697923d39a8571b201b0675c62b26",
+  "plan_b/evaluation/policies/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "plan_b/evaluation/policies/base.py": "a148c3ead466660c177ad77d0ffe8d9e664efe81fd9acfa8aa151382fa6da006",
+  "plan_b/evaluation/policies/pantry_rules.py": "907febec6b5b2e2f666172130aa647a5b021d6e3ea68d197fd781a556e7b8985",
+  "plan_b/evaluation/policies/parser.py": "9e6d6877d14ff6ce848525480ef3f0df18ce257e5e880e020ccbade2ba4fe74d",
+  "plan_b/evaluation/policies/rules.py": "23ea1aaf1086dc15295d4836b46c4b8dfe143d716de4bc56e0eec45489423cf9",
+  "plan_b/evaluation/run.py": "2cc5470207180ffd8f92b71eb1c047ef472bbea38e62be140d0bf88b9ea1733a",
+  "plan_b/evaluation/scoring.py": "315f98fb0e850594db9b65fa132905a5c8192a5c549e01112bfb152773b81785",
+  "plan_b/scenarios/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "plan_b/scenarios/policy_host.py": "4bcdcf3c294f611a06305bfda0c4f7735b2ccbfef7933db4dfaea51a8adaaf8f",
+  "plan_b/scenarios/runner.py": "11d4d67ca158e2cebc413872d1f8fa04a6c962730908afbdac25b0104230a02d",
+  "plan_b/store/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "plan_b/store/database.py": "7e2346e5a6e81a409e7d7c036b488e927003679fc05859a0eb4b75d1cdebba2f",
+  "plan_b/store/engine.py": "5556b53d99fe955be2e4349ae6888e27b0f7831a520a3bcf763dce5bb677ffe1",
+  "plan_b/store/episodes.py": "c6f3f0c3340d8429d2054105813fe03b99fa246a25541d6dcf98434e63dcd39c",
+  "plan_b/store/migrations/0001_initial.sql": "9d22b458174bef4cc5e50369521e194857a39933756de7d64b41ccdcb3528ab1",
+  "plan_b/store/migrations/0002_scheduled_actions.sql": "935784e86ed1fc370d5dd98149bf65f5ffe760e0335c9ee8f9b7baa4bb70c3c5",
+  "plan_b/store/migrations/0003_history_guards.sql": "4bd0ccf0ffe447a4bdffb2f935037409824fdc2c66fd603d1762521803195da1",
+  "plan_b/store/migrations/0004_consumable_stock.sql": "dca6ef2d423cf5d941f9af72da269689511559584559c9548c6ad11b5bdcb014",
+  "plan_b/store/projection_db.py": "ef136b4600886b7455c280da231dc2761cff7de30fd3bf5786931ccccf2a6888",
+  "plan_b/store/repo.py": "f841b97fb6c0a7f9a5eb43b8d917e32c513aee315ae502dc8a5b5e2721995a7c",
+  "plan_b/store/sessions.py": "6d202e912045cf9d2ad58bfdcb6c496986ad3dd55cd5fe8469c2ea09dd5855b0",
+  "plan_b/tools/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "plan_b/tools/client.py": "685109ceb701401bb494047f6fa77fe8804afc86ee62c2ddc91cdd709fac3f6e",
+  "plan_b/tools/executor.py": "3a77761376b8ece69b0d4db92d21809cc64c3ceb9734b9464093e4bb73e7aaf2",
+  "plan_b/tools/handlers.py": "c5fd7e6184041d2ea97e66cc8c467e2101184277662e9c4eadfb54f43fcc2ab1",
+  "plan_b/tools/stock.py": "ef32035b0c5d2e276f172ee28564ea82e4b43992dad66f924ae11fc55beeb59a",
+  "plan_b/world/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "plan_b/world/leakcheck.py": "4492aa6dd18a93208a1d2dc999a1e665d1057519284291b39b7acaac8a43fb97",
+  "plan_b/world/validate.py": "6391cb76ece1167a07f0006cf4ab20c80a106cbb03d3f21bf538668463fd1f78",
+  "plan_b/world/world.py": "67a6493e8856a05cc29899b59fb5c63d4d50be5e5fdd155926f695670619a242",
+  "pyproject.toml": "67df07892eb493f695b7057415c3e98c129a7142fb1aaa2101913918a73d0eff",
+  "uv.lock": "95b8337fea6818cf0fe290a5df4d0187258a7392f9624bac769b68f974128803"
+ },
+ "files_sha256": "c3ad3118a4a1ab349c0404e84b1c3a4607d389a872e83ebc4dd1deabbf92488a",
+ "frozen_at": "2026-10-25T23:23:47Z",
+ "generation": {
+  "agent_constants": {
+   "plan_b.agent.gate": {
+    "DEFAULT_TIMEOUT_S": 90.0,
+    "GATE_MAX_MODEL_CALLS": 6,
+    "GATE_MAX_TOOL_CALLS": 16
+   },
+   "plan_b.agent.orchestrator": {
+    "CHOOSE_MAX_TOKENS": 4096,
+    "DEFAULT_MAX_MODEL_CALLS": 8,
+    "DEFAULT_MAX_TOOL_CALLS": 32,
+    "DEFAULT_TIMEOUT_S": 90.0,
+    "INTERPRET_MAX_TOKENS": 4096,
+    "MAX_OUTPUT_TOKENS": 4096,
+    "MAX_STALE_RETRIES": 2,
+    "PROVIDER_RETRY": {
+     "seconds": 120.0
+    },
+    "RETRYABLE_REJECTIONS": [
+     "CANDIDATE_STALE",
+     "GOAL_VERSION_CONFLICT",
+     "HOLD_EXPIRED",
+     "REVISION_CONFLICT"
+    ]
+   },
+   "plan_b.agent.policies.tool_use": {
+    "DEFAULT_MAX_MODEL_CALLS": 8,
+    "DEFAULT_MAX_TOOL_CALLS": 32,
+    "DEFAULT_TIMEOUT_S": 90.0,
+    "MAX_CALLS_PER_TURN": 3,
+    "MAX_OUTPUT_TOKENS": 4096,
+    "MAX_TURNS": 6,
+    "PROVIDER_RETRY": {
+     "seconds": 120.0
+    },
+    "TURN_MAX_TOKENS": 4096
+   },
+   "plan_b.agent.policies.verify_all": {
+    "DEFAULT_MAX_MODEL_CALLS": 8,
+    "DEFAULT_MAX_TOOL_CALLS": 32,
+    "DEFAULT_TIMEOUT_S": 90.0
+   },
+   "plan_b.agent.provider": {
+    "DEFAULT_TIMEOUT_S": 90.0,
+    "MAX_OUTPUT_TOKENS": 4096,
+    "RETRY_429_BASE_S": 3.0,
+    "RETRY_429_MAX_DELAY_S": 20.0,
+    "RETRY_429_MAX_WAIT_S": 60.0,
+    "SEED_UNSUPPORTED": [
+     "anthropic/claude-sonnet-5.5"
+    ],
+    "TEMPERATURE": null
+   }
+  },
+  "request_template": {
+   "model": "anthropic/claude-sonnet-5.5",
+   "provider": {
+    "require_parameters": true
+   },
+   "response_format": {
+    "json_schema": {
+     "strict": true
+    },
+    "type": "json_schema"
+   },
+   "usage": {
+    "include": true
+   }
+  }
+ },
+ "git_head_at_freeze": "1ea8ea1cad3433709c4ea5a891a13dea3e9e3095",
+ "model": {
+  "base_url": "https://openrouter.ai/api/v1",
+  "max_run_cost_usd": 0.5,
+  "model_id": "anthropic/claude-sonnet-5.5",
+  "provider": "openrouter",
+  "source": "endpoint configuration"
+ },
+ "model_response_cache": false,
+ "order_seed": 20261025,
+ "p3_relevance_rule": "verify-all-relevance/1.0.0",
+ "planner_version": "plan_b.planner/1.2.0",
+ "policies": {
+  "P0": "rules",
+  "P1": "tool-use",
+  "P2": "live",
+  "P3": "verify-all"
+ },
+ "policy_ids": {
+  "P0": {
+   "event": "rules/1.0.0",
+   "pantry": "pantry-rules/1.1.0"
+  },
+  "P1": "tool-use/1.2.0",
+  "P2": "live/1.2.0",
+  "P3": "verify-all/1.2.0"
+ },
+ "prompts": {
+  "choose_action.v1": "d82725c25cc976d303dd4b36ad4f36556f4ad5c168b6674e1ac59abfbfd25b8d",
+  "choose_action_pantry.v1": "1b0c1cc1305a944d516609e3c7a17d17818d664e41b43201abb38e929d58e48a",
+  "interpret.v1": "147d6c1cb253545af8de61a99958c3430e329f4369c228e5142bef97598556e4",
+  "tool_use.v1": "189709ae324fe24feed61fe6d38434925f85431179dbe3795e7b48a8567a1d34",
+  "tool_use.v2": "77f8fa810f3b5153eea1e14602ba24d30c9ec501d11d4b7cb1e83fef041d82cd",
+  "tool_use.v3": "07254aa874ac92b0b315139c88b76ad63bd95594f72feb23391c89e263ee188f"
+ },
+ "protocol_version": "plan_b.eval_protocol/1.0.0",
+ "retry_rules": [
+  "Every model call counts against the episode's model-call cap, a repair attempt and a failed call included; every tool call, failed calls, retries and receipt lookups included, counts against the tool-call cap.",
+  "Malformed or schema-violating model output gets one repair attempt; after it the step is a visible wait or an unresolved reading, never an invented result.",
+  "A provider timeout, HTTP or transport failure is a visible wait, retried at a later wake. Policy 1.2: an HTTP 429 is first waited out inside the call (3 s doubling to 20 s, at most 60 s of waiting per call) and uses no model call; only one that outlasts the bound is such a failure.",
+  "A rejected mutation (for example a stale revision) is re-read and re-evaluated a bounded number of times; a lost mutation response is reconciled with its original idempotency key. Policy 1.2: P2 and P3 re-issue a choice rejected only as stale when the re-read menu still offers the same intent and candidate, without a model call.",
+  "P3 checks each relevant source once per unresolved update and retries a failed source once; it never waits for a failed source.",
+  "A reached cap is one host-recorded stop decision; the policy is not woken again and the episode runs to its hard end, scored as it stands."
+ ],
+ "runtime": {
+  "distributions": {
+   "fastapi": "0.162.0",
+   "pydantic": "2.14.1",
+   "pydantic-core": "2.50.1",
+   "uvicorn": "0.54.0"
+  },
+  "implementation": "cpython",
+  "python": "3.12.11"
+ },
+ "seeds": [
+  101,
+  202,
+  303
+ ]
+}
