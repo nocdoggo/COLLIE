@@ -42,7 +42,8 @@ export function Section({
   className?: string;
 }) {
   return (
-    <section id={id} aria-labelledby={`${id}-title`} className={`card ${className ?? ""}`}>
+    // tabIndex -1: a JumpButton (or the board's section links) can move keyboard focus here.
+    <section id={id} aria-labelledby={`${id}-title`} className={`card ${className ?? ""}`} tabIndex={-1}>
       <h2 id={`${id}-title`} className="card-title">
         {title}
       </h2>

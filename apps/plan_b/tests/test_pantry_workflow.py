@@ -32,7 +32,14 @@ from plan_b.store.database import Database
 from plan_b.store.projection_db import build_snapshot
 from plan_b.world.leakcheck import find_leaks
 from plan_b.world.world import load_case
-from tests.test_pantry_fixture import DISTRIBUTION_WINDOW, EVENT, SCENARIO, PantrySandbox, pt
+from tests.test_pantry_fixture import (
+    DISTRIBUTION_WINDOW,
+    EVENT,
+    SCENARIO,
+    PantrySandbox,
+    error_code,
+    pt,
+)
 
 PKG = Path(__file__).resolve().parents[1] / "plan_b"
 FORBIDDEN = (
@@ -413,3 +420,87 @@ def test_outcome_scoring_flags_unattested_and_agent_records(db: Database) -> Non
     categories = [v.category for v in adapter.score_outcome(broken, result.history).violations]
     assert categories.count("stock_not_conserved") == 2
     assert "unattested_stock_record" in categories
+
+
+# ---------------------------------------------------------------------------
+# W3.3 release checks: quantity drills (docs/RELEASE_CHECKS.md)
+# ---------------------------------------------------------------------------
+
+
+def _hold_of(env: Any) -> str:
+    assert env.data is not None, env.error
+    return str(env.data["hold"]["hold_id"])
+
+
+def test_consumed_kits_cannot_be_claimed_again_under_fresh_keys_or_references(
+    pantry: PantrySandbox,
+) -> None:
+    pantry.committed_40()
+    pantry.advance_to("13:40")
+    served = pantry.distribute("k-dist", 40, reference="dist_all")
+    assert served.status == "succeeded", served.error
+    assert pantry.balances()["pantry_stock"] == (0, 0, 0)
+    # The same physical distribution under a fresh transport key is refused.
+    assert error_code(pantry.distribute("k-dist-2", 40, reference="dist_all")) == (
+        "DUPLICATE_REFERENCE"
+    )
+    # A new reference under a fresh key finds no committed kit left to distribute.
+    again = pantry.distribute("k-dist-3", 1, reference="dist_more")
+    assert error_code(again) == "INSUFFICIENT_STOCK"
+    stock = pantry.view().stock
+    assert stock is not None
+    s = stock.service[0]
+    assert (s.distributed_quantity, s.on_time_quantity, len(stock.distributions)) == (40, 40, 1)
+    assert pantry.balances()["pantry_stock"] == (0, 0, 0) and pantry.conserved()
+
+
+def test_a_partial_handoff_then_late_service_keeps_the_residual_and_no_retroactive_success(
+    pantry: PantrySandbox,
+) -> None:
+    hold = _hold_of(pantry.hold_partner("k-partner", 16))
+    partial = pantry.handoff("k-ten", hold, 10, reference="handoff_ten")
+    assert partial.status == "succeeded", partial.error
+    residual = next(h for h in pantry.view().holds if h.hold_id == hold)
+    assert (residual.effective_status, residual.remaining_quantity) == ("active", 6)
+    assert pantry.balances() == {"pantry_stock": (34, 0, 34), "partner_stock": (6, 6, 0)}
+    assert pantry.hold_pantry("k-34", 34).status == "succeeded"
+    assert pantry.apply_best("k-apply").status == "succeeded"
+    # The residual six stay held until the 12:50 handoff cutoff; a late handoff is refused.
+    pantry.advance_to("12:50")
+    lapsed = next(h for h in pantry.view().holds if h.hold_id == hold)
+    assert lapsed.effective_status == "expired"
+    assert error_code(pantry.handoff("k-six", hold, 6, reference="handoff_six")) == "HOLD_EXPIRED"
+    assert pantry.balances()["partner_stock"] == (6, 0, 6)  # back to the partner, not received
+    pantry.advance_to("13:40")
+    assert pantry.distribute("k-30", 30, reference="dist_on_time").status == "succeeded"
+    pantry.advance_to("13:52")
+    late = pantry.distribute("k-4", 4, reference="dist_late")
+    assert late.status == "succeeded", late.error
+    assert late.receipt is not None and late.receipt.executed_at == pt("13:52")
+    stock = pantry.view().stock
+    assert stock is not None
+    times = [(d.at, d.quantity, d.on_time) for d in stock.distributions]
+    assert times == [(pt("13:40"), 30, True), (pt("13:52"), 4, False)]
+    s = stock.service[0]
+    assert (s.original_quantity, s.on_time_quantity, s.late_quantity) == (40, 30, 4)
+    assert (s.unfulfilled_quantity, s.attained) == (10, False)  # the on-time deficit stays
+    assert pantry.balances()["pantry_stock"] == (0, 0, 0) and pantry.conserved()
+
+
+def test_distribution_at_the_inclusive_deadline_is_on_time_and_a_minute_later_is_not(
+    pantry: PantrySandbox,
+) -> None:
+    pantry.committed_40()
+    pantry.advance_to("13:40")
+    assert pantry.distribute("k-at", 20, reference="dist_at_deadline").status == "succeeded"
+    pantry.advance_to("13:41")
+    assert pantry.distribute("k-after", 20, reference="dist_after").status == "succeeded"
+    stock = pantry.view().stock
+    assert stock is not None
+    assert [(d.at, d.on_time) for d in stock.distributions] == [
+        (pt("13:40"), True),
+        (pt("13:41"), False),
+    ]
+    s = stock.service[0]
+    assert (s.on_time_quantity, s.late_quantity, s.unfulfilled_quantity) == (20, 20, 20)
+    assert s.attained is False

@@ -16,7 +16,29 @@ import { PlanComparison } from "../components/PlanComparison";
 import type { PolicySelection } from "../components/policyMode";
 import { Budget, HoldsAndCommitments, RoleReadiness } from "../components/Resources";
 import { Schedule } from "../components/Schedule";
+import { JumpButton } from "../components/ui";
 import type { EventStateView } from "../types";
+
+/**
+ * Keyboard shortcuts to the parts a viewer needs first: the current plan, the evidence, the
+ * latest decision and the action status (and the pantry quantities when the profile has stock).
+ * Each moves focus to its section; the sections render in every mode.
+ */
+export function BoardJumps({ view }: { view: EventStateView }) {
+  const targets: (readonly [string, string])[] = [["schedule", "Current plan"]];
+  if (view.stock !== null && view.stock !== undefined) targets.push(["pantry-board", "Stock and service"]);
+  targets.push(["status-checks", "Evidence"], ["what-changed", "Latest decision"], ["action-history", "Action status"]);
+  return (
+    <nav className="board-jumps" aria-label="Board sections">
+      <span className="muted small">Jump to:</span>
+      {targets.map(([id, label]) => (
+        <JumpButton key={id} targetId={id}>
+          {label}
+        </JumpButton>
+      ))}
+    </nav>
+  );
+}
 
 export function BoardView({
   view,
@@ -44,6 +66,7 @@ export function BoardView({
     <div className={`board board-${mode}`}>
       {showHeader ? <BoardHeader view={view} mode={mode} actions={headerActions} selection={selection} /> : null}
       {beforeGrid}
+      <BoardJumps view={view} />
       <div className="board-grid">
         <div className="col-main">
           <ChangeSummary view={view} />

@@ -102,6 +102,11 @@ code,
   outline-offset: 2px;
 }
 
+/* A click inside a board card focuses its section (tabIndex -1): ring for keyboard focus only. */
+section[tabindex="-1"]:focus:not(:focus-visible) {
+  outline: none;
+}
+
 [id] {
   scroll-margin-top: 6rem;
 }
@@ -1384,4 +1389,13 @@ textarea {
     scroll-behavior: auto !important;
     transition: none !important;
   }
+}
+
+/* The board's section links (BoardView BoardJumps). */
+.board-jumps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 1rem;
+  margin: 0 0 0.75rem;
 }

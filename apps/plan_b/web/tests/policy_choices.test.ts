@@ -3,9 +3,12 @@
 // a model-driven mode, as it does for the live agent (P2).
 
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
+import { DETERMINISTIC_POLICY_ID } from "../src/api.ts";
 import { modelPolicyLabel, policyModeOf } from "../src/components/policyMode.ts";
+import { CHOICE_POLICY_ID } from "../src/panels/moderatorState.ts";
 import type { JsonValue, PolicyDecision } from "../src/types.ts";
 import { liveDecision, ruleDecision } from "./support/wave2.ts";
 
@@ -49,4 +52,16 @@ test("a P1 or P3 selection without a server label names its own policy", () => {
   assert.equal(policyModeOf([], { choice: "verify-all", modelId: null }).label, "Verify-all agent · model not reported yet");
   assert.equal(policyModeOf([], { choice: "live", modelId: "m" }).label, "Live agent · m");
   assert.equal(policyModeOf([], { choice: "verify-all", modelId: "m" }).kind, "live");
+});
+
+test("the moderator's fallback policy ids are the frozen Wave 3 ids", () => {
+  const freeze = JSON.parse(
+    readFileSync(new URL("../../plan_b/evaluation/manifests/freeze.json", import.meta.url), "utf-8"),
+  ) as { policy_ids: { P0: { event: string }; P1: string; P2: string; P3: string } };
+  const ids = freeze.policy_ids;
+  assert.deepEqual(CHOICE_POLICY_ID, { "tool-use": ids.P1, live: ids.P2, "verify-all": ids.P3 });
+  assert.equal(DETERMINISTIC_POLICY_ID, ids.P0.event);
+  // The new ids still name their policies on the board.
+  assert.equal(modelPolicyLabel(ids.P1), "Tool-use agent");
+  assert.equal(modelPolicyLabel(ids.P3), "Verify-all agent");
 });

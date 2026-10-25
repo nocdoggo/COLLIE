@@ -103,11 +103,15 @@ export const MODEL_CHOICE_LABEL: Record<Exclude<PolicyChoice, "rules">, string> 
   "verify-all": "Verify-all agent",
 };
 
-/** The policy id each choice runs (the server's `policy_id` wins when it sent one). */
+/**
+ * The policy id each choice runs (the server's `policy_id` wins when it sent one): the ids of the
+ * Wave 3 freeze (evaluation/manifests/freeze.json `policy_ids`). Recorded Wave 2 traces keep
+ * their own 1.0.0 ids.
+ */
 export const CHOICE_POLICY_ID: Record<Exclude<PolicyChoice, "rules">, string> = {
-  "tool-use": "tool-use/1.0.0",
-  live: "live/1.0.0",
-  "verify-all": "verify-all/1.0.0",
+  "tool-use": "tool-use/1.1.0",
+  live: "live/1.1.0",
+  "verify-all": "verify-all/1.1.0",
 };
 
 /** "<policy label> · <model id>" for a model-driven choice; "Live agent · …" for the live agent. */
