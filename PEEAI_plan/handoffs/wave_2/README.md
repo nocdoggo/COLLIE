@@ -24,7 +24,7 @@ evaluation or comparative claim. It is **not community validation**.
 | --- | --- |
 | Branch | `hackathon/peeaai-plan` (local; nothing pushed) |
 | Base | `d6b9256` (the Wave 1 packet) |
-| Implementation | `bf71e43` (the app, committed by the integrator from the tree the evidence describes); the first version of this packet is the commit after it (`fd04d48`). The finishing step (2026-10-25: P1, P3, the pantry stock options of P2, the development runs, the demo runbook, and the audit step's P1 reruns and fixes) is committed by its integration step as `9158793` (the app) and `c4f7cd9` (this packet); the evidence is regenerated from a clean checkout of `c4f7cd9` in the commit after it |
+| Implementation | `bf71e43` (the app, committed by the integrator from the tree the evidence describes); the first version of this packet is the commit after it (`fd04d48`). The finishing step (2026-10-25: P1, P3, the pantry stock options of P2, the development runs, the demo runbook, and the audit step's P1 reruns and fixes) is committed by its integration step as `9158793` (the app) and `c4f7cd9` (this packet), with the evidence regenerated from a clean checkout of `c4f7cd9` in `c189209`. The final audit's fixes are `d6dd3f6` (the app) and `0edb069` (this packet); the evidence is regenerated from a clean checkout of `0edb069` in the commit after it |
 | Runtime contract | 1.1.0 ([`apps/plan_b/docs/RUNTIME_CONTRACT.md`](../../../apps/plan_b/docs/RUNTIME_CONTRACT.md); sections 15–18 are new) |
 | Trace format | 1.0.0 (unchanged) |
 | Model | `anthropic/claude-sonnet-5.5` via OpenRouter (requested on every call, and returned on every answered call) |
@@ -52,11 +52,11 @@ was not built. The details are in [VERIFICATION.md](VERIFICATION.md), sections 1
 | Staff boundary | Pass |
 | Future comparison parity | Pass: P0–P3 read the same grant, tools and candidates and run through one executor (parity tests); P1–P3 ran end to end with the real model with recorded prompts (20 development runs, 15 current) |
 
-The checks behind this table come from a clean checkout of the packet commit `c4f7cd9` on
-2026-10-25 (`scripts/collect_wave2_evidence.py`; all 56 checks exited 0; VERIFICATION.md
-sections 1, 1d and 2):
+The checks behind this table come from a clean checkout of the final audit's packet commit
+`0edb069` on 2026-10-25 (`scripts/collect_wave2_evidence.py`; all 56 checks exited 0;
+VERIFICATION.md sections 1, 1e and 2):
 
-* **Python:** 764 tests passed, 0 skipped.
+* **Python:** 766 tests passed, 0 skipped.
 * **Web:** 392 tests passed; typecheck, build and boundary lint passed (25 read-only modules).
 * **Linters:** ruff, ruff format and mypy are clean.
 * **Development cases:** `plan-b run-case all` printed 9 lines, all `matches_expectation=True`,
@@ -72,9 +72,10 @@ The recorded live runs were made once each, from working trees: the 8 Wave 2 run
 first commit, and the 20 P1–P3 development runs (15 current, all matching; 5 superseded P1 runs
 under `tool_use.v1`) in the finishing and audit steps (VERIFICATION.md, sections 1b and 1c). The
 rest of the evidence was regenerated from the clean checkout, with no paid call.
-`environment.json` records `git_head = c4f7cd9…` and `app_tree_clean: true`. The same battery
-also passed on the working tree before the integration step's commits (section 1d). The first
-version of this packet was regenerated the same way from `fd04d48` on 2026-10-24.
+`environment.json` records `git_head = 0edb069…` and `app_tree_clean: true`. The full battery
+also passed on the working tree before the integration step's commits (section 1d), and
+pytest, ruff, mypy and `run-case all` before the final audit's (section 1e). The first version of this packet was regenerated the same way
+from `fd04d48` on 2026-10-24, and the finishing step's from `c4f7cd9`.
 
 For the first version, the integrator re-ran the full battery on the tree that `bf71e43` commits,
 with the same results: ruff, ruff format and mypy clean; 634 Python tests passed; web

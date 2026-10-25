@@ -168,7 +168,9 @@ model calls**, phase `development`, for every coordinator policy (`policy_host.E
   the recorded live runs were copied and re-verified. The non-secret endpoint settings were
   passed as environment variables, because a clean checkout has no `.local/`. The integration
   step of the finishing work regenerated it the same way from a clean checkout of `c4f7cd9`,
-  with the 28 recorded live runs and the demo storyboard (VERIFICATION section 1d).
+  with the 28 recorded live runs and the demo storyboard (VERIFICATION section 1d), and the
+  final audit once more from `0edb069`, with the key file's absolute path, because selecting a
+  model policy checks that the key file is present (VERIFICATION section 1e).
 * **The collector checks that the five Wave 1 case lines are unchanged**, against the Wave 1
   evidence's `checks.json`.
 * **Each M2 check is mapped to its focused tests** in the same pytest run's JUnit report. A

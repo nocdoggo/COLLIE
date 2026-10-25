@@ -193,8 +193,9 @@ below says otherwise.
   `scripts/run_live_cases.py` already does. The committed gate record has `error: null`.
 * **Concurrent workers.** The live runs were recorded after every worker of the wave had
   finished, from the working tree that the integrator then committed. The deterministic
-  evidence was regenerated afterwards from a clean checkout of `fd04d48`, and again from a
-  clean checkout of `c4f7cd9` after the finishing step (DECISIONS W2-D9). The P1–P3
+  evidence was regenerated afterwards from a clean checkout of `fd04d48`, again from a clean
+  checkout of `c4f7cd9` after the finishing step, and once more from `0edb069` after the final
+  audit (DECISIONS W2-D9). The P1–P3
   development runs were recorded from the finishing step's working trees (VERIFICATION 1b
   and 1c).
 

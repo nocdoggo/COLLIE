@@ -19,16 +19,18 @@ shipped `tool_use.v2` and fixed what its five auditors confirmed (section 1c). T
 step closed two last audit items, committed the finishing work (`9158793`, the app, and
 `c4f7cd9`, the packet) and regenerated the evidence from a clean checkout of `c4f7cd9`
 (sections 1, 1d and 2). A final audit of the committed result then fixed two pantry details
-and the packet's wording, and disclosed one gap shared by every policy (section 1e).
+and the packet's wording, disclosed one gap shared by every policy, committed `d6dd3f6` (the
+app) and `0edb069` (the packet), and regenerated the evidence from a clean checkout of
+`0edb069` (section 1e).
 
 ## 1. How the evidence was produced
 
 Two scripts produced it. The recorded live runs were each made once from a working tree: the 8
 Wave 2 runs on 2026-10-24, after every Wave 2 worker had finished, and the 20 P1–P3 development
 runs on 2026-10-25 (sections 1b and 1c). The rest of the evidence was then regenerated on
-2026-10-25 from a fresh, clean checkout of the packet commit `c4f7cd9`, after the integration
-step's commits (the 2026-10-24 regeneration used `fd04d48` in the same way). `environment.json`
-records `git_head = c4f7cd9…` and `app_tree_clean = true`. The collector made no paid call: it
+2026-10-25 from a fresh, clean checkout of the final audit's packet commit `0edb069`, after its
+commits (the 2026-10-24 regeneration used `fd04d48` in the same way, and the integration step's
+used `c4f7cd9`). `environment.json` records `git_head = 0edb069…` and `app_tree_clean = true`. The collector made no paid call: it
 copied the 28 recorded live runs and verified each live trace again, and the ledger file was
 byte-identical before and after.
 
@@ -36,7 +38,12 @@ A clean checkout has no `.local/` directory, so the regeneration passed the non-
 settings of `.local/keys/model_endpoint.env` as environment variables (`PLAN_B_MODEL_PROVIDER`,
 `PLAN_B_MODEL_BASE_URL`, `PLAN_B_MODEL_KEY_FILE`). The Wave 2 walkthrough only selects the live
 policy, so no model call was made. Without these settings its policy-switch flow correctly
-reports that the live policy is not configured.
+reports that the live policy is not configured. Selecting a model policy also requires the key
+file to be present (a presence check; the key is read only for a model call), so the final
+audit's regeneration set `PLAN_B_MODEL_KEY_FILE` to the main checkout's key file by its absolute
+path. Its first attempt used the relative path, which resolves inside the clean checkout where
+no key file exists; only the Wave 2 walkthrough's policy-switch flow failed, and that output
+was discarded.
 
 ```bash
 cd apps/plan_b
@@ -49,7 +56,7 @@ PLAN_B_MODEL_MAX_TOTAL_COST_USD=8.00 uv run python scripts/run_live_cases.py --o
 PLAN_B_MODEL_MAX_TOTAL_COST_USD=8.00 uv run python scripts/run_live_cases.py --out <live> dev05 dev06
 #    (the P1-P3 development runs and reruns: sections 1b and 1c)
 # 2. Every check, the deterministic cases, both walkthroughs, the storyboard and the scans
-#    (no paid call), from a clean checkout of c4f7cd9 (git worktree, uv sync --all-groups
+#    (no paid call), from a clean checkout of 0edb069 (git worktree, uv sync --all-groups
 #    --locked, npm ci, the ledger copied into the worktree's var/)
 uv run python scripts/collect_wave2_evidence.py --out <empty dir> \
     --live ../../PEEAI_plan/handoffs/wave_2/evidence \
@@ -263,6 +270,32 @@ Each code fix was checked by reverting it: its test then failed. Disclosed, not 
 (P0–P3) wakes when the handoff window opens (KNOWN_LIMITATIONS, "No policy wakes when the
 handoff window opens"). A probe with a 12:42–12:49 window reproduced it for P0, P2 and P3.
 
+```bash
+cd apps/plan_b
+# 1. the affected battery on the working tree, after the fixes
+uv run ruff format <changed files>; uv run ruff check <changed files>; uv run mypy
+uv run pytest -q -o addopts= -p no:cacheprovider
+uv run plan-b run-case all --db <scratch>/runs.sqlite3 --out <scratch>/out   # + verify-trace on each
+# 2. commit d6dd3f6 (apps/plan_b) and 0edb069 (this packet), explicit paths, no trailers
+# 3. the clean regeneration (section 1), into an empty directory that then replaced evidence/
+git worktree add --detach <scratch>/clean HEAD    # 0edb069
+uv run python scripts/collect_wave2_evidence.py --out <empty> \
+    --live ../../PEEAI_plan/handoffs/wave_2/evidence \
+    --gate ../../PEEAI_plan/handoffs/wave_2/evidence/reports/g_llm_gate.json
+```
+
+Step 1: ruff format and check clean on the five changed files, mypy clean (70 source files),
+766 Python tests passed (764 and the two new ones), `run-case all` exited 0 with 9 lines, all
+`matches_expectation=True` and identical to the evidence lines, and the 9 traces `intact`. The
+three deterministic traces in `evidence/traces/` differed from the new run only in episode ids
+and the digests that contain them. Before each commit a script compared every staged file with
+the key file and searched for credential shapes, local paths, the host and user names and
+attribution text, printing file names only: nothing was found. Step 3 printed `all checks
+passed` (56 checks, section 2) and exited 0, with the ledger byte-identical before and after.
+Its output has the same 182 files as the evidence it replaced. The copied live runs are
+byte-identical, the case lines and M2 test counts are unchanged, and the deterministic traces
+again differ only in episode ids and their digests. The worktree was removed afterwards.
+
 ## 2. Commands and results
 
 These are the collector's rows from `reports/checks.json`. `<work>` is its temporary directory
@@ -275,7 +308,7 @@ and `<evidence>` is `PEEAI_plan/handoffs/wave_2/evidence`.
 | 3 | Types | `uv run mypy` | 0 | no issues in 70 source files |
 | 4 | Web typecheck | `npm run typecheck` (web/) | 0 | `tsc --noEmit` clean |
 | 5 | Web build | `npm run build` (web/) | 0 | JS 322.18 kB (95.84 kB gzip) |
-| 6 | Python tests | `uv run pytest -o addopts= -q -p no:cacheprovider --junitxml=…` | 0 | **764 passed, 0 failed, 0 skipped** (1 warning: Starlette's httpx deprecation) |
+| 6 | Python tests | `uv run pytest -o addopts= -q -p no:cacheprovider --junitxml=…` | 0 | **766 passed, 0 failed, 0 skipped** (1 warning: Starlette's httpx deprecation) |
 | 7 | Web tests | `npm test` (web/) | 0 | **392 passed**, 0 failed |
 | 8 | Web boundary lint | `npm run lint` (web/) | 0 | 25 read-only modules, 40 sources, dist bundle scanned |
 | 9 | Development cases | `uv run plan-b run-case all --db <work>/runs.sqlite3 --out <work>/out` | 0 | 9/9 `matches_expectation=True`, `violations=0` (section 4) |
@@ -298,7 +331,7 @@ report is `reports/pytest_junit.xml`, with its host name replaced and its timest
 
 The checks are the "Mandatory M2 checks" of `PEEAI_plan/waves/02_adaptation.md`. Test paths are
 relative to `apps/plan_b/tests/`. `reports/m2_focused_tests.json` lists every mapped test with
-its outcome in the row-6 run (the clean regeneration from `c4f7cd9`, 764 tests). Its counts are
+its outcome in the row-6 run (the clean regeneration from `0edb069`, 766 tests). Its counts are
 those of the audit step's full run (section 1c) cited below: live campus 8, bounded failure 57,
 community 40, pantry core 15, stock and service 7, quantity 10, staff boundary 11 and comparison
 parity 101, all passed.

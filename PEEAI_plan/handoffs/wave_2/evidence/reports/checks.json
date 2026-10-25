@@ -1,6 +1,6 @@
 {
   "pytest_counts": {
-    "tests": 764,
+    "tests": 766,
     "failures": 0,
     "errors": 0,
     "skipped": 0
@@ -613,7 +613,7 @@
       "command": "uv run mypy",
       "cwd": "apps/plan_b",
       "exit_code": 0,
-      "seconds": 2.6,
+      "seconds": 0.1,
       "summary": [
         "Success: no issues found in 70 source files"
       ]
@@ -634,14 +634,14 @@
       "command": "npm run build",
       "cwd": "apps/plan_b/web",
       "exit_code": 0,
-      "seconds": 3.9,
+      "seconds": 4.0,
       "summary": [
         "rendering chunks...",
         "computing gzip size...",
         "dist/index.html                   0.67 kB \u2502 gzip:  0.37 kB",
         "dist/assets/index-BGRQ8t_6.css   17.31 kB \u2502 gzip:  4.45 kB",
         "dist/assets/index-BlGI9_bm.js   322.18 kB \u2502 gzip: 95.84 kB",
-        "\u2713 built in 625ms"
+        "\u2713 built in 638ms"
       ]
     },
     {
@@ -649,14 +649,14 @@
       "command": "uv run pytest -o addopts= -q -p no:cacheprovider --junitxml=<evidence>/reports/pytest_junit.xml",
       "cwd": "apps/plan_b",
       "exit_code": 0,
-      "seconds": 305.9,
+      "seconds": 318.9,
       "summary": [
         ".venv/lib/python3.12/site-packages/fastapi/testclient.py:1",
         "  <repo>/apps/plan_b/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.",
         "    from starlette.testclient import TestClient as TestClient  # noqa",
         "-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html",
         "- generated xml file: <evidence>/reports/pytest_junit.xml -",
-        "764 passed, 1 warning in 305.21s (0:05:05)"
+        "766 passed, 1 warning in 318.47s (0:05:18)"
       ]
     },
     {
@@ -664,14 +664,14 @@
       "command": "npm test",
       "cwd": "apps/plan_b/web",
       "exit_code": 0,
-      "seconds": 24.3,
+      "seconds": 24.9,
       "summary": [
         "# pass 392",
         "# fail 0",
         "# cancelled 0",
         "# skipped 0",
         "# todo 0",
-        "# duration_ms 24194.777073"
+        "# duration_ms 24768.33971"
       ]
     },
     {
@@ -691,7 +691,7 @@
       "command": "uv run plan-b run-case all --db <work>/runs.sqlite3 --out <work>/out",
       "cwd": "apps/plan_b",
       "exit_code": 0,
-      "seconds": 25.6,
+      "seconds": 26.1,
       "summary": [
         "dev05: goal_complete=False infeasibility_reported=True applied_plans=0 committed=0 violations=0 matches_expectation=True",
         "dev06: goal_complete=True infeasibility_reported=False applied_plans=1 committed=0 violations=0 matches_expectation=True",
@@ -851,7 +851,7 @@
       "command": "uv run python tests/e2e/walkthrough.py --out <work>/shots1",
       "cwd": "apps/plan_b",
       "exit_code": 0,
-      "seconds": 73.9,
+      "seconds": 73.2,
       "summary": [
         "PASS no horizontal overflow at 1920px",
         "PASS no horizontal overflow at 1280px",
@@ -878,10 +878,10 @@
     },
     {
       "name": "demo storyboard (Playwright, Chromium)",
-      "command": "uv run python tests/e2e/storyboard.py --out <evidence>/storyboard --port 37833",
+      "command": "uv run python tests/e2e/storyboard.py --out <evidence>/storyboard --port 54881",
       "cwd": "apps/plan_b",
       "exit_code": 0,
-      "seconds": 43.3,
+      "seconds": 44.6,
       "summary": [
         "PASS the replay list holds the recorded traces the runbook opens - 31 traces",
         "PASS no model call in the story: every decision of its 5 episodes came from a deterministic policy, and the selection stayed deterministic - {\"episodes\": 5, \"policies\": [\"pantry-rules/1.0.0\", \"rules/1.0.0\"], \"caps\": {\"phase\": \"development\", \"max_tool_calls\": 48, \"max_model_calls\": 8, \"tool_calls\": 21, \"model_calls\": 0, \"reached\": []}}",
@@ -1146,7 +1146,7 @@
       "command": "uv run plan-b verify-trace <evidence>/traces/live_pantry_dev01_trace.json",
       "cwd": "apps/plan_b",
       "exit_code": 0,
-      "seconds": 0.1,
+      "seconds": 0.2,
       "summary": [
         "intact"
       ]
@@ -1186,7 +1186,7 @@
       "command": "every text file written to <evidence>: host name, user name, git email, local paths",
       "cwd": "apps/plan_b",
       "exit_code": 0,
-      "seconds": 5.2,
+      "seconds": 5.6,
       "summary": [
         "146 text files: no host name, user name, git email or local path"
       ]

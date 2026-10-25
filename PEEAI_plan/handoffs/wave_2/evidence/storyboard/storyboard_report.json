@@ -9,7 +9,7 @@
   "paths": "deterministic policies, role tabs and recorded replays; no model call",
   "passed": true,
   "planned_seconds": 420,
-  "automated_run_seconds": 41.7,
+  "automated_run_seconds": 43.0,
   "segments": [
     {
       "segment": "showcase",
@@ -19,7 +19,7 @@
       "frames": [
         "story_01_campus_showcase.png"
       ],
-      "automated_seconds": 2.0,
+      "automated_seconds": 1.9,
       "passed": true
     },
     {
@@ -83,7 +83,7 @@
         "story_14_p3_server_checks.png",
         "story_15_harness_bug_on_record.png"
       ],
-      "automated_seconds": 3.0,
+      "automated_seconds": 3.1,
       "passed": true
     },
     {
@@ -96,7 +96,7 @@
         "story_17_community_replanned.png",
         "story_18_resource_offer.png"
       ],
-      "automated_seconds": 7.4,
+      "automated_seconds": 7.2,
       "passed": true
     },
     {
@@ -111,7 +111,7 @@
         "story_22_kits_committed.png",
         "story_23_distributed.png"
       ],
-      "automated_seconds": 8.3,
+      "automated_seconds": 9.6,
       "passed": true
     },
     {
@@ -122,7 +122,7 @@
       "frames": [
         "story_24_fallback_ready.png"
       ],
-      "automated_seconds": 0.5,
+      "automated_seconds": 0.6,
       "passed": true
     }
   ],
@@ -142,8 +142,8 @@
           "story_step": 1
         }
       ],
-      "started_s": 2.3,
-      "seconds": 2.0
+      "started_s": 2.4,
+      "seconds": 1.9
     },
     {
       "step": 2,
@@ -395,7 +395,7 @@
         }
       ],
       "started_s": 25.3,
-      "seconds": 0.7
+      "seconds": 0.8
     },
     {
       "step": 15,
@@ -418,7 +418,7 @@
           "story_step": 15
         }
       ],
-      "started_s": 26.0,
+      "started_s": 26.1,
       "seconds": 1.0
     },
     {
@@ -436,7 +436,7 @@
           "story_step": 16
         }
       ],
-      "started_s": 27.0,
+      "started_s": 27.1,
       "seconds": 2.0
     },
     {
@@ -454,8 +454,8 @@
           "story_step": 17
         }
       ],
-      "started_s": 29.0,
-      "seconds": 4.7
+      "started_s": 29.1,
+      "seconds": 4.5
     },
     {
       "step": 18,
@@ -472,7 +472,7 @@
           "story_step": 18
         }
       ],
-      "started_s": 33.7,
+      "started_s": 33.6,
       "seconds": 0.7
     },
     {
@@ -490,8 +490,8 @@
           "story_step": 19
         }
       ],
-      "started_s": 34.4,
-      "seconds": 1.8
+      "started_s": 34.3,
+      "seconds": 1.9
     },
     {
       "step": 20,
@@ -527,7 +527,7 @@
         }
       ],
       "started_s": 37.2,
-      "seconds": 1.3
+      "seconds": 1.2
     },
     {
       "step": 22,
@@ -544,8 +544,8 @@
           "story_step": 22
         }
       ],
-      "started_s": 38.5,
-      "seconds": 0.8
+      "started_s": 38.4,
+      "seconds": 0.9
     },
     {
       "step": 23,
@@ -563,7 +563,7 @@
         }
       ],
       "started_s": 39.3,
-      "seconds": 3.4
+      "seconds": 4.6
     },
     {
       "step": 24,
@@ -604,8 +604,8 @@
           "story_step": 24
         }
       ],
-      "started_s": 42.7,
-      "seconds": 0.5
+      "started_s": 43.9,
+      "seconds": 0.6
     }
   ],
   "checks": [

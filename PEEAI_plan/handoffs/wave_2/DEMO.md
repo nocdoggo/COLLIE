@@ -443,33 +443,33 @@ run timed the app work only (loading, clicks, policy runs, waiting for the board
 speaking. A human presenter still needs three uninterrupted timed rehearsals (09's preflight),
 including one forced provider failure if the live mode is used.
 
-The run recorded here is the integration step's collector run, from a clean checkout of
-`c4f7cd9`: it wrote `evidence/storyboard/` (24 frames and `storyboard_report.json`), and the
+The run recorded here is the final audit's collector run, from a clean checkout of
+`0edb069`: it wrote `evidence/storyboard/` (24 frames and `storyboard_report.json`), and the
 table below is read from that committed report. Result: **32/32 checks passed**, exit 0. The
-demo worker's run and the audit step's run (07:49Z) gave the same counts, with timings that
-differ by tenths of a second. The closing checks found no model call (5 episodes, only
+demo worker's run, the audit step's run (07:49Z) and the integration step's collector run gave
+the same counts, with segment timings within about 1.3 s of these. The closing checks found no model call (5 episodes, only
 `rules/1.0.0` and `pantry-rules/1.0.0` decided), no page error, no horizontal overflow at
 1536 px, and no join code or session token in the visible text of any frame (join links
 masked).
 
 | Segment | Planned (s) | Automated app time (s) | Frames | Checks |
 | --- | --- | --- | --- | --- |
-| 0:00-0:35 The campus showcase | 35 | 2.0 | 1 | 1/1 |
+| 0:00-0:35 The campus showcase | 35 | 1.9 | 1 | 1/1 |
 | 0:35-1:10 What is committed and what the agent may change | 35 | 1.0 | 2 | 2/2 |
 | 1:10-2:25 The delayed projector: verify, then commit | 75 | 2.3 | 4 | 4/4 |
 | 2:25-3:10 A stale and a duplicate warning, handled without churn | 45 | 6.0 | 1 | 2/2 |
 | 3:10-4:00 Prepare, ask, commit: the organizer-approved paid backup | 50 | 10.4 | 3 | 3/3 |
-| 4:00-4:55 The live coordinator's decision card (recorded replay) | 55 | 3.0 | 4 | 7/7 |
-| 4:55-5:40 A participant's own check-in changes the plan | 45 | 7.4 | 3 | 3/3 |
-| 5:40-6:25 Pantry Continuity cameo | 45 | 8.3 | 5 | 5/5 |
-| 6:25-7:00 Close: what is delivered, and the fallback | 35 | 0.5 | 1 | 5/5 |
-| **Total** | **420** | **40.9** (whole script 41.7 s, server start to stop) | **24** | **32/32** |
+| 4:00-4:55 The live coordinator's decision card (recorded replay) | 55 | 3.1 | 4 | 7/7 |
+| 4:55-5:40 A participant's own check-in changes the plan | 45 | 7.2 | 3 | 3/3 |
+| 5:40-6:25 Pantry Continuity cameo | 45 | 9.6 | 5 | 5/5 |
+| 6:25-7:00 Close: what is delivered, and the fallback | 35 | 0.6 | 1 | 5/5 |
+| **Total** | **420** | **42.1** (whole script 43.0 s, server start to stop) | **24** | **32/32** |
 
 What the run says about the live demo:
 
 * **The app is never the bottleneck.** In every segment, the clicks and waits took at most about 10.4 s of
   the planned time. The slowest steps were `stale_and_duplicate` (6.0 s), `backup_held_and_asked` (5.2 s)
-  and `community_replanned` (4.7 s). In those steps the server runs the policy or
+  and `distributed` (4.6 s). In those steps the server runs the policy or
   fast-forwards the clock, and the board polls every 1.5 s.
 * **The time goes to talking and switching tabs.** The busiest segments for a person are the
   paid backup (an organizer tab), the community segment (one or two participant tabs) and the
