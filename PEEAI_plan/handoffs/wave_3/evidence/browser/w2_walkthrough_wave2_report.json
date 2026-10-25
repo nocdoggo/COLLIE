@@ -1,0 +1,244 @@
+{
+  "base_url_kind": "local plan-b serve on a free port with a fresh state directory",
+  "browser": "Chromium (Playwright)",
+  "passed": true,
+  "checks": [
+    {
+      "check": "pantry case loaded on its own scenario under the deterministic policy",
+      "passed": true,
+      "detail": "\u2699 Deterministic policy \u00b7 selected, not run yet \u00b7 dev_fixture_03 (pantry_continuity)",
+      "flow": "pantry"
+    },
+    {
+      "check": "initial counters and pools: gap 16, unfulfilled 40; pantry 24, partner 16, expected 20",
+      "passed": true,
+      "detail": "board gap 16 standard kits, unfulfilled 40 standard kits; pools {\"pantry_stock\": {\"on_hand\": 24, \"reserved\": 0, \"available\": 24, \"expected\": 20, \"distributed\": 0}, \"partner_stock\": {\"on_hand\": 16, \"reserved\": 0, \"available\": 16, \"expected\": 0, \"distributed\": 0}}",
+      "flow": "pantry"
+    },
+    {
+      "check": "staff tab is its own scoped session with the staff-only tools",
+      "passed": true,
+      "detail": "Signed in as Pantry staff (fictional) \u00b7 Participant \u00b7 fictional_staff",
+      "flow": "pantry"
+    },
+    {
+      "check": "policy holds 16 partner kits: partner reserved 16, available 0; gap 16, unfulfilled 40",
+      "passed": true,
+      "detail": "board gap 16 standard kits, unfulfilled 40 standard kits; pools {\"pantry_stock\": {\"on_hand\": 24, \"reserved\": 0, \"available\": 24, \"expected\": 20, \"distributed\": 0}, \"partner_stock\": {\"on_hand\": 16, \"reserved\": 16, \"available\": 0, \"expected\": 0, \"distributed\": 0}}",
+      "flow": "pantry"
+    },
+    {
+      "check": "decision cards narrate the hold and the ask with the policy that ran",
+      "passed": true,
+      "detail": "\u2691Ask Asked staff to hand off 16 units from partner_stock into pantry_stock (hold hold_0001, the local staff task); only a staff-recorded receipt moves stock. | 12:35 \u00b7 revision 6 \u00b7 pantry-rules/1.1.0 | \u2016Prepare Held 16 units of partner_stock for a staff handoff into pantry_stock; the hold moves nothing and serves nobody. | \u25ceVerify Checked availability of partner_stock with its registered source: available. A status answer is evidence, not stock. | 12:34 \u00b7 revision 5 \u00b7 pantry-rules/1.1.0 | 12:32 \u00b7 revision 4 \u00b7 pantry-rules/1.1.0",
+      "flow": "pantry"
+    },
+    {
+      "check": "staff tab recorded the handoff: one receipt of 16 from the held partner pool",
+      "passed": true,
+      "detail": "hold:hold_0001; [[\"handoff_001\", 16, \"fictional_staff\"]]",
+      "flow": "pantry"
+    },
+    {
+      "check": "after the handoff: pantry 40, partner 0, expected 20 unreceived; gap 0, unfulfilled 40",
+      "passed": true,
+      "detail": "board gap 0 standard kits, unfulfilled 40 standard kits; pools {\"pantry_stock\": {\"on_hand\": 40, \"reserved\": 0, \"available\": 40, \"expected\": 20, \"distributed\": 0}, \"partner_stock\": {\"on_hand\": 0, \"reserved\": 0, \"available\": 0, \"expected\": 0, \"distributed\": 0}}",
+      "flow": "pantry"
+    },
+    {
+      "check": "plan applied: 40 committed and reserved; gap 0, unfulfilled still 40, 0 achieved",
+      "passed": true,
+      "detail": "board gap 0 standard kits, unfulfilled 40 standard kits; pools {\"pantry_stock\": {\"on_hand\": 40, \"reserved\": 40, \"available\": 0, \"expected\": 20, \"distributed\": 0}, \"partner_stock\": {\"on_hand\": 0, \"reserved\": 0, \"available\": 0, \"expected\": 0, \"distributed\": 0}}; achieved 0 of 40 on time",
+      "flow": "pantry"
+    },
+    {
+      "check": "staff tab recorded the distribution of 40 at 13:40, on time",
+      "passed": true,
+      "detail": "[[\"distribution_001\", 40, true, \"2026-11-09T18:40:00Z\"]]",
+      "flow": "pantry"
+    },
+    {
+      "check": "after distribution: gap 0, unfulfilled 0, 40 of 40 on time; both pools 0, expected 20",
+      "passed": true,
+      "detail": "board gap 0 standard kits, unfulfilled 0 standard kits; pools {\"pantry_stock\": {\"on_hand\": 0, \"reserved\": 0, \"available\": 0, \"expected\": 20, \"distributed\": 40}, \"partner_stock\": {\"on_hand\": 0, \"reserved\": 0, \"available\": 0, \"expected\": 0, \"distributed\": 0}}; achieved 40 of 40 on time",
+      "flow": "pantry"
+    },
+    {
+      "check": "staff tab has no horizontal overflow at 1280px",
+      "passed": true,
+      "detail": "",
+      "flow": "pantry"
+    },
+    {
+      "check": "pantry trace replays: integrity passed, pantry board and policy label shown",
+      "passed": true,
+      "detail": "ep_61e2e593dcd8_rev17.json",
+      "flow": "pantry"
+    },
+    {
+      "check": "pantry replay issued no POST/PUT/DELETE requests",
+      "passed": true,
+      "detail": "[]",
+      "flow": "pantry"
+    },
+    {
+      "check": "skills case loaded on its own scenario through the event adapter, without a pantry board",
+      "passed": true,
+      "detail": "dev_fixture_02 (community_skills_exchange); peer exchange at 11:20",
+      "flow": "community"
+    },
+    {
+      "check": "participation view shows the volunteer's alias and the role's declared window",
+      "passed": true,
+      "detail": "Peer exchange facilitator | Peer exchange facilitator (peer_lead), declared 09:30\u201312:00",
+      "flow": "community"
+    },
+    {
+      "check": "the peer lead's own check-in until 11:05 changes the moderator's board",
+      "passed": true,
+      "detail": "before: Peer exchange facilitator (peer_lead) \u29d7No check-in yet; after: Peer exchange facilitator (peer_lead) \u26a0Check-in available until 11:05 \u2014 does not cover Peer knowledge exchange 11:20\u201311:40 | At 09:20, available 09:20\u201311:05 (participant session) by participant_peer_lead",
+      "flow": "community"
+    },
+    {
+      "check": "the check-in made keep infeasible; the policy applied the peer exchange swap",
+      "passed": true,
+      "detail": "plan v2: peer exchange 10:40-11:00 (fresh API read)",
+      "flow": "community"
+    },
+    {
+      "check": "the steward's offer activates the preconfigured backup kit; no hold, spend or plan change",
+      "passed": true,
+      "detail": "backup kit expected (status_observation, obs_0002); budget {\"budget_cents\": 8000, \"committed_cents\": 0, \"reserved_cents\": 0, \"remaining_cents\": 8000}",
+      "flow": "community"
+    },
+    {
+      "check": "community trace replays: integrity passed, the check-in and the re-plan shown",
+      "passed": true,
+      "detail": "ep_cd48b8410509_rev4.json",
+      "flow": "community"
+    },
+    {
+      "check": "community replay issued no POST/PUT/DELETE requests",
+      "passed": true,
+      "detail": "[]",
+      "flow": "community"
+    },
+    {
+      "check": "deterministic label in the header and the moderator panel; run button names it",
+      "passed": true,
+      "detail": "\u2699 Deterministic policy \u00b7 selected, not run yet",
+      "flow": "policy_switch"
+    },
+    {
+      "check": "selecting the live agent shows its label with the configured model id",
+      "passed": true,
+      "detail": "\u2726 Live agent \u00b7 anthropic/claude-sonnet-5.5 (requested; no reply yet) \u00b7 selected, not run yet",
+      "flow": "policy_switch"
+    },
+    {
+      "check": "a role tab shows the same live label from the server (GET /api/policy)",
+      "passed": true,
+      "detail": "\u2726 Live agent \u00b7 anthropic/claude-sonnet-5.5 (requested; no reply yet) \u00b7 selected, not run yet",
+      "flow": "policy_switch"
+    },
+    {
+      "check": "no live model call was made: no decision, no tool call, zero model calls",
+      "passed": true,
+      "detail": "{\"policy\": \"live\", \"policy_id\": \"live/1.1.0\", \"caps\": {\"phase\": \"development\", \"max_tool_calls\": 48, \"max_model_calls\": 8, \"tool_calls\": 0, \"model_calls\": 0, \"reached\": []}, \"locked\": false, \"returned_model_id\": null}",
+      "flow": "policy_switch"
+    },
+    {
+      "check": "switching back restores the deterministic policy before anything ran",
+      "passed": true,
+      "detail": "",
+      "flow": "policy_switch"
+    },
+    {
+      "check": "no horizontal overflow at 1920px",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "no horizontal overflow at 1280px",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "no page errors",
+      "passed": true,
+      "detail": "0 page errors: []"
+    },
+    {
+      "check": "no join code or session token in the visible text at any screenshot",
+      "passed": true,
+      "detail": "12 screenshots; 4 join codes, 5 session tokens and the moderator code checked; 3 join links masked; exposed: []"
+    },
+    {
+      "check": "every Wave 2 flow ran with passing checks",
+      "passed": true,
+      "detail": "pantry, community, policy_switch"
+    }
+  ],
+  "flows": [
+    {
+      "flow": "pantry",
+      "title": "Pantry: staff record the handoff and the distribution; the counters move as planned",
+      "checks": [
+        "pantry case loaded on its own scenario under the deterministic policy",
+        "initial counters and pools: gap 16, unfulfilled 40; pantry 24, partner 16, expected 20",
+        "staff tab is its own scoped session with the staff-only tools",
+        "policy holds 16 partner kits: partner reserved 16, available 0; gap 16, unfulfilled 40",
+        "decision cards narrate the hold and the ask with the policy that ran",
+        "staff tab recorded the handoff: one receipt of 16 from the held partner pool",
+        "after the handoff: pantry 40, partner 0, expected 20 unreceived; gap 0, unfulfilled 40",
+        "plan applied: 40 committed and reserved; gap 0, unfulfilled still 40, 0 achieved",
+        "staff tab recorded the distribution of 40 at 13:40, on time",
+        "after distribution: gap 0, unfulfilled 0, 40 of 40 on time; both pools 0, expected 20",
+        "staff tab has no horizontal overflow at 1280px",
+        "pantry trace replays: integrity passed, pantry board and policy label shown",
+        "pantry replay issued no POST/PUT/DELETE requests"
+      ],
+      "passed": true
+    },
+    {
+      "flow": "community",
+      "title": "Community: a participant's own check-in changes the board and the plan",
+      "checks": [
+        "skills case loaded on its own scenario through the event adapter, without a pantry board",
+        "participation view shows the volunteer's alias and the role's declared window",
+        "the peer lead's own check-in until 11:05 changes the moderator's board",
+        "the check-in made keep infeasible; the policy applied the peer exchange swap",
+        "the steward's offer activates the preconfigured backup kit; no hold, spend or plan change",
+        "community trace replays: integrity passed, the check-in and the re-plan shown",
+        "community replay issued no POST/PUT/DELETE requests"
+      ],
+      "passed": true
+    },
+    {
+      "flow": "policy_switch",
+      "title": "Moderator policy switch: deterministic and live labels (no live model call)",
+      "checks": [
+        "deterministic label in the header and the moderator panel; run button names it",
+        "selecting the live agent shows its label with the configured model id",
+        "a role tab shows the same live label from the server (GET /api/policy)",
+        "no live model call was made: no decision, no tool call, zero model calls",
+        "switching back restores the deterministic policy before anything ran"
+      ],
+      "passed": true
+    }
+  ],
+  "screenshots": [
+    "w2_01_pantry_loaded.png",
+    "w2_02_pantry_handoff_requested_full.png",
+    "w2_03_staff_recorded_handoff.png",
+    "w2_04_staff_recorded_distribution.png",
+    "w2_05_pantry_distributed.png",
+    "w2_06_pantry_replay.png",
+    "w2_07_participant_checked_in.png",
+    "w2_08_community_replanned_full.png",
+    "w2_09_resource_offer_sent.png",
+    "w2_10_community_replay.png",
+    "w2_11_live_policy_selected.png",
+    "w2_12_role_tab_live_label.png"
+  ]
+}

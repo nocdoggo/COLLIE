@@ -1,0 +1,102 @@
+{
+  "base_url_kind": "local plan-b serve on a free port with a fresh state directory",
+  "browser": "Chromium (Playwright)",
+  "passed": true,
+  "checks": [
+    {
+      "check": "the first Tab stop is the skip link",
+      "passed": true,
+      "detail": "{\"tag\": \"a\", \"id\": null, \"text\": \"Skip to content\", \"section\": null, \"ring\": true, \"again\": false}"
+    },
+    {
+      "check": "the moderator signs in with the keyboard only (Tab, type, Enter)",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "check": "Enter on the skip link moves focus past the header into the content",
+      "passed": true,
+      "detail": "{\"id\": \"main\", \"tag\": \"main\"}"
+    },
+    {
+      "check": "Tab reaches the board and every stop shows a visible focus ring",
+      "passed": true,
+      "detail": "46 stops; without a ring: []"
+    },
+    {
+      "check": "the current plan is reached by keyboard (Tab to 'Current plan', Enter)",
+      "passed": true,
+      "detail": "focus on 'schedule'; 0 Tab stops inside the schedule"
+    },
+    {
+      "check": "the schedule names the plan version and every start time the API reports",
+      "passed": true,
+      "detail": "plan version 2; starts [('setup', '16:30'), ('welcome', '17:00'), ('demonstrations', '17:30'), ('skills_exchange', '17:10'), ('closing', '17:50')]"
+    },
+    {
+      "check": "the evidence (status checks, incoming updates, raw evidence) is reached by keyboard",
+      "passed": true,
+      "detail": "'Evidence' moves focus to 'status-checks'; 8 Tab stops in ['evidence', 'observations', 'status-checks']"
+    },
+    {
+      "check": "the status checks show the checked entity",
+      "passed": true,
+      "detail": "Status checks and arrivals"
+    },
+    {
+      "check": "the latest decision and the decision list are reached by keyboard",
+      "passed": true,
+      "detail": "'Latest decision' moves focus to 'what-changed'; 8 Tab stops"
+    },
+    {
+      "check": "the latest policy decision says what the API says, with its next wake",
+      "passed": true,
+      "detail": "keep: 'Keep plan v2: it passes every hard check under its stated as'; wait_until None; board: =Keep plan Keep plan v2: it passes every hard check under its stated assumptions; projector is expected (status observation, reported ETA 17:25) for demonstrations at 17:30; notice obs_notice_01 corroborated by obs_0001. | \u270ePolicy decision =Keep plan Keep plan v2: it passes every hard check under its stated assumptions; projector is expected (status observation, reported ETA 17:25) for demonstrations at 17:30; notice obs_notice_01 corroborated by obs_0001."
+    },
+    {
+      "check": "the action status (Action history) is reached by keyboard",
+      "passed": true,
+      "detail": "'Action status' moves focus to 'action-history'; 1 Tab stops"
+    },
+    {
+      "check": "every receipt the API reports is listed with its tool",
+      "passed": true,
+      "detail": "1 receipts: [('apply_plan', 'applied')]"
+    },
+    {
+      "check": "Enter on a receipt's evidence button moves focus to that receipt",
+      "passed": true,
+      "detail": "focus moved to rcpt-rcpt_0001"
+    },
+    {
+      "check": "Shift+Tab reaches the same stops in reverse",
+      "passed": true,
+      "detail": "46 backwards, 46 forwards"
+    },
+    {
+      "check": "two signed-in views agree on the revision and the receipts",
+      "passed": true,
+      "detail": "revision 6 / 6; headers 'STATE REVISION\\n6' / 'STATE REVISION\\n6'"
+    },
+    {
+      "check": "the pantry stock and service board is reached by keyboard",
+      "passed": true,
+      "detail": "'Stock and service' moves focus to 'pantry-board'; 2 Tab stops inside"
+    },
+    {
+      "check": "the pantry board keeps expected, held, received, committed and distributed apart",
+      "passed": true,
+      "detail": "Expected (not stock): True; held,: True; received: True; committed: True; Distributed: True; Service deficit: True; Achieved service (staff-recorded): True"
+    },
+    {
+      "check": "the pantry pool row shows the quantities the API reports",
+      "passed": true,
+      "detail": "shown {'on_hand': '24', 'reserved': '0', 'available': '24', 'expected': '20', 'distributed': '0'}; api {'on_hand': '24', 'reserved': '0', 'available': '24', 'expected': '20', 'distributed': '0'}"
+    },
+    {
+      "check": "the target stays 40 and the deficit is visible before any distribution",
+      "passed": true,
+      "detail": "on time 0, deficit 40, committed 0"
+    }
+  ]
+}

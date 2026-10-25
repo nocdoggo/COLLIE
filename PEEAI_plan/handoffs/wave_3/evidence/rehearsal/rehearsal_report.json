@@ -1,0 +1,2220 @@
+{
+  "kind": "automated internal rehearsals of the showcase story (PEEAI_plan/handoffs/wave_3/SHOWCASE.md); not human rehearsals",
+  "base_url_kind": "local plan-b serve on 127.0.0.1, a clean demo_prep state each",
+  "browser": "Chromium (Playwright), headless",
+  "viewport": {
+    "width": 1536,
+    "height": 864
+  },
+  "rehearsals_run": 3,
+  "consecutive": true,
+  "passed": true,
+  "same_receipts_and_final_states": true,
+  "repository_ledger_unchanged": true,
+  "expected_outcomes": {
+    "checks": {
+      "dev01: plan version 2 by one apply_plan receipt (rcpt_0001)": true,
+      "dev04: plan version 1 kept, no receipt, no hold, no spend": true,
+      "dev02: hold, organizer approval, one commitment of $35.00": true,
+      "skills_dev01: the check-in then the swap (plan version 2)": true,
+      "pantry_dev01: target 40, 40 distributed on time": true,
+      "five episodes recorded": true
+    },
+    "passed": true
+  },
+  "total_seconds": 134.3,
+  "rehearsals": [
+    {
+      "rehearsal": 1,
+      "forced_provider_failure": false,
+      "seconds": 42.2,
+      "segments_seconds": {
+        "showcase": 1.9,
+        "commitments": 1.0,
+        "delay": 2.3,
+        "stale": 5.9,
+        "backup": 9.9,
+        "live": 3.2,
+        "community": 7.7,
+        "pantry": 9.8,
+        "close": 0.3
+      },
+      "forced_failure_checks": 0,
+      "story_checks": 34,
+      "checks": [
+        {
+          "check": "clean dev01 episode: revision 3, no receipt, no hold; header labels visible",
+          "passed": true,
+          "detail": "\u26a0 Fictional sandbox \u2014 no real bookings, purchases, or messages | \u2699 Deterministic policy \u00b7 selected, not run yet | 16:40 | Opens 17:00 \u00b7 Public deadline: must finish by 18:00 EST",
+          "story_step": 1
+        },
+        {
+          "check": "the schedule shows plan version 1 with every activity (fresh API read)",
+          "passed": true,
+          "detail": "5 activities; Current schedule (plan version 1)",
+          "story_step": 2
+        },
+        {
+          "check": "the agent's grant is on the board: $0.00 committed limit, $35.00 hold limit",
+          "passed": true,
+          "detail": "committed limit 0 cents; agent_demo (coordinator agent, grant_coordinator_demo v1) \u2713Valid now",
+          "story_step": 3
+        },
+        {
+          "check": "the projector notice is on the board with its source and times",
+          "passed": true,
+          "detail": "notice \u00b7 from delivery_contact | Observed 16:39 \u00b7 received 16:40",
+          "story_step": 4
+        },
+        {
+          "check": "the status query's answer is shown with its ETA (fresh API read)",
+          "passed": true,
+          "detail": "Primary projector delivery \u29d7Expected, not yet arrived basis: status observation at 16:40\u25f7Reported ETA 17:25 \u2014 not an arrival | delivery eta: reported delayed \u29d7Expected, not yet arrived\u25f7Reported ETA 17:25 \u2014 a reported ETA is not an arrival",
+          "story_step": 5
+        },
+        {
+          "check": "alternatives show the feasible swap and the rejected candidates; nothing reserved",
+          "passed": true,
+          "detail": "#1 Swap demonstrations and skills exchange | Objective terms for Swap demonstrations and skills exchange | #3 Swap demonstrations and skills exchange + Use backup_projector instead of projector for demonstrations | Objective terms for Swap demonstrations and skills exchange + Use backup_projector instead of projector for demonstrations | Rejected alternatives (13) and the checks they fail",
+          "story_step": 6
+        },
+        {
+          "check": "one applied plan receipt (4 -> 5), shown on the board; no money committed",
+          "passed": true,
+          "detail": "rcpt_0001; Plan version 1 \u2192 2, applied at 16:43 by receipt rcpt_0001 from candidate cand_0001_dc26f35f.",
+          "story_step": 7
+        },
+        {
+          "check": "the stale notice is inapplicable with its reasons and the copy is a duplicate",
+          "passed": true,
+          "detail": "\u29c9Duplicate Notice obs_0003 is a forwarded copy of handled notice obs_0002 (same correlation group and text): one evidence lineage, not corroboration. No plan change. | \u2298Does not apply Notice obs_0002 does not apply to this event: refers to 2026-10-29 but the event is on 2026-11-05; order P09 is not projector's booking P17. No plan change.",
+          "story_step": 8
+        },
+        {
+          "check": "no churn: plan v1 kept, no hold, nothing committed or reserved (fresh API read)",
+          "passed": true,
+          "detail": "{\"plan\": 1, \"budget\": {\"budget_cents\": 15000, \"committed_cents\": 0, \"reserved_cents\": 0, \"remaining_cents\": 15000}}",
+          "story_step": 8
+        },
+        {
+          "check": "a hold on the backup projector with its id and expiry; an authorization request",
+          "passed": true,
+          "detail": "hold_0001 expires 16:55; Hold expires",
+          "story_step": 9
+        },
+        {
+          "check": "the organizer's approval raised the coordinator's committed limit to $35.00",
+          "passed": true,
+          "detail": "grant_coordinator_demo max_total_committed_cents 3500",
+          "story_step": 10
+        },
+        {
+          "check": "one commitment of $35.00, nothing left reserved (fresh API read and board)",
+          "passed": true,
+          "detail": "{\"budget_cents\": 15000, \"committed_cents\": 3500, \"reserved_cents\": 0, \"remaining_cents\": 11500}",
+          "story_step": 11
+        },
+        {
+          "check": "the replay is labeled, verified, and from the recorded live run",
+          "passed": true,
+          "detail": "\u25b8 Recorded replay | \u2714Integrity check passed (hashes not signed) | Loaded server: live_p2-live_dev02_trace.json \u00b7 trace 1.0.0, runtime 1.1.0 \u00b7 episode ep_660fc1b24c93 \u00b7 scenario dev_fixture_01 \u00b7 policy live/1.0.0 \u00b7 24 frames, 35 tool calls, 5 receipts | \u2714 Integrity check passed. The trace is consistent with its own hashes, recomputed in this browser (SHA-256 of canonical JSON).",
+          "story_step": 12
+        },
+        {
+          "check": "the decision card names the model call that chose it, the model, latency and cost",
+          "passed": true,
+          "detail": "16:48 \u00b7 revision 8 \u00b7 live/1.0.0 \u00b7 chosen by a model call | Model (as returned) | Chose menu option apply:cand_0005_f5fc676f in model call mc_0006, citing cand_0005_f5fc676f, rpt_0005_f5fc676f, obs_notice_01, hold_0001, cand_0005_4f53cda1.",
+          "story_step": 12
+        },
+        {
+          "check": "the replay issued no POST/PUT/DELETE request",
+          "passed": true,
+          "detail": "[]",
+          "story_step": 12
+        },
+        {
+          "check": "the moderator's policy selector offers P0-P3 by name; the deterministic one is selected",
+          "passed": true,
+          "detail": "Deterministic policy The documented rule baseline for this e | Tool-use agent \u00b7 anthropic/claude-sonnet-5.5 P1: a model cho | Live agent \u00b7 anthropic/claude-sonnet-5.5 P2, selective: a mo | Verify-all agent \u00b7 anthropic/claude-sonnet-5.5 P3: every rel",
+          "story_step": 13
+        },
+        {
+          "check": "a P3 server check is labeled with its relevance rule, a P3 hold as a model choice",
+          "passed": true,
+          "detail": "16:42 \u00b7 revision 4 \u00b7 verify-all/1.0.0 \u00b7 server check under verify-all-relevance/1.0.0, no model choice | 16:45 \u00b7 revision 6 \u00b7 verify-all/1.0.0 \u00b7 chosen by a model call",
+          "story_step": 14
+        },
+        {
+          "check": "P1's recorded pantry run replays with 0 of 40 on time, executor rejections and the cap",
+          "passed": true,
+          "detail": "6 rejected holds; 0 of 40 on time | \u26a0 Failure model_call_cap: the episode's model-call cap is reached. Nothing was invented in its place. | \u25a0Stop Stopped for this episode: the model-call cap of 8 for this episode is spent. No further action is taken; the accepted plan and every commitment stay as they are.",
+          "story_step": 15
+        },
+        {
+          "check": "the rerun under the fixed prompt replays with 40 of 40 on time and no refused hold",
+          "passed": true,
+          "detail": "40 of 40 on time",
+          "story_step": 15
+        },
+        {
+          "check": "the check-in is recorded from the participant's own session, until 11:05",
+          "passed": true,
+          "detail": "participant_peer_lead until 11:05",
+          "story_step": 16
+        },
+        {
+          "check": "plan v2 moves the peer exchange to 10:40, inside the peer lead's window",
+          "passed": true,
+          "detail": "10:10\u201310:40 | 10:40\u201311:00 | Guided practice (practice) \u25cbPlanned\u21bbChanged: was 10:40\u201311:20 | \u29d7 Pending: predecessor skills_demo scheduled to complete by 10:40",
+          "story_step": 17
+        },
+        {
+          "check": "the offer activates the preconfigured backup kit; no hold, spend or plan change",
+          "passed": true,
+          "detail": "backup kit expected (status_observation)",
+          "story_step": 18
+        },
+        {
+          "check": "fictional pantry board: shortfall 16, deficit 40; pantry 24, expected 20, partner 16",
+          "passed": true,
+          "detail": "board gap 16 standard kits, unfulfilled 40 standard kits; pools {\"pantry_stock\": {\"on_hand\": 24, \"reserved\": 0, \"available\": 24, \"expected\": 20, \"distributed\": 0}, \"partner_stock\": {\"on_hand\": 16, \"reserved\": 0, \"available\": 16, \"expected\": 0, \"distributed\": 0}}; Fictional pantry sandbox: fictional kits, stock and staff. Physical receipt and distribution are staff attestations; the coordinator agent cannot record them. | Supply shortfall",
+          "story_step": 19
+        },
+        {
+          "check": "16 partner kits held for an open staff task; pantry still 24; shortfall 16, deficit 40",
+          "passed": true,
+          "detail": "board gap 16 standard kits, unfulfilled 40 standard kits; pools {\"pantry_stock\": {\"on_hand\": 24, \"reserved\": 0, \"available\": 24, \"expected\": 20, \"distributed\": 0}, \"partner_stock\": {\"on_hand\": 16, \"reserved\": 16, \"available\": 0, \"expected\": 0, \"distributed\": 0}}",
+          "story_step": 20
+        },
+        {
+          "check": "one staff receipt of 16; pantry 40, partner 0; shortfall 0, deficit still 40",
+          "passed": true,
+          "detail": "[0, 40]",
+          "story_step": 21
+        },
+        {
+          "check": "40 committed; shortfall 0, deficit still 40, 0 achieved",
+          "passed": true,
+          "detail": "board gap 0 standard kits, unfulfilled 40 standard kits; pools {\"pantry_stock\": {\"on_hand\": 40, \"reserved\": 40, \"available\": 0, \"expected\": 20, \"distributed\": 0}, \"partner_stock\": {\"on_hand\": 0, \"reserved\": 0, \"available\": 0, \"expected\": 0, \"distributed\": 0}}; achieved 0 of 40 on time",
+          "story_step": 22
+        },
+        {
+          "check": "40 of 40 on time at 13:40; shortfall 0, deficit 0; S20 still 20 unreceived",
+          "passed": true,
+          "detail": "ran 63 minutes from 12:37; board gap 0 standard kits, unfulfilled 0 standard kits; pools {\"pantry_stock\": {\"on_hand\": 0, \"reserved\": 0, \"available\": 0, \"expected\": 20, \"distributed\": 40}, \"partner_stock\": {\"on_hand\": 0, \"reserved\": 0, \"available\": 0, \"expected\": 0, \"distributed\": 0}}",
+          "story_step": 23
+        },
+        {
+          "check": "the replay list holds the recorded traces the runbook opens",
+          "passed": true,
+          "detail": "31 traces",
+          "story_step": 24
+        },
+        {
+          "check": "no model call in the story: every decision of its 5 episodes came from a deterministic policy, and the selection stayed deterministic",
+          "passed": true,
+          "detail": "{\"episodes\": 5, \"policies\": [\"pantry-rules/1.1.0\", \"rules/1.0.0\"], \"caps\": {\"phase\": \"development\", \"max_tool_calls\": 48, \"max_model_calls\": 8, \"tool_calls\": 21, \"model_calls\": 0, \"reached\": []}}",
+          "story_step": 24
+        },
+        {
+          "check": "no horizontal overflow at 1536px",
+          "passed": true,
+          "detail": "",
+          "story_step": 24
+        },
+        {
+          "check": "no page errors",
+          "passed": true,
+          "detail": "0 page errors: []",
+          "story_step": 24
+        },
+        {
+          "check": "no join code or session token in the visible text at any frame",
+          "passed": true,
+          "detail": "24 frames; 4 join codes, 5 session tokens and the moderator code checked; 6 join links masked; exposed: []",
+          "story_step": 24
+        },
+        {
+          "check": "the results figure opens with its title",
+          "passed": true,
+          "detail": "Outcome met and status checks, per case and policy",
+          "story_step": 25
+        },
+        {
+          "check": "the figure is the committed report's (commit c052338)",
+          "passed": true,
+          "detail": "e738e76635007fa6 against e738e76635007fa6",
+          "story_step": 25
+        }
+      ],
+      "passed": true,
+      "signatures": [
+        {
+          "case_ref": "dev01",
+          "scenario_id": "dev_fixture_01",
+          "clock": "2026-11-05T21:43:00Z",
+          "revision": 5,
+          "plan_version": 2,
+          "assignments": [
+            [
+              "setup",
+              "2026-11-05T21:30:00Z",
+              "2026-11-05T21:50:00Z"
+            ],
+            [
+              "welcome",
+              "2026-11-05T22:00:00Z",
+              "2026-11-05T22:10:00Z"
+            ],
+            [
+              "demonstrations",
+              "2026-11-05T22:30:00Z",
+              "2026-11-05T22:50:00Z"
+            ],
+            [
+              "skills_exchange",
+              "2026-11-05T22:10:00Z",
+              "2026-11-05T22:30:00Z"
+            ],
+            [
+              "closing",
+              "2026-11-05T22:50:00Z",
+              "2026-11-05T23:00:00Z"
+            ]
+          ],
+          "receipts": [
+            [
+              "rcpt_0001",
+              "apply_plan",
+              "applied"
+            ]
+          ],
+          "holds": [],
+          "commitments": 0,
+          "budget": {
+            "committed_cents": 0,
+            "reserved_cents": 0
+          },
+          "decisions": [
+            [
+              "rules/1.0.0",
+              "verify"
+            ],
+            [
+              "rules/1.0.0",
+              "commit"
+            ]
+          ],
+          "stock": null
+        },
+        {
+          "case_ref": "dev04",
+          "scenario_id": "dev_fixture_01",
+          "clock": "2026-11-05T21:50:00Z",
+          "revision": 7,
+          "plan_version": 1,
+          "assignments": [
+            [
+              "setup",
+              "2026-11-05T21:30:00Z",
+              "2026-11-05T21:50:00Z"
+            ],
+            [
+              "welcome",
+              "2026-11-05T22:00:00Z",
+              "2026-11-05T22:10:00Z"
+            ],
+            [
+              "demonstrations",
+              "2026-11-05T22:10:00Z",
+              "2026-11-05T22:30:00Z"
+            ],
+            [
+              "skills_exchange",
+              "2026-11-05T22:30:00Z",
+              "2026-11-05T22:50:00Z"
+            ],
+            [
+              "closing",
+              "2026-11-05T22:50:00Z",
+              "2026-11-05T23:00:00Z"
+            ]
+          ],
+          "receipts": [],
+          "holds": [],
+          "commitments": 0,
+          "budget": {
+            "committed_cents": 0,
+            "reserved_cents": 0
+          },
+          "decisions": [
+            [
+              "rules/1.0.0",
+              "verify"
+            ],
+            [
+              "rules/1.0.0",
+              "keep"
+            ],
+            [
+              "rules/1.0.0",
+              "inapplicable"
+            ],
+            [
+              "rules/1.0.0",
+              "duplicate"
+            ]
+          ],
+          "stock": null
+        },
+        {
+          "case_ref": "dev02",
+          "scenario_id": "dev_fixture_01",
+          "clock": "2026-11-05T21:46:00Z",
+          "revision": 8,
+          "plan_version": 2,
+          "assignments": [
+            [
+              "setup",
+              "2026-11-05T21:30:00Z",
+              "2026-11-05T21:50:00Z"
+            ],
+            [
+              "welcome",
+              "2026-11-05T22:00:00Z",
+              "2026-11-05T22:10:00Z"
+            ],
+            [
+              "demonstrations",
+              "2026-11-05T22:10:00Z",
+              "2026-11-05T22:30:00Z"
+            ],
+            [
+              "skills_exchange",
+              "2026-11-05T22:30:00Z",
+              "2026-11-05T22:50:00Z"
+            ],
+            [
+              "closing",
+              "2026-11-05T22:50:00Z",
+              "2026-11-05T23:00:00Z"
+            ]
+          ],
+          "receipts": [
+            [
+              "rcpt_0001",
+              "hold_resource",
+              "applied"
+            ],
+            [
+              "rcpt_0002",
+              "update_grant",
+              "applied"
+            ],
+            [
+              "rcpt_0003",
+              "apply_plan",
+              "applied"
+            ]
+          ],
+          "holds": [
+            [
+              "hold_0001",
+              "committed"
+            ]
+          ],
+          "commitments": 1,
+          "budget": {
+            "committed_cents": 3500,
+            "reserved_cents": 0
+          },
+          "decisions": [
+            [
+              "rules/1.0.0",
+              "verify"
+            ],
+            [
+              "rules/1.0.0",
+              "verify"
+            ],
+            [
+              "rules/1.0.0",
+              "prepare"
+            ],
+            [
+              "rules/1.0.0",
+              "ask"
+            ],
+            [
+              "rules/1.0.0",
+              "commit"
+            ]
+          ],
+          "stock": null
+        },
+        {
+          "case_ref": "skills_dev01",
+          "scenario_id": "dev_fixture_02",
+          "clock": "2026-11-07T14:21:00Z",
+          "revision": 4,
+          "plan_version": 2,
+          "assignments": [
+            [
+              "setup",
+              "2026-11-07T14:30:00Z",
+              "2026-11-07T14:50:00Z"
+            ],
+            [
+              "welcome",
+              "2026-11-07T15:00:00Z",
+              "2026-11-07T15:10:00Z"
+            ],
+            [
+              "skills_demo",
+              "2026-11-07T15:10:00Z",
+              "2026-11-07T15:40:00Z"
+            ],
+            [
+              "practice",
+              "2026-11-07T16:00:00Z",
+              "2026-11-07T16:40:00Z"
+            ],
+            [
+              "peer_exchange",
+              "2026-11-07T15:40:00Z",
+              "2026-11-07T16:00:00Z"
+            ],
+            [
+              "closing",
+              "2026-11-07T16:40:00Z",
+              "2026-11-07T17:00:00Z"
+            ]
+          ],
+          "receipts": [
+            [
+              "rcpt_0001",
+              "check_in",
+              "applied"
+            ],
+            [
+              "rcpt_0002",
+              "apply_plan",
+              "applied"
+            ],
+            [
+              "rcpt_0003",
+              "submit_observation",
+              "applied"
+            ]
+          ],
+          "holds": [],
+          "commitments": 0,
+          "budget": {
+            "committed_cents": 0,
+            "reserved_cents": 0
+          },
+          "decisions": [
+            [
+              "rules/1.0.0",
+              "unresolved"
+            ],
+            [
+              "rules/1.0.0",
+              "commit"
+            ]
+          ],
+          "stock": null
+        },
+        {
+          "case_ref": "pantry_dev01",
+          "scenario_id": "dev_fixture_03",
+          "clock": "2026-11-09T18:40:00Z",
+          "revision": 17,
+          "plan_version": 2,
+          "assignments": [
+            [
+              "setup",
+              "2026-11-09T17:40:00Z",
+              "2026-11-09T17:50:00Z"
+            ],
+            [
+              "briefing",
+              "2026-11-09T17:50:00Z",
+              "2026-11-09T18:00:00Z"
+            ],
+            [
+              "distribution",
+              "2026-11-09T18:00:00Z",
+              "2026-11-09T18:40:00Z"
+            ],
+            [
+              "reconciliation",
+              "2026-11-09T18:40:00Z",
+              "2026-11-09T19:00:00Z"
+            ]
+          ],
+          "receipts": [
+            [
+              "rcpt_0001",
+              "hold_resource",
+              "applied"
+            ],
+            [
+              "rcpt_0002",
+              "record_stock_receipt",
+              "applied"
+            ],
+            [
+              "rcpt_0003",
+              "hold_resource",
+              "applied"
+            ],
+            [
+              "rcpt_0004",
+              "apply_plan",
+              "applied"
+            ],
+            [
+              "rcpt_0005",
+              "record_distribution",
+              "applied"
+            ]
+          ],
+          "holds": [
+            [
+              "hold_0001",
+              "fulfilled"
+            ],
+            [
+              "hold_0002",
+              "committed"
+            ]
+          ],
+          "commitments": 0,
+          "budget": {
+            "committed_cents": 0,
+            "reserved_cents": 0
+          },
+          "decisions": [
+            [
+              "pantry-rules/1.1.0",
+              "verify"
+            ],
+            [
+              "pantry-rules/1.1.0",
+              "verify"
+            ],
+            [
+              "pantry-rules/1.1.0",
+              "prepare"
+            ],
+            [
+              "pantry-rules/1.1.0",
+              "ask"
+            ],
+            [
+              "pantry-rules/1.1.0",
+              "prepare"
+            ],
+            [
+              "pantry-rules/1.1.0",
+              "commit"
+            ],
+            [
+              "pantry-rules/1.1.0",
+              "keep"
+            ]
+          ],
+          "stock": {
+            "service": [
+              {
+                "target_id": "kits_40",
+                "unit": "standard_kit",
+                "activity_id": "distribution",
+                "deadline": "2026-11-09T18:40:00Z",
+                "target_quantity": 40,
+                "original_quantity": 40,
+                "distributed_quantity": 40,
+                "on_time_quantity": 40,
+                "late_quantity": 0,
+                "committed_quantity": 0,
+                "supply_gap_quantity": 0,
+                "unfulfilled_quantity": 0,
+                "qualified_minutes": 40,
+                "capacity_quantity": 0,
+                "attained": true
+              }
+            ],
+            "balances": [
+              {
+                "resource_id": "pantry_stock",
+                "unit": "standard_kit",
+                "opening_quantity": 24,
+                "received_quantity": 16,
+                "transferred_out_quantity": 0,
+                "distributed_quantity": 40,
+                "on_hand_quantity": 0,
+                "held_quantity": 0,
+                "committed_quantity": 0,
+                "reserved_quantity": 0,
+                "available_quantity": 0,
+                "expected_quantity": 20,
+                "conserved": true
+              },
+              {
+                "resource_id": "partner_stock",
+                "unit": "standard_kit",
+                "opening_quantity": 16,
+                "received_quantity": 0,
+                "transferred_out_quantity": 16,
+                "distributed_quantity": 0,
+                "on_hand_quantity": 0,
+                "held_quantity": 0,
+                "committed_quantity": 0,
+                "reserved_quantity": 0,
+                "available_quantity": 0,
+                "expected_quantity": 0,
+                "conserved": true
+              }
+            ],
+            "allocations": [
+              {
+                "allocation_id": "alloc_0001",
+                "resource_id": "pantry_stock",
+                "service_target_id": "kits_40",
+                "activity_id": "distribution",
+                "quantity": 40,
+                "remaining_quantity": 0,
+                "source_hold_id": "hold_0002",
+                "plan_version": 2,
+                "receipt_id": "rcpt_0004",
+                "actor_id": "agent_demo",
+                "grant_id": "grant_pantry_agent"
+              }
+            ],
+            "distributions": [
+              {
+                "distribution_id": "dist_0001",
+                "distribution_reference": "distribution_001",
+                "resource_id": "pantry_stock",
+                "service_target_id": "kits_40",
+                "activity_id": "distribution",
+                "quantity": 40,
+                "unit": "standard_kit",
+                "goal_version": 1,
+                "allocation_ids": [
+                  "alloc_0001"
+                ],
+                "at": "2026-11-09T18:40:00Z",
+                "on_time": true,
+                "actor_id": "fictional_staff",
+                "receipt_id": "rcpt_0005",
+                "revision": 17
+              }
+            ],
+            "handoff_tasks": [
+              {
+                "hold_id": "hold_0001",
+                "source_resource_id": "partner_stock",
+                "destination_resource_id": "pantry_stock",
+                "requested_quantity": 16,
+                "remaining_quantity": 0,
+                "requested_at": "2026-11-09T17:35:00Z",
+                "respond_after": "2026-11-09T17:37:00Z",
+                "cutoff": "2026-11-09T17:50:00Z",
+                "status": "fulfilled",
+                "stock_receipt_ids": [
+                  "srec_0001"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "forced": null
+    },
+    {
+      "rehearsal": 2,
+      "forced_provider_failure": true,
+      "seconds": 43.8,
+      "segments_seconds": {
+        "live": 6.3,
+        "showcase": 1.8,
+        "commitments": 1.1,
+        "delay": 2.2,
+        "stale": 6.0,
+        "backup": 9.9,
+        "community": 6.5,
+        "pantry": 9.7,
+        "close": 0.3
+      },
+      "forced_failure_checks": 8,
+      "story_checks": 34,
+      "checks": [
+        {
+          "check": "the board shows the live label before the press",
+          "passed": true,
+          "detail": "",
+          "story_step": 1
+        },
+        {
+          "check": "the failure is visible as a provider_error card within 20 s",
+          "passed": true,
+          "detail": "0.2 s after the press",
+          "story_step": 1
+        },
+        {
+          "check": "nothing changed: plan, holds, commitments, budget and receipts as before the press",
+          "passed": true,
+          "detail": "{\"plan_version\": true, \"holds\": true, \"commitments\": true, \"budget\": true, \"receipts\": true}",
+          "story_step": 1
+        },
+        {
+          "check": "the failed run is recorded under the live policy id",
+          "passed": true,
+          "detail": "[['live/1.1.0', 'wait']]",
+          "story_step": 1
+        },
+        {
+          "check": "the work ledger recorded the failed call, as a transport failure with no cost",
+          "passed": true,
+          "detail": "1 calls, outcomes ['transport'], total 0.0",
+          "story_step": 1
+        },
+        {
+          "check": "the replay is labeled and its integrity check passed",
+          "passed": true,
+          "detail": "integrity passed; ready 0.8 s after the switch",
+          "story_step": 1
+        },
+        {
+          "check": "the replay's final state shows the recorded receipts",
+          "passed": true,
+          "detail": "receipts ['rcpt_0001', 'rcpt_0002', 'rcpt_0003']",
+          "story_step": 1
+        },
+        {
+          "check": "the replay sent no request other than GET",
+          "passed": true,
+          "detail": "0 sent",
+          "story_step": 1
+        },
+        {
+          "check": "clean dev01 episode: revision 3, no receipt, no hold; header labels visible",
+          "passed": true,
+          "detail": "\u26a0 Fictional sandbox \u2014 no real bookings, purchases, or messages | \u2699 Deterministic policy \u00b7 selected, not run yet | 16:40 | Opens 17:00 \u00b7 Public deadline: must finish by 18:00 EST",
+          "story_step": 2
+        },
+        {
+          "check": "the schedule shows plan version 1 with every activity (fresh API read)",
+          "passed": true,
+          "detail": "5 activities; Current schedule (plan version 1)",
+          "story_step": 3
+        },
+        {
+          "check": "the agent's grant is on the board: $0.00 committed limit, $35.00 hold limit",
+          "passed": true,
+          "detail": "committed limit 0 cents; agent_demo (coordinator agent, grant_coordinator_demo v1) \u2713Valid now",
+          "story_step": 4
+        },
+        {
+          "check": "the projector notice is on the board with its source and times",
+          "passed": true,
+          "detail": "notice \u00b7 from delivery_contact | Observed 16:39 \u00b7 received 16:40",
+          "story_step": 5
+        },
+        {
+          "check": "the status query's answer is shown with its ETA (fresh API read)",
+          "passed": true,
+          "detail": "Primary projector delivery \u29d7Expected, not yet arrived basis: status observation at 16:40\u25f7Reported ETA 17:25 \u2014 not an arrival | delivery eta: reported delayed \u29d7Expected, not yet arrived\u25f7Reported ETA 17:25 \u2014 a reported ETA is not an arrival",
+          "story_step": 6
+        },
+        {
+          "check": "alternatives show the feasible swap and the rejected candidates; nothing reserved",
+          "passed": true,
+          "detail": "#1 Swap demonstrations and skills exchange | Objective terms for Swap demonstrations and skills exchange | #3 Swap demonstrations and skills exchange + Use backup_projector instead of projector for demonstrations | Objective terms for Swap demonstrations and skills exchange + Use backup_projector instead of projector for demonstrations | Rejected alternatives (13) and the checks they fail",
+          "story_step": 7
+        },
+        {
+          "check": "one applied plan receipt (4 -> 5), shown on the board; no money committed",
+          "passed": true,
+          "detail": "rcpt_0001; Plan version 1 \u2192 2, applied at 16:43 by receipt rcpt_0001 from candidate cand_0001_dc26f35f.",
+          "story_step": 8
+        },
+        {
+          "check": "the stale notice is inapplicable with its reasons and the copy is a duplicate",
+          "passed": true,
+          "detail": "\u29c9Duplicate Notice obs_0003 is a forwarded copy of handled notice obs_0002 (same correlation group and text): one evidence lineage, not corroboration. No plan change. | \u2298Does not apply Notice obs_0002 does not apply to this event: refers to 2026-10-29 but the event is on 2026-11-05; order P09 is not projector's booking P17. No plan change.",
+          "story_step": 9
+        },
+        {
+          "check": "no churn: plan v1 kept, no hold, nothing committed or reserved (fresh API read)",
+          "passed": true,
+          "detail": "{\"plan\": 1, \"budget\": {\"budget_cents\": 15000, \"committed_cents\": 0, \"reserved_cents\": 0, \"remaining_cents\": 15000}}",
+          "story_step": 9
+        },
+        {
+          "check": "a hold on the backup projector with its id and expiry; an authorization request",
+          "passed": true,
+          "detail": "hold_0001 expires 16:55; Hold expires",
+          "story_step": 10
+        },
+        {
+          "check": "the organizer's approval raised the coordinator's committed limit to $35.00",
+          "passed": true,
+          "detail": "grant_coordinator_demo max_total_committed_cents 3500",
+          "story_step": 11
+        },
+        {
+          "check": "one commitment of $35.00, nothing left reserved (fresh API read and board)",
+          "passed": true,
+          "detail": "{\"budget_cents\": 15000, \"committed_cents\": 3500, \"reserved_cents\": 0, \"remaining_cents\": 11500}",
+          "story_step": 12
+        },
+        {
+          "check": "the replay is labeled, verified, and from the recorded live run",
+          "passed": true,
+          "detail": "\u25b8 Recorded replay | \u2714Integrity check passed (hashes not signed) | Loaded server: live_p2-live_dev02_trace.json \u00b7 trace 1.0.0, runtime 1.1.0 \u00b7 episode ep_660fc1b24c93 \u00b7 scenario dev_fixture_01 \u00b7 policy live/1.0.0 \u00b7 24 frames, 35 tool calls, 5 receipts | \u2714 Integrity check passed. The trace is consistent with its own hashes, recomputed in this browser (SHA-256 of canonical JSON).",
+          "story_step": 13
+        },
+        {
+          "check": "the decision card names the model call that chose it, the model, latency and cost",
+          "passed": true,
+          "detail": "16:48 \u00b7 revision 8 \u00b7 live/1.0.0 \u00b7 chosen by a model call | Model (as returned) | Chose menu option apply:cand_0005_f5fc676f in model call mc_0006, citing cand_0005_f5fc676f, rpt_0005_f5fc676f, obs_notice_01, hold_0001, cand_0005_4f53cda1.",
+          "story_step": 13
+        },
+        {
+          "check": "the replay issued no POST/PUT/DELETE request",
+          "passed": true,
+          "detail": "[]",
+          "story_step": 13
+        },
+        {
+          "check": "the moderator's policy selector offers P0-P3 by name; the deterministic one is selected",
+          "passed": true,
+          "detail": "Deterministic policy The documented rule baseline for this e | Tool-use agent \u00b7 anthropic/claude-sonnet-5.5 P1: a model cho | Live agent \u00b7 anthropic/claude-sonnet-5.5 P2, selective: a mo | Verify-all agent \u00b7 anthropic/claude-sonnet-5.5 P3: every rel",
+          "story_step": 14
+        },
+        {
+          "check": "a P3 server check is labeled with its relevance rule, a P3 hold as a model choice",
+          "passed": true,
+          "detail": "16:42 \u00b7 revision 4 \u00b7 verify-all/1.0.0 \u00b7 server check under verify-all-relevance/1.0.0, no model choice | 16:45 \u00b7 revision 6 \u00b7 verify-all/1.0.0 \u00b7 chosen by a model call",
+          "story_step": 15
+        },
+        {
+          "check": "P1's recorded pantry run replays with 0 of 40 on time, executor rejections and the cap",
+          "passed": true,
+          "detail": "6 rejected holds; 0 of 40 on time | \u26a0 Failure model_call_cap: the episode's model-call cap is reached. Nothing was invented in its place. | \u25a0Stop Stopped for this episode: the model-call cap of 8 for this episode is spent. No further action is taken; the accepted plan and every commitment stay as they are.",
+          "story_step": 16
+        },
+        {
+          "check": "the rerun under the fixed prompt replays with 40 of 40 on time and no refused hold",
+          "passed": true,
+          "detail": "40 of 40 on time",
+          "story_step": 16
+        },
+        {
+          "check": "the check-in is recorded from the participant's own session, until 11:05",
+          "passed": true,
+          "detail": "participant_peer_lead until 11:05",
+          "story_step": 17
+        },
+        {
+          "check": "plan v2 moves the peer exchange to 10:40, inside the peer lead's window",
+          "passed": true,
+          "detail": "10:10\u201310:40 | 10:40\u201311:00 | Guided practice (practice) \u25cbPlanned\u21bbChanged: was 10:40\u201311:20 | \u29d7 Pending: predecessor skills_demo scheduled to complete by 10:40",
+          "story_step": 18
+        },
+        {
+          "check": "the offer activates the preconfigured backup kit; no hold, spend or plan change",
+          "passed": true,
+          "detail": "backup kit expected (status_observation)",
+          "story_step": 19
+        },
+        {
+          "check": "fictional pantry board: shortfall 16, deficit 40; pantry 24, expected 20, partner 16",
+          "passed": true,
+          "detail": "board gap 16 standard kits, unfulfilled 40 standard kits; pools {\"pantry_stock\": {\"on_hand\": 24, \"reserved\": 0, \"available\": 24, \"expected\": 20, \"distributed\": 0}, \"partner_stock\": {\"on_hand\": 16, \"reserved\": 0, \"available\": 16, \"expected\": 0, \"distributed\": 0}}; Fictional pantry sandbox: fictional kits, stock and staff. Physical receipt and distribution are staff attestations; the coordinator agent cannot record them. | Supply shortfall",
+          "story_step": 20
+        },
+        {
+          "check": "16 partner kits held for an open staff task; pantry still 24; shortfall 16, deficit 40",
+          "passed": true,
+          "detail": "board gap 16 standard kits, unfulfilled 40 standard kits; pools {\"pantry_stock\": {\"on_hand\": 24, \"reserved\": 0, \"available\": 24, \"expected\": 20, \"distributed\": 0}, \"partner_stock\": {\"on_hand\": 16, \"reserved\": 16, \"available\": 0, \"expected\": 0, \"distributed\": 0}}",
+          "story_step": 21
+        },
+        {
+          "check": "one staff receipt of 16; pantry 40, partner 0; shortfall 0, deficit still 40",
+          "passed": true,
+          "detail": "[0, 40]",
+          "story_step": 22
+        },
+        {
+          "check": "40 committed; shortfall 0, deficit still 40, 0 achieved",
+          "passed": true,
+          "detail": "board gap 0 standard kits, unfulfilled 40 standard kits; pools {\"pantry_stock\": {\"on_hand\": 40, \"reserved\": 40, \"available\": 0, \"expected\": 20, \"distributed\": 0}, \"partner_stock\": {\"on_hand\": 0, \"reserved\": 0, \"available\": 0, \"expected\": 0, \"distributed\": 0}}; achieved 0 of 40 on time",
+          "story_step": 23
+        },
+        {
+          "check": "40 of 40 on time at 13:40; shortfall 0, deficit 0; S20 still 20 unreceived",
+          "passed": true,
+          "detail": "ran 63 minutes from 12:37; board gap 0 standard kits, unfulfilled 0 standard kits; pools {\"pantry_stock\": {\"on_hand\": 0, \"reserved\": 0, \"available\": 0, \"expected\": 20, \"distributed\": 40}, \"partner_stock\": {\"on_hand\": 0, \"reserved\": 0, \"available\": 0, \"expected\": 0, \"distributed\": 0}}",
+          "story_step": 24
+        },
+        {
+          "check": "the replay list holds the recorded traces the runbook opens",
+          "passed": true,
+          "detail": "31 traces",
+          "story_step": 25
+        },
+        {
+          "check": "no model call in the story: every decision of its 5 episodes came from a deterministic policy, and the selection stayed deterministic",
+          "passed": true,
+          "detail": "{\"episodes\": 5, \"policies\": [\"pantry-rules/1.1.0\", \"rules/1.0.0\"], \"caps\": {\"phase\": \"development\", \"max_tool_calls\": 48, \"max_model_calls\": 8, \"tool_calls\": 21, \"model_calls\": 0, \"reached\": []}}",
+          "story_step": 25
+        },
+        {
+          "check": "no horizontal overflow at 1536px",
+          "passed": true,
+          "detail": "",
+          "story_step": 25
+        },
+        {
+          "check": "no page errors",
+          "passed": true,
+          "detail": "0 page errors: []",
+          "story_step": 25
+        },
+        {
+          "check": "no join code or session token in the visible text at any frame",
+          "passed": true,
+          "detail": "26 frames; 4 join codes, 6 session tokens and the moderator code checked; 6 join links masked; exposed: []",
+          "story_step": 25
+        },
+        {
+          "check": "the results figure opens with its title",
+          "passed": true,
+          "detail": "Outcome met and status checks, per case and policy",
+          "story_step": 26
+        },
+        {
+          "check": "the figure is the committed report's (commit c052338)",
+          "passed": true,
+          "detail": "e738e76635007fa6 against e738e76635007fa6",
+          "story_step": 26
+        }
+      ],
+      "passed": true,
+      "signatures": [
+        {
+          "case_ref": "dev01",
+          "scenario_id": "dev_fixture_01",
+          "clock": "2026-11-05T21:43:00Z",
+          "revision": 5,
+          "plan_version": 2,
+          "assignments": [
+            [
+              "setup",
+              "2026-11-05T21:30:00Z",
+              "2026-11-05T21:50:00Z"
+            ],
+            [
+              "welcome",
+              "2026-11-05T22:00:00Z",
+              "2026-11-05T22:10:00Z"
+            ],
+            [
+              "demonstrations",
+              "2026-11-05T22:30:00Z",
+              "2026-11-05T22:50:00Z"
+            ],
+            [
+              "skills_exchange",
+              "2026-11-05T22:10:00Z",
+              "2026-11-05T22:30:00Z"
+            ],
+            [
+              "closing",
+              "2026-11-05T22:50:00Z",
+              "2026-11-05T23:00:00Z"
+            ]
+          ],
+          "receipts": [
+            [
+              "rcpt_0001",
+              "apply_plan",
+              "applied"
+            ]
+          ],
+          "holds": [],
+          "commitments": 0,
+          "budget": {
+            "committed_cents": 0,
+            "reserved_cents": 0
+          },
+          "decisions": [
+            [
+              "rules/1.0.0",
+              "verify"
+            ],
+            [
+              "rules/1.0.0",
+              "commit"
+            ]
+          ],
+          "stock": null
+        },
+        {
+          "case_ref": "dev04",
+          "scenario_id": "dev_fixture_01",
+          "clock": "2026-11-05T21:50:00Z",
+          "revision": 7,
+          "plan_version": 1,
+          "assignments": [
+            [
+              "setup",
+              "2026-11-05T21:30:00Z",
+              "2026-11-05T21:50:00Z"
+            ],
+            [
+              "welcome",
+              "2026-11-05T22:00:00Z",
+              "2026-11-05T22:10:00Z"
+            ],
+            [
+              "demonstrations",
+              "2026-11-05T22:10:00Z",
+              "2026-11-05T22:30:00Z"
+            ],
+            [
+              "skills_exchange",
+              "2026-11-05T22:30:00Z",
+              "2026-11-05T22:50:00Z"
+            ],
+            [
+              "closing",
+              "2026-11-05T22:50:00Z",
+              "2026-11-05T23:00:00Z"
+            ]
+          ],
+          "receipts": [],
+          "holds": [],
+          "commitments": 0,
+          "budget": {
+            "committed_cents": 0,
+            "reserved_cents": 0
+          },
+          "decisions": [
+            [
+              "rules/1.0.0",
+              "verify"
+            ],
+            [
+              "rules/1.0.0",
+              "keep"
+            ],
+            [
+              "rules/1.0.0",
+              "inapplicable"
+            ],
+            [
+              "rules/1.0.0",
+              "duplicate"
+            ]
+          ],
+          "stock": null
+        },
+        {
+          "case_ref": "dev02",
+          "scenario_id": "dev_fixture_01",
+          "clock": "2026-11-05T21:46:00Z",
+          "revision": 8,
+          "plan_version": 2,
+          "assignments": [
+            [
+              "setup",
+              "2026-11-05T21:30:00Z",
+              "2026-11-05T21:50:00Z"
+            ],
+            [
+              "welcome",
+              "2026-11-05T22:00:00Z",
+              "2026-11-05T22:10:00Z"
+            ],
+            [
+              "demonstrations",
+              "2026-11-05T22:10:00Z",
+              "2026-11-05T22:30:00Z"
+            ],
+            [
+              "skills_exchange",
+              "2026-11-05T22:30:00Z",
+              "2026-11-05T22:50:00Z"
+            ],
+            [
+              "closing",
+              "2026-11-05T22:50:00Z",
+              "2026-11-05T23:00:00Z"
+            ]
+          ],
+          "receipts": [
+            [
+              "rcpt_0001",
+              "hold_resource",
+              "applied"
+            ],
+            [
+              "rcpt_0002",
+              "update_grant",
+              "applied"
+            ],
+            [
+              "rcpt_0003",
+              "apply_plan",
+              "applied"
+            ]
+          ],
+          "holds": [
+            [
+              "hold_0001",
+              "committed"
+            ]
+          ],
+          "commitments": 1,
+          "budget": {
+            "committed_cents": 3500,
+            "reserved_cents": 0
+          },
+          "decisions": [
+            [
+              "rules/1.0.0",
+              "verify"
+            ],
+            [
+              "rules/1.0.0",
+              "verify"
+            ],
+            [
+              "rules/1.0.0",
+              "prepare"
+            ],
+            [
+              "rules/1.0.0",
+              "ask"
+            ],
+            [
+              "rules/1.0.0",
+              "commit"
+            ]
+          ],
+          "stock": null
+        },
+        {
+          "case_ref": "skills_dev01",
+          "scenario_id": "dev_fixture_02",
+          "clock": "2026-11-07T14:21:00Z",
+          "revision": 4,
+          "plan_version": 2,
+          "assignments": [
+            [
+              "setup",
+              "2026-11-07T14:30:00Z",
+              "2026-11-07T14:50:00Z"
+            ],
+            [
+              "welcome",
+              "2026-11-07T15:00:00Z",
+              "2026-11-07T15:10:00Z"
+            ],
+            [
+              "skills_demo",
+              "2026-11-07T15:10:00Z",
+              "2026-11-07T15:40:00Z"
+            ],
+            [
+              "practice",
+              "2026-11-07T16:00:00Z",
+              "2026-11-07T16:40:00Z"
+            ],
+            [
+              "peer_exchange",
+              "2026-11-07T15:40:00Z",
+              "2026-11-07T16:00:00Z"
+            ],
+            [
+              "closing",
+              "2026-11-07T16:40:00Z",
+              "2026-11-07T17:00:00Z"
+            ]
+          ],
+          "receipts": [
+            [
+              "rcpt_0001",
+              "check_in",
+              "applied"
+            ],
+            [
+              "rcpt_0002",
+              "apply_plan",
+              "applied"
+            ],
+            [
+              "rcpt_0003",
+              "submit_observation",
+              "applied"
+            ]
+          ],
+          "holds": [],
+          "commitments": 0,
+          "budget": {
+            "committed_cents": 0,
+            "reserved_cents": 0
+          },
+          "decisions": [
+            [
+              "rules/1.0.0",
+              "unresolved"
+            ],
+            [
+              "rules/1.0.0",
+              "commit"
+            ]
+          ],
+          "stock": null
+        },
+        {
+          "case_ref": "pantry_dev01",
+          "scenario_id": "dev_fixture_03",
+          "clock": "2026-11-09T18:40:00Z",
+          "revision": 17,
+          "plan_version": 2,
+          "assignments": [
+            [
+              "setup",
+              "2026-11-09T17:40:00Z",
+              "2026-11-09T17:50:00Z"
+            ],
+            [
+              "briefing",
+              "2026-11-09T17:50:00Z",
+              "2026-11-09T18:00:00Z"
+            ],
+            [
+              "distribution",
+              "2026-11-09T18:00:00Z",
+              "2026-11-09T18:40:00Z"
+            ],
+            [
+              "reconciliation",
+              "2026-11-09T18:40:00Z",
+              "2026-11-09T19:00:00Z"
+            ]
+          ],
+          "receipts": [
+            [
+              "rcpt_0001",
+              "hold_resource",
+              "applied"
+            ],
+            [
+              "rcpt_0002",
+              "record_stock_receipt",
+              "applied"
+            ],
+            [
+              "rcpt_0003",
+              "hold_resource",
+              "applied"
+            ],
+            [
+              "rcpt_0004",
+              "apply_plan",
+              "applied"
+            ],
+            [
+              "rcpt_0005",
+              "record_distribution",
+              "applied"
+            ]
+          ],
+          "holds": [
+            [
+              "hold_0001",
+              "fulfilled"
+            ],
+            [
+              "hold_0002",
+              "committed"
+            ]
+          ],
+          "commitments": 0,
+          "budget": {
+            "committed_cents": 0,
+            "reserved_cents": 0
+          },
+          "decisions": [
+            [
+              "pantry-rules/1.1.0",
+              "verify"
+            ],
+            [
+              "pantry-rules/1.1.0",
+              "verify"
+            ],
+            [
+              "pantry-rules/1.1.0",
+              "prepare"
+            ],
+            [
+              "pantry-rules/1.1.0",
+              "ask"
+            ],
+            [
+              "pantry-rules/1.1.0",
+              "prepare"
+            ],
+            [
+              "pantry-rules/1.1.0",
+              "commit"
+            ],
+            [
+              "pantry-rules/1.1.0",
+              "keep"
+            ]
+          ],
+          "stock": {
+            "service": [
+              {
+                "target_id": "kits_40",
+                "unit": "standard_kit",
+                "activity_id": "distribution",
+                "deadline": "2026-11-09T18:40:00Z",
+                "target_quantity": 40,
+                "original_quantity": 40,
+                "distributed_quantity": 40,
+                "on_time_quantity": 40,
+                "late_quantity": 0,
+                "committed_quantity": 0,
+                "supply_gap_quantity": 0,
+                "unfulfilled_quantity": 0,
+                "qualified_minutes": 40,
+                "capacity_quantity": 0,
+                "attained": true
+              }
+            ],
+            "balances": [
+              {
+                "resource_id": "pantry_stock",
+                "unit": "standard_kit",
+                "opening_quantity": 24,
+                "received_quantity": 16,
+                "transferred_out_quantity": 0,
+                "distributed_quantity": 40,
+                "on_hand_quantity": 0,
+                "held_quantity": 0,
+                "committed_quantity": 0,
+                "reserved_quantity": 0,
+                "available_quantity": 0,
+                "expected_quantity": 20,
+                "conserved": true
+              },
+              {
+                "resource_id": "partner_stock",
+                "unit": "standard_kit",
+                "opening_quantity": 16,
+                "received_quantity": 0,
+                "transferred_out_quantity": 16,
+                "distributed_quantity": 0,
+                "on_hand_quantity": 0,
+                "held_quantity": 0,
+                "committed_quantity": 0,
+                "reserved_quantity": 0,
+                "available_quantity": 0,
+                "expected_quantity": 0,
+                "conserved": true
+              }
+            ],
+            "allocations": [
+              {
+                "allocation_id": "alloc_0001",
+                "resource_id": "pantry_stock",
+                "service_target_id": "kits_40",
+                "activity_id": "distribution",
+                "quantity": 40,
+                "remaining_quantity": 0,
+                "source_hold_id": "hold_0002",
+                "plan_version": 2,
+                "receipt_id": "rcpt_0004",
+                "actor_id": "agent_demo",
+                "grant_id": "grant_pantry_agent"
+              }
+            ],
+            "distributions": [
+              {
+                "distribution_id": "dist_0001",
+                "distribution_reference": "distribution_001",
+                "resource_id": "pantry_stock",
+                "service_target_id": "kits_40",
+                "activity_id": "distribution",
+                "quantity": 40,
+                "unit": "standard_kit",
+                "goal_version": 1,
+                "allocation_ids": [
+                  "alloc_0001"
+                ],
+                "at": "2026-11-09T18:40:00Z",
+                "on_time": true,
+                "actor_id": "fictional_staff",
+                "receipt_id": "rcpt_0005",
+                "revision": 17
+              }
+            ],
+            "handoff_tasks": [
+              {
+                "hold_id": "hold_0001",
+                "source_resource_id": "partner_stock",
+                "destination_resource_id": "pantry_stock",
+                "requested_quantity": 16,
+                "remaining_quantity": 0,
+                "requested_at": "2026-11-09T17:35:00Z",
+                "respond_after": "2026-11-09T17:37:00Z",
+                "cutoff": "2026-11-09T17:50:00Z",
+                "status": "fulfilled",
+                "stock_receipt_ids": [
+                  "srec_0001"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "forced": {
+        "endpoint": "http://127.0.0.1:<closed port>/api/v1 (nothing listening)",
+        "failure_visible_seconds": 0.2,
+        "replay": "live_p2-live_dev01_trace.json",
+        "replay_ready_seconds": 0.8,
+        "ledger_calls": 1,
+        "ledger_outcomes": [
+          "transport"
+        ],
+        "ledger_total_usd": 0.0,
+        "unchanged": {
+          "plan_version": true,
+          "holds": true,
+          "commitments": true,
+          "budget": true,
+          "receipts": true
+        }
+      }
+    },
+    {
+      "rehearsal": 3,
+      "forced_provider_failure": false,
+      "seconds": 40.8,
+      "segments_seconds": {
+        "showcase": 1.9,
+        "commitments": 1.0,
+        "delay": 2.3,
+        "stale": 6.0,
+        "backup": 10.5,
+        "live": 3.1,
+        "community": 7.2,
+        "pantry": 8.3,
+        "close": 0.3
+      },
+      "forced_failure_checks": 0,
+      "story_checks": 34,
+      "checks": [
+        {
+          "check": "clean dev01 episode: revision 3, no receipt, no hold; header labels visible",
+          "passed": true,
+          "detail": "\u26a0 Fictional sandbox \u2014 no real bookings, purchases, or messages | \u2699 Deterministic policy \u00b7 selected, not run yet | 16:40 | Opens 17:00 \u00b7 Public deadline: must finish by 18:00 EST",
+          "story_step": 1
+        },
+        {
+          "check": "the schedule shows plan version 1 with every activity (fresh API read)",
+          "passed": true,
+          "detail": "5 activities; Current schedule (plan version 1)",
+          "story_step": 2
+        },
+        {
+          "check": "the agent's grant is on the board: $0.00 committed limit, $35.00 hold limit",
+          "passed": true,
+          "detail": "committed limit 0 cents; agent_demo (coordinator agent, grant_coordinator_demo v1) \u2713Valid now",
+          "story_step": 3
+        },
+        {
+          "check": "the projector notice is on the board with its source and times",
+          "passed": true,
+          "detail": "notice \u00b7 from delivery_contact | Observed 16:39 \u00b7 received 16:40",
+          "story_step": 4
+        },
+        {
+          "check": "the status query's answer is shown with its ETA (fresh API read)",
+          "passed": true,
+          "detail": "Primary projector delivery \u29d7Expected, not yet arrived basis: status observation at 16:40\u25f7Reported ETA 17:25 \u2014 not an arrival | delivery eta: reported delayed \u29d7Expected, not yet arrived\u25f7Reported ETA 17:25 \u2014 a reported ETA is not an arrival",
+          "story_step": 5
+        },
+        {
+          "check": "alternatives show the feasible swap and the rejected candidates; nothing reserved",
+          "passed": true,
+          "detail": "#1 Swap demonstrations and skills exchange | Objective terms for Swap demonstrations and skills exchange | #3 Swap demonstrations and skills exchange + Use backup_projector instead of projector for demonstrations | Objective terms for Swap demonstrations and skills exchange + Use backup_projector instead of projector for demonstrations | Rejected alternatives (13) and the checks they fail",
+          "story_step": 6
+        },
+        {
+          "check": "one applied plan receipt (4 -> 5), shown on the board; no money committed",
+          "passed": true,
+          "detail": "rcpt_0001; Plan version 1 \u2192 2, applied at 16:43 by receipt rcpt_0001 from candidate cand_0001_dc26f35f.",
+          "story_step": 7
+        },
+        {
+          "check": "the stale notice is inapplicable with its reasons and the copy is a duplicate",
+          "passed": true,
+          "detail": "\u29c9Duplicate Notice obs_0003 is a forwarded copy of handled notice obs_0002 (same correlation group and text): one evidence lineage, not corroboration. No plan change. | \u2298Does not apply Notice obs_0002 does not apply to this event: refers to 2026-10-29 but the event is on 2026-11-05; order P09 is not projector's booking P17. No plan change.",
+          "story_step": 8
+        },
+        {
+          "check": "no churn: plan v1 kept, no hold, nothing committed or reserved (fresh API read)",
+          "passed": true,
+          "detail": "{\"plan\": 1, \"budget\": {\"budget_cents\": 15000, \"committed_cents\": 0, \"reserved_cents\": 0, \"remaining_cents\": 15000}}",
+          "story_step": 8
+        },
+        {
+          "check": "a hold on the backup projector with its id and expiry; an authorization request",
+          "passed": true,
+          "detail": "hold_0001 expires 16:55; Hold expires",
+          "story_step": 9
+        },
+        {
+          "check": "the organizer's approval raised the coordinator's committed limit to $35.00",
+          "passed": true,
+          "detail": "grant_coordinator_demo max_total_committed_cents 3500",
+          "story_step": 10
+        },
+        {
+          "check": "one commitment of $35.00, nothing left reserved (fresh API read and board)",
+          "passed": true,
+          "detail": "{\"budget_cents\": 15000, \"committed_cents\": 3500, \"reserved_cents\": 0, \"remaining_cents\": 11500}",
+          "story_step": 11
+        },
+        {
+          "check": "the replay is labeled, verified, and from the recorded live run",
+          "passed": true,
+          "detail": "\u25b8 Recorded replay | \u2714Integrity check passed (hashes not signed) | Loaded server: live_p2-live_dev02_trace.json \u00b7 trace 1.0.0, runtime 1.1.0 \u00b7 episode ep_660fc1b24c93 \u00b7 scenario dev_fixture_01 \u00b7 policy live/1.0.0 \u00b7 24 frames, 35 tool calls, 5 receipts | \u2714 Integrity check passed. The trace is consistent with its own hashes, recomputed in this browser (SHA-256 of canonical JSON).",
+          "story_step": 12
+        },
+        {
+          "check": "the decision card names the model call that chose it, the model, latency and cost",
+          "passed": true,
+          "detail": "16:48 \u00b7 revision 8 \u00b7 live/1.0.0 \u00b7 chosen by a model call | Model (as returned) | Chose menu option apply:cand_0005_f5fc676f in model call mc_0006, citing cand_0005_f5fc676f, rpt_0005_f5fc676f, obs_notice_01, hold_0001, cand_0005_4f53cda1.",
+          "story_step": 12
+        },
+        {
+          "check": "the replay issued no POST/PUT/DELETE request",
+          "passed": true,
+          "detail": "[]",
+          "story_step": 12
+        },
+        {
+          "check": "the moderator's policy selector offers P0-P3 by name; the deterministic one is selected",
+          "passed": true,
+          "detail": "Deterministic policy The documented rule baseline for this e | Tool-use agent \u00b7 anthropic/claude-sonnet-5.5 P1: a model cho | Live agent \u00b7 anthropic/claude-sonnet-5.5 P2, selective: a mo | Verify-all agent \u00b7 anthropic/claude-sonnet-5.5 P3: every rel",
+          "story_step": 13
+        },
+        {
+          "check": "a P3 server check is labeled with its relevance rule, a P3 hold as a model choice",
+          "passed": true,
+          "detail": "16:42 \u00b7 revision 4 \u00b7 verify-all/1.0.0 \u00b7 server check under verify-all-relevance/1.0.0, no model choice | 16:45 \u00b7 revision 6 \u00b7 verify-all/1.0.0 \u00b7 chosen by a model call",
+          "story_step": 14
+        },
+        {
+          "check": "P1's recorded pantry run replays with 0 of 40 on time, executor rejections and the cap",
+          "passed": true,
+          "detail": "6 rejected holds; 0 of 40 on time | \u26a0 Failure model_call_cap: the episode's model-call cap is reached. Nothing was invented in its place. | \u25a0Stop Stopped for this episode: the model-call cap of 8 for this episode is spent. No further action is taken; the accepted plan and every commitment stay as they are.",
+          "story_step": 15
+        },
+        {
+          "check": "the rerun under the fixed prompt replays with 40 of 40 on time and no refused hold",
+          "passed": true,
+          "detail": "40 of 40 on time",
+          "story_step": 15
+        },
+        {
+          "check": "the check-in is recorded from the participant's own session, until 11:05",
+          "passed": true,
+          "detail": "participant_peer_lead until 11:05",
+          "story_step": 16
+        },
+        {
+          "check": "plan v2 moves the peer exchange to 10:40, inside the peer lead's window",
+          "passed": true,
+          "detail": "10:10\u201310:40 | 10:40\u201311:00 | Guided practice (practice) \u25cbPlanned\u21bbChanged: was 10:40\u201311:20 | \u29d7 Pending: predecessor skills_demo scheduled to complete by 10:40",
+          "story_step": 17
+        },
+        {
+          "check": "the offer activates the preconfigured backup kit; no hold, spend or plan change",
+          "passed": true,
+          "detail": "backup kit expected (status_observation)",
+          "story_step": 18
+        },
+        {
+          "check": "fictional pantry board: shortfall 16, deficit 40; pantry 24, expected 20, partner 16",
+          "passed": true,
+          "detail": "board gap 16 standard kits, unfulfilled 40 standard kits; pools {\"pantry_stock\": {\"on_hand\": 24, \"reserved\": 0, \"available\": 24, \"expected\": 20, \"distributed\": 0}, \"partner_stock\": {\"on_hand\": 16, \"reserved\": 0, \"available\": 16, \"expected\": 0, \"distributed\": 0}}; Fictional pantry sandbox: fictional kits, stock and staff. Physical receipt and distribution are staff attestations; the coordinator agent cannot record them. | Supply shortfall",
+          "story_step": 19
+        },
+        {
+          "check": "16 partner kits held for an open staff task; pantry still 24; shortfall 16, deficit 40",
+          "passed": true,
+          "detail": "board gap 16 standard kits, unfulfilled 40 standard kits; pools {\"pantry_stock\": {\"on_hand\": 24, \"reserved\": 0, \"available\": 24, \"expected\": 20, \"distributed\": 0}, \"partner_stock\": {\"on_hand\": 16, \"reserved\": 16, \"available\": 0, \"expected\": 0, \"distributed\": 0}}",
+          "story_step": 20
+        },
+        {
+          "check": "one staff receipt of 16; pantry 40, partner 0; shortfall 0, deficit still 40",
+          "passed": true,
+          "detail": "[0, 40]",
+          "story_step": 21
+        },
+        {
+          "check": "40 committed; shortfall 0, deficit still 40, 0 achieved",
+          "passed": true,
+          "detail": "board gap 0 standard kits, unfulfilled 40 standard kits; pools {\"pantry_stock\": {\"on_hand\": 40, \"reserved\": 40, \"available\": 0, \"expected\": 20, \"distributed\": 0}, \"partner_stock\": {\"on_hand\": 0, \"reserved\": 0, \"available\": 0, \"expected\": 0, \"distributed\": 0}}; achieved 0 of 40 on time",
+          "story_step": 22
+        },
+        {
+          "check": "40 of 40 on time at 13:40; shortfall 0, deficit 0; S20 still 20 unreceived",
+          "passed": true,
+          "detail": "ran 63 minutes from 12:37; board gap 0 standard kits, unfulfilled 0 standard kits; pools {\"pantry_stock\": {\"on_hand\": 0, \"reserved\": 0, \"available\": 0, \"expected\": 20, \"distributed\": 40}, \"partner_stock\": {\"on_hand\": 0, \"reserved\": 0, \"available\": 0, \"expected\": 0, \"distributed\": 0}}",
+          "story_step": 23
+        },
+        {
+          "check": "the replay list holds the recorded traces the runbook opens",
+          "passed": true,
+          "detail": "31 traces",
+          "story_step": 24
+        },
+        {
+          "check": "no model call in the story: every decision of its 5 episodes came from a deterministic policy, and the selection stayed deterministic",
+          "passed": true,
+          "detail": "{\"episodes\": 5, \"policies\": [\"pantry-rules/1.1.0\", \"rules/1.0.0\"], \"caps\": {\"phase\": \"development\", \"max_tool_calls\": 48, \"max_model_calls\": 8, \"tool_calls\": 21, \"model_calls\": 0, \"reached\": []}}",
+          "story_step": 24
+        },
+        {
+          "check": "no horizontal overflow at 1536px",
+          "passed": true,
+          "detail": "",
+          "story_step": 24
+        },
+        {
+          "check": "no page errors",
+          "passed": true,
+          "detail": "0 page errors: []",
+          "story_step": 24
+        },
+        {
+          "check": "no join code or session token in the visible text at any frame",
+          "passed": true,
+          "detail": "24 frames; 4 join codes, 5 session tokens and the moderator code checked; 6 join links masked; exposed: []",
+          "story_step": 24
+        },
+        {
+          "check": "the results figure opens with its title",
+          "passed": true,
+          "detail": "Outcome met and status checks, per case and policy",
+          "story_step": 25
+        },
+        {
+          "check": "the figure is the committed report's (commit c052338)",
+          "passed": true,
+          "detail": "e738e76635007fa6 against e738e76635007fa6",
+          "story_step": 25
+        }
+      ],
+      "passed": true,
+      "signatures": [
+        {
+          "case_ref": "dev01",
+          "scenario_id": "dev_fixture_01",
+          "clock": "2026-11-05T21:43:00Z",
+          "revision": 5,
+          "plan_version": 2,
+          "assignments": [
+            [
+              "setup",
+              "2026-11-05T21:30:00Z",
+              "2026-11-05T21:50:00Z"
+            ],
+            [
+              "welcome",
+              "2026-11-05T22:00:00Z",
+              "2026-11-05T22:10:00Z"
+            ],
+            [
+              "demonstrations",
+              "2026-11-05T22:30:00Z",
+              "2026-11-05T22:50:00Z"
+            ],
+            [
+              "skills_exchange",
+              "2026-11-05T22:10:00Z",
+              "2026-11-05T22:30:00Z"
+            ],
+            [
+              "closing",
+              "2026-11-05T22:50:00Z",
+              "2026-11-05T23:00:00Z"
+            ]
+          ],
+          "receipts": [
+            [
+              "rcpt_0001",
+              "apply_plan",
+              "applied"
+            ]
+          ],
+          "holds": [],
+          "commitments": 0,
+          "budget": {
+            "committed_cents": 0,
+            "reserved_cents": 0
+          },
+          "decisions": [
+            [
+              "rules/1.0.0",
+              "verify"
+            ],
+            [
+              "rules/1.0.0",
+              "commit"
+            ]
+          ],
+          "stock": null
+        },
+        {
+          "case_ref": "dev04",
+          "scenario_id": "dev_fixture_01",
+          "clock": "2026-11-05T21:50:00Z",
+          "revision": 7,
+          "plan_version": 1,
+          "assignments": [
+            [
+              "setup",
+              "2026-11-05T21:30:00Z",
+              "2026-11-05T21:50:00Z"
+            ],
+            [
+              "welcome",
+              "2026-11-05T22:00:00Z",
+              "2026-11-05T22:10:00Z"
+            ],
+            [
+              "demonstrations",
+              "2026-11-05T22:10:00Z",
+              "2026-11-05T22:30:00Z"
+            ],
+            [
+              "skills_exchange",
+              "2026-11-05T22:30:00Z",
+              "2026-11-05T22:50:00Z"
+            ],
+            [
+              "closing",
+              "2026-11-05T22:50:00Z",
+              "2026-11-05T23:00:00Z"
+            ]
+          ],
+          "receipts": [],
+          "holds": [],
+          "commitments": 0,
+          "budget": {
+            "committed_cents": 0,
+            "reserved_cents": 0
+          },
+          "decisions": [
+            [
+              "rules/1.0.0",
+              "verify"
+            ],
+            [
+              "rules/1.0.0",
+              "keep"
+            ],
+            [
+              "rules/1.0.0",
+              "inapplicable"
+            ],
+            [
+              "rules/1.0.0",
+              "duplicate"
+            ]
+          ],
+          "stock": null
+        },
+        {
+          "case_ref": "dev02",
+          "scenario_id": "dev_fixture_01",
+          "clock": "2026-11-05T21:46:00Z",
+          "revision": 8,
+          "plan_version": 2,
+          "assignments": [
+            [
+              "setup",
+              "2026-11-05T21:30:00Z",
+              "2026-11-05T21:50:00Z"
+            ],
+            [
+              "welcome",
+              "2026-11-05T22:00:00Z",
+              "2026-11-05T22:10:00Z"
+            ],
+            [
+              "demonstrations",
+              "2026-11-05T22:10:00Z",
+              "2026-11-05T22:30:00Z"
+            ],
+            [
+              "skills_exchange",
+              "2026-11-05T22:30:00Z",
+              "2026-11-05T22:50:00Z"
+            ],
+            [
+              "closing",
+              "2026-11-05T22:50:00Z",
+              "2026-11-05T23:00:00Z"
+            ]
+          ],
+          "receipts": [
+            [
+              "rcpt_0001",
+              "hold_resource",
+              "applied"
+            ],
+            [
+              "rcpt_0002",
+              "update_grant",
+              "applied"
+            ],
+            [
+              "rcpt_0003",
+              "apply_plan",
+              "applied"
+            ]
+          ],
+          "holds": [
+            [
+              "hold_0001",
+              "committed"
+            ]
+          ],
+          "commitments": 1,
+          "budget": {
+            "committed_cents": 3500,
+            "reserved_cents": 0
+          },
+          "decisions": [
+            [
+              "rules/1.0.0",
+              "verify"
+            ],
+            [
+              "rules/1.0.0",
+              "verify"
+            ],
+            [
+              "rules/1.0.0",
+              "prepare"
+            ],
+            [
+              "rules/1.0.0",
+              "ask"
+            ],
+            [
+              "rules/1.0.0",
+              "commit"
+            ]
+          ],
+          "stock": null
+        },
+        {
+          "case_ref": "skills_dev01",
+          "scenario_id": "dev_fixture_02",
+          "clock": "2026-11-07T14:21:00Z",
+          "revision": 4,
+          "plan_version": 2,
+          "assignments": [
+            [
+              "setup",
+              "2026-11-07T14:30:00Z",
+              "2026-11-07T14:50:00Z"
+            ],
+            [
+              "welcome",
+              "2026-11-07T15:00:00Z",
+              "2026-11-07T15:10:00Z"
+            ],
+            [
+              "skills_demo",
+              "2026-11-07T15:10:00Z",
+              "2026-11-07T15:40:00Z"
+            ],
+            [
+              "practice",
+              "2026-11-07T16:00:00Z",
+              "2026-11-07T16:40:00Z"
+            ],
+            [
+              "peer_exchange",
+              "2026-11-07T15:40:00Z",
+              "2026-11-07T16:00:00Z"
+            ],
+            [
+              "closing",
+              "2026-11-07T16:40:00Z",
+              "2026-11-07T17:00:00Z"
+            ]
+          ],
+          "receipts": [
+            [
+              "rcpt_0001",
+              "check_in",
+              "applied"
+            ],
+            [
+              "rcpt_0002",
+              "apply_plan",
+              "applied"
+            ],
+            [
+              "rcpt_0003",
+              "submit_observation",
+              "applied"
+            ]
+          ],
+          "holds": [],
+          "commitments": 0,
+          "budget": {
+            "committed_cents": 0,
+            "reserved_cents": 0
+          },
+          "decisions": [
+            [
+              "rules/1.0.0",
+              "unresolved"
+            ],
+            [
+              "rules/1.0.0",
+              "commit"
+            ]
+          ],
+          "stock": null
+        },
+        {
+          "case_ref": "pantry_dev01",
+          "scenario_id": "dev_fixture_03",
+          "clock": "2026-11-09T18:40:00Z",
+          "revision": 17,
+          "plan_version": 2,
+          "assignments": [
+            [
+              "setup",
+              "2026-11-09T17:40:00Z",
+              "2026-11-09T17:50:00Z"
+            ],
+            [
+              "briefing",
+              "2026-11-09T17:50:00Z",
+              "2026-11-09T18:00:00Z"
+            ],
+            [
+              "distribution",
+              "2026-11-09T18:00:00Z",
+              "2026-11-09T18:40:00Z"
+            ],
+            [
+              "reconciliation",
+              "2026-11-09T18:40:00Z",
+              "2026-11-09T19:00:00Z"
+            ]
+          ],
+          "receipts": [
+            [
+              "rcpt_0001",
+              "hold_resource",
+              "applied"
+            ],
+            [
+              "rcpt_0002",
+              "record_stock_receipt",
+              "applied"
+            ],
+            [
+              "rcpt_0003",
+              "hold_resource",
+              "applied"
+            ],
+            [
+              "rcpt_0004",
+              "apply_plan",
+              "applied"
+            ],
+            [
+              "rcpt_0005",
+              "record_distribution",
+              "applied"
+            ]
+          ],
+          "holds": [
+            [
+              "hold_0001",
+              "fulfilled"
+            ],
+            [
+              "hold_0002",
+              "committed"
+            ]
+          ],
+          "commitments": 0,
+          "budget": {
+            "committed_cents": 0,
+            "reserved_cents": 0
+          },
+          "decisions": [
+            [
+              "pantry-rules/1.1.0",
+              "verify"
+            ],
+            [
+              "pantry-rules/1.1.0",
+              "verify"
+            ],
+            [
+              "pantry-rules/1.1.0",
+              "prepare"
+            ],
+            [
+              "pantry-rules/1.1.0",
+              "ask"
+            ],
+            [
+              "pantry-rules/1.1.0",
+              "prepare"
+            ],
+            [
+              "pantry-rules/1.1.0",
+              "commit"
+            ],
+            [
+              "pantry-rules/1.1.0",
+              "keep"
+            ]
+          ],
+          "stock": {
+            "service": [
+              {
+                "target_id": "kits_40",
+                "unit": "standard_kit",
+                "activity_id": "distribution",
+                "deadline": "2026-11-09T18:40:00Z",
+                "target_quantity": 40,
+                "original_quantity": 40,
+                "distributed_quantity": 40,
+                "on_time_quantity": 40,
+                "late_quantity": 0,
+                "committed_quantity": 0,
+                "supply_gap_quantity": 0,
+                "unfulfilled_quantity": 0,
+                "qualified_minutes": 40,
+                "capacity_quantity": 0,
+                "attained": true
+              }
+            ],
+            "balances": [
+              {
+                "resource_id": "pantry_stock",
+                "unit": "standard_kit",
+                "opening_quantity": 24,
+                "received_quantity": 16,
+                "transferred_out_quantity": 0,
+                "distributed_quantity": 40,
+                "on_hand_quantity": 0,
+                "held_quantity": 0,
+                "committed_quantity": 0,
+                "reserved_quantity": 0,
+                "available_quantity": 0,
+                "expected_quantity": 20,
+                "conserved": true
+              },
+              {
+                "resource_id": "partner_stock",
+                "unit": "standard_kit",
+                "opening_quantity": 16,
+                "received_quantity": 0,
+                "transferred_out_quantity": 16,
+                "distributed_quantity": 0,
+                "on_hand_quantity": 0,
+                "held_quantity": 0,
+                "committed_quantity": 0,
+                "reserved_quantity": 0,
+                "available_quantity": 0,
+                "expected_quantity": 0,
+                "conserved": true
+              }
+            ],
+            "allocations": [
+              {
+                "allocation_id": "alloc_0001",
+                "resource_id": "pantry_stock",
+                "service_target_id": "kits_40",
+                "activity_id": "distribution",
+                "quantity": 40,
+                "remaining_quantity": 0,
+                "source_hold_id": "hold_0002",
+                "plan_version": 2,
+                "receipt_id": "rcpt_0004",
+                "actor_id": "agent_demo",
+                "grant_id": "grant_pantry_agent"
+              }
+            ],
+            "distributions": [
+              {
+                "distribution_id": "dist_0001",
+                "distribution_reference": "distribution_001",
+                "resource_id": "pantry_stock",
+                "service_target_id": "kits_40",
+                "activity_id": "distribution",
+                "quantity": 40,
+                "unit": "standard_kit",
+                "goal_version": 1,
+                "allocation_ids": [
+                  "alloc_0001"
+                ],
+                "at": "2026-11-09T18:40:00Z",
+                "on_time": true,
+                "actor_id": "fictional_staff",
+                "receipt_id": "rcpt_0005",
+                "revision": 17
+              }
+            ],
+            "handoff_tasks": [
+              {
+                "hold_id": "hold_0001",
+                "source_resource_id": "partner_stock",
+                "destination_resource_id": "pantry_stock",
+                "requested_quantity": 16,
+                "remaining_quantity": 0,
+                "requested_at": "2026-11-09T17:35:00Z",
+                "respond_after": "2026-11-09T17:37:00Z",
+                "cutoff": "2026-11-09T17:50:00Z",
+                "status": "fulfilled",
+                "stock_receipt_ids": [
+                  "srec_0001"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "forced": null
+    }
+  ]
+}

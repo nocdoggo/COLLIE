@@ -1,0 +1,324 @@
+[
+  {
+    "tag": "a",
+    "id": null,
+    "text": "Skip to content",
+    "section": null,
+    "ring": true
+  },
+  {
+    "tag": "button",
+    "id": null,
+    "text": "Sign out of this tab",
+    "section": null,
+    "ring": true
+  },
+  {
+    "tag": "select",
+    "id": null,
+    "text": "dev01dev02dev04dev05dev06pantry_dev01pantry_dev02skills_dev01skills_dev02",
+    "section": "moderator-panel",
+    "ring": true
+  },
+  {
+    "tag": "button",
+    "id": null,
+    "text": "Reset: load a clean episode\u2026",
+    "section": "moderator-panel",
+    "ring": true
+  },
+  {
+    "tag": "button",
+    "id": null,
+    "text": "+1 min",
+    "section": "moderator-panel",
+    "ring": true
+  },
+  {
+    "tag": "button",
+    "id": null,
+    "text": "+5 min",
+    "section": "moderator-panel",
+    "ring": true
+  },
+  {
+    "tag": "button",
+    "id": null,
+    "text": "+10 min",
+    "section": "moderator-panel",
+    "ring": true
+  },
+  {
+    "tag": "input",
+    "id": null,
+    "text": "rules",
+    "section": "moderator-panel",
+    "ring": true
+  },
+  {
+    "tag": "button",
+    "id": null,
+    "text": "Run deterministic policy",
+    "section": "moderator-panel",
+    "ring": true
+  },
+  {
+    "tag": "input",
+    "id": null,
+    "text": "5",
+    "section": "moderator-panel",
+    "ring": true
+  },
+  {
+    "tag": "button",
+    "id": null,
+    "text": "Run 5 minutes with policy",
+    "section": "moderator-panel",
+    "ring": true
+  },
+  {
+    "tag": "button",
+    "id": null,
+    "text": "Issue join code",
+    "section": "moderator-panel",
+    "ring": true
+  },
+  {
+    "tag": "button",
+    "id": null,
+    "text": "Issue join code",
+    "section": "moderator-panel",
+    "ring": true
+  },
+  {
+    "tag": "button",
+    "id": null,
+    "text": "Issue join code",
+    "section": "moderator-panel",
+    "ring": true
+  },
+  {
+    "tag": "button",
+    "id": null,
+    "text": "Issue join code",
+    "section": "moderator-panel",
+    "ring": true
+  },
+  {
+    "tag": "button",
+    "id": null,
+    "text": "Export trace",
+    "section": "moderator-panel",
+    "ring": true
+  },
+  {
+    "tag": "a",
+    "id": null,
+    "text": "Open replay",
+    "section": "moderator-panel",
+    "ring": true
+  },
+  {
+    "tag": "button",
+    "id": null,
+    "text": "Current plan",
+    "section": null,
+    "ring": true
+  },
+  {
+    "tag": "button",
+    "id": null,
+    "text": "Evidence",
+    "section": null,
+    "ring": true
+  },
+  {
+    "tag": "button",
+    "id": null,
+    "text": "Latest decision",
+    "section": null,
+    "ring": true
+  },
+  {
+    "tag": "button",
+    "id": null,
+    "text": "Action status",
+    "section": null,
+    "ring": true
+  },
+  {
+    "tag": "button",
+    "id": null,
+    "text": "evidence",
+    "section": "what-changed",
+    "ring": true
+  },
+  {
+    "tag": "button",
+    "id": null,
+    "text": "answer as observation",
+    "section": "status-checks",
+    "ring": true
+  },
+  {
+    "tag": "button",
+    "id": null,
+    "text": "full update",
+    "section": "status-checks",
+    "ring": true
+  },
+  {
+    "tag": "summary",
+    "id": null,
+    "text": "Hard-constraint checks (11 confirmed, 2 under assumptions, 4 not applicable)",
+    "section": "candidates",
+    "ring": true
+  },
+  {
+    "tag": "summary",
+    "id": null,
+    "text": "Candidate record (JSON) cand_0002_4f53cda1",
+    "section": "candidates",
+    "ring": true
+  },
+  {
+    "tag": "summary",
+    "id": null,
+    "text": "Hard-constraint checks (13 confirmed, 2 under assumptions, 2 not applicable)",
+    "section": "candidates",
+    "ring": true
+  },
+  {
+    "tag": "summary",
+    "id": null,
+    "text": "Candidate record (JSON) cand_0002_f5fc676f",
+    "section": "candidates",
+    "ring": true
+  },
+  {
+    "tag": "summary",
+    "id": null,
+    "text": "Hard-constraint checks (13 confirmed, 2 under assumptions, 2 not applicable)",
+    "section": "candidates",
+    "ring": true
+  },
+  {
+    "tag": "summary",
+    "id": null,
+    "text": "Candidate record (JSON) cand_0002_b4c09c0c",
+    "section": "candidates",
+    "ring": true
+  },
+  {
+    "tag": "summary",
+    "id": null,
+    "text": "Rejected alternatives (13) and the checks they fail",
+    "section": "candidates",
+    "ring": true
+  },
+  {
+    "tag": "summary",
+    "id": null,
+    "text": "Declared scenario assumptions (3)",
+    "section": "constraints",
+    "ring": true
+  },
+  {
+    "tag": "button",
+    "id": null,
+    "text": "decision",
+    "section": "observations",
+    "ring": true
+  },
+  {
+    "tag": "summary",
+    "id": null,
+    "text": "Observation record (JSON)",
+    "section": "observations",
+    "ring": true
+  },
+  {
+    "tag": "button",
+    "id": null,
+    "text": "decision",
+    "section": "observations",
+    "ring": true
+  },
+  {
+    "tag": "button",
+    "id": null,
+    "text": "decision",
+    "section": "observations",
+    "ring": true
+  },
+  {
+    "tag": "summary",
+    "id": null,
+    "text": "Observation record (JSON)",
+    "section": "observations",
+    "ring": true
+  },
+  {
+    "tag": "summary",
+    "id": null,
+    "text": "Receipt evidence (JSON) rcpt_0001",
+    "section": "action-history",
+    "ring": true
+  },
+  {
+    "tag": "button",
+    "id": null,
+    "text": "obs_notice_01",
+    "section": "decisions",
+    "ring": true
+  },
+  {
+    "tag": "summary",
+    "id": null,
+    "text": "Decision details (JSON)",
+    "section": "decisions",
+    "ring": true
+  },
+  {
+    "tag": "button",
+    "id": null,
+    "text": "rcpt_0001",
+    "section": "decisions",
+    "ring": true
+  },
+  {
+    "tag": "summary",
+    "id": null,
+    "text": "Decision details (JSON)",
+    "section": "decisions",
+    "ring": true
+  },
+  {
+    "tag": "button",
+    "id": null,
+    "text": "obs_notice_01",
+    "section": "decisions",
+    "ring": true
+  },
+  {
+    "tag": "button",
+    "id": null,
+    "text": "obs_0001",
+    "section": "decisions",
+    "ring": true
+  },
+  {
+    "tag": "summary",
+    "id": null,
+    "text": "Decision details (JSON)",
+    "section": "decisions",
+    "ring": true
+  },
+  {
+    "tag": "summary",
+    "id": null,
+    "text": "Evidence drawer (raw JSON)",
+    "section": "evidence",
+    "ring": true
+  }
+]

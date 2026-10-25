@@ -1,0 +1,106 @@
+{
+  "kind": "plan_b local release package build (not hosted, not submitted)",
+  "manifest": "apps/plan_b/release/manifest.json",
+  "manifest_sha256": "b5529026c73405d6c0dbaf58448b714d699a8a24d2a591a821859a851ec59f24",
+  "git_head": "c052338c9aa8fbf10b82116050766b84b1e1af87",
+  "tree_clean": false,
+  "files": 615,
+  "bytes": 59613420,
+  "excluded_by_reason": {
+    "build caches and installed packages": 71,
+    "evaluator records with predicates and expected outcomes": 231,
+    "evaluator-only held-out cases (messages, timings, predicates, expectations)": 25
+  },
+  "served_and_replayed": true,
+  "passed": true,
+  "checks": [
+    {
+      "check": "every allowlist entry matches a file",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "check": "every required path is in the package",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "check": "every written file is allowlisted and none matches an exclude pattern",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "check": "no credential, local path or local user/host name in any text file",
+      "passed": true,
+      "detail": {
+        "text_files_scanned": 616,
+        "binary_files_not_text_scanned": 0,
+        "findings": {
+          "credential": [],
+          "local path": [],
+          "identifier": []
+        },
+        "ok": true
+      }
+    },
+    {
+      "check": "the browser bundle holds no held-out case ref or scenario id",
+      "passed": true,
+      "detail": {
+        "files": 3,
+        "tokens_searched": 15,
+        "hits": [],
+        "ok": true
+      }
+    },
+    {
+      "check": "plan_b is imported from the package, not the repository",
+      "passed": true,
+      "detail": "<package>/apps/plan_b/plan_b/__init__.py"
+    },
+    {
+      "check": "freeze.json verifies in the package",
+      "passed": true,
+      "detail": "True {'files': 76, 'files_sha256': '7d41fada702f2172c39a968bb6a2a1d72b6cac4e6d23cb047133d47ce373596f', 'recorded_files_sha256': '7d41fada702f2172c39a968bb6a2a1d72b6cac4e6d23cb047133d47ce373596f'} []"
+    },
+    {
+      "check": "held-out public fixtures match heldout.json; the private case files are withheld",
+      "passed": true,
+      "detail": "12 public fixture entries checked; mismatched []; private present []"
+    },
+    {
+      "check": "demo_prep.py from the package prepares a clean state and verifies the packaged traces",
+      "passed": true,
+      "detail": "exit 0; 9 traces verified intact"
+    },
+    {
+      "check": "plan-b serve starts from the package on 127.0.0.1",
+      "passed": true,
+      "detail": {
+        "ok": true,
+        "runtime_version": "1.1.0",
+        "mode": "deterministic_policy"
+      }
+    },
+    {
+      "check": "the board's index.html is served from the packaged bundle",
+      "passed": true,
+      "detail": "668 bytes"
+    },
+    {
+      "check": "the server lists every packaged replay",
+      "passed": true,
+      "detail": "9 listed"
+    },
+    {
+      "check": "each replay is served byte for byte",
+      "passed": true,
+      "detail": "9/9"
+    },
+    {
+      "check": "verify-trace passes on every packaged replay (run from the package)",
+      "passed": true,
+      "detail": "9/9"
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+{
+  "dev01": {
+    "wave_1": {
+      "goal_complete": true,
+      "infeasibility_reported": false,
+      "applied_plans": 1,
+      "committed": 0,
+      "violations": 0,
+      "matches_expectation": true
+    },
+    "now": {
+      "goal_complete": true,
+      "infeasibility_reported": false,
+      "applied_plans": 1,
+      "committed": 0,
+      "violations": 0,
+      "matches_expectation": true
+    },
+    "same": true
+  },
+  "dev02": {
+    "wave_1": {
+      "goal_complete": true,
+      "infeasibility_reported": false,
+      "applied_plans": 1,
+      "committed": 3500,
+      "violations": 0,
+      "matches_expectation": true
+    },
+    "now": {
+      "goal_complete": true,
+      "infeasibility_reported": false,
+      "applied_plans": 1,
+      "committed": 3500,
+      "violations": 0,
+      "matches_expectation": true
+    },
+    "same": true
+  },
+  "dev04": {
+    "wave_1": {
+      "goal_complete": true,
+      "infeasibility_reported": false,
+      "applied_plans": 0,
+      "committed": 0,
+      "violations": 0,
+      "matches_expectation": true
+    },
+    "now": {
+      "goal_complete": true,
+      "infeasibility_reported": false,
+      "applied_plans": 0,
+      "committed": 0,
+      "violations": 0,
+      "matches_expectation": true
+    },
+    "same": true
+  },
+  "dev05": {
+    "wave_1": {
+      "goal_complete": false,
+      "infeasibility_reported": true,
+      "applied_plans": 0,
+      "committed": 0,
+      "violations": 0,
+      "matches_expectation": true
+    },
+    "now": {
+      "goal_complete": false,
+      "infeasibility_reported": true,
+      "applied_plans": 0,
+      "committed": 0,
+      "violations": 0,
+      "matches_expectation": true
+    },
+    "same": true
+  },
+  "dev06": {
+    "wave_1": {
+      "goal_complete": true,
+      "infeasibility_reported": false,
+      "applied_plans": 1,
+      "committed": 0,
+      "violations": 0,
+      "matches_expectation": true
+    },
+    "now": {
+      "goal_complete": true,
+      "infeasibility_reported": false,
+      "applied_plans": 1,
+      "committed": 0,
+      "violations": 0,
+      "matches_expectation": true
+    },
+    "same": true
+  }
+}

@@ -1,0 +1,305 @@
+{
+  "results": "apps/plan_b/evaluation/results/wave3_heldout_20261025T1625Z",
+  "suites": {
+    "campus": {
+      "episodes_recorded": 80,
+      "missing": [],
+      "aborted": [],
+      "cases": 8,
+      "by_policy": {
+        "P0": {
+          "met": 6,
+          "recorded": 8,
+          "planned": 8,
+          "classes": {
+            "goal_completion": "5/7",
+            "appropriate_infeasibility": "1/1"
+          },
+          "statuses": {
+            "completed": 8
+          },
+          "executed_violations": 0,
+          "invalid_attempts": 0,
+          "unnecessary_changes": {
+            "cases": [
+              "C02",
+              "C03",
+              "C04"
+            ],
+            "committed_changes": 0,
+            "episodes_with_change": 0,
+            "n": 3
+          },
+          "cost_usd": 0,
+          "model_calls": 0
+        },
+        "P1": {
+          "met": 24,
+          "recorded": 24,
+          "planned": 24,
+          "classes": {
+            "goal_completion": "21/21",
+            "appropriate_infeasibility": "3/3"
+          },
+          "statuses": {
+            "completed": 24
+          },
+          "executed_violations": 0,
+          "invalid_attempts": 5,
+          "unnecessary_changes": {
+            "cases": [
+              "C02",
+              "C03",
+              "C04"
+            ],
+            "committed_changes": 0,
+            "episodes_with_change": 0,
+            "n": 9
+          },
+          "cost_usd": 3.00696,
+          "model_calls": 90
+        },
+        "P2": {
+          "met": 18,
+          "recorded": 24,
+          "planned": 24,
+          "classes": {
+            "goal_completion": "15/21",
+            "appropriate_infeasibility": "3/3"
+          },
+          "statuses": {
+            "capped": 3,
+            "completed": 21
+          },
+          "executed_violations": 0,
+          "invalid_attempts": 0,
+          "unnecessary_changes": {
+            "cases": [
+              "C02",
+              "C03",
+              "C04"
+            ],
+            "committed_changes": 0,
+            "episodes_with_change": 0,
+            "n": 9
+          },
+          "cost_usd": 1.004722,
+          "model_calls": 84
+        },
+        "P3": {
+          "met": 21,
+          "recorded": 24,
+          "planned": 24,
+          "classes": {
+            "goal_completion": "18/21",
+            "appropriate_infeasibility": "3/3"
+          },
+          "statuses": {
+            "completed": 24
+          },
+          "executed_violations": 0,
+          "invalid_attempts": 6,
+          "unnecessary_changes": {
+            "cases": [
+              "C02",
+              "C03",
+              "C04"
+            ],
+            "committed_changes": 0,
+            "episodes_with_change": 0,
+            "n": 9
+          },
+          "cost_usd": 0.570856,
+          "model_calls": 57
+        }
+      },
+      "cases_with_all_trials_met": {
+        "P0": 6,
+        "P1": 8,
+        "P2": 6,
+        "P3": 7
+      },
+      "per_case_met": {
+        "C01": {
+          "P0": "1/1",
+          "P1": "3/3",
+          "P2": "3/3",
+          "P3": "3/3"
+        },
+        "C02": {
+          "P0": "1/1",
+          "P1": "3/3",
+          "P2": "3/3",
+          "P3": "3/3"
+        },
+        "C03": {
+          "P0": "1/1",
+          "P1": "3/3",
+          "P2": "3/3",
+          "P3": "3/3"
+        },
+        "C04": {
+          "P0": "1/1",
+          "P1": "3/3",
+          "P2": "3/3",
+          "P3": "3/3"
+        },
+        "C05": {
+          "P0": "1/1",
+          "P1": "3/3",
+          "P2": "3/3",
+          "P3": "3/3"
+        },
+        "C06": {
+          "P0": "0/1",
+          "P1": "3/3",
+          "P2": "0/3",
+          "P3": "0/3"
+        },
+        "C07": {
+          "P0": "0/1",
+          "P1": "3/3",
+          "P2": "0/3",
+          "P3": "3/3"
+        },
+        "C08": {
+          "P0": "1/1",
+          "P1": "3/3",
+          "P2": "3/3",
+          "P3": "3/3"
+        }
+      }
+    },
+    "pantry": {
+      "episodes_recorded": 40,
+      "missing": [],
+      "aborted": [],
+      "cases": 4,
+      "by_policy": {
+        "P0": {
+          "met": 4,
+          "recorded": 4,
+          "planned": 4,
+          "classes": {
+            "target_attainment": "2/2",
+            "supported_partial": "2/2"
+          },
+          "statuses": {
+            "completed": 4
+          },
+          "executed_violations": 0,
+          "invalid_attempts": 5,
+          "unnecessary_changes": {
+            "cases": [],
+            "committed_changes": 0,
+            "episodes_with_change": 0,
+            "n": 0
+          },
+          "cost_usd": 0,
+          "model_calls": 0
+        },
+        "P1": {
+          "met": 6,
+          "recorded": 12,
+          "planned": 12,
+          "classes": {
+            "target_attainment": "6/6",
+            "supported_partial": "0/6"
+          },
+          "statuses": {
+            "capped": 6,
+            "completed": 6
+          },
+          "executed_violations": 0,
+          "invalid_attempts": 12,
+          "unnecessary_changes": {
+            "cases": [],
+            "committed_changes": 0,
+            "episodes_with_change": 0,
+            "n": 0
+          },
+          "cost_usd": 2.55511,
+          "model_calls": 84
+        },
+        "P2": {
+          "met": 9,
+          "recorded": 12,
+          "planned": 12,
+          "classes": {
+            "target_attainment": "6/6",
+            "supported_partial": "3/6"
+          },
+          "statuses": {
+            "capped": 6,
+            "completed": 6
+          },
+          "executed_violations": 0,
+          "invalid_attempts": 9,
+          "unnecessary_changes": {
+            "cases": [],
+            "committed_changes": 0,
+            "episodes_with_change": 0,
+            "n": 0
+          },
+          "cost_usd": 0.95309,
+          "model_calls": 83
+        },
+        "P3": {
+          "met": 6,
+          "recorded": 12,
+          "planned": 12,
+          "classes": {
+            "target_attainment": "3/6",
+            "supported_partial": "3/6"
+          },
+          "statuses": {
+            "capped": 6,
+            "completed": 6
+          },
+          "executed_violations": 0,
+          "invalid_attempts": 18,
+          "unnecessary_changes": {
+            "cases": [],
+            "committed_changes": 0,
+            "episodes_with_change": 0,
+            "n": 0
+          },
+          "cost_usd": 0.986032,
+          "model_calls": 84
+        }
+      },
+      "cases_with_all_trials_met": {
+        "P0": 4,
+        "P1": 2,
+        "P2": 3,
+        "P3": 2
+      },
+      "per_case_met": {
+        "T01": {
+          "P0": "1/1",
+          "P1": "3/3",
+          "P2": "3/3",
+          "P3": "3/3"
+        },
+        "T02": {
+          "P0": "1/1",
+          "P1": "3/3",
+          "P2": "3/3",
+          "P3": "0/3"
+        },
+        "T03": {
+          "P0": "1/1",
+          "P1": "0/3",
+          "P2": "0/3",
+          "P3": "0/3"
+        },
+        "T04": {
+          "P0": "1/1",
+          "P1": "0/3",
+          "P2": "3/3",
+          "P3": "3/3"
+        }
+      }
+    }
+  }
+}
