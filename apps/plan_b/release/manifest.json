@@ -1,0 +1,83 @@
+{
+  "kind": "plan_b.release_allowlist/1.0.0",
+  "name": "plan-b-wave3-local-package",
+  "description": "The local reviewable package of Plan B for the Wave 3 showcase: setup and run instructions, the app source with its public fixtures, the built browser bundle, sanitized recorded traces for the stage fallback, the frozen manifests, the held-out results with their figure and failure analysis, the seven-minute script, the submission deck, poster and documentation, the claims ledger, the rehearsal record and the source and license notes. Built by apps/plan_b/scripts/build_release.py from this explicit allowlist. A local package only: nothing is hosted or submitted.",
+  "paths_are": "relative to the repository root; the package keeps the same relative layout, so links between packaged files still resolve inside it. Links to planning documents and Wave 2 screenshots outside the allowlist point to the repository",
+  "include": [
+    {"role": "license", "paths": ["LICENSE"]},
+    {"role": "setup and run instructions", "paths": ["apps/plan_b/README.md", "apps/plan_b/web/README.md", "apps/plan_b/.env.example"]},
+    {"role": "dependency references", "paths": ["apps/plan_b/pyproject.toml", "apps/plan_b/uv.lock", "apps/plan_b/web/package.json", "apps/plan_b/web/package-lock.json", "apps/plan_b/web/tsconfig.json", "apps/plan_b/web/vite.config.ts", "apps/plan_b/web/index.html"]},
+    {"role": "app source (server, policies, planner, store, public fixtures, frozen manifests)", "paths": ["apps/plan_b/plan_b/**"]},
+    {"role": "web source and its boundary check", "paths": ["apps/plan_b/web/src/**", "apps/plan_b/web/scripts/**"]},
+    {"role": "built browser bundle (scanned for evaluator-only content)", "paths": ["apps/plan_b/web/dist/**"]},
+    {"role": "demo and release scripts", "paths": ["apps/plan_b/scripts/demo_prep.py", "apps/plan_b/scripts/build_release.py", "apps/plan_b/release/manifest.json"]},
+    {"role": "browser rehearsal and storyboard scripts", "paths": ["apps/plan_b/tests/e2e/walkthrough.py", "apps/plan_b/tests/e2e/walkthrough_wave2.py", "apps/plan_b/tests/e2e/storyboard.py", "apps/plan_b/tests/e2e/rehearsal.py", "apps/plan_b/tests/e2e/keyboard.py"]},
+    {"role": "runtime contract, evaluation protocol notes and release checks", "paths": ["apps/plan_b/docs/*.md"]},
+    {"role": "held-out results: public records, sanitized traces, reports, figure", "paths": ["apps/plan_b/evaluation/results/wave3_heldout_20261025T1625Z/**"]},
+    {"role": "sanitized recorded traces for the stage fallback (development runs)", "paths": [
+      "PEEAI_plan/handoffs/wave_2/evidence/traces/live_p2-live_dev01_trace.json",
+      "PEEAI_plan/handoffs/wave_2/evidence/traces/live_p2-live_dev02_trace.json",
+      "PEEAI_plan/handoffs/wave_2/evidence/traces/live_p2-live_dev04_trace.json",
+      "PEEAI_plan/handoffs/wave_2/evidence/traces/live_p3-verify-all_dev02_trace.json",
+      "PEEAI_plan/handoffs/wave_2/evidence/traces/live_p1-tool-use_pantry_dev01_trace.json",
+      "PEEAI_plan/handoffs/wave_2/evidence/traces/live_p1-tool-use_pantry_dev01_r2_trace.json",
+      "PEEAI_plan/handoffs/wave_2/evidence/traces/live_p2-live_pantry_dev01_trace.json",
+      "PEEAI_plan/handoffs/wave_2/evidence/traces/pantry_dev01_trace.json",
+      "PEEAI_plan/handoffs/wave_2/evidence/traces/skills_dev01_trace.json"
+    ]},
+    {"role": "Wave 2 runbook the showcase builds on", "paths": ["PEEAI_plan/handoffs/wave_2/DEMO.md"]},
+    {"role": "protocol, presentation plan, pantry showcase, templates", "paths": ["PEEAI_plan/08_evaluation.md", "PEEAI_plan/09_seven_minute_presentation.md", "PEEAI_plan/15_pantry_showcase.md", "PEEAI_plan/waves/03_evidence_showcase.md", "PEEAI_plan/templates/evaluation_results.md", "PEEAI_plan/templates/pitch_claims.md", "PEEAI_plan/12_research_sources.md"]},
+    {"role": "public planning fixtures and schema", "paths": ["PEEAI_plan/examples/*.public.json", "PEEAI_plan/examples/README.md", "PEEAI_plan/schemas/**"]},
+    {"role": "Wave 3 packet: script, claims ledger, rehearsal record, checklist, evidence", "paths": ["PEEAI_plan/handoffs/wave_3/**"]},
+    {"role": "submission: slide deck, poster, Word documentation and their spoken scripts", "paths": [
+      "PEEAI_plan/submission/slides/slides.pdf",
+      "PEEAI_plan/submission/slides/pres-note.md",
+      "PEEAI_plan/submission/poster/poster.pdf",
+      "PEEAI_plan/submission/poster/poster-note.md",
+      "PEEAI_plan/submission/poster/LICENSE-gemini.md",
+      "PEEAI_plan/submission/documentation/Plan_B_Project_Documentation.docx"
+    ]}
+  ],
+  "required": [
+    "LICENSE",
+    "apps/plan_b/README.md",
+    "apps/plan_b/plan_b/evaluation/manifests/freeze.json",
+    "apps/plan_b/plan_b/evaluation/manifests/heldout.json",
+    "apps/plan_b/web/dist/index.html",
+    "apps/plan_b/evaluation/results/wave3_heldout_20261025T1625Z/campus/report/figure.svg",
+    "apps/plan_b/evaluation/results/wave3_heldout_20261025T1625Z/campus/report/metrics.json",
+    "apps/plan_b/evaluation/results/wave3_heldout_20261025T1625Z/pantry/report/metrics.json",
+    "apps/plan_b/evaluation/results/wave3_heldout_20261025T1625Z/FAILURES.md",
+    "PEEAI_plan/handoffs/wave_3/SHOWCASE.md",
+    "PEEAI_plan/handoffs/wave_3/CLAIMS.md",
+    "PEEAI_plan/handoffs/wave_3/REHEARSALS.md",
+    "PEEAI_plan/handoffs/wave_3/SUBMISSION_CHECKLIST.md",
+    "PEEAI_plan/submission/slides/slides.pdf",
+    "PEEAI_plan/submission/poster/poster.pdf",
+    "PEEAI_plan/submission/documentation/Plan_B_Project_Documentation.docx"
+  ],
+  "exclude": [
+    {"why": "local secret store and endpoint settings", "patterns": [".local/**", "**/*.key", "**/*.env", "**/model_endpoint.env"]},
+    {"why": "local state: databases, sessions, join codes, the spend ledger, demo state", "patterns": ["**/var/**", "**/*.sqlite3", "**/*.sqlite3-*", "**/moderator_code.txt", "**/.lock"]},
+    {"why": "evaluator-only held-out cases (messages, timings, predicates, expectations)", "patterns": ["apps/plan_b/plan_b/scenarios/private/eval/**"]},
+    {"why": "evaluator records with predicates and expected outcomes", "patterns": ["**/runner_private/**"]},
+    {"why": "build caches and installed packages", "patterns": ["**/__pycache__/**", "**/*.pyc", "**/node_modules/**", "**/.venv/**", "**/.mypy_cache/**", "**/.ruff_cache/**", "**/.pytest_cache/**"]},
+    {"why": "participant data: none is collected; any participant file is refused", "patterns": ["**/participants/**", "**/*participant_data*"]}
+  ],
+  "browser_bundle": {
+    "path": "apps/plan_b/web/dist",
+    "must_not_contain": "any held-out case ref (heldout.json case_refs), any held-out scenario id, or any evaluator case id paired with a ref"
+  },
+  "public_identifiers": {
+    "why": "the repository's own public URL and the presenter's name appear on purpose in the submission items and the checklist; the identifier scan blanks exactly these strings before searching for local user or host names",
+    "strings": ["github.com/nocdoggo/COLLIE", "Noctis Zhang", "Copyright (c) 2026 Noctis"]
+  },
+  "verify": [
+    "every required path is present; no packaged path matches an exclude pattern",
+    "no credential-shaped text (an OpenRouter or other sk- key, a bearer token, a private key block or a secret assignment), no local absolute path and no local user or host name in any text file, gzip trace, docx part or PDF (visible text, Info dictionary and inflated streams)",
+    "the browser bundle holds no held-out case ref or scenario id",
+    "plan_b imported from the package (not the repository): plan-b eval verify-freeze passes",
+    "demo_prep.py run from the package prepares a clean state and verifies the packaged traces",
+    "plan-b serve from the package starts on 127.0.0.1, serves the board (index.html) and lists the packaged replays; each replay is served byte for byte and verify-trace passes on it"
+  ]
+}

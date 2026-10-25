@@ -5,8 +5,10 @@ Usage (from apps/plan_b; PAID: every run makes real model calls):
     uv run python scripts/run_live_cases.py --out <dir> [--policy POLICY] CASE [CASE ...]
 
 ``--policy`` is one of the model-driven choices of ``run_case``: ``tool-use`` (P1,
-``tool-use/1.0.0``), ``live`` or its alias ``selective`` (P2, ``live/1.0.0``, the default) or
-``verify-all`` (P3, ``verify-all/1.0.0``). Each case runs once through
+``tool-use/1.1.0``), ``live`` or its alias ``selective`` (P2, ``live/1.1.0``, the default) or
+``verify-all`` (P3, ``verify-all/1.1.0``): the ids of the Wave 3 freeze
+(``plan_b/evaluation/manifests/freeze.json``); the recorded Wave 2 runs keep their 1.0.0 ids.
+Each case runs once through
 ``run_case(policy=...)`` under the development episode caps, on a fresh episode in its own
 temporary SQLite database. For each run, ``<dir>`` receives:
 

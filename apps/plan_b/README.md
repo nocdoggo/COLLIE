@@ -1,4 +1,4 @@
-# Plan B: The Show Must Go On — sandbox (Waves 1 and 2)
+# Plan B: The Show Must Go On — sandbox (Waves 1 to 3)
 
 A deterministic, **fictional, local** sandbox for keeping a small campus event workable when a
 delivery, a participant, or a resource changes. It verifies a decision-relevant fact, prepares a
@@ -7,12 +7,14 @@ change is needed, or explains the unresolved constraint when recovery is impossi
 
 Every action is a real mutation of the local SQLite store and nothing else. No university
 booking, purchase, delivery, or message is made. By default the coordinator is a documented
-deterministic rule policy (`rules/1.0.0`, and `pantry-rules/1.0.0` for the pantry profile).
+deterministic rule policy (`rules/1.0.0`, and `pantry-rules/1.1.0` for the pantry profile).
 Wave 2 adds three optional model-driven policies, the P1-P3 of the evaluation plan: the **live
-agent** (`live/1.0.0`, P2) interprets notices and chooses among server-built options with a
-language model, including the pantry's stock options; the **tool-use agent** (`tool-use/1.0.0`,
-P1) calls the tools itself; the **verify-all agent** (`verify-all/1.0.0`, P3) is P2 with every
-relevant status check made first. They make **paid** model calls and are off unless selected.
+agent** (`live/1.1.0`, P2) interprets notices and chooses among server-built options with a
+language model, including the pantry's stock options; the **tool-use agent** (`tool-use/1.1.0`,
+P1) calls the tools itself; the **verify-all agent** (`verify-all/1.1.0`, P3) is P2 with every
+relevant status check made first. These are the ids of the Wave 3 freeze
+(`plan_b/evaluation/manifests/freeze.json` `policy_ids`); the recorded Wave 2 traces keep the
+1.0.0 ids they ran under. They make **paid** model calls and are off unless selected.
 Wave 2 also adds a second event configuration (a community skills exchange), a pantry profile
 with consumable stock and staff-only attestations, participant check-ins and resource offers,
 and per-episode caps for every policy.
@@ -20,7 +22,8 @@ and per-episode caps for every policy.
 Contract: [docs/RUNTIME_CONTRACT.md](docs/RUNTIME_CONTRACT.md) (runtime 1.1.0). Planning source:
 [`PEEAI_plan/`](../../PEEAI_plan/README.md). Audit packets:
 [`PEEAI_plan/handoffs/wave_1/`](../../PEEAI_plan/handoffs/wave_1/README.md) and
-[`PEEAI_plan/handoffs/wave_2/`](../../PEEAI_plan/handoffs/wave_2/README.md).
+[`PEEAI_plan/handoffs/wave_2/`](../../PEEAI_plan/handoffs/wave_2/README.md) and
+[`PEEAI_plan/handoffs/wave_3/`](../../PEEAI_plan/handoffs/wave_3/README.md).
 
 ## Requirements
 
@@ -187,6 +190,31 @@ placeholders, and fails its last check if any evidence file names the host, the 
 path. A host or user name that is an ordinary word can be exempted with
 `--allow-identifier WORD`.
 
+## Wave 3: the frozen comparison, the held-out results and the showcase
+
+* **Freeze.** `plan_b/evaluation/manifests/freeze.json` (commit `3de5962`, 76 measured files)
+  fixes the code, prompts, model (`anthropic/claude-sonnet-5.5` via OpenRouter), caps (8 model,
+  48 tool calls per episode), seeds and order. `uv run plan-b eval verify-freeze` checks it;
+  `--require-heldout` also checks the case lock `heldout.json` (commit `49e62b5`).
+* **Held-out results.** [`evaluation/results/wave3_heldout_20261025T1625Z/`](evaluation/results/wave3_heldout_20261025T1625Z/README.md):
+  campus 80 of 80 and pantry 40 of 40 episodes recorded, the reports (`*/report/`), the figure
+  and [`FAILURES.md`](evaluation/results/wave3_heldout_20261025T1625Z/FAILURES.md).
+  `uv run plan-b eval report --results <suite dir> --out <dir>` recomputes a report from the
+  committed raw records without a model call.
+* **Showcase.** The seven-minute script and runbook, the claims ledger and the rehearsal record
+  are in [`PEEAI_plan/handoffs/wave_3/`](../../PEEAI_plan/handoffs/wave_3/SHOWCASE.md).
+  `uv run python tests/e2e/rehearsal.py --out <dir>` runs three automated rehearsals from a
+  clean reset (one with a forced provider failure and the switch to the recorded replay);
+  `tests/e2e/keyboard.py --out <dir>` is the keyboard check.
+* **Release package.** `uv run python scripts/build_release.py --out <empty dir>` builds the
+  local reviewable package from the allowlist [`release/manifest.json`](release/manifest.json)
+  (no `.local`, no `var`, no held-out case files, no evaluator records) and starts it: the freeze
+  verifies, the board and every packaged replay are served from the package. Nothing is hosted
+  or submitted. The package carries no unit tests (`tests/*.py`, `web/tests/`): run the checks
+  below from a repository clone.
+* **Evidence.** `uv run python scripts/collect_wave3_evidence.py --out <empty dir>` regenerates
+  the Wave 3 packet evidence with no paid call.
+
 ## Checks
 
 ```bash
@@ -209,5 +237,7 @@ uv run mypy
 | `plan_b/agent/` | Model-driven policies (Wave 2): endpoint configuration, provider and spend ledger, interpretation, closed action menu, the live orchestrator (P2), `policies/` (P1 tool-use, P2 selective, P3 verify-all), prompts, the G-LLM gate |
 | `plan_b/api/` | FastAPI application, policy configuration, participation view |
 | `web/` | React + TypeScript board and replay |
-| `scripts/` | Evidence collectors, the Wave 1 manifest writer, recorded live runs, the development results writer |
+| `scripts/` | Evidence collectors (Waves 1-3), the Wave 1 manifest writer, recorded live runs, the development results writer, the demo preparation and the release builder |
+| `release/` | The release allowlist (`manifest.json`) read by `scripts/build_release.py` |
+| `evaluation/results/` | The Wave 3 held-out results (outside the frozen tree) |
 | `tests/` | Focused tests against the real store and executor |
