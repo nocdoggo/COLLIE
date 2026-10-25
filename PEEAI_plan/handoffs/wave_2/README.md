@@ -2,7 +2,10 @@
 
 Plan B ("The Show Must Go On"), Wave 2, built on the Wave 1 deterministic foundation
 ([`../wave_1/`](../wave_1/README.md)). Everything is still a fictional, local SQLite sandbox.
-Wave 2 adds four things:
+Plan B helps a community event stay on track when its plan is disrupted: a coordinator reads
+notices, checks sources, holds reversible backups, asks the organizer for spending authority,
+and commits only plans the server has checked, each with a receipt. Wave 1 built that loop with
+a deterministic rule baseline (P0, `rules/1.0.0`). Wave 2 adds four things:
 
 * **A live, model-driven coordinator** (`live/1.0.0`, P2). It interprets notices with a
   language model, then chooses among server-built options, the pantry's stock options included.
@@ -21,28 +24,29 @@ evaluation or comparative claim. It is **not community validation**.
 | --- | --- |
 | Branch | `hackathon/peeaai-plan` (local; nothing pushed) |
 | Base | `d6b9256` (the Wave 1 packet) |
-| Implementation | `bf71e43` (the app, committed by the integrator from the tree the evidence describes); this packet is the commit after it. The finishing step (2026-10-25: P1, P3, the pantry stock options of P2, the development runs, the demo runbook, and the audit step's P1 reruns and fixes) is committed by its integration step as `9158793` (the app) and `c4f7cd9` (this packet); the evidence is regenerated from a clean checkout of `c4f7cd9` in the commit after it |
+| Implementation | `bf71e43` (the app, committed by the integrator from the tree the evidence describes); the first version of this packet is the commit after it (`fd04d48`). The finishing step (2026-10-25: P1, P3, the pantry stock options of P2, the development runs, the demo runbook, and the audit step's P1 reruns and fixes) is committed by its integration step as `9158793` (the app) and `c4f7cd9` (this packet); the evidence is regenerated from a clean checkout of `c4f7cd9` in the commit after it |
 | Runtime contract | 1.1.0 ([`apps/plan_b/docs/RUNTIME_CONTRACT.md`](../../../apps/plan_b/docs/RUNTIME_CONTRACT.md); sections 15–18 are new) |
 | Trace format | 1.0.0 (unchanged) |
-| Model | `anthropic/claude-sonnet-5.5` via OpenRouter (requested and returned on every call) |
-| Paid spend | 2.91545 USD in the ledger (136 entries): 0.03509 for the G-LLM gate, 0.26397 for the 8 Wave 2 live runs, 1.66656 for the 16 P1-P3 development runs of the finishing step, 0.91328 for the audit step's 4 P1 reruns, and 0.03655 for its one browser press of **Run live agent** |
+| Model | `anthropic/claude-sonnet-5.5` via OpenRouter (requested on every call, and returned on every answered call) |
+| Paid spend | 2.91545 USD in the ledger (136 entries): 0.03509 for the G-LLM gate, 0.26397 for the 8 Wave 2 live runs, 1.66656 for the finishing step's 15 P1-P3 development runs and its P1 pantry rerun, 0.91328 for the audit step's 4 P1 reruns, and 0.03655 for its one browser press of **Run live agent** |
 
 ## M2 status
 
 **Self-assessed. M2 is passed on the recorded checks.** The first version of this packet had
 "Future comparison parity" partial and its live pantry run failed. The finishing step
 (2026-10-25) built P1 and P3, gave P2 the pantry's stock options, and recorded one development
-run each of P1, P2 and P3 on five cases; the audit step reran P1's four `tool_use.v1` runs under
-the shipped `tool_use.v2`. The live pantry result is now the P2 run
+run each of P1, P2 and P3 on five cases, and reran P1's failed pantry run after fixing its
+harness; the audit step reran P1's other four `tool_use.v1` runs under the shipped
+`tool_use.v2`. The live pantry result is now the P2 run
 `live_p2-live_pantry_dev01`, which completed 40 of 40 on time. W2.4 (MBTA) is a stretch item and
 was not built. The details are in [VERIFICATION.md](VERIFICATION.md), sections 1b, 3 and 4.
 
 | M2 check | Outcome |
 | --- | --- |
-| Live campus behavior | Pass: live dev01 recovery (query → consumed result → validated apply → fresh-state agreement); live dev04's stale P09 reminder was recorded `inapplicable` with its reasons, and its copy `duplicate` (Wave 2 runs from the `bf71e43` tree; reproduced on the shipped code by `live_p2-live_dev01` and `live_p2-live_dev04`) |
+| Live campus behavior | Pass: live dev01 recovery (query → consumed result → validated apply → fresh-state agreement); live dev04's stale P09 reminder was recorded `inapplicable` with its reasons, and its copy `duplicate` (Wave 2 runs from the `bf71e43` tree; reproduced with the finishing step's code by `live_p2-live_dev01` and `live_p2-live_dev04`) |
 | Bounded failure behavior | Pass on 57 mapped tests (22 of them for P1–P3); a stale revision (skills_dev02) and a status outage (dev06) also occurred live, and so did malformed output and exhausted model-call caps in P1 runs |
 | Community workflow | Pass |
-| Shared pantry core | Pass; P1, P2 and P3 also completed pantry_dev01 live (P1 after a fix to its prompt) |
+| Shared pantry core | Pass; P1, P2 and P3 also completed pantry_dev01 live (P1 after a fix to its prompt and its turn token limit) |
 | Stock and service accounting | Pass (24/16 → 40/0 in one staff receipt; target 40 throughout; service only at distribution) |
 | Quantity failure checks | Pass |
 | Staff boundary | Pass |
@@ -57,7 +61,8 @@ sections 1, 1d and 2):
 * **Linters:** ruff, ruff format and mypy are clean.
 * **Development cases:** `plan-b run-case all` printed 9 lines, all `matches_expectation=True`,
   and the dev01–dev06 lines are byte-identical to the Wave 1 evidence.
-* **Traces:** all 10 deterministic and 28 recorded live traces are `intact`.
+* **Traces:** the 10 deterministic traces the collector regenerated (3 of them are kept in
+  `evidence/traces/`) and the 28 recorded live traces are all `intact`.
 * **Browser:** both walkthroughs passed, 41/41 (Wave 1) and 30/30 (Wave 2), and the demo
   storyboard 32/32, in Chromium.
 * **M2 focused tests:** every mapped test passed (parity 101, bounded failure 57).
@@ -152,6 +157,8 @@ The browser demos for the skills exchange, the pantry staff flow and the policy 
   (P1's `tool_use.v2`, P3's relevance rule), the per-policy output-token limits (P1 4096 per
   turn; P2 and P3 1024 per choice, 2048 per interpretation), the model and the planner before
   any comparison. P1 reached the 8-call model cap in three of its five current development runs.
+* **Wake every policy when the pantry handoff window opens** (P0–P3 alike; KNOWN_LIMITATIONS).
+  Both development cases open it at load, so a Wave 3 case that opens it later needs this.
 * **Run held-out evaluation** with repeated live trials of P1–P3 and P0 once per case.
 * **Store `AuthorizationRequest` state explicitly.**
 * **Optionally, the MBTA adapter (W2.4).**

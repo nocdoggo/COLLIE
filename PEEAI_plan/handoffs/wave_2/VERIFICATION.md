@@ -18,7 +18,8 @@ updated: "Future comparison parity" is now passed, and the live pantry result is
 shipped `tool_use.v2` and fixed what its five auditors confirmed (section 1c). The integration
 step closed two last audit items, committed the finishing work (`9158793`, the app, and
 `c4f7cd9`, the packet) and regenerated the evidence from a clean checkout of `c4f7cd9`
-(sections 1, 1d and 2).
+(sections 1, 1d and 2). A final audit of the committed result then fixed two pantry details
+and the packet's wording, and disclosed one gap shared by every policy (section 1e).
 
 ## 1. How the evidence was produced
 
@@ -227,6 +228,41 @@ the evidence it replaced. Apart from the regenerated reports, screenshots and st
 episode ids differ in the deterministic outcomes and traces. The copied live runs are
 byte-identical. The worktree was removed afterwards.
 
+### 1e. Final audit of the committed result (2026-10-25)
+
+The audit checked the commits after `65997ac` (author, committer, no trailers, no attribution),
+that nothing was pushed, the key and credential scans of the committed tree and of every new
+commit's blobs (no match), the evidence (`environment.json`, every check's exit code, every
+relative link in this packet, the storyboard frames DEMO.md embeds), and had three read-only
+auditors re-read the packet as a first-time judge, spot-check the P1, P3 and pantry code, and
+scan the committed evidence and storyboard for secrets and identifiers. Each finding was
+checked before it was acted on. The security read found nothing to fix. Fixed:
+
+* **The awaited-handoff `wait` now records its wake time.** P2 and P3 recorded the server's
+  "Waiting for staff to record the handoff" decision without `wait_until`, although the run's
+  own wake was right and the contract (section 16) promises it. It now carries the staff
+  task's `respond_after`, then its cutoff (`agent/orchestrator.py`;
+  `tests/test_pantry_live_menu.py`).
+* **A handoff requested before its window opens is checked as too early.** The planner's
+  `stock_transfer` check said "too late" in that case too. It now says "too early, the handoff
+  window opens at …" (`domain/adapters/pantry.py`; `tests/test_comparison_policy_fixes.py`).
+  Every policy reads this text, and P1 reads it directly. Neither development case reaches this
+  branch: their deterministic traces differ from the evidence only in episode ids and the
+  digests that contain them.
+* **P1's staff-tool filter has a test that can fail.** No shipped grant lists a staff tool, so
+  the parity test could not reach the filter. A new test widens a grant and checks P1's turn
+  tools (`tests/test_comparison_policy_fixes.py`).
+* **The packet's wording.** README.md now says what Plan B does and what P0 is. Its numbers
+  name which runs they count, and its claims say which code the P2 runs came from. In DEMO.md
+  the presenter now says that the first four minutes run the rule baseline. The optional
+  readout names the superseded runs, the rejected-hold codes are given as the trace has them,
+  and the backup P3 frame has its URL. Section 9's table is now read from the committed
+  storyboard report.
+
+Each code fix was checked by reverting it: its test then failed. Disclosed, not fixed: no policy
+(P0–P3) wakes when the handoff window opens (KNOWN_LIMITATIONS, "No policy wakes when the
+handoff window opens"). A probe with a 12:42–12:49 window reproduced it for P0, P2 and P3.
+
 ## 2. Commands and results
 
 These are the collector's rows from `reports/checks.json`. `<work>` is its temporary directory
@@ -269,7 +305,7 @@ parity 101, all passed.
 
 | M2 check | Recorded outcome | Evidence |
 | --- | --- | --- |
-| **Live campus behavior**: one real model-driven end-to-end recovery with a useful tool call, a validated action and fresh-state agreement; a stale warning gets a distinct, justified response | **Pass** (one live trial each; see the dev01 and dev04 details below the table; Wave 2 runs from the `bf71e43` tree, reproduced on the shipped code by `live_p2-live_dev01` and `live_p2-live_dev04`) | `reports/live_dev01_run.json`, `traces/live_dev01_trace.json`; `reports/live_dev04_run.json`, `traces/live_dev04_trace.json`; also live dev02, dev05, dev06, skills_dev01 and skills_dev02 (section 4); `reports/g_llm_gate.json` (G-LLM pass); 8 focused tests passed |
+| **Live campus behavior**: one real model-driven end-to-end recovery with a useful tool call, a validated action and fresh-state agreement; a stale warning gets a distinct, justified response | **Pass** (one live trial each; see the dev01 and dev04 details below the table; Wave 2 runs from the `bf71e43` tree, reproduced with the finishing step's code by `live_p2-live_dev01` and `live_p2-live_dev04`) | `reports/live_dev01_run.json`, `traces/live_dev01_trace.json`; `reports/live_dev04_run.json`, `traces/live_dev04_trace.json`; also live dev02, dev05, dev06, skills_dev01 and skills_dev02 (section 4); `reports/g_llm_gate.json` (G-LLM pass); 8 focused tests passed |
 | **Bounded failure behavior**: malformed output, unknown entity, exhausted cap, timeout and stale revision stay visible and produce no invented success | **Pass on the focused tests; four failure paths also occurred live** (see below the table) | 57 mapped tests passed in the audit step's run (35 in `test_agent_boundary.py`, `test_agent_provider.py`, `test_integration_policy.py`, `test_integration_api.py`, as recorded at `fd04d48`; 22 for every class under P1, P2 and P3 in `test_live_workflow.py`); `reports/live_skills_dev02_run.json`, `reports/live_dev06_run.json`, `reports/live_p1-tool-use_pantry_dev01_run.json`, `reports/live_p1-tool-use_dev02_run.json` |
 | **Community workflow**: participant input changes a role fact and affects planning; unauthorized goal or stock actions reject; the skills exchange loads through the event adapter | **Pass** (see below the table) | 40 focused tests passed (`test_community_skills_exchange.py`, `test_resource_offer.py`, `test_integration_api.py`, `test_stock_conservation.py::test_agent_cannot_call_staff_only_tools`); `traces/skills_dev01_trace.json`; `traces/live_skills_dev01_trace.json`; walkthrough_wave2 community flow (`screenshots/w2_07`–`w2_10`) |
 | **Shared pantry core**: the same orchestration, grants, receipts, replay and transaction boundary run the pantry scenario; the domain adapter owns only the added semantics | **Pass** (see below the table) | `traces/pantry_dev01_trace.json`, `traces/pantry_dev02_trace.json` (`intact`); 15 focused tests passed (`test_pantry_workflow.py`, `test_pantry_fixture.py`, `test_integration_policy.py`); walkthrough_wave2 pantry flow (`screenshots/w2_01`–`w2_06`) |

@@ -116,6 +116,14 @@ below says otherwise.
 * **Pantry policies.** Each (source, destination) handoff is requested once, as by P0, even
   after a partial handoff and its release. In pantry_dev01, P2's wait for the staff handoff was
   model-chosen, because a pool hold stayed on the menu.
+* **No policy wakes when the handoff window opens (final audit).** P0–P3 wake on a state change,
+  a deadline watch, an authorization expiry or an owed staff response, but not on the opening of
+  `pantry_parameters.handoff_window`. Both development cases open the window when the episode
+  loads, so they are unaffected. A case whose window opens after the policy's last wake misses the
+  handoff: a probe with a 12:42–12:49 window had P2 and P3 report the shortfall at 12:50 and P0
+  report it at 12:36, while a request at 12:41–12:46 would have been accepted. Add this wake to
+  all four policies alike before the Wave 3 freeze. The planner's `stock_transfer` check now
+  says "too early, the handoff window opens at …" before the window opens (it said "too late").
 * **Live interpretation is not the rule parser.** Verify-only behaviour is approximated: a
   reading that names a registered resource and proposes `query_status` prompts a status check,
   never a hypothesis. The model may class some notices differently from the parser, for example
@@ -161,6 +169,11 @@ below says otherwise.
     and searched the working tree for the key and its encodings, printing file names only. It
     found none. This is a read outside server-side code, made because the audit task asks for
     that comparison; the key was never printed or written.
+* **Key use in the final audit (2026-10-25):** no model call and no network. One script read
+  `.local/keys/openrouter.key` into memory and compared it, and fragments of it, with every blob
+  of the committed tree and of every commit after the planning baseline, printing file names
+  only. It found none. As in the audit step, this is a read outside server-side code, made
+  because the task asks for that comparison.
 * **Network access in this wave:**
   * one read-only `GET /api/v1/key` before the live runs (authorized for this step; only numeric
     fields were printed);

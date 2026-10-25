@@ -41,7 +41,7 @@ The story arc:
 7. **The Pantry Continuity cameo (45 s).** The target is 40 kits. The supply shortfall and the
    service deficit are separate counters. Staff confirm the handoff and the distribution.
 
-### Decisions recorded for this runbook (made headless, without a human to ask)
+### Decisions recorded for this runbook (made by the automated build; no human has reviewed them yet)
 
 - **Order.** The segments follow the arc above. 09's own table puts the participant check-in
   before 3:35 and a 70-second results slot at 4:30–5:40. There is no comparative result to fill
@@ -54,15 +54,14 @@ The story arc:
 - **Operating mode.** The **default** is the deterministic coordinator, acting live in the
   browser, for the campus, community and pantry segments, plus a **Recorded replay** for the live
   LLM segment (section 2).
-- **Which recorded runs.** The live card is `live_p2-live_dev02` (P2 on the finished Wave 2
-  tree, 2026-10-25). The failure on record is `live_p1-tool-use_pantry_dev01`, P1's first live
+- **Which recorded runs.** The live card is `live_p2-live_dev02` (P2 with the finishing step's
+  code, 2026-10-25). The failure on record is `live_p1-tool-use_pantry_dev01`, P1's first live
   pantry run. It failed on a **defect in our P1 harness**, not on the model's judgment and not on
   the tool-use approach. Prompt `tool_use.v1` never said which window a hold covers, and the
   1536-token turn limit counted the model's reasoning tokens. The fix was prompt `tool_use.v2`
   and a 4096-token limit. The rerun `live_p1-tool-use_pantry_dev01_r2` distributed 40 of 40, and
   the failed run is kept and marked superseded (`apps/plan_b/plan_b/evaluation/development/README.md`).
-  The run coordinator asked for this framing, and I checked it against that README and the live
-  step's report.
+  This framing is checked against that README and the two runs' records.
 
 ## 2. Operating mode: choose and say it before you start
 
@@ -147,8 +146,10 @@ scenario clock is simulated, so say "fast-forward" whenever you advance it.
 - **Point at:** the demonstrations need the "Primary projector delivery", which is "Expected,
   not yet arrived". Then the `agent_demo` grant: "Committed $0.00 of $0.00 · held $0.00 of
   $35.00", with its tool list.
-- **Say:** "The agent can check sources, evaluate options and place a refundable hold of up to
-  $35. It cannot spend a cent without the organizer."
+- **Say:** "Until four minutes in, the coordinator you see is our rule-based baseline: the badge
+  says 'Deterministic policy'. The language model comes later. The agent can check sources,
+  evaluate options and place a refundable hold of up to $35. It cannot spend a cent without the
+  organizer."
 
 ### 1:10–2:25 · The delayed projector: verify, then commit (75 s)
 
@@ -224,7 +225,8 @@ scenario clock is simulated, so say "fast-forward" whenever you advance it.
 ![P0–P3 policy choices](evidence/storyboard/story_13_policy_choices.png)
 ![A failed development run kept on record (replay)](evidence/storyboard/story_15_harness_bug_on_record.png)
 
-Backup frame, only for a question: P3's own checks are labeled as server checks.
+Backup frame, only for a question: P3's own checks are labeled as server checks (in T2, open
+`#/replay/live_p3-verify-all_dev02_trace.json` → **Final recorded state**).
 
 ![P3 server checks (replay)](evidence/storyboard/story_14_p3_server_checks.png)
 
@@ -241,8 +243,8 @@ Backup frame, only for a question: P3's own checks are labeled as server checks.
 - **Point at (T1):** the four choices: Deterministic policy (the rule baseline, P0 in our plan),
   Tool-use agent (P1), Live agent (P2, selective), Verify-all agent (P3). "Selecting makes none
   [no model calls]."
-- **Point at (T3):** `tool-use/1.0.0`, six "hold_resource was rejected (INVALID_REQUEST /
-  CONSTRAINT_VIOLATION)" cards, "Stop … the model-call cap of 8 for this episode is spent", and
+- **Point at (T3):** `tool-use/1.0.0`, six "hold_resource was rejected (…)" cards (three
+  `INVALID_REQUEST`, three `CONSTRAINT_VIOLATION`), "Stop … the model-call cap of 8 for this episode is spent", and
   "0 of 40 on time", with stock conserved. The executor refused every malformed hold, and nothing
   was invented.
 - **Say:** "Here a language model picks the next step, but only from options the server built and
@@ -250,11 +252,12 @@ Backup frame, only for a question: P3's own checks are labeled as server checks.
   policies with the same tools, grants and checks, and have not compared them yet. One
   development run failed, and we keep it on record: it caught a bug in *our* P1 (tool-use)
   harness, whose prompt never said which time window a hold covers. The executor refused every
-  bad hold. We fixed the prompt, and the rerun served all 40 kits."
+  bad hold. We fixed the prompt and its token limit, and the rerun served all 40 kits."
 - **Optional functional readout** (a count, not a comparison): "Fifteen current development
-  runs, P1 to P3 on five cases, one trial each, all matched their expected outcomes."
-  Source: `apps/plan_b/plan_b/evaluation/development/README.md`, the five superseded runs
-  excluded. Do not break it down by policy.
+  runs, P1 to P3 on five cases, one trial each, all matched their expected outcomes. Five
+  superseded P1 runs, the failure just shown among them, are kept on record."
+  Source: `apps/plan_b/plan_b/evaluation/development/README.md`. Do not break it down by
+  policy, and do not turn it into a rate.
 - **A second honest limit, for questions:** P1 treats every new observation as material. It
   spent model calls confirming "keep" and reached its 8-call cap after its plan was already in
   place, in three of its five current runs (dev01 at 17:24, dev02 at 17:44, skills_dev01 at
@@ -282,8 +285,8 @@ Backup frame, only for a question: P3's own checks are labeled as server checks.
      exchange moves 11:20–11:40 → 10:40–11:00, and Guided practice 10:40–11:20 → 11:00–11:40.
   3. For the offer: "Offer from participant_kit_steward activates backup_learning_kit … nothing
      is reserved or spent".
-- **Say:** "A different event, the community skills exchange, on the same engine. The peer lead
-  says, from their own phone, that they must leave at 11:05. That one fact makes the old plan
+- **Say:** "A different event, the community skills exchange, on the same engine and the same
+  rule baseline. The peer lead says, from their own session, that they must leave at 11:05. That one fact makes the old plan
   infeasible, and the swap fixes it. A participant can report their own availability; they cannot
   change anyone else's or the goal."
 
@@ -384,7 +387,7 @@ Paths are relative to this packet unless they start with `apps/`.
 | P3's own checks are server checks (`verify-all-relevance/1.0.0`) | `evidence/traces/live_p3-verify-all_dev02_trace.json`; `storyboard_report.json` step 14; `apps/plan_b/web/tests/demo_story.test.ts` |
 | A failed development run kept on record: P1's first live pantry run had 6 refused holds, reached the 8-model-call cap and served 0 of 40, because of a defect in our P1 harness (prompt v1, token budget). It was fixed with `tool_use.v2`, and the rerun served 40 of 40 | `evidence/reports/live_p1-tool-use_pantry_dev01_run.json` ($0.26454) and `…_outcome.public.json`; `live_p1-tool-use_pantry_dev01_r2_run.json` ($0.15995); `apps/plan_b/plan_b/evaluation/development/README.md` ("Superseded runs"); `storyboard_report.json` step 15 (and the rerun check) |
 | Optional readout: 15 current development runs of P1–P3 on 5 cases match their expected outcomes (one trial each) | `apps/plan_b/plan_b/evaluation/development/README.md` |
-| The first Wave 2 live pantry run served 0 of 40 (no stock options then); P2's pantry run on the finished tree served 40 of 40 on time | `evidence/reports/live_pantry_dev01_run.json`; `evidence/reports/live_p2-live_pantry_dev01_run.json` ($0.045208) |
+| The first Wave 2 live pantry run served 0 of 40 (no stock options then); P2's pantry run with the finishing step's code served 40 of 40 on time | `evidence/reports/live_pantry_dev01_run.json`; `evidence/reports/live_p2-live_pantry_dev01_run.json` ($0.045208) |
 | A participant's own check-in (until 11:05) makes the plan infeasible, and the swap fixes it | `storyboard_report.json` steps 16–17; `evidence/traces/skills_dev01_trace.json`; `evidence/screenshots/walkthrough_wave2_report.json` (community flow) |
 | An offer activates a preconfigured kit with no hold, spend or plan change | `storyboard_report.json` step 18; `walkthrough_wave2_report.json` |
 | Pantry 24/16 → 40/0 through one staff receipt; the target stays 40; only distribution reduces the service deficit; stock is conserved | `storyboard_report.json` steps 19–23; `evidence/reports/pantry_accounting.json`; `traces/pantry_dev01_trace.json` |
@@ -400,7 +403,8 @@ Paths are relative to this packet unless they start with `apps/`.
   our harness, now fixed. Present it only as "a development run caught our bug; it is kept on
   record".
 - **Development runs only.** Every case is a development case, each live case ran once, and
-  nothing is held-out evaluation. Do not quote completion rates.
+  nothing is held-out evaluation. Do not quote completion rates; the optional readout in
+  section 4 is a count of single trials, with the superseded runs named.
 - **Fictional sandbox.** It has no real bookings, purchases, messages, rooms, people or stock.
   The November dates are fictional.
 - **No real pantry, no U-ACCESS involvement.** Do not imply that U-ACCESS staff, systems,
@@ -409,7 +413,8 @@ Paths are relative to this packet unless they start with `apps/`.
   scenario assumptions, not measured throughput.
 - **Not community validation.** No participant gave feedback.
 - **The rationale is not an explanation.** The model's text is labeled untrusted, and it
-  sometimes misstates details. For example, it calls a candidate "lowest-rank". The receipts
+  sometimes misstates details. For example, the commit card calls the rank-1 candidate "the
+  lowest-ranked applicable candidate". The receipts
   and checks are the evidence.
 - Do not say "always safe", "proven reliable", "zero-shot transfer", "optimal" or "first ever".
 - Do not present the optional live mode as rehearsed unless a human rehearsal on the stage
@@ -432,40 +437,39 @@ Paths are relative to this packet unless they start with `apps/`.
 
 ## 9. Rehearsal record: one timed automated internal dry run
 
-This is **not a human rehearsal**. It is one run of `tests/e2e/storyboard.py` by the audit step
-(an automated agent; the demo worker's earlier run gave the same counts): headless Chromium on
-the development machine, a clean `demo_prep` state, and port 8791. The run timed the app work only (loading, clicks, policy runs, waiting for the
-board), with no speaking. A human presenter still needs three uninterrupted timed rehearsals
-(09's preflight), including one forced provider failure if the live mode is used.
+This is **not a human rehearsal**. It is one automated run of `tests/e2e/storyboard.py`:
+headless Chromium on the development machine, a clean `demo_prep` state, and a local port. The
+run timed the app work only (loading, clicks, policy runs, waiting for the board), with no
+speaking. A human presenter still needs three uninterrupted timed rehearsals (09's preflight),
+including one forced provider failure if the live mode is used.
 
-Run: `uv run python tests/e2e/storyboard.py --port 8791` (default `--out`), finished 2026-10-25T07:49Z. Result:
-**32/32 checks passed**, exit 0. The integration step's collector run, from a clean checkout of
-`c4f7cd9`, then rewrote `evidence/storyboard/` (32/32 again, 24 frames, 40.9 s of app work in
-its segments; the frames keep their names, so the links here resolve). Its `storyboard_report.json`
-holds that run's own step checks and timings, which differ by tenths of a second from this
-table, the record of the 07:49Z run. The closing
-checks found no model call (5 episodes, only `rules/1.0.0` and `pantry-rules/1.0.0` decided), no
-page error, no horizontal overflow at 1536 px, and no join code or session token in the visible
-text of any frame (join links masked).
+The run recorded here is the integration step's collector run, from a clean checkout of
+`c4f7cd9`: it wrote `evidence/storyboard/` (24 frames and `storyboard_report.json`), and the
+table below is read from that committed report. Result: **32/32 checks passed**, exit 0. The
+demo worker's run and the audit step's run (07:49Z) gave the same counts, with timings that
+differ by tenths of a second. The closing checks found no model call (5 episodes, only
+`rules/1.0.0` and `pantry-rules/1.0.0` decided), no page error, no horizontal overflow at
+1536 px, and no join code or session token in the visible text of any frame (join links
+masked).
 
 | Segment | Planned (s) | Automated app time (s) | Frames | Checks |
 | --- | --- | --- | --- | --- |
-| 0:00-0:35 The campus showcase | 35 | 1.9 | 1 | 1/1 |
-| 0:35-1:10 What is committed and what the agent may change | 35 | 1.1 | 2 | 2/2 |
-| 1:10-2:25 The delayed projector: verify, then commit | 75 | 2.2 | 4 | 4/4 |
-| 2:25-3:10 A stale and a duplicate warning, handled without churn | 45 | 5.9 | 1 | 2/2 |
+| 0:00-0:35 The campus showcase | 35 | 2.0 | 1 | 1/1 |
+| 0:35-1:10 What is committed and what the agent may change | 35 | 1.0 | 2 | 2/2 |
+| 1:10-2:25 The delayed projector: verify, then commit | 75 | 2.3 | 4 | 4/4 |
+| 2:25-3:10 A stale and a duplicate warning, handled without churn | 45 | 6.0 | 1 | 2/2 |
 | 3:10-4:00 Prepare, ask, commit: the organizer-approved paid backup | 50 | 10.4 | 3 | 3/3 |
-| 4:00-4:55 The live coordinator's decision card (recorded replay) | 55 | 3.1 | 4 | 7/7 |
-| 4:55-5:40 A participant's own check-in changes the plan | 45 | 7.2 | 3 | 3/3 |
-| 5:40-6:25 Pantry Continuity cameo | 45 | 8.4 | 5 | 5/5 |
-| 6:25-7:00 Close: what is delivered, and the fallback | 35 | 0.6 | 1 | 5/5 |
-| **Total** | **420** | **40.8** (whole script 41.6 s, server start to stop) | **24** | **32/32** |
+| 4:00-4:55 The live coordinator's decision card (recorded replay) | 55 | 3.0 | 4 | 7/7 |
+| 4:55-5:40 A participant's own check-in changes the plan | 45 | 7.4 | 3 | 3/3 |
+| 5:40-6:25 Pantry Continuity cameo | 45 | 8.3 | 5 | 5/5 |
+| 6:25-7:00 Close: what is delivered, and the fallback | 35 | 0.5 | 1 | 5/5 |
+| **Total** | **420** | **40.9** (whole script 41.7 s, server start to stop) | **24** | **32/32** |
 
 What the run says about the live demo:
 
 * **The app is never the bottleneck.** In every segment, the clicks and waits took at most about 10.4 s of
-  the planned time. The slowest steps were `stale_and_duplicate` (5.9 s), `backup_held_and_asked` (5.2 s)
-  and `community_replanned` (4.6 s). In those steps the server runs the policy or
+  the planned time. The slowest steps were `stale_and_duplicate` (6.0 s), `backup_held_and_asked` (5.2 s)
+  and `community_replanned` (4.7 s). In those steps the server runs the policy or
   fast-forwards the clock, and the board polls every 1.5 s.
 * **The time goes to talking and switching tabs.** The busiest segments for a person are the
   paid backup (an organizer tab), the community segment (one or two participant tabs) and the
