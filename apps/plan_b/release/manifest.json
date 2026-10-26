@@ -4,7 +4,7 @@
   "description": "The local reviewable package of Plan B for the Wave 3 showcase: setup and run instructions, the app source with its public fixtures, the built browser bundle, sanitized recorded traces for the stage fallback, the frozen manifests, the held-out results with their figure and failure analysis, the seven-minute script, the submission deck, poster and documentation, the claims ledger, the rehearsal record and the source and license notes. Built by apps/plan_b/scripts/build_release.py from this explicit allowlist. A local package only: nothing is hosted or submitted.",
   "paths_are": "relative to the repository root; the package keeps the same relative layout, so links between packaged files still resolve inside it. Links to planning documents and Wave 2 screenshots outside the allowlist point to the repository",
   "include": [
-    {"role": "license", "paths": ["LICENSE"]},
+    {"role": "license", "paths": ["apps/plan_b/LICENSE"]},
     {"role": "setup and run instructions", "paths": ["apps/plan_b/README.md", "apps/plan_b/web/README.md", "apps/plan_b/.env.example"]},
     {"role": "dependency references", "paths": ["apps/plan_b/pyproject.toml", "apps/plan_b/uv.lock", "apps/plan_b/web/package.json", "apps/plan_b/web/package-lock.json", "apps/plan_b/web/tsconfig.json", "apps/plan_b/web/vite.config.ts", "apps/plan_b/web/index.html"]},
     {"role": "app source (server, policies, planner, store, public fixtures, frozen manifests)", "paths": ["apps/plan_b/plan_b/**"]},
@@ -39,7 +39,7 @@
     ]}
   ],
   "required": [
-    "LICENSE",
+    "apps/plan_b/LICENSE",
     "apps/plan_b/README.md",
     "apps/plan_b/plan_b/evaluation/manifests/freeze.json",
     "apps/plan_b/plan_b/evaluation/manifests/heldout.json",

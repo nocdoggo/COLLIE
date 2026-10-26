@@ -3,7 +3,7 @@ name = "plan-b"
 version = "0.1.0"
 description = "Plan B: The Show Must Go On. Wave 1 deterministic campus sandbox (fictional, local only)."
 requires-python = ">=3.11,<3.13"
-license = { text = "MIT" }
+license = { text = "GPL-3.0-only" }
 
 # The application has its own dependency boundary, separate from the COLLIE
 # research environment at the repository root. Exact versions are in uv.lock.

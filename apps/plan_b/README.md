@@ -253,3 +253,7 @@ uv run mypy
 | `release/` | The release allowlist (`manifest.json`) read by `scripts/build_release.py` |
 | `evaluation/results/` | The Wave 3 held-out results and the Wave 3b version 1.2 runs (outside the frozen tree) |
 | `tests/` | Focused tests against the real store and executor |
+
+## License
+
+Plan B is free software under the GNU General Public License, version 3 ([`LICENSE`](LICENSE)).

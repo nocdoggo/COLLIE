@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "Browser board and recorded replay for the Plan B fictional campus sandbox.",
   "type": "module",
-  "license": "MIT",
+  "license": "GPL-3.0-only",
   "engines": {
     "node": ">=22.18.0"
   },
