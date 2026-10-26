@@ -1,0 +1,24 @@
+% The use case as a four-beat story: one volunteer organizer (an illustration), twenty minutes
+% before doors open. Times and the swap come from development case dev01.
+\documentclass[border=6pt]{standalone}
+\input{fig_style}
+\usepackage{fontawesome5}
+\begin{document}
+\begin{tikzpicture}[font=\sffamily,
+  beat/.style={circle, minimum size=2.1cm, inner sep=0pt, line width=1.6pt},
+  t/.style={font=\sffamily\bfseries\large, text=ink},
+  d/.style={font=\sffamily\normalsize, text=muted, align=center, text width=4.2cm}]
+  % time rail
+  \draw[line, line width=1.2pt] (0,0) -- (15.6,0);
+  \foreach \x/\c/\ic/\tm/\head/\body in {
+     0.0/umborange/\faSms/16:40/A text arrives/{``The projector may be about 25 minutes late.''},
+     5.2/primary/\faTruck/16:42/Plan B checks/{The supplier's tracking says ETA 17:25. A claim became a fact.},
+    10.4/primary/\faRandom/16:43/It changes one thing/{Demos swap with the skills exchange. Cost \$0. A receipt is written.},
+    15.6/okgreen/\faDoorOpen/17:00/Doors open/{The show goes on. Nobody waited, nothing was bought.}}{
+    \node[beat, draw=\c, fill=white] (b) at (\x,0) {\textcolor{\c}{\fontsize{30}{30}\selectfont\ic}};
+    \node[t, above=0.25cm of b] {\textcolor{\c}{\tm}\enspace\head};
+    \node[d, below=0.3cm of b] {\body};
+  }
+  \node[font=\sffamily\small, text=muted, anchor=west] at (-1.2,2.35) {\faUser\enspace Maya, a volunteer organizer (an illustration), 20 minutes before doors open};
+\end{tikzpicture}
+\end{document}

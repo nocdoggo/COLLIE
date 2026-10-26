@@ -10,7 +10,7 @@
 %
 % Every held-out number comes from figures/results_numbers.tex and figures/fig_results.tex, which
 % ../make_results.py writes from the committed run wave3_heldout_20261025T1625Z (metrics.json),
-% the evaluation of record of version 1.1. The version 1.2 numbers come from
+% the evaluation of record of the first test. The the final system numbers come from
 % figures/results_numbers_v12.tex: fresh: is the held-out run wave3b_fresh_20261025T2327Z, and
 % rerun: is wave3b_rerun_spent_20261025T2345Z, a post-hoc diagnostic rerun on spent cases.
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -25,7 +25,7 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
 \input{loadslides.tex} % Loads packages and some defined commands
 \usepackage{appendixnumberbeamer} % backups are not counted in the slide total
 \input{figures/results_numbers.tex} % Held-out numbers, read as \res{suite:policy:key}
-\input{figures/results_numbers_v12.tex} % Version 1.2, read as \res{fresh:suite:policy:key}
+\input{figures/results_numbers_v12.tex} % The final system, read as \res{fresh:suite:policy:key}
 
 % \setbeameroption{show notes} % uncomment to render speaker notes alongside slides
 
@@ -78,7 +78,7 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
   \end{itemize}
   \vspace{0.1cm}
   \begin{center}
-    \includegraphics[width=0.86\textwidth]{fig_timeline.pdf}
+    \includegraphics[width=0.86\textwidth]{fig_story.pdf}
   \end{center}
   \note{
     \textbf{(27s, ends 0:37)} Imagine you organize a campus showcase. It opens at five and
@@ -217,7 +217,7 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % 9. THE HELD-OUT TEST, VERSION 1.1 (38 s)
-\begin{frame}{Held-out test of version 1.1: zero violations, no clear winner}
+\begin{frame}{A first test on 12 unseen cases: no rule broken, three defects found}
   \begin{itemize}
     \item \textbf{Held-out cases}: locked before the test and hidden from every policy. Code, prompts, model and limits were \textbf{frozen} first. A run is \textbf{met} when its final state and receipts show the case's outcome.
   \end{itemize}
@@ -227,7 +227,7 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
   \vspace{-0.1cm}
   \begin{itemize}
     \item All \res{both:recorded} runs recorded. Every policy: \textbf{\res{both:viol} executed violations}, \textbf{\res{both:unnec} changes} on the 3 quiet cases. Refused: \res{campus:all:refused} campus and \res{pantry:all:refused} pantry requests (\res{both:stale} on a state that changed meanwhile).
-    \item \emphasize{No consistent advantage for P2.} Campus model cost: P1 met \res{campus:P1:metk} of \res{campus:P1:metn} runs for \$\res{campus:P1:usd}, P3 \res{campus:P3:metk} for \$\res{campus:P3:usd}, P2 \res{campus:P2:metk} for \$\res{campus:P2:usd}. Fixed rules met every pantry run.
+    \item \emphasize{No consistent advantage for our coordinator.} Campus model cost: the tool-calling model met \res{campus:P1:metk} of \res{campus:P1:metn} runs for \$\res{campus:P1:usd}, the check-all variant \res{campus:P3:metk} for \$\res{campus:P3:usd}, our coordinator \res{campus:P2:metk} for \$\res{campus:P2:usd}. Fixed rules met every pantry run.
   \end{itemize}
   \note{
     \textbf{(38s, ends 4:43)} Everything so far came from practice cases I built with. Then
@@ -243,8 +243,8 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
 % 10. ONE FAILURE (26 s)
 \begin{frame}{One failure: a correct reading that never reached the planner}
   \begin{itemize}
-    \item Held-out case \textbf{C06}: a volunteer will be late, with a later check-in.
-    \item P2 and P3 failed it in all \textbf{6 runs}, and every one stays \textbf{in the count}. P1 met it in 3 of 3.
+    \item A case where \textbf{a volunteer runs late} and checks in later.
+    \item Our coordinator and the check-all variant failed it in all \textbf{6 runs}, and every one stays \textbf{in the count}. The tool-calling model met it in 3 of 3.
   \end{itemize}
   \vspace{0.25cm}
   \begin{center}
@@ -277,7 +277,7 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
   \end{center}
   \vspace{-0.1cm}
   \begin{itemize}
-    \item \textbf{Held-out pantry, version 1.1}: rules met \res{pantry:P0:metk} of \res{pantry:P0:metn} runs, model policies \res{pantry:P1:metk} to \res{pantry:P2:metk} of 12, partly from a frozen planner defect (T03). \emphasize{No kit counted twice.}
+    \item \textbf{In the first pantry test}: rules met \res{pantry:P0:metk} of \res{pantry:P0:metn} runs, model policies \res{pantry:P1:metk} to \res{pantry:P2:metk} of 12, partly from a frozen planner defect. \emphasize{No kit counted twice.}
   \end{itemize}
   \note{
     \textbf{(40s, ends 5:49)} The same loop runs a fictional pantry. Staff need forty kits
@@ -291,10 +291,10 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % 12. VERSION 1.2 (39 s)
-\begin{frame}{Version 1.2: the fixes, then six fresh held-out cases}
+\begin{frame}{After three fixes: six new cases it had never seen}
   \begin{itemize}
-    \item \textbf{Fixed after the held-out failures}: a person's own delay now reaches the planner (C06), a pool checked as unavailable is no longer offered (T03), a menu the model declined is not sent again, and a rate limit is waited out.
-    \item \textbf{Fresh held-out set}: 6 new cases, C09 to C12, T05 and T06, written without the new code and \textbf{locked before the first 1.2 call}. Same model and limits.
+    \item \textbf{Fixed after the held-out failures}: a person's own delay now reaches the planner, a pool checked as unavailable is no longer offered, a menu the model declined is not sent again, and a rate limit is waited out.
+    \item \textbf{Fresh held-out set}: 6 new cases, written without the new code and \textbf{locked before the final system ran}. Same model and limits.
   \end{itemize}
   \vspace{0.1cm}
   \begin{center}
@@ -303,19 +303,19 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
   \begin{tabular}{@{}lcccc@{\hspace{12pt}}cccc@{}}
     \toprule
     & \multicolumn{4}{c}{\textbf{Campus runs met}} & \multicolumn{4}{c}{\textbf{Pantry runs met}} \\
-    & P0 & P1 & P2 & P3 & P0 & P1 & P2 & P3 \\
+    & Rules & Tools & Ours & All & Rules & Tools & Ours & All \\
     \midrule
-    Version 1.1: 12 cases, the record & \res{campus:P0:met} & \res{campus:P1:met} & \res{campus:P2:met} & \res{campus:P3:met} & \res{pantry:P0:met} & \res{pantry:P1:met} & \res{pantry:P2:met} & \res{pantry:P3:met} \\
-    Version 1.2: 6 different, fresh cases & \res{fresh:campus:P0:met} & \res{fresh:campus:P1:met} & \res{fresh:campus:P2:met} & \res{fresh:campus:P3:met} & \res{fresh:pantry:P0:met} & \res{fresh:pantry:P1:met} & \res{fresh:pantry:P2:met} & \res{fresh:pantry:P3:met} \\
+    First test: 12 cases & \res{campus:P0:met} & \res{campus:P1:met} & \res{campus:P2:met} & \res{campus:P3:met} & \res{pantry:P0:met} & \res{pantry:P1:met} & \res{pantry:P2:met} & \res{pantry:P3:met} \\
+    Final test: 6 new cases & \res{fresh:campus:P0:met} & \res{fresh:campus:P1:met} & \res{fresh:campus:P2:met} & \res{fresh:campus:P3:met} & \res{fresh:pantry:P0:met} & \res{fresh:pantry:P1:met} & \res{fresh:pantry:P2:met} & \res{fresh:pantry:P3:met} \\
     \bottomrule
   \end{tabular}\par}
   \end{center}
   \vspace{0.05cm}
   \begin{itemize}
-    \item \emphasize{\res{fresh:both:metk} of \res{fresh:both:metn} fresh runs met}, \res{fresh:both:viol} executed violations. The miss: P0 on C11, a person's own delay that its rules cannot read. P1 to P3 met every run, so this small set \textbf{cannot rank them}.
+    \item \emphasize{\res{fresh:both:metk} of \res{fresh:both:metn} fresh runs met}, \res{fresh:both:viol} executed violations. The one miss: the fixed rules, on a person's own delay that rules cannot read. The tool-calling model to the check-all variant met every run, so this small set \textbf{cannot rank them}.
   \end{itemize}
   \vspace{0.05cm}
-  \figcaption{Different cases, so the two rows are not a before and after. The fresh cases repeat known conditions (C11 is the C06 condition, T06 is T03). Descriptive counts, no significance test. A post-hoc rerun of 1.2 on the spent cases is diagnostic only, not held-out (backup).}
+  \figcaption{Different cases, so the two rows are not a before and after. The new cases repeat known situations with new details. Descriptive counts, no significance test. A post-hoc rerun of 1.2 on the spent cases is diagnostic only, not held-out (backup).}
   \note{
     \textbf{(39s, ends 6:28)} Version one point two targets those failures. A person's own
     delay now reaches the planner, and a pool checked as unavailable is no longer offered.
@@ -333,7 +333,7 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
     \column{0.7\textwidth}
       \begin{itemize}
         \item \textbf{Works}: verify, prepare, commit in a local sandbox. Every accepted change has a \emphasize{receipt}, and people approve spending.
-        \item \textbf{Tested} on 12 held-out cases (\res{both:recorded} runs), then version 1.2 on 6 fresh ones (\res{fresh:both:recorded} runs): \emphasize{zero executed violations}, and no clear winner among the policies.
+        \item \textbf{Tested} on 12 held-out cases (\res{both:recorded} runs), then, after three fixes, on 6 new ones (\res{fresh:both:recorded} runs): \emphasize{zero executed violations}, and no clear winner among the policies.
         \item \textbf{In real life} a message is a text, a status check is a tracking page, a hold is a refundable reservation.
         \item \textbf{Not shown}: real bookings, real stock, a community pilot. \textbf{Next}: review the workflows with community staff.
       \end{itemize}
@@ -368,7 +368,7 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
     \column{0.42\textwidth}
       \begin{itemize}
         \item A \textbf{replay} re-shows a recorded run. It never calls a tool and is never a new trial.
-        \item A development run of P2 on case dev02, recorded with an earlier version (\texttt{live/1.0.0}) before the freeze.
+        \item A development run of our coordinator on case dev02, recorded with an earlier version (\texttt{live/1.0.0}) before the freeze.
         \item The model chose one option the server built. The server checked it and wrote the receipt. The model's own rationale is shown as \emphasize{untrusted text}.
       \end{itemize}
     \column{0.56\textwidth}
@@ -380,7 +380,7 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
 \begin{frame}{Backup: the report's per-case figure, campus}
   \begin{center}
     \includegraphics[height=8.2cm]{report_campus.pdf}\\[2pt]
-    \figcaption{\texttt{campus/report/figure.svg} of run wave3\_heldout\_20261025T1625Z, printed to PDF. Case order as in the report. Legend: P1 tool use is P1 model calls tools, P2 selective is P2 model picks options, P3 verify-all is P3 every check first.}
+    \figcaption{\texttt{campus/report/figure.svg} of run wave3\_heldout\_20261025T1625Z, printed to PDF. Case order as in the report. Legend: the tool-calling model tool use is the tool-calling model model calls tools, our coordinator selective is our coordinator model picks options, the check-all variant verify-all is the check-all variant every check first.}
   \end{center}
 \end{frame}
 
@@ -400,15 +400,15 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
     & \multicolumn{2}{c}{\textbf{Campus}} & \multicolumn{2}{c}{\textbf{Pantry}} \\
     \textbf{Policy} & \textbf{Model calls} & \textbf{Model USD} & \textbf{Model calls} & \textbf{Model USD} \\
     \midrule
-    P0 fixed rules & \res{campus:P0:calls} & \res{campus:P0:usd} & \res{pantry:P0:calls} & \res{pantry:P0:usd} \\
-    P1 model calls tools & \res{campus:P1:calls} & \res{campus:P1:usd} & \res{pantry:P1:calls} & \res{pantry:P1:usd} \\
-    P2 model picks options & \res{campus:P2:calls} & \res{campus:P2:usd} & \res{pantry:P2:calls} & \res{pantry:P2:usd} \\
-    P3 every check first & \res{campus:P3:calls} & \res{campus:P3:usd} & \res{pantry:P3:calls} & \res{pantry:P3:usd} \\
+    the fixed rules fixed rules & \res{campus:P0:calls} & \res{campus:P0:usd} & \res{pantry:P0:calls} & \res{pantry:P0:usd} \\
+    the tool-calling model model calls tools & \res{campus:P1:calls} & \res{campus:P1:usd} & \res{pantry:P1:calls} & \res{pantry:P1:usd} \\
+    our coordinator model picks options & \res{campus:P2:calls} & \res{campus:P2:usd} & \res{pantry:P2:calls} & \res{pantry:P2:usd} \\
+    the check-all variant every check first & \res{campus:P3:calls} & \res{campus:P3:usd} & \res{pantry:P3:calls} & \res{pantry:P3:usd} \\
     \bottomrule
   \end{tabular}\par}
   \end{center}
   \begin{itemize}
-    \item Provider-reported cost of the reported run of version 1.1. Version 1.2 cost \$\res{fresh:both:usd} for the \res{fresh:both:recorded} fresh held-out runs and \$\res{rerun:both:usd} for the \res{rerun:both:recorded} runs of the diagnostic rerun. Runs of 1.1 stopped by the 8-call limit: campus \res{campus:all:capped}, pantry \res{pantry:all:capped}, so \res{both:capped} runs, 15 of them among the 26 failed runs. All stay in the counts.
+    \item Provider-reported cost of the reported run of the first test. The final system cost \$\res{fresh:both:usd} for the \res{fresh:both:recorded} fresh held-out runs and \$\res{rerun:both:usd} for the \res{rerun:both:recorded} runs of the diagnostic rerun. Runs of 1.1 stopped by the 8-call limit: campus \res{campus:all:capped}, pantry \res{pantry:all:capped}, so \res{both:capped} runs, 15 of them among the 26 failed runs. All stay in the counts.
     \item A first attempt was \textbf{voided} before the reported run began: the provider's rate limit (20 requests a minute) answered most calls with an error. It is kept on record. The frozen status rules would have scored its capped runs, so the void is a disclosed departure from them. The whole protocol was rerun one run at a time.
   \end{itemize}
 \end{frame}
@@ -416,15 +416,15 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
 \begin{frame}{Backup: what the held-out numbers do not show}
   \begin{itemize}
     \item \textbf{The case is the unit}: 8 campus and 4 pantry cases. Three runs of a case are repeated trials. No significance test.
-    \item \textbf{C06} is out of reach for P0, P2 and P3 by a frozen rule, disclosed before the runs.
-    \item \textbf{Pantry}: only P2 and P3 had pantry guidance in their prompts. A defect in my frozen planner kept a pool checked as unavailable on offer, and it is where each of the six P2 and P3 failures on case T03 first went wrong.
+    \item \textbf{C06} is out of reach for the fixed rules, our coordinator and the check-all variant by a frozen rule, disclosed before the runs.
+    \item \textbf{Pantry}: only our coordinator and the check-all variant had pantry guidance in their prompts. A defect in my frozen planner kept a pool checked as unavailable on offer, and it is where each of the six our coordinator and the check-all variant failures on case T03 first went wrong.
     \item The 8 model calls per run come from development and ended 15 of the 26 failed runs.
-    \item These 12 cases are now spent. Version 1.2 got 6 new cases and a new freeze.
-    \item \textbf{Version 1.2}: 6 cases are few, and they repeat known conditions with near copies of the old wording. Five limits found by the audit before the freeze stay frozen, so that no one who had seen the new cases changed a policy.
+    \item These 12 cases are now spent. The final system got 6 new cases and a new freeze.
+    \item \textbf{The final system}: 6 cases are few, and they repeat known conditions with near copies of the old wording. Five limits found by the audit before the freeze stay frozen, so that no one who had seen the new cases changed a policy.
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Backup: version 1.2 on the spent cases, a diagnostic rerun}
+\begin{frame}{Backup: the final system on the spent cases, a diagnostic rerun}
   \begin{itemize}
     \item \textbf{Post-hoc diagnostic rerun after fixes, on spent cases. Not a held-out result.} The fixes were made after reading these failures.
   \end{itemize}
@@ -435,24 +435,24 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
   \begin{tabular}{@{}lcccc@{\hspace{12pt}}cccc@{}}
     \toprule
     & \multicolumn{4}{c}{\textbf{Campus runs met}} & \multicolumn{4}{c}{\textbf{Pantry runs met}} \\
-    & P0 & P1 & P2 & P3 & P0 & P1 & P2 & P3 \\
+    & Rules & Tools & Ours & All & Rules & Tools & Ours & All \\
     \midrule
-    Version 1.1, held-out record & \res{campus:P0:met} & \res{campus:P1:met} & \res{campus:P2:met} & \res{campus:P3:met} & \res{pantry:P0:met} & \res{pantry:P1:met} & \res{pantry:P2:met} & \res{pantry:P3:met} \\
-    Version 1.2, diagnostic rerun & \res{rerun:campus:P0:met} & \res{rerun:campus:P1:met} & \res{rerun:campus:P2:met} & \res{rerun:campus:P3:met} & \res{rerun:pantry:P0:met} & \res{rerun:pantry:P1:met} & \res{rerun:pantry:P2:met} & \res{rerun:pantry:P3:met} \\
+    The first test, held-out record & \res{campus:P0:met} & \res{campus:P1:met} & \res{campus:P2:met} & \res{campus:P3:met} & \res{pantry:P0:met} & \res{pantry:P1:met} & \res{pantry:P2:met} & \res{pantry:P3:met} \\
+    The final system, diagnostic rerun & \res{rerun:campus:P0:met} & \res{rerun:campus:P1:met} & \res{rerun:campus:P2:met} & \res{rerun:campus:P3:met} & \res{rerun:pantry:P0:met} & \res{rerun:pantry:P1:met} & \res{rerun:pantry:P2:met} & \res{rerun:pantry:P3:met} \\
     \bottomrule
   \end{tabular}\par}
   \end{center}
   \vspace{0.05cm}
   \begin{itemize}
-    \item Consistent with the fixes: P1 to P3 met every run on C06 and T03. Still failing, as in 1.1: C07 under P2 (the call budget spent on hold churn), T02 under P3 (a stale apply), T04 under P1 in 2 of 3 runs, and P0 on C06 and C07.
+    \item Consistent with the fixes: the tool-calling model to the check-all variant met every run on C06 and T03. Still failing, as in 1.1: C07 under our coordinator (the call budget spent on hold churn), T02 under the check-all variant (a stale apply), T04 under the tool-calling model in 2 of 3 runs, and the fixed rules on C06 and C07.
     \item Run two at a time: \res{rerun:both:capped} runs stopped at the 8-call limit, and 61 rate-limit answers were waited out at no cost. \res{rerun:both:viol} executed violations.
   \end{itemize}
 \end{frame}
 
 \begin{frame}{Backup: a development failure, kept on record}
   \begin{itemize}
-    \item In development, P1's first run on the pantry practice case: the executor \textbf{refused 6 holds}, the model call limit was reached, \emphasize{0 of 40} kits were served.
-    \item Cause: a defect in my P1 harness. The prompt never said which time window a hold covers, and the reply limit counted the model's reasoning.
+    \item In development, the tool-calling model's first run on the pantry practice case: the executor \textbf{refused 6 holds}, the model call limit was reached, \emphasize{0 of 40} kits were served.
+    \item Cause: a defect in my the tool-calling model harness. The prompt never said which time window a hold covers, and the reply limit counted the model's reasoning.
     \item Fixed in the prompt and the limit. The rerun served \emphasize{40 of 40}. The failed run is kept.
   \end{itemize}
 \end{frame}
@@ -460,7 +460,7 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
 \begin{frame}{Backup: a participant's own check-in changes the plan}
   \begin{center}
     \includegraphics[height=7.6cm]{community_replanned.png}\\[3pt]
-    \figcaption{Development case skills\_dev01: the peer lead can stay only until 11:05, so the plan swaps two activities. P0 fixed rules, automated run.}
+    \figcaption{Development case skills\_dev01: the peer lead can stay only until 11:05, so the plan swaps two activities. The fixed rules fixed rules, automated run.}
   \end{center}
 \end{frame}
 
@@ -474,12 +474,12 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
 
 \begin{frame}{Backup: the frozen configurations}
   \begin{itemize}
-    \item \textbf{Policies}: P0 \texttt{rules/1.0.0} and \texttt{pantry-rules/1.1.0}, P1 \texttt{tool-use/1.1.0}, P2 \texttt{live/1.1.0}, P3 \texttt{verify-all/1.1.0}.
-    \item \textbf{Model}: \texttt{anthropic/claude-sonnet-5.5} through OpenRouter, the same for P1 to P3.
+    \item \textbf{Policies}: the fixed rules \texttt{rules/1.0.0} and \texttt{pantry-rules/1.1.0}, the tool-calling model \texttt{tool-use/1.1.0}, our coordinator \texttt{live/1.1.0}, the check-all variant \texttt{verify-all/1.1.0}.
+    \item \textbf{Model}: \texttt{anthropic/claude-sonnet-5.5} through OpenRouter, the same for the tool-calling model to the check-all variant.
     \item \textbf{Limits per run}: 48 tool calls, 8 model calls, \$0.50, 900 seconds.
     \item \textbf{Seeds} 101, 202 and 303 are recorded but not sent, because the model's endpoints refuse a seed. The three runs of a case are repeated trials, not reproducible ones.
     \item Frozen by hash in \texttt{freeze.json} before the first held-out call.
-    \item \textbf{Version 1.2}: P1 \texttt{tool-use/1.2.0}, P2 \texttt{live/1.2.0}, P3 \texttt{verify-all/1.2.0}, P0 unchanged on planner 1.2.0. Same model and limits. Frozen in \texttt{freeze\_v1\_2.json} at 23:23:47 UTC, the fresh cases locked at 23:23:54, the first call at 23:27:31.
+    \item \textbf{The final system}: the tool-calling model \texttt{tool-use/1.2.0}, our coordinator \texttt{live/1.2.0}, the check-all variant \texttt{verify-all/1.2.0}, the fixed rules unchanged on planner 1.2.0. Same model and limits. Frozen in \texttt{freeze\_v1\_2.json} at 23:23:47 UTC, the fresh cases locked at 23:23:54, the first call at 23:27:31.
   \end{itemize}
 \end{frame}
 

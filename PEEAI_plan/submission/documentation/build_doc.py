@@ -148,16 +148,16 @@ def different(doc) -> None:
     para(
         doc,
         "Plan B combines known ideas in one bounded workflow. It does not claim to be the first of its "
-        "kind. P0 to P3 are the four coordinator policies compared in section 7.",
+        "kind. The four coordinator policies are the ones compared in section 7.",
     )
     bullets(
         doc,
         [
             "**Ordinary tool-calling agents** let the model write tool calls directly. Plan B keeps "
-            "that design as a comparison policy (P1), and in its own policy (P2) the model picks one "
+            "that design as a comparison policy (the tool-calling model), and in its own policy (our coordinator) the model picks one "
             "option from a menu the server built and checked.",
             "**Rule systems** are predictable but read only the message forms they were written for. "
-            "Plan B keeps a published rule policy (P0) as a baseline.",
+            "Plan B keeps a published rule policy (the fixed rules) as a baseline.",
             "**Plan repair and information gathering** are well studied in planning research. Plan B "
             "applies them to a small event with explicit holds, receipts and human approval.",
             "**Reversible preparation.** A hold reserves a backup for free and expires on its own, so "
@@ -250,8 +250,8 @@ def walkthrough(doc) -> None:
     doc.add_heading("4.4 Which policy acted", level=2)
     para(
         doc,
-        "The frames above come from an automated browser run of the rule baseline (P0), with no model "
-        "call. In a recorded development run, the AI coordinator (P2) made the same status check and the "
+        "The frames above come from an automated browser run of the rule baseline (the fixed rules), with no model "
+        "call. In a recorded development run, the AI coordinator (our coordinator) made the same status check and the "
         "same swap at 16:43 with receipt `rcpt_0001`, in 3 model calls for $0.0366.",
     )
 
@@ -270,8 +270,8 @@ def architecture(doc) -> None:
             ["Planner", "Builds and checks candidate repairs", "`plan_b/domain/candidates.py`, `constraints.py`, `objective.py`"],
             ["Adapters", "Campus and pantry rules on the shared core", "`plan_b/domain/adapters/`"],
             ["Runner and clock", "Simulated clock, scripted world events, policy wakes and limits", "`plan_b/scenarios/`"],
-            ["Rule policies (P0)", "Published deterministic rules and parser", "`plan_b/evaluation/policies/`"],
-            ["Model policies (P1 to P3)", "Menu, interpretation, attention rule, provider", "`plan_b/agent/`"],
+            ["Rule policies (the fixed rules)", "Published deterministic rules and parser", "`plan_b/evaluation/policies/`"],
+            ["Model policies (the tool-calling model to the check-all variant)", "Menu, interpretation, attention rule, provider", "`plan_b/agent/`"],
             ["Browser board", "Organizer, participant, staff and moderator views", "`web/` (React, TypeScript)"],
             ["Trace and replay", "Sanitized traces, integrity check, offline replay", "`plan_b/evaluation/export_trace.py`, `web/src/replay/`"],
             ["Evaluation harness", "Freeze, held-out runs, metrics, report", "`plan_b/evaluation/`"],
@@ -285,7 +285,7 @@ def decision_policy(doc) -> None:
     figure(doc, PNG / "fig_loop.png", "Figure 8. Verify, prepare, commit, keep, with this event's examples.")
     para(
         doc,
-        "The selective policy P2 follows these steps each time the runner wakes it, that is, gives it a "
+        "The selective policy our coordinator follows these steps each time the runner wakes it, that is, gives it a "
         "turn because the shared state changed or a wait it set has passed:",
     )
     numbered(
@@ -328,16 +328,16 @@ def policies(doc) -> None:
     bullets(
         doc,
         [
-            "**Model**: `anthropic/claude-sonnet-5.5` through OpenRouter, the same configuration for P1 "
-            "to P3, 4096 output tokens per call, strict JSON output.",
+            "**Model**: `anthropic/claude-sonnet-5.5` through OpenRouter, the same configuration for the tool-calling model "
+            "to the check-all variant, 4096 output tokens per call, strict JSON output.",
             "**Limits per run**: 48 tool calls, 8 model calls, $0.50, 900 seconds. Every failed call "
             "and retry counts.",
             "**Seeds** 101, 202 and 303 are recorded but not sent, because the model's endpoints refuse a "
             "seed. The three runs of a case are repeated trials, not independent units, and not "
             "reproducible.",
-            "**P1 is a serious baseline.** It sees the objective, the budget, the tools and the "
-            "candidates, and may verify and hold like P2.",
-            "**P3 is an ablation.** Its checks are made by the server, so its lower model-call count on "
+            "**the tool-calling model is a serious baseline.** It sees the objective, the budget, the tools and the "
+            "candidates, and may verify and hold like our coordinator.",
+            "**the check-all variant is an ablation.** Its checks are made by the server, so its lower model-call count on "
             "campus does not mean less checking.",
         ],
     )
@@ -456,7 +456,7 @@ def protocol(doc) -> None:
     bullets(
         doc,
         [
-            "**Planned size**: 80 campus runs (8 cases, P0 once, P1 to P3 three times each) and, "
+            "**Planned size**: 80 campus runs (8 cases, the fixed rules once, the tool-calling model to the check-all variant three times each) and, "
             "separately, 40 pantry runs. The two suites are never pooled.",
             "**Freeze**: code, prompts, model, limits, seeds and run order fixed by hash in "
             "`plan_b/evaluation/manifests/freeze.json` (commit 3de5962) before the first held-out call.",
@@ -495,11 +495,11 @@ def results(doc) -> None:
     para(
         doc,
         "**Headline.** No policy executed a violation, and no policy committed a change on the three "
-        "quiet cases. **P2, my policy, shows no consistent advantage over P1 or P0 here.** On one reported run "
-        f"of 8 campus and 4 pantry held-out cases, P2 met every run of {campus['P2']['cases']} of 8 "
-        f"campus cases (P1 met every run of {campus['P1']['cases']}, P3 of {campus['P3']['cases']}, P0 of "
-        f"{campus['P0']['cases']}) and of {pantry['P2']['cases']} of 4 pantry cases (P0 of "
-        f"{pantry['P0']['cases']}, P1 of {pantry['P1']['cases']}, P3 of {pantry['P3']['cases']}). Its "
+        "quiet cases. **our coordinator, my policy, shows no consistent advantage over the tool-calling model or the fixed rules here.** On one reported run "
+        f"of 8 campus and 4 pantry held-out cases, our coordinator met every run of {campus['P2']['cases']} of 8 "
+        f"campus cases (the tool-calling model met every run of {campus['P1']['cases']}, the check-all variant of {campus['P3']['cases']}, the fixed rules of "
+        f"{campus['P0']['cases']}) and of {pantry['P2']['cases']} of 4 pantry cases (the fixed rules of "
+        f"{pantry['P0']['cases']}, the tool-calling model of {pantry['P1']['cases']}, the check-all variant of {pantry['P3']['cases']}). Its "
         "misses come from a frozen attention rule that passes only equipment notices to the planner (C06), choices that used up the 8-call limit (C07) "
         "and an unavailable pool kept as a handoff option (T03). A first attempt was voided, as "
         "section 12.5 explains.",
@@ -570,27 +570,27 @@ def results(doc) -> None:
     )
     para(
         doc,
-        "**One failure.** In C06 (a volunteer will be late, with a later check-in), P2 and P3 read the "
+        "**One failure.** In C06 (a volunteer will be late, with a later check-in), our coordinator and the check-all variant read the "
         "volunteer's message correctly in all six runs. But the frozen attention rule treats only "
         "equipment notices as material, so the reading never reached the planner, the plan was never "
         "put in question, and the activity the volunteer leads could not start in time. The earliest "
-        "broken stage is planner input. P0's parser does not read the message. P1 met C06 in 3 of 3 "
+        "broken stage is planner input. P0's parser does not read the message. The tool-calling model met C06 in 3 of 3 "
         "runs. This limit was disclosed at the case lock, before the runs.",
     )
-    figure(doc, PNG / "fig_failure.png", "Figure 15. The C06 failure of P2 and P3 in four steps.")
+    figure(doc, PNG / "fig_failure.png", "Figure 15. The C06 failure of our coordinator and the check-all variant in four steps.")
     para(doc, "The other failed runs, each with its earliest broken stage (from the run's `FAILURES.md`):")
     bullets(
         doc,
         [
-            "**C07** (status service unavailable), P2 in 3 runs, action selection: a repeated check and a "
+            "**C07** (status service unavailable), our coordinator in 3 runs, action selection: a repeated check and a "
             "hold released and made again used the 8 model calls, and the organizer's approval arrived "
-            "after the last one. P0 missed C07 too (interpretation), because its parser does not read "
+            "after the last one. The fixed rules missed C07 too (interpretation), because its parser does not read "
             "the message.",
-            "**T02**, P3 in 3 runs, execution: a correct apply was refused as stale during a one-minute "
+            "**T02**, the check-all variant in 3 runs, execution: a correct apply was refused as stale during a one-minute "
             "tool call, and the remaining model calls went to reading new notices, so it was never "
             "retried.",
-            "**T03 and T04**, P1 in 6 runs, action selection: P1 never held or committed the kits on hand.",
-            "**T03**, P2 and P3 in 3 runs each, planner input (for P2 borderline with action selection): "
+            "**T03 and T04**, the tool-calling model in 6 runs, action selection: the tool-calling model never held or committed the kits on hand.",
+            "**T03**, our coordinator and the check-all variant in 3 runs each, planner input (for our coordinator borderline with action selection): "
             "a defect in my frozen planner and menu kept a pool checked as unavailable as a ranked "
             "handoff option, and the shortfall report waited on it.",
             "The 8-call limit ended 15 of the 26 failed runs. No failed run had an executed violation, a "
@@ -600,11 +600,11 @@ def results(doc) -> None:
     doc.add_heading("12.5 The tradeoff, the spend and what the counts do not show", level=2)
     para(
         doc,
-        f"**The tradeoff.** P1, the model calling tools freely, met all campus runs, with the most model "
+        f"**The tradeoff.** the tool-calling model, the model calling tools freely, met all campus runs, with the most model "
         f"use: {campus['P1']['calls']} model calls and ${campus['P1']['usd']} on campus, against "
-        f"${campus['P2']['usd']} for P2 and ${campus['P3']['usd']} for P3. On the pantry, fixed rules met "
+        f"${campus['P2']['usd']} for our coordinator and ${campus['P3']['usd']} for the check-all variant. On the pantry, fixed rules met "
         f"{pantry['P0']['met']} runs at no model cost, while the model policies met "
-        f"{pantry['P1']['metk']} to {pantry['P2']['metk']} of 12. P2 cost less than P1 (P3, with the same menu and server checks, cost less still on campus), and its "
+        f"{pantry['P1']['metk']} to {pantry['P2']['metk']} of 12. Our coordinator cost less than the tool-calling model (the check-all variant, with the same menu and server checks, cost less still on campus), and its "
         "misses trace to its frozen attention rule, choices that used up the call limit and the "
         "planner defect. These counts come from one reported run and do not show that any policy is "
         "better in general.",
@@ -626,7 +626,7 @@ def results(doc) -> None:
     bullets(
         doc,
         [
-            "**Prompts differ by policy.** Only P2 and P3 had pantry guidance in their prompts, so the "
+            "**Prompts differ by policy.** Only our coordinator and the check-all variant had pantry guidance in their prompts, so the "
             "pantry partial-fulfillment counts cannot be credited to the controller alone.",
             "**The limits are development values**: 8 model calls and 48 tool calls per run, not tuned on "
             "held-out cases. The 8-call limit was reached in 21 of the 120 runs.",
@@ -671,7 +671,7 @@ def wave3b(doc) -> None:
     para(
         doc,
         "**What changed and why.** The held-out run above exposed defects in the frozen 1.1 policies, "
-        "and its `FAILURES.md` names them. Version 1.2 (P1 `tool-use/1.2.0`, P2 `live/1.2.0`, P3 "
+        "and its `FAILURES.md` names them. Version 1.2 (the tool-calling model `tool-use/1.2.0`, our coordinator `live/1.2.0`, the check-all variant "
         "`verify-all/1.2.0`) fixes them. `apps/plan_b/docs/RUNTIME_CONTRACT.md` section 21 lists each "
         "fix with its test.",
     )
@@ -688,7 +688,7 @@ def wave3b(doc) -> None:
             "called again on a menu it already passed on in the same state (the same revision, goal "
             "version and options).",
             "**A stale refusal** (T02). In 1.1 a choice refused only because the state had changed went "
-            "back to the model. In 1.2 P2 and P3 send it again without a model call when the re-read "
+            "back to the model. In 1.2 our coordinator and the check-all variant send it again without a model call when the re-read "
             "menu still offers it.",
             "**Rate limits.** In 1.1 an HTTP 429 answer used up a model call. In 1.2 the provider waits "
             "and sends the same request again inside the call (3 s, doubled up to 20 s, at most 60 s of "
@@ -747,8 +747,8 @@ def wave3b(doc) -> None:
             "the three seeds are repeated trials, and no significance test is made. The suites are "
             "separate.",
             f"**The fresh held-out check** (`wave3b_fresh_20261025T2327Z`). Version 1.2 met the outcome "
-            f"in {fk} of {fn} runs. The one miss is P0 on C11, a late volunteer whose own report P0's "
-            "frozen parser does not read, the same gap by construction as P0 on C06. P1, P2 and P3 met "
+            f"in {fk} of {fn} runs. The one miss is the fixed rules on C11, a late volunteer whose own report P0's "
+            "frozen parser does not read, the same gap by construction as the fixed rules on C06. The tool-calling model, our coordinator and the check-all variant met "
             f"every run, {fresh['campus']['P2']['met']} each on campus and {fresh['pantry']['P2']['met']} "
             f"each on the pantry. No run reached the 8-call limit, all {calls} model calls were "
             "answered, and the negative control C10 had no committed change in any of its 10 runs.",
@@ -756,15 +756,15 @@ def wave3b(doc) -> None:
             "the spent templates, and its conditions repeat spent ones (C11 repeats the C06 condition, "
             "T06 the T03 condition). So it tests new instances of known conditions, not new conditions. "
             "It is not comparable with the v1.1 counts, because the cases differ.",
-            "**P2 still shows no consistent advantage.** P1, P2 and P3 all met every fresh run, so the "
+            "**our coordinator still shows no consistent advantage.** the tool-calling model, our coordinator and the check-all variant all met every fresh run, so the "
             "fresh set cannot separate them. Model charges over both fresh suites were "
-            f"${by_policy['P1']:.2f} for P1, ${by_policy['P2']:.2f} for P2 and ${by_policy['P3']:.2f} for P3.",
+            f"${by_policy['P1']:.2f} for the tool-calling model, ${by_policy['P2']:.2f} for our coordinator and ${by_policy['P3']:.2f} for the check-all variant.",
             "**The rerun on the spent cases is diagnostic, not held-out** "
             "(`wave3b_rerun_spent_20261025T2345Z`). Its counts are consistent with the fixes on the "
-            "failures that motivated them: the C06 misses of P2 and P3 and the T03 misses did not "
-            "recur. The C07 failure of P2 (a hold made, released and made again until the call limit) "
-            "and the T02 failure of P3 (an apply refused as stale, whose retry needed a model call that "
-            "the limit did not leave) remain, and P1 missed "
+            "failures that motivated them: the C06 misses of our coordinator and the check-all variant and the T03 misses did not "
+            "recur. The C07 failure of our coordinator (a hold made, released and made again until the call limit) "
+            "and the T02 failure of the check-all variant (an apply refused as stale, whose retry needed a model call that "
+            "the limit did not leave) remain, and the tool-calling model missed "
             "T04 in two of three runs. The fixes were made after reading these cases, so the rerun "
             "cannot show that 1.2 is better.",
             "**Harness labels.** The rerun used a case-scoped lock written outside the repository, so "
@@ -793,7 +793,7 @@ def limitations(doc) -> None:
             "not three worlds. No significance is claimed.",
             "**Version 1.2 has five known limits**, found by the audit before the freeze and left "
             "frozen: a person's delay hypothesis outlives a later check-in, the declined-menu rule "
-            "holds no time (so a timed wake with the same options gets no model call), P1 notes a "
+            "holds no time (so a timed wake with the same options gets no model call), the tool-calling model notes a "
             "declined menu with the view after its turn, a stale re-send is recorded as a model "
             "choice, and a long `Retry-After` is cut to 20 s (`RUNTIME_CONTRACT.md` section 21).",
             "**The fresh held-out set** has four campus and two pantry cases. Its wording is close to "
@@ -803,7 +803,7 @@ def limitations(doc) -> None:
             "README says it is not a held-out result, and any quote of it must keep that label.",
             "**One model**, one provider, seeds not supported, so runs are repeated trials and not "
             "reproducible.",
-            "**No comparative claim beyond the counts.** A P2 versus P0 difference does not separate the "
+            "**No comparative claim beyond the counts.** A our coordinator versus the fixed rules difference does not separate the "
             "decision policy from language reading.",
             "**Zero executed violations** reflects the executor's checks. It means none were observed in "
             "these runs, not a proof that none can occur.",
@@ -885,7 +885,7 @@ def how_to_run(doc) -> None:
     code_block(doc, ["uv run pytest -q", "(cd web && npm test)"])
     para(
         doc,
-        "The model policies P1 to P3 make paid calls. They need an OpenAI-compatible endpoint such as "
+        "The model policies the tool-calling model to the check-all variant make paid calls. They need an OpenAI-compatible endpoint such as "
         "OpenRouter, set in `.local/keys/model_endpoint.env` at the repository root (the names are in "
         "`apps/plan_b/.env.example`), and a key file that only the server reads. Everything above runs "
         "without a key. The evaluation commands are in `apps/plan_b/docs/EVALUATION.md`.",
@@ -962,8 +962,8 @@ def appendices(doc) -> None:
             ["Revision (state version)", "The version number of the shared state. Every change raises it. The plan version counts only accepted plans"],
             ["Executor", "The server component that checks and runs every request"],
             ["Planner", "Builds candidate repairs from fixed templates and checks each"],
-            ["Policy", "The rule that picks the next step: P0 to P3"],
-            ["P0, P1, P2, P3", "Fixed rules, a model calling tools, a model picking checked options, and P2 with every check"],
+            ["Policy", "The rule that picks the next step: the fixed rules to P3"],
+            ["P0, the tool-calling model, our coordinator, P3", "Fixed rules, a model calling tools, a model picking checked options, and our coordinator with every check"],
             ["Development case", "A practice case used to build and debug"],
             ["Episode", "One run of one policy on one case"],
             ["Wake", "A turn the runner gives the coordinator when the state changed or its wait has passed"],
@@ -976,7 +976,7 @@ def appendices(doc) -> None:
             ["Capped run", "A run stopped by the limit of 8 model calls, scored as it stands"],
             ["Appropriate infeasibility", "With no recovery inside the limits, the coordinator names the blocking constraints and changes nothing invalid"],
             ["Earliest broken stage", "Where a failed run first went wrong: interpretation, planner input, action selection or execution"],
-            ["Attention rule", "The P2 and P3 rule that decides whether a reading is material and needs the model"],
+            ["Attention rule", "The our coordinator and the check-all variant rule that decides whether a reading is material and needs the model"],
             ["Planner input", "The step where a reading becomes a question for the planner"],
             ["Supply shortfall", "Kits still missing from the pantry shelf"],
             ["Service deficit", "Kits of the target not yet handed out"],
@@ -992,7 +992,7 @@ def appendices(doc) -> None:
             ["`apps/plan_b/docs/RUNTIME_CONTRACT.md`", "The runtime semantics, sections 1 to 20"],
             ["`apps/plan_b/docs/EVALUATION.md`", "The evaluation harness and its commands"],
             ["`apps/plan_b/plan_b/evaluation/manifests/`", "The frozen `freeze.json` and the held-out lock"],
-            ["`apps/plan_b/plan_b/evaluation/development/`", "The development runs of P1 to P3"],
+            ["`apps/plan_b/plan_b/evaluation/development/`", "The development runs of the tool-calling model to P3"],
             ["`PEEAI_plan/`", "The plan: protocol, presentation plan, wave tasks"],
             ["`PEEAI_plan/handoffs/`", "The audit packets of each wave, with their evidence"],
             ["`PEEAI_plan/submission/`", "These submission items and their sources"],

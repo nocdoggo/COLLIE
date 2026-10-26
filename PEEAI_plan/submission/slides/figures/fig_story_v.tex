@@ -1,0 +1,19 @@
+% Vertical variant of fig_story for the poster.
+\documentclass[border=6pt]{standalone}
+\input{fig_style}
+\usepackage{fontawesome5}
+\begin{document}
+\begin{tikzpicture}[font=\sffamily,
+  beat/.style={circle, minimum size=1.7cm, inner sep=0pt, line width=1.4pt},
+  d/.style={font=\sffamily\normalsize, text=ink, align=left, text width=6.2cm, anchor=west}]
+  \draw[line, line width=1.1pt] (0,0) -- (0,-7.8);
+  \foreach \y/\c/\ic/\tm/\head/\body in {
+     0.0/umborange/\faSms/16:40/A text arrives/{``The projector may be 25 minutes late.''},
+    -2.6/primary/\faTruck/16:42/Plan B checks/{Supplier tracking: ETA 17:25.},
+    -5.2/primary/\faRandom/16:43/{One change, \$0}/{Demos swap with the skills exchange. Receipt written.},
+    -7.8/okgreen/\faDoorOpen/17:00/Doors open/{The show goes on.}}{
+    \node[beat, draw=\c, fill=white] (b) at (0,\y) {\textcolor{\c}{\fontsize{24}{24}\selectfont\ic}};
+    \node[d] at (1.15,\y) {{\bfseries\color{\c}\tm\enspace\head}\\[2pt]\textcolor{muted}{\body}};
+  }
+\end{tikzpicture}
+\end{document}

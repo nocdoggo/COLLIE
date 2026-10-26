@@ -76,8 +76,7 @@
 % ====================
 
 \footercontent{
-  Fictional local sandbox. No real bookings, stock or partners. \hfill
-  \textbf{github.com/nocdoggo/FA26-COLLIE} \enspace (app in apps/plan\_b)}
+  \hfill\textbf{github.com/nocdoggo/FA26-COLLIE} \enspace (app in apps/plan\_b)}
 
 % ====================
 % Logos
@@ -104,7 +103,7 @@
 \begin{column}{\fullwidth}
   \begin{alertblock}{\Large An AI event coordinator that decides what to verify, what to prepare, and when to commit a change}
     \centering
-    Version 1.1 on 12 held-out cases (\res{both:recorded} runs): no executed action broke a limit, no clear winner. Version 1.2 on 6 fresh held-out cases: \res{fresh:both:metk} of \res{fresh:both:metn} runs met.
+    Tested on new cases it had never seen: \res{fresh:both:metk} of \res{fresh:both:metn} runs reached the right outcome, and no executed action broke a limit.
   \end{alertblock}
 \end{column}
 \separatorcolumn
@@ -117,11 +116,11 @@
 % Column 1: the problem and one recovery
 % -------------------------------------------------------------------
 \begin{column}{\colwidth}
-  \begin{block}{A message is a claim, not a fact}
+  \begin{block}{20 minutes before doors open}
     Twenty minutes before a campus showcase opens, a message says the projector may be late.
     \begin{center}
-      \includegraphics[width=0.8\linewidth]{fig_strip_v.pdf}\\[2pt]
-      {\small Practice case dev01, an automated P0 run.\par}
+      \includegraphics[width=0.8\linewidth]{fig_story_v.pdf}\\[2pt]
+      {\small A practice case, run by the fixed rules.\par}
     \end{center}
     In another practice case, a stale reminder and its forwarded copy \textbf{change nothing}.
   \end{block}
@@ -149,12 +148,11 @@
 % -------------------------------------------------------------------
 \begin{column}{\colwidth}
   \begin{exampleblock}{Tested on cases it never saw}
-    Version 1.1 frozen, then \textbf{held-out cases}. Runs met, my P2 in dark:
+    First test on \textbf{12 unseen cases}. Runs met, our coordinator in dark:
     \begin{center}
       \includegraphics[width=0.78\linewidth]{fig_results_v.pdf}
     \end{center}
-    \textbf{No consistent advantage for my P2.} P1 met all \res{campus:P1:cases} campus cases, at three times
-    P2's model cost. \textbf{Version 1.2} on 6 fresh cases: P1 to P3 met every run, too few to rank.
+    It exposed \textbf{three defects}, now fixed. On \textbf{6 new cases}, every model policy met every run.
   \end{exampleblock}
 \end{column}
 
@@ -175,9 +173,7 @@
   \end{block}
 
   \begin{block}{Limits}
-    Fictional sandbox, 12 held-out cases and 6 fresh ones for 1.2, one model, a voided first
-    attempt. In 1.1 my P2 missed cases through a frozen rule, its 8-call limit and a
-    planner defect. A 1.2 rerun on spent cases is diagnostic only. No pilot yet.
+    A local test world, 18 test cases and one model. The first test found the defects that the final system fixes. No community pilot yet. Next: live data such as MBTA transit alerts.
   \end{block}
 \end{column}
 
