@@ -1,0 +1,29 @@
+% Slide 12, why Plan B. Safer (the three idea marks, the checks come built in), more flexible
+% (a laptop, three kinds of event, any OpenAI-compatible model or the fixed rules), more personal
+% (sliders, each group sets its own event and how much the AI may spend without asking).
+% Sources REVISION_PLAN.md section 2a. Drawn at final size, 18.4 x 9.6 cm.
+\documentclass[border=1pt]{standalone}
+\input{planb_figstyle}
+\begin{document}
+\fontsize{12}{14}\selectfont
+\begin{tikzpicture}[x=1cm, y=1cm, line join=round]
+  \def\W{18.33}\def\H{9.53}\def\gap{0.45}
+  \useasboundingbox (0,0) rectangle (\W,\H);
+  \pgfmathsetmacro{\pw}{(\W-2*\gap)/3}
+  \foreach \i/\hd/\ln in {0/Safer/The three ideas{,}\\built in,
+                          1/More flexible/3 kinds of event{,}\\your AI or none,
+                          2/More personal/Your event{,}\\your spending limit}{
+    \pgfmathsetmacro{\x}{\i*(\pw+\gap)}
+    \fill[ground, rounded corners=6pt] (\x,0) rectangle (\x+\pw,\H);
+    \node[anchor=north, text=ink, align=center, font=\fontsize{21}{25}\selectfont\bfseries] at (\x+\pw/2,\H-5.15) {\hd};
+    \node[anchor=north, text=ink, align=center, font=\fontsize{18}{23}\selectfont] at (\x+\pw/2,\H-6.6) {\ln};
+  }
+  \pgfmathsetmacro{\xa}{\pw/2}
+  \pgfmathsetmacro{\xb}{\pw+\gap+\pw/2}
+  \pgfmathsetmacro{\xc}{2*(\pw+\gap)+\pw/2}
+  \node[text=umbblue, font=\fontsize{42}{42}\selectfont] at (\xa,\H-2.7) {\marksafer};
+  \node[text=umbblue, font=\fontsize{58}{58}\selectfont] at (\xb,\H-2.15) {\markflexible};
+  \node[text=umbblue, font=\fontsize{24}{24}\selectfont] at (\xb,\H-3.9) {\faUniversity\quad\faHandsHelping\quad\faBoxOpen};
+  \node[text=umbblue, font=\fontsize{58}{58}\selectfont] at (\xc,\H-2.7) {\markpersonal};
+\end{tikzpicture}
+\end{document}

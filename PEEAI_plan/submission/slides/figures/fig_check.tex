@@ -1,0 +1,37 @@
+% Slide 4, idea 1. The text is a claim, Plan B looks up the delivery once, the answer is about
+% 5.25 pm. Below, messages that should change nothing keep the plan. Drawn at final size,
+% 18.4 x 9.6 cm. Facts from dev01.json and the false-alarm, other-order and repeat cases.
+\documentclass[border=1pt]{standalone}
+\input{planb_figstyle}
+\begin{document}
+\fontsize{12}{14}\selectfont
+\begin{tikzpicture}[x=1cm, y=1cm, line join=round]
+  \def\W{18.33}\def\H{9.53}
+  \useasboundingbox (0,0) rectangle (\W,\H);
+  % ------------------------------------------------------------ top row, the look-up
+  \def\yt{\H}\def\rh{4.6}
+  \fill[accent, rounded corners=8pt] (0,\yt-0.35) rectangle (5.2,\yt-\rh+0.35);
+  \fill[accent] (0.6,\yt-\rh+0.36) -- (0.35,\yt-\rh-0.05) -- (1.35,\yt-\rh+0.36) -- cycle;
+  \node[text=white, align=center, text width=4.6cm, font=\fontsize{26}{31}\selectfont\bfseries]
+    at (2.6,\yt-\rh/2) {25 minutes late?};
+  % the arrow, with the mark and the label
+  \draw[umbblue, line width=2.4pt, -{Stealth[length=5mm,width=4.4mm]}] (5.55,\yt-\rh/2) -- (11.75,\yt-\rh/2);
+  \node[text=umbblue, font=\fontsize{36}{36}\selectfont] at (8.6,\yt-\rh/2+1.0) {\markcheck};
+  \node[text=umbblue, font=\fontsize{19}{22}\selectfont] at (8.6,\yt-\rh/2-0.7) {looks up the delivery};
+  % the answer
+  \fill[umbblue, rounded corners=8pt] (12.1,\yt-0.35) rectangle (\W,\yt-\rh+0.35);
+  \node[text=white, align=center, text width=5.8cm, font=\fontsize{26}{31}\selectfont\bfseries]
+    at ({(12.1+\W)/2},\yt-\rh/2) {Delayed, about 5.25 pm};
+  % ------------------------------------------------------------ bottom row, messages that change nothing
+  \fill[ground, rounded corners=6pt] (0,0) rectangle (\W,4.1);
+  \foreach \i/\lab in {0/False alarm, 1/Other order, 2/Repeat}{
+    \pgfmathsetmacro{\x}{0.35+\i*3.9}
+    \fill[white, rounded corners=6pt] (\x,1.0) rectangle (\x+3.7,3.1);
+    \fill[white] (\x+0.35,1.01) -- (\x+0.2,0.6) -- (\x+0.95,1.01) -- cycle;
+    \node[text=muted, font=\fontsize{18}{21}\selectfont] at (\x+1.85,2.05) {\strut\lab};
+  }
+  \draw[quiet, line width=1.6pt, -{Stealth[length=4mm,width=3.4mm]}] (12.2,2.05) -- (14.0,2.05);
+  \fill[rulegrey!60, rounded corners=6pt] (14.3,1.0) rectangle (\W-0.4,3.1);
+  \node[text=ink, font=\fontsize{22}{26}\selectfont\bfseries] at ({(14.3+\W-0.4)/2},2.05) {Plan kept};
+\end{tikzpicture}
+\end{document}

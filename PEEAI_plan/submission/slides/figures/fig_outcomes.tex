@@ -1,0 +1,44 @@
+% Slide 8, the final test. Six cases sealed before the final test, one row each. One run with the
+% fixed rules (no AI) and nine with the AI (three approaches, three runs each, in groups of 3).
+% Green = met the expected outcome, orange = the one miss. Drawn at final size, 18.4 x 9.6 cm.
+% Source apps/plan_b/evaluation/results/wave3b_fresh_20261025T2327Z/README.md (results table and
+% "The one miss is C11 under P0") and FAILURES.md. Rows to cases, from the case files in
+% apps/plan_b/plan_b/scenarios/private/eval/set2/ (case_id inside each file):
+%   Projector late  = C09 (ev_r4h), False alarm   = C10 (ev_j8p), Volunteer late = C11 (ev_w2n),
+%   Cannot be saved = C12 (ev_s6d), Pantry delivery = T05 (ev_y3k), Pantry claims = T06 (ev_u5b).
+\documentclass[border=1pt]{standalone}
+\input{planb_figstyle}
+\begin{document}
+\fontsize{12}{14}\selectfont
+\begin{tikzpicture}[x=1cm, y=1cm, line join=round]
+  \def\W{18.33}\def\H{9.53}
+  \useasboundingbox (0,0) rectangle (\W,\H);
+  \def\r{0.36}         % dot radius, 7.2 mm dots
+  \def\xn{6.55}        % centre of the No AI column
+  \def\xw{8.55}        % left edge of the With AI dots
+  \def\dd{0.92}        % dot pitch inside a group
+  \def\gg{0.62}        % extra gap between groups
+  % column heads
+  \node[anchor=base, text=ink, font=\fontsize{16}{19}\selectfont\bfseries] at (\xn,\H-0.72) {Fixed rules};
+  \pgfmathsetmacro{\wmid}{\xw+\r+4*\dd+\gg}
+  \foreach \g/\name in {0/Ours, 1/Check-all, 2/Tool-calling}{
+    \node[anchor=base, text=ink, font=\fontsize{16}{19}\selectfont\bfseries] at ({\xw+\r+(\g*3+1)*\dd+\g*\gg},\H-0.72) {\name};
+  }
+  % rows: label / miss under no AI (1 = missed)
+  \foreach \i/\lab/\miss in {0/Projector late/0, 1/False alarm/0, 2/Volunteer late/1,
+                             3/Cannot be saved/0, 4/Pantry delivery/0, 5/Pantry claims/0}{
+    \pgfmathsetmacro{\yt}{\H-1.18-\i*1.39}
+    \pgfmathsetmacro{\yc}{\yt-0.62}
+    \fill[ground, rounded corners=4pt] (0,\yt) rectangle (\W,\yt-1.24);
+    \node[anchor=west, text=ink, font=\fontsize{19}{22}\selectfont] at (0.3,\yc) {\lab};
+    \ifnum\miss=1
+      \fill[accent] (\xn,\yc) circle (\r);
+    \else
+      \fill[ok] (\xn,\yc) circle (\r);
+    \fi
+    \foreach \g in {0,1,2}{\foreach \k in {0,1,2}{
+      \fill[ok] ({\xw+\r+(\g*3+\k)*\dd+\g*\gg},\yc) circle (\r);
+    }}
+  }
+\end{tikzpicture}
+\end{document}

@@ -1,0 +1,31 @@
+% The made-up pantry's distribution day (pantry_dev02.json), kits at four moments against the
+% 40 needed. Late kits and kits still at the partner are drawn as outlines because they are not
+% counted. Used by backup slide B4 and the report.
+\documentclass[border=1pt]{standalone}
+\input{planb_figstyle}
+\begin{document}
+\begin{tikzpicture}[x=1cm, y=0.105cm, font=\fontsize{11}{13}\selectfont]
+  \def\bw{1.5}
+  % the 40 needed
+  \draw[draw=ink, line width=0.7pt] (-0.2,40) -- (17.9,40);
+  \node[anchor=south west, inner sep=2pt, font=\fontsize{11}{13}\selectfont\bfseries] at (-0.2,40.6) {40 kits needed by 1.40 pm};
+  \draw[draw=muted, line width=0.5pt] (-0.2,0) -- (17.9,0);
+  % 1 start
+  \fill[umbblue] (0.3,0) rectangle ++(\bw,24); \node[text=white, font=\fontsize{11}{13}\selectfont\bfseries] at (0.3+\bw/2,12) {24};
+  \draw[accent, line width=1pt] (2.0,0) rectangle ++(\bw,20); \node[text=accent, align=center, font=\fontsize{9.5}{11}\selectfont] at (2.0+\bw/2,10) {20\\late};
+  \node[anchor=north, align=center] at (1.9,-1.5) {Start, 24 on the shelf};
+  % 2 hold
+  \fill[umbblue] (5.0,0) rectangle ++(\bw,24); \node[text=white, font=\fontsize{11}{13}\selectfont\bfseries] at (5.0+\bw/2,12) {24};
+  \fill[primarysoft] (5.0,24) rectangle ++(\bw,16); \draw[umbblue, line width=0.8pt] (5.0,24) rectangle ++(\bw,16);
+  \node[text=umbblue, font=\fontsize{11}{13}\selectfont\bfseries] at (5.0+\bw/2,32) {16};
+  \node[anchor=north, align=center] at (5.75,-1.5) {16 held for free};
+  % 3 staff sign for 10
+  \fill[umbblue] (9.0,0) rectangle ++(\bw,34); \node[text=white, font=\fontsize{11}{13}\selectfont\bfseries] at (9.0+\bw/2,17) {34};
+  \draw[muted, line width=0.8pt] (10.7,0) rectangle ++(\bw,6); \node[anchor=south, text=muted, font=\fontsize{9.5}{11}\selectfont] at (10.7+\bw/2,6.5) {6 left};
+  \node[anchor=north, align=center] at (10.6,-1.5) {Staff sign for 10};
+  % 4 handed out
+  \fill[ok] (14.2,0) rectangle ++(\bw,34); \node[text=white, font=\fontsize{11}{13}\selectfont\bfseries] at (14.2+\bw/2,17) {34};
+  \draw[accent, line width=1pt] (14.2,34) rectangle ++(\bw,6); \node[anchor=west, text=accent, font=\fontsize{11}{13}\selectfont\bfseries] at (14.2+\bw+0.15,37) {6 short};
+  \node[anchor=north, align=center] at (14.95,-1.5) {34 handed out on time};
+\end{tikzpicture}
+\end{document}

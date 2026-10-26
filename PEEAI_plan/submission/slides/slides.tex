@@ -3,379 +3,459 @@
 % To view a copy of this license, visit http://creativecommons.org/licenses/by/4.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
 %
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% Plan B: The Show Must Go On. Seven-minute hackathon presentation (420 s: the title and ten
-% timed slides, then backup slides). Author: Noctis Zhang, University of Massachusetts Boston.
-% Speaker notes for each slide live in the \note{...} blocks and match pres-note.md.
-% Uncomment the \setbeameroption line below to see them.
+% Plan B, The Show Must Go On. Seven-minute hackathon presentation (fourteen timed slides, at most
+% 420 s, then eight backup slides). Author: Noctis Zhang, Department of Computer Science,
+% University of Massachusetts Boston.
 %
-% The story and the figures follow ../STORY_PLAN.md: assertion and evidence (a full-sentence title,
-% one visual, at most two short lines), one final system, plain names instead of policy codes.
-% Every number of the evaluation comes from files that ../make_results.py writes:
-% figures/results_numbers_v12.tex (fresh: the final system on the six fresh held-out cases of
-% wave3b_fresh_20261025T2327Z), figures/results_numbers_final.tex (sums of those numbers, and the
-% size of the earlier 12-case test) and figures/fig_result.tex (the chart).
+% The story follows ../REVISION_PLAN.md. Three ideas carry the talk (check the fact, pick only what
+% fits, leave a receipt, and money waits for a person's OK). Slide 3 announces them, slides 4 to 6
+% deliver them on Jordan's evening, slide 7 shows the real board, slide 14 repeats them. Each slide has one visual and about 35
+% visible words or fewer, title included (python3 ../tools/wc.py slides.pdf 14).
+%
+% The speaker notes are copied from pres-note.md by ../tools/sync_notes.py, and
+% ../check_writing.py fails if they differ. Edit pres-note.md, then run the sync.
+% The evaluation numbers come from files that ../make_results.py writes
+% (figures/results_numbers_v12.tex for the six sealed cases of wave3b_fresh_20261025T2327Z).
+% Build with: latexmk -pdf slides.tex
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 \documentclass[
-t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle={Plan B: The Show Must Go On},pdfsubject={Seven-minute project presentation}}
+t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle={Plan B, The Show Must Go On},pdfsubject={Seven minute project presentation}}
 ]{beamer}
-% Keep the PDF metadata to title, author and subject: no producer, creator or embedded file info.
+% Keep the PDF metadata to title, author and subject, with no producer, creator or embedded file info.
 \pdfsuppressptexinfo=-1
 \hypersetup{pdfcreator={},pdfproducer={}}
 
 \input{loadslides.tex} % Loads packages and some defined commands
 \usepackage{appendixnumberbeamer} % backups are not counted in the slide total
-\input{figures/results_numbers.tex}       % the earlier 12-case test, read as \res{campus:P2:met}
-\input{figures/results_numbers_v12.tex}   % the final system, read as \res{fresh:campus:P2:met}
-\input{figures/results_numbers_final.tex} % sums, read as \res{final:P2:metk} and \res{dev:recorded}
+\usepackage{fontawesome5}
+\usetikzlibrary{arrows.meta}
+\input{figures/results_numbers_v12.tex}   % the final test, read as \res{fresh:campus:P2:met}
+\input{figures/results_numbers_final.tex} % sums, read as \res{final:P2:metk}
 
 % \setbeameroption{show notes} % uncomment to render speaker notes alongside slides
 
-% The template ships \emphasize as an environment. Redefine it as a one-argument command for
-% inline highlighting, as the ICML deck does.
 \renewcommand{\emphasize}[1]{\textcolor{primary}{#1}}
 
-\graphicspath{{figures/}{../poster/logos/}}
+\graphicspath{{figures/}{../poster/logos/}{../screenshots/}{./}}
 \hyphenpenalty=10000
 \exhyphenpenalty=10000
 
-\definecolor{accent}{HTML}{E8701A}
-\definecolor{muted}{HTML}{6B6B6B}
+% The calm UMass Boston palette (the same as figures/planb_figstyle.tex).
+\definecolor{umbblue}{HTML}{005A8B}
+\definecolor{navy}{HTML}{132245}
 \definecolor{umbprimary}{HTML}{08457E}
+\definecolor{ground}{HTML}{EEF2F6}
+\definecolor{accent}{HTML}{FF791F}
+\definecolor{ok}{HTML}{2E7D32}
+\definecolor{ink}{HTML}{1F1F1F}
+\definecolor{muted}{HTML}{6B6B6B}
 
-% Small caption under a figure, and the one or two supporting lines of a slide.
-\newcommand{\figcaption}[1]{{\scriptsize\color{muted}#1\par}}
-\newcommand{\support}[1]{{\small #1\par}}
+% The three idea marks, the same in the deck, the poster and the report.
+\providecommand{\markcheck}{\faSearch}
+\providecommand{\markfits}{\faFilter}
+\providecommand{\markreceipt}{\faReceipt}
 
-% A full-bleed blue story slide: white type, no footer.
-\newenvironment{bluebeat}{%
-  \setbeamercolor{background canvas}{bg=umbprimary}%
-  \setbeamercolor{frametitle}{fg=white}%
-  \setbeamertemplate{footline}{}%
-  \color{white}%
-}{}
+% Narrow margins, a compact title and a footer with only the text logo and the slide number,
+% so the visible words on a slide are the title, the visual and at most one supporting line.
+\setbeamersize{text margin left=0.7cm, text margin right=0.7cm}
+\setbeamerfont{frametitle}{size=\Large}
+\setbeamercolor{frametitle}{fg=umbprimary}
+\setbeamertemplate{frametitle}{\vspace*{0.42cm}\usebeamercolor*[fg]{frametitle}\usebeamerfont{frametitle}\insertframetitle\par\vspace*{0.22cm}}
+\setbeamertemplate{footline}{%
+  \hspace*{0.7cm}\raisebox{0.18cm}{\includegraphics[height=0.42cm]{Umass_boston_textlogo.png}}%
+  \hfill{\scriptsize\color{muted}\insertframenumber{} / \inserttotalframenumber}\hspace*{0.7cm}\vspace*{0.12cm}}
 
-\title[Plan B]{Plan B: The Show Must Go On}
-\subtitle{Deciding what to verify, what to prepare, and when to commit a change}
+% One visual per slide, sized to the space under the title. A missing figure shows a grey box,
+% so the deck still builds while a figure is redrawn.
+\newcommand{\visual}[2]{%
+  \IfFileExists{figures/#1.pdf}%
+    {\includegraphics[width=\linewidth,height=#2,keepaspectratio]{#1.pdf}}%
+    {\colorbox{ground}{\parbox[c][#2][c]{\dimexpr\linewidth-2\fboxsep\relax}{\centering\color{muted}\detokenize{#1}}}}}
+% The one supporting line of a slide.
+\newcommand{\support}[1]{\par\vspace{0.12cm}{\Large\color{ink}#1\par}}
+% A small source line on a backup slide.
+\newcommand{\source}[1]{\par\vspace{0.08cm}{\scriptsize\color{muted}#1\par}}
+
+\title[Plan B]{Plan B, The Show Must Go On}
 \author[Noctis Zhang]{Noctis Zhang}
-\institute{University of Massachusetts Boston}
-\date{Paul English Applied AI Institute (PEAAII) Hackathon, UMass Boston, October 2026}
-\titlegraphic{\vspace{0.2cm}\includegraphics[height=1.35cm]{Blue-UMB-logo-lockup.png}}
+\institute{Department of Computer Science, University of Massachusetts Boston}
+\date{PEAAII AI Applications Hackathon 2026, October 2026}
 
 \begin{document}
-\hypersetup{pdftitle={Plan B: The Show Must Go On}}
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% 1. TITLE (8 s)
+% 1. TITLE. A navy band with the white UMass Boston lockup and the title, then the three ideas,
+% the name and the affiliation.
 {
 \setbeamertemplate{footline}{}
-\begin{frame}
-  \titlepage
+\begin{frame}[plain]
+  \begin{tikzpicture}[remember picture, overlay]
+    \fill[navy] (current page.north west) rectangle ([yshift=-5.5cm]current page.north east);
+    \node[anchor=west, inner sep=0] at ([xshift=0.9cm, yshift=-2.75cm]current page.north west)
+      {\includegraphics[width=4.5cm]{White-UMB-logo-lockup.png}};
+    \node[anchor=west, inner sep=0, text=white, align=left, font=\fontsize{33}{38}\selectfont\bfseries]
+      at ([xshift=6.5cm, yshift=-2.75cm]current page.north west) {Plan B,\\The Show Must Go On};
+    \foreach \i/\mark/\name in {0/\markcheck/Check the fact, 1/\markfits/Pick only what fits, 2/\markreceipt/Leave a receipt} {
+      \fill[ground] ([xshift=0.7cm+\i*6.27cm, yshift=-6.0cm]current page.north west) rectangle ++(5.93cm,-3.45cm);
+      \node[anchor=north, inner sep=0, text=umbblue, font=\fontsize{30}{30}\selectfont]
+        at ([xshift=0.7cm+\i*6.27cm+2.965cm, yshift=-6.55cm]current page.north west) {\mark};
+      \node[anchor=north, inner sep=0, text=ink, font=\fontsize{17}{20}\selectfont\bfseries]
+        at ([xshift=0.7cm+\i*6.27cm+2.965cm, yshift=-8.1cm]current page.north west) {\name};
+    }
+    \node[anchor=north, inner sep=0, text width=18.2cm, align=center, text=ink]
+      at ([yshift=-10.05cm]current page.north)
+      {{\fontsize{18}{21}\selectfont\bfseries Noctis Zhang}\par\vspace{0.2cm}
+       {\fontsize{13}{16}\selectfont Department of Computer Science, University of Massachusetts Boston}\par\vspace{0.12cm}
+       {\fontsize{13}{16}\selectfont\color{muted} PEAAII AI Applications Hackathon 2026, October 2026}};
+  \end{tikzpicture}
   \note{
-    \textbf{(8s, ends 0:08)} Hello, I am Noctis Zhang from UMass Boston. This is Plan B. The
-    show must go on.
+    \textbf{(about 13 seconds, ends 0.13)} Hello, I am Noctis Zhang, from the Department of Computer Science at UMass Boston. This is Plan B. The show must go on. Plan B checks before it changes anything.
   }
 \end{frame}
 }
-\addtocounter{framenumber}{-1}
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% 2. THE HOOK (28 s), full-bleed blue
-{
-\begin{bluebeat}
-\begin{frame}{\Large 16:40. Twenty minutes to doors open.}
-  \vspace{0.5cm}
-  \begin{center}
-    \includegraphics[width=0.86\textwidth]{fig_hook.pdf}
-  \end{center}
-  \vfill
-  {\small Jordan, a volunteer organizer, is an illustration, and the campus showcase is a simulated event in a local sandbox.\par}
-  \vspace{0.3cm}
+% 2. THE TEXT (the problem, the moment of tension)
+\begin{frame}{Twenty minutes before doors open, Jordan gets a text}
+  \centering
+  \visual{fig_hook}{9.35cm}
+  \support{Jordan, a volunteer organizer we made up.}
   \note{
-    \textbf{(28s, ends 0:36)} Meet Jordan, a volunteer organizer. Jordan is an illustration,
-    and the event is simulated. It is four forty. In twenty minutes the doors of a campus
-    showcase open, and student teams are ready to demo. Then a text arrives: the projector
-    may be twenty five minutes late. Events like this have no operations staff. Would you
-    wait, check, or book a backup?
-  }
-\end{frame}
-\end{bluebeat}
-}
-
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% 3. THE RISK AND THE IDEA (45 s)
-\begin{frame}{An agent that acts on a text can spend money on a rumor, so Plan B checks first}
-  \vfill
-  \begin{center}
-    \includegraphics[width=\textwidth]{fig_contrast.pdf}
-  \end{center}
-  \vfill
-  \support{In Plan B the model never acts on its own. It picks one option the server checked, and \textbf{one gate} writes the receipt.}
-  \vspace{0.2cm}
-  \note{
-    \textbf{(45s, ends 1:21)} Here is the risk. An AI agent with tools can read that text
-    and act at once. It believes the claim, books the thirty five dollar backup, and
-    reshuffles the whole program. That top lane is an illustration, not one of the systems I
-    tested. Plan B works differently. First it checks the one fact that matters. Then the
-    server builds the possible fixes and checks each one. The language model only picks one
-    of them. And every change passes one gate that writes a receipt, the server's own record
-    of the change. The model chooses. The server decides what is allowed.
+    \textbf{(about 33 seconds, ends 0.46)} Meet Jordan, a volunteer organizer we made up. Jordan runs a small campus showcase. The projector is due at five, when doors open, and the demonstrations at ten past five need it. At four forty, a text arrives. The projector may be twenty five minutes late. Wait and hope? Spend thirty five dollars of club money on a maybe? Reshuffle the evening alone? Small events change by text, and a wrong move costs money or the evening.
   }
 \end{frame}
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% 4. THE EXAMPLE (58 s)
-\begin{frame}{Plan B checked one fact, swapped two activities, and the doors opened on time}
-  \vspace{0.05cm}
-  \begin{center}
-    \includegraphics[width=0.96\textwidth]{fig_story.pdf}
-  \end{center}
-  \vfill
-  \support{The planner built \textbf{16 options} and \textbf{3 passed} every check. The swap cost \emphasize{\$0}.}
-  \figcaption{A development run in the sandbox with the fixed rules. In a recorded run, our coordinator made the same check and the same swap at 16:43.}
-  \vspace{0.15cm}
-  \note{
-    \textbf{(56s, ends 2:17)} Here is what Plan B did. At four forty the text arrives. Plan B
-    treats it as a claim, not a fact. It makes one status check, which means asking the
-    supplier's tracking. The answer is delayed, with a reported arrival at five twenty five.
-    That is still a report, not an arrival. Now the planner builds the possible fixes,
-    sixteen of them, and checks each against the deadline, the people, and the budget. Three
-    pass. The best one is free. The demonstrations and the skills exchange swap places, so
-    the demos start at five thirty, after the reported arrival. At four forty three the
-    change is made, and the server writes a receipt. The doors open on time at five, and no
-    money is spent.
-  }
-\end{frame}
-
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% 5. KNOWING WHEN NOT TO ACT (28 s)
-\begin{frame}{Most messages should change nothing, so Plan B checks only what could change the decision}
-  \vfill
-  \begin{center}
-    \includegraphics[width=\textwidth]{fig_quiet2.pdf}
-  \end{center}
-  \vfill
-  \support{On the new test cases, our coordinator made \res{fresh:campus:P2:checks} status checks per campus run and the check-all variant \res{fresh:campus:P3:checks}, with the same outcomes.}
-  \figcaption{A second development case, in the order it happened, decided by the fixed rules in an automated run.}
-  \vspace{0.15cm}
-  \note{
-    \textbf{(27s, ends 2:44)} Knowing when not to act matters just as much. In another
-    practice case four messages arrive. The first is a false alarm, because the check says
-    on schedule. The second is about another order on another date. The last two are one
-    source, repeated. Plan B changes nothing. Checks are selective. It verifies only what
-    could change the decision.
-  }
-\end{frame}
-
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% 6. THE DESIGN (62 s)
-\begin{frame}{The model only picks among options the server built and checked, and one gate writes every receipt}
-  \vspace{0.05cm}
-  \begin{center}
-    \includegraphics[width=0.84\textwidth]{fig_design.pdf}
-  \end{center}
-  \vfill
-  \support{\textbf{The model}: Claude Sonnet 5.5 (\texttt{anthropic/claude-sonnet-5.5}) through the OpenRouter API, the same model and settings for all three model approaches. Only how the model is used differs. Spending starts as a \textbf{hold}, a free reservation that expires on its own, until a person approves.}
-  \vspace{0.2cm}
-  \note{
-    \textbf{(60s, ends 3:44)} Here is how it works. Think of a restaurant. The kitchen decides
-    what can be served, the waiter picks from the menu, a manager signs off on anything that
-    costs money, and every order gets a ticket. In Plan B the server is the kitchen. Its planner builds
-    the options and checks each one. The language model is the waiter. Its only outputs are a checked
-    reading of the message and one option from the server's list. It holds no tool that
-    writes. Every change, from the model or a person, passes one gate. Is it allowed for
-    this role? Is the plan still current? Is it within budget? Spending starts as a hold, a
-    free reservation that expires on its own, until a person approves. The gate writes the
-    receipt.
-  }
-\end{frame}
-
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% 7. THE EVIDENCE (68 s)
-\begin{frame}{On \res{final:cases} new cases, \res{fresh:both:metk} of \res{fresh:both:metn} runs met the expected outcome, and the one miss was the fixed rules}
-  \begin{center}
-    \includegraphics[width=\textwidth,height=4.15cm,keepaspectratio]{fig_result.pdf}
-  \end{center}
-  \vspace{-0.15cm}
-  \support{\textbf{The runs}: each new case ran 10 times, the fixed rules once (no model) and each model approach 3 times, all on Claude Sonnet 5.5 through OpenRouter. 4 campus cases make 40 runs, 2 pantry cases make 20. \textbf{No executed action broke a rule}: the gate refused \res{fresh:both:refused} attempts and recorded each.}
-  \vspace{0.05cm}
-  \figcaption{\textbf{The six new cases.} Campus: a real projector delay, a believable false alarm, a volunteer who runs late and then checks in, and a disruption with no allowed fix. Pantry: a late shipment while a partner can lend kits, and a false ``it arrived'' claim. Written and locked before the first model call. An earlier \res{dev:cases}-case test found real defects, fixed before the freeze.}
-  \note{
-    \textbf{(64s, ends 4:48)} Does it work? I froze the code, the prompts, the model and the
-    limits. Then I ran six new cases, written by a separate worker before the freeze and
-    locked with it. Fixed rules ran once per case, the model approaches three times each, all on the same model, Claude Sonnet 5.5. Fifty nine of sixty runs met the expected
-    outcome. Our coordinator met all eighteen of its runs, and so did the other two model
-    approaches. The one miss was the fixed rules, in a case where a volunteer runs late,
-    because a person's own delay is a message its rules cannot read. No action ever broke a
-    rule in these runs, because every change passes the one gate. It refused six attempts and recorded
-    each. With six cases there is no ranking. The point is safety and reliability. An
-    earlier, larger test is how I found and fixed real defects before this freeze.
-  }
-\end{frame}
-
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% 8. THE SECOND DOMAIN (38 s)
-\begin{frame}{The same loop runs a food pantry, where food counts only once it is on the shelf}
+% 3. THE THREE IDEAS, announced
+\begin{frame}{Plan B rests on three simple ideas}
+  \centering
   \vspace{0.1cm}
-  \begin{center}
-    \includegraphics[width=0.84\textwidth]{fig_pantry_chart.pdf}
-  \end{center}
-  \vfill
-  \support{Plan B can hold the partner's 16 kits, but \textbf{only staff} record a handoff or a distribution.}
-  \figcaption{A development case of the fictional pantry sandbox. The two new pantry cases are in the test on the previous slide.}
-  \vspace{0.15cm}
+  \visual{fig_ideas}{10.2cm}
   \note{
-    \textbf{(39s, ends 5:27)} The same loop runs a second domain, a food pantry. Staff need
-    forty kits by one forty. Twenty four are on the shelf. Twenty more are on a late truck,
-    and late stock does not count. Sixteen wait in a partner pool nearby, and Plan B holds
-    them. Only staff can record the handoff and the distribution, so the AI can never claim
-    food that is not there. The two new pantry cases were part of the test you just saw,
-    and no kit was counted twice in these runs.
+    \textbf{(about 18 seconds, ends 1.04)} So how does Jordan decide in twenty minutes? Plan B rests on three simple ideas. Check the fact. Pick only what fits. Leave a receipt. And money waits for a person's OK. Let me show you each one on Jordan's evening.
   }
 \end{frame}
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% 9. WHAT IS NEXT (45 s)
-\begin{frame}{Plan B helps the people who run community events, runs on one laptop, and adapts to new events}
+% 4. IDEA 1, check the fact
+\begin{frame}{First, Plan B checks the one fact that matters}
+  \centering
+  \visual{fig_check}{9.35cm}
+  \support{A message is a claim, not a fact.}
+  \note{
+    \textbf{(about 25 seconds, ends 1.29)} First, check the fact. A message is a claim, not a fact. So Plan B changes nothing yet. It looks up the one fact that could change the plan, the delivery. In our rehearsal, the answer is delayed, expected about five twenty five. Most messages, like a false alarm, should change nothing, and then Plan B keeps the plan.
+  }
+\end{frame}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% 5. IDEA 2, pick only what fits
+\begin{frame}{Then the AI picks only from changes that fit}
+  \centering
+  \visual{fig_fits}{9.35cm}
+  \support{The AI chooses. Plan B makes the change.}
+  \note{
+    \textbf{(about 39 seconds, ends 2.08)} Second, pick only what fits. Plan B lists every allowed change, sixteen in all. It throws out every change that breaks the time, the people or the budget. Three fit. The AI picks one of the three, the free swap. The demonstrations move to five thirty, after the projector should arrive. Why only pick? The AI reads messy messages well, but can answer differently each time. So the AI only chooses among changes that fit, and Plan B makes the change. In an earlier recorded run, the AI made this same pick.
+  }
+\end{frame}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% 6. IDEA 3, leave a receipt, and money waits for a person
+\begin{frame}{Every change leaves a receipt, and money waits for a person's OK}
+  \centering
   \vspace{0.1cm}
-  \begin{columns}[T,onlytextwidth]
-    \column{0.56\textwidth}
+  \visual{fig_receipt}{10.2cm}
+  \note{
+    \textbf{(about 43 seconds, ends 2.51)} Third, leave a receipt. Plan B checks every change against the rules before it happens, and if a check fails, it keeps the plan. Then it writes a receipt, a record of what changed, when, and what it cost. At four forty three, version one became version two, for zero dollars, and the thirty five dollar backup was never booked. Money waits for a person's OK, because club money is a person's call. In a separate practice case, not Jordan's, the projector came too late. Plan B held the backup for free, so it was not lost while a person decided.
+  }
+\end{frame}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% 7. THE REAL BOARD after the swap (a screenshot of the running app, native resolution)
+\begin{frame}{This is the real board after the swap}
+  \centering
+  \begin{tikzpicture}
+    \node[inner sep=0pt] (shot) {\includegraphics[height=9.25cm]{shot_campus_beforeafter_crop.png}};
+    \draw[draw=gray!45, line width=0.4pt] (shot.south west) rectangle (shot.north east);
+    \node[anchor=west, fill=umbblue, text=white, font=\Large\bfseries, inner sep=7pt, rounded corners=3pt, text width=3.6cm, align=center]
+      (pill) at ([xshift=0.55cm, yshift=-0.75cm]shot.east) {Two activities swapped};
+    \draw[umbblue, line width=1.6pt, -{Stealth[length=3mm]}] (pill.west) -- ++(-0.5cm,0);
+    \node[anchor=west, fill=ground, text=ink, font=\Large\bfseries, inner sep=7pt, rounded corners=3pt, text width=3.6cm, align=center]
+      at ([xshift=0.55cm, yshift=2.6cm]shot.east) {Everything else unchanged};
+  \end{tikzpicture}
+  \support{The running board, in a rehearsal with the fixed rules and no AI.}
+  \note{
+    \textbf{(about 12 seconds, ends 3.03)} Here is the real board after the swap. In this rehearsal the fixed rules, with no AI, made the same swap. Jordan shares this plan with the group chat.
+  }
+\end{frame}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% 8. HOW WE TESTED IT, in first-year words
+\begin{frame}{We tested Plan B on event days it had never seen}
+  \centering
+  \visual{fig_test}{9.35cm}
+  \support{Nothing real is booked or bought.}
+  \note{
+    \textbf{(about 37 seconds, ends 3.40)} One evening is a story, not proof. A test case is a small made-up event day, written in advance, with messages that arrive at set times. We run it in a rehearsal on a computer, with a clock we can speed up, where nothing real is booked or bought. At the end, code checks the final state. Did every activity happen, and was no rule broken? The six final cases were sealed, written and locked before the test and never seen by whoever changed the code.
+  }
+\end{frame}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% 9. THE RESULT
+\begin{frame}{59 of 60 runs met the expected outcome}
+  \centering
+  \visual{fig_outcomes}{9.35cm}
+  \support{Every AI run met it. No executed action broke a rule.}
+  \note{
+    \textbf{(about 38 seconds, ends 4.18)} Each case ran once with the fixed rules, and three times with each of three AI designs, ours, a check-all variant and a tool-calling model, because the AI can answer differently each time. Fifty nine of sixty met the expected outcome, meaning every final check passed. Every AI run met it. The fixed rules missed one, a late volunteer's own text, the kind of message the AI is there to read. No executed action broke a rule. Six cases are a small check, not a ranking.
+  }
+\end{frame}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% 10. RESPONSIBLE USE OF AI AND LIMITS, with how Plan B works inside
+\begin{frame}{Inside Plan B, careful with messages and money}
+  \centering
+  \vspace{0.05cm}
+  \visual{fig_design_slide}{10.0cm}
+  \note{
+    \textbf{(about 34 seconds, ends 4.52)} Inside Plan B, the same ideas guard messages and money. In our coordinator the AI only picks a change from the list, so a misleading message can at most lead to a choice that already fits. Money needs a person's OK, and if nobody answers, nothing is bought. Every message goes to an outside AI service, so keep names and health details out of messages. Not shown yet. Only six test cases, made-up events, one AI model, no trial.
+  }
+\end{frame}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% 11. WHO IT IS FOR
+\begin{frame}{Built for student clubs and volunteer groups}
+  \centering
+  \visual{fig_people}{9.35cm}
+  \support{It checks the text before you spend club money.}
+  \note{
+    \textbf{(about 25 seconds, ends 5.17)} So who is it for? Student club officers come first. Then volunteer coordinators and pantry staff. Two of the six test cases were days at a made-up food pantry, and all twenty runs met. For a student it is simple. It checks the text before you spend club money, and leaves the treasurer a record of why.
+  }
+\end{frame}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% 12. WHO ELSE DOES THIS
+\begin{frame}{Other tools help, and Plan B works beside them}
+  \centering
+  \visual{fig_others}{9.35cm}
+  \support{From their own pages.}
+  \note{
+    \textbf{(about 28 seconds, ends 5.45)} Indirect competitors first. Today the text lands in a group chat, a shared sheet, a sign-up sheet or a campus portal. Direct competitors, event platforms such as Sessionboard, check agenda changes, and Cvent and Bizzabo have announced agents. AI assistants ask before they buy. These pieces are not new. Plan B puts them together for a small group on the day of an event.
+  }
+\end{frame}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% 13. WHY PLAN B, AND NOT THE TOOLS PEOPLE ALREADY USE
+\begin{frame}{Plan B is safer, more flexible and more personal}
+  \centering
+  \visual{fig_why}{9.35cm}
+  \support{We have not tested the others.}
+  \note{
+    \textbf{(about 35 seconds, ends 6.20)} So why Plan B? Safer, because the three ideas are built in, where in Zapier the user adds the approval step. More flexible, because Cvent and Bizzabo build for event teams, and Plan B ran campus, community and pantry events on one laptop, with your AI model or none. More personal, because ChatGPT and Gemini ask before buying the way their makers designed, and here your group writes its own event and its own spending limit. We have not tested the others.
+  }
+\end{frame}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% 14. THE CLOSE, the three ideas again over Jordan's result
+\begin{frame}{Check the fact, pick only what fits, leave a receipt}
+  \vspace{0.15cm}
+  \begin{columns}[T,totalwidth=\textwidth]
+    \begin{column}{0.735\textwidth}
+      \visual{fig_ideas_close}{9.8cm}
+    \end{column}
+    \begin{column}{0.245\textwidth}
       \centering
-      \includegraphics[width=\linewidth,height=5.9cm,keepaspectratio]{../screenshots/shot_campus_trail.png}\par
-      \figcaption{The running board on one laptop at 16:43 (screenshot of the projector case): the check, the change and the receipt.}
-    \column{0.41\textwidth}
-      \textbf{\color{primary}Who it helps}\par
-      {\small Student organizers, clubs, volunteers and pantry staff. Fewer last-minute scrambles, no surprise spending, a receipt for every change.\par}
-      \vspace{0.18cm}
-      \textbf{\color{primary}Easy to run}\par
-      {\small One laptop, local storage, one command to start. No network without a model. Any OpenAI-compatible model can plug in.\par}
-      \vspace{0.18cm}
-      \textbf{\color{primary}Adaptive}\par
-      {\small One core ran a campus showcase, a skills exchange and a food pantry. A new event is a configuration file.\par}
-  \end{columns}
-  \vfill
-  \figcaption{Next: real feeds such as MBTA alerts as context only, and a pilot where Plan B proposes and the organizer acts. Everything shown runs in a local sandbox, and no community has used it yet.}
-  \vspace{0.1cm}
-  \note{
-    \textbf{(48s, ends 6:15)} Who does this help? Student organizers, clubs, volunteers and pantry staff, the people who run events with little time. It means fewer last-minute scrambles, no surprise spending, and a receipt for every change. It is easy to run. This is the real board on one laptop: install, then one command starts it. Without a model it needs no network at all, and any OpenAI-compatible model can plug in. And it adapts. The same core ran a campus showcase, a skills exchange and a food pantry. Next come real feeds, such as MBTA alerts as context only, and a pilot where Plan B proposes and the organizer acts. No community has used it yet.
-  }
-\end{frame}
-
-% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% 10. CLOSE (26 s), full-bleed blue
-{
-\begin{bluebeat}
-\begin{frame}{\Large 16:40 again. Check first, then change.}
-  \vspace{0.4cm}
-  \begin{columns}[c,onlytextwidth]
-    \column{0.66\textwidth}
-      {\Large\bfseries Plan B helps a community event stay on track by deciding what to verify, what to prepare, and when to commit a change.\par}
-      \vspace{0.4cm}
-      {\normalsize At 17:00 the doors opened on time: one check, a free swap, and a receipt.\par}
-      \vspace{0.5cm}
-      {\small Noctis Zhang, University of Massachusetts Boston\par}
-      \vspace{0.3cm}
-      \includegraphics[height=1.1cm]{White-UMB-logo-lockup.png}
-    \column{0.3\textwidth}
-      \centering
-      {\setlength{\fboxsep}{5pt}\colorbox{white}{\includegraphics[width=0.85\textwidth]{fig_qr.pdf}}\par}
-      \vspace{0.15cm}
-      {\footnotesize github.com/nocdoggo/FA26-COLLIE\par}
+      \vspace{0.2cm}
+      \includegraphics[width=\linewidth]{fig_qr.pdf}\par
+      \vspace{0.08cm}
+      {\small\bfseries Code\par}
+      {\footnotesize\color{ink}github.com/nocdoggo/\par FA26-COLLIE\par}
+      \vspace{0.45cm}
+      {\normalsize\color{ink}Next, a walk-through with staff.\par}
+      \vspace{0.6cm}
+      {\Large\bfseries\color{umbprimary}Thanks, PEAAII organizers\par}
+    \end{column}
   \end{columns}
   \note{
-    \textbf{(30s, ends 6:41)} So, back to four forty, twenty minutes to doors open. Would you
-    wait, check, or book a backup? Plan B checks the one fact that matters, prepares what it
-    can undo, and commits only a change the server has checked, with a receipt. It helps a
-    community event stay on track by deciding what to verify, what to prepare, and when to
-    commit a change. Thank you.
+    \textbf{(about 37 seconds, ends 6.57)} So, three ideas. Plan B checked the fact, so Jordan did not spend club money on a maybe. The AI picked only from changes that fit. And every change left a receipt, and money waited for a person's OK. Doors opened at five, the projector came at five twenty four, and the demonstrations started at five thirty. The code is free. Next is a walk-through on paper with community staff, so please tell me where it goes wrong. Thanks to the PEAAII organizers, and to you.
   }
 \end{frame}
-\end{bluebeat}
-}
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% BACKUP SLIDES (not timed)
+% BACKUPS (not timed, not counted). Denser, with no empty half.
 \appendix
-\begin{frame}{Backup: the six new cases and the sixty runs, one by one}
-  \vspace{0.1cm}
-  {\scriptsize
-  \renewcommand{\arraystretch}{1.25}\begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.5cm}>{\raggedright\arraybackslash}p{4.3cm}>{\raggedright\arraybackslash}p{3.9cm}cc@{}}
-    \toprule
-    \textbf{New case} & \textbf{What happens} & \textbf{The right outcome} & \textbf{Fixed rules} & \textbf{Each model approach}\\
-    \midrule
-    Campus, real delay & The projector delivery will miss its slot & Move the demonstrations ten minutes and finish on time & met, 1 of 1 & met, 3 of 3\\
-    Campus, false alarm & A relayed call says the delivery is late, the order desk says on schedule & Change nothing & met, 1 of 1 & met, 3 of 3\\
-    Campus, late volunteer & The leader of the first activity reports a late bus, then checks in & Adjust from the check-in and still finish & \textbf{missed}, 0 of 1 & met, 3 of 3\\
-    Campus, no allowed fix & The projector order is withdrawn and the spare needs confirming too far ahead & Report that no allowed fix exists and change nothing invalid & met, 1 of 1 & met, 3 of 3\\
-    Pantry, late shipment & The main shipment arrives after service, a partner can lend 16 kits & Hold and receive the 16, reach the 40-kit target & met, 1 of 1 & met, 3 of 3\\
-    Pantry, false claim & A sales rep says ``delivered'', the real shipment comes after the deadline & Serve the 24 kits on hand and report the 16-kit gap & met, 1 of 1 & met, 3 of 3\\
-    \bottomrule
-  \end{tabular}\par}
-  \vspace{0.25cm}
-  \support{\textbf{Four approaches.} Fixed rules: written rules, no model. Tool-calling model: the model calls the sandbox tools itself. Check-all variant: the server runs every relevant status check first, then the model picks. Our coordinator: the model picks one option from the menu the server built and checked. The three model approaches all use Claude Sonnet 5.5 through OpenRouter.}
+
+% B1. The six sealed test cases
+\begin{frame}{More detail, the six sealed test cases}
+  \small
+  \setlength{\tabcolsep}{4pt}
+  \renewcommand{\arraystretch}{1.38}
+  \rowcolors{2}{ground}{white}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash\bfseries}p{2.75cm}>{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}p{4.3cm} >{\centering\arraybackslash}p{1.15cm} >{\centering\arraybackslash}p{1.3cm}@{}}
+    \rowcolor{navy}\color{white}Case & \color{white}\bfseries What happens & \color{white}\bfseries Met means & \color{white}\bfseries No AI & \color{white}\bfseries With AI \\
+    \leavevmode{\color{umbblue}\markfits}~Projector late & The projector is really late, past its slot, so the swap does not work & a ten minute shift, or the spare after a person's OK & 1 of 1 & 9 of 9 \\
+    \leavevmode{\color{umbblue}\markcheck}~False alarm & An anonymous call says the projector will be late. The delivery is on time & no change at all & 1 of 1 & 9 of 9 \\
+    \leavevmode{\color{umbblue}\markfits}~Volunteer late & The skills exchange leader texts that their bus is out of service & the swap, so every activity still happens & \textcolor{accent}{\bfseries 0 of 1} & 9 of 9 \\
+    \leavevmode{\color{umbblue}\markreceipt}~Cannot be saved & The projector fails its test, and the spare cannot be confirmed in time & Plan B says plainly it cannot be fully done & 1 of 1 & 9 of 9 \\
+    \leavevmode{\color{umbblue}\markreceipt}~Pantry delivery & A late delivery cannot arrive in time, and a partner's kits can & 40 kits handed out by the deadline & 1 of 1 & 9 of 9 \\
+    \leavevmode{\color{umbblue}\markcheck}~Pantry claims & Wrong and stale delivery claims, and a partner who declines & only kits really on the shelf counted, the shortfall said plainly & 1 of 1 & 9 of 9 \\
+  \end{tabularx}
+  \par\vspace{0.3cm}
+  {\normalsize Each case ran once with the fixed rules and three times with each of three AI approaches (our coordinator, the check-all variant, the tool-calling model). The fixed rules were never written to read the volunteer's own message. In that case no approach looked anything up, all took the volunteer's word. The six cases use new wording but the same kinds of trouble as earlier cases.\par}
+  \source{Source, the final test's results folder in the code repository, with its notes on the one miss.}
+  \note{}
 \end{frame}
 
-\begin{frame}{Backup: the running board, food pantry}
-  \begin{columns}[T,onlytextwidth]
-    \column{0.49\textwidth}
-      \includegraphics[width=\linewidth,height=6.4cm,keepaspectratio]{../screenshots/shot_pantry_trail.png}
-    \column{0.49\textwidth}
-      \includegraphics[width=\linewidth,height=6.4cm,keepaspectratio]{../screenshots/shot_pantry_stock.png}
+% B2. How Plan B works inside
+\begin{frame}{More detail, how Plan B works inside}
+  \centering
+  \visual{fig_design}{9.4cm}
+  \source{Only Plan B's server can make a change, in every approach tested. In our coordinator the AI picks from the changes that fit.}
+  \note{}
+\end{frame}
+
+% B3. The 5.45 pm what if
+\begin{frame}{A separate practice case, when the projector would be too late}
+  \centering
+  \vspace{0.2cm}
+  \visual{fig_whatif}{7.3cm}
+  \par\vspace{0.3cm}
+  \begin{minipage}{0.97\linewidth}\large
+    If the look-up had said 5.45 pm, too late for either slot, Plan B holds the backup projector for free, kept aside for ten minutes and released on its own. Its spending allowance is \$0, so it asks the organizer to allow \$35. Only after the OK is the backup booked, once. In a recorded run of this case the AI made that choice at 4.48 pm. This is a separate practice case, not part of Jordan's evening.
+  \end{minipage}
+  \note{}
+\end{frame}
+
+% B4. The made-up pantry
+\begin{frame}{The same ideas at a made-up food pantry}
+  \centering
+  \visual{fig_pantry_kits}{5.8cm}
+  \par\vspace{0.2cm}
+  \begin{columns}[T,totalwidth=\textwidth]
+    \begin{column}{0.49\textwidth}\Large\raggedright
+      40 kits are needed by 1.40 pm. 24 are on the shelf and 20 are late, so the late ones are not counted until staff sign for them.\par\vspace{0.15cm}
+      Plan B holds a partner's 16 kits for free and asks staff for the handoff. Staff sign for 10.
+    \end{column}
+    \begin{column}{0.49\textwidth}\Large\raggedright
+      34 kits are handed out on time. Plan B tells staff 6 will be short, and staff decide what to tell the line. No kit is counted twice.\par\vspace{0.15cm}
+      {\bfseries Plan B counts kits, never people. Who gets food is always a person's call.}\par\vspace{0.1cm}
+      {\scriptsize\color{muted}Made up, not based on any real pantry's data. Identical boxed kits only.\par}
+    \end{column}
   \end{columns}
-  \vfill
-  \figcaption{Screenshots of the running board, the pantry practice case run by the fixed rules: check, hold the partner's 16 kits, ask staff for the handoff, receipt. The counters show the supply shortfall and the service deficit.}
+  \note{}
 \end{frame}
 
-\begin{frame}{Backup: the interfaces connected today and next}
-  \begin{center}
-    \includegraphics[width=\textwidth,height=6.2cm,keepaspectratio]{fig_next.pdf}
-  \end{center}
-  \vfill
-  \figcaption{Connected today: the OpenRouter model API, the sandbox tool API and the board HTTP API. Designed, not connected: the MBTA V3 transit alerts, as context only.}
+% B5. The earlier 12-case test
+\begin{frame}{The earlier 12 case test, and what it found}
+  \normalsize
+  \begin{columns}[T,totalwidth=\textwidth]
+    \begin{column}{0.52\textwidth}
+      \vspace{0.3cm}
+      \setlength{\tabcolsep}{6pt}
+      \renewcommand{\arraystretch}{2.6}
+      \rowcolors{2}{ground}{white}
+      \Large
+      \begin{tabular}{@{}l c c@{}}
+        \rowcolor{navy}\color{white}\bfseries Runs that met & \color{white}\bfseries Campus & \color{white}\bfseries Pantry \\
+        The fixed rules & 6 of 8 & 4 of 4 \\
+        The tool-calling model & 24 of 24 & 6 of 12 \\
+        Our coordinator & 18 of 24 & 9 of 12 \\
+        The check-all variant & 21 of 24 & 6 of 12 \\
+      \end{tabular}
+      \vspace{0.3cm}\source{Twelve sealed cases, 120 runs, version 1.1 of the code. Source, the earlier test's notes in the code repository.}
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      \Large The earlier test, on twelve sealed cases, found four problems. A partner's stock that was already checked as unavailable stayed an option, a message about a person running late was not treated as important, the AI was asked again about choices it had already passed on, and a choice refused as out of date cost a new AI call.\par\vspace{0.2cm}
+      I worked on all four before the final test. A later rerun of the earlier cases still misses two of the cases these changes were aimed at, so not every problem is fully solved.
+    \end{column}
+  \end{columns}
+  \note{}
 \end{frame}
 
-\begin{frame}{Backup: what the new test cost, per run}
-  \vspace{0.3cm}
-  \begin{center}
-  {\small
-  \setlength{\tabcolsep}{9pt}
-  \begin{tabular}{@{}lcccc@{}}
-    & \multicolumn{2}{c}{\textbf{Campus event}} & \multicolumn{2}{c}{\textbf{Food pantry}} \\
-    \textbf{Approach} & \textbf{Model calls} & \textbf{USD per run} & \textbf{Model calls} & \textbf{USD per run} \\
-    \midrule
-    Fixed rules (baseline) & \res{fresh:campus:P0:calls} & \res{final:P0:campus:usdrun} & \res{fresh:pantry:P0:calls} & \res{final:P0:pantry:usdrun} \\
-    Tool-calling model & \res{fresh:campus:P1:calls} & \res{final:P1:campus:usdrun} & \res{fresh:pantry:P1:calls} & \res{final:P1:pantry:usdrun} \\
-    Check-all variant & \res{fresh:campus:P3:calls} & \res{final:P3:campus:usdrun} & \res{fresh:pantry:P3:calls} & \res{final:P3:pantry:usdrun} \\
-    \textbf{Our coordinator} & \res{fresh:campus:P2:calls} & \res{final:P2:campus:usdrun} & \res{fresh:pantry:P2:calls} & \res{final:P2:pantry:usdrun} \\
-  \end{tabular}\par}
-  \end{center}
-  \vspace{0.3cm}
-  \support{Provider-reported cost. The whole new test cost \$\res{fresh:both:usd} for \res{fresh:both:recorded} runs. Limits per run: 48 tool calls, 8 model calls, \$0.50 and 900 seconds.}
+% B6. Who else does this, with sources
+\begin{frame}{Who else does this, from their own pages}
+  \normalsize
+  \setlength{\tabcolsep}{5pt}
+  \renewcommand{\arraystretch}{1.6}
+  \rowcolors{2}{ground}{white}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash\bfseries}p{3.9cm}>{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X@{}}
+    \rowcolor{navy}\color{white}Tool & \color{white}\bfseries What its own page says it is for & \color{white}\bfseries What Plan B adds for a small group \\
+    Sessionboard [1] & AI agenda building, checks agenda changes against rules and sends big changes for sign-off & the one fact checked first, a receipt for every change, free and open \\
+    Cvent [2], Bizzabo [3] & agents for event teams, announced in 2026, whose changes a person reviews or approves & runs today on one laptop, free, with no vendor contract \\
+    ChatGPT agent, Copilot, Gemini [4, 5, 6] & general assistants that ask before purchases and other actions with real-world consequences & picks only from changes that fit this event's rules \\
+    Zapier Agents [7] & automations that stop for approval when the user adds that step & the checks come built in \\
+    Group chat, shared sheet, sign-up sheet, campus portal [11, 12, 15, 17] & where the text lands today & works beside them, not instead of them \\
+  \end{tabularx}
+  \source{We have not tested the others. Full sources in the project documentation.}
+  \note{}
 \end{frame}
 
-\begin{frame}{Backup: what these numbers do not show}
-  \vspace{0.2cm}
-  \support{\textbf{Small and close to development.} Six new cases, and all six repeat conditions seen in development, with similar wording. The case is the unit. Three runs of a case are repeats with the provider's default sampling, not independent evidence. No significance test.}
-  \vspace{0.4cm}
-  \support{\textbf{The earlier locked test, before the fixes.} Our coordinator met every run of \res{campus:P2:cases} of \res{campus:P2:ncases} campus cases there, and the tool-calling model of \res{campus:P1:cases} of \res{campus:P1:ncases}. Those failures are what the fixes target. A rerun on those spent cases is a diagnostic, not a test and not comparable as an improvement: our coordinator meets every run of \res{rerun:campus:P2:cases} of \res{rerun:campus:P2:ncases} campus cases there and still misses one case in all three runs. The documentation has the full record.}
-  \vspace{0.4cm}
-  \support{\textbf{A gate by design.} Zero executed violations is what the gate enforces. The refused attempts show it at work. Scoring is separate code that reads the final state and the receipts.}
+% B7. Cost and limits
+\begin{frame}{What the final test cost, and the limits per run}
+  \begin{columns}[T,totalwidth=\textwidth]
+    \begin{column}{0.56\textwidth}
+      \begin{tikzpicture}
+        \begin{axis}[
+          xbar, scale only axis, width=5.0cm, height=8.7cm, bar width=1.2cm,
+          xmin=0, xmax=17, axis x line*=bottom, axis y line*=left,
+          symbolic y coords={The tool-calling model,Our coordinator,The check-all variant,The fixed rules},
+          ytick=data, y dir=reverse, enlarge y limits=0.18,
+          xlabel={AI service cost of one run, in cents}, xlabel style={font=\small, text=ink},
+          tick label style={font=\small, text=ink}, xtick={0,5,10,15},
+          axis line style={draw=muted}, tick style={draw=muted},
+          nodes near coords, nodes near coords style={font=\small\bfseries, text=ink, anchor=west, xshift=2pt},
+          point meta=explicit symbolic]
+          \addplot[fill=umbblue, draw=none] coordinates {
+            (12.9,The tool-calling model) [12.9]
+            (4.2,Our coordinator) [4.2]
+            (2.9,The check-all variant) [2.9]
+            (0,The fixed rules) [0]};
+        \end{axis}
+      \end{tikzpicture}
+    \end{column}
+    \begin{column}{0.42\textwidth}\large
+      \vspace{0.2cm}
+      All 60 runs cost \textbf{\$3.61} in AI service fees, with 194 AI calls and no service errors.\par\vspace{0.6cm}
+      Limits per run, at most 48 tool calls, 8 AI calls, \$0.50 of AI service fees and 900 seconds. By default the AI service's bill is capped at \$20 in total. The final test ran under a \$40 cap.\par\vspace{0.6cm}
+      These limits cap the AI service's bill, not event money. Event money always waits for a person's OK.\par\vspace{0.6cm}
+      {\bfseries\color{umbprimary}The same outcomes cost about a third as much when the AI picks from the changes that fit.\par}
+    \end{column}
+  \end{columns}
+  \source{Source, the final test's results and spend notes, and the default settings in Plan B's code.}
+  \note{}
 \end{frame}
 
-\begin{frame}{Backup: a partial handoff stays partial}
-  \vspace{0.2cm}
-  \support{In another development case of the pantry, staff hand off only \textbf{10 of the 16} kits. \emphasize{34 kits} are handed out and a \emphasize{6-kit deficit} is reported. The target stays 40.}
-  \vspace{0.4cm}
-  \support{Stock is conserved: 34 handed out plus 6 left in the partner pool make 40. The 20 kits of the late shipment never count as stock.}
-\end{frame}
-
-\begin{frame}{Backup: the frozen configuration}
-  \vspace{0.2cm}
-  \support{\textbf{Model}: anthropic/claude-sonnet-5.5 through the OpenRouter API, the same for the three model approaches, with strict JSON output.}
-  \vspace{0.4cm}
-  \support{\textbf{Limits per run}: 48 tool calls, 8 model calls, \$0.50 and 900 seconds. Seeds 101, 202 and 303 are recorded but not sent, because the model's endpoints refuse a seed.}
-  \vspace{0.4cm}
-  \support{\textbf{Frozen by hash} before the first call on the new cases. The cases were locked seven seconds after the freeze, and the first model call came almost four minutes later.}
+% B8. Acknowledgements and the sources cited in this deck
+\begin{frame}{Thanks, and the sources cited in this deck}
+  \normalsize
+  \begin{columns}[T,totalwidth=\textwidth]
+    \begin{column}{0.49\textwidth}
+      {\large\bfseries Thanks\par}\vspace{0.1cm}
+      \large To the PEAAII organizers at UMass Boston. The AI model is Claude Sonnet 5.5 by Anthropic, reached through OpenRouter. The deck uses the elegant beamer template by Lars Spreng, and the poster the Gemini theme by Anish Athalye with the UMass Boston colors. Plan B is built with FastAPI, uvicorn and Pydantic. Thanks do not imply that any of them endorses Plan B.\par\vspace{0.25cm}
+      {\large\bfseries Code\par}\vspace{0.1cm}
+      github.com/nocdoggo/FA26-COLLIE, free and open source (GPL-3).\par\vspace{0.25cm}
+      \includegraphics[height=3.3cm]{fig_qr.pdf}\par
+    \end{column}
+    \begin{column}{0.49\textwidth}\small
+      {\normalsize\bfseries Sources\par}\vspace{0.1cm}
+      [1] Sessionboard, AI Agenda Builder and Event Scheduler, 2026.\par
+      [2] Cvent press release, July 14, 2026.\par
+      [3] Bizzabo, Agentic Operating System for Events, October 12, 2026.\par
+      [4] OpenAI, Introducing ChatGPT agent.\par
+      [5] Microsoft Support, Browse with Copilot.\par
+      [6] Google, Manage your tasks and workflows in Gemini Apps.\par
+      [7] Zapier Help Center, Add approval steps to your agent's instructions.\par
+      [11] Microsoft Support, What is GroupMe.\par
+      [12] Google Workspace, Sheets.\par
+      [15] UMass Boston, Student Activities.\par
+      [17] SignUpGenius, Online Sign Up Sheets.\par
+      [28] UMass Boston, Student Groups and Activities, checked October 26, 2026.\par
+      [33] OWASP, LLM01 2025 Prompt Injection.\par
+      [37] NCSC, Prompt injection is not SQL injection, December 8, 2025.
+      \par Full list in the project documentation.\par
+    \end{column}
+  \end{columns}
+  \note{}
 \end{frame}
 
 \end{document}

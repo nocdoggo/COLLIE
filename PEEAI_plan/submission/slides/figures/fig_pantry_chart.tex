@@ -1,42 +1,38 @@
-% The pantry in four moments (development case pantry_dev01, the same sources as fig_pantry.tex:
-% DEMO.md section 4 and pantry_accounting.json). Target 40 kits by 13:40. 24 on the shelf, 16 in
-% a partner pool at the same venue, 20 more in a late shipment that do not count as stock.
-\documentclass[border=3pt]{standalone}
+% Backup B4 and the report. The made-up pantry's distribution day (pantry_dev02.json, not based on
+% any real pantry's data). 40 kits needed by 13.40. 24 on the shelf, 20 late and not counted until
+% staff sign for them, 16 at a partner. Plan B holds the 16 for free, staff sign for 10, 6 stay
+% with the partner. 34 handed out on time, 6 short, no kit counted twice. Drawn at 18.4 x 9.6 cm.
+\documentclass[border=1pt]{standalone}
 \input{planb_figstyle}
 \begin{document}
-\begin{tikzpicture}[font=\small]
-\begin{axis}[planb, scale only axis, width=11.2cm, height=4.6cm,
-  ybar=1.5pt, bar width=12pt,
-  ymin=0, ymax=45, ytick={0,10,20,30,40}, ymajorgrids,
-  axis x line*=bottom, axis y line*=left, xtick style={draw=none},
-  xtick={1,2,3,4}, xmin=0.5, xmax=4.5,
-  xticklabels={{Start},{Plan B holds\\the 16},{Staff hand off\\the 16},{Staff hand out\\all 40}},
-  xticklabel style={align=center, text=ink},
-    ylabel={kits},
-  legend style={at={(0.0,1.04)}, anchor=south west, legend columns=4, /tikz/every even column/.append style={column sep=10pt}},
-  legend image code/.code={\fill[#1] (0cm,-0.1cm) rectangle (0.32cm,0.14cm);},
-  clip=false]
-  \addplot[fill=primary, draw=none] coordinates {(1,24) (2,24) (3,40) (4,0)};
-  \addlegendentry{on the pantry shelf}
-  \addplot[fill=quiet, draw=none] coordinates {(1,16) (2,0) (3,0) (4,0)};
-  \addlegendentry{in the partner pool}
-  \addplot[fill=primary!35, draw=none] coordinates {(1,0) (2,16) (3,0) (4,0)};
-  \addlegendentry{held for the pantry}
-  \addplot[fill=ok, draw=none] coordinates {(1,0) (2,0) (3,0) (4,40)};
-  \addlegendentry{handed out}
-  % the target
-  \draw[ink, line width=0.8pt, dash pattern=on 4pt off 2pt] (axis cs:0.5,40) -- (axis cs:4.5,40);
-  \node[anchor=south west, text=ink, font=\small\bfseries] at (axis cs:0.5,40.3) {target: 40 kits by 13:40};
-  % value labels (the bars are 12 pt wide with 1.5 pt between them, four bars per group)
-  \node[anchor=south, text=ink, font=\footnotesize] at ([xshift=-20.25pt]axis cs:1,24) {24};
-  \node[anchor=south, text=ink, font=\footnotesize] at ([xshift=-6.75pt]axis cs:1,16) {16};
-  \node[anchor=south, text=ink, font=\footnotesize] at ([xshift=-20.25pt]axis cs:2,24) {24};
-  \node[anchor=north, text=white, font=\footnotesize\bfseries] at ([xshift=-20.25pt]axis cs:3,40) {40};
-  \node[anchor=south, text=ink, font=\footnotesize] at ([xshift=6.75pt]axis cs:2,16) {16};
-  \node[anchor=north, text=white, font=\footnotesize\bfseries] at ([xshift=20.25pt]axis cs:4,40) {40};
-  % the late shipment: not stock
-  \draw[accent, line width=0.7pt, dash pattern=on 2.5pt off 1.5pt] ([xshift=13.5pt]axis cs:1,0) rectangle ([xshift=25.5pt]axis cs:1,20);
-  \node[anchor=south, text=accent, font=\footnotesize, align=center] at ([xshift=21pt]axis cs:1,20) {20 late:\\not counted};
-\end{axis}
+\fontsize{12}{14}\selectfont
+\begin{tikzpicture}[x=1cm, y=1cm, line join=round]
+  \def\W{18.33}\def\H{9.53}
+  \useasboundingbox (0,0) rectangle (\W,\H);
+  \def\yz{1.55}\def\k{0.178}\def\bw{2.7}
+  \newcommand{\seg}[6]{% centre x, from kits, to kits, fill, text colour, label
+    \fill[#4] ({#1-\bw/2},{\yz+#2*\k+0.02}) rectangle ({#1+\bw/2},{\yz+#3*\k-0.02});
+    \node[text=#5, align=center, font=\fontsize{13}{15}\selectfont\bfseries] at (#1,{\yz+(#2+#3)/2*\k}) {#6};}
+  % axis and the target
+  \draw[muted, line width=0.8pt] (0.3,\yz) -- (\W,\yz);
+  \draw[ink, line width=1pt] (0.3,\yz+40*\k) -- (\W,\yz+40*\k);
+  \node[anchor=south west, text=ink, font=\fontsize{15}{18}\selectfont\bfseries, inner sep=0pt] at (0.3,\yz+40*\k+0.15) {40 kits needed by 1.40 pm};
+  % 1 start
+  \seg{1.75}{0}{24}{umbblue}{white}{24 on\\the shelf}
+  \seg{1.75}{24}{40}{gridgrey}{ink}{16 at\\a partner}
+  \node[anchor=west, text=accent, align=left, font=\fontsize{13}{15}\selectfont\bfseries] at (3.2,\yz+12*\k) {20 late\\not counted};
+  % 2 Plan B holds the 16
+  \seg{7.45}{0}{24}{umbblue}{white}{24 on\\the shelf}
+  \seg{7.45}{24}{40}{primarysoft}{umbblue}{16 held\\for free}
+  % 3 staff sign for 10
+  \seg{11.85}{0}{34}{umbblue}{white}{34 on\\the shelf}
+  \seg{11.85}{34}{40}{gridgrey}{ink}{6 stay}
+  % 4 handed out
+  \seg{16.0}{0}{34}{ok}{white}{34\\handed out}
+  \seg{16.0}{34}{40}{accent}{white}{6 short}
+  % stage labels
+  \foreach \x/\l in {1.75/Start, 7.45/Plan B holds\\the 16, 11.85/Staff sign\\for 10, 16.0/Handed out\\on time}{
+    \node[anchor=north, text=ink, align=center, font=\fontsize{13}{16}\selectfont] at (\x,\yz-0.15) {\l};
+  }
 \end{tikzpicture}
 \end{document}

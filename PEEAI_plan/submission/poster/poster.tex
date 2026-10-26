@@ -1,15 +1,18 @@
-% Plan B: The Show Must Go On. One-slide 2-minute presentation (horizontal poster, 16:9).
-% Author: Noctis Zhang, University of Massachusetts Boston.
+% Plan B, The Show Must Go On. One-slide two-minute poster (horizontal, 16:9).
+% Author Noctis Zhang, Department of Computer Science, University of Massachusetts Boston.
 % Built on the Gemini beamerposter theme (https://github.com/anishathalye/gemini, MIT License,
 % see LICENSE-gemini.md) with the UMass Boston colour theme of the Overleaf template.
 % Build: latexmk -pdflatex='lualatex -interaction nonstopmode' -pdf poster.tex
 %
-% The story and the layout follow ../STORY_PLAN.md: labelled visuals, one final system, plain
-% names instead of policy codes. The evaluation numbers come from ../slides/figures/
+% The layout is the committed six-panel poster. The wording follows ../REVISION_PLAN.md (the
+% three ideas, plain names, no colons). The story, result and pantry figures are poster copies in
+% figures/ with today's wording (the deck's originals in ../slides/figures/ stay untouched), the
+% design figure is the deck's redrawn fig_design_poster.pdf, and the board is a crop of
+% ../screenshots/shot_campus_beforeafter.png without its change column and its unchanged setup row. The evaluation numbers come from ../slides/figures/
 % results_numbers_v12.tex (fresh:, the six new held-out cases of wave3b_fresh_20261025T2327Z),
 % results_numbers_final.tex and the chart fig_result_v.tex, all written by ../make_results.py.
 
-\documentclass[final]{beamer}
+\documentclass[final,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle={Plan B, The Show Must Go On}}]{beamer}
 % Keep the PDF metadata to title and author: no producer, creator or embedded file info.
 \pdfvariable suppressoptionalinfo 1023
 \hypersetup{pdfcreator={},pdfproducer={}}
@@ -41,7 +44,7 @@
 \exhyphenpenalty=10000
 \setlength{\parskip}{0.6ex}
 
-\graphicspath{{../slides/figures/}{../screenshots/}}
+\graphicspath{{figures/}{../slides/figures/}}
 
 % ====================
 % Lengths
@@ -57,14 +60,14 @@
 \setlength{\colB}{0.395\paperwidth}
 \setlength{\colC}{0.1975\paperwidth}
 % Two rows: 3 \sepwidth + \rowAa + \rowAb and 4 \sepwidth + \rowBa + \rowBb + \rowBc = \paperwidth.
-\newlength{\rAone}\setlength{\rAone}{0.377\paperwidth}
-\newlength{\rAtwo}\setlength{\rAtwo}{0.238\paperwidth}
-\newlength{\rAthree}\setlength{\rAthree}{0.331\paperwidth}
-\newlength{\rBone}\setlength{\rBone}{0.389\paperwidth}
-\newlength{\rBtwo}\setlength{\rBtwo}{0.330\paperwidth}
-\newlength{\rBthree}\setlength{\rBthree}{0.227\paperwidth}
-\newlength{\hA}\setlength{\hA}{20.2cm}
-\newlength{\hB}\setlength{\hB}{14.5cm}
+\newlength{\rAone}\setlength{\rAone}{0.36\paperwidth}
+\newlength{\rAtwo}\setlength{\rAtwo}{0.29\paperwidth}
+\newlength{\rAthree}\setlength{\rAthree}{0.295\paperwidth}
+\newlength{\rBone}\setlength{\rBone}{0.372\paperwidth}
+\newlength{\rBtwo}\setlength{\rBtwo}{0.285\paperwidth}
+\newlength{\rBthree}\setlength{\rBthree}{0.288\paperwidth}
+\newlength{\hA}\setlength{\hA}{21.7cm}
+\newlength{\hB}\setlength{\hB}{15.3cm}
 \newlength{\rowAa}\setlength{\rowAa}{0.505\paperwidth}
 \newlength{\rowAb}\setlength{\rowAb}{0.441\paperwidth}
 \newlength{\rowBa}\setlength{\rowBa}{0.405\paperwidth}
@@ -95,18 +98,18 @@
 % Title
 % ====================
 
-\title{Plan B: The Show Must Go On}
+\title{Plan B, The Show Must Go On}
 
 \author{Noctis Zhang}
 
-\institute{University of Massachusetts Boston \enspace$\bullet$\enspace PEAAII Hackathon, October 2026}
+\institute{Department of Computer Science, University of Massachusetts Boston \enspace$\bullet$\enspace PEAAII AI Applications Hackathon 2026, October 2026}
 
 % ====================
 % Footer
 % ====================
 
 \footercontent{
-  \hfill\textbf{github.com/nocdoggo/FA26-COLLIE} \enspace (app in apps/plan\_b)}
+  Thanks to the PEAAII organizers at UMass Boston. Sources [1] to [37] are in the documentation.\hfill\textbf{github.com/nocdoggo/FA26-COLLIE}}
 
 % ====================
 % Logos
@@ -128,9 +131,9 @@
 % The one message, as a line of type, not a box.
 \vspace{-1ex}
 \begin{center}
-  {\large\bfseries\color{planbink} Plan B helps a community event stay on track by deciding what to verify, what to prepare, and when to commit a change.\par}
+  {\large\bfseries\color{planbink} Check the fact. Pick only what fits. Leave a receipt.\par}
   \vspace{0.4ex}
-  {\normalsize\color{planbmuted} An AI coordinator that checks a message before acting and never spends money without a person.\par}
+  {\normalsize\color{planbmuted} An AI event coordinator for student clubs and volunteer groups. It checks before it changes anything, and money waits for a person's OK.\par}
 \end{center}
 \vspace{-1ex}
 
@@ -139,21 +142,20 @@
 \begin{columns}[t]
 \separatorcolumn
 \begin{column}{\rAone}
-  \begin{block}{16:40, twenty minutes to doors open}
+  \begin{block}{4.40 pm, twenty minutes before doors open}
     {\centering\includegraphics[width=\linewidth,height=\hA,keepaspectratio]{fig_story_poster.pdf}\par}
   \end{block}
 \end{column}
 \separatorcolumn
 \begin{column}{\rAtwo}
-  \begin{block}{The running board at 16:43}
-    {\centering\includegraphics[width=\linewidth,height=\hA,keepaspectratio]{shot_campus_trail.png}\par}
-    {\small\color{planbmuted} Screenshot: the check, the change and its receipt, newest on top.\par}
+  \begin{block}{The running board, a rehearsal with no AI}
+    {\centering\includegraphics[width=\linewidth,height=\hA,keepaspectratio]{board_beforeafter.png}\par}
   \end{block}
 \end{column}
 \separatorcolumn
 \begin{column}{\rAthree}
-  \begin{block}{The model picks checked options. One gate decides.}
-    {\centering\includegraphics[width=\linewidth,height=\hA,keepaspectratio]{fig_design.pdf}\par}
+  \begin{block}{The AI picks, and Plan B checks every change}
+    {\centering\includegraphics[width=\linewidth,height=\hA,keepaspectratio]{fig_design_poster.pdf}\par}
   \end{block}
 \end{column}
 \separatorcolumn
@@ -163,25 +165,26 @@
 \begin{columns}[t]
 \separatorcolumn
 \begin{column}{\rBone}
-  \begin{block}{\res{fresh:both:metk} of \res{fresh:both:metn} runs met the expected outcome on \res{final:cases} new cases}
-    {\centering\includegraphics[width=\linewidth,height=\hB,keepaspectratio]{fig_result_poster.pdf}\par}
+  \begin{block}{\res{fresh:both:metk} of \res{fresh:both:metn} runs met the expected outcome on \res{final:cases} sealed cases}
+    {\centering\includegraphics[width=\linewidth,height=\dimexpr\hB-3.6cm\relax,keepaspectratio]{fig_result_poster.pdf}\par}
+    {\small Made-up days, sealed before the test, each AI design run 3 times. One AI model, no real event yet.\par}
   \end{block}
 \end{column}
 \separatorcolumn
 \begin{column}{\rBtwo}
-  \begin{block}{The same loop runs a food pantry}
-    {\centering\includegraphics[width=\linewidth,height=\hB,keepaspectratio]{fig_pantry_chart_poster.pdf}\par}
+  \begin{block}{The same checks run a made-up food pantry}
+    {\centering\includegraphics[width=\linewidth,height=\dimexpr\hB-2.6cm\relax,keepaspectratio]{fig_pantry_kits_poster.pdf}\par}
+    {\small Staff sign for only 10 of the 16 held kits, so 6 are short.\par}
   \end{block}
 \end{column}
 \separatorcolumn
 \begin{column}{\rBthree}
-  \begin{block}{Why it matters}
-    \setlength{\parskip}{0.5ex}
-    {\small \textbf{Safe}: every change passes one gate, and no executed action broke a rule.\par}
-    {\small \textbf{Who it helps}: student organizers, clubs, volunteers and pantry staff.\par}
-    {\small \textbf{Easy to run}: one laptop, one command, any OpenAI-compatible model or none.\par}
-    {\small \textbf{Adaptive}: one core runs a campus event, a skills exchange and a food pantry.\par}
-    {\small \textbf{Next}: MBTA alerts as context, and a community pilot.\par}
+  \begin{block}{Why Plan B, not the tools you use}
+    \setlength{\parskip}{0.6ex}
+    {\small Today the text lands in a group chat or a shared sheet [11, 12]. We have not tested the other tools named here.\par}
+    {\small \textbf{Safer.} The three ideas are built in, where in Zapier the user adds the approval step [7].\par}
+    {\small \textbf{More flexible.} Cvent and Bizzabo build for event teams [2, 3]. Plan B runs campus, community or pantry events on one laptop, with your AI model or none. Free, open source.\par}
+    {\small \textbf{More personal.} Assistants ask as their makers designed [4, 6]. Here each group writes its own event and spending limit.\par}
   \end{block}
 \end{column}
 \separatorcolumn

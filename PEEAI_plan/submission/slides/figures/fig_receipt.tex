@@ -1,0 +1,35 @@
+% Slide 6, idea 3. The receipt Plan B wrote at 4.43 pm, redrawn from the board, and the green
+% resolution. Drawn at final size, 18.4 x 10.2 cm. Facts from dev01.json and the storyboard
+% (the swap at 16.43, plan version 1 to 2, $0 spent, the $35 backup not booked, doors on time).
+\documentclass[border=1pt]{standalone}
+\input{planb_figstyle}
+\begin{document}
+\fontsize{12}{14}\selectfont
+\begin{tikzpicture}[x=1cm, y=1cm, line join=round]
+  \def\W{18.33}\def\H{10.13}
+  \useasboundingbox (0,0) rectangle (\W,\H);
+  % ------------------------------------------------------------ the receipt slip
+  \def\rl{0.1}\def\rr{12.3}\def\hs{1.85}
+  % body with a zig-zag bottom edge
+  \pgfmathsetmacro{\dz}{(\rr-\rl)/16}
+  \path[fill=white, draw=navy, line width=1.6pt]
+    (\rl,\H-0.05) -- (\rr,\H-0.05) -- (\rr,0.45)
+    \foreach \k in {1,...,16}{ -- ({\rr-(\k-0.5)*\dz},0.08) -- ({\rr-\k*\dz},0.45) }
+    -- cycle;
+  \fill[navy] (\rl,\H-0.05) rectangle (\rr,\H-\hs);
+  \node[anchor=west, text=white, font=\fontsize{32}{32}\selectfont] at (\rl+0.55,\H-\hs/2-0.02) {\markreceipt};
+  \node[anchor=west, text=white, font=\fontsize{27}{32}\selectfont\bfseries] at (\rl+1.65,\H-\hs/2) {Receipt};
+  \foreach \i/\t/\f in {0/4.43 pm/\bfseries,
+                        1/Swap demos and skills exchange/,
+                        2/Version 1 to 2/,
+                        3/\$0 spent{,} \$35 not booked/\bfseries}{
+    \node[anchor=west, text=ink, font=\fontsize{22}{27}\selectfont\f] at (\rl+0.55,\H-\hs-1.1-\i*1.75) {\t};
+  }
+  % ------------------------------------------------------------ the resolution
+  \def\gl{12.95}
+  \filldraw[fill=oksoft, draw=ok, line width=1.6pt, rounded corners=8pt] (\gl,0.08) rectangle (\W-0.05,\H-0.05);
+  \node[text=ok, font=\fontsize{72}{72}\selectfont] at ({(\gl+\W)/2},\H-3.3) {\faCheckCircle};
+  \node[anchor=north, text=ok, align=center, text width=5.2cm, font=\fontsize{24}{29}\selectfont\bfseries]
+    at ({(\gl+\W)/2},\H-5.3) {Doors open on time};
+\end{tikzpicture}
+\end{document}

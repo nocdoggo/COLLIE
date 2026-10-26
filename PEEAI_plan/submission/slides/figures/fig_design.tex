@@ -1,110 +1,64 @@
-% Plan B design: the language model never acts. The server asks it to read a message and to pick
-% one option id from a menu the server built and checked. Every change, from every policy and
-% every person, passes one gate that writes a receipt. MBTA alerts are designed, not connected.
-\documentclass[border=3pt]{standalone}
+% How Plan B works inside (backup B2 and the report), in plain words. A message is a claim. Plan B
+% looks up only the fact that could change the decision and lists the changes that fit. In our
+% coordinator the AI reads the message and picks one change from that list. Plan B checks every
+% change before it happens and writes a receipt. Spending is held for free first and needs a
+% person's OK. Transit alerts are designed but not connected yet. Drawn at 18.4 x 9.6 cm.
+\documentclass[border=1pt]{standalone}
 \input{planb_figstyle}
 \begin{document}
-\begin{tikzpicture}[font=\small]
-  \tikzset{
-    blk/.style={align=left, text=ink, inner sep=0pt, anchor=north west},
-    note/.style={font=\footnotesize, text=muted, align=left, inner sep=0pt},
-    apilab/.style={font=\footnotesize, text=muted, inner sep=1.5pt},
-    srv/.style={fill=white, draw=none, inner sep=4pt, align=left, text=ink, anchor=north west},
-  }
-  % geometry
-  \def\rail{2.85}   % the action path
-  \def\bx{3.45}     % server and model column, left edge
-  \def\ex{11.65}    % right edge
-  \def\gx{12.15}    % gate, left edge
-  \def\gw{2.15}     % gate width
-  \def\ox{14.8}     % outcomes, left edge
-  % ---------- regions ----------
-  \fill[primarysoft] (\bx,1.0) rectangle (\ex,4.55);
-  \draw[rulegrey, line width=0.6pt] (\bx,5.35) rectangle (\ex,8.1);
-
-  % ---------- (1) input ----------
-  \node[blk, text width=2.95cm] (msg) at (0,4.1) {%
-    {\color{accent}\faCommentDots\ \bfseries A message}\\[1pt]
-    a claim, not a fact\\[2pt]
-    {\footnotesize\color{muted} texts from people and suppliers}};
-  \node[planned, font=\footnotesize, text width=2.95cm, anchor=south west, inner sep=4pt, rounded corners=0pt] (mbta) at (0,0.25) {%
-    {\faBus\ \bfseries next}\\[1pt]
-    MBTA V3 transit alerts\\ as context only\\[1pt]
-    designed, not connected};
-
-  % ---------- (2) the server ----------
-  \node[font=\small\bfseries, text=primary, anchor=north west, inner sep=0pt] at (\bx+0.2,4.37) {\faServer\ The server};
-  \node[srv, text width=2.6cm] (chk) at (\bx+0.15,3.92) {%
-    {\bfseries Selective checks}\\[1pt]
-    verify only what could change the decision\\[2pt]
-    {\footnotesize\color{muted} a status check, e.g.\ supplier tracking}};
-  \node[srv, text width=4.15cm, anchor=north east] (pln) at (\ex-0.15,3.92) {%
-    {\bfseries Planner}\\[1pt]
-    builds the options and checks each against the deadline, the people and the budget\\[3pt]
-    {\color{primary}\faList\ a menu of checked options}};
-  \node[note, anchor=north west] (sapi) at (\bx+0.2,0.85) {sandbox tool API: status checks, holds, plan changes, receipts};
-
-  % ---------- (3) the model ----------
-  \node[anchor=north west, inner sep=0pt, align=left] (mhd) at (\bx+0.2,7.92) {%
-    {\bfseries\faBrain\ Language model}\\[1pt]
-    {\footnotesize\color{muted} anthropic/claude-sonnet-5.5 through the OpenRouter API}};
-  \node[note, text=ink, anchor=north east, align=right] at (\ex-0.2,7.92) {holds no tool that writes};
-  \node[blk, text width=3.6cm] (rd) at (\bx+0.2,6.92) {%
-    {\bfseries reads the message}\\[1pt]
-    {\footnotesize does it apply, what changed, check or not}\\[1pt]
-    {\footnotesize\color{muted} strict, schema checked}};
-  \node[blk, text width=3.7cm] (pk) at (\ex-3.9,6.92) {%
-    {\bfseries picks one option id}\\[1pt]
-    {\footnotesize from the menu}\\[1pt]
-    {\footnotesize\color{muted} strict, schema checked}};
-
-  % ---------- (4) the gate ----------
-  \fill[primary] (\gx,1.95) rectangle (\gx+\gw,8.1);
-  \node[anchor=north west, text=white, align=left, text width=1.75cm, inner sep=0pt] (gtxt) at (\gx+0.2,7.9) {%
-    {\faLock\ \bfseries One gate}\\[4pt]
-    {\footnotesize every change, from every policy and every person, passes here}\\[-2pt]
-    {\color{white!45!primary}\rule{1.75cm}{0.5pt}}\\[4pt]
-    allowed for this role?\\[8pt]
-    plan still current?\\[8pt]
-    within budget?};
-
-  % ---------- (5) outcomes ----------
-  \node[blk, text width=3.45cm, anchor=west] (rcpt) at (\ox,\rail+0.3) {%
-    {\color{ok}\faReceipt\ \bfseries Receipt}\\[1pt]
-    the server's own record of each accepted change};
-  \node[blk, text width=3.25cm, anchor=west] (plan) at (\ox,6.1) {%
-    {\bfseries Event plan}\\[1pt]
-    {\color{muted} changed only through the gate}};
-
-  % spending branch, below the gate
-  \node[blk, text width=2.3cm] (hold) at (\gx,1.5) {%
-    {\faHourglassHalf\ \bfseries Spending}\\[1pt]
-    {\footnotesize a hold first, a free reservation that expires on its own}};
-  \node[blk, text width=3.3cm] (who) at (\ox,1.5) {%
-    {\faUserCheck\ \bfseries A person approves}\\[1pt]
-    {\footnotesize on the board}};
-
-  % ---------- arrows ----------
-  \draw[warmlink] (msg.east |- 0,\rail) -- (\bx,\rail);
-  \draw[syslink] (chk.east |- 0,\rail) -- (pln.west |- 0,\rail);
-  \draw[syslink] (\ex,\rail) -- (\gx,\rail);
-  \draw[nextlink] (mbta.east) -- (mbta.east -| \bx,0);
-  % server and model, over the model API
-  \draw[link] (\bx+2.65,4.55) -- (\bx+2.65,5.35);
-  \draw[link] (\bx+3.25,5.35) -- (\bx+3.25,4.55);
-  \draw[link] (\ex-1.55,4.55) -- (\ex-1.55,5.35);
-  \draw[link] (\ex-0.95,5.35) -- (\ex-0.95,4.55);
-  \node[apilab] at ($(\bx+3.25,4.95)!0.5!(\ex-1.55,4.95)$) {OpenRouter model API};
-  % gate out
-  \draw[oklink] (\gx+\gw,\rail) -- (\ox,\rail);
-  \draw[link] (\gx+\gw,6.1) -- (plan.west);
-  % spending
-  \draw[link] (\gx+0.45,1.95) -- (\gx+0.45,1.53);
-  \draw[link] (\gx+\gw,1.27) -- (\ox,1.27);
-  \draw[link] (\ox+0.2,1.55) |- (\gx+\gw,2.35);
-  \node[apilab, anchor=north west, align=left, inner sep=0pt] at (\ox+0.35,2.27) {board HTTP API\\ approve, report, attest};
-  % feedback
-  \draw[link, line width=0.5pt] (plan.north east) |- (\bx-0.27,8.45) |- (\bx,4.15);
-  \node[apilab, anchor=south] at ($(\bx,8.45)!0.5!(\ex,8.45)$) {the next decision uses what actually happened};
+\fontsize{12}{14}\selectfont
+\begin{tikzpicture}[x=1cm, y=1cm, line join=round]
+  \def\W{18.33}\def\H{9.53}
+  \useasboundingbox (0,0) rectangle (\W,\H);
+  \tikzset{hd/.style={anchor=north west, inner sep=0pt, align=left, text=ink, font=\fontsize{14}{17}\selectfont\bfseries},
+           tx/.style={anchor=north west, inner sep=0pt, align=left, text=ink, font=\fontsize{12}{14.5}\selectfont},
+           ar/.style={line width=1.8pt, -{Stealth[length=3.6mm,width=3.4mm]}}}
+  % ------------------------------------------------------------ the message
+  \node[text=accent, font=\fontsize{30}{30}\selectfont] at (0.75,5.3) {\faCommentDots};
+  \node[hd] at (0,4.55) {A message};
+  \node[tx, text width=2.9cm] at (0,3.95) {a claim, not a fact};
+  \node[tx, text=quiet, text width=2.9cm] at (0,1.35) {Transit alerts\\not connected yet};
+  % ------------------------------------------------------------ the AI
+  \fill[ground, rounded corners=6pt] (3.55,6.95) rectangle (11.2,\H);
+  \node[text=muted, font=\fontsize{24}{24}\selectfont] at (4.25,8.75) {\faBrain};
+  \node[hd, text=muted] at (4.9,9.1) {The AI};
+  \node[tx, text width=3.0cm] at (3.85,7.95) {reads the message};
+  \node[tx, text width=3.3cm] at (7.6,7.95) {picks one change from the list};
+  % ------------------------------------------------------------ Plan B
+  \fill[ground, rounded corners=6pt] (3.55,0) rectangle (11.2,5.6);
+  \node[text=umbblue, font=\fontsize{24}{24}\selectfont] at (4.25,4.8) {\faServer};
+  \node[hd, text=umbblue] at (4.9,5.15) {Plan B};
+  \node[text=umbblue, font=\fontsize{22}{22}\selectfont] at (4.3,3.75) {\markcheck};
+  \node[hd] at (3.85,3.0) {Checks\\the fact};
+  \node[tx, text width=3.15cm] at (3.85,1.75) {looks up only what could change the decision};
+  \node[text=umbblue, font=\fontsize{22}{22}\selectfont] at (8.05,3.75) {\markfits};
+  \node[hd] at (7.6,3.0) {Lists the\\changes that fit};
+  \node[tx, text width=3.3cm] at (7.6,1.75) {the time, the people and the budget};
+  \draw[umbblue, ar] (6.95,3.75) -- (7.45,3.75);
+  % the AI and Plan B talk both ways
+  \draw[quiet, ar, {Stealth[length=3.6mm,width=3.4mm]}-{Stealth[length=3.6mm,width=3.4mm]}] (5.4,5.75) -- (5.4,6.8);
+  \draw[quiet, ar, {Stealth[length=3.6mm,width=3.4mm]}-{Stealth[length=3.6mm,width=3.4mm]}] (9.2,5.75) -- (9.2,6.8);
+  % message in
+  \draw[accent, ar] (2.85,3.75) -- (3.45,3.75);
+  % ------------------------------------------------------------ Plan B checks every change
+  \fill[umbblue, rounded corners=6pt] (11.75,0) rectangle (14.55,\H);
+  \node[anchor=north west, inner sep=0pt, align=left, text=white, text width=2.4cm, font=\fontsize{14}{17}\selectfont\bfseries] at (11.95,\H-0.3)
+    {Plan B checks every change};
+  \node[anchor=north west, inner sep=0pt, align=left, text=white, text width=2.4cm, font=\fontsize{12}{14.5}\selectfont] at (11.95,6.2)
+    {allowed for this role\\[14pt] plan still current\\[14pt] within budget};
+  \draw[umbblue, ar] (11.25,3.75) -- (11.7,3.75);
+  % ------------------------------------------------------------ what comes out
+  \node[text=umbblue, font=\fontsize{24}{24}\selectfont] at (15.35,8.75) {\markreceipt};
+  \node[hd] at (15.95,9.1) {Receipt};
+  \node[tx, text width=3.3cm] at (15.05,7.95) {a written record of each change};
+  \node[text=umbblue, font=\fontsize{24}{24}\selectfont] at (15.35,5.35) {\faCalendar*};
+  \node[hd] at (15.95,5.7) {Event plan};
+  \node[tx, text width=3.3cm] at (15.05,4.55) {changed only after the checks};
+  \node[text=navy, font=\fontsize{24}{24}\selectfont] at (15.35,2.05) {\faUserCheck};
+  \node[hd, font=\fontsize{13}{16}\selectfont\bfseries] at (15.85,2.6) {A person\\OKs money};
+  \node[tx, text width=3.3cm] at (15.05,1.05) {held for free first};
+  \draw[umbblue, ar] (14.6,8.75) -- (14.95,8.75);
+  \draw[umbblue, ar] (14.6,5.35) -- (14.95,5.35);
+  \draw[navy, ar] (14.6,2.05) -- (14.95,2.05);
 \end{tikzpicture}
 \end{document}

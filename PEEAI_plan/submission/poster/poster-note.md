@@ -1,33 +1,33 @@
-# Poster notes: the two-minute pitch
+# Poster pitch, Plan B, The Show Must Go On
 
-Plan B: The Show Must Go On
-Noctis Zhang, University of Massachusetts Boston, PEAAII Hackathon, October 2026
+Noctis Zhang, Department of Computer Science, University of Massachusetts Boston, PEAAII AI Applications Hackathon 2026, October 2026
 
-The evaluation numbers come from make_results.py. The test shown is the final system on six new held-out cases (wave3b_fresh_20261025T2327Z), written by a separate worker before the final freeze and locked with it, before the first model call. If asked about the earlier, larger test, say it found the defects that were fixed before the freeze, and that its cases are now development cases. If asked about the rerun on those cases, say "diagnostic, not held-out".
+> Speak at about 140 words a minute. The first part is the short version. If the visitor has only half a minute, say it alone while pointing at the top left panel. For the full pitch, go on and point at each panel as you reach it.
 
-Speak at a steady pace, about 140 words a minute, and point at each panel as you reach it, top row first. The one message comes first, so the pitch works even if the listener leaves after twenty seconds. Say the approaches by their plain names, never by codes.
+## The short version
+_about 35 seconds_
 
-## The scene and the one message
-_about 30 seconds_
+_Point at the top left panel, left to right._
 
-It is four forty, twenty minutes before a campus showcase opens. A text says the projector may be twenty five minutes late. Plan B helps a community event stay on track by deciding what to verify, what to prepare, and when to commit a change. Jordan, the organizer, is an illustration, and the event runs in a local sandbox.
+Jordan, a volunteer organizer we made up, gets a text at four forty. The projector may be twenty five minutes late. Plan B rests on three ideas. Check the fact. It looks up the delivery, about five twenty five. Pick only what fits. Of sixteen changes, three fit, and the AI picks the free swap. Leave a receipt. The swap is written down at four forty three for zero dollars, and money waits for a person's OK. Doors open on time.
 
-## What Plan B did
-_about 25 seconds_
+## The board and the design
+_about 16 seconds_
 
-Plan B treats the text as a claim. It checks the supplier's tracking once: delayed, with a reported arrival at five twenty five. Then it swaps two activities, so the demos start after the reported arrival. It costs nothing, the server writes a receipt, and the doors open on time.
+_Point at the running board, then at the design panel._
 
-## How it works
-_about 25 seconds_
+This is the real board after the swap, in a rehearsal where the fixed rules, with no AI, made the same swap. On the right, the AI only picks, and Plan B checks every change before it happens.
 
-The language model never acts on its own. The server builds the possible fixes and checks each one. The model only picks one of them. Every change passes one gate, which writes the receipt, and spending needs a person.
+## How we tested it
+_about 26 seconds_
 
-## Does it work
-_about 22 seconds_
+_Point at the bottom left panel._
 
-I froze the system and ran six new cases it had never seen, close to situations from development. Fifty nine of sixty runs met the expected outcome. The one miss was the fixed rules, when a volunteer ran late. No action broke a rule. Six cases are too few to rank anything.
+Each test is a made-up event day on a practice copy of the event, with a sped up clock, where nothing real is bought. Six were written and locked before the final test, and each of the three AI designs ran each one three times, because the AI can answer differently. Fifty nine of sixty runs met the expected outcome.
 
-## Who it helps and what is next
-_about 25 seconds_
+## Why Plan B, the three ideas again, and thanks
+_about 56 seconds_
 
-It is built for student organizers, clubs, volunteers and pantry staff. It runs on one laptop with one command, with any model or none, and the same core already runs a food pantry. Next come transit alerts as context, and a pilot with real organizers. The code is behind the QR code.
+_Point at the bottom right panel._
+
+Today the text lands in a group chat or a shared sheet, and other tools already change plans with a person's OK. Plan B is safer, because the three ideas are built in, where in Zapier you add the approval step. More flexible, because event platforms are built for event teams, and Plan B runs a campus evening or a pantry on one laptop, free and open source. More personal, because each group sets its own spending limit. We have not tested the others. So, check the fact, pick only what fits, leave a receipt. Jordan's doors opened on time, and the projector came at five twenty four. Next is a walk-through on paper with community staff, so please tell me where it goes wrong. Thanks to the PEAAII organizers.

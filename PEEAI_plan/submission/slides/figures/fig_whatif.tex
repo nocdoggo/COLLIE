@@ -1,0 +1,28 @@
+% Backup B3 and the report. The 5.45 pm "what if", a second practice case and never part of
+% Jordan's main run. Source apps/plan_b/plan_b/scenarios/private/dev02.json (expected 17.45, the
+% backup free to hold, $35 to book, beyond the AI's $0 allowance, the organizer allows it, booked
+% once) and storyboard frames 9 to 12. Drawn at final size, 18.4 x 7.0 cm.
+\documentclass[border=1pt]{standalone}
+\input{planb_figstyle}
+\begin{document}
+\fontsize{12}{14}\selectfont
+\begin{tikzpicture}[x=1cm, y=1cm, line join=round]
+  \def\W{18.33}\def\H{6.93}\def\gap{0.62}\def\ph{5.45}
+  \useasboundingbox (0,0) rectangle (\W,\H);
+  \node[anchor=north west, inner sep=0pt, text=ink, font=\fontsize{20}{24}\selectfont\bfseries] at (0,\H-0.05) {What if the projector came at 5.45 pm};
+  \pgfmathsetmacro{\pw}{(\W-3*\gap)/4}
+  \foreach \i/\ic/\lab/\col in {0/\faPauseCircle/{Backup held\\for free{,}\\10 minutes}/umbblue,
+                               1/\faQuestionCircle/{Asks the\\organizer to\\allow \$35}/umbblue,
+                               2/\faUserCheck/{Organizer\\says OK}/navy,
+                               3/\faCheck/{Booked\\once{,} \$35}/umbblue}{
+    \pgfmathsetmacro{\x}{\i*(\pw+\gap)}
+    \fill[ground, rounded corners=6pt] (\x,0) rectangle (\x+\pw,\ph);
+    \node[text=\col, font=\fontsize{44}{44}\selectfont] at (\x+\pw/2,\ph-1.4) {\ic};
+    \node[anchor=north, text=ink, align=center, font=\fontsize{17}{21}\selectfont\bfseries] at (\x+\pw/2,\ph-2.6) {\lab};
+  }
+  \foreach \i in {0,1,2}{
+    \pgfmathsetmacro{\xa}{(\i+1)*\pw+\i*\gap+0.07}
+    \draw[umbblue, line width=2.4pt, -{Stealth[length=4.4mm,width=4.2mm]}] (\xa,\ph-1.4) -- (\xa+\gap-0.14,\ph-1.4);
+  }
+\end{tikzpicture}
+\end{document}

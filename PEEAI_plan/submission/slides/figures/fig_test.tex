@@ -1,0 +1,26 @@
+% Slide 7, how one test runs. A made-up event day, messages at set times, a rehearsal clock that
+% is sped up, and code that checks the end state. Drawn at final size, 18.4 x 9.6 cm.
+\documentclass[border=1pt]{standalone}
+\input{planb_figstyle}
+\begin{document}
+\fontsize{12}{14}\selectfont
+\begin{tikzpicture}[x=1cm, y=1cm, line join=round]
+  \def\W{18.33}\def\H{9.53}\def\gap{0.72}
+  \useasboundingbox (0,0) rectangle (\W,\H);
+  \pgfmathsetmacro{\pw}{(\W-3*\gap)/4}
+  \foreach \i/\ic/\la/\lb in {0/{\faCalendar*}/Made-up/event day,
+                              1/\faCommentDots/Messages/at set times,
+                              2/{\faTachometer*}/Clock/sped up,
+                              3/\faClipboardCheck/Code checks/the end}{
+    \pgfmathsetmacro{\x}{\i*(\pw+\gap)}
+    \fill[ground, rounded corners=6pt] (\x,0) rectangle (\x+\pw,\H);
+    \node[text=umbblue, font=\fontsize{70}{70}\selectfont] at (\x+\pw/2,\H-3.2) {\ic};
+    \node[anchor=north, text=ink, align=center, font=\fontsize{19}{24}\selectfont\bfseries]
+      at (\x+\pw/2,3.3) {\la\\\lb};
+  }
+  \foreach \i in {0,1,2}{
+    \pgfmathsetmacro{\xa}{(\i+1)*\pw+\i*\gap+0.08}
+    \draw[umbblue, line width=2.6pt, -{Stealth[length=4.6mm,width=4.6mm]}] (\xa,\H-3.2) -- (\xa+\gap-0.16,\H-3.2);
+  }
+\end{tikzpicture}
+\end{document}

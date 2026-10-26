@@ -1,0 +1,51 @@
+% How Plan B works inside, the main-slide version of fig_design with about 25 words (slide 10,
+% responsible use). A message comes in (no personal details, it goes to an outside AI service).
+% Plan B checks the fact and lists the changes that fit. In our coordinator the AI picks one.
+% Plan B checks every change before it happens, then writes a receipt and changes the plan, and
+% money needs a person's OK. Drawn at 18.4 x 10.0 cm.
+\documentclass[border=1pt]{standalone}
+\input{planb_figstyle}
+\begin{document}
+\begin{tikzpicture}[x=1cm, y=1cm, line join=round]
+  \def\W{18.33}\def\H{9.93}
+  \useasboundingbox (0,0) rectangle (\W,\H);
+  \tikzset{hd/.style={anchor=north west, inner sep=0pt, align=left, text=ink, font=\fontsize{16}{19}\selectfont\bfseries},
+           tx/.style={anchor=north west, inner sep=0pt, align=left, text=ink, font=\fontsize{14}{17}\selectfont},
+           ar/.style={line width=2pt, -{Stealth[length=4mm,width=3.8mm]}}}
+  % the message
+  \node[text=accent, font=\fontsize{36}{36}\selectfont] at (1.35,5.6) {\faCommentDots};
+  \node[hd, anchor=north] at (1.4,4.75) {A message};
+  \node[tx, anchor=north, align=center, text=muted, text width=3.0cm] at (1.4,4.0) {no personal\\details};
+  \draw[accent, ar] (2.35,5.6) -- (3.45,5.6);
+  % the AI, outside
+  \fill[ground, rounded corners=6pt] (3.55,7.15) rectangle (11.2,\H);
+  \node[text=muted, font=\fontsize{30}{30}\selectfont] at (4.55,8.55) {\faCloud};
+  \node[hd, text=ink, anchor=west] at (5.55,8.55) {AI picks one change};
+  \draw[quiet, ar, {Stealth[length=4mm,width=3.8mm]}-{Stealth[length=4mm,width=3.8mm]}] (7.35,6.1) -- (7.35,7.05);
+  % Plan B
+  \fill[ground, rounded corners=6pt] (3.55,0) rectangle (11.2,6.0);
+  \node[text=umbblue, font=\fontsize{30}{30}\selectfont] at (4.45,4.95) {\faServer};
+  \node[hd, text=umbblue, anchor=west, font=\fontsize{20}{24}\selectfont\bfseries] at (5.2,5.0) {Plan B};
+  \node[text=umbblue, font=\fontsize{28}{28}\selectfont] at (4.75,3.1) {\markcheck};
+  \node[hd, anchor=north, align=center] at (4.95,2.2) {Checks\\the fact};
+  \node[text=umbblue, font=\fontsize{28}{28}\selectfont] at (9.15,3.1) {\markfits};
+  \node[hd, anchor=north, align=center] at (9.15,2.2) {Lists changes\\that fit};
+  \draw[umbblue, ar] (5.9,3.1) -- (8.2,3.1);
+  % every change checked
+  \fill[umbblue, rounded corners=6pt] (11.75,0) rectangle (14.45,\H);
+  \node[text=white, font=\fontsize{30}{30}\selectfont] at (13.1,7.6) {\faClipboardCheck};
+  \node[anchor=north, inner sep=0pt, align=center, text=white, text width=2.4cm, font=\fontsize{17}{21}\selectfont\bfseries] at (13.1,6.2)
+    {Every change checked};
+  \draw[umbblue, ar] (11.25,3.1) -- (11.7,3.1);
+  % what comes out
+  \node[text=umbblue, font=\fontsize{30}{30}\selectfont] at (15.5,8.4) {\markreceipt};
+  \node[hd, anchor=west] at (16.2,8.4) {Receipt};
+  \node[text=umbblue, font=\fontsize{30}{30}\selectfont] at (15.5,5.0) {\faCalendar*};
+  \node[hd, anchor=west] at (16.2,5.0) {Event\\plan};
+  \node[text=navy, font=\fontsize{30}{30}\selectfont] at (15.5,1.6) {\faUserCheck};
+  \node[hd, anchor=west, text=navy] at (16.2,1.6) {Person\\OKs\\money};
+  \draw[umbblue, ar] (14.5,8.4) -- (14.95,8.4);
+  \draw[umbblue, ar] (14.5,5.0) -- (14.95,5.0);
+  \draw[navy, ar] (14.5,1.6) -- (14.95,1.6);
+\end{tikzpicture}
+\end{document}

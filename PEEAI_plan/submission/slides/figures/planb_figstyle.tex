@@ -16,8 +16,11 @@
 % Colours
 \definecolor{primary}{HTML}{08457E}   % UMB blue: the system, Plan B's own policy
 \definecolor{primarysoft}{HTML}{E7EEF5}
-\definecolor{accent}{HTML}{E8701A}    % tension only: the message, the clock
-\definecolor{accentsoft}{HTML}{FCEBDD}
+\definecolor{accent}{HTML}{FF791F}    % tension only: the message, the gap, the one missed run
+\definecolor{accentsoft}{HTML}{FFEBDC}
+\definecolor{umbblue}{HTML}{005A8B}   % UMB blue: the three idea marks and structure
+\definecolor{navy}{HTML}{132245}      % title bands, the receipt, the dark close
+\definecolor{ground}{HTML}{EEF2F6}    % the light blue-grey ground behind white cards
 \definecolor{ok}{HTML}{2E7D32}        % an accepted receipt, a met run
 \definecolor{oksoft}{HTML}{E5F1E6}
 \definecolor{ink}{HTML}{1F1F1F}
@@ -63,3 +66,15 @@
     legend cell align=left,
   },
 }
+
+% The three idea marks, the same in the deck, the poster and the report.
+% 1 Check the fact (a magnifier), 2 Pick only what fits (a funnel that keeps what fits),
+% 3 Leave a receipt (a receipt slip). Always in UMB blue unless the panel is navy.
+\providecommand{\markcheck}{\faSearch}
+\providecommand{\markfits}{\faFilter}
+\providecommand{\markreceipt}{\faReceipt}
+% The three points of "Why Plan B": safer shows the three marks together, more flexible a laptop,
+% more personal a set of sliders.
+\providecommand{\marksafer}{\faSearch\,\faFilter\,\faReceipt}
+\providecommand{\markflexible}{\faLaptop}
+\providecommand{\markpersonal}{\faSlidersH}

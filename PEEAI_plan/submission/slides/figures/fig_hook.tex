@@ -1,45 +1,42 @@
-% The hook, for a full-bleed UMB-blue title-style slide. Drawn white and accent only, with no
-% background fill, so it sits on the blue slide. The message arrives at 16:40, the doors open at
-% 17:00: a 20-minute wedge on the clock. Facts from the recorded development run.
-\documentclass[border=3pt]{standalone}
+% Slide 2, the hook. Jordan's phone at 4.40 pm with the one orange message, and the three bad
+% moves Jordan could make alone. Drawn at final size, 18.4 x 9.6 cm. Facts from dev01.json
+% (the text at 16.40, about 25 minutes late, a $35 backup projector).
+\documentclass[border=1pt]{standalone}
 \input{planb_figstyle}
 \begin{document}
+\fontsize{12}{14}\selectfont
 \begin{tikzpicture}[x=1cm, y=1cm, line join=round]
-  % ---------------------------------------------------------------- the phone
-  \def\pw{4.3}   % phone width
-  \def\ph{6.4}   % phone height
-  \draw[white, line width=1pt, rounded corners=0.5cm] (0,0) rectangle (\pw,\ph);
-  \draw[white, line width=1pt, line cap=round] (\pw/2-0.4,\ph-0.32) -- (\pw/2+0.4,\ph-0.32);   % speaker
-  \draw[white, line width=1pt, line cap=round] (\pw/2-0.55,0.28) -- (\pw/2+0.55,0.28);          % home bar
-  % the incoming message
-  \node[anchor=north west, fill=accent, text=white, inner sep=7pt, text width=3.25cm, align=left,
-        font=\normalsize, rounded corners=1pt] (msg) at (0.28,\ph-1.55)
-    {{\footnotesize\bfseries Delivery contact, 16:40}\\[3pt]
-     Our projector delivery\\ may be about 25\\ minutes late.};
-  \fill[accent] ($(msg.south west)+(0,0.0)$) -- ($(msg.south west)+(-0.18,-0.16)$) -- ($(msg.south west)+(0.32,0)$) -- cycle;
+  \def\H{9.53}
+  \useasboundingbox (0,0) rectangle (18.33,\H);
+  % ------------------------------------------------------------ the phone
+  \def\px{0.3}\def\pw{6.4}\def\ph{9.53}
+  \draw[navy, line width=2.2pt, rounded corners=0.75cm] (\px+0.04,0.04) rectangle (\px+\pw-0.04,\ph-0.04);
+  \draw[navy, line width=2.2pt, line cap=round] (\px+\pw/2-0.55,\ph-0.45) -- (\px+\pw/2+0.55,\ph-0.45);
+  \draw[navy, line width=2.2pt, line cap=round] (\px+\pw/2-0.75,0.42) -- (\px+\pw/2+0.75,0.42);
+  \node[text=muted, font=\fontsize{15}{18}\selectfont] at (\px+\pw/2,\ph-1.45) {4.40 pm};
+  % the one message
+  \node[anchor=north west, fill=accent, text=white, inner sep=9pt, text width=4.7cm, align=left,
+        font=\fontsize{24}{29}\selectfont\bfseries, rounded corners=6pt] (msg) at (\px+0.6,\ph-2.45)
+    {Projector may be 25~minutes late};
+  \fill[accent] ($(msg.south west)+(0.25,0.05)$) -- ($(msg.south west)+(0.0,-0.38)$) -- ($(msg.south west)+(0.85,0.05)$) -- cycle;
 
-  % ---------------------------------------------------------------- the clock at 16:40
-  \def\cx{6.95}
-  \def\cy{3.2}
-  \def\r{2.15}
-  \begin{scope}[shift={(\cx,\cy)}]
-    % the 20 minutes from 16:40 to 17:00
-    \fill[accent] (0,0) -- (210:\r-0.06) arc[start angle=210, end angle=90, radius=\r-0.06] -- cycle;
-    \draw[white, line width=1pt] (0,0) circle (\r);
-    \foreach \h in {0,...,11}{
-      \pgfmathsetmacro{\len}{mod(\h,3)==0 ? 0.36 : 0.2}
-      \draw[white, line width=1pt] (90-\h*30:\r) -- (90-\h*30:\r-\len);
-    }
-    % hands: hour at 4:40, minute at 40
-    \draw[white, line width=2.2pt, line cap=round] (0,0) -- (-50:1.15);
-    \draw[white, line width=1.4pt, line cap=round] (0,0) -- (210:1.85);
-    \fill[white] (0,0) circle (0.09);
-  \end{scope}
+  % ------------------------------------------------------------ the question
+  \node[text=accent, font=\fontsize{40}{40}\selectfont\bfseries] (q) at (7.6,4.77) {?};
 
-  % ---------------------------------------------------------------- the words
-  \node[anchor=west, text=white, align=left, inner sep=0pt, font=\fontsize{24}{27}\selectfont\bfseries]
-    (big) at (\cx+\r+0.5,\cy+0.62) {20 minutes\\to doors open};
-  \node[anchor=north west, text=white, align=left, inner sep=0pt, font=\large]
-    at ($(big.south west)+(0,-0.35)$) {Guests arrive at 17:00.\\The demonstrations need\\the projector.};
+  % ------------------------------------------------------------ the three bad moves
+  \def\cx{8.75}\def\cw{9.58}\def\chh{2.77}
+  \foreach \i/\ic/\lab in {0/\faHourglassHalf/Wait and hope,
+                           1/\faDollarSign/Spend \$35 on a maybe,
+                           2/\faRandom/Reshuffle alone}{
+    \pgfmathsetmacro{\yt}{\H-\i*(\chh+0.61)}
+    \fill[ground, rounded corners=4pt] (\cx,\yt) rectangle (\cx+\cw,\yt-\chh);
+    \node[text=quiet, font=\fontsize{34}{34}\selectfont] at (\cx+1.2,\yt-\chh/2) {\ic};
+    \node[anchor=west, text=ink, font=\fontsize{20}{24}\selectfont] at (\cx+2.3,\yt-\chh/2) {\lab};
+  }
+  \foreach \i in {0,1,2}{
+    \pgfmathsetmacro{\yc}{\H-\i*(\chh+0.61)-\chh/2}
+    \draw[rulegrey, line width=1pt, ->] (q.east) ++(0.05,0) -- (\cx-0.12,\yc);
+  }
+  \draw[rulegrey, line width=1pt] (\px+\pw+0.1,4.77) -- (q.west);
 \end{tikzpicture}
 \end{document}

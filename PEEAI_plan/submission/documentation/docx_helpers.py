@@ -22,9 +22,10 @@ from docx.text.run import Run
 
 PRIMARY = RGBColor(0x08, 0x45, 0x7E)
 MUTED = RGBColor(0x5A, 0x5A, 0x5A)
-PLACEHOLDER = RGBColor(0xB3, 0x47, 0x00)
 LINK = RGBColor(0x05, 0x63, 0xC1)
 TEXT_WIDTH_IN = 6.5
+MAX_FIGURE_HEIGHT_IN = 7.6
+MAX_REFERENCE = 37  # RESEARCH_BRIEF.md [1] to [37]. [38] and [39] were never confirmed
 
 
 def new_document(title: str, author: str, subject: str, keywords: str) -> Document:
@@ -80,31 +81,25 @@ def add_page_number_footer(section) -> None:
 
 
 def rich(paragraph, text: str) -> None:
-    """Add text where **bold** spans are bold, `code` spans are inline code, <<url>> spans are
-    clickable links, [[...]] spans are marked result placeholders and {{...}} spans are short
-    placeholder tokens for table cells."""
+    """Add text where **bold** spans are bold, `code` spans are inline code and <<url>> spans are
+    clickable links that show the address without its scheme."""
     tokens = []
     rest = text
     while rest:
-        starts = [(rest.find(m), m) for m in ("**", "[[", "{{", "`", "<<") if rest.find(m) >= 0]
+        starts = [(rest.find(m), m) for m in ("**", "`", "<<") if rest.find(m) >= 0]
         if not starts:
             tokens.append(("plain", rest))
             break
         index, mark = min(starts)
         if index:
             tokens.append(("plain", rest[:index]))
-        close = {"**": "**", "[[": "]]", "{{": "}}", "`": "`", "<<": ">>"}[mark]
-        kind = {"**": "bold", "[[": "placeholder", "{{": "token", "`": "code", "<<": "link"}[mark]
+        close = {"**": "**", "`": "`", "<<": ">>"}[mark]
+        kind = {"**": "bold", "`": "code", "<<": "link"}[mark]
         end = rest.find(close, index + len(mark))
         tokens.append((kind, rest[index + len(mark) : end]))
         rest = rest[end + len(close) :]
     for kind, piece in tokens:
-        if kind in ("placeholder", "token"):
-            text = f"[Wave 3 result: {piece} pending]" if kind == "placeholder" else f"[{piece}]"
-            run = paragraph.add_run(text)
-            run.bold = True
-            run.font.color.rgb = PLACEHOLDER
-        elif kind == "code":
+        if kind == "code":
             paragraph.add_run(piece, style="Inline Code")
         elif kind == "link":
             hyperlink(paragraph, piece)
@@ -113,15 +108,24 @@ def rich(paragraph, text: str) -> None:
             run.bold = kind == "bold"
 
 
+def cite(*numbers: int) -> str:
+    """A citation as printed in the text, [4] or [4, 5, 6], checked against the reference list."""
+    assert numbers and all(1 <= n <= MAX_REFERENCE for n in numbers), numbers
+    return "[" + ", ".join(str(n) for n in numbers) + "]"
+
+
 def hyperlink(paragraph, url: str) -> None:
-    """Add url as a clickable external link, blue and underlined, showing the url itself."""
+    """Add url as a clickable external link, blue and underlined. The link target keeps its
+    scheme, and the visible text shows the address without "https://"."""
+    target = url if "://" in url else f"https://{url}"
+    shown = url.split("://", 1)[-1]
     link = OxmlElement("w:hyperlink")
-    link.set(qn("r:id"), paragraph.part.relate_to(url, RELATIONSHIP_TYPE.HYPERLINK, is_external=True))
+    link.set(qn("r:id"), paragraph.part.relate_to(target, RELATIONSHIP_TYPE.HYPERLINK, is_external=True))
     element = OxmlElement("w:r")
     link.append(element)
     paragraph._p.append(link)
     run = Run(element, paragraph)
-    run.text = url
+    run.text = shown
     run.font.color.rgb = LINK
     run.font.underline = True
 
@@ -215,13 +219,26 @@ def _keep_rows_whole(grid) -> None:
             trPr.append(OxmlElement("w:tblHeader"))
 
 
-def figure(doc: Document, image: Path, caption: str, width_in: float = TEXT_WIDTH_IN) -> None:
+def figure(doc: Document, image: Path, caption: str, width_in: float = TEXT_WIDTH_IN) -> bool:
+    """Place a picture and its caption. A missing picture is skipped with a printed warning, so
+    the report still builds while a figure is being redrawn. Tall pictures are narrowed so they
+    fit the page. Returns whether the picture was placed."""
+    if not image.exists():
+        print(f"warning: figure {image.name} is missing, skipped")
+        return False
+    from docx.image.image import Image as DocxImage
+
+    size = DocxImage.from_file(str(image))
+    height = width_in * size.px_height / size.px_width
+    if height > MAX_FIGURE_HEIGHT_IN:
+        width_in = MAX_FIGURE_HEIGHT_IN * size.px_width / size.px_height
     doc.add_picture(str(image), width=Inches(width_in))
     doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
     doc.paragraphs[-1].paragraph_format.keep_with_next = True  # the caption stays with its picture
     paragraph = doc.add_paragraph(style="Caption")
     rich(paragraph, caption)
     paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    return True
 
 
 def neutral_app_properties(path: Path) -> None:

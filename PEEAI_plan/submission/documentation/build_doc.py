@@ -2,23 +2,31 @@
 
     uv run --no-project --with python-docx==1.1.2 python build_doc.py
 
-The figures are the slide deck's TikZ figures (../slides/figures/*.pdf), rendered here to PNG
-with pdftoppm, and crops of the Wave 2 storyboard frames (../slides/figures/frames/).
+The report follows PEEAI_plan/submission/REVISION_PLAN.md section 7 (the Rule of Three, the seven
+questions, the writing rules). Outside facts and their numbers come from RESEARCH_BRIEF.md [1] to
+[37], cited with cite(). The figures are the slide deck's TikZ figures (../slides/figures/*.pdf),
+rendered here to 300 dpi PNG with pdftoppm. A figure whose PDF does not exist yet is skipped with
+a printed warning, so the report builds while the deck's figures are being redrawn.
 
-Every held-out number comes from results.json, which ../make_results.py writes from the committed
-run wave3_heldout_20261025T1625Z (its two report/metrics.json files). The rest of section 12
-cites that run's README.md and FAILURES.md. That run stays the evaluation of record. Section 12.7
-adds version 1.2 (Wave 3b) from results_v12.json, which the same script writes from the fresh
-held-out run wave3b_fresh_20261025T2327Z and from the post-hoc diagnostic rerun on the spent cases
-wave3b_rerun_spent_20261025T2345Z (not a held-out result).
+The numbers of the final six-case test come from results_v12.json ("fresh"), which
+../make_results.py writes from the committed run wave3b_fresh_20261025T2327Z. The earlier 12-case
+test comes from results.json (run wave3_heldout_20261025T1625Z) and the diagnostic rerun on its
+spent cases from results_v12.json ("rerun", never a sealed result).
 """
 
+import datetime
 import json
+import re
 import subprocess
 from pathlib import Path
 
+from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.shared import Inches, Pt
+
 from docx_helpers import (
+    PRIMARY,
     bullets,
+    cite,
     code_block,
     figure,
     neutral_app_properties,
@@ -31,881 +39,921 @@ from docx_helpers import (
 
 HERE = Path(__file__).resolve().parent
 FIGURES = HERE.parent / "slides" / "figures"
-FRAMES = FIGURES / "frames"
-SHOTS = HERE.parent / "screenshots"
+LOGO_SOURCE = HERE.parent / "slides" / "Blue-UMB-logo-lockup.png"
+LOGO_BOX = (1012, 1456, 5589, 3643)  # the visible part of the 6600 by 5100 lockup
 PNG = HERE / "figures"
+SHOTS = HERE.parent / "screenshots"
+LOGO = PNG / "umb_lockup_blue.png"
 OUT = HERE / "Plan_B_Project_Documentation.docx"
 RESULTS = json.loads((HERE / "results.json").read_text(encoding="utf-8"))
-# Wave 3b, policy 1.2: "fresh" is held-out (C09 to C12, T05, T06), "rerun" is a post-hoc
-# diagnostic rerun on the spent cases and never a held-out result.
 V12 = json.loads((HERE / "results_v12.json").read_text(encoding="utf-8"))
+COMPARISON_BRIEF = HERE.parent / "COMPARISON_BRIEF.md"
 
-TITLE = "Plan B: The Show Must Go On"
+TITLE = "Plan B, The Show Must Go On"
+PROMISE = "Plan B checks before it changes anything."
+TAGLINE = "Check the fact. Pick only what fits. Leave a receipt."
+MONEY = "Money waits for a person's OK."
+STUDENT = "It checks the text before you spend club money, and leaves the treasurer a record of why."
 AUTHOR = "Noctis Zhang"
+AFFILIATION = "Department of Computer Science, University of Massachusetts Boston"
+EVENT = "PEAAII AI Applications Hackathon 2026, October 2026"
 REPO = "https://github.com/nocdoggo/FA26-COLLIE"
-APP_URL = REPO
+
+# The deck's figures used here, in the order they appear. Anything else in ../slides/figures is
+# not rendered (old figures whose wording breaks the writing rules stay out of the report).
+USED_FIGURES = [
+    "fig_hook", "fig_ideas", "fig_check", "fig_fits", "fig_receipt", "fig_whatif", "fig_design",
+    "fig_pantry_kits", "fig_test", "fig_outcomes", "fig_flow", "fig_people", "fig_others", "fig_why",
+]
+SLIDE_FIGURE_WIDTH_IN = 6.0
+
+_figure_count = 0
+_table_count = 0
 
 
 def render_figures() -> None:
-    """Render each TikZ and pgfplots figure PDF to a 300 dpi PNG for the Word document."""
+    """Render each figure the report uses from its PDF to a 300 dpi PNG, and crop the blue UMass
+    Boston lockup to its visible box at native resolution (Pillow, when it is installed)."""
     PNG.mkdir(exist_ok=True)
-    for pdf in sorted(FIGURES.glob("fig_*.pdf")):
-        if pdf.stem.endswith("_poster"):  # the poster's larger-type variants are not used here
+    for stem in USED_FIGURES:
+        pdf = FIGURES / f"{stem}.pdf"
+        target = PNG / f"{stem}.png"
+        if not pdf.exists():
             continue
-        target = PNG / f"{pdf.stem}.png"
         if target.exists() and target.stat().st_mtime >= pdf.stat().st_mtime:
             continue
-        subprocess.run(
-            ["pdftoppm", "-png", "-r", "300", "-singlefile", str(pdf), str(PNG / pdf.stem)],
-            check=True,
-        )
+        subprocess.run(["pdftoppm", "-png", "-r", "300", "-singlefile", str(pdf), str(PNG / stem)], check=True)
+    if not LOGO.exists():
+        try:
+            from PIL import Image
+        except ImportError:
+            print("warning: Pillow is not installed, so the cropped lockup cannot be made")
+            return
+        Image.open(LOGO_SOURCE).crop(LOGO_BOX).save(LOGO, optimize=True)
+
+
+def fig(doc, stem: str, caption: str, width_in: float = SLIDE_FIGURE_WIDTH_IN) -> None:
+    """A numbered figure from the deck's figure PDFs. A missing figure stops the build."""
+    global _figure_count
+    pdf = FIGURES / f"{stem}.pdf"
+    if not pdf.exists():
+        raise SystemExit(f"figure {stem} is missing, build it in ../slides/figures first")
+    _figure_count += 1
+    figure(doc, PNG / f"{stem}.png", f"Figure {_figure_count}. {caption}", width_in)
+
+
+def shot(doc, name: str, caption: str, width_in: float = 6.0) -> None:
+    """A numbered screenshot of the running board, at its native resolution, only scaled down."""
+    global _figure_count
+    path = SHOTS / name
+    if not path.exists():
+        raise SystemExit(f"screenshot {name} is missing")
+    _figure_count += 1
+    figure(doc, path, f"Figure {_figure_count}. {caption}", width_in)
+
+
+def tab(doc, caption: str, header: list[str], rows: list[list[str]], widths: list[float]) -> None:
+    """A numbered table with its caption above it."""
+    global _table_count
+    _table_count += 1
+    paragraph = doc.add_paragraph(style="Caption")
+    rich(paragraph, f"Table {_table_count}. {caption}")
+    paragraph.paragraph_format.keep_with_next = True
+    table(doc, header, rows, widths)
+
+
+def h1(doc, text: str) -> None:
+    doc.add_heading(text, level=1)
+
+
+def h2(doc, text: str) -> None:
+    doc.add_heading(text, level=2)
+
+
+def fresh_totals() -> dict:
+    fresh = V12["fresh"]
+    suites, ai = ("campus", "pantry"), ("P1", "P2", "P3")
+    met = sum(int(fresh[s][p]["metk"]) for s in suites for p in ("P0", *ai))
+    runs = sum(int(fresh[s][p]["metn"]) for s in suites for p in ("P0", *ai))
+    ai_met = sum(int(fresh[s][p]["metk"]) for s in suites for p in ai)
+    ai_runs = sum(int(fresh[s][p]["metn"]) for s in suites for p in ai)
+    cases = sum(int(fresh[s]["P2"]["ncases"]) for s in suites)
+    calls = sum(int(fresh[s][p]["calls"]) for s in suites for p in ai)
+    refused = sum(int(fresh[s]["all"]["refused"]) for s in suites)
+    viol = sum(int(fresh[s]["all"]["viol"]) for s in suites)
+    return dict(met=met, runs=runs, ai_met=ai_met, ai_runs=ai_runs, cases=cases, calls=calls, refused=refused, viol=viol)
+
+
+# ----------------------------------------------------------------------------------------------
+# Title, abstract, one page, seven questions
+# ----------------------------------------------------------------------------------------------
 
 
 def title_block(doc) -> None:
-    doc.add_heading(TITLE, level=0)
-    para(doc, "**Project Documentation**")
-    para(doc, "An AI coordinator that decides what to verify, what to prepare, and when to commit a change.")
-    table(
+    if LOGO.exists():
+        doc.add_picture(str(LOGO), width=Inches(2.2))
+        doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.LEFT
+    else:
+        print("warning: the cropped lockup is missing, title block has no logo")
+    title = doc.add_paragraph()
+    run = title.add_run(TITLE)
+    run.bold, run.font.size, run.font.color.rgb = True, Pt(26), PRIMARY
+    title.paragraph_format.space_before = Pt(12)
+    title.paragraph_format.space_after = Pt(4)
+    promise = doc.add_paragraph()
+    run = promise.add_run(PROMISE)
+    run.font.size = Pt(14)
+    para(doc, f"**{TAGLINE}** {MONEY}")
+    para(doc, "Project documentation")
+    for line in (f"**{AUTHOR}**", AFFILIATION, EVENT):
+        p = para(doc, line)
+        p.paragraph_format.space_after = Pt(0)
+    para(doc, f"Code and these documents, <<{REPO}>>").paragraph_format.space_before = Pt(6)
+
+
+def abstract(doc) -> None:
+    t = fresh_totals()
+    h1(doc, "Abstract")
+    para(
         doc,
-        ["Item", "Value"],
+        f"**{TAGLINE}** Plan B is a free and open AI event coordinator for small volunteer events. "
+        "When a text says the projector may be late, Plan B looks up the one fact the decision "
+        "depends on. It lists every allowed change, throws out the ones that break the time, the "
+        "people or the budget, and lets the AI pick one of the changes that fit. Plan B then checks "
+        "the change against the rules before it happens and leaves a receipt, a written record of "
+        f"the change. {MONEY} I built Plan B and tested it as a rehearsal on a computer, with "
+        f"made-up events. The final test ran {t['cases']} cases that were sealed before the test "
+        f"began. {t['met']} of {t['runs']} runs met the expected outcome. Every AI run met it "
+        f"({t['ai_met']} of {t['ai_runs']}), the fixed rules with no AI missed one, and no executed "
+        "action broke a rule. The whole test cost $3.61 in AI service charges. Six cases are a small "
+        "check, not a ranking, and no club, pantry or person has used Plan B yet.",
+    )
+
+
+def one_page(doc) -> None:
+    t = fresh_totals()
+    h1(doc, "Plan B in one page")
+    para(
+        doc,
+        "**The 30-second version.** Jordan, a volunteer organizer we made up, gets a text twenty "
+        "minutes before doors open. The projector may be 25 minutes late. Plan B does not panic and "
+        "does not spend. It checks the delivery first, which says about 5.25 pm. It lists every possible "
+        "change, keeps the 3 that fit the time, the people and the budget, and the AI picks the free "
+        "one, swapping two activities. Plan B checks the change and leaves a receipt. Doors open on "
+        "time, and the projector arrives in time for the demonstrations. No club money spent.",
+    )
+    para(
+        doc,
+        "**The moment of tension.** At 4.40 pm the text arrives. If it is true, the demonstrations "
+        "at 5.10 pm start with no projector. A backup projector costs $35. Jordan is carrying chairs, "
+        "the advisor is not picking up, and the three easy moves are all bad. Wait and hope, spend "
+        "$35 of club money on a maybe, or reshuffle the evening alone.",
+    )
+    fig(doc, "fig_hook", "At 4.40 pm a text says the projector may be 25 minutes late, and Jordan has three bad moves.")
+    tab(
+        doc,
+        "The three ideas of Plan B, each in three parts.",
+        ["Idea", "Part a", "Part b", "Part c"],
         [
-            ["Author", "Noctis Zhang (single author, no team)"],
-            ["Institution", "University of Massachusetts Boston"],
-            ["Event", "Paul English Applied AI Institute (PEAAII) Hackathon, UMass Boston, October 2026"],
-            ["Repository", f"<<{APP_URL}>>"],
-            ["App and submission paths", "the app is in `apps/plan_b` and the submission items are in `PEEAI_plan/submission` of the repository `nocdoggo/FA26-COLLIE`"],
+            [
+                "**1. Check the fact**",
+                "A message is a claim, not a fact. A text can be wrong, late, about another order or sent twice.",
+                "Look up only the fact that could change the plan. One look-up, 2 rehearsal minutes, the answer \"delayed, expected about 5.25 pm\".",
+                "Most messages should change nothing. A false alarm, a note about another order or the same note twice leaves the plan as it is.",
+            ],
+            [
+                "**2. Pick only what fits**",
+                "Plan B lists every allowed change. Keep, swap, a ten-minute shift, the backup, and pairs of these. 16 for Jordan.",
+                "It throws out any that break the time, the people or the budget. 3 fit.",
+                "The AI reads the messages and picks one, but cannot change the plan itself. It picked the free swap.",
+            ],
+            [
+                f"**3. Leave a receipt**\n{MONEY}",
+                "Plan B checks every change against the rules before it happens. If a check fails, it says so and keeps the plan.",
+                "Every accepted change leaves a receipt. What changed, when, which part of Plan B made it, and what it cost.",
+                f"{MONEY} Plan B's own spending allowance is $0, and only a person can raise it.",
+            ],
+        ],
+        [1.2, 1.75, 1.75, 1.8],
+    )
+    para(
+        doc,
+        f"**The headline result.** On {t['cases']} test cases sealed before the final test, "
+        f"{t['met']} of {t['runs']} runs met the expected outcome. Every AI run met it. The fixed "
+        "rules with no AI missed one, a late volunteer whose message they were never written to read. "
+        "No executed action broke a rule. Six cases are a small check, not a ranking.",
+    )
+    para(doc, f"**The sentence a student can repeat.** \"{STUDENT}\"")
+
+
+SECTIONS = {
+    "problem": "1. The problem we want to solve",
+    "ideas": "2. Three ideas",
+    "evening": "3. Jordan's evening, step by step",
+    "works": "4. How Plan B works",
+    "people": "5. Who takes part, and the made-up pantry",
+    "tested": "6. How we evaluated the AI agents",
+    "results": "7. Results",
+    "responsible": "8. Responsible use of AI",
+    "market": "9. Who it is for, our target market",
+    "others": "10. Who else does this, our direct and indirect competitors",
+    "why": "10.3 Why Plan B and not the tools people already use",
+    "benefit": "11. How students and the community benefit",
+    "limits": "12. Limitations",
+    "run": "13. How to run it",
+    "demo": "14. Demo guide",
+    "else": "15. Anything else to add",
+    "close": "16. Three ideas, one evening",
+    "sources": "Key sources and acknowledgement",
+}
+
+
+def seven_questions(doc) -> None:
+    h1(doc, "The seven questions at a glance")
+    para(doc, "The hackathon asks seven questions. Each one is answered in its own section, named here.")
+    s = SECTIONS
+    tab(
+        doc,
+        "Where each of the seven questions is answered.",
+        ["Question", "Where it is answered"],
+        [
+            ["1. What problems would you like to solve?", f"{s['problem']}, told through Jordan's evening, and Plan B in one page"],
+            ["2. Who are your direct and indirect competitors?", f"{s['others']}, then {s['why']}"],
+            ["3. Who is your target market?", f"{s['market']}, and {s['benefit']}"],
+            ["4. How does your application work?", f"{s['ideas']}, {s['evening']} and {s['works']}"],
+            ["5. Evaluation of AI agents, and responsible use of AI", f"{s['tested']}, {s['results']} and {s['responsible']}"],
+            ["6. Key sources and acknowledgement", f"{s['sources']}, with the acknowledgements and the references [1] to [37]"],
+            ["7. Anything else to add", f"{s['else']}, then {s['close']}"],
+        ],
+        [2.6, 3.9],
+    )
+
+
+# ----------------------------------------------------------------------------------------------
+# 1 to 5, the story and how Plan B works
+# ----------------------------------------------------------------------------------------------
+
+
+def problem(doc) -> None:
+    h1(doc, SECTIONS["problem"])
+    para(
+        doc,
+        "Small volunteer events change by text, with nobody to check, and a wrong move costs club "
+        "money or the evening. Plan B is built for the twenty minutes before the doors open, when a "
+        "message arrives and somebody has to decide what to do.",
+    )
+    para(
+        doc,
+        "Jordan, a volunteer organizer we made up, runs a small campus showcase. This event has no "
+        "operations staff. Doors open at 5 pm with a welcome. The community demonstrations at 5.10 pm "
+        "need a projector, promised for 5 pm. The skills exchange follows at 5.30 pm. Its leader "
+        "checks in at 5.05 pm, and the demonstration presenter at 5.20 pm. Everything has to be done "
+        "by 6 pm. At 4.40 pm a text says the projector \"may be about 25 minutes late\".",
+    )
+    para(doc, "Three things make that moment hard.")
+    bullets(
+        doc,
+        [
+            "**A message is a claim, not a fact.** It can be wrong, late, about another order, or the same note sent twice.",
+            "**A wrong move costs something.** Spending $35 on a rumor wastes club money. Doing nothing can leave the demonstrations without a projector.",
+            "**Jordan decides alone, with twenty minutes left.** Jordan is carrying chairs and the advisor is not picking up. Reshuffling the program by hand means keeping the times, the people and the equipment in one head.",
+        ],
+    )
+    para(
+        doc,
+        "The problem we want to solve is that moment. A small group should be able to check the one "
+        "fact that matters, see only the changes that really fit, and keep a record of what changed "
+        "and why, without spending money nobody agreed to.",
+    )
+
+
+def ideas(doc) -> None:
+    h1(doc, SECTIONS["ideas"])
+    para(doc, f"Plan B rests on three simple ideas. **{TAGLINE}** Under the third idea sits one more line. **{MONEY}**")
+    fig(doc, "fig_ideas", "The three ideas, each with one fact from Jordan's evening.")
+    h2(doc, "Idea 1. Check the fact")
+    bullets(
+        doc,
+        [
+            "**A message is a claim, not a fact.** A text can be wrong, late, about another order or sent twice.",
+            "**Look up only the fact that could change the plan.** For Jordan that is the delivery. One look-up takes 2 rehearsal minutes and answers \"delayed, expected about 5.25 pm\".",
+            "**Most messages should change nothing.** A false alarm, a note about another order or the same note twice leaves the plan as it is.",
+        ],
+    )
+    para(doc, "**Why.** Acting on a rumor is the mistake that costs money. Each look-up takes time (two minutes in the rehearsal), so Plan B looks up only the one fact that could change the decision.")
+    h2(doc, "Idea 2. Pick only what fits")
+    bullets(
+        doc,
+        [
+            "**Plan B lists every allowed change.** Keep the plan, swap two activities, shift one by ten minutes, book the backup, or pairs of these. For Jordan that is 16 changes.",
+            "**It throws out any that break the time, the people or the budget.** 3 fit. A change that would start the demonstrations before the projector arrives never reaches the AI.",
+            "**The AI reads the messages and picks one, but cannot change the plan itself.** It picked the free swap.",
+        ],
+    )
+    para(
+        doc,
+        "**Why only pick.** The AI reads messy messages well, but it can answer differently each "
+        "time. So in our design it never writes a change the rules have not checked. The AI chooses. "
+        "Plan B makes the change.",
+    )
+    h2(doc, f"Idea 3. Leave a receipt. {MONEY}")
+    bullets(
+        doc,
+        [
+            "**Plan B checks every change against the rules before it happens.** The right role, the plan still current, within budget. If a check fails, it says so and keeps the plan.",
+            "**Every accepted change leaves a receipt.** A receipt is a written record of the change. It says what changed, when, which part of Plan B made it, and what it cost. For Jordan, 4.43 pm, plan version 1 to 2, $0, and the $35 backup not booked. The treasurer can read it.",
+            f"**{MONEY}** Plan B's own spending allowance is $0. It can hold a backup for free while it asks, and only a person can allow spending.",
+        ],
+    )
+    para(doc, "**Why.** Spending club money is a decision a person should own, and a written record lets anyone see later what changed and why. Plan B holds a backup for free first, so it is not lost while the person decides, and nothing is spent if nobody answers.")
+
+
+def evening(doc) -> None:
+    h1(doc, SECTIONS["evening"])
+    para(
+        doc,
+        "Jordan's evening is a practice case in Plan B's rehearsal on a computer, a practice copy "
+        "of an event with a clock we can speed up, where nothing real is booked or bought. The "
+        "event, the times, the people and the numbers are that practice case.",
+    )
+    h2(doc, "3.1 The main run")
+    numbered(
+        doc,
+        [
+            "**Setup.** Doors open at 5 pm with a welcome. The demonstrations at 5.10 pm need the projector, promised for 5 pm. The skills exchange follows at 5.30 pm. The skills exchange leader checks in at 5.05 pm and the demonstration presenter at 5.20 pm.",
+            "**The text (idea 1).** At 4.40 pm a text says the projector may be about 25 minutes late. Plan B treats it as a claim, not a fact.",
+            "**The look-up (idea 1).** Plan B looks up the delivery once. In the rehearsal that takes 2 minutes. The answer is \"delayed, expected about 5.25 pm\". An expected time is still not an arrival.",
+            "**The changes that fit (idea 2).** Plan B lists every allowed change, 16 in all, and throws out any that break the time, the people or the budget. 3 fit. The AI picks one of the 3, the free swap. The skills exchange moves up to 5.10 pm, since its leader is there from 5.05 pm, and the demonstrations move to 5.30 pm, after the expected arrival and after the presenter checks in.",
+            "**The receipt (idea 3).** At 4.43 pm Plan B checks the swap against the rules, makes it and writes a receipt. The plan goes from version 1 to version 2. $0 is spent, and the $35 backup is not booked. Jordan tells the group chat and the host from the new plan on the board. Plan B sends no messages in the rehearsal.",
+            "**Resolution.** Doors open at 5 pm on time. The projector arrives at 5.24 pm, in time for the demonstrations at 5.30 pm.",
+        ],
+    )
+    fig(doc, "fig_check", "Plan B treats the text as a claim and looks up the delivery once, while most messages change nothing.")
+    fig(doc, "fig_fits", "Of 16 allowed changes, 3 fit the time, the people and the budget, and the AI picks the free swap.")
+    fig(doc, "fig_receipt", "The receipt at 4.43 pm records the swap, version 1 to 2, $0 spent and the $35 backup not booked.")
+    h2(doc, "3.2 A practice case under idea 1, four messages and no change")
+    para(doc, "Another practice case shows the third part of idea 1, that most messages should change nothing.")
+    numbered(
+        doc,
+        [
+            "The same delay text arrives, but the look-up says the delivery is on schedule, expected at 4.58 pm. It is a false alarm, so the plan stays.",
+            "At 4.44 pm a reminder says an order for a workshop on October 29 was cancelled. That is another order on another date, so it does not apply.",
+            "The reminder arrives again at 4.46 pm, and a volunteer forwards it at 4.47 pm. One source repeated is still one source.",
+            "Plan version 1 is kept. No hold, no spending, no change.",
+        ],
+    )
+    h2(doc, "3.3 A practice case under idea 3, the 5.45 pm \"what if\"")
+    para(
+        doc,
+        "This is a separate practice case, never part of Jordan's main run. If the look-up had said "
+        "5.45 pm, too late for either slot, Plan B holds the backup projector for free. Held for free "
+        "means kept aside for ten minutes at no cost and released on its own, here at 4.55 pm. Plan B "
+        "then asks the organizer to allow $35, because its own spending allowance is $0 and only a "
+        "person can raise it. The organizer says OK in their own session, and only then is the backup "
+        "booked, once, for $35.00. In a recorded run of this case the AI made that choice at 4.48 pm, "
+        "after the OK. If nobody had answered, the hold would have lapsed, nothing would have been "
+        "bought, and the evening might have had no projector.",
+    )
+    fig(doc, "fig_whatif", "A second practice case, where the backup is held for free, the organizer says OK and $35 is spent once.")
+    h2(doc, "3.4 Which run these pictures show")
+    para(
+        doc,
+        "Acted out on a computer. In an earlier recorded run, the AI made the same choice. "
+        "The pictures of Jordan's evening come from a rehearsal of this case with the fixed rules, "
+        "with no AI. In an earlier recorded run of the same case, an earlier version of our "
+        "coordinator made the same look-up and the same swap at 4.43 pm, with 3 AI calls costing "
+        "under 4 cents ($0.0366). That recorded run used an earlier version, not version 1.2, which "
+        "is the one tested in section 7. On a real night the look-up would be the delivery company's "
+        "tracking page, and that link is not built yet.",
+    )
+
+
+def works(doc) -> None:
+    h1(doc, SECTIONS["works"])
+    para(
+        doc,
+        "**In plain words.** Messages come in. The AI reads them and helps decide what to do. Plan B's "
+        "server, the part that keeps the plan and is the only part allowed to change it, does the "
+        "rest. It answers look-ups, lists the allowed changes and checks each one against the time, "
+        "the people and the budget. It checks every change against the rules before it happens and "
+        "writes a receipt. People watch the same plan on a board in their browser. The organizer "
+        "approves any spending in their own session, and staff record what really arrived.",
+    )
+    fig(doc, "fig_design", "Messages come in, the AI picks from the changes that fit, and Plan B checks every change and writes the receipt.")
+    para(
+        doc,
+        "**The running board.** The three pictures below are screenshots of the real board in a "
+        "rehearsal of Jordan's evening with the fixed rules, so the ranking shown is the fixed rules' "
+        "ranking, not the AI's pick. The board uses its own words. Its log marks every stated reason "
+        "as narration and not evidence, and shows internal names and clock times the way the code "
+        "prints them.",
+    )
+    shot(doc, "shot_campus_beforeafter_crop.png", "The running board after the swap. The demonstrations move from 5.10 pm to 5.30 pm and the skills exchange from 5.30 pm to 5.10 pm, and nothing else changes.")
+    shot(doc, "shot_campus_alternatives.png", "The changes that fit, best first, on the running board. The free swap ranks first of 3, with no added spending.")
+    shot(doc, "shot_campus_trail.png", "The board's log at 4.40 pm to 4.43 pm, newest on top. The look-up, the decision, the change and its receipt.")
+    para(doc, "Each time something changes, our coordinator does one of five things.")
+    tab(
+        doc,
+        "The five things our coordinator can do with a new message.",
+        ["What it does", "When", "Example from the practice cases"],
+        [
+            ["Keep the plan", "The message changes nothing", "A reminder about another order on another date"],
+            ["Look up the fact", "One fact could change the decision", "The delivery says delayed, expected about 5.25 pm"],
+            ["Hold for free", "A backup may be needed while a fact or an OK is pending", "The backup projector held until 4.55 pm, in the separate 5.45 pm practice case"],
+            ["Make a change", "A change fits and the rules allow it", "The free swap at 4.43 pm, with its receipt"],
+            ["Say it cannot be done", "No change fits", "Plan B names what blocks it and changes nothing that breaks a rule"],
+        ],
+        [1.4, 2.4, 2.7],
+    )
+    h2(doc, "4.1 The four approaches we compared")
+    para(
+        doc,
+        "Every approach works on the same plan, the same tools and the same limits, and in every "
+        "approach only Plan B's server can make a change, and it checks each one. They differ in who "
+        "decides the next step.",
+    )
+    tab(
+        doc,
+        "The four approaches.",
+        ["Approach", "How it decides"],
+        [
+            ["Our coordinator", "The AI reads the messages and picks one step from a short list Plan B built and checked. This is my design."],
+            ["The check-all variant", "Our coordinator, with every relevant look-up made by the server first."],
+            ["The tool-calling model", "The AI calls Plan B's tools itself and chooses its own next tool. The server still checks every call."],
+            ["The fixed rules", "Written rules and a small message reader, with no AI and no cost."],
+        ],
+        [1.8, 4.7],
+    )
+    para(
+        doc,
+        "So \"the AI only picks\" describes our coordinator and the check-all variant. The "
+        "tool-calling model chooses its own tools. What holds for all four is that only the server "
+        "can make a change.",
+    )
+    h2(doc, "4.2 Details that matter")
+    bullets(
+        doc,
+        [
+            "**The receipt names the part that acted.** It records which part of Plan B made the change, for example our coordinator's own login and its allowance. It does not name the organizer, because free changes inside the rules happen without a person.",
+            "**The AI's reason is shown as untrusted text.** The board shows the AI's stated reason under the label \"untrusted model text, not evidence\". The receipts and the checks are the evidence.",
+            "**The AI model.** The three AI approaches used Claude Sonnet 5.5 by Anthropic, reached through OpenRouter. The settings accept any AI service that takes the same requests as OpenAI's, chosen with one setting, but only this one model was run.",
+            "**Limits on each run.** At most 48 tool calls, 8 AI calls, $0.50 of AI service charges and 900 seconds.",
+            "**Each role has a written list of what it may do.** The server enforces those lists. The coordinator may look up a fact, hold a backup for free or make a change the rules allow. It cannot record that stock arrived, which only staff may do.",
+        ],
+    )
+    tab(
+        doc,
+        "The parts of Plan B. Appendix B shows where each one lives in the code.",
+        ["Part", "What it does"],
+        [
+            ["Store", "Keeps the plan, its versions, holds, receipts and stock"],
+            ["Tools and checks", "Check the role, the plan version and the budget before a change, then write the receipt"],
+            ["Change lister", "Lists the allowed changes and checks each against time, people and budget"],
+            ["AI coordinator", "Reads messages and picks a step from the checked list"],
+            ["Rehearsal clock", "A clock we can speed up and messages that arrive at set times"],
+            ["Test runner", "Seals cases, runs them, scores the end state"],
+            ["Board", "What the organizer, volunteers, staff and the moderator see"],
         ],
         [1.6, 4.9],
     )
 
 
-def _v12_met(layer: str) -> tuple[int, int]:
-    """Runs met and recorded over both suites and all policies of one Wave 3b layer."""
-    rows = [V12[layer][s][p] for s in ("campus", "pantry") for p in ("P0", "P1", "P2", "P3")]
-    return sum(int(r["metk"]) for r in rows), sum(int(r["metn"]) for r in rows)
-
-
-def table_caption(doc, text: str) -> None:
-    paragraph = doc.add_paragraph(style="Caption")
-    rich(paragraph, text)
-    paragraph.paragraph_format.keep_with_next = True  # the caption stays with its table
-
-
-def abstract(doc) -> None:
-    doc.add_heading("Abstract", level=1)
-    fk, fn = _v12_met("fresh")
-    fresh = V12["fresh"]
-    ours = sum(int(fresh[x]["P2"]["metk"]) for x in ("campus", "pantry"))
-    ours_n = sum(int(fresh[x]["P2"]["metn"]) for x in ("campus", "pantry"))
-    cases = sum(int(fresh[x]["P2"]["ncases"]) for x in ("campus", "pantry"))
-    dev_cases = sum(int(RESULTS[x]["P2"]["ncases"]) for x in ("campus", "pantry"))
-    dev_runs = sum(int(RESULTS[x]["all"]["recorded"]) for x in ("campus", "pantry"))
-    para(
-        doc,
-        "Small community events run on volunteers, borrowed equipment and fixed rooms. Twenty minutes "
-        "before the doors open, a single text such as \"the projector may be late\" can push an organizer "
-        "into a rushed change, and an AI agent that acts on that text at once can spend money on a "
-        "rumor. **Plan B** is a coordinator that decides what to verify, what to prepare and when to "
-        "commit a change, inside written limits it cannot exceed. The language model never acts on its "
-        "own: it reads each message and picks one of the options the server has built and checked. "
-        "Every change passes one gate that checks the role, the plan version and the budget and writes "
-        "a **receipt**, a **hold** keeps a backup open for free while a fact or an approval is pending, "
-        "and checks are selective, so only a fact that could change the decision is verified. I built "
-        "Plan B as a fictional local sandbox with a campus showcase, a community skills exchange and a "
-        f"fictional pantry. It is meant for student organizers, clubs, volunteers and pantry staff, runs on "
-        "one laptop with local storage, works with no model at all, and one core served all three settings. "
-        "The final system was frozen and run on {cases} new cases, written by a "
-        "separate worker before the final freeze and locked in the same commit, before the first model "
-        "call. The author of the code changes never read them."
-        f" {fk} of {fn} runs met the expected outcome. Our coordinator met all {ours} of its "
-        f"{ours_n} runs, as did the two other model-based approaches, and the one miss was the fixed "
-        "rules on a case where a volunteer runs late. No executed action broke a rule, because every "
-        "change passes the gate. Six cases cannot rank the approaches. An earlier locked test of "
-        f"{dev_cases} cases ({dev_runs} runs) found the defects fixed before the final freeze, and its "
-        "cases are now development cases. Section 12 keeps that complete record. Everything is "
-        "fictional and local, and no community pilot has been run.",
-    )
-    figure(doc, PNG / "fig_story.png", "Figure 1. The late projector, beat by beat, and the program before and after the free swap (a development run in the sandbox).")
-
-
-def problem(doc) -> None:
-    doc.add_heading("1. Problem and motivation", level=1)
-    para(
-        doc,
-        "Meet Jordan, a volunteer organizer of a campus showcase (Jordan is an illustration, and the "
-        "event is simulated). The doors open at 17:00 and the event must finish by 18:00. At 16:40, "
-        "twenty minutes to doors open, a text says the projector may be about 25 minutes late. If "
-        "Jordan changes too much, presenters and volunteers lose their time. If Jordan waits too long, "
-        "the demonstrations fail.",
-    )
-    para(doc, "Three facts make this hard:")
+def people(doc) -> None:
+    h1(doc, SECTIONS["people"])
     bullets(
         doc,
         [
-            "**A message is a claim, not a fact.** It can be late, stale, duplicated, about another "
-            "booking, or simply wrong.",
-            "**Checking costs time.** A status check takes minutes that the event may not have.",
-            "**Changes have owners.** Spending money, changing the goal or recording that stock "
-            "physically arrived belong to people, not to an assistant.",
+            "**Sign-in.** The moderator signs in with a code Plan B makes on its first start, and gives each role a one-time join code. Each browser tab is its own session.",
+            "**Volunteers** check in for their own role from a phone link. A check-in can make the plan stop fitting, and Plan B then looks for a change that fits.",
+            "**A partner** may offer a listed backup, such as a spare kit. An accepted offer changes only that item's status.",
+            "**The organizer** approves spending in their own session. No message gives anyone a say over money or bookings.",
         ],
     )
+    h2(doc, "5.1 The made-up pantry, a second example of the same three ideas")
     para(
         doc,
-        "AI agents are starting to book, buy and reschedule things for people. Acting on a wrong or "
-        "stale message is the failure that matters. Plan B asks a narrow question: can an agent keep a "
-        "community event on track by deciding what to verify, what to prepare and when to commit, "
-        "without ever acting outside its written limits?",
-    )
-    figure(doc, PNG / "fig_contrast.png", "Figure 2. The same text, two ways. The top lane is an illustration of an agent with no gate, not one of the tested systems.")
-
-
-def different(doc) -> None:
-    doc.add_heading("2. What is different here", level=1)
-    para(
-        doc,
-        "Plan B combines known ideas in one bounded workflow. It does not claim to be the first of its "
-        "kind. The four coordinator policies are the ones compared in section 7.",
-    )
-    bullets(
-        doc,
-        [
-            "**Ordinary tool-calling agents** let the model write tool calls directly. Plan B keeps "
-            "that design as a comparison policy (the tool-calling model), and in its own policy (our coordinator) the model picks one "
-            "option from a menu the server built and checked.",
-            "**Rule systems** are predictable but read only the message forms they were written for. "
-            "Plan B keeps a published rule policy (the fixed rules) as a baseline.",
-            "**Plan repair and information gathering** are well studied in planning research. Plan B "
-            "applies them to a small event with explicit holds, receipts and human approval.",
-            "**Reversible preparation.** A hold reserves a backup for free and expires on its own, so "
-            "the agent can prepare without committing.",
-            "**An honest comparison.** The four policies share the same tools, rights, candidate repairs, "
-            "limits and executor, and were frozen before the held-out test. Prompts differ by policy "
-            "(section 12.5).",
-        ],
-    )
-
-
-def what_it_does(doc) -> None:
-    doc.add_heading("3. What Plan B does", level=1)
-    para(doc, "For each new message or observation, the coordinator takes one of five outcomes:")
-    table(
-        doc,
-        ["Outcome", "Meaning", "Example"],
-        [
-            ["Verify", "Check one fact that could change the decision", "Supplier status: delayed, ETA 17:25"],
-            ["Prepare", "Hold a backup while a fact or an approval is pending", "Backup projector held until 16:55"],
-            ["Commit", "Apply a plan the server checked, with a receipt", "Free swap applied at 16:43"],
-            ["Keep", "Change nothing on purpose", "A stale reminder about another order"],
-            ["Report infeasible", "Name the blocking constraints, change nothing invalid", "No recovery fits the limits"],
-        ],
-        [1.3, 2.9, 2.3],
-    )
-    para(doc, "Each role has narrow, written rights, called a **grant**. The server enforces every grant.")
-    figure(doc, PNG / "fig_roles.png", "Figure 3. Who may do what. One executor checks every request.")
-    para(
-        doc,
-        "Everything runs in a **fictional local sandbox**. Every action is a real change to a local "
-        "SQLite database and nothing else. No university booking, purchase, delivery or message is made.",
-    )
-    para(
-        doc,
-        "I built Plan B in three waves: the campus sandbox (Wave 1), the model policies, community roles "
-        "and pantry (Wave 2), and the frozen held-out comparison (Wave 3). Each wave ended with an audit "
-        "packet of evidence in `PEEAI_plan/handoffs/`, which later sections cite. The packets and the "
-        "plan are kept in the development repository, https://github.com/nocdoggo/COLLIE (branch "
-        "`hackathon/peeaai-plan`). The hackathon repository keeps the app and these final files.",
-    )
-    benefits(doc)
-
-
-def benefits(doc) -> None:
-    doc.add_heading("3.1 Who it helps", level=2)
-    para(
-        doc,
-        "Plan B is meant for the people who keep community events running with little time: student "
-        "organizers, clubs, campus offices, volunteers and the staff of a food pantry. For them it means "
-        "fewer last-minute scrambles, no surprise spending, and a receipt for every change, so anyone can "
-        "see later what changed and why. Participants can help too: a volunteer checks in from a phone "
-        "link, and a partner can offer a listed resource, without any right to spend or to change the plan.",
-    )
-    doc.add_heading("3.2 Easy to deploy", level=2)
-    bullets(
-        doc,
-        [
-            "**One laptop.** The server needs Python with uv and Node.js with npm. Install with two commands, "
-            "then one command starts the board in a browser (section 14).",
-            "**Light and local.** Its runtime libraries are FastAPI, uvicorn and Pydantic, and its data is one "
-            "local SQLite file. There is no cloud service to set up.",
-            "**A model is optional.** The fixed-rules policy runs with no model and no network. Any "
-            "OpenAI-compatible endpoint can serve the model policies. The one used here was Claude Sonnet 5.5 "
-            "through OpenRouter, with a spend cap.",
-            "**Safe to try.** Everything happens in a sandbox, and the moderator can reset an episode at any time.",
-        ],
-    )
-    figure(doc, SHOTS / "shot_campus_trail.png", "Figure 3a. The running board at 16:43, newest entry on top: the status check, the decision, the change and its receipt (screenshot of the projector practice case, fixed rules).", 6.0)
-    doc.add_heading("3.3 Adaptive and versatile", level=2)
-    para(
-        doc,
-        "One core runs different settings. The campus showcase and the community skills exchange are two "
-        "event configurations of the same event model: a new event of that kind is a configuration file with "
-        "its activities, people, resources, rules and budget. A new domain needs an adapter for its own rules. "
-        "The food pantry added one for stock, where late stock does not count and only staff record a "
-        "handoff or a distribution, and it reused the same decision loop, gate and receipts. The policies "
-        "are interchangeable too: fixed rules, a model that calls tools freely, or the coordinator that picks "
-        "checked options, behind the same gate.",
-    )
-    figure(doc, SHOTS / "shot_pantry_trail.png", "Figure 3b. The same board running the fictional pantry: check, hold the partner's 16 kits, ask staff for the handoff, receipt (screenshot of a practice case, fixed rules).", 6.0)
-
-
-def walkthrough(doc) -> None:
-    doc.add_heading("4. A recovery, step by step", level=1)
-    para(doc, "The fictional campus showcase in these development cases takes place on November 5, 2026.")
-    doc.add_heading("4.1 The late projector (a development case)", level=2)
-    numbered(
-        doc,
-        [
-            "At 16:40 a notice from the delivery contact says the projector delivery may be about 25 "
-            "minutes later than the promised 17:00 arrival.",
-            "The coordinator treats it as a claim and makes one **status check** of order P17. In the "
-            "sandbox a status check takes two simulated minutes.",
-            "The answer is delayed, reported ETA 17:25. A reported ETA is still not an arrival.",
-            "The **planner** builds the allowed repairs from fixed templates (keep, swap, a ten-minute "
-            "shift, the approved backup, and pairs of these) and checks each against the deadline, the "
-            "people and the budget: 16 built, 3 feasible.",
-            "The best repair is free: swap the demonstrations and the skills exchange, so the "
-            "demonstrations start at 17:30, after the reported ETA.",
-            "The executor applies it at 16:43 and writes receipt `rcpt_0001`. The plan version goes from "
-            "1 to 2.",
-        ],
-    )
-    para(doc, "Figure 1 shows these steps and the program before and after the swap.")
-    doc.add_heading("4.2 Four messages, zero changes (a second development case)", level=2)
-    numbered(
-        doc,
-        [
-            "The same delay notice arrives, but the status check says on schedule, ETA 16:58. It is a "
-            "false alarm, so the plan stays.",
-            "At 16:44 a reminder says an order for the October 29 workshop was cancelled. That is "
-            "another order on another date, so it does not apply.",
-            "The reminder arrives again at 16:46, and a volunteer forwards it at 16:47. One source "
-            "repeated is still one source, so it is a duplicate.",
-            "Plan version 1 is kept: no hold, no spending, no change.",
-        ],
-    )
-    figure(doc, PNG / "fig_quiet2.png", "Figure 4. Four messages, zero changes: checks are selective, so only a fact that could change the decision is verified.")
-    doc.add_heading("4.3 Prepare, ask, commit (a third development case)", level=2)
-    numbered(
-        doc,
-        [
-            "The status check reports ETA 17:45, too late for either demonstration slot.",
-            "The coordinator places a free **hold** on the backup projector that expires at 16:55, and "
-            "asks the organizer to raise the spending limit from $0 to $35.",
-            "The organizer approves in a separate session. Only then is the backup committed, once, "
-            "for $35.00.",
-        ],
-    )
-    doc.add_heading("4.4 Which policy acted", level=2)
-    para(
-        doc,
-        "The frames above come from an automated browser run of the rule baseline (the fixed rules), with no model "
-        "call. In a recorded development run, our coordinator (the AI policy) made the same status check and the "
-        "same swap at 16:43 with receipt `rcpt_0001`, in 3 model calls for $0.0366.",
-    )
-
-
-def architecture(doc) -> None:
-    doc.add_heading("5. Architecture", level=1)
-    figure(doc, PNG / "fig_design.png", "Figure 5. The model only picks among options the server built and checked, and one gate writes every receipt. Solid: connected today. Dashed: designed, not connected.")
-    para(doc, "The runtime dependencies are FastAPI, uvicorn and Pydantic only. Paths are under `apps/plan_b/`.")
-    table(
-        doc,
-        ["Component", "Role", "Where"],
-        [
-            ["Server", "HTTP API, sessions, moderator controls", "`plan_b/api/`"],
-            ["Event store", "State, plan versions, holds, receipts, stock ledger (SQLite with migrations)", "`plan_b/store/`"],
-            ["Executor and tools", "Checks grant, state version (revision), repeat key and budget, then writes a receipt", "`plan_b/tools/`"],
-            ["Planner", "Builds and checks candidate repairs", "`plan_b/domain/candidates.py`, `constraints.py`, `objective.py`"],
-            ["Adapters", "Campus and pantry rules on the shared core", "`plan_b/domain/adapters/`"],
-            ["Runner and clock", "Simulated clock, scripted world events, policy wakes and limits", "`plan_b/scenarios/`"],
-            ["Rule policies (the fixed rules)", "Published deterministic rules and parser", "`plan_b/evaluation/policies/`"],
-            ["Model policies (the three model approaches)", "Menu, interpretation, attention rule, provider", "`plan_b/agent/`"],
-            ["Browser board", "Organizer, participant, staff and moderator views", "`web/` (React, TypeScript)"],
-            ["Trace and replay", "Sanitized traces, integrity check, offline replay", "`plan_b/evaluation/export_trace.py`, `web/src/replay/`"],
-            ["Evaluation harness", "Freeze, held-out runs, metrics, report", "`plan_b/evaluation/`"],
-        ],
-        [1.5, 2.8, 2.2],
-    )
-
-
-def decision_policy(doc) -> None:
-    doc.add_heading("6. The decision policy", level=1)
-    figure(doc, PNG / "fig_loop.png", "Figure 6. Verify, prepare, commit, keep, with this event's examples.")
-    para(
-        doc,
-        "The selective policy our coordinator follows these steps each time the runner wakes it, that is, gives it a "
-        "turn because the shared state changed or a wait it set has passed:",
+        "The pantry is made up, not based on any real pantry's data. It shows that the same three "
+        "ideas work for a distribution day. 40 kits are needed by 1.40 pm. 24 are on the shelf and "
+        "20 are late, so the late ones are not counted until staff sign for them.",
     )
     numbered(
         doc,
         [
-            "A language model reads each new notice into a structured claim. The server then checks its "
-            "identity: the booking reference and the date must match, or the notice does not apply.",
-            "An **attention rule** decides whether the model is needed at all. It is called for a new "
-            "notice the server cannot resolve, or when the menu offers an action. Otherwise the server "
-            "records what the state determines.",
-            "The server builds a closed **menu** from the visible state: keep, query, hold, apply a "
-            "checked candidate, ask the organizer, release a hold, or wait.",
-            "The model returns one option id under a strict JSON schema. An id outside the menu is "
-            "rejected.",
-            "The executor validates and runs the option, writes a receipt, and the next wake reads what "
-            "actually happened.",
+            "**Check the fact.** A delivery claim counts for nothing until staff sign for the kits.",
+            "**Pick only what fits.** Late kits do not count, so the change that fits is a partner's 16 kits, held for free.",
+            "**Leave a receipt.** Each accepted change is written down, and the handoff waits for staff to sign. Staff sign for 10 of the 16, and the other 6 stay with the partner. 34 kits are handed out on time, and Plan B tells staff that 6 will be short. Staff decide what to tell the line, and no kit is counted twice.",
         ],
     )
+    fig(doc, "fig_pantry_kits", "Kits at four moments of the made-up pantry's day. Late kits and kits still at the partner are outlines, because they are not counted.")
+    shot(doc, "shot_pantry_stock.png", "The made-up pantry's stock on the running board at the start of the day. 24 kits on the shelf, 20 expected and not counted, 0 of 40 handed out yet.")
+    shot(doc, "shot_pantry_trail.png", "The board's log for the made-up pantry. Plan B checks the claims, holds the partner's 16 kits for free and asks staff for the handoff.")
     para(
         doc,
-        "The model's rationale is stored and shown only as untrusted text. The receipts and checks are "
-        "the evidence.",
+        "Two of the six final test cases were pantry days, and all 20 of their runs met the expected "
+        "outcome. The pantry needed a small extension for counting stock, so it reuses the same core "
+        "with new code rather than a new settings file alone. It handles identical boxed kits only, "
+        "with no fresh food, household sizes or client choice.",
     )
+    para(doc, "**Plan B counts kits, never people. Who gets food is always a person's call, and Plan B never decides who goes without.**")
 
 
-def policies(doc) -> None:
-    doc.add_heading("7. The agent and the comparison policies", level=1)
-    para(doc, "A **policy** is the rule that picks the next step. All four share the same tools, grants, candidate repairs, limits and executor. Prompts differ by policy (section 12.5).")
-    table(
-        doc,
-        ["Policy", "Frozen ids: earlier test, then final system", "How it decides"],
-        [
-            ["Fixed rules (baseline)", "`rules/1.0.0`, `pantry-rules/1.1.0`, unchanged", "Published deterministic rules and a small parser. No model"],
-            ["Tool-calling model", "`tool-use/1.1.0` (prompt `tool_use.v3`), then `tool-use/1.2.0`", "The model calls the tools itself. The executor checks every call"],
-            ["Our coordinator (my design)", "`live/1.1.0`, then `live/1.2.0`", "The model picks one option from the server's checked menu"],
-            ["Check-all variant", "`verify-all/1.1.0`, then `verify-all/1.2.0`", "Our coordinator, with every relevant status check run first by the server under rule `verify-all-relevance/1.0.0`"],
-        ],
-        [1.4, 2.2, 2.9],
-    )
+# ----------------------------------------------------------------------------------------------
+# 6 to 8, tests, results, responsible use
+# ----------------------------------------------------------------------------------------------
+
+
+def tested(doc) -> None:
+    h1(doc, SECTIONS["tested"])
+    para(doc, "Five words first, in plain terms.")
     bullets(
         doc,
         [
-            "**Model**: `anthropic/claude-sonnet-5.5` through OpenRouter, the same configuration for the three model "
-            "approaches, 4096 output tokens per call, strict JSON output.",
-            "**Limits per run**: 48 tool calls, 8 model calls, $0.50, 900 seconds. Every failed call "
-            "and retry counts.",
-            "**Seeds** 101, 202 and 303 are recorded but not sent, because the model's endpoints refuse a "
-            "seed. The three runs of a case are repeated trials, not independent units, and not "
-            "reproducible.",
-            "**The tool-calling model is a serious baseline.** It sees the objective, the budget, the tools and the "
-            "candidates, and may verify and hold like our coordinator.",
-            "**The check-all variant is an ablation.** Its checks are made by the server, so its lower model-call count on "
-            "campus does not mean less checking.",
+            "**A test case** is a small made-up event day written in advance, with messages that arrive at set times. We run it in the rehearsal, and at the end code checks the final state, for example that every activity happened by 6 pm, the welcome started at 5 pm, nothing started before its equipment arrived, and no rule was broken.",
+            "**The rehearsal on a computer** is a practice copy of the event, with a clock we can speed up, where nothing real is booked or bought.",
+            "**A sealed case** was written and locked before the final test, and never seen by the person who changed the code. The six sealed cases use new wording but the same kinds of trouble as earlier cases.",
+            "**3 runs** means the same case repeated three times with the AI, because the AI can answer differently each time. The fixed rules give the same answer every time, so they ran once. 6 cases times (1 plus 3 approaches times 3 runs) is 60 runs.",
+            "**Met the expected outcome** means the code's checks on the final state all passed. For most cases that means the event ran on time with no rule broken. For a case that cannot be fully done, it means Plan B said so plainly instead of pretending.",
         ],
     )
-
-
-def community(doc) -> None:
-    doc.add_heading("8. Community participation", level=1)
+    fig(doc, "fig_test", "One test, from a made-up event day and its messages to code that checks the end state.")
+    h2(doc, "6.1 How the final test ran")
     bullets(
         doc,
         [
-            "The moderator issues a one-time join code for each role. Each browser tab is its own "
-            "scoped session.",
-            "A participant can check in for their own role. A check-in can make the plan infeasible, and "
-            "the coordinator then repairs it.",
-            "In the community skills exchange, the kit steward may offer the registered backup kit. An "
-            "accepted offer changes only that resource's status. Campus offers are refused.",
-            "The organizer approves spending in their own session. No participant gains spending "
-            "authority from a message.",
+            "**Sealed first.** The code, the AI instructions, the model and the limits were locked at 23.23.47 UTC on October 25, 2026, with a digital fingerprint that shows any later change. The six cases were locked at 23.23.54 UTC. The first AI call of the test came at 23.27.31 UTC.",
+            "**Four campus cases and two pantry cases**, each run once with the fixed rules and three times with each of the three AI approaches, one run at a time.",
+            "**Scored by the end state.** Code reads the final plan and the receipts, not the AI's explanation. A run that stops early still counts.",
+            "**Kept apart.** The person who changed the code never opened the sealed cases. The case author saw no new code, but did read the coder's short written list of the problems to be fixed. That isolation is good but not perfect.",
+            "**Same kinds of trouble.** Each sealed case repeats a kind of trouble seen in development, with new wording. So the test shows new examples of known trouble, not new kinds of trouble.",
         ],
-    )
-    figure(
-        doc,
-        FRAMES / "community_replanned.png",
-        "Figure 7. A real screenshot of the app, in a development case of the skills exchange: the peer lead's own check-in moves two activities (automated run).",
-        5.0,
-    )
-
-
-def pantry(doc) -> None:
-    doc.add_heading("9. The pantry extension", level=1)
-    para(
-        doc,
-        "Pantry Continuity is a **fictional pantry sandbox**. Staff need 40 shelf-stable kits by 13:40. "
-        "24 are on the shelf, 20 more are expected late and count for nothing until received, and 16 wait "
-        "in a partner pool at the same venue. Two counters stay visible: the **supply shortfall** (kits "
-        "still missing from the shelf) and the **service deficit** (kits not yet handed out).",
-    )
-    numbered(
-        doc,
-        [
-            "The coordinator holds the 16 partner kits for a staff handoff. A hold moves no stock.",
-            "Staff record the handoff: the partner pool goes from 16 to 0 and the pantry shelf from 24 to "
-            "40. The supply shortfall is 0, but nobody has been served.",
-            "The coordinator holds and commits the 40 kits for the distribution.",
-            "Staff record the distribution of 40 kits at 13:40. Only this brings the service deficit to 0.",
-        ],
-    )
-    figure(doc, PNG / "fig_pantry_chart.png", "Figure 8. Kits at four moments of a development case, with the 40-kit target. The 20 late kits never count as stock.")
-    para(
-        doc,
-        "In a second pantry development case, staff hand off only 10 of the 16 kits. 34 kits are "
-        "distributed, a 6-kit deficit is reported, and the target stays 40.",
     )
     para(
         doc,
-        "The pantry reuses the shared core (state, versions, grants, holds, receipts, executor, loop) and "
-        "adds a domain extension: consumable stock with quantity holds (`store/migrations/0004_consumable_stock.sql`, "
-        "`domain/stock.py`, `tools/stock.py`), the pantry adapter and rule policy, and staff-only "
-        "`record_stock_receipt` and `record_distribution`. This is reuse with an explicit extension, "
-        "not zero-shot transfer.",
+        "Scoring by the final state of the rehearsal follows τ-bench, which compares the database "
+        f"at the end of a conversation with the goal state {cite(30)}. Running each AI case three "
+        f"times follows the same paper's idea of checking how reliably an agent behaves over repeated "
+        f"trials {cite(30)}. We count runs that met the outcome and do not compute that paper's own "
+        "measure.",
     )
 
 
-def safety(doc) -> None:
-    doc.add_heading("10. Safety and authority boundaries", level=1)
-    bullets(
-        doc,
-        [
-            "**Grants** are enforced by the executor on the server. The coordinator's grant lacks the "
-            "staff tools, so it cannot record a receipt or a distribution.",
-            "**State versions.** Every change names the state version it was made on (its **revision**). "
-            "A change made on an old version is rejected without a partial change.",
-            "**Repeat keys.** Repeating an action with the same key returns the same receipt without a "
-            "second reservation or charge.",
-            "**Holds expire** at their declared time and release the backup.",
-            "**Message text is data.** Instructions inside a notice change nothing.",
-            "**Receipts.** Every accepted change has a receipt. Refused requests are recorded too, some as "
-            "attempts without a receipt. Read-only tools have no receipt.",
-            "**Public and evaluator-only data are separate.** Hidden expectations never reach a policy or "
-            "the browser.",
-            "**Spend caps and a ledger** bound every paid model call. The key is read by the server's "
-            "provider at call time. The audit scripts' reads of the key are disclosed in the Wave 2 audit packet "
-            "(`PEEAI_plan/handoffs/wave_2/`).",
-        ],
-    )
-
-
-def protocol(doc) -> None:
-    doc.add_heading("11. Evaluation protocol", level=1)
-    para(
-        doc,
-        "A **development case** is a practice case I built and debugged with. A **held-out case** was "
-        "written and locked before the comparison, never used in development, and hidden from every "
-        "policy. Development results are never reported as evaluation results.",
-    )
-    figure(doc, PNG / "fig_freeze.png", "Figure 9. Practice, freeze, then one held-out test.")
-    table(
-        doc,
-        ["Case", "Public condition (from the protocol)", "Outcome class"],
-        [
-            ["C01", "Genuine projector delivery delay", "Goal"],
-            ["C02", "Quiet event with ordinary updates", "Goal, negative control"],
-            ["C03", "Plausible false delivery warning", "Goal, negative control"],
-            ["C04", "Stale warning followed by its duplicate", "Goal, negative control"],
-            ["C05", "Conflicting updates about the current booking", "Goal"],
-            ["C06", "Volunteer late, with a later check-in", "Goal"],
-            ["C07", "Relevant status service unavailable", "Goal"],
-            ["C08", "No feasible recovery within the limits", "Appropriate infeasibility"],
-            ["T01", "Shipment late, alternate 16 kits in time", "Target met"],
-            ["T02", "Feasible supply with duplicate and adversarial quantities", "Target met"],
-            ["T03", "Stale receipt claim, real receipt too late", "Supported partial"],
-            ["T04", "Alternate source supplies only part of the kits", "Supported partial"],
-        ],
-        [0.7, 3.9, 1.9],
-    )
-    bullets(
-        doc,
-        [
-            "**Planned size**: 80 campus runs (8 cases, the fixed rules once, the three model approaches three times each) and, "
-            "separately, 40 pantry runs. The two suites are never pooled.",
-            "**Freeze**: code, prompts, model, limits, seeds and run order fixed by hash in "
-            "`plan_b/evaluation/manifests/freeze.json` (commit 3de5962) before the first held-out call.",
-            "**Scoring** reads the final state and receipts, not the agent's narration. A timed-out or "
-            "crashed run stays in the denominator as a failure.",
-            "**Metrics**: goal completion (C01 to C07), appropriate infeasibility (C08), unnecessary "
-            "committed changes on the quiet cases (C02 to C04), refused requests, executed violations, "
-            "status checks, recovery delay, model calls and cost, and for the pantry target attainment, "
-            "supported partial fulfillment and stock conservation.",
-            "**Capped runs**: a run that reaches the limit of 8 model calls stops there and is scored "
-            "from its final state like any other run, so it stays in the denominator. The results "
-            "tables count them in the column \"Runs capped\".",
-        ],
-    )
-
-
-def _row(suite: str, policy: str, keys: list[str]) -> list[str]:
-    return [str(RESULTS[suite][policy][key]) for key in keys]
+SIX_CASES = [
+    ["Projector late", "C09", "The projector really arrives too late for its slot", "The evening runs on time with no rule broken", "10 of 10"],
+    ["False alarm", "C10", "An anonymous call says the projector will be late, but the delivery is on time", "No unneeded change", "10 of 10"],
+    ["Volunteer late", "C11", "The skills exchange leader texts that their bus is out of service", "The evening still runs on time", "9 of 10 (the fixed rules missed it)"],
+    ["Cannot be saved", "C12", "The projector fails its test and the spare cannot be confirmed in time", "Plan B says plainly that it cannot be done", "10 of 10"],
+    ["Pantry delivery", "T05", "The late delivery cannot arrive in time, but a partner's kits can", "The 40 kits are handed out on time", "10 of 10"],
+    ["Pantry claims", "T06", "Wrong and stale delivery claims, and a partner who declines", "Plan B hands out what it can and says plainly how many are short", "10 of 10"],
+]
 
 
 def results(doc) -> None:
-    campus, pantry = RESULTS["campus"], RESULTS["pantry"]
-    names = {"P0": "Fixed rules", "P1": "Tool-calling model", "P2": "Our coordinator", "P3": "Check-all variant"}
-    doc.add_heading("12. Results", level=1)
-    fk, fn = _v12_met("fresh")
+    t = fresh_totals()
+    fresh = V12["fresh"]
+    h1(doc, SECTIONS["results"])
+    h2(doc, "7.1 The final test on six sealed cases")
     para(
         doc,
-        f"**The final system.** On the six new cases of the final freeze, {fk} of {fn} runs met the "
-        "expected outcome (Figure 10). All three model-based approaches met every run, and the only "
-        "miss was the fixed rules on a case where a volunteer runs late, because a person's own delay "
-        "is a message its rules cannot read. No executed action broke a rule, because every change of "
-        "every approach passes the same gate. Six cases cannot rank the approaches, so the result is "
-        "about safety and reliability, not a winner. Section 12.7 gives these numbers in full.",
+        f"**{t['met']} of {t['runs']} runs met the expected outcome.** Every AI run met it "
+        f"({t['ai_met']} of {t['ai_runs']}). The fixed rules missed one. No executed action broke a "
+        f"rule. Plan B refused {t['refused']} attempts, and nothing happened. The whole test cost "
+        f"$3.61 in AI service charges for {t['calls']} AI calls, with no errors from the AI service.",
     )
-    figure(doc, PNG / "fig_result.png", "Figure 10. The final system on six new cases: runs that met the expected outcome, per approach and suite.")
-    para(
+    fig(doc, "fig_outcomes", "Each of the six sealed cases with its one fixed-rules run and nine AI runs, where only one run missed.")
+    tab(
         doc,
-        "**The complete record.** Sections 12.1 to 12.6 report the earlier locked test of the previous "
-        "policies on twelve cases. It is how the defects fixed before the final freeze were found, and "
-        "its cases are now development cases. Section 12.7 reports the final system and a diagnostic "
-        "rerun on those spent cases, which is never a held-out result.",
+        "The six sealed cases and their results.",
+        ["Case", "What happens", "What met means here", "Runs met"],
+        [row[:1] + row[2:] for row in SIX_CASES],
+        [1.1, 2.35, 1.95, 1.1],
     )
-    para(
-        doc,
-        f"The reported run of the frozen comparison on the twelve cases of the earlier locked test (now development cases) is `{RESULTS['run_id']}`, "
-        f"committed in c052338 under `{RESULTS['source']}/`. All {campus['all']['recorded']} planned "
-        f"campus runs and all {pantry['all']['recorded']} planned pantry runs were recorded, with none "
-        "missing, aborted, timed out or crashed. These are descriptive counts from one reported run on 8 campus "
-        "and 4 pantry cases. The case is the unit, the three runs of a case are repeated trials, and no "
-        "significance test is made. The two suites are separate. Section 12.7 adds version 1.2 "
-        "(Wave 3b): a fresh held-out check on six new cases and a post-hoc diagnostic rerun on these "
-        "spent cases. Neither replaces this run.",
-    )
-    para(
-        doc,
-        "**Headline.** No policy executed a violation, and no policy committed a change on the three "
-        "quiet cases. **Our coordinator, my policy, shows no consistent advantage over the tool-calling model or the fixed rules here.** On one reported run "
-        f"of 8 campus and 4 pantry held-out cases, our coordinator met every run of {campus['P2']['cases']} of 8 "
-        f"campus cases (the tool-calling model met every run of {campus['P1']['cases']}, the check-all variant of {campus['P3']['cases']}, the fixed rules of "
-        f"{campus['P0']['cases']}) and of {pantry['P2']['cases']} of 4 pantry cases (the fixed rules of "
-        f"{pantry['P0']['cases']}, the tool-calling model of {pantry['P1']['cases']}, the check-all variant of {pantry['P3']['cases']}). Its "
-        "misses come from a frozen attention rule that passes only equipment notices to the planner (C06), choices that used up the 8-call limit (C07) "
-        "and an unavailable pool kept as a handoff option (T03). A first attempt was voided, as "
-        "section 12.5 explains.",
-    )
-    figure(doc, PNG / "fig_result_record.png", "Figure 11. The earlier locked test: runs that met the case's outcome, per policy and suite.")
-    doc.add_heading("12.1 Campus suite (8 cases, 80 runs)", level=2)
-    table_caption(doc, "Table 1. Campus outcomes per policy, version 1.1, held-out.")
-    table(
-        doc,
-        ["Policy", "Met / recorded", "Cases fully met", "Goal met C01 to C07", "Infeasibility C08", "Changes on C02 to C04"],
-        [
-            [names[p], *_row("campus", p, ["met"]), f"{campus[p]['cases']} of 8", *_row("campus", p, ["goal", "infeas"]),
-             f"{campus[p]['unnec']} in {campus[p]['unnecn']} runs"]
-            for p in ["P0", "P1", "P2", "P3"]
-        ],
-        [1.5, 0.9, 0.9, 1.0, 1.0, 1.2],
-    )
-    table_caption(doc, "Table 2. Campus integrity and model use per policy, version 1.1, held-out.")
-    table(
-        doc,
-        ["Policy", "Refused requests", "Executed violations", "Status checks per run", "Model calls", "Model USD", "Runs capped"],
-        [[names[p], *_row("campus", p, ["refused", "viol", "checks", "calls", "usd", "capped"])] for p in ["P0", "P1", "P2", "P3"]],
-        [1.5, 0.8, 0.85, 0.85, 0.8, 0.85, 0.85],
-    )
-    para(
-        doc,
-        "On C08, the fixed rules' infeasibility report was decided by the policy, the tool-calling model's three by the model, and "
-        "our coordinator's and the check-all variant's three each by the server's shared narration. A refused request is a "
-        "coordinator call that the server rejected, so nothing it asked for happened. Across both "
-        f"suites {RESULTS['campus']['all']['stale'] + RESULTS['pantry']['all']['stale']} of the "
-        f"{RESULTS['campus']['all']['refused'] + RESULTS['pantry']['all']['refused']} refused "
-        "requests were made on a state that had changed meanwhile, which is retryable by design.",
-    )
-    doc.add_heading("12.2 Pantry suite (4 cases, 40 runs)", level=2)
-    table_caption(doc, "Table 3. Pantry outcomes per policy, version 1.1, held-out.")
-    table(
-        doc,
-        ["Policy", "Met / recorded", "Cases fully met", "Target met T01, T02", "Supported partial T03, T04", "Kits on time / target"],
-        [
-            [names[p], *_row("pantry", p, ["met"]), f"{pantry[p]['cases']} of 4", *_row("pantry", p, ["target", "partial", "kits"])]
-            for p in ["P0", "P1", "P2", "P3"]
-        ],
-        [1.5, 0.9, 0.9, 1.0, 1.1, 1.1],
-    )
-    table_caption(doc, "Table 4. Pantry integrity and model use per policy, version 1.1, held-out.")
-    table(
-        doc,
-        ["Policy", "Refused requests", "Executed violations", "Conservation failures", "Duplicate credits", "Model USD", "Runs capped"],
-        [[names[p], *_row("pantry", p, ["refused", "viol", "conserv", "credits", "usd", "capped"])] for p in ["P0", "P1", "P2", "P3"]],
-        [1.5, 0.8, 0.85, 0.85, 0.8, 0.85, 0.85],
-    )
-    para(
-        doc,
-        "Kits on time are summed over a policy's runs against the summed original targets. For pantry "
-        "partial fulfillment, the fixed rules' two reports were decided by the policy, and those of our coordinator and the check-all variant (T04, "
-        "three each) by the server. The tool-calling model's three T03 deficit reports were decided by the model but did "
-        "not meet the class.",
-    )
-    doc.add_heading("12.3 Per-case figures from the report", level=2)
-    para(
-        doc,
-        "The report's own per-case figures stay in the repository: `campus/report/figure.svg` and "
-        "`pantry/report/figure.svg` of the run, with printed copies in "
-        "`PEEAI_plan/submission/slides/figures/report_campus.pdf` and `report_pantry.pdf`.",
-    )
-    doc.add_heading("12.4 One success, one failure, and the other failures", level=2)
-    para(
-        doc,
-        "**One success.** C01, a genuine projector delivery delay, was met in every run by every "
-        "policy (10 of 10), scored from the final state and the receipts. The three quiet cases C02 to "
-        "C04 were met in all 30 of their runs with no committed change.",
-    )
-    para(
-        doc,
-        "**One failure.** In C06 (a volunteer will be late, with a later check-in), our coordinator and the check-all variant read the "
-        "volunteer's message correctly in all six runs. But the frozen attention rule treats only "
-        "equipment notices as material, so the reading never reached the planner, the plan was never "
-        "put in question, and the activity the volunteer leads could not start in time. The earliest "
-        "broken stage is planner input. The fixed rules' parser does not read the message. The tool-calling model met C06 in 3 of 3 "
-        "runs. This limit was disclosed at the case lock, before the runs.",
-    )
-    figure(doc, PNG / "fig_failure.png", "Figure 12. The C06 failure of our coordinator and the check-all variant in four steps.")
-    para(doc, "The other failed runs, each with its earliest broken stage (from the run's `FAILURES.md`):")
+    rows = []
+    names = {"P0": "The fixed rules", "P1": "The tool-calling model", "P2": "Our coordinator", "P3": "The check-all variant"}
+    for p in ("P2", "P3", "P1", "P0"):
+        met = sum(int(fresh[s][p]["metk"]) for s in ("campus", "pantry"))
+        n = sum(int(fresh[s][p]["metn"]) for s in ("campus", "pantry"))
+        usd = sum(float(fresh[s][p]["usd"]) for s in ("campus", "pantry"))
+        calls = sum(int(fresh[s][p]["calls"]) for s in ("campus", "pantry"))
+        per_run = f"about {100 * usd / n:.1f} cents" if usd else "no cost"
+        rows.append([names[p], f"{met} of {n}", str(calls), f"${usd:.2f}", per_run])
+    tab(doc, "Results and cost per approach in the final test.", ["Approach", "Runs met", "AI calls", "AI service cost", "Cost per run"], rows, [1.9, 1.0, 0.9, 1.3, 1.4])
     bullets(
         doc,
         [
-            "**C07** (status service unavailable), our coordinator in 3 runs, action selection: a repeated check and a "
-            "hold released and made again used the 8 model calls, and the organizer's approval arrived "
-            "after the last one. The fixed rules missed C07 too (interpretation), because its parser does not read "
-            "the message.",
-            "**T02**, the check-all variant in 3 runs, execution: a correct apply was refused as stale during a one-minute "
-            "tool call, and the remaining model calls went to reading new notices, so it was never "
-            "retried.",
-            "**T03 and T04**, the tool-calling model in 6 runs, action selection: the tool-calling model never held or committed the kits on hand.",
-            "**T03**, our coordinator and the check-all variant in 3 runs each, planner input (for our coordinator borderline with action selection): "
-            "a defect in my frozen planner and menu kept a pool checked as unavailable as a ranked "
-            "handoff option, and the shortfall report waited on it.",
-            "The 8-call limit ended 15 of the 26 failed runs. No failed run had an executed violation, a "
-            "conservation failure or an unauthorized credit.",
+            "**The one miss.** The fixed rules missed the late-volunteer case because they were never written to read a volunteer's own message. This does not show that the AI helps, because the AI approaches were changed after failing the same kind of case earlier.",
+            "**No approach looked anything up in the late-volunteer case.** All of them took the volunteer's word. That is a known limit (section 12).",
+            "**The 6 refused attempts** were all on pantry days. 5 asked for a partner's rack that the case was built to decline, and 1 was based on an out-of-date plan. They were expected refusals, not misbehavior.",
+            "**The false alarm** led to no unneeded change in any of its 10 runs. **The case that cannot be saved** was said plainly in all 10 runs.",
+            "**Cost per run.** Our coordinator cost about 2.9 cents a run on the campus cases and about 7.0 cents on the pantry days, so 3 to 7 cents. The tool-calling model met the same 18 of 18 at about three times the cost. So the test does not show that picking from a list improves outcomes. It shows the same outcomes at about a third of the cost.",
+            "**How often each approach looked things up**, as description only. On the campus cases our coordinator made 10 look-ups in 12 runs and the check-all variant 18 in 12. Fewer look-ups is not better in itself. In the earlier test the check-all variant cost less than our coordinator and met more of the campus runs.",
+            "**Six cases are a small check, not a ranking.** They cannot show that one approach is better than another.",
         ],
     )
-    doc.add_heading("12.5 The tradeoff, the spend and what the counts do not show", level=2)
-    para(
-        doc,
-        f"**The tradeoff.** The tool-calling model, the model calling tools freely, met all campus runs, with the most model "
-        f"use: {campus['P1']['calls']} model calls and ${campus['P1']['usd']} on campus, against "
-        f"${campus['P2']['usd']} for our coordinator and ${campus['P3']['usd']} for the check-all variant. On the pantry, fixed rules met "
-        f"{pantry['P0']['met']} runs at no model cost, while the model policies met "
-        f"{pantry['P1']['metk']} to {pantry['P2']['metk']} of 12. Our coordinator cost less than the tool-calling model (the check-all variant, with the same menu and server checks, cost less still on campus), and its "
-        "misses trace to its frozen attention rule, choices that used up the call limit and the "
-        "planner defect. These counts come from one reported run and do not show that any policy is "
-        "better in general.",
-    )
-    para(
-        doc,
-        "**Spend.** The reported run cost 9.08 USD in provider-reported model charges (campus 4.58, "
-        "pantry 4.49). With the voided first attempt the evaluation step cost 9.64 USD, and the spend "
-        "ledger stood at 13.40 USD after it, under the 40 USD limit for Wave 3.",
-    )
-    para(
-        doc,
-        "**A voided first attempt.** The first attempt ran eight runs at a time and hit the provider's "
-        "limit of 20 requests a minute. Most calls were answered with an error, and each error used up "
-        "one of a run's 8 model calls. It was declared void before the reported run began, kept on "
-        "record, and the whole protocol was rerun one run at a time. Under the frozen status rules its "
-        "capped runs would have been scored, so the void is a disclosed departure from those rules.",
-    )
-    bullets(
-        doc,
-        [
-            "**Prompts differ by policy.** Only our coordinator and the check-all variant had pantry guidance in their prompts, so the "
-            "pantry partial-fulfillment counts cannot be credited to the controller alone.",
-            "**The limits are development values**: 8 model calls and 48 tool calls per run, not tuned on "
-            "held-out cases. The 8-call limit was reached in 21 of the 120 runs.",
-            "**No backoff on a rate-limit error** in the frozen provider. A live demo runs one model "
-            "episode at a time, with the recorded replay as the fallback. Version 1.2 adds one "
-            "(section 12.7).",
-            "**Reproducibility.** Seeds were recorded but not sent, the temperature is the provider "
-            "default, and the provider's upstream route was not recorded.",
-            "**These held-out cases are now spent.** A revised policy needs new cases and a new freeze. "
-            "Section 12.7 reports both for version 1.2.",
-        ],
-    )
-    doc.add_heading("12.6 Functional evidence", level=2)
-    bullets(
-        doc,
-        [
-            "Python tests: 896 passed, in the Wave 3 evidence collector's run from a clean checkout of "
-            "commit 3442874 (`PEEAI_plan/handoffs/wave_3/evidence/reports/checks.json`). The same run passed 396 "
-            "web tests, the browser walkthroughs 41 of 41 and 30 of 30, the storyboard 32 of 32 and the "
-            "keyboard walk 19 of 19, and `plan-b run-case all` matched all 9 development cases.",
-            "At the Wave 2 packet (development evidence): 766 Python tests and 392 web tests passed, the "
-            "browser walkthroughs passed 41 of 41 and 30 of 30 checks, and the demo storyboard 32 of 32.",
-            "Wave 1 rejection demo: 20 steps, each with its expected result.",
-            "Rehearsals: three automated rehearsals of the showcase's board path passed, one of them "
-            "with a forced provider failure and a switch to the labelled replay (Wave 3 packet, "
-            "`PEEAI_plan/handoffs/wave_3/REHEARSALS.md`). The spoken script is 922 counted words, about 6 "
-            "minutes 35 seconds at 140 words a minute, inside the 7 minutes.",
-        ],
-    )
-    wave3b(doc)
+    earlier(doc)
 
 
-def wave3b(doc) -> None:
-    """Section 12.7: version 1.2 in two layers that stay apart from the v1.1 record."""
-    fresh, rerun = V12["fresh"], V12["rerun"]
-    pols = ["P0", "P1", "P2", "P3"]
-    fk, fn = _v12_met("fresh")
-    calls = sum(int(fresh[s][p]["calls"]) for s in ("campus", "pantry") for p in pols)
-    usd = {k: sum(float(V12[k][s][p]["usd"]) for s in ("campus", "pantry") for p in pols) for k in ("fresh", "rerun")}
-    by_policy = {p: sum(float(fresh[s][p]["usd"]) for s in ("campus", "pantry")) for p in ("P1", "P2", "P3")}
-    doc.add_heading("12.7 The final system on six new cases, in full (Wave 3b, version 1.2)", level=2)
+# The earlier test's cost per approach, summed from the unrounded suite costs in
+# apps/plan_b/evaluation/results/wave3_heldout_20261025T1625Z/README.md (campus plus pantry).
+EARLIER_USD = {"P1": 3.006960 + 2.555110, "P2": 1.004722 + 0.953090, "P3": 0.570856 + 0.986032}
+
+
+def earlier(doc) -> None:
+    r, rerun = RESULTS, V12["rerun"]
+    h2(doc, "7.2 The earlier 12-case test, which found four problems")
     para(
         doc,
-        "**What changed and why.** The held-out run above exposed defects in the frozen 1.1 policies, "
-        "and its `FAILURES.md` names them. Version 1.2 (the tool-calling model `tool-use/1.2.0`, our coordinator `live/1.2.0`, the check-all variant "
-        "`verify-all/1.2.0`) fixes them. `apps/plan_b/docs/RUNTIME_CONTRACT.md` section 21 lists each "
-        "fix with its test.",
+        "Before the final test, an earlier sealed test ran the previous version on 12 cases, 8 campus "
+        f"and 4 pantry, in {r['campus']['all']['recorded'] + r['pantry']['all']['recorded']} runs. "
+        "It found four problems, which I worked on before the final test. An earlier planning brief "
+        "for this submission said three problems, and the records of that test say four, so this "
+        "report says four. Those 12 cases are now spent, because the code was changed after reading "
+        "their failures.",
+    )
+    names = {"P0": "The fixed rules", "P1": "The tool-calling model", "P2": "Our coordinator", "P3": "The check-all variant"}
+    tab(
+        doc,
+        "Runs that met the expected outcome in the earlier test, per approach.",
+        ["Approach", "Campus, 8 cases", "Pantry, 4 cases", "AI service cost"],
+        [
+            [names[p], r["campus"][p]["met"].replace("/", " of "), r["pantry"][p]["met"].replace("/", " of "),
+             f"${EARLIER_USD[p]:.2f}" if p != "P0" else "no cost"]
+            for p in ("P0", "P1", "P2", "P3")
+        ],
+        [2.0, 1.5, 1.5, 1.5],
     )
     bullets(
         doc,
         [
-            "**A person's delay** (C06). In 1.1 only equipment notices were material, so a volunteer's "
-            "own report never reached the planner. In 1.2 a notice about a person that a not-started "
-            "activity uses is material, and the claimed arrival time reaches the planner as a hypothesis.",
-            "**An unavailable pool** (T03). In 1.1 a pool checked as unavailable stayed a ranked handoff "
-            "option, and the shortfall report waited on it. In 1.2 the planner fails that handoff unless "
-            "it is already held.",
-            "**Calls with no progress** (the runs that used up the 8-call limit). In 1.2 the model is not "
-            "called again on a menu it already passed on in the same state (the same revision, goal "
-            "version and options).",
-            "**A stale refusal** (T02). In 1.1 a choice refused only because the state had changed went "
-            "back to the model. In 1.2 our coordinator and the check-all variant send it again without a model call when the re-read "
-            "menu still offers it.",
-            "**Rate limits.** In 1.1 an HTTP 429 answer used up a model call. In 1.2 the provider waits "
-            "and sends the same request again inside the call (3 s, doubled up to 20 s, at most 60 s of "
-            "waiting a call), so a 429 uses no model call.",
-            "The fixed rules' code and ids are unchanged, but they share the planner, so the freeze records the "
-            "planner version `plan_b.planner/1.2.0`. The model, the output limit and every cap are the "
-            "same as in 1.1.",
+            "**The four problems.** A volunteer's own report of a delay never reached the part that lists changes. A partner's stock already found unavailable stayed on the list. Some runs used up the 8 AI calls without making progress. A change refused only because the plan had just moved on needed a new AI call to try again, and the limit of 8 AI calls sometimes came first.",
+            "**What changed.** Version 1.2 passes a person's delay on as something to plan around, drops stock already found unavailable, stops asking the AI again about the same unchanged list, and resends a refused change when it still fits.",
+            "**A later rerun still misses two of the targeted cases in every run, and a third in two of its three runs.** In a rerun on the spent cases after the changes, our coordinator still missed the case where the look-up service is down in 3 of 3 runs, the check-all variant still missed a pantry case with duplicate and misleading quantity claims in 3 of 3, and the tool-calling model still missed a pantry case in 2 of 3. This rerun is a diagnostic, not a sealed result, and it cannot show that version 1.2 is better.",
         ],
     )
     para(
         doc,
-        "**How the new held-out result was kept apart.** The twelve cases above are spent, because the "
-        "fixes were made after reading their failures. A separate worker wrote six fresh cases (campus "
-        "C09 to C12, with C10 a quiet negative control, and pantry T05 and T06). They were locked "
-        "with the 1.2 freeze (`freeze_v1_2.json` at 23:23:47 UTC, `heldout2.json` at 23:23:54 UTC, "
-        "commit 5955243) before the first 1.2 model call on them (23:27:31 UTC). Whoever changed the "
-        "policies never read those cases. Two limits remain. The case author read the prose list of "
-        "planned fixes, but no code. The audit before the freeze had seen the cases, so it changed no "
-        "policy behavior and left five known limits of 1.2 frozen (section 13).",
+        f"Rerun counts, for the record. Campus, our coordinator {rerun['campus']['P2']['met'].replace('/', ' of ')}, "
+        f"the check-all variant {rerun['campus']['P3']['met'].replace('/', ' of ')}. Pantry, our coordinator "
+        f"{rerun['pantry']['P2']['met'].replace('/', ' of ')}, the check-all variant "
+        f"{rerun['pantry']['P3']['met'].replace('/', ' of ')}, the tool-calling model "
+        f"{rerun['pantry']['P1']['met'].replace('/', ' of ')}.",
     )
-    layers = [
-        ("v1.1 earlier locked test: campus C01 to C08", RESULTS, "campus"),
-        ("v1.1 earlier locked test: pantry T01 to T04", RESULTS, "pantry"),
-        ("v1.2 fresh held-out: campus C09 to C12", fresh, "campus"),
-        ("v1.2 fresh held-out: pantry T05, T06", fresh, "pantry"),
-        ("v1.2 post-hoc diagnostic rerun on spent cases, not held-out: campus C01 to C08", rerun, "campus"),
-        ("v1.2 post-hoc diagnostic rerun on spent cases, not held-out: pantry T01 to T04", rerun, "pantry"),
+    h2(doc, "7.3 Automated tests of the app")
+    bullets(
+        doc,
+        [
+            "951 Python tests passed on the final version of the code (896 passed on version 1.1), and 397 web tests passed.",
+            "11 of the 12 small release checks pass, and the 12th does not apply because the link to bus and train alerts was not built. These checks are automated tests of the app, run separately from the final test. Among them, a change made against an old copy of the plan is refused with nothing half done, an offer or a check-in gives no say over money or bookings, text that says \"ignore your instructions\" stays text, no receipt is invented after a failure, and every receipt matches what was saved.",
+            "The checks on misleading messages use a scripted, deliberately fooled AI, not the real model.",
+        ],
+    )
+
+
+def responsible(doc) -> None:
+    h1(doc, SECTIONS["responsible"])
+    para(
+        doc,
+        "Plan B follows five practices. Each comes with what outside sources say, how Plan B meets "
+        "it, and a careful note on what we do not claim.",
+    )
+    fig(doc, "fig_flow", "What goes where, from a message to the outside AI service, Plan B's checks, the receipt and the person who approves money, with the limits beside it.")
+    practices = [
+        (
+            "8.1 Check the fact, and pick only what fits",
+            f"OWASP, a security group, lists prompt injection (a message that tries to give the AI new orders) first among the risks of AI language apps, and among ways to reduce its impact lists separating and clearly marking untrusted content {cite(33)}. Its entry on AI that is allowed to do too much recommends that the systems around the AI decide what is allowed, rather than letting the AI decide what is allowed {cite(34)}. The UK National Cyber Security Centre says current models do not keep instructions and data apart, and that protections should rely more on fixed safeguards outside the model {cite(37)}. Anthropic warns that Claude may sometimes follow commands found in content {cite(36)}.",
+            "A message is a claim, and its text is treated as data, not as instructions. Plan B looks up only the fact that could change the decision. The server lists the allowed changes and checks each, and in our coordinator the AI picks only among those that passed. A misleading message can at most lead to a choice among changes that already fit.",
+            "This limits what a misleading message can do. It does not prevent prompt injection, and we do not claim it does.",
+        ),
+        (
+            "8.2 Leave a receipt",
+            f"NIST lists accountable and transparent among the qualities of trustworthy AI, including how and when decisions were made and by whom {cite(32)}. The OpenAI paper says a ledger of the actions an agent took may be particularly important {cite(35)}.",
+            "The server writes a receipt for every accepted change, and the AI cannot write one. Refused attempts are recorded too. A free hold ends on its own, so it can be reviewed after the fact.",
+            "Neither source requires this design. The receipt follows these ideas.",
+        ),
+        (
+            "8.3 Money waits for a person's OK",
+            f"OWASP lists human approval for high-risk actions among measures that reduce impact {cite(33, 34)}. A paper by Shavit and colleagues at OpenAI says some decisions, such as a large financial transaction, may be too important to hand to an agent, and that approving many decisions quickly makes each approval less careful {cite(35)}. Anthropic suggests asking a person to confirm decisions with real-world consequences, such as payments {cite(36)}. NIST notes that human roles in overseeing AI need to be clearly defined {cite(32)}.",
+            f"{MONEY} Plan B's own spending allowance is $0 by default, so any spending waits for the organizer, who approves it in their own session. The coordinator may make free changes inside the rules and hold a backup for free, so the organizer is asked only about money.",
+            "Approval before spending is common practice among the tools in section 10, so it is responsible design, not something new. The allowance is Plan B's own design choice, and the NIST passage is framing, not a requirement.",
+        ),
+        (
+            "8.4 A rehearsal on a computer",
+            f"τ-bench scores agents by the final state {cite(30)}. NIST's framework is meant for voluntary use, to bring trustworthiness into design and testing {cite(31)}, and lists valid and reliable, safe, and secure among its qualities {cite(32)}.",
+            "Everything runs in the rehearsal. Every action changes a local database and nothing else. Sealed cases are scored by the final state, and paid AI calls run under limits per run and in total.",
+            "Plan B's design draws on these ideas. We do not claim that it complies with the NIST framework or is certified against it.",
+        ),
+        (
+            "8.5 No personal data",
+            f"NIST lists privacy-enhanced among the qualities of trustworthy AI {cite(32)}.",
+            "All events, people, rooms, stock, times and costs are made up. The pantry plans count kits only, with no names and no eligibility, allergy or medical decisions. Plan B counts kits, never people. Who gets food is always a person's call, and Plan B never decides who goes without. No real message was sent and no participant feedback was collected. No pantry, U-ACCESS staff, system or partner took part.",
+            "The sources state principles and did not review Plan B. We say the rehearsal uses no personal data, not that Plan B meets a privacy standard.",
+        ),
     ]
-    table_caption(doc, "Table 5. Runs that met the case's outcome over recorded runs, per policy, in three separately labelled layers.")
-    table(
-        doc,
-        ["Layer and cases", "Runs", "Fixed rules", "Tool-calling model", "Our coordinator", "Check-all variant"],
-        [[label, str(src[suite]["all"]["recorded"]), *[str(src[suite][p]["met"]) for p in pols]] for label, src, suite in layers],
-        [2.6, 0.5, 0.8, 0.8, 1.0, 0.8],
-    )
-
-    def quiet(src: dict, suite: str) -> str:
-        n = sum(int(src[suite][p]["unnecn"]) for p in pols)
-        return f"{src[suite]['all']['unnec']} in {n} runs" if n else "no quiet case"
-
-    table_caption(doc, "Table 6. Integrity measures in the same layers, summed over the four policies.")
-    table(
-        doc,
-        ["Layer and cases", "Executed violations", "Refused requests", "Runs capped", "Changes on quiet cases"],
-        [
-            [label, str(src[suite]["all"]["viol"]), str(src[suite]["all"]["refused"]), str(src[suite]["all"]["capped"]), quiet(src, suite)]
-            for label, src, suite in layers
-        ],
-        [2.6, 0.95, 0.95, 0.9, 1.1],
-    )
-    para(doc, "**What these numbers show and do not show.**")
+    for heading, sources, meets, careful in practices:
+        h2(doc, heading)
+        para(doc, f"**What the sources say.** {sources}")
+        para(doc, f"**How Plan B meets it.** {meets}")
+        para(doc, f"**Careful.** {careful}")
+    h2(doc, "8.6 The privacy rule, and what is still missing")
+    para(doc, "**Never put a name, address, health or immigration detail in a message Plan B reads. Every message goes to an outside AI service.**")
     bullets(
         doc,
         [
-            "**Descriptive counts only.** Each layer is one run of the protocol. The case is the unit, "
-            "the three seeds are repeated trials, and no significance test is made. The suites are "
-            "separate.",
-            f"**The fresh held-out check** (`wave3b_fresh_20261025T2327Z`). Version 1.2 met the outcome "
-            f"in {fk} of {fn} runs. The one miss is the fixed rules on C11, a late volunteer whose own report the fixed rules' "
-            "frozen parser does not read, the same gap by construction as the fixed rules on C06. The tool-calling model, our coordinator and the check-all variant met "
-            f"every run, {fresh['campus']['P2']['met']} each on campus and {fresh['pantry']['P2']['met']} "
-            f"each on the pantry. No run reached the 8-call limit, all {calls} model calls were "
-            "answered, and the negative control C10 had no committed change in any of its 10 runs.",
-            "**Small, and close to the spent cases.** Six cases is a small set. Its wording is close to "
-            "the spent templates, and its conditions repeat spent ones (C11 repeats the C06 condition, "
-            "T06 the T03 condition). So it tests new instances of known conditions, not new conditions. "
-            "It is not comparable with the v1.1 counts, because the cases differ.",
-            "**Our coordinator still shows no consistent advantage.** The tool-calling model, our coordinator and the check-all variant all met every fresh run, so the "
-            "fresh set cannot separate them. Model charges over both fresh suites were "
-            f"${by_policy['P1']:.2f} for the tool-calling model, ${by_policy['P2']:.2f} for our coordinator and ${by_policy['P3']:.2f} for the check-all variant.",
-            "**The rerun on the spent cases is diagnostic, not held-out** "
-            "(`wave3b_rerun_spent_20261025T2345Z`). Its counts are consistent with the fixes on the "
-            "failures that motivated them: the C06 misses of our coordinator and the check-all variant and the T03 misses did not "
-            "recur. The C07 failure of our coordinator (a hold made, released and made again until the call limit) "
-            "and the T02 failure of the check-all variant (an apply refused as stale, whose retry needed a model call that "
-            "the limit did not leave) remain, and the tool-calling model missed "
-            "T04 in two of three runs. The fixes were made after reading these cases, so the rerun "
-            "cannot show that 1.2 is better.",
-            "**Harness labels.** The rerun used a case-scoped lock written outside the repository, so "
-            "its generated files (`plan.json`, `metrics.json` and the report text) say held-out. Its "
-            "README says in its first line that it is not a held-out result, and every table here "
-            "labels it so.",
-            "**Run conditions.** The fresh run went one episode at a time and met no rate limit. The "
-            "rerun ran two at a time and waited out 61 HTTP 429 answers on 28 calls, each unbilled and "
-            f"using no model call. {rerun['campus']['all']['capped'] + rerun['pantry']['all']['capped']} "
-            "rerun episodes reached the 8-call limit.",
-            f"**Zero executed violations** in all three layers. **Spend:** the fresh run cost "
-            f"{usd['fresh']:.2f} USD and the rerun {usd['rerun']:.2f} USD in provider-reported model "
-            "charges, and the spend ledger stood at 26.43 USD after both, under the 40 USD limit.",
+            "**No tricky message in the final test.** Automated release checks show that \"ignore your instructions\" text is stored as content and changes nothing, but the six sealed cases had no such message.",
+            "**OpenRouter passes each call on to one of several companies that run the model,** and we did not record which one answered each call.",
+            "**A poor pick that keeps every rule is not caught.** The checks stop changes that break a rule, not changes that are allowed but unwise.",
+            "**\"No executed action broke a rule\" is enforced by the same server that is counted.** So it tests the server, not the AI's judgment.",
+            "**If nobody answers,** the hold lapses and nothing is bought, and the evening may have no projector.",
+            "**The AI service key** stays in a private file on the organizer's own computer, is read for each call and sent only to the AI service, and never reaches the browser or any record.",
         ],
     )
 
 
-def limitations(doc) -> None:
-    doc.add_heading("13. Limitations and what was not done", level=1)
+# ----------------------------------------------------------------------------------------------
+# 9 to 12, market, competitors, why Plan B, benefit
+# ----------------------------------------------------------------------------------------------
+
+
+def market(doc) -> None:
+    h1(doc, SECTIONS["market"])
     bullets(
         doc,
         [
-            "**Fictional sandbox.** No real bookings, rooms, purchases, messages, people or stock.",
-            "**Small case set.** Eight campus and four pantry held-out cases in the evaluation of "
-            "record, and six fresh cases for version 1.2. The case is the unit, and three runs are "
-            "not three worlds. No significance is claimed.",
-            "**Version 1.2 has five known limits**, found by the audit before the freeze and left "
-            "frozen: a person's delay hypothesis outlives a later check-in, the declined-menu rule "
-            "holds no time (so a timed wake with the same options gets no model call), the tool-calling model notes a "
-            "declined menu with the view after its turn, a stale re-send is recorded as a model "
-            "choice, and a long `Retry-After` is cut to 20 s (`RUNTIME_CONTRACT.md` section 21).",
-            "**The fresh held-out set** has four campus and two pantry cases. Its wording is close to "
-            "the spent templates, its conditions repeat spent ones, and its author read the prose list "
-            "of planned fixes.",
-            "**The diagnostic rerun's generated files say held-out** because of the harness path. Its "
-            "README says it is not a held-out result, and any quote of it must keep that label.",
-            "**One model**, one provider, seeds not supported, so runs are repeated trials and not "
-            "reproducible.",
-            "**No comparative claim beyond the counts.** A difference between our coordinator and the fixed rules does not separate the "
-            "decision policy from language reading.",
-            "**Zero executed violations** reflects the executor's checks. It means none were observed in "
-            "these runs, not a proof that none can occur.",
-            "**Rehearsals** were automated (three board rehearsals). No human rehearsal had been done "
-            "when this document was written.",
-            "**Failure paths** were mostly tested with scripted model replies. The model was driven from a "
-            "browser once, by hand.",
-            "**Not built**: the optional MBTA transit adapter. Authorization requests have no stored state "
-            "of their own yet.",
-            "**Browsers**: only Chromium was driven. Screen readers, Firefox and Safari were not tested.",
-            "**Trace hashes** are checked but not signed.",
-            "**No community validation, pilot or partner.**",
+            "**Who uses it.** Student club officers first, then volunteer coordinators of community groups and pantry staff, the people who run small events with little time and no operations staff.",
+            f"**The first group to reach.** Student clubs at UMass Boston, which has 100+ student groups {cite(28)} and a student group portal hosted on CampusGroups {cite(14, 15)}. These counts are context, not a market size, and imply no partnership.",
+            "**How a group starts.** The code is free to read and run. A group needs one laptop, an account with an AI service, and cents per run (3 to 7 cents a run for our coordinator in the final test), or no account at all with the fixed rules.",
+            "**The honest effort.** Today it needs someone comfortable running code. A new event of a known kind is a settings file, and a new kind of day needs new code (the pantry needed a small stock extension).",
+            "**Who else gains.** Attendees, whose evening runs on time. Volunteers, whose time is not wasted on unneeded changes. The treasurer or advisor, who can read the receipt.",
+        ],
+    )
+    fig(doc, "fig_people", "Built first for student club officers, then volunteer coordinators and the staff of a pantry like the made-up one.")
+    para(doc, "The facts below size the people and the need around these events. None of them measures demand for Plan B.")
+    tab(
+        doc,
+        "Need facts and their limits.",
+        ["Fact", "Source", "Its limit"],
+        [
+            ["An estimated 23 percent of US college students, about 3.8 million, experienced food insecurity in 2020", cite(21), "Data year 2020, report 2024. Shows need for campus food support, not demand for Plan B"],
+            ["More than 650 colleges reported a campus food pantry", cite(22), "A count reported in 2018, not a current total"],
+            ["59 percent of 74,350 students at 91 institutions had food or housing insecurity, 41 percent food insecurity", cite(23), "Institutions that chose to take part, 2023 to 2024, not a national rate"],
+            ["Over 75.7 million people in the US volunteered through an organization between September 2022 and September 2023", cite(24), "Counts volunteers, not events or organizers"],
+            ["Nearly 48 million people in the US experienced food insecurity, as USDA reports, and nearly half of them had incomes too high for federal nutrition help", cite(25), "Counts people, not events or organizers"],
+            ["40 percent of Massachusetts households were food insecure in 2025, and over 600 pantries and partners depend on The Greater Boston Food Bank", cite(26), "An online survey with its own method, not comparable with national rates"],
+            ["About 19.0 million students attended US colleges in fall 2022", cite(27), "Counts students, not clubs or organizers"],
+            ["UMass Boston has 100+ student groups", cite(28), "Not evidence that any group wants Plan B"],
+            ["The U-ACCESS food pantry at UMass Boston opened in 2013 and relies on community support", cite(29), "Our pantry is made up, with no partnership or data access"],
+        ],
+        [3.0, 0.8, 2.7],
+    )
+
+
+DIRECT = [
+    ["Sessionboard AI Agenda Builder", "When a speaker cancels or a room is lost, its AI assesses the impact and suggests adjustments, checks changes against the agenda's rules, and sends big changes for sign-off", "The page does not describe an expiring free hold or a receipt for each decision. Plan B shows both, the hold in a separate practice case", cite(1)],
+    ["Cvent Assistant (announced)", "Announced in July 2026 and expected in the third quarter of 2026. Maps an attendee change request across the platform for one-click review", "The release does not mention a look-up of the one fact, holds or receipts", cite(2)],
+    ["Bizzabo agents (announced)", "Announced October 12, 2026. Agents build and update schedules, and nothing goes live until a person approves it. Broad availability planned for early 2027", "The announcement does not describe a fact check on the day or an expiring hold", cite(3)],
+    ["ChatGPT agent", "Can rearrange meetings and plan and book events, and asks permission before actions with real-world consequences such as a purchase", "In Plan B the AI picks among changes the server built and checked for one event", cite(4)],
+    ["Browse with Copilot", "Acts in the Edge browser and asks for the user's supervision before buying or booking", "Plan B adds the event's own checks, the hold and the receipt", cite(5)],
+    ["Gemini Apps tasks", "Edits calendar events and asks for confirmation before purchases or sending messages", "Plan B checks whether a warning is true before it changes a shared event plan", cite(6)],
+    ["Zapier Agents", "A user can make an agent wait for confirmation by adding that step. Zapier is moving Agents to AI by Zapier", "In Plan B the checks come built in, and spending always needs a person", cite(7)],
+    ["Eventbrite AI tools (2023 post)", "Write event summaries, page copy and ads", "The post says nothing about changes on the day", cite(8)],
+    ["Whova AI features", "Help write event descriptions and summaries, and tell organizers to check facts because AI can make things up", "Writing and reporting, not a last-minute problem", cite(9)],
+    ["Reclaim.ai", "Adjusts personal and team calendars, with preview and approval for changes asked in conversation", "Personal calendars, not shared equipment and volunteers", cite(10)],
+]
+INDIRECT = [
+    ["GroupMe", "A free group chat, with a campus tab for finding groups", "Where a late warning usually lands. Plan B works behind the chat", cite(11)],
+    ["Google Sheets", "A shared spreadsheet with permissions and AI help", "Stands in for the shared run-of-show sheet", cite(12)],
+    ["Doodle group polls", "Settle a time before the event", "Plan B handles the day itself", cite(13)],
+    ["CampusGroups", "Events, membership, messages and attendance for student groups", "Plan B can sit alongside it", cite(14)],
+    ["UMBeInvolved", "UMass Boston's portal for student groups, hosted on CampusGroups", "The local status quo. No integration claimed", cite(15)],
+    ["Engage from Encoura, formerly Anthology Engage", "Event planning and reviewer workflows for student affairs", "Planning ahead, not recovery on the day", cite(16)],
+    ["SignUpGenius", "Sign-up sheets with reminders and waitlists that fill a cancelled slot", "Does not describe how a late arrival affects the activities that depend on it", cite(17)],
+    ["VolunteerHub", "Volunteer shifts, framed by the vendor as a step up from spreadsheets and email", "Vendor framing, not independent evidence", cite(18)],
+    ["PantrySoft", "Campus pantry sign-up, appointments and visit tracking", "Plan B would sit beside an intake tool like this", cite(19)],
+    ["Link2Feed", "Pantry software, which says pantries depend on volunteers and paper records are hard", "Vendor framing. Plan B sits beside it", cite(20)],
+]
+
+
+def others(doc) -> None:
+    h1(doc, SECTIONS["others"])
+    para(
+        doc,
+        f"Event platforms already check agenda changes against rules and send big changes for "
+        f"sign-off {cite(1)}, and two have announced agents that turn a request into changes a person "
+        f"reviews or approves {cite(2, 3)}. General assistants already ask before they buy or book "
+        f"{cite(4, 5, 6)}. Each tool below is described only by what its own page says, and we have "
+        "not tested any of them. Plan B does not claim to be the first of its kind.",
+    )
+    fig(doc, "fig_others", "Where a late text lands today, and the tools that already change plans, each with its source number.")
+    h2(doc, "10.1 Direct competitors, tools that already change plans")
+    tab(doc, "Direct competitors, tools that already change plans.", ["Tool", "What its own page says", "What Plan B adds", "Source"], DIRECT, [1.3, 2.7, 1.9, 0.6])
+    h2(doc, "10.2 Indirect competitors and the status quo")
+    para(
+        doc,
+        f"Today a late message lands in a group chat, a shared spreadsheet or a sign-up sheet "
+        f"{cite(11, 12, 17)}. Plan B works behind these tools and does not replace them.",
+    )
+    tab(doc, "Indirect competitors and the status quo.", ["Tool", "What its own page says", "How Plan B relates", "Source"], INDIRECT, [1.4, 2.5, 2.0, 0.6])
+    para(
+        doc,
+        "What Plan B shows on one community event is the look-up of the one fact the decision "
+        "depends on, picking only from changes that fit, and a receipt for every change while money "
+        "waits for a person's OK, free and open.",
+    )
+
+
+def why(doc) -> None:
+    h2(doc, SECTIONS["why"])
+    if COMPARISON_BRIEF.exists():
+        print("note: COMPARISON_BRIEF.md exists, check this section against its What not to claim list")
+    para(
+        doc,
+        "Safer, more flexible and more personal, for a small group on the day of an event. Safer is "
+        "the payoff of the three ideas. In our design the AI can only choose, Plan B checks every "
+        "change before it happens, and the AI cannot spend money unless a person allows it. More "
+        "flexible means the same program runs different kinds of events, with whichever AI you pick "
+        "or none at all, on your own laptop for free. More personal means your group writes down "
+        "its own event, people and backups, and sets how much the AI may spend without asking, and "
+        "Plan B follows that.",
+    )
+    fig(doc, "fig_why", "Safer, more flexible and more personal, each with one simple drawing.")
+    tab(
+        doc,
+        "Why Plan B, each point with how we know it and what the others are built for.",
+        ["Point", "Plan B's feature, in plain words", "How we know it", "What the others are built for"],
+        [
+            [
+                "**Safer**",
+                "In our coordinator the AI picks only from changes that fit, and in every approach one place checks every change before it happens. A change against an old copy of the plan is refused. Message text that says \"ignore your instructions\" changes nothing. Paying needs the organizer's OK. In the final test no executed action broke a rule in 60 runs.",
+                "The release checks in the code (11 of 12 passing, 1 not applicable, Appendix C) and the final test's results",
+                f"Sessionboard also checks agenda changes against rules and sends big changes for sign-off {cite(1)}, and its page does not describe a receipt for each decision. In Zapier Agents the user adds the approval step {cite(7)}. General assistants already ask before buying {cite(4, 5, 6)}, so asking is not the difference.",
+            ],
+            [
+                "**More flexible**",
+                "One core runs three kinds of event, a campus evening, a community skills exchange and a food pantry (with a small stock extension). It works with any AI service that accepts the same requests as OpenAI's, or with the fixed rules and no AI. It runs on one laptop, free and open source under GPL-3, with no vendor contract. It needs an account with an AI service unless the group uses the fixed rules or a model on its own computer.",
+                "The settings file, the three kinds of practice case in the code, and the GPL-3 license file (Appendix B)",
+                f"ChatGPT agent, Copilot and Gemini are each their maker's own assistant {cite(4, 5, 6)}. Sessionboard, Cvent and Bizzabo are event platforms for organizers {cite(1, 2, 3)}.",
+            ],
+            [
+                "**More personal**",
+                "Each group writes its own event, people, times, backups and stock targets, sets how much the AI may spend without asking (by default nothing, so any spending waits for a person), and picks its own AI model and AI cost limits.",
+                "The example event files and the spending check in the code (Appendix B)",
+                f"ChatGPT asks before actions with real-world consequences and Gemini before purchases {cite(4, 6)}. Their pages say each assistant is trained or designed to ask before such actions.",
+            ],
+        ],
+        [0.9, 2.5, 1.5, 1.6],
+    )
+    para(
+        doc,
+        "A model on the organizer's own computer is allowed by the settings but was not tested in "
+        "this project, and only one AI model was run. We have not tested the others.",
+    )
+
+
+def benefit(doc) -> None:
+    h1(doc, SECTIONS["benefit"])
+    para(doc, f"**\"{STUDENT}\"**")
+    bullets(
+        doc,
+        [
+            "**Not deciding alone.** The benefit is not the swap, which Jordan could do by hand. It is not deciding alone at 4.40 pm, with the one fact checked and only the changes that fit on the table.",
+            "**No club money on a rumor.** Plan B spends nothing without a person's OK, and the $35 backup stays unbooked when it is not needed.",
+            "**A record ready when someone asks.** When the treasurer or advisor asks why the program changed, the receipt is there.",
+            f"**For the community.** Volunteer groups and pantries face the same late deliveries and no-shows. Community events run on volunteers, and over 75.7 million people in the US volunteered through an organization between September 2022 and September 2023 {cite(24)}. The code is free, and an evening of AI calls costs cents. Plan B can help such groups. No group uses it yet.",
+            "**Easy to start for a known kind of event.** A new event of a known kind is a settings file. A new kind of day needs code.",
+        ],
+    )
+    para(doc, "No user study was run, so we make no claim of time saved.")
+
+
+# ----------------------------------------------------------------------------------------------
+# 13 to 17
+# ----------------------------------------------------------------------------------------------
+
+
+def limits(doc) -> None:
+    h1(doc, SECTIONS["limits"])
+    bullets(
+        doc,
+        [
+            "**Made-up events only.** No real bookings, rooms, purchases, messages, people or stock.",
+            "**Six sealed cases.** A small check. The case is the unit, and three runs of one case are not three different evenings.",
+            "**All six sealed cases repeat conditions seen in development**, with new wording.",
+            "**The late-volunteer case had no look-up.** Every approach took the volunteer's word. A person's reported delay can also outlive a later check-in, a known limit of version 1.2.",
+            "**One AI model**, one AI service, and the route behind it not recorded. The AI can answer differently each time, so runs cannot be repeated exactly.",
+            "**No tricky message in the final test**, a poor pick that keeps every rule is not caught, and \"no executed action broke a rule\" tests the server, not the AI's judgment (section 8.6).",
+            "**A later rerun still misses targeted cases** of the earlier test (section 7.2).",
+            "**No trial with organizers.** No club, pantry or person has used Plan B, and no user study was run.",
+            "**Not built yet.** Real delivery tracking and the transit alerts. The look-up is a rehearsal.",
+            "**Only Chromium was tested** in the browser. Screen readers, Firefox and Safari were not.",
         ],
     )
 
 
 def how_to_run(doc) -> None:
-    doc.add_heading("14. How to run it", level=1)
-    para(doc, f"Repository: <<{APP_URL}>>")
+    h1(doc, SECTIONS["run"])
     para(
         doc,
-        "Requirements: a bash shell (tested on Linux), Python 3.11 or 3.12 with uv (tested with uv "
-        "0.9.18), and Node.js 22.18 or newer with npm. Get the code and start the board:",
+        "You need a bash shell (tested on Linux), Python 3.11 or 3.12 with uv, and Node.js 22.18 or "
+        "newer with npm. Get the code and start the board.",
     )
     code_block(
         doc,
@@ -915,38 +963,38 @@ def how_to_run(doc) -> None:
             "unset VIRTUAL_ENV",
             "uv sync --all-groups --locked",
             "(cd web && npm ci && npm run build)",
-            "uv run plan-b serve                # http://127.0.0.1:8765",
+            "uv run plan-b serve                # then open http://127.0.0.1:8765",
         ],
     )
     para(
         doc,
-        "Open http://127.0.0.1:8765 in a browser. Sign in with the moderator code in "
-        "`var/moderator_code.txt`, which the server writes on its first start. Choose case `dev01`, "
-        "click **Load episode**, then **Run deterministic policy**. The server keeps its terminal busy, "
-        "so run the next commands in a second terminal in `FA26-COLLIE/apps/plan_b`.",
+        "Open the address on the last line in a browser and sign in with the moderator code in "
+        "`var/moderator_code.txt`, which the server writes on its first start. Choose the practice "
+        "case `dev01` (Jordan's evening), load it, and run the fixed rules. The server keeps its "
+        "terminal busy, so run the next commands in a second terminal in `FA26-COLLIE/apps/plan_b`.",
     )
-    para(
-        doc,
-        "Deterministic development cases and the freeze check. All nine case lines should end with "
-        "`matches_expectation=True`, and the check should print `verified` for `freeze.json` and "
-        "`heldout.json`:",
-    )
-    code_block(doc, ["uv run plan-b run-case all", "uv run plan-b eval verify-freeze --require-heldout"])
-    para(doc, "Recompute the held-out reports from the committed records, with no model call:")
+    para(doc, "Run the practice cases with the fixed rules, and check that the final test's sealed files are unchanged (version 1.2).")
     code_block(
         doc,
         [
-            "R=evaluation/results/wave3_heldout_20261025T1625Z",
+            "uv run plan-b run-case all",
+            "uv run plan-b eval verify-freeze --freeze freeze_v1_2.json --heldout heldout2.json --require-heldout",
+        ],
+    )
+    para(doc, "Recompute the final test's reports from the committed records, with no AI call.")
+    code_block(
+        doc,
+        [
+            "R=evaluation/results/wave3b_fresh_20261025T2327Z",
             "uv run plan-b eval report --results $R/campus --out /tmp/campus_report",
             "uv run plan-b eval report --results $R/pantry --out /tmp/pantry_report",
         ],
     )
     para(
         doc,
-        "The demo setup, with a fresh state and verified recorded traces, on its own port. Replace "
-        "`<choose one>` with any code, open http://127.0.0.1:8790 and sign in with it. "
-        "The recorded runs play back with no key, for example "
-        "http://127.0.0.1:8790/#/replay/live_p2-live_dev02_trace.json.",
+        "For a demonstration after the talk, prepare a fresh state with the recorded runs on their "
+        "own port. The recorded runs play back with no key and no AI call, and the board labels "
+        "each one \"Recorded replay\".",
     )
     code_block(
         doc,
@@ -954,184 +1002,268 @@ def how_to_run(doc) -> None:
             "uv run python scripts/demo_prep.py",
             "PLAN_B_MODERATOR_CODE='<choose one>' uv run plan-b serve --port 8790 \\",
             "    --var var/demo/state --replay-dir var/demo/replays",
+            "# then open http://127.0.0.1:8790/#/replay/live_p2-live_dev02_trace.json",
         ],
     )
-    para(
-        doc,
-        "The tests behind section 12.6, from `FA26-COLLIE/apps/plan_b` (the browser walkthroughs are in "
-        "`tests/e2e/`):",
-    )
+    para(doc, "Run the tests of the app.")
     code_block(doc, ["uv run pytest -q", "(cd web && npm test)"])
     para(
         doc,
-        "The three model approaches make paid calls. They need an OpenAI-compatible endpoint such as "
-        "OpenRouter, set in `.local/keys/model_endpoint.env` at the repository root (the names are in "
-        "`apps/plan_b/.env.example`), and a key file that only the server reads. Everything above runs "
-        "without a key. The evaluation commands are in `apps/plan_b/docs/EVALUATION.md`.",
+        "The three AI approaches make paid calls. They need an OpenAI-compatible AI service such as "
+        "OpenRouter, set in `.local/keys/model_endpoint.env` at the repository root (the setting "
+        "names are in `apps/plan_b/.env.example`), and a key file that only the server reads. "
+        "Everything above runs without a key. More commands are in `apps/plan_b/docs/EVALUATION.md`.",
     )
+
+
+# What to show or say on each slide, in the order of the spoken script. The titles and the planned
+# seconds are read from ../slides/pres-note.md, so the guide always follows the script.
+DEMO_SHOW = [
+    "Name, department, Plan B in one line",
+    "The problem and the three bad moves",
+    "Check the fact, pick only what fits, leave a receipt",
+    "Idea 1 and its three parts",
+    "Idea 2, the 16 changes and the 3 that fit",
+    "Idea 3, the receipt, and money waits for a person",
+    "The real board after the swap, a rehearsal with the fixed rules",
+    "What a test case and a sealed case are",
+    "The result, the one miss, a small check",
+    "How Plan B works inside, responsible use of AI, and what is not done yet",
+    "Who it is for, and the made-up pantry",
+    "Who else does this",
+    "Why Plan B, with \"we have not tested the others\"",
+    "The close, the thanks and the ask",
+]
+SCRIPT = HERE.parent / "slides" / "pres-note.md"
+
+
+def demo_slides() -> list[tuple[str, int, str]]:
+    """Each slide of the spoken script as (title, planned seconds, what to show)."""
+    parts = re.split(r"^## ", SCRIPT.read_text(encoding="utf-8"), flags=re.M)[1:]
+    slides = []
+    for number, part in enumerate(parts):
+        heading, _, body = part.partition("\n")
+        title = re.sub(r"^Slide \d+\. ", "", heading.strip())
+        seconds = int(re.search(r"^_about (\d+) seconds", body, re.M).group(1))
+        slides.append((title, seconds, DEMO_SHOW[number] if number < len(DEMO_SHOW) else ""))
+    return slides
 
 
 def demo_guide(doc) -> None:
-    doc.add_heading("15. Demo guide", level=1)
-    table(
-        doc,
-        ["Clock", "Slide", "Scenario to load", "Show"],
-        [
-            ["0:00 to 0:36", "Title, then 16:40, twenty minutes to doors open", "dev01", "Goal, deadline, the 16:40 text"],
-            ["0:36 to 1:21", "An agent with no gate against Plan B", "", "The idea: the model chooses, the gate decides"],
-            ["1:21 to 2:17", "One fact checked, two activities swapped", "dev01", "Status check, options, receipt"],
-            ["2:17 to 2:44", "Most messages change nothing", "dev04", "Does not apply, duplicate, plan kept"],
-            ["2:44 to 3:44", "The design", "dev02", "Hold until 16:55, organizer approval"],
-            ["3:44 to 4:48", "The test on six new cases", "results", "59 of 60 runs met, the one miss, the gate"],
-            ["4:48 to 5:27", "The food pantry", "pantry_dev01", "Late stock does not count, staff record"],
-            ["5:27 to 6:11", "What is next", "", "Connected APIs, MBTA as context, a pilot"],
-            ["6:11 to 6:41", "Close", "", "The callback and the one message"],
-        ],
-        [1.1, 1.9, 1.1, 2.4],
-    )
+    h1(doc, SECTIONS["demo"])
     para(
         doc,
-        "The slide deck works alone. If the live board is used and the model provider fails, say "
-        "“We are switching to a recorded run of the same scenario” and open the replay, which is "
-        "labelled **Recorded replay** on every page. A **replay** re-shows a recorded run and never calls "
-        "a tool.",
+        "The talk has no live demo inside its seven minutes. The clock below follows the planned "
+        "time of each slide in the spoken script, as minutes and seconds, so \"0.46\" is 46 seconds in.",
+    )
+    rows, start = [], 0
+    for number, (title, seconds, show) in enumerate(demo_slides(), 1):
+        end = start + seconds
+        rows.append([f"{start // 60}.{start % 60:02d} to {end // 60}.{end % 60:02d}", str(number), title, show])
+        start = end
+    tab(doc, f"The talk, slide by slide, {start // 60} minutes {start % 60} seconds planned.", ["Clock", "Slide", "Title", "What to show or say"], rows, [1.1, 0.5, 2.6, 2.3])
+    para(
+        doc,
+        "After the talk, the board can show Jordan's practice case run by the fixed rules, or a "
+        "recorded AI run played back with no AI call (section 13). Say \"recorded\" whenever a "
+        "recorded run is shown, and never call it live.",
     )
 
 
-def ethics(doc) -> None:
-    doc.add_heading("16. Ethics and the fictional sandbox", level=1)
+def anything_else(doc) -> None:
+    h1(doc, SECTIONS["else"])
     bullets(
         doc,
         [
-            "All events, people, rooms, stock, timings and costs are fictional. The November 2026 date is fictional.",
-            "The pantry scenario is inspired by the public context of campus food services. No pantry, "
-            "U-ACCESS staff, system or partner took part, and no partnership is claimed.",
-            "The pantry plans aggregate kit counts only. There are no recipient identities and no "
-            "eligibility, allergen or medical decisions.",
-            "No participant feedback was collected. No real message was sent.",
-            "Paid model calls ran only under per-run and total spend caps.",
+            "**Cost.** The final test's 60 runs cost $3.61 in AI service charges, for 194 AI calls. Our coordinator cost 3 to 7 cents a run. The fixed rules cost nothing. By default Plan B caps the AI service's own bill at $0.50 a run and $20 in total, and the final test ran under a $40 total. These caps limit the AI service's bill, not event money.",
+            "**What comes next.** A walk-through on paper with community staff, then a pilot with one campus event series where Plan B suggests and the organizer acts. Real delivery tracking in place of the rehearsal look-up. Transit alerts as context only, never as proof of a person's arrival. A test with tricky messages, more sealed cases and more than one AI model.",
+            "**How to try it.** The code and these documents are at github.com/nocdoggo/FA26-COLLIE. Section 13 has the commands. Everything except the AI approaches runs without an AI account.",
+            "**Free and open source (GPL-3).** Anyone can read, run and change the code.",
+            "**The ask.** Tell us where it goes wrong.",
         ],
     )
 
 
-def future(doc) -> None:
-    doc.add_heading("17. Future work", level=1)
+def close(doc) -> None:
+    h1(doc, SECTIONS["close"])
     para(
         doc,
-        "Three interfaces are connected today: the OpenRouter model API (`anthropic/claude-sonnet-5.5`), "
-        "the sandbox's tool API (status checks, holds, plan changes and receipts) and the board's HTTP "
-        "API, where people approve spending, report and attest. Real feeds are the next step. The MBTA "
-        "V3 API for live transit alerts is designed in, and a key exists, but the adapter was not built "
-        "and no MBTA data is used. Transit data could only ever be context, never proof of a person's "
-        "arrival.",
+        "So, three ideas. Plan B checked the fact, so Jordan did not spend club money on a maybe. "
+        "The AI picked only from changes that fit. And every change left a receipt, and money "
+        "waited for a person's OK. Doors opened at 5 pm, the projector arrived at 5.24 pm, and the "
+        "demonstrations started at 5.30 pm.",
     )
-    figure(doc, PNG / "fig_next.png", "Figure 13. Connected today (solid) and next (dashed).")
-    bullets(
+    para(doc, f"**\"{STUDENT}\"**")
+
+
+# ----------------------------------------------------------------------------------------------
+# Sources, acknowledgement, appendices
+# ----------------------------------------------------------------------------------------------
+
+REFERENCES = [
+    "AI Agenda Builder & Event Scheduler (2026). Sessionboard. <<https://www.sessionboard.com/capabilities/ai-agenda>>",
+    "Cvent Unveils More Than 70 Product Innovations at Cvent CONNECT 2026, Backed by $1 Billion Technology Investment. Cvent press release, July 14, 2026. <<https://www.cvent.com/en/press-release/cvent-unveils-more-70-product-innovations-cvent-connect-2026-backed-1-billion>>",
+    "Bizzabo Reveals Its Agentic Operating System for Events. Bizzabo, October 12, 2026. <<https://www.bizzabo.com/blog/bizzabo-reveals-its-agentic-operating-system-for-events>>",
+    "Introducing ChatGPT agent. OpenAI. <<https://openai.com/index/introducing-chatgpt-agent/>> The text was checked against the Internet Archive copy saved on October 10, 2026, at <<https://web.archive.org/web/20261010075929/openai.com/index/introducing-chatgpt-agent/>>",
+    "Browse with Copilot. Microsoft Support. <<https://support.microsoft.com/en-US/microsoft-copilot/browse-with-copilot>>",
+    "Manage your tasks & workflows in Gemini Apps. Gemini Apps Help, Google. <<https://support.google.com/gemini/answer/16596215>>",
+    "Add approval steps to your agent's instructions. Zapier Help Center. <<https://help.zapier.com/hc/en-us/articles/41776074420493>>",
+    "Eventbrite Reimagines Events With the Debut of AI-Powered Tools. Eventbrite blog, May 9, 2023. <<https://www.eventbrite.com/blog/eventbrite-ai-powered-tools/>>",
+    "How to Use AI for Event Planning in 2026 with Real Examples. Whova blog, last updated August 20, 2026. <<https://whova.com/blog/ai-event-planning/>>",
+    "Reclaim, AI Calendar for Work & Life. Reclaim.ai home page. <<https://reclaim.ai/>>",
+    "What is GroupMe? Microsoft Support. <<https://support.microsoft.com/en-us/groupme/what-is-groupme>>",
+    "Collaborative, AI-powered spreadsheets. Google Workspace. <<https://workspace.google.com/products/sheets/>>",
+    "Create a free group poll. Doodle. <<https://doodle.com/en/product/polls/>>",
+    "What is CampusGroups? Ready Education Help Center. <<https://helpcenter.readyeducation.com/what-is-campusgroups>>",
+    "Student Activities. UMass Boston. <<https://www.umb.edu/campus-life/clubs-activities/student-activities/>>",
+    "Engage, Student Engagement Platform from Encoura. Encoura. <<https://www.encoura.org/student-success/engage/>> The old Anthology Engage address redirects here, and Encoura's note on the acquisition is at encoura.org/anthology.",
+    "Online Sign Up Sheets. SignUpGenius. <<https://www.signupgenius.com/sign-ups>>",
+    "Volunteer Management Software for Nonprofits. VolunteerHub. <<https://volunteerhub.com/platform>>",
+    "Campus Pantry Software for Colleges and Universities. PantrySoft. <<https://pantrysoft.com/customer/colleges-and-universities/>>",
+    "Food Bank & Pantry Software Solutions. Link2Feed. <<https://www.link2feed.com/food-banks-pantries/>>",
+    "Supplemental Nutrition Assistance Program, Estimated Eligibility and Receipt among Food Insecure College Students. GAO-24-107074, U.S. Government Accountability Office, published June 24, 2024, publicly released July 24, 2024. <<https://www.gao.gov/products/gao-24-107074>>",
+    "Food Insecurity, Better Information Could Help Eligible College Students Access Federal Food Assistance Benefits. GAO-19-95, U.S. Government Accountability Office, published December 21, 2018, publicly released January 9, 2019. <<https://www.gao.gov/products/gao-19-95>>",
+    "2023-2024 Student Basic Needs Survey Report. The Hope Center for Student Basic Needs, February 2025. <<https://hope.temple.edu/research/hope-center-basic-needs-survey/2023-2024-student-basic-needs-survey-report>>",
+    "New U.S. Census Bureau and AmeriCorps Research Tracks Virtual Volunteering for First Time. U.S. Census Bureau, November 19, 2024. <<https://www.census.gov/library/stories/2024/11/civic-engagement-and-volunteerism.html>>",
+    "Food insecurity reaches every U.S. community, with rural and southern counties facing the highest rates. Feeding America press release on Map the Meal Gap 2026, July 28, 2026. <<https://www.feedingamerica.org/about-us/press-room/Map-the-Meal-Gap-2026>>",
+    "Food Insecurity Rose to 40% in 2025, According to The Greater Boston Food Bank and Mass General Brigham's Sixth Annual Statewide Food Access Report. The Greater Boston Food Bank press release, April 7, 2026. <<https://www.gbfb.org/news/press-releases/hunger-on-the-rise/>>",
+    "Fast Facts, Back-to-school statistics (372). National Center for Education Statistics. <<https://nces.ed.gov/fastfacts/display.asp?id=372>>",
+    "Student Groups & Activities. UMass Boston, checked October 26, 2026. <<https://www.umb.edu/campus-life/clubs-activities/>>",
+    "Food Pantry. UMass Boston U-ACCESS. <<https://www.umb.edu/campus-life/current-students/u-access/food-pantry/>>",
+    "τ-bench, A Benchmark for Tool-Agent-User Interaction in Real-World Domains. Shunyu Yao, Noah Shinn, Pedram Razavi and Karthik Narasimhan, arXiv 2406.12045, submitted June 17, 2024. <<https://arxiv.org/abs/2406.12045>>",
+    "AI Risk Management Framework. NIST. <<https://www.nist.gov/itl/ai-risk-management-framework>>",
+    "Artificial Intelligence Risk Management Framework (AI RMF 1.0), NIST AI 100-1. NIST, January 2023. Section 3.4 on page 15 and Appendix C on page 40. <<https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf>>",
+    "LLM01, 2025 Prompt Injection. OWASP Gen AI Security Project. <<https://genai.owasp.org/llmrisk/llm01-prompt-injection/>>",
+    "LLM06, 2025 Excessive Agency. OWASP Gen AI Security Project. <<https://genai.owasp.org/llmrisk/llm062025-excessive-agency/>>",
+    "Practices for Governing Agentic AI Systems. Yonadav Shavit and colleagues, OpenAI. Sections 4.2 and 4.4. <<https://cdn.openai.com/papers/practices-for-governing-agentic-ai-systems.pdf>>",
+    "Computer use tool. Claude Platform Docs, Anthropic. <<https://platform.claude.com/docs/en/agents-and-tools/tool-use/computer-use-tool>>",
+    "Prompt injection is not SQL injection (it may be worse). Dave Chismon, National Cyber Security Centre blog, December 8, 2025. <<https://www.ncsc.gov.uk/blog-post/prompt-injection-is-not-sql-injection>>",
+]
+REFERENCE_GROUPS = [(1, "Direct competitors"), (11, "Indirect competitors and the status quo"), (21, "Target market and community need"), (30, "Responsible use of AI")]
+
+
+def sources(doc) -> None:
+    h1(doc, SECTIONS["sources"])
+    h2(doc, "Acknowledgements")
+    para(
         doc,
-        [
-            "Review the workflows with community staff, starting with one bounded tabletop session, then "
-            "a pilot with a campus event series where Plan B proposes and the organizer acts, counting "
-            "messages, checks, changes and approvals.",
-            "Store authorization requests as explicit state.",
-            "Build the MBTA transit adapter, labelled as uncertain context, and replace the simulated "
-            "status check with a supplier's real tracking page.",
-            "More held-out cases and more than one model.",
-            "Human rehearsals and a comprehension check with new viewers.",
-        ],
+        "Thanks to the Paul English Applied AI Institute (PEAAII) at UMass Boston for organizing the "
+        "hackathon. Plan B's AI coordinator runs on Claude Sonnet 5.5, a model made by Anthropic, "
+        "reached through OpenRouter. The slides use the elegant beamer theme by Lars Spreng (CC BY "
+        "4.0), and the poster uses the Gemini beamerposter theme by Anish Athalye (MIT License) with "
+        "the UMass Boston color theme from the Overleaf poster template. The app's server uses the "
+        "open-source libraries FastAPI, uvicorn and Pydantic, and this report is built with "
+        "python-docx. Thanks do not imply that any of them endorses Plan B.",
     )
+    h2(doc, "References")
+    para(
+        doc,
+        "Each tool is described only by what its own page says, and we have not tested any of them. "
+        "Addresses are printed without their \"https\" prefix, and a colon inside a source's title "
+        "is printed as a comma.",
+    )
+    assert len(REFERENCES) == 37
+    groups = dict(REFERENCE_GROUPS)
+    for number, text in enumerate(REFERENCES, 1):
+        if number in groups:
+            para(doc, f"**{groups[number]}**").paragraph_format.keep_with_next = True
+        p = para(doc, f"[{number}] {text}")
+        p.paragraph_format.left_indent = Inches(0.35)
+        p.paragraph_format.first_line_indent = Inches(-0.35)
+        p.paragraph_format.space_after = Pt(3)
 
 
 def appendices(doc) -> None:
-    doc.add_heading("Appendix A. Glossary", level=1)
-    table(
+    h1(doc, "Appendix A. Glossary")
+    tab(
         doc,
-        ["Term", "One-line meaning"],
+        "Words used in this report, in plain terms.",
+        ["Word", "What it means"],
         [
-            ["Coordinator", "The AI agent that decides the next step, inside its grant"],
-            ["Grant", "The written list of actions a role may take, enforced by the server"],
-            ["Hold", "A free reservation of a backup that expires on its own"],
-            ["Status check", "A query to a registered source, such as the supplier's status service"],
-            ["Receipt", "The server's own record of an accepted change"],
-            ["Revision (state version)", "The version number of the shared state. Every change raises it. The plan version counts only accepted plans"],
-            ["Executor", "The server component that checks and runs every request"],
-            ["Planner", "Builds candidate repairs from fixed templates and checks each"],
-            ["Policy", "The rule that picks the next step: one of the four approaches"],
-            ["P0, P1, P2, P3", "Fixed rules, the tool-calling model, our coordinator (picks checked options), and the check-all variant (every check first)"],
-            ["Development case", "A practice case used to build and debug"],
-            ["Episode", "One run of one policy on one case"],
-            ["Wake", "A turn the runner gives the coordinator when the state changed or its wait has passed"],
-            ["Held-out case", "A case locked before the test and hidden from every policy"],
-            ["Replay", "A re-showing of a recorded run that calls no tool"],
-            ["Met", "The run's final state and receipts show the outcome its case requires"],
-            ["Quiet case", "A case where the right answer is to change nothing (C02 to C04, the negative controls)"],
-            ["Executed violation", "An accepted action that left the state breaking a rule on rights, stock or resources"],
-            ["Refused request", "A request the server turned away, so nothing it asked for happened"],
-            ["Capped run", "A run stopped by the limit of 8 model calls, scored as it stands"],
-            ["Appropriate infeasibility", "With no recovery inside the limits, the coordinator names the blocking constraints and changes nothing invalid"],
-            ["Earliest broken stage", "Where a failed run first went wrong: interpretation, planner input, action selection or execution"],
-            ["Attention rule", "The rule of our coordinator and the check-all variant that decides whether a reading is material and needs the model"],
-            ["Planner input", "The step where a reading becomes a question for the planner"],
-            ["Supply shortfall", "Kits still missing from the pantry shelf"],
-            ["Service deficit", "Kits of the target not yet handed out"],
+            ["A change", "means one way to alter the plan, such as swapping two activities or booking the backup"],
+            ["Prompt injection", "means a message that tries to give the AI new orders. Plan B treats such text as data, not as instructions"],
+            ["A receipt", "means a written record of a change, made by Plan B's server, saying what changed, when, which part made it and what it cost"],
+            ["Held for free", "means kept aside for ten minutes at no cost and released on its own"],
+            ["A look-up", "means one question to a source of facts, such as the delivery company's status"],
+            ["Plan B's server", "means the part that keeps the plan and is the only part allowed to change it"],
+            ["Spending allowance", "means how much the AI may spend without asking a person, $0 by default"],
+            ["The rehearsal on a computer", "means a practice copy of an event, with a clock we can speed up, where nothing real is booked or bought"],
+            ["A test case", "means a small made-up event day with messages at set times, checked by code at the end"],
+            ["A sealed case", "means a case written and locked before the final test and never seen by the person who changed the code"],
+            ["A practice case", "means a case used while building Plan B, not part of the final test"],
+            ["A run", "means one approach playing one case once"],
+            ["Met the expected outcome", "means the code's checks on the final state all passed"],
+            ["An executed action that broke a rule", "means an accepted change that left the plan breaking a rule on roles, stock or resources. There were none"],
+            ["A refused attempt", "means a request Plan B turned away, so nothing it asked for happened"],
+            ["Our coordinator", "means my design, where the AI picks one step from a list Plan B built and checked"],
+            ["The check-all variant", "means our coordinator with every relevant look-up made first"],
+            ["The tool-calling model", "means the AI calling Plan B's tools itself"],
+            ["The fixed rules", "means written rules with no AI and no cost"],
         ],
-        [1.9, 4.6],
+        [2.0, 4.5],
     )
-    doc.add_heading("Appendix B. File map", level=1)
-    table(
+    h1(doc, "Appendix B. File map")
+    para(doc, "Paths in the repository github.com/nocdoggo/FA26-COLLIE.")
+    code_block(
         doc,
-        ["Path", "Content"],
         [
-            ["`apps/plan_b/`", "The app: Python package `plan_b`, `web/`, `tests/`, `scripts/`, `docs/`"],
-            ["`apps/plan_b/docs/RUNTIME_CONTRACT.md`", "The runtime semantics, sections 1 to 21"],
-            ["`apps/plan_b/docs/EVALUATION.md`", "The evaluation harness and its commands"],
-            ["`apps/plan_b/plan_b/evaluation/manifests/`", "The frozen `freeze.json` and the held-out lock"],
-            ["`apps/plan_b/plan_b/evaluation/development/`", "The development runs of the three model approaches"],
-            ["`PEEAI_plan/`", "The plan: protocol, presentation plan, wave tasks (development repository only)"],
-            ["`PEEAI_plan/handoffs/`", "The audit packets of each wave, with their evidence (development repository only)"],
-            ["`PEEAI_plan/submission/`", "These submission items (their sources are in the development repository)"],
+            "apps/plan_b/                              the app (Python package plan_b, web/, tests/, scripts/, docs/)",
+            "apps/plan_b/plan_b/api/                   the server's sign-in and the board's connections",
+            "apps/plan_b/plan_b/store/                 the plan, versions, holds, receipts, stock",
+            "apps/plan_b/plan_b/tools/                 the checks before each change, and the receipts",
+            "apps/plan_b/plan_b/domain/                the change lister and the campus and pantry rules",
+            "apps/plan_b/plan_b/agent/                 the AI coordinator and its settings (config.py)",
+            "apps/plan_b/plan_b/scenarios/             the rehearsal clock and the practice cases",
+            "apps/plan_b/plan_b/evaluation/            sealing, running and scoring the tests",
+            "apps/plan_b/plan_b/store/migrations/0004_consumable_stock.sql   the pantry's stock extension",
+            "apps/plan_b/web/                          the board (React, TypeScript)",
+            "apps/plan_b/docs/RUNTIME_CONTRACT.md      how the app behaves, sections 1 to 21",
+            "apps/plan_b/docs/EVALUATION.md            the test commands",
+            "apps/plan_b/docs/RELEASE_CHECKS.md        the release checks",
+            "apps/plan_b/evaluation/results/           the committed test records",
+            "PEEAI_plan/submission/                    the deck, the poster, this report and their sources",
         ],
-        [3.0, 3.5],
     )
-    doc.add_heading("Appendix C. Evidence index", level=1)
-    table(
+    h1(doc, "Appendix C. Evidence index")
+    tab(
         doc,
-        ["Number in this document", "Source"],
+        "Where each number in this report comes from.",
+        ["Number or claim", "Source in the repository"],
         [
-            ["dev01 notice, check, 16 built and 3 feasible, swap at 16:43, `rcpt_0001`", "Wave 2 storyboard frames 4 to 7 and `PEEAI_plan/handoffs/wave_2/evidence/storyboard/storyboard_report.json`"],
-            ["Our coordinator on dev01: same check and swap, 3 model calls, $0.0366", "`apps/plan_b/plan_b/evaluation/development/README.md`"],
-            ["dev02 hold until 16:55, $35.00 committed once", "Wave 2 storyboard frames 9 to 11, Wave 1 README"],
-            ["dev04 messages and verdicts", "`apps/plan_b/plan_b/scenarios/private/dev04.json` (development), storyboard frame 8"],
-            ["Pantry 24, 20, 16, 40 and the counters", "`PEEAI_plan/handoffs/wave_2/DEMO.md` section 4, `PEEAI_plan/handoffs/wave_2/evidence/reports/pantry_accounting.json`"],
-            ["Partial handoff, 34 distributed, 6-kit deficit", "Wave 2 README (pantry_dev02)"],
-            ["Frozen policies, model, limits, seeds", "`freeze.json`, `RUNTIME_CONTRACT.md` section 20"],
-            ["Wave 2 test counts", "Wave 2 README and `VERIFICATION.md`"],
-            ["Wave 3 test counts (section 12.6)", "`PEEAI_plan/handoffs/wave_3/evidence/reports/checks.json` (clean checkout of 3442874)"],
-            ["Held-out results (section 12)", "`apps/plan_b/evaluation/results/wave3_heldout_20261025T1625Z/` (commit c052338): `campus/report/metrics.json`, `pantry/report/metrics.json`, `README.md`, `FAILURES.md`, read by `PEEAI_plan/submission/make_results.py`"],
-            ["Version 1.2 fresh held-out results (section 12.7)", "`apps/plan_b/evaluation/results/wave3b_fresh_20261025T2327Z/` (commit f715dfc): `campus/report/metrics.json`, `pantry/report/metrics.json`, `README.md`, `FAILURES.md`, read by `make_results.py` into `documentation/results_v12.json`"],
-            ["Version 1.2 post-hoc diagnostic rerun on spent cases, not held-out (section 12.7)", "`apps/plan_b/evaluation/results/wave3b_rerun_spent_20261025T2345Z/` (commit f715dfc): the same files, and its README's first line says it is not a held-out result"],
-            ["Version 1.2 fixes, known limits, freeze and lock", "`apps/plan_b/docs/RUNTIME_CONTRACT.md` section 21, `apps/plan_b/docs/EVALUATION.md`, `freeze_v1_2.json` and `heldout2.json` (commit 5955243)"],
+            ["59 of 60 runs met, every AI run met, the one miss, refusals, cost per approach, timing of the seal", "`apps/plan_b/evaluation/results/wave3b_fresh_20261025T2327Z/README.md` and its campus and pantry `report/metrics.json`"],
+            ["$3.61 and 194 AI calls", "the same folder, `spend_extract.json`"],
+            ["Earlier 12-case test, its counts and its four problems", "`PEEAI_plan/handoffs/wave_3/README.md` (development repository) and `apps/plan_b/evaluation/results/wave3_heldout_20261025T1625Z/`"],
+            ["The rerun that still misses two targeted cases", "`apps/plan_b/evaluation/results/wave3b_rerun_spent_20261025T2345Z/`"],
+            ["951 tests passed", "`PEEAI_plan/handoffs/wave_3/VERIFICATION.md` (development repository)"],
+            ["Jordan's evening, its times, 16 changes and 3 that fit", "`apps/plan_b/plan_b/scenarios/private/dev01.json` and `PEEAI_plan/examples/campus_showcase.evaluator.json`"],
+            ["The recorded AI run of Jordan's case, 3 AI calls, $0.0366", "`apps/plan_b/data/recorded/wave_1/dev01_trace.json` and `PEEAI_plan/handoffs/wave_2/evidence/reports/live_dev01_run.json`"],
+            ["The 5.45 pm practice case", "`apps/plan_b/plan_b/scenarios/private/dev02.json`"],
+            ["The made-up pantry's numbers", "`apps/plan_b/plan_b/scenarios/private/pantry_dev02.json`"],
+            ["Release checks, 11 of 12 passing", "`apps/plan_b/docs/RELEASE_CHECKS.md`"],
+            ["AI cost caps of $0.50 a run and $20 in total, the key handling", "`apps/plan_b/plan_b/agent/config.py`"],
+            ["Outside facts [1] to [37]", "`PEEAI_plan/submission/RESEARCH_BRIEF.md`"],
         ],
-        [3.3, 3.2],
+        [2.6, 3.9],
     )
 
 
 def main() -> None:
     render_figures()
     doc = new_document(
-        title=f"{TITLE}, Project Documentation",
+        title=TITLE,
         author=AUTHOR,
-        subject="PEAAII Hackathon project documentation",
-        keywords="Plan B, community events, AI coordinator, verification, holds, receipts",
+        subject="PEAAII AI Applications Hackathon 2026, project documentation",
+        keywords="Plan B, community events, AI coordinator, receipts",
     )
     for section in (
-        title_block, abstract, problem, different, what_it_does, walkthrough, architecture,
-        decision_policy, policies, community, pantry, safety, protocol, results, limitations,
-        how_to_run, demo_guide, ethics, future, appendices,
+        title_block, abstract, one_page, seven_questions, problem, ideas, evening, works, people,
+        tested, results, responsible, market, others, why, benefit, limits, how_to_run, demo_guide,
+        anything_else, close, sources, appendices,
     ):
         section(doc)
     doc.save(OUT)
     neutral_app_properties(OUT)
-    print(f"wrote {OUT.name}")
+    print(f"wrote {OUT.name}, {_figure_count} figures, {_table_count} tables")
 
 
 if __name__ == "__main__":

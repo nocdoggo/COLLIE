@@ -1,0 +1,68 @@
+% Slide 5, idea 2. Plan B lists 16 changes, 3 fit the time, the people and the budget, and the
+% AI picks the free swap. The program before and after, on a 5 pm to 6 pm axis, with the
+% projector expected at 5.25. Drawn at final size, 18.4 x 9.6 cm. Facts from dev01.json,
+% campus_showcase.evaluator.json and the storyboard ("ranks first of 3 feasible, 13 rejected").
+\documentclass[border=1pt]{standalone}
+\input{planb_figstyle}
+\begin{document}
+\fontsize{12}{14}\selectfont
+\begin{tikzpicture}[x=1cm, y=1cm, line join=round]
+  \def\W{18.33}\def\H{9.53}
+  \useasboundingbox (0,0) rectangle (\W,\H);
+  % ------------------------------------------------------------ the 16 changes
+  \def\ts{1.52}\def\tg{0.22}
+  \node[text=ink, font=\fontsize{22}{26}\selectfont\bfseries] at (3.37,8.95) {16 changes, 3 fit};
+  \foreach \r in {0,...,3}{\foreach \c in {0,...,3}{
+    \pgfmathsetmacro{\x}{\c*(\ts+\tg)}
+    \pgfmathsetmacro{\y}{8.05-\r*(\ts+\tg)}
+    \fill[gridgrey, rounded corners=4pt] (\x,\y) rectangle (\x+\ts,\y-\ts);
+  }}
+  \foreach \r/\c in {0/1, 1/3, 3/0}{
+    \pgfmathsetmacro{\x}{\c*(\ts+\tg)}
+    \pgfmathsetmacro{\y}{8.05-\r*(\ts+\tg)}
+    \fill[umbblue, rounded corners=4pt] (\x,\y) rectangle (\x+\ts,\y-\ts);
+  }
+  % the AI's pick, ringed
+  \pgfmathsetmacro{\px}{3*(\ts+\tg)}
+  \pgfmathsetmacro{\py}{8.05-1*(\ts+\tg)}
+  \draw[navy, line width=2.4pt, rounded corners=6pt] (\px-0.13,\py+0.13) rectangle (\px+\ts+0.13,\py-\ts-0.13);
+  \pgfmathsetmacro{\pyc}{\py-\ts/2}
+  \draw[navy, line width=2.2pt, -{Stealth[length=4.5mm,width=4mm]}] (\px+\ts+0.25,\pyc) -- (9.45,\pyc);
+  \node[anchor=south, text=navy, font=\fontsize{16}{19}\selectfont\bfseries] at ({(\px+\ts+9.45)/2+0.25},\pyc+0.15) {AI's pick};
+
+  % ------------------------------------------------------------ the program, before and after
+  \def\xa{9.95}\def\xb{18.25}
+  \pgfmathsetmacro{\s}{(\xb-\xa)/60}
+  \newcommand{\tx}[1]{\xa+#1*\s}
+  % axis
+  \draw[muted, line width=0.8pt] (\xa,1.15) -- (\xb,1.15);
+  \foreach \t in {0,60}{\draw[muted, line width=0.8pt] ({\xa+\t*\s},1.15) -- ({\xa+\t*\s},0.95);}
+  \node[anchor=north west, inner sep=0pt, text=ink, font=\fontsize{16}{19}\selectfont] at (\xa-0.05,0.85) {5 pm};
+  \node[anchor=north east, inner sep=0pt, text=ink, font=\fontsize{16}{19}\selectfont] at (\xb+0.04,0.85) {6 pm};
+  % rows
+  \def\bh{2.4}
+  \def\yB{5.05}\def\yA{1.6}
+  \node[anchor=south west, text=ink, font=\fontsize{18}{21}\selectfont\bfseries, inner sep=0pt] at (\xa,\yB+\bh+0.22) {Before};
+  \node[anchor=south west, text=ink, font=\fontsize{18}{21}\selectfont\bfseries, inner sep=0pt] at (\xa,\yA+\bh+0.22) {After};
+  \def\g{0.04}
+  % the projector, expected at 5.25, drawn behind the bars
+  \draw[accent, line width=1.6pt] ({\xa+25*\s},1.15) -- ({\xa+25*\s},8.55);
+  % before
+  \fill[rulegrey] ({\xa+0*\s+\g},\yB) rectangle ({\xa+10*\s-\g},\yB+\bh);
+  \filldraw[fill=accentsoft, draw=accent, line width=1.2pt] ({\xa+10*\s+\g+0.03},\yB+0.02) rectangle ({\xa+30*\s-\g-0.03},\yB+\bh-0.02);
+  \node[text=ink, font=\fontsize{16}{19}\selectfont\bfseries] at ({\xa+17.5*\s},\yB+\bh/2) {Demos};
+  \fill[primarysoft] ({\xa+30*\s+\g},\yB) rectangle ({\xa+50*\s-\g},\yB+\bh);
+  \node[text=umbblue, align=center, font=\fontsize{16}{19}\selectfont\bfseries] at ({\xa+40*\s},\yB+\bh/2) {Skills\\exchange};
+  \fill[rulegrey] ({\xa+50*\s+\g},\yB) rectangle ({\xa+60*\s},\yB+\bh);
+  % after
+  \fill[rulegrey] ({\xa+50*\s+\g},\yA) rectangle ({\xa+60*\s},\yA+\bh);
+  \fill[rulegrey] ({\xa+0*\s+\g},\yA) rectangle ({\xa+10*\s-\g},\yA+\bh);
+  \fill[primarysoft] ({\xa+10*\s+\g},\yA) rectangle ({\xa+30*\s-\g},\yA+\bh);
+  \node[text=umbblue, align=center, font=\fontsize{16}{19}\selectfont\bfseries] at ({\xa+20*\s},\yA+\bh/2) {Skills\\exchange};
+  \fill[umbblue] ({\xa+30*\s+\g},\yA) rectangle ({\xa+50*\s-\g},\yA+\bh);
+  \node[text=white, font=\fontsize{18}{21}\selectfont\bfseries] at ({\xa+40*\s},\yA+\bh/2) {Demos};
+  % the projector mark
+  \node[anchor=south east, text=accent, font=\fontsize{22}{22}\selectfont, inner sep=0pt] at ({\xa+25*\s-0.1},8.68) {\faVideo};
+  \node[anchor=south west, text=accent, font=\fontsize{18}{21}\selectfont\bfseries, inner sep=0pt] at ({\xa+25*\s+0.14},8.68) {5.25 pm};
+\end{tikzpicture}
+\end{document}

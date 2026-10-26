@@ -1,0 +1,29 @@
+% Slide 10, who it is for. Club officers (UMass Boston has 100+ student groups [28]), volunteer
+% coordinators, and pantry staff, with the made-up pantry's kit count (40 needed, 34 handed out,
+% 6 short, pantry_dev02.json). Drawn at final size, 18.4 x 9.6 cm.
+\documentclass[border=1pt]{standalone}
+\input{planb_figstyle}
+\begin{document}
+\fontsize{12}{14}\selectfont
+\begin{tikzpicture}[x=1cm, y=1cm, line join=round]
+  \def\W{18.33}\def\H{9.53}\def\gap{0.45}
+  \useasboundingbox (0,0) rectangle (\W,\H);
+  \pgfmathsetmacro{\pw}{(\W-2*\gap)/3}
+  \foreach \i/\ic/\nm in {0/\faUsers/Club officers, 1/\faHandsHelping/Volunteer\\coordinators, 2/\faBoxOpen/Pantry staff}{
+    \pgfmathsetmacro{\x}{\i*(\pw+\gap)}
+    \fill[ground, rounded corners=6pt] (\x,0) rectangle (\x+\pw,\H);
+    \node[text=umbblue, font=\fontsize{68}{68}\selectfont] at (\x+\pw/2,\H-2.1) {\ic};
+    \node[anchor=north, text=ink, align=center, font=\fontsize{22}{26}\selectfont\bfseries] at (\x+\pw/2,\H-4.0) {\nm};
+  }
+  % card 1, the local count
+  \node[anchor=north, text=ink, align=center, font=\fontsize{18}{23}\selectfont] at (\pw/2,3.55)
+    {100+ UMass Boston\\groups\textsuperscript{\fontsize{12}{12}\selectfont 28}};
+  % card 2, the trouble the late-volunteer test case is about
+  \node[anchor=north, text=ink, align=center, font=\fontsize{18}{23}\selectfont] at (\pw+\gap+\pw/2,3.55)
+    {A helper\\runs late};
+  % card 3, the made-up pantry days in the final test
+  \pgfmathsetmacro{\xc}{2*(\pw+\gap)}
+  \node[anchor=north, text=ink, align=center, font=\fontsize{18}{23}\selectfont] at (\xc+\pw/2,3.55)
+    {20 of 20 runs met\\{\color{muted}\fontsize{14}{17}\selectfont made-up pantry days}};
+\end{tikzpicture}
+\end{document}

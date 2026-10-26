@@ -1,0 +1,34 @@
+% Slide 3, the announce. The three ideas, each with its mark and one fact from Jordan's evening,
+% and "Money waits for a person's OK" under idea 3. Drawn at final size, 18.4 x 10.2 cm.
+% Facts from dev01.json and the storyboard (1 look-up of 2 rehearsal minutes, 16 changes of which
+% 3 fit, the receipt at 16.43 with $0 spent).
+\documentclass[border=1pt]{standalone}
+\input{planb_figstyle}
+\begin{document}
+\fontsize{12}{14}\selectfont
+\begin{tikzpicture}[x=1cm, y=1cm, line join=round]
+  \def\W{18.33}\def\H{10.13}\def\gap{0.42}
+  \pgfmathsetmacro{\pw}{(\W-2*\gap)/3}
+  \def\strip{1.8}
+  \useasboundingbox (0,0) rectangle (\W,\H);
+  \foreach \i/\mk/\nmA/\nmB/\fact in {
+      0/\markcheck/Check/the fact/1 look-up{,} 2 minutes,
+      1/\markfits/Pick only/what fits/16 changes{,} 3 fit,
+      2/\markreceipt/Leave/a receipt/4.43 pm{,} \$0 spent}{
+    \pgfmathsetmacro{\x}{\i*(\pw+\gap)}
+    \pgfmathsetmacro{\yb}{\i==2 ? \strip+0.12 : 0}
+    \fill[ground, rounded corners=4pt] (\x,\yb) rectangle (\x+\pw,\H);
+    \node[anchor=north west, text=umbblue, font=\fontsize{18}{20}\selectfont\bfseries]
+      at (\x+0.3,\H-0.3) {\the\numexpr\i+1\relax};
+    \node[text=umbblue, font=\fontsize{54}{54}\selectfont] at (\x+\pw/2,\H-2.35) {\mk};
+    \node[anchor=north, text=ink, align=center, font=\fontsize{23}{28}\selectfont\bfseries]
+      at (\x+\pw/2,\H-4.25) {\nmA\\\nmB};
+    \node[anchor=north, text=ink, align=center, font=\fontsize{18}{21}\selectfont]
+      at (\x+\pw/2,\H-7.0) {\fact};
+  }
+  \pgfmathsetmacro{\xs}{2*(\pw+\gap)}
+  \fill[navy, rounded corners=4pt] (\xs,0) rectangle (\xs+\pw,\strip);
+  \node[text=white, align=center, text width=\pw cm-0.5cm, font=\fontsize{18}{22}\selectfont\bfseries]
+    at (\xs+\pw/2,\strip/2) {Money waits for a person's~OK};
+\end{tikzpicture}
+\end{document}

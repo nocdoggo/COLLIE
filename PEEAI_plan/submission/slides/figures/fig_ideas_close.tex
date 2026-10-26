@@ -1,0 +1,30 @@
+% Slide 13, the close. The three idea panels from slide 3 (no names, the slide title says them),
+% each with Jordan's result, and "Money waits for a person's OK" under idea 3. The QR code and the
+% thanks sit to its right on the slide. Drawn at final size, 13.6 x 9.8 cm.
+\documentclass[border=1pt]{standalone}
+\input{planb_figstyle}
+\begin{document}
+\fontsize{12}{14}\selectfont
+\begin{tikzpicture}[x=1cm, y=1cm, line join=round]
+  \def\W{13.53}\def\H{9.73}\def\gap{0.35}
+  \pgfmathsetmacro{\pw}{(\W-2*\gap)/3}
+  \def\strip{2.55}
+  \useasboundingbox (0,0) rectangle (\W,\H);
+  \foreach \i/\mk/\res in {0/\markcheck/One\\look-up,
+                           1/\markfits/The free\\swap,
+                           2/\markreceipt/Doors on\\time{,} \$0}{
+    \pgfmathsetmacro{\x}{\i*(\pw+\gap)}
+    \pgfmathsetmacro{\yb}{\i==2 ? \strip+0.12 : 0}
+    \fill[ground, rounded corners=4pt] (\x,\yb) rectangle (\x+\pw,\H);
+    \node[anchor=north west, text=umbblue, font=\fontsize{17}{19}\selectfont\bfseries]
+      at (\x+0.28,\H-0.28) {\the\numexpr\i+1\relax};
+    \node[text=umbblue, font=\fontsize{62}{62}\selectfont] at (\x+\pw/2,\H-2.75) {\mk};
+    \node[anchor=north, text=ink, align=center, font=\fontsize{21}{26}\selectfont\bfseries]
+      at (\x+\pw/2,\H-5.0) {\res};
+  }
+  \pgfmathsetmacro{\xs}{2*(\pw+\gap)}
+  \fill[navy, rounded corners=4pt] (\xs,0) rectangle (\xs+\pw,\strip);
+  \node[text=white, align=center, font=\fontsize{16}{20}\selectfont\bfseries]
+    at (\xs+\pw/2,\strip/2) {Money\\waits for a\\person's OK};
+\end{tikzpicture}
+\end{document}

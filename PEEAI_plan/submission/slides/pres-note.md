@@ -1,85 +1,90 @@
-# Presentation notes
+# Plan B, The Show Must Go On. The seven-minute script
 
-Plan B: The Show Must Go On
-Noctis Zhang, University of Massachusetts Boston, Paul English Applied AI Institute (PEAAII) Hackathon, October 2026
+> Noctis Zhang, Department of Computer Science, University of Massachusetts Boston. PEAAII AI Applications Hackathon 2026, October 2026.
+> Fourteen slides, at most 420 seconds at 140 words a minute (the timing tool prints the count). The italic line under each heading is a stage direction (the planned seconds and the clock at the end of the slide). It is not spoken, and the timing tool skips it.
+> The speaker notes in the deck source say exactly what this file says. The sync tool in the tools folder copies them, and the writing check compares them.
+> Three ideas carry the talk. Check the fact. Pick only what fits. Leave a receipt, and money waits for a person's OK. Slide 3 announces them, slides 4 to 6 deliver them on Jordan's evening, slide 7 shows the real board, and slide 14 repeats them.
 
-This script is identical to the \note blocks of slides.tex. The story follows STORY_PLAN.md: one volunteer organizer (Jordan, an illustration), twenty minutes to doors open, the decision, the receipt, then the design, the evidence and what is next. Every evaluation number on the slides comes from make_results.py. The evaluation shown is the final system on six new held-out cases (wave3b_fresh_20261025T2327Z), written by a separate worker before the final freeze and locked in the same commit seven seconds after it, before the first model call. The earlier 12-case test (wave3_heldout_20261025T1625Z) is named once, as the test that found the defects fixed before the freeze. A rerun on its spent cases is a diagnostic and appears only on a backup slide. Never call it held-out.
+## Slide 1. Plan B, The Show Must Go On
 
-Slide numbers here count the title as slide 1. The footer counter on the slides does not count the title, so slide 7 here shows 6/9 in its footer.
+_about 13 seconds, ends 0.13_
 
-Read each paragraph at a steady, clear pace, about 140 words a minute. The script fits inside seven minutes with time to point and change slides. Pause briefly each time you advance a slide. The bold checkpoints are the clock times of the plan. Say the policies by their plain names: the fixed rules, the tool-calling model, our coordinator, the check-all variant. Say "recorded" whenever you show a recorded run, and never call it live.
+Hello, I am Noctis Zhang, from the Department of Computer Science at UMass Boston. This is Plan B. The show must go on. Plan B checks before it changes anything.
 
-## Slide 1. Title
-_about 8 seconds_
+## Slide 2. Twenty minutes before doors open, Jordan gets a text
 
-Hello, I am Noctis Zhang from UMass Boston. This is Plan B. The show must go on.
+_about 33 seconds, ends 0.46_
 
-**Checkpoint 0:08.**
+Meet Jordan, a volunteer organizer we made up. Jordan runs a small campus showcase. The projector is due at five, when doors open, and the demonstrations at ten past five need it. At four forty, a text arrives. The projector may be twenty five minutes late. Wait and hope? Spend thirty five dollars of club money on a maybe? Reshuffle the evening alone? Small events change by text, and a wrong move costs money or the evening.
 
-## Slide 2. 16:40. Twenty minutes to doors open
-_about 28 seconds_
+## Slide 3. Plan B rests on three simple ideas
 
-Meet Jordan, a volunteer organizer. Jordan is an illustration, and the event is simulated. It is four forty. In twenty minutes the doors of a campus showcase open, and student teams are ready to demo. Then a text arrives: the projector may be twenty five minutes late. Events like this have no operations staff. Would you wait, check, or book a backup?
+_about 18 seconds, ends 1.04_
 
-**Checkpoint 0:36.**
+So how does Jordan decide in twenty minutes? Plan B rests on three simple ideas. Check the fact. Pick only what fits. Leave a receipt. And money waits for a person's OK. Let me show you each one on Jordan's evening.
 
-## Slide 3. An agent that acts on a text can spend money on a rumor, so Plan B checks first
-_about 45 seconds_
+## Slide 4. First, Plan B checks the one fact that matters
 
-Here is the risk. An AI agent with tools can read that text and act at once. It believes the claim, books the thirty five dollar backup, and reshuffles the whole program. That top lane is an illustration, not one of the systems I tested. Plan B works differently. First it checks the one fact that matters. Then the server builds the possible fixes and checks each one. The language model only picks one of them. And every change passes one gate that writes a receipt, the server's own record of the change. The model chooses. The server decides what is allowed.
+_about 25 seconds, ends 1.29_
 
-**Checkpoint 1:21.**
+First, check the fact. A message is a claim, not a fact. So Plan B changes nothing yet. It looks up the one fact that could change the plan, the delivery. In our rehearsal, the answer is delayed, expected about five twenty five. Most messages, like a false alarm, should change nothing, and then Plan B keeps the plan.
 
-## Slide 4. Plan B checked one fact, swapped two activities, and the doors opened on time
-_about 56 seconds_
+## Slide 5. Then the AI picks only from changes that fit
 
-Here is what Plan B did. At four forty the text arrives. Plan B treats it as a claim, not a fact. It makes one status check, which means asking the supplier's tracking. The answer is delayed, with a reported arrival at five twenty five. That is still a report, not an arrival. Now the planner builds the possible fixes, sixteen of them, and checks each against the deadline, the people, and the budget. Three pass. The best one is free. The demonstrations and the skills exchange swap places, so the demos start at five thirty, after the reported arrival. At four forty three the change is made, and the server writes a receipt. The doors open on time at five, and no money is spent.
+_about 39 seconds, ends 2.08_
 
-**Checkpoint 2:17.**
+Second, pick only what fits. Plan B lists every allowed change, sixteen in all. It throws out every change that breaks the time, the people or the budget. Three fit. The AI picks one of the three, the free swap. The demonstrations move to five thirty, after the projector should arrive. Why only pick? The AI reads messy messages well, but can answer differently each time. So the AI only chooses among changes that fit, and Plan B makes the change. In an earlier recorded run, the AI made this same pick.
 
-## Slide 5. Most messages should change nothing, so Plan B checks only what could change the decision
-_about 27 seconds_
+## Slide 6. Every change leaves a receipt, and money waits for a person's OK
 
-Knowing when not to act matters just as much. In another practice case four messages arrive. The first is a false alarm, because the check says on schedule. The second is about another order on another date. The last two are one source, repeated. Plan B changes nothing. Checks are selective. It verifies only what could change the decision.
+_about 43 seconds, ends 2.51_
 
-**Checkpoint 2:44.**
+Third, leave a receipt. Plan B checks every change against the rules before it happens, and if a check fails, it keeps the plan. Then it writes a receipt, a record of what changed, when, and what it cost. At four forty three, version one became version two, for zero dollars, and the thirty five dollar backup was never booked. Money waits for a person's OK, because club money is a person's call. In a separate practice case, not Jordan's, the projector came too late. Plan B held the backup for free, so it was not lost while a person decided.
 
-## Slide 6. The model only picks among options the server built and checked, and one gate writes every receipt
-_about 60 seconds_
+## Slide 7. This is the real board after the swap
 
-Here is how it works. Think of a restaurant. The kitchen decides what can be served, the waiter picks from the menu, a manager signs off on anything that costs money, and every order gets a ticket. In Plan B the server is the kitchen. Its planner builds the options and checks each one. The language model is the waiter. Its only outputs are a checked reading of the message and one option from the server's list. It holds no tool that writes. Every change, from the model or a person, passes one gate. Is it allowed for this role? Is the plan still current? Is it within budget? Spending starts as a hold, a free reservation that expires on its own, until a person approves. The gate writes the receipt.
+_about 12 seconds, ends 3.03_
 
-**Checkpoint 3:44.**
+Here is the real board after the swap. In this rehearsal the fixed rules, with no AI, made the same swap. Jordan shares this plan with the group chat.
 
-## Slide 7. On 6 new cases, 59 of 60 runs met the expected outcome, and the one miss was the fixed rules
-_about 64 seconds_
+## Slide 8. We tested Plan B on event days it had never seen
 
-Does it work? I froze the code, the prompts, the model and the limits. Then I ran six new cases, written by a separate worker before the freeze and locked with it. Fixed rules ran once per case, the model approaches three times each, all on the same model, Claude Sonnet 5.5. Fifty nine of sixty runs met the expected outcome. Our coordinator met all eighteen of its runs, and so did the other two model approaches. The one miss was the fixed rules, in a case where a volunteer runs late, because a person's own delay is a message its rules cannot read. No action ever broke a rule in these runs, because every change passes the one gate. It refused six attempts and recorded each. With six cases there is no ranking. The point is safety and reliability. An earlier, larger test is how I found and fixed real defects before this freeze.
+_about 37 seconds, ends 3.40_
 
-**Checkpoint 4:48.**
+One evening is a story, not proof. A test case is a small made-up event day, written in advance, with messages that arrive at set times. We run it in a rehearsal on a computer, with a clock we can speed up, where nothing real is booked or bought. At the end, code checks the final state. Did every activity happen, and was no rule broken? The six final cases were sealed, written and locked before the test and never seen by whoever changed the code.
 
-## Slide 8. The same loop runs a food pantry, where food counts only once it is on the shelf
-_about 39 seconds_
+## Slide 9. 59 of 60 runs met the expected outcome
 
-The same loop runs a second domain, a food pantry. Staff need forty kits by one forty. Twenty four are on the shelf. Twenty more are on a late truck, and late stock does not count. Sixteen wait in a partner pool nearby, and Plan B holds them. Only staff can record the handoff and the distribution, so the AI can never claim food that is not there. The two new pantry cases were part of the test you just saw, and no kit was counted twice in these runs.
+_about 38 seconds, ends 4.18_
 
-**Checkpoint 5:27.**
+Each case ran once with the fixed rules, and three times with each of three AI designs, ours, a check-all variant and a tool-calling model, because the AI can answer differently each time. Fifty nine of sixty met the expected outcome, meaning every final check passed. Every AI run met it. The fixed rules missed one, a late volunteer's own text, the kind of message the AI is there to read. No executed action broke a rule. Six cases are a small check, not a ranking.
 
-## Slide 9. Plan B helps the people who run community events, runs on one laptop, and adapts to new events
-_about 48 seconds_
+## Slide 10. Inside Plan B, careful with messages and money
 
-Who does this help? Student organizers, clubs, volunteers and pantry staff, the people who run events with little time. It means fewer last-minute scrambles, no surprise spending, and a receipt for every change. It is easy to run. This is the real board on one laptop: install, then one command starts it. Without a model it needs no network at all, and any OpenAI-compatible model can plug in. And it adapts. The same core ran a campus showcase, a skills exchange and a food pantry. Next come real feeds, such as MBTA alerts as context only, and a pilot where Plan B proposes and the organizer acts. No community has used it yet.
+_about 34 seconds, ends 4.52_
 
-**Checkpoint 6:15.**
+Inside Plan B, the same ideas guard messages and money. In our coordinator the AI only picks a change from the list, so a misleading message can at most lead to a choice that already fits. Money needs a person's OK, and if nobody answers, nothing is bought. Every message goes to an outside AI service, so keep names and health details out of messages. Not shown yet. Only six test cases, made-up events, one AI model, no trial.
 
-## Slide 10. 16:40 again. Check first, then change
-_about 30 seconds_
+## Slide 11. Built for student clubs and volunteer groups
 
-So, back to four forty, twenty minutes to doors open. Would you wait, check, or book a backup? Plan B checks the one fact that matters, prepares what it can undo, and commits only a change the server has checked, with a receipt. It helps a community event stay on track by deciding what to verify, what to prepare, and when to commit a change. Thank you.
+_about 25 seconds, ends 5.17_
 
-**Checkpoint 6:41.**
+So who is it for? Student club officers come first. Then volunteer coordinators and pantry staff. Two of the six test cases were days at a made-up food pantry, and all twenty runs met. For a student it is simple. It checks the text before you spend club money, and leaves the treasurer a record of why.
 
-## Backup slides
-_about 0 seconds_
+## Slide 12. Other tools help, and Plan B works beside them
 
-_Not timed, and not read out. Use them only to answer a question: what the new test cost per run, what these numbers do not show (including the earlier test and the diagnostic rerun on its spent cases), a partial pantry handoff, and the frozen configuration._
+_about 28 seconds, ends 5.45_
+
+Indirect competitors first. Today the text lands in a group chat, a shared sheet, a sign-up sheet or a campus portal. Direct competitors, event platforms such as Sessionboard, check agenda changes, and Cvent and Bizzabo have announced agents. AI assistants ask before they buy. These pieces are not new. Plan B puts them together for a small group on the day of an event.
+
+## Slide 13. Plan B is safer, more flexible and more personal
+
+_about 35 seconds, ends 6.20_
+
+So why Plan B? Safer, because the three ideas are built in, where in Zapier the user adds the approval step. More flexible, because Cvent and Bizzabo build for event teams, and Plan B ran campus, community and pantry events on one laptop, with your AI model or none. More personal, because ChatGPT and Gemini ask before buying the way their makers designed, and here your group writes its own event and its own spending limit. We have not tested the others.
+
+## Slide 14. Check the fact, pick only what fits, leave a receipt
+
+_about 37 seconds, ends 6.57_
+
+So, three ideas. Plan B checked the fact, so Jordan did not spend club money on a maybe. The AI picked only from changes that fit. And every change left a receipt, and money waited for a person's OK. Doors opened at five, the projector came at five twenty four, and the demonstrations started at five thirty. The code is free. Next is a walk-through on paper with community staff, so please tell me where it goes wrong. Thanks to the PEAAII organizers, and to you.

@@ -1,0 +1,32 @@
+% Slide 11, who else does this. Where the text lands today and tools that change plans, each
+% named from its own page with its source number in RESEARCH_BRIEF.md ([11] GroupMe as the group
+% chat, [12] Google Sheets, [17] SignUpGenius, [15] UMass Boston student activities, [1]
+% Sessionboard, [2] Cvent, [3] Bizzabo, [4, 5, 6] ChatGPT agent, Copilot, Gemini). Plan B sits
+% beside both rows, not instead of them. Drawn at final size, 18.4 x 9.6 cm.
+\documentclass[border=1pt]{standalone}
+\input{planb_figstyle}
+\newcommand{\src}[1]{\textsuperscript{\fontsize{11}{11}\selectfont #1}}
+\begin{document}
+\fontsize{12}{14}\selectfont
+\begin{tikzpicture}[x=1cm, y=1cm, line join=round]
+  \def\W{18.33}\def\H{9.53}
+  \useasboundingbox (0,0) rectangle (\W,\H);
+  \def\bw{15.05}\def\bh{4.55}
+  \def\cw{3.46}\def\cg{0.2}\def\ch{2.45}
+  \foreach \r/\lab in {0/{Indirect, today}, 1/{Direct, change plans}}{
+    \pgfmathsetmacro{\yt}{\H-\r*(\bh+0.43)}
+    \fill[ground, rounded corners=6pt] (0,\yt) rectangle (\bw,\yt-\bh);
+    \node[anchor=north west, text=ink, font=\fontsize{20}{24}\selectfont\bfseries] at (0.3,\yt-0.3) {\lab};
+  }
+  \foreach \r/\k/\t in {0/0/Group\\chat\src{11}, 0/1/Shared\\sheet\src{12}, 0/2/Sign-up\\sheet\src{17}, 0/3/Campus\\portal\src{15},
+                        1/0/{\fontsize{15}{18}\selectfont Sessionboard\src{1}}, 1/1/Cvent\src{2}, 1/2/Bizzabo\src{3}, 1/3/AI\\assistants\src{4,5,6}}{
+    \pgfmathsetmacro{\yt}{\H-\r*(\bh+0.43)-1.72}
+    \pgfmathsetmacro{\x}{0.3+\k*(\cw+\cg)}
+    \fill[white, rounded corners=5pt] (\x,\yt) rectangle (\x+\cw,\yt-\ch);
+    \node[text=ink, align=center, font=\fontsize{16}{20}\selectfont] at (\x+\cw/2,\yt-\ch/2) {\t};
+  }
+  % Plan B, beside both rows
+  \fill[umbblue, rounded corners=8pt] (\bw+0.4,0) rectangle (\W,\H);
+  \node[text=white, font=\fontsize{22}{26}\selectfont\bfseries] at ({(\bw+0.4+\W)/2},\H/2) {Plan B};
+\end{tikzpicture}
+\end{document}
