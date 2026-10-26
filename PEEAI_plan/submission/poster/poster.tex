@@ -21,7 +21,7 @@
 \usepackage[T1]{fontenc}
 % 48 x 27 inches, exactly 16:9, so it projects as one slide and prints as a flyer.
 % beamerposter's size=custom takes width and height literally in cm.
-\usepackage[orientation=landscape,size=custom,width=121.92,height=68.58,scale=1.75]{beamerposter}
+\usepackage[orientation=landscape,size=custom,width=121.92,height=68.58,scale=1.55]{beamerposter}
 \usetheme{gemini}
 \usecolortheme{umb}
 % Projection needs heavier strokes than the template's Lato Light.
@@ -109,74 +109,60 @@
 \separatorcolumn
 \end{columns}
 
+\newlength{\wa}\setlength{\wa}{\dimexpr 0.585\fullwidth\relax}
+\newlength{\wb}\setlength{\wb}{\dimexpr \fullwidth-\wa-\sepwidth\relax}
+\newlength{\wc}\setlength{\wc}{\dimexpr 0.385\fullwidth\relax}
+\newlength{\wdd}\setlength{\wdd}{\dimexpr 0.345\fullwidth\relax}
+\newlength{\we}\setlength{\we}{\dimexpr \fullwidth-\wc-\wdd-2\sepwidth\relax}
 \begin{columns}[t]
 \separatorcolumn
-
-% -------------------------------------------------------------------
-% Column 1: the problem and one recovery
-% -------------------------------------------------------------------
-\begin{column}{\colwidth}
-  \begin{block}{20 minutes before doors open}
-    Twenty minutes before a campus showcase opens, a message says the projector may be late.
-    \begin{center}
-      \includegraphics[width=0.8\linewidth]{fig_story_v.pdf}\\[2pt]
-      {\small A practice case, run by the fixed rules.\par}
-    \end{center}
-    In another practice case, a stale reminder and its forwarded copy \textbf{change nothing}.
+\begin{column}{\wa}
+  \begin{block}{Twenty minutes before doors open, the projector may be late}
+    \centering
+    \includegraphics[width=\linewidth,height=15cm,keepaspectratio]{fig_story.pdf}\\[4pt]
+    {\raggedright Plan B checks before it changes anything and leaves a receipt. A stale reminder \textbf{changes nothing}.\par}
   \end{block}
 \end{column}
-
 \separatorcolumn
-
-% -------------------------------------------------------------------
-% Column 2: how it decides
-% -------------------------------------------------------------------
-\begin{column}{\colwidth}
-  \begin{block}{Model chooses, server checks}
-    \begin{center}
-      \includegraphics[width=0.96\linewidth]{fig_loop_poster.pdf}
-    \end{center}
-    A language model picks one option. The server builds the options, checks every action
-    and writes the \textbf{receipt}. Spending needs a person.
+\begin{column}{\wb}
+  \begin{block}{The model chooses, the server checks}
+    \centering
+    \includegraphics[width=\linewidth,height=15cm,keepaspectratio]{fig_loop.pdf}\\[4pt]
+    {\raggedright The model picks from options the server checked. One gate writes every \textbf{receipt}.\par}
   \end{block}
 \end{column}
-
 \separatorcolumn
+\end{columns}
 
-% -------------------------------------------------------------------
-% Column 3: the held-out test
-% -------------------------------------------------------------------
-\begin{column}{\colwidth}
+\begin{columns}[t]
+\separatorcolumn
+\begin{column}{\wc}
   \begin{exampleblock}{Tested on cases it never saw}
-    First test on \textbf{12 unseen cases}. Runs met, our coordinator in dark:
-    \begin{center}
-      \includegraphics[width=0.78\linewidth]{fig_results_v.pdf}
-    \end{center}
-    It exposed \textbf{three defects}, now fixed. On \textbf{6 new cases}, every model policy met every run.
+    \centering
+    \includegraphics[width=\linewidth,height=11cm,keepaspectratio]{fig_results.pdf}\\[4pt]
+    {\raggedright The first test on \textbf{12 unseen cases} exposed \textbf{three defects}, now fixed.
+    On \textbf{6 new cases}, every model policy met every run.\par}
   \end{exampleblock}
 \end{column}
-
 \separatorcolumn
-
-% -------------------------------------------------------------------
-% Column 4: the pantry, what I built, and the limits (the link is in the footer)
-% -------------------------------------------------------------------
-\begin{column}{\colwidth}
-  \begin{block}{Same loop, a fictional pantry}
-    In a fictional pantry, late stock does not count and only staff record a handoff.
-    \textbf{No kit was counted twice} in any held-out run.
+\begin{column}{\wdd}
+  \begin{block}{The same loop in a fictional pantry}
+    \centering
+    \includegraphics[width=\linewidth,height=11cm,keepaspectratio]{fig_pantry.pdf}\\[4pt]
+    {\raggedright Late stock does not count, and only staff record a handoff. \textbf{No kit was
+    counted twice}.\par}
   \end{block}
-
+\end{column}
+\separatorcolumn
+\begin{column}{\we}
   \begin{block}{What I built}
     A local server and board, a checked executor, a planner, four policies and a frozen test
     harness.
   \end{block}
-
-  \begin{block}{Limits}
-    A local test world, 18 test cases and one model. The first test found the defects that the final system fixes. No community pilot yet. Next: live data such as MBTA transit alerts.
+  \begin{block}{What is next}
+    Live data such as MBTA transit alerts, more test cases, and a pilot with community staff.
   \end{block}
 \end{column}
-
 \separatorcolumn
 \end{columns}
 

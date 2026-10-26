@@ -78,7 +78,7 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
   \end{itemize}
   \vspace{0.1cm}
   \begin{center}
-    \includegraphics[width=0.86\textwidth]{fig_story.pdf}
+    \includegraphics[width=\textwidth,height=6.6cm,keepaspectratio]{fig_story.pdf}
   \end{center}
   \note{
     \textbf{(27s, ends 0:37)} Imagine you organize a campus showcase. It opens at five and
@@ -99,7 +99,7 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
   \end{itemize}
   \vspace{0.1cm}
   \begin{center}
-    \includegraphics[width=0.97\textwidth]{fig_roles.pdf}
+    \includegraphics[width=\textwidth,height=6.4cm,keepaspectratio]{fig_roles.pdf}
   \end{center}
   \note{
     \textbf{(30s, ends 1:07)} Plan B is a coordinator, an AI agent with written limits. It
@@ -139,7 +139,7 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
   \end{itemize}
   \vspace{0.05cm}
   \begin{center}
-    \includegraphics[width=0.84\textwidth]{fig_swap.pdf}\\[4pt]
+    \includegraphics[width=\textwidth,height=5.0cm,keepaspectratio]{fig_swap.pdf}\\[4pt]
     \fcolorbox{muted}{white}{\includegraphics[width=0.84\textwidth]{receipt_line.png}}\\[3pt]
     \figcaption{Shown: my fixed-rule baseline in an automated run. In a recorded practice run, the AI coordinator made the same check and the same swap at 16:43.}
   \end{center}
@@ -163,7 +163,7 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
   \end{itemize}
   \vspace{0.15cm}
   \begin{center}
-    \includegraphics[width=0.95\textwidth]{fig_quiet.pdf}\\[3pt]
+    \includegraphics[width=\textwidth,height=6.2cm,keepaspectratio]{fig_quiet.pdf}\\[3pt]
     \figcaption{Development case dev04, decided by the rule baseline in an automated run of the app.}
   \end{center}
   \note{
@@ -182,7 +182,7 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
 \begin{frame}{Verify, prepare, commit}
   \vspace{-0.1cm}
   \begin{center}
-    \includegraphics[width=\textwidth]{fig_loop.pdf}
+    \includegraphics[width=\textwidth,height=7.2cm,keepaspectratio]{fig_loop.pdf}
   \end{center}
   \vspace{-0.1cm}
   \begin{itemize}
@@ -204,7 +204,7 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
   \end{itemize}
   \vspace{0.05cm}
   \begin{center}
-    \includegraphics[width=0.9\textwidth]{fig_architecture.pdf}
+    \includegraphics[width=\textwidth,height=6.9cm,keepaspectratio]{fig_architecture.pdf}
   \end{center}
   \note{
     \textbf{(30s, ends 4:05)} A policy is the rule that picks the next step. P zero is fixed
@@ -248,7 +248,7 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
   \end{itemize}
   \vspace{0.25cm}
   \begin{center}
-    \includegraphics[width=\textwidth]{fig_failure.pdf}\\[6pt]
+    \includegraphics[width=\textwidth,height=5.2cm,keepaspectratio]{fig_failure.pdf}\\[6pt]
     \figcaption{From the run's failure analysis. Other failures: the limit of 8 model calls per run ended 15 of the 26 failed runs (backup).}
   \end{center}
   \vspace{0.2cm}
@@ -272,7 +272,7 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
   \end{itemize}
   \vspace{0.05cm}
   \begin{center}
-    \includegraphics[width=0.74\textwidth]{fig_pantry.pdf}\\[2pt]
+    \includegraphics[width=\textwidth,height=6.0cm,keepaspectratio]{fig_pantry.pdf}\\[2pt]
     \figcaption{\textbf{Shortfall}: kits still missing from the shelf. \textbf{Deficit}: kits not yet handed out. Fictional pantry sandbox, development case pantry\_dev01.}
   \end{center}
   \vspace{-0.1cm}
@@ -300,7 +300,7 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
   \begin{center}
   {\small
   \setlength{\tabcolsep}{4pt}
-  \begin{tabular}{@{}lcccc@{\hspace{12pt}}cccc@{}}
+  \resizebox{\textwidth}{!}{\begin{tabular}{@{}lcccc@{\hspace{12pt}}cccc@{}}
     \toprule
     & \multicolumn{4}{c}{\textbf{Campus runs met}} & \multicolumn{4}{c}{\textbf{Pantry runs met}} \\
     & Rules & Tools & Ours & All & Rules & Tools & Ours & All \\
@@ -308,7 +308,7 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
     First test: 12 cases & \res{campus:P0:met} & \res{campus:P1:met} & \res{campus:P2:met} & \res{campus:P3:met} & \res{pantry:P0:met} & \res{pantry:P1:met} & \res{pantry:P2:met} & \res{pantry:P3:met} \\
     Final test: 6 new cases & \res{fresh:campus:P0:met} & \res{fresh:campus:P1:met} & \res{fresh:campus:P2:met} & \res{fresh:campus:P3:met} & \res{fresh:pantry:P0:met} & \res{fresh:pantry:P1:met} & \res{fresh:pantry:P2:met} & \res{fresh:pantry:P3:met} \\
     \bottomrule
-  \end{tabular}\par}
+  \end{tabular}}\par}
   \end{center}
   \vspace{0.05cm}
   \begin{itemize}
