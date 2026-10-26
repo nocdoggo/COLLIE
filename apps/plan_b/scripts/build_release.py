@@ -250,13 +250,18 @@ def verify_package(pkg: Path, work: Path, checks: list[dict[str, Any]]) -> None:
         [
             "-c",
             "from pathlib import Path; from plan_b.evaluation import manifest; "
-            "c = manifest.verify_freeze(Path('plan_b/evaluation/manifests/freeze.json')); "
+            "c = manifest.verify_freeze(Path('plan_b/evaluation/manifests/freeze_v1_2.json')); "
             "print(c.ok, c.detail, list(c.drift)[:5]); raise SystemExit(0 if c.ok else 1)",
         ],
         env,
     )
+    # freeze.json (1.1) verifies only at its own commit since the 1.2 code, so the package checks
+    # the current freeze.
     check(
-        checks, "freeze.json verifies in the package", freeze.returncode == 0, freeze.stdout.strip()
+        checks,
+        "freeze_v1_2.json verifies in the package",
+        freeze.returncode == 0,
+        freeze.stdout.strip(),
     )
     heldout = json.loads((pkg_app / "plan_b/evaluation/manifests/heldout.json").read_text())
     public = [
