@@ -46,14 +46,14 @@ APP_URL = REPO
 
 
 def render_figures() -> None:
-    """Render each TikZ figure PDF to a 200 dpi PNG for the Word document."""
+    """Render each TikZ and pgfplots figure PDF to a 300 dpi PNG for the Word document."""
     PNG.mkdir(exist_ok=True)
-    for pdf in sorted([*FIGURES.glob("fig_*.pdf"), *FIGURES.glob("report_*.pdf")]):
+    for pdf in sorted(FIGURES.glob("fig_*.pdf")):
         target = PNG / f"{pdf.stem}.png"
         if target.exists() and target.stat().st_mtime >= pdf.stat().st_mtime:
             continue
         subprocess.run(
-            ["pdftoppm", "-png", "-r", "200", "-singlefile", str(pdf), str(PNG / pdf.stem)],
+            ["pdftoppm", "-png", "-r", "300", "-singlefile", str(pdf), str(PNG / pdf.stem)],
             check=True,
         )
 
@@ -90,37 +90,48 @@ def table_caption(doc, text: str) -> None:
 
 def abstract(doc) -> None:
     doc.add_heading("Abstract", level=1)
+    fk, fn = _v12_met("fresh")
+    fresh = V12["fresh"]
+    ours = sum(int(fresh[x]["P2"]["metk"]) for x in ("campus", "pantry"))
+    ours_n = sum(int(fresh[x]["P2"]["metn"]) for x in ("campus", "pantry"))
+    cases = sum(int(fresh[x]["P2"]["ncases"]) for x in ("campus", "pantry"))
+    dev_cases = sum(int(RESULTS[x]["P2"]["ncases"]) for x in ("campus", "pantry"))
+    dev_runs = sum(int(RESULTS[x]["all"]["recorded"]) for x in ("campus", "pantry"))
     para(
         doc,
-        "Small community events run on volunteers, borrowed equipment and fixed rooms. A single late "
-        "delivery or stale message can push an organizer into a rushed change that costs people their "
-        "time. **Plan B** is a coordinator agent that decides what to verify, what to prepare and when "
-        "to commit a change, inside written limits it cannot exceed. A language model reads each "
-        "message and picks one of the options the server has built and checked. A **hold** keeps a "
-        "backup open while a fact or an approval is pending, and every accepted change returns a "
-        "**receipt**. I built Plan B as a fictional local sandbox with a campus showcase, a community "
-        "skills exchange and a fictional pantry, and compared four coordinator policies on held-out "
-        "cases that were locked before the test. In 120 held-out runs of version 1.1, the evaluation of "
-        "record, no policy executed a violation "
-        "or changed a quiet event, but my policy showed no consistent advantage: a model calling the "
-        "tools freely met every campus run at three times my policy's model cost, and fixed rules met "
-        "every pantry run. That run exposed defects, so I made version 1.2 and tested it on a fresh "
-        "held-out set of six cases, locked before any 1.2 call. It met the expected outcome in "
-        f"{_v12_met('fresh')[0]} of {_v12_met('fresh')[1]} runs, and the one miss was the fixed rules on a late-volunteer case. "
-        "That set is small and repeats known conditions in new cases, so it is not comparable with "
-        "the first run. Everything is fictional and local, the case set is small, and no community "
-        "pilot has been run.",
+        "Small community events run on volunteers, borrowed equipment and fixed rooms. Twenty minutes "
+        "before the doors open, a single text such as \"the projector may be late\" can push an organizer "
+        "into a rushed change, and an AI agent that acts on that text at once can spend money on a "
+        "rumor. **Plan B** is a coordinator that decides what to verify, what to prepare and when to "
+        "commit a change, inside written limits it cannot exceed. The language model never acts on its "
+        "own: it reads each message and picks one of the options the server has built and checked. "
+        "Every change passes one gate that checks the role, the plan version and the budget and writes "
+        "a **receipt**, a **hold** keeps a backup open for free while a fact or an approval is pending, "
+        "and checks are selective, so only a fact that could change the decision is verified. I built "
+        "Plan B as a fictional local sandbox with a campus showcase, a community skills exchange and a "
+        f"fictional pantry. The final system was frozen and run on {cases} new cases, written by a "
+        "separate worker before the final freeze and locked in the same commit, before the first model "
+        "call. The author of the code changes never read them."
+        f" {fk} of {fn} runs met the expected outcome. Our coordinator met all {ours} of its "
+        f"{ours_n} runs, as did the two other model-based approaches, and the one miss was the fixed "
+        "rules on a case where a volunteer runs late. No executed action broke a rule, because every "
+        "change passes the gate. Six cases cannot rank the approaches. An earlier locked test of "
+        f"{dev_cases} cases ({dev_runs} runs) found the defects fixed before the final freeze, and its "
+        "cases are now development cases. Section 12 keeps that complete record. Everything is "
+        "fictional and local, and no community pilot has been run.",
     )
-    figure(doc, PNG / "fig_strip.png", "Figure 1. One recovery in four steps (development case dev01).")
+    figure(doc, PNG / "fig_story.png", "Figure 1. The late projector, beat by beat, and the program before and after the free swap (a development run in the sandbox).")
 
 
 def problem(doc) -> None:
     doc.add_heading("1. Problem and motivation", level=1)
     para(
         doc,
-        "Imagine you organize a campus showcase. It opens at 17:00 and must finish by 18:00. At 16:40 "
-        "a message says the projector may be about 25 minutes late. If you change too much, presenters "
-        "and volunteers lose their time. If you wait too long, the demonstrations fail.",
+        "Meet Jordan, a volunteer organizer of a campus showcase (Jordan is an illustration, and the "
+        "event is simulated). The doors open at 17:00 and the event must finish by 18:00. At 16:40, "
+        "twenty minutes to doors open, a text says the projector may be about 25 minutes late. If "
+        "Jordan changes too much, presenters and volunteers lose their time. If Jordan waits too long, "
+        "the demonstrations fail.",
     )
     para(doc, "Three facts make this hard:")
     bullets(
@@ -140,7 +151,7 @@ def problem(doc) -> None:
         "community event on track by deciding what to verify, what to prepare and when to commit, "
         "without ever acting outside its written limits?",
     )
-    figure(doc, PNG / "fig_timeline.png", "Figure 2. The fictional campus showcase and the 16:40 message.")
+    figure(doc, PNG / "fig_contrast.png", "Figure 2. The same text, two ways. The top lane is an illustration of an agent with no gate, not one of the tested systems.")
 
 
 def different(doc) -> None:
@@ -148,16 +159,16 @@ def different(doc) -> None:
     para(
         doc,
         "Plan B combines known ideas in one bounded workflow. It does not claim to be the first of its "
-        "kind. P0 to P3 are the four coordinator policies compared in section 7.",
+        "kind. The four coordinator policies are the ones compared in section 7.",
     )
     bullets(
         doc,
         [
             "**Ordinary tool-calling agents** let the model write tool calls directly. Plan B keeps "
-            "that design as a comparison policy (P1), and in its own policy (P2) the model picks one "
+            "that design as a comparison policy (the tool-calling model), and in its own policy (our coordinator) the model picks one "
             "option from a menu the server built and checked.",
             "**Rule systems** are predictable but read only the message forms they were written for. "
-            "Plan B keeps a published rule policy (P0) as a baseline.",
+            "Plan B keeps a published rule policy (the fixed rules) as a baseline.",
             "**Plan repair and information gathering** are well studied in planning research. Plan B "
             "applies them to a small event with explicit holds, receipts and human approval.",
             "**Reversible preparation.** A hold reserves a backup for free and expires on its own, so "
@@ -202,7 +213,7 @@ def what_it_does(doc) -> None:
 def walkthrough(doc) -> None:
     doc.add_heading("4. A recovery, step by step", level=1)
     para(doc, "The fictional campus showcase in these development cases takes place on November 5, 2026.")
-    doc.add_heading("4.1 The late projector (development case dev01)", level=2)
+    doc.add_heading("4.1 The late projector (a development case)", level=2)
     numbered(
         doc,
         [
@@ -220,23 +231,22 @@ def walkthrough(doc) -> None:
             "1 to 2.",
         ],
     )
-    figure(doc, PNG / "fig_swap.png", "Figure 4. The free swap: the demonstrations move after the projector's ETA.")
-    figure(doc, FRAMES / "before_after.png", "Figure 5. The app's before and after view with the receipt (automated run).", 5.6)
-    doc.add_heading("4.2 Four messages, zero changes (development case dev04)", level=2)
+    para(doc, "Figure 1 shows these steps and the program before and after the swap.")
+    doc.add_heading("4.2 Four messages, zero changes (a second development case)", level=2)
     numbered(
         doc,
         [
             "The same delay notice arrives, but the status check says on schedule, ETA 16:58. It is a "
             "false alarm, so the plan stays.",
-            "At 16:44 a reminder says order P09 for the October 29 workshop was cancelled. That is "
+            "At 16:44 a reminder says an order for the October 29 workshop was cancelled. That is "
             "another order on another date, so it does not apply.",
             "The reminder arrives again at 16:46, and a volunteer forwards it at 16:47. One source "
             "repeated is still one source, so it is a duplicate.",
             "Plan version 1 is kept: no hold, no spending, no change.",
         ],
     )
-    figure(doc, PNG / "fig_quiet.png", "Figure 6. Four messages, zero changes.")
-    doc.add_heading("4.3 Prepare, ask, commit (development case dev02)", level=2)
+    figure(doc, PNG / "fig_quiet2.png", "Figure 4. Four messages, zero changes: checks are selective, so only a fact that could change the decision is verified.")
+    doc.add_heading("4.3 Prepare, ask, commit (a third development case)", level=2)
     numbered(
         doc,
         [
@@ -250,15 +260,15 @@ def walkthrough(doc) -> None:
     doc.add_heading("4.4 Which policy acted", level=2)
     para(
         doc,
-        "The frames above come from an automated browser run of the rule baseline (P0), with no model "
-        "call. In a recorded development run, the AI coordinator (P2) made the same status check and the "
+        "The frames above come from an automated browser run of the rule baseline (the fixed rules), with no model "
+        "call. In a recorded development run, our coordinator (the AI policy) made the same status check and the "
         "same swap at 16:43 with receipt `rcpt_0001`, in 3 model calls for $0.0366.",
     )
 
 
 def architecture(doc) -> None:
     doc.add_heading("5. Architecture", level=1)
-    figure(doc, PNG / "fig_architecture.png", "Figure 7. Four policies, one executor at the authority boundary.")
+    figure(doc, PNG / "fig_design.png", "Figure 5. The model only picks among options the server built and checked, and one gate writes every receipt. Solid: connected today. Dashed: designed, not connected.")
     para(doc, "The runtime dependencies are FastAPI, uvicorn and Pydantic only. Paths are under `apps/plan_b/`.")
     table(
         doc,
@@ -270,8 +280,8 @@ def architecture(doc) -> None:
             ["Planner", "Builds and checks candidate repairs", "`plan_b/domain/candidates.py`, `constraints.py`, `objective.py`"],
             ["Adapters", "Campus and pantry rules on the shared core", "`plan_b/domain/adapters/`"],
             ["Runner and clock", "Simulated clock, scripted world events, policy wakes and limits", "`plan_b/scenarios/`"],
-            ["Rule policies (P0)", "Published deterministic rules and parser", "`plan_b/evaluation/policies/`"],
-            ["Model policies (P1 to P3)", "Menu, interpretation, attention rule, provider", "`plan_b/agent/`"],
+            ["Rule policies (the fixed rules)", "Published deterministic rules and parser", "`plan_b/evaluation/policies/`"],
+            ["Model policies (the three model approaches)", "Menu, interpretation, attention rule, provider", "`plan_b/agent/`"],
             ["Browser board", "Organizer, participant, staff and moderator views", "`web/` (React, TypeScript)"],
             ["Trace and replay", "Sanitized traces, integrity check, offline replay", "`plan_b/evaluation/export_trace.py`, `web/src/replay/`"],
             ["Evaluation harness", "Freeze, held-out runs, metrics, report", "`plan_b/evaluation/`"],
@@ -282,10 +292,10 @@ def architecture(doc) -> None:
 
 def decision_policy(doc) -> None:
     doc.add_heading("6. The decision policy", level=1)
-    figure(doc, PNG / "fig_loop.png", "Figure 8. Verify, prepare, commit, keep, with this event's examples.")
+    figure(doc, PNG / "fig_loop.png", "Figure 6. Verify, prepare, commit, keep, with this event's examples.")
     para(
         doc,
-        "The selective policy P2 follows these steps each time the runner wakes it, that is, gives it a "
+        "The selective policy our coordinator follows these steps each time the runner wakes it, that is, gives it a "
         "turn because the shared state changed or a wait it set has passed:",
     )
     numbered(
@@ -316,28 +326,28 @@ def policies(doc) -> None:
     para(doc, "A **policy** is the rule that picks the next step. All four share the same tools, grants, candidate repairs, limits and executor. Prompts differ by policy (section 12.5).")
     table(
         doc,
-        ["Policy", "Frozen id", "How it decides"],
+        ["Policy", "Frozen ids: earlier test, then final system", "How it decides"],
         [
-            ["P0 rules", "`rules/1.0.0`, `pantry-rules/1.1.0`", "Published deterministic rules and a small parser. No model"],
-            ["P1 tool use", "`tool-use/1.1.0` (prompt `tool_use.v3`)", "The model calls the tools itself. The executor checks every call"],
-            ["P2 selective (mine)", "`live/1.1.0`", "The model picks one option from the server's checked menu"],
-            ["P3 verify all", "`verify-all/1.1.0`", "P2, with every relevant status check run first by the server under rule `verify-all-relevance/1.0.0`"],
+            ["Fixed rules (baseline)", "`rules/1.0.0`, `pantry-rules/1.1.0`, unchanged", "Published deterministic rules and a small parser. No model"],
+            ["Tool-calling model", "`tool-use/1.1.0` (prompt `tool_use.v3`), then `tool-use/1.2.0`", "The model calls the tools itself. The executor checks every call"],
+            ["Our coordinator (my design)", "`live/1.1.0`, then `live/1.2.0`", "The model picks one option from the server's checked menu"],
+            ["Check-all variant", "`verify-all/1.1.0`, then `verify-all/1.2.0`", "Our coordinator, with every relevant status check run first by the server under rule `verify-all-relevance/1.0.0`"],
         ],
         [1.4, 2.2, 2.9],
     )
     bullets(
         doc,
         [
-            "**Model**: `anthropic/claude-sonnet-5.5` through OpenRouter, the same configuration for P1 "
-            "to P3, 4096 output tokens per call, strict JSON output.",
+            "**Model**: `anthropic/claude-sonnet-5.5` through OpenRouter, the same configuration for the three model "
+            "approaches, 4096 output tokens per call, strict JSON output.",
             "**Limits per run**: 48 tool calls, 8 model calls, $0.50, 900 seconds. Every failed call "
             "and retry counts.",
             "**Seeds** 101, 202 and 303 are recorded but not sent, because the model's endpoints refuse a "
             "seed. The three runs of a case are repeated trials, not independent units, and not "
             "reproducible.",
-            "**P1 is a serious baseline.** It sees the objective, the budget, the tools and the "
-            "candidates, and may verify and hold like P2.",
-            "**P3 is an ablation.** Its checks are made by the server, so its lower model-call count on "
+            "**The tool-calling model is a serious baseline.** It sees the objective, the budget, the tools and the "
+            "candidates, and may verify and hold like our coordinator.",
+            "**The check-all variant is an ablation.** Its checks are made by the server, so its lower model-call count on "
             "campus does not mean less checking.",
         ],
     )
@@ -361,7 +371,7 @@ def community(doc) -> None:
     figure(
         doc,
         FRAMES / "community_replanned.png",
-        "Figure 9. Development case skills_dev01: the peer lead's own check-in moves two activities (automated run).",
+        "Figure 7. A real screenshot of the app, in a development case of the skills exchange: the peer lead's own check-in moves two activities (automated run).",
         5.0,
     )
 
@@ -385,10 +395,10 @@ def pantry(doc) -> None:
             "Staff record the distribution of 40 kits at 13:40. Only this brings the service deficit to 0.",
         ],
     )
-    figure(doc, PNG / "fig_pantry.png", "Figure 10. Stock and the two counters at four moments (development case pantry_dev01).")
+    figure(doc, PNG / "fig_pantry_chart.png", "Figure 8. Kits at four moments of a development case, with the 40-kit target. The 20 late kits never count as stock.")
     para(
         doc,
-        "In development case pantry_dev02, staff hand off only 10 of the 16 kits. 34 kits are "
+        "In a second pantry development case, staff hand off only 10 of the 16 kits. 34 kits are "
         "distributed, a 6-kit deficit is reported, and the target stays 40.",
     )
     para(
@@ -433,7 +443,7 @@ def protocol(doc) -> None:
         "written and locked before the comparison, never used in development, and hidden from every "
         "policy. Development results are never reported as evaluation results.",
     )
-    figure(doc, PNG / "fig_freeze.png", "Figure 11. Practice, freeze, then one held-out test.")
+    figure(doc, PNG / "fig_freeze.png", "Figure 9. Practice, freeze, then one held-out test.")
     table(
         doc,
         ["Case", "Public condition (from the protocol)", "Outcome class"],
@@ -456,7 +466,7 @@ def protocol(doc) -> None:
     bullets(
         doc,
         [
-            "**Planned size**: 80 campus runs (8 cases, P0 once, P1 to P3 three times each) and, "
+            "**Planned size**: 80 campus runs (8 cases, the fixed rules once, the three model approaches three times each) and, "
             "separately, 40 pantry runs. The two suites are never pooled.",
             "**Freeze**: code, prompts, model, limits, seeds and run order fixed by hash in "
             "`plan_b/evaluation/manifests/freeze.json` (commit 3de5962) before the first held-out call.",
@@ -479,11 +489,29 @@ def _row(suite: str, policy: str, keys: list[str]) -> list[str]:
 
 def results(doc) -> None:
     campus, pantry = RESULTS["campus"], RESULTS["pantry"]
-    names = {"P0": "P0 rules", "P1": "P1 tool use", "P2": "P2 selective (mine)", "P3": "P3 verify all"}
+    names = {"P0": "Fixed rules", "P1": "Tool-calling model", "P2": "Our coordinator", "P3": "Check-all variant"}
     doc.add_heading("12. Results", level=1)
+    fk, fn = _v12_met("fresh")
     para(
         doc,
-        f"The reported run of the frozen comparison on the locked held-out cases is `{RESULTS['run_id']}`, "
+        f"**The final system.** On the six new cases of the final freeze, {fk} of {fn} runs met the "
+        "expected outcome (Figure 10). All three model-based approaches met every run, and the only "
+        "miss was the fixed rules on a case where a volunteer runs late, because a person's own delay "
+        "is a message its rules cannot read. No executed action broke a rule, because every change of "
+        "every approach passes the same gate. Six cases cannot rank the approaches, so the result is "
+        "about safety and reliability, not a winner. Section 12.7 gives these numbers in full.",
+    )
+    figure(doc, PNG / "fig_result.png", "Figure 10. The final system on six new cases: runs that met the expected outcome, per approach and suite.")
+    para(
+        doc,
+        "**The complete record.** Sections 12.1 to 12.6 report the earlier locked test of the previous "
+        "policies on twelve cases. It is how the defects fixed before the final freeze were found, and "
+        "its cases are now development cases. Section 12.7 reports the final system and a diagnostic "
+        "rerun on those spent cases, which is never a held-out result.",
+    )
+    para(
+        doc,
+        f"The reported run of the frozen comparison on the twelve cases of the earlier locked test (now development cases) is `{RESULTS['run_id']}`, "
         f"committed in c052338 under `{RESULTS['source']}/`. All {campus['all']['recorded']} planned "
         f"campus runs and all {pantry['all']['recorded']} planned pantry runs were recorded, with none "
         "missing, aborted, timed out or crashed. These are descriptive counts from one reported run on 8 campus "
@@ -495,16 +523,16 @@ def results(doc) -> None:
     para(
         doc,
         "**Headline.** No policy executed a violation, and no policy committed a change on the three "
-        "quiet cases. **P2, my policy, shows no consistent advantage over P1 or P0 here.** On one reported run "
-        f"of 8 campus and 4 pantry held-out cases, P2 met every run of {campus['P2']['cases']} of 8 "
-        f"campus cases (P1 met every run of {campus['P1']['cases']}, P3 of {campus['P3']['cases']}, P0 of "
-        f"{campus['P0']['cases']}) and of {pantry['P2']['cases']} of 4 pantry cases (P0 of "
-        f"{pantry['P0']['cases']}, P1 of {pantry['P1']['cases']}, P3 of {pantry['P3']['cases']}). Its "
+        "quiet cases. **Our coordinator, my policy, shows no consistent advantage over the tool-calling model or the fixed rules here.** On one reported run "
+        f"of 8 campus and 4 pantry held-out cases, our coordinator met every run of {campus['P2']['cases']} of 8 "
+        f"campus cases (the tool-calling model met every run of {campus['P1']['cases']}, the check-all variant of {campus['P3']['cases']}, the fixed rules of "
+        f"{campus['P0']['cases']}) and of {pantry['P2']['cases']} of 4 pantry cases (the fixed rules of "
+        f"{pantry['P0']['cases']}, the tool-calling model of {pantry['P1']['cases']}, the check-all variant of {pantry['P3']['cases']}). Its "
         "misses come from a frozen attention rule that passes only equipment notices to the planner (C06), choices that used up the 8-call limit (C07) "
         "and an unavailable pool kept as a handoff option (T03). A first attempt was voided, as "
         "section 12.5 explains.",
     )
-    figure(doc, PNG / "fig_results.png", "Figure 12. Held-out runs that met the case's outcome, per policy and suite.")
+    figure(doc, PNG / "fig_result_record.png", "Figure 11. The earlier locked test: runs that met the case's outcome, per policy and suite.")
     doc.add_heading("12.1 Campus suite (8 cases, 80 runs)", level=2)
     table_caption(doc, "Table 1. Campus outcomes per policy, version 1.1, held-out.")
     table(
@@ -526,8 +554,8 @@ def results(doc) -> None:
     )
     para(
         doc,
-        "On C08, P0's infeasibility report was decided by the policy, P1's three by the model, and "
-        "P2's and P3's three each by the server's shared narration. A refused request is a "
+        "On C08, the fixed rules' infeasibility report was decided by the policy, the tool-calling model's three by the model, and "
+        "our coordinator's and the check-all variant's three each by the server's shared narration. A refused request is a "
         "coordinator call that the server rejected, so nothing it asked for happened. Across both "
         f"suites {RESULTS['campus']['all']['stale'] + RESULTS['pantry']['all']['stale']} of the "
         f"{RESULTS['campus']['all']['refused'] + RESULTS['pantry']['all']['refused']} refused "
@@ -554,13 +582,17 @@ def results(doc) -> None:
     para(
         doc,
         "Kits on time are summed over a policy's runs against the summed original targets. For pantry "
-        "partial fulfillment, P0's two reports were decided by the policy, and P2's and P3's (T04, "
-        "three each) by the server. P1's three T03 deficit reports were decided by the model but did "
+        "partial fulfillment, the fixed rules' two reports were decided by the policy, and those of our coordinator and the check-all variant (T04, "
+        "three each) by the server. The tool-calling model's three T03 deficit reports were decided by the model but did "
         "not meet the class.",
     )
     doc.add_heading("12.3 Per-case figures from the report", level=2)
-    figure(doc, PNG / "report_campus.png", "Figure 13. The report's per-case figure, campus (`campus/report/figure.svg`).", 5.6)
-    figure(doc, PNG / "report_pantry.png", "Figure 14. The report's per-case figure, pantry (`pantry/report/figure.svg`).", 5.6)
+    para(
+        doc,
+        "The report's own per-case figures stay in the repository: `campus/report/figure.svg` and "
+        "`pantry/report/figure.svg` of the run, with printed copies in "
+        "`PEEAI_plan/submission/slides/figures/report_campus.pdf` and `report_pantry.pdf`.",
+    )
     doc.add_heading("12.4 One success, one failure, and the other failures", level=2)
     para(
         doc,
@@ -570,27 +602,27 @@ def results(doc) -> None:
     )
     para(
         doc,
-        "**One failure.** In C06 (a volunteer will be late, with a later check-in), P2 and P3 read the "
+        "**One failure.** In C06 (a volunteer will be late, with a later check-in), our coordinator and the check-all variant read the "
         "volunteer's message correctly in all six runs. But the frozen attention rule treats only "
         "equipment notices as material, so the reading never reached the planner, the plan was never "
         "put in question, and the activity the volunteer leads could not start in time. The earliest "
-        "broken stage is planner input. P0's parser does not read the message. P1 met C06 in 3 of 3 "
+        "broken stage is planner input. The fixed rules' parser does not read the message. The tool-calling model met C06 in 3 of 3 "
         "runs. This limit was disclosed at the case lock, before the runs.",
     )
-    figure(doc, PNG / "fig_failure.png", "Figure 15. The C06 failure of P2 and P3 in four steps.")
+    figure(doc, PNG / "fig_failure.png", "Figure 12. The C06 failure of our coordinator and the check-all variant in four steps.")
     para(doc, "The other failed runs, each with its earliest broken stage (from the run's `FAILURES.md`):")
     bullets(
         doc,
         [
-            "**C07** (status service unavailable), P2 in 3 runs, action selection: a repeated check and a "
+            "**C07** (status service unavailable), our coordinator in 3 runs, action selection: a repeated check and a "
             "hold released and made again used the 8 model calls, and the organizer's approval arrived "
-            "after the last one. P0 missed C07 too (interpretation), because its parser does not read "
+            "after the last one. The fixed rules missed C07 too (interpretation), because its parser does not read "
             "the message.",
-            "**T02**, P3 in 3 runs, execution: a correct apply was refused as stale during a one-minute "
+            "**T02**, the check-all variant in 3 runs, execution: a correct apply was refused as stale during a one-minute "
             "tool call, and the remaining model calls went to reading new notices, so it was never "
             "retried.",
-            "**T03 and T04**, P1 in 6 runs, action selection: P1 never held or committed the kits on hand.",
-            "**T03**, P2 and P3 in 3 runs each, planner input (for P2 borderline with action selection): "
+            "**T03 and T04**, the tool-calling model in 6 runs, action selection: the tool-calling model never held or committed the kits on hand.",
+            "**T03**, our coordinator and the check-all variant in 3 runs each, planner input (for our coordinator borderline with action selection): "
             "a defect in my frozen planner and menu kept a pool checked as unavailable as a ranked "
             "handoff option, and the shortfall report waited on it.",
             "The 8-call limit ended 15 of the 26 failed runs. No failed run had an executed violation, a "
@@ -600,11 +632,11 @@ def results(doc) -> None:
     doc.add_heading("12.5 The tradeoff, the spend and what the counts do not show", level=2)
     para(
         doc,
-        f"**The tradeoff.** P1, the model calling tools freely, met all campus runs, with the most model "
+        f"**The tradeoff.** The tool-calling model, the model calling tools freely, met all campus runs, with the most model "
         f"use: {campus['P1']['calls']} model calls and ${campus['P1']['usd']} on campus, against "
-        f"${campus['P2']['usd']} for P2 and ${campus['P3']['usd']} for P3. On the pantry, fixed rules met "
+        f"${campus['P2']['usd']} for our coordinator and ${campus['P3']['usd']} for the check-all variant. On the pantry, fixed rules met "
         f"{pantry['P0']['met']} runs at no model cost, while the model policies met "
-        f"{pantry['P1']['metk']} to {pantry['P2']['metk']} of 12. P2 cost less than P1 (P3, with the same menu and server checks, cost less still on campus), and its "
+        f"{pantry['P1']['metk']} to {pantry['P2']['metk']} of 12. Our coordinator cost less than the tool-calling model (the check-all variant, with the same menu and server checks, cost less still on campus), and its "
         "misses trace to its frozen attention rule, choices that used up the call limit and the "
         "planner defect. These counts come from one reported run and do not show that any policy is "
         "better in general.",
@@ -626,7 +658,7 @@ def results(doc) -> None:
     bullets(
         doc,
         [
-            "**Prompts differ by policy.** Only P2 and P3 had pantry guidance in their prompts, so the "
+            "**Prompts differ by policy.** Only our coordinator and the check-all variant had pantry guidance in their prompts, so the "
             "pantry partial-fulfillment counts cannot be credited to the controller alone.",
             "**The limits are development values**: 8 model calls and 48 tool calls per run, not tuned on "
             "held-out cases. The 8-call limit was reached in 21 of the 120 runs.",
@@ -652,8 +684,8 @@ def results(doc) -> None:
             "Wave 1 rejection demo: 20 steps, each with its expected result.",
             "Rehearsals: three automated rehearsals of the showcase's board path passed, one of them "
             "with a forced provider failure and a switch to the labelled replay (Wave 3 packet, "
-            "`PEEAI_plan/handoffs/wave_3/REHEARSALS.md`). The spoken script is 932 words, about 6 "
-            "minutes 39 seconds at 140 words a minute, inside the 7 minutes.",
+            "`PEEAI_plan/handoffs/wave_3/REHEARSALS.md`). The spoken script is 922 counted words, about 6 "
+            "minutes 35 seconds at 140 words a minute, inside the 7 minutes.",
         ],
     )
     wave3b(doc)
@@ -667,11 +699,11 @@ def wave3b(doc) -> None:
     calls = sum(int(fresh[s][p]["calls"]) for s in ("campus", "pantry") for p in pols)
     usd = {k: sum(float(V12[k][s][p]["usd"]) for s in ("campus", "pantry") for p in pols) for k in ("fresh", "rerun")}
     by_policy = {p: sum(float(fresh[s][p]["usd"]) for s in ("campus", "pantry")) for p in ("P1", "P2", "P3")}
-    doc.add_heading("12.7 Wave 3b: version 1.2", level=2)
+    doc.add_heading("12.7 The final system on six new cases, in full (Wave 3b, version 1.2)", level=2)
     para(
         doc,
         "**What changed and why.** The held-out run above exposed defects in the frozen 1.1 policies, "
-        "and its `FAILURES.md` names them. Version 1.2 (P1 `tool-use/1.2.0`, P2 `live/1.2.0`, P3 "
+        "and its `FAILURES.md` names them. Version 1.2 (the tool-calling model `tool-use/1.2.0`, our coordinator `live/1.2.0`, the check-all variant "
         "`verify-all/1.2.0`) fixes them. `apps/plan_b/docs/RUNTIME_CONTRACT.md` section 21 lists each "
         "fix with its test.",
     )
@@ -688,12 +720,12 @@ def wave3b(doc) -> None:
             "called again on a menu it already passed on in the same state (the same revision, goal "
             "version and options).",
             "**A stale refusal** (T02). In 1.1 a choice refused only because the state had changed went "
-            "back to the model. In 1.2 P2 and P3 send it again without a model call when the re-read "
+            "back to the model. In 1.2 our coordinator and the check-all variant send it again without a model call when the re-read "
             "menu still offers it.",
             "**Rate limits.** In 1.1 an HTTP 429 answer used up a model call. In 1.2 the provider waits "
             "and sends the same request again inside the call (3 s, doubled up to 20 s, at most 60 s of "
             "waiting a call), so a 429 uses no model call.",
-            "P0's code and ids are unchanged, but it shares the planner, so the freeze records the "
+            "The fixed rules' code and ids are unchanged, but they share the planner, so the freeze records the "
             "planner version `plan_b.planner/1.2.0`. The model, the output limit and every cap are the "
             "same as in 1.1.",
         ],
@@ -710,8 +742,8 @@ def wave3b(doc) -> None:
         "policy behavior and left five known limits of 1.2 frozen (section 13).",
     )
     layers = [
-        ("v1.1 held-out, evaluation of record: campus C01 to C08", RESULTS, "campus"),
-        ("v1.1 held-out, evaluation of record: pantry T01 to T04", RESULTS, "pantry"),
+        ("v1.1 earlier locked test: campus C01 to C08", RESULTS, "campus"),
+        ("v1.1 earlier locked test: pantry T01 to T04", RESULTS, "pantry"),
         ("v1.2 fresh held-out: campus C09 to C12", fresh, "campus"),
         ("v1.2 fresh held-out: pantry T05, T06", fresh, "pantry"),
         ("v1.2 post-hoc diagnostic rerun on spent cases, not held-out: campus C01 to C08", rerun, "campus"),
@@ -720,7 +752,7 @@ def wave3b(doc) -> None:
     table_caption(doc, "Table 5. Runs that met the case's outcome over recorded runs, per policy, in three separately labelled layers.")
     table(
         doc,
-        ["Layer and cases", "Runs", "P0 rules", "P1 tool use", "P2 selective (mine)", "P3 verify all"],
+        ["Layer and cases", "Runs", "Fixed rules", "Tool-calling model", "Our coordinator", "Check-all variant"],
         [[label, str(src[suite]["all"]["recorded"]), *[str(src[suite][p]["met"]) for p in pols]] for label, src, suite in layers],
         [2.6, 0.5, 0.8, 0.8, 1.0, 0.8],
     )
@@ -747,8 +779,8 @@ def wave3b(doc) -> None:
             "the three seeds are repeated trials, and no significance test is made. The suites are "
             "separate.",
             f"**The fresh held-out check** (`wave3b_fresh_20261025T2327Z`). Version 1.2 met the outcome "
-            f"in {fk} of {fn} runs. The one miss is P0 on C11, a late volunteer whose own report P0's "
-            "frozen parser does not read, the same gap by construction as P0 on C06. P1, P2 and P3 met "
+            f"in {fk} of {fn} runs. The one miss is the fixed rules on C11, a late volunteer whose own report the fixed rules' "
+            "frozen parser does not read, the same gap by construction as the fixed rules on C06. The tool-calling model, our coordinator and the check-all variant met "
             f"every run, {fresh['campus']['P2']['met']} each on campus and {fresh['pantry']['P2']['met']} "
             f"each on the pantry. No run reached the 8-call limit, all {calls} model calls were "
             "answered, and the negative control C10 had no committed change in any of its 10 runs.",
@@ -756,15 +788,15 @@ def wave3b(doc) -> None:
             "the spent templates, and its conditions repeat spent ones (C11 repeats the C06 condition, "
             "T06 the T03 condition). So it tests new instances of known conditions, not new conditions. "
             "It is not comparable with the v1.1 counts, because the cases differ.",
-            "**P2 still shows no consistent advantage.** P1, P2 and P3 all met every fresh run, so the "
+            "**Our coordinator still shows no consistent advantage.** The tool-calling model, our coordinator and the check-all variant all met every fresh run, so the "
             "fresh set cannot separate them. Model charges over both fresh suites were "
-            f"${by_policy['P1']:.2f} for P1, ${by_policy['P2']:.2f} for P2 and ${by_policy['P3']:.2f} for P3.",
+            f"${by_policy['P1']:.2f} for the tool-calling model, ${by_policy['P2']:.2f} for our coordinator and ${by_policy['P3']:.2f} for the check-all variant.",
             "**The rerun on the spent cases is diagnostic, not held-out** "
             "(`wave3b_rerun_spent_20261025T2345Z`). Its counts are consistent with the fixes on the "
-            "failures that motivated them: the C06 misses of P2 and P3 and the T03 misses did not "
-            "recur. The C07 failure of P2 (a hold made, released and made again until the call limit) "
-            "and the T02 failure of P3 (an apply refused as stale, whose retry needed a model call that "
-            "the limit did not leave) remain, and P1 missed "
+            "failures that motivated them: the C06 misses of our coordinator and the check-all variant and the T03 misses did not "
+            "recur. The C07 failure of our coordinator (a hold made, released and made again until the call limit) "
+            "and the T02 failure of the check-all variant (an apply refused as stale, whose retry needed a model call that "
+            "the limit did not leave) remain, and the tool-calling model missed "
             "T04 in two of three runs. The fixes were made after reading these cases, so the rerun "
             "cannot show that 1.2 is better.",
             "**Harness labels.** The rerun used a case-scoped lock written outside the repository, so "
@@ -793,7 +825,7 @@ def limitations(doc) -> None:
             "not three worlds. No significance is claimed.",
             "**Version 1.2 has five known limits**, found by the audit before the freeze and left "
             "frozen: a person's delay hypothesis outlives a later check-in, the declined-menu rule "
-            "holds no time (so a timed wake with the same options gets no model call), P1 notes a "
+            "holds no time (so a timed wake with the same options gets no model call), the tool-calling model notes a "
             "declined menu with the view after its turn, a stale re-send is recorded as a model "
             "choice, and a long `Retry-After` is cut to 20 s (`RUNTIME_CONTRACT.md` section 21).",
             "**The fresh held-out set** has four campus and two pantry cases. Its wording is close to "
@@ -803,7 +835,7 @@ def limitations(doc) -> None:
             "README says it is not a held-out result, and any quote of it must keep that label.",
             "**One model**, one provider, seeds not supported, so runs are repeated trials and not "
             "reproducible.",
-            "**No comparative claim beyond the counts.** A P2 versus P0 difference does not separate the "
+            "**No comparative claim beyond the counts.** A difference between our coordinator and the fixed rules does not separate the "
             "decision policy from language reading.",
             "**Zero executed violations** reflects the executor's checks. It means none were observed in "
             "these runs, not a proof that none can occur.",
@@ -885,7 +917,7 @@ def how_to_run(doc) -> None:
     code_block(doc, ["uv run pytest -q", "(cd web && npm test)"])
     para(
         doc,
-        "The model policies P1 to P3 make paid calls. They need an OpenAI-compatible endpoint such as "
+        "The three model approaches make paid calls. They need an OpenAI-compatible endpoint such as "
         "OpenRouter, set in `.local/keys/model_endpoint.env` at the repository root (the names are in "
         "`apps/plan_b/.env.example`), and a key file that only the server reads. Everything above runs "
         "without a key. The evaluation commands are in `apps/plan_b/docs/EVALUATION.md`.",
@@ -896,16 +928,17 @@ def demo_guide(doc) -> None:
     doc.add_heading("15. Demo guide", level=1)
     table(
         doc,
-        ["Clock", "Segment", "Case", "Show"],
+        ["Clock", "Slide", "Scenario to load", "Show"],
         [
-            ["0:00 to 0:37", "The problem", "dev01", "Goal, deadline, the 16:40 notice"],
-            ["0:37 to 1:12", "Who may do what", "dev01", "The coordinator's grant"],
-            ["1:12 to 2:35", "Verify, then commit", "dev01", "Status check, options, receipt"],
-            ["2:35 to 3:25", "Four messages, zero changes", "dev04", "Does not apply, duplicate, plan kept"],
-            ["3:25 to 4:23", "The loop and the gate", "dev02", "Hold until 16:55, organizer approval"],
-            ["4:23 to 5:39", "Held-out results", "results", "Counts and one failure"],
-            ["5:39 to 6:29", "Pantry cameo", "pantry_dev01", "The two counters"],
-            ["6:29 to 7:00", "Close", "", "What works, what is next"],
+            ["0:00 to 0:36", "Title, then 16:40, twenty minutes to doors open", "dev01", "Goal, deadline, the 16:40 text"],
+            ["0:36 to 1:21", "An agent with no gate against Plan B", "", "The idea: the model chooses, the gate decides"],
+            ["1:21 to 2:17", "One fact checked, two activities swapped", "dev01", "Status check, options, receipt"],
+            ["2:17 to 2:44", "Most messages change nothing", "dev04", "Does not apply, duplicate, plan kept"],
+            ["2:44 to 3:44", "The design", "dev02", "Hold until 16:55, organizer approval"],
+            ["3:44 to 4:48", "The test on six new cases", "results", "59 of 60 runs met, the one miss, the gate"],
+            ["4:48 to 5:27", "The food pantry", "pantry_dev01", "Late stock does not count, staff record"],
+            ["5:27 to 6:11", "What is next", "", "Connected APIs, MBTA as context, a pilot"],
+            ["6:11 to 6:41", "Close", "", "The callback and the one message"],
         ],
         [1.1, 1.9, 1.1, 2.4],
     )
@@ -936,12 +969,25 @@ def ethics(doc) -> None:
 
 def future(doc) -> None:
     doc.add_heading("17. Future work", level=1)
+    para(
+        doc,
+        "Three interfaces are connected today: the OpenRouter model API (`anthropic/claude-sonnet-5.5`), "
+        "the sandbox's tool API (status checks, holds, plan changes and receipts) and the board's HTTP "
+        "API, where people approve spending, report and attest. Real feeds are the next step. The MBTA "
+        "V3 API for live transit alerts is designed in, and a key exists, but the adapter was not built "
+        "and no MBTA data is used. Transit data could only ever be context, never proof of a person's "
+        "arrival.",
+    )
+    figure(doc, PNG / "fig_next.png", "Figure 13. Connected today (solid) and next (dashed).")
     bullets(
         doc,
         [
-            "Review the workflows with community staff, starting with one bounded tabletop session.",
+            "Review the workflows with community staff, starting with one bounded tabletop session, then "
+            "a pilot with a campus event series where Plan B proposes and the organizer acts, counting "
+            "messages, checks, changes and approvals.",
             "Store authorization requests as explicit state.",
-            "Add the optional MBTA transit context, labelled as uncertain information.",
+            "Build the MBTA transit adapter, labelled as uncertain context, and replace the simulated "
+            "status check with a supplier's real tracking page.",
             "More held-out cases and more than one model.",
             "Human rehearsals and a comprehension check with new viewers.",
         ],
@@ -962,8 +1008,8 @@ def appendices(doc) -> None:
             ["Revision (state version)", "The version number of the shared state. Every change raises it. The plan version counts only accepted plans"],
             ["Executor", "The server component that checks and runs every request"],
             ["Planner", "Builds candidate repairs from fixed templates and checks each"],
-            ["Policy", "The rule that picks the next step: P0 to P3"],
-            ["P0, P1, P2, P3", "Fixed rules, a model calling tools, a model picking checked options, and P2 with every check"],
+            ["Policy", "The rule that picks the next step: one of the four approaches"],
+            ["P0, P1, P2, P3", "Fixed rules, the tool-calling model, our coordinator (picks checked options), and the check-all variant (every check first)"],
             ["Development case", "A practice case used to build and debug"],
             ["Episode", "One run of one policy on one case"],
             ["Wake", "A turn the runner gives the coordinator when the state changed or its wait has passed"],
@@ -976,7 +1022,7 @@ def appendices(doc) -> None:
             ["Capped run", "A run stopped by the limit of 8 model calls, scored as it stands"],
             ["Appropriate infeasibility", "With no recovery inside the limits, the coordinator names the blocking constraints and changes nothing invalid"],
             ["Earliest broken stage", "Where a failed run first went wrong: interpretation, planner input, action selection or execution"],
-            ["Attention rule", "The P2 and P3 rule that decides whether a reading is material and needs the model"],
+            ["Attention rule", "The rule of our coordinator and the check-all variant that decides whether a reading is material and needs the model"],
             ["Planner input", "The step where a reading becomes a question for the planner"],
             ["Supply shortfall", "Kits still missing from the pantry shelf"],
             ["Service deficit", "Kits of the target not yet handed out"],
@@ -989,10 +1035,10 @@ def appendices(doc) -> None:
         ["Path", "Content"],
         [
             ["`apps/plan_b/`", "The app: Python package `plan_b`, `web/`, `tests/`, `scripts/`, `docs/`"],
-            ["`apps/plan_b/docs/RUNTIME_CONTRACT.md`", "The runtime semantics, sections 1 to 20"],
+            ["`apps/plan_b/docs/RUNTIME_CONTRACT.md`", "The runtime semantics, sections 1 to 21"],
             ["`apps/plan_b/docs/EVALUATION.md`", "The evaluation harness and its commands"],
             ["`apps/plan_b/plan_b/evaluation/manifests/`", "The frozen `freeze.json` and the held-out lock"],
-            ["`apps/plan_b/plan_b/evaluation/development/`", "The development runs of P1 to P3"],
+            ["`apps/plan_b/plan_b/evaluation/development/`", "The development runs of the three model approaches"],
             ["`PEEAI_plan/`", "The plan: protocol, presentation plan, wave tasks"],
             ["`PEEAI_plan/handoffs/`", "The audit packets of each wave, with their evidence"],
             ["`PEEAI_plan/submission/`", "These submission items and their sources"],
@@ -1005,7 +1051,7 @@ def appendices(doc) -> None:
         ["Number in this document", "Source"],
         [
             ["dev01 notice, check, 16 built and 3 feasible, swap at 16:43, `rcpt_0001`", "Wave 2 storyboard frames 4 to 7 and `PEEAI_plan/handoffs/wave_2/evidence/storyboard/storyboard_report.json`"],
-            ["P2 on dev01: same check and swap, 3 model calls, $0.0366", "`apps/plan_b/plan_b/evaluation/development/README.md`"],
+            ["Our coordinator on dev01: same check and swap, 3 model calls, $0.0366", "`apps/plan_b/plan_b/evaluation/development/README.md`"],
             ["dev02 hold until 16:55, $35.00 committed once", "Wave 2 storyboard frames 9 to 11, Wave 1 README"],
             ["dev04 messages and verdicts", "`apps/plan_b/plan_b/scenarios/private/dev04.json` (development), storyboard frame 8"],
             ["Pantry 24, 20, 16, 40 and the counters", "`PEEAI_plan/handoffs/wave_2/DEMO.md` section 4, `PEEAI_plan/handoffs/wave_2/evidence/reports/pantry_accounting.json`"],

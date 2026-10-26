@@ -1,33 +1,26 @@
-% Shared preamble of the standalone TikZ figures (slides, poster and documentation).
-\usepackage[T1]{fontenc}
-\usepackage[scaled]{helvet}
-\renewcommand{\familydefault}{\sfdefault}
-\usepackage{tikz}
-\hyphenpenalty=10000
-\exhyphenpenalty=10000
-\usetikzlibrary{arrows.meta,positioning,calc,fit,backgrounds,shapes.geometric,patterns}
+% Shared preamble of the older standalone TikZ figures that the documentation still uses
+% (fig_roles, fig_loop, fig_freeze, fig_failure, fig_qr). It loads the Plan B figure style and maps
+% the older colour and box names onto it: flat white boxes, thin rules, 1 pt corners, no pastel
+% fills. New figures input planb_figstyle.tex directly.
+\input{planb_figstyle}
+\usetikzlibrary{shapes.geometric,patterns}
 
-% The slide theme's primary colour and the UMass Boston brand colours.
-\definecolor{primary}{HTML}{08457E}
-\definecolor{umbdark}{HTML}{132245}
-\definecolor{umbblue}{HTML}{005A8B}
-\definecolor{umborange}{HTML}{FF791F}
+\colorlet{umbdark}{ink}
+\colorlet{umbblue}{primary}
+\colorlet{umborange}{accent}
 \definecolor{umbyellow}{HTML}{FEDE42}
-\definecolor{ink}{HTML}{2B2B2B}
-\definecolor{muted}{HTML}{6B6B6B}
-\definecolor{line}{HTML}{B8B8B8}
-\definecolor{okgreen}{HTML}{2E7D32}
-\definecolor{softblue}{HTML}{E6EEF6}
-\definecolor{softorange}{HTML}{FFF0E5}
-\definecolor{softgreen}{HTML}{E8F3E9}
-\definecolor{softgray}{HTML}{F2F2F2}
+\colorlet{line}{rulegrey}
+\colorlet{okgreen}{ok}
+\colorlet{softblue}{white}
+\colorlet{softorange}{white}
+\colorlet{softgreen}{white}
+\colorlet{softgray}{faint}
 
 \tikzset{
-  >={Latex[length=2.2mm]},
-  flow/.style={->, draw=muted, line width=0.9pt},
-  box/.style={draw=line, fill=white, rounded corners=3pt, align=center, inner sep=5pt, text=ink},
-  keybox/.style={draw=primary, fill=softblue, rounded corners=3pt, align=center, inner sep=5pt, text=ink, line width=0.9pt},
-  hotbox/.style={draw=umborange, fill=softorange, rounded corners=3pt, align=center, inner sep=5pt, text=ink, line width=0.9pt},
-  okbox/.style={draw=okgreen, fill=softgreen, rounded corners=3pt, align=center, inner sep=5pt, text=ink, line width=0.9pt},
+  flow/.style={->, draw=muted, line width=0.6pt},
+  box/.style={draw=rulegrey, line width=0.5pt, fill=white, rounded corners=1pt, align=center, inner sep=5pt, text=ink},
+  keybox/.style={draw=primary, fill=white, rounded corners=1pt, align=center, inner sep=5pt, text=ink, line width=0.8pt},
+  hotbox/.style={draw=accent, fill=white, rounded corners=1pt, align=center, inner sep=5pt, text=ink, line width=0.8pt},
+  okbox/.style={draw=ok, fill=white, rounded corners=1pt, align=center, inner sep=5pt, text=ink, line width=0.8pt},
   lbl/.style={text=muted, align=center},
 }

@@ -4,10 +4,10 @@
 % see LICENSE-gemini.md) with the UMass Boston colour theme of the Overleaf template.
 % Build: latexmk -pdflatex='lualatex -interaction nonstopmode' -pdf poster.tex
 %
-% The held-out numbers come from ../slides/figures/results_numbers.tex and fig_results_v.tex, which
-% ../make_results.py writes from the committed run wave3_heldout_20261025T1625Z (metrics.json),
-% the evaluation of record of version 1.1. The version 1.2 numbers (fresh:) come from
-% results_numbers_v12.tex, written from the held-out run wave3b_fresh_20261025T2327Z.
+% The story and the layout follow ../STORY_PLAN.md: labelled visuals, one final system, plain
+% names instead of policy codes. The evaluation numbers come from ../slides/figures/
+% results_numbers_v12.tex (fresh:, the six new held-out cases of wave3b_fresh_20261025T2327Z),
+% results_numbers_final.tex and the chart fig_result_v.tex, all written by ../make_results.py.
 
 \documentclass[final]{beamer}
 % Keep the PDF metadata to title and author: no producer, creator or embedded file info.
@@ -47,19 +47,37 @@
 % Lengths
 % ====================
 
-% (N+1)*\sepwidth + N*\colwidth = \paperwidth, with N = 4
+% Earlier three-column widths, kept for reference.
 \newlength{\sepwidth}
-\newlength{\colwidth}
+\newlength{\colA}
+\newlength{\colB}
+\newlength{\colC}
 \setlength{\sepwidth}{0.018\paperwidth}
-\setlength{\colwidth}{0.2275\paperwidth}
-\newlength{\fullwidth}
-\setlength{\fullwidth}{\dimexpr 4\colwidth+3\sepwidth\relax}
+\setlength{\colA}{0.335\paperwidth}
+\setlength{\colB}{0.395\paperwidth}
+\setlength{\colC}{0.1975\paperwidth}
+% Two rows: 3 \sepwidth + \rowAa + \rowAb and 4 \sepwidth + \rowBa + \rowBb + \rowBc = \paperwidth.
+\newlength{\rowAa}\setlength{\rowAa}{0.513\paperwidth}
+\newlength{\rowAb}\setlength{\rowAb}{0.433\paperwidth}
+\newlength{\rowBa}\setlength{\rowBa}{0.40\paperwidth}
+\newlength{\rowBb}\setlength{\rowBb}{0.29\paperwidth}
+\newlength{\rowBc}\setlength{\rowBc}{0.238\paperwidth}
+\newlength{\toph}\setlength{\toph}{19.5cm}
+\newlength{\both}\setlength{\both}{13cm}
 
 \newcommand{\separatorcolumn}{\begin{column}{\sepwidth}\end{column}}
 
-% Held-out numbers, read as \res{suite:policy:key}.
-\input{../slides/figures/results_numbers.tex}
+% No decorative rules: no line under the header or under a block title.
+\setbeamercolor*{headline rule}{}
+\setbeamercolor{block separator}{bg=white}
+\setbeamerfont{block title}{family=\Raleway,size=\normalsize,series=\bfseries}
+\definecolor{planbblue}{HTML}{08457E}
+\setbeamercolor{block title}{fg=planbblue,bg=white}
+\definecolor{planbmuted}{HTML}{5F5F5F}
+
+% Numbers, read as \res{fresh:campus:P2:met} and \res{final:P2:metk}.
 \input{../slides/figures/results_numbers_v12.tex}
+\input{../slides/figures/results_numbers_final.tex}
 
 % ====================
 % Title
@@ -76,8 +94,7 @@
 % ====================
 
 \footercontent{
-  Fictional local sandbox. No real bookings, stock or partners. \hfill
-  \textbf{github.com/nocdoggo/FA26-COLLIE} \enspace (app in apps/plan\_b)}
+  \hfill\textbf{github.com/nocdoggo/FA26-COLLIE} \enspace (app in apps/plan\_b)}
 
 % ====================
 % Logos
@@ -96,91 +113,66 @@
 \begin{document}
 \begin{frame}[t]
 
-% -------------------------------------------------------------------
-% Band: the one message and the headline result
-% -------------------------------------------------------------------
+% The one message, as a line of type, not a box.
+\vspace{-1ex}
+\begin{center}
+  {\large\bfseries\color{planbblue} Plan B helps a community event stay on track by deciding what to verify, what to prepare, and when to commit a change.\par}
+  \vspace{0.4ex}
+  {\normalsize\color{planbmuted} An AI coordinator that checks a message before acting and never spends money without a person.\par}
+\end{center}
+\vspace{-1ex}
+
+% Two rows, as the owner asked: the scene and the design on top,
+% the evidence, the second domain and the short text below.
 \begin{columns}[t]
 \separatorcolumn
-\begin{column}{\fullwidth}
-  \begin{alertblock}{\Large An AI event coordinator that decides what to verify, what to prepare, and when to commit a change}
-    \centering
-    Version 1.1 on 12 held-out cases (\res{both:recorded} runs): no executed action broke a limit, no clear winner. Version 1.2 on 6 fresh held-out cases: \res{fresh:both:metk} of \res{fresh:both:metn} runs met.
-  \end{alertblock}
+\begin{column}{\rowAa}
+  \begin{block}{16:40, twenty minutes to doors open}
+    {\centering
+      \includegraphics[width=\linewidth,height=\toph,keepaspectratio]{fig_story.pdf}\\[0.3ex]
+      {\normalsize\color{planbmuted} Jordan is an illustration. A simulated event, run in the local sandbox.\par}
+    \par}
+  \end{block}
+\end{column}
+\separatorcolumn
+\begin{column}{\rowAb}
+  \begin{block}{The model only picks checked options. One gate decides.}
+    {\centering
+      \includegraphics[width=\linewidth,height=\toph,keepaspectratio]{fig_design.pdf}
+    \par}
+  \end{block}
 \end{column}
 \separatorcolumn
 \end{columns}
 
+\vspace{1ex}
 \begin{columns}[t]
 \separatorcolumn
-
-% -------------------------------------------------------------------
-% Column 1: the problem and one recovery
-% -------------------------------------------------------------------
-\begin{column}{\colwidth}
-  \begin{block}{A message is a claim, not a fact}
-    Twenty minutes before a campus showcase opens, a message says the projector may be late.
-    \begin{center}
-      \includegraphics[width=0.8\linewidth]{fig_strip_v.pdf}\\[2pt]
-      {\small Practice case dev01, an automated P0 run.\par}
-    \end{center}
-    In another practice case, a stale reminder and its forwarded copy \textbf{change nothing}.
+\begin{column}{\rowBa}
+  \begin{block}{\res{fresh:both:metk} of \res{fresh:both:metn} runs met the expected outcome on \res{final:cases} new cases}
+    {\centering
+      \includegraphics[width=\linewidth,height=\both,keepaspectratio]{fig_result.pdf}
+    \par}
   \end{block}
 \end{column}
-
 \separatorcolumn
-
-% -------------------------------------------------------------------
-% Column 2: how it decides
-% -------------------------------------------------------------------
-\begin{column}{\colwidth}
-  \begin{block}{Model chooses, server checks}
-    \begin{center}
-      \includegraphics[width=0.96\linewidth]{fig_loop_poster.pdf}
-    \end{center}
-    A language model picks one option. The server builds the options, checks every action
-    and writes the \textbf{receipt}. Spending needs a person.
+\begin{column}{\rowBb}
+  \begin{block}{The same loop runs a food pantry}
+    {\centering
+      \includegraphics[width=\linewidth,height=\both,keepaspectratio]{fig_pantry_chart.pdf}
+    \par}
   \end{block}
 \end{column}
-
 \separatorcolumn
-
-% -------------------------------------------------------------------
-% Column 3: the held-out test
-% -------------------------------------------------------------------
-\begin{column}{\colwidth}
-  \begin{exampleblock}{Tested on cases it never saw}
-    Version 1.1 frozen, then \textbf{held-out cases}. Runs met, my P2 in dark:
-    \begin{center}
-      \includegraphics[width=0.78\linewidth]{fig_results_v.pdf}
-    \end{center}
-    \textbf{No consistent advantage for my P2.} P1 met all \res{campus:P1:cases} campus cases, at three times
-    P2's model cost. \textbf{Version 1.2} on 6 fresh cases: P1 to P3 met every run, too few to rank.
-  \end{exampleblock}
-\end{column}
-
-\separatorcolumn
-
-% -------------------------------------------------------------------
-% Column 4: the pantry, what I built, and the limits (the link is in the footer)
-% -------------------------------------------------------------------
-\begin{column}{\colwidth}
-  \begin{block}{Same loop, a fictional pantry}
-    In a fictional pantry, late stock does not count and only staff record a handoff.
-    \textbf{No kit was counted twice} in any held-out run.
-  \end{block}
-
-  \begin{block}{What I built}
-    A local server and board, a checked executor, a planner, four policies and a frozen test
-    harness.
-  \end{block}
-
-  \begin{block}{Limits}
-    Fictional sandbox, 12 held-out cases and 6 fresh ones for 1.2, one model, a voided first
-    attempt. In 1.1 my P2 missed cases through a frozen rule, its 8-call limit and a
-    planner defect. A 1.2 rerun on spent cases is diagnostic only. No pilot yet.
+\begin{column}{\rowBc}
+  \begin{block}{What it means}
+    {\small \textbf{No executed action broke a rule}, because every change passes the one gate.
+    The one miss: the fixed rules, when a volunteer runs late. The new cases repeat situations
+    seen in development, and six cases cannot rank the model approaches.\par}
+    {\small \textbf{Next:} MBTA transit alerts as context only, designed and not connected. A
+    pilot where Plan B proposes and the organizer acts.\par}
   \end{block}
 \end{column}
-
 \separatorcolumn
 \end{columns}
 

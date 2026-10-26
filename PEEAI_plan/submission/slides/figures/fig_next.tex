@@ -1,0 +1,29 @@
+% What is connected today and what is next. Connected: the OpenRouter model API, the sandbox's
+% tool API and the board's HTTP API. Designed but not connected: the MBTA V3 API (the key exists,
+% the adapter was not built). A pilot has not started.
+\documentclass[border=3pt]{standalone}
+\input{planb_figstyle}
+\begin{document}
+\begin{tikzpicture}[font=\small, x=1cm, y=1cm]
+  \node[anchor=west, font=\bfseries, text=primary] at (0,0) {Connected today};
+  \node[anchor=west, font=\bfseries, text=muted] at (8.8,0) {Next};
+  \foreach \y/\icon/\name/\what in {
+    -1.0/\faBrain/{OpenRouter model API}/{anthropic/claude-sonnet-5.5 reads messages and picks options},
+    -2.3/\faServer/{The sandbox's tool API}/{status checks, holds, plan changes, receipts},
+    -3.6/\faUsers/{The board's HTTP API}/{people approve spending, report and attest}}{
+    \fill[primary] (0,\y+0.35) rectangle (0.08,\y-0.55);
+    \node[anchor=west, text=primary, font=\large] at (0.25,\y-0.1) {\icon};
+    \node[anchor=north west, text=ink, font=\bfseries] at (1.0,\y+0.38) {\name};
+    \node[anchor=north west, text=muted, text width=6.6cm, align=left] at (1.0,\y-0.05) {\what};
+  }
+  \foreach \y/\icon/\name/\what in {
+    -1.0/\faBus/{MBTA V3 API, live transit alerts}/{designed, not connected: context only, never a person's arrival},
+    -2.3/\faTruck/{Real tracking pages}/{a supplier's own status in place of the sandbox's},
+    -3.6/\faHandshake/{A pilot with a campus event series}/{Plan B proposes, the organizer acts. Count messages, checks, changes and approvals}}{
+    \draw[muted, line width=0.8pt, dash pattern=on 3pt off 2pt] (8.84,\y+0.35) -- (8.84,\y-0.55);
+    \node[anchor=west, text=muted, font=\large] at (9.05,\y-0.1) {\icon};
+    \node[anchor=north west, text=ink, font=\bfseries] at (9.8,\y+0.38) {\name};
+    \node[anchor=north west, text=muted, text width=6.9cm, align=left] at (9.8,\y-0.05) {\what};
+  }
+\end{tikzpicture}
+\end{document}

@@ -3,33 +3,31 @@
 Plan B: The Show Must Go On
 Noctis Zhang, University of Massachusetts Boston, PEAAII Hackathon, October 2026
 
-The held-out numbers come from committed runs in apps/plan_b/evaluation/results/, through make_results.py: wave3_heldout_20261025T1625Z for version 1.1, the evaluation of record, and wave3b_fresh_20261025T2327Z for version 1.2 on six fresh held-out cases. A rerun of version 1.2 on the spent cases (wave3b_rerun_spent_20261025T2345Z) is a post-hoc diagnostic rerun. If asked about it, say "diagnostic, not held-out".
+The evaluation numbers come from make_results.py. The test shown is the final system on six new held-out cases (wave3b_fresh_20261025T2327Z), written by a separate worker before the final freeze and locked with it, before the first model call. If asked about the earlier, larger test, say it found the defects that were fixed before the freeze, and that its cases are now development cases. If asked about the rerun on those cases, say "diagnostic, not held-out".
 
-Speak at a steady pace, about 140 words a minute. The script is about 265 words, so there is time to point. It works even if the listener leaves after the first twenty seconds, because the one message comes first. Point at each column as you reach it.
+Speak at a steady pace, about 140 words a minute, and point at each panel as you reach it, top row first. The one message comes first, so the pitch works even if the listener leaves after twenty seconds. Say the approaches by their plain names, never by codes.
 
-## Opening, the one message
-_about 20 seconds_
+## The scene and the one message
+_about 30 seconds_
 
-Twenty minutes before a campus showcase opens, a message says the projector may be late. Plan B decides what to verify, what to prepare, and when to commit a change. On twelve held-out cases, no policy executed a violation, and there was no clear winner.
+It is four forty, twenty minutes before a campus showcase opens. A text says the projector may be twenty five minutes late. Plan B helps a community event stay on track by deciding what to verify, what to prepare, and when to commit a change. Jordan, the organizer, is an illustration, and the event runs in a local sandbox.
 
-## Column 1, one recovery
-_about 24 seconds_
+## What Plan B did
+_about 25 seconds_
 
-Here the message is only a claim, so Plan B makes one status check. The supplier says delayed, arriving at five twenty five. The planner finds a free fix: two activities swap places. The server makes the change and writes a receipt. A stale reminder and its forwarded copy change nothing.
+Plan B treats the text as a claim. It checks the supplier's tracking once: delayed, with a reported arrival at five twenty five. Then it swaps two activities, so the demos start after the reported arrival. It costs nothing, the server writes a receipt, and the doors open on time.
 
-## Column 2 and column 3, how it decides and how it was tested
-_about 48 seconds_
+## How it works
+_about 25 seconds_
 
-A language model reads the message and picks one option, but the server built those options and checks every action. Spending needs a person. I froze the system, then tested it on cases it never saw, against three other coordinators.
+The language model never acts on its own. The server builds the possible fixes and checks each one. The model only picks one of them. Every change passes one gate, which writes the receipt, and spending needs a person.
 
-On the three cases that needed no change, none changed the plan. But my policy showed no consistent advantage. The model calling tools freely met all eight campus cases, at three times my policy's model cost. After fixes, version one point two met fifty nine of sixty runs on six fresh held-out cases, too few to rank the policies.
+## Does it work
+_about 22 seconds_
 
-## The pantry, in one sentence
-_about 10 seconds_
+I froze the system and ran six new cases it had never seen, close to situations from development. Fifty nine of sixty runs met the expected outcome. The one miss was the fixed rules, when a volunteer ran late. No action broke a rule. Six cases are too few to rank anything.
 
-The same loop runs a fictional pantry, where late stock does not count and only staff can record a handoff. No kit was counted twice.
+## Next
+_about 13 seconds_
 
-## Close
-_about 18 seconds_
-
-The limits are on the poster: twelve held-out cases and six fresh ones, one model, one reported run after a voided first attempt, and no pilot yet. Everything is a fictional local sandbox. The code is on GitHub, through the QR code. Thank you.
+The same loop already runs a food pantry. Next come transit alerts as context, and a pilot with real organizers. The code is behind the QR code.

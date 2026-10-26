@@ -8,6 +8,11 @@ suite, as written by `plan-b eval report`. Nothing is typed in by hand. The scri
   policy, per suite), side by side for the slides and stacked for the poster;
 - `documentation/results.json`: the same numbers for `build_doc.py`.
 
+The pgfplots charts `slides/figures/fig_result.tex` (deck and document), `fig_result_v.tex`
+(poster) and `fig_result_record.tex` (the earlier 12-case test, document only) are written from
+the same numbers, with plain policy names instead of codes. `slides/figures/results_numbers_final.tex`
+holds the sums the single-system story reads (`\\res{final:P2:metk}`, `\\res{dev:recorded}`).
+
 Wave 3b adds two more sources and never replaces the first. The fresh held-out run of policy
 1.2 (`wave3b_fresh_20261025T2327Z`, cases C09 to C12, T05 and T06) gives the keys
 `\\res{fresh:campus:P2:met}`, and the post-hoc diagnostic rerun of 1.2 on the spent cases
@@ -211,6 +216,98 @@ def figure(numbers: dict[str, dict[str, dict[str, object]]], stacked: bool = Fal
     parts += ["\\end{tikzpicture}", "\\end{document}", ""]
     return "\n".join(parts)
 
+def final_macros(fresh: dict[str, dict[str, dict[str, object]]], record: dict[str, dict[str, dict[str, object]]]) -> str:
+    """The sums the single-system story reads (keys `final:` and `dev:`): runs met per policy over
+    both suites of the fresh held-out run, its case count, the model cost per run, and the size
+    of the earlier 12-case test. Derived only from the numbers above."""
+    run = REPO / "apps/plan_b/evaluation/results" / V12_RUNS["fresh"]
+    lines = [
+        f"% Written by make_results.py from {V12_RUNS['fresh']} (final:) and {RUN_ID} (dev:), "
+        "<suite>/report/metrics.json. Do not edit.",
+        "\\providecommand{\\res}[1]{\\csname res:#1\\endcsname}",
+    ]
+    values: dict[str, object] = {}
+    for policy in POLICIES:
+        values[f"final:{policy}:metk"] = sum(int(fresh[s][policy]["metk"]) for s in fresh)
+        values[f"final:{policy}:metn"] = sum(int(fresh[s][policy]["metn"]) for s in fresh)
+        for suite in fresh:
+            metrics = json.loads((run / suite / "report" / "metrics.json").read_text(encoding="utf-8"))
+            p = metrics["by_policy"][policy]
+            values[f"final:{policy}:{suite}:usdrun"] = f"{p['computation']['cost_usd'] / p['recorded']:.2f}"
+    values["final:cases"] = sum(int(fresh[s]["P2"]["ncases"]) for s in fresh)
+    values["dev:cases"] = sum(int(record[s]["P2"]["ncases"]) for s in record)
+    values["dev:recorded"] = sum(int(record[s]["all"]["recorded"]) for s in record)
+    for key, value in values.items():
+        lines.append(f"\\expandafter\\def\\csname res:{key}\\endcsname{{{value}}}")
+    return "\n".join(lines) + "\n"
+
+
+# Plain names for the charts the audience reads: no policy codes.
+PLAIN = {
+    "P0": "Fixed rules (baseline)",
+    "P1": "Tool-calling model",
+    "P2": "Our coordinator: picks checked options",
+    "P3": "Check-all variant",
+}
+
+
+def chart(numbers: dict[str, dict[str, dict[str, object]]], source: str, stacked: bool = False) -> str:
+    """The results chart in pgfplots: per suite, the share of recorded runs that met the case's
+    outcome, one horizontal bar per policy, labelled with the count k of n. Plan B's own policy
+    is in the brand colour and the others in grey. Side by side for the deck and the document,
+    stacked with larger type for the poster."""
+    parts = [
+        f"% Written by make_results.py from {source}/<suite>/report/metrics.json. Do not edit.",
+        "% Share of recorded runs that met the case's outcome, per policy and suite.",
+        "\\documentclass[border=3pt]{standalone}",
+        "\\input{planb_figstyle}",
+        "\\begin{document}",
+        f"\\begin{{tikzpicture}}[font=\\{'LARGE' if stacked else 'small'}]",
+    ]
+    order = ["P0", "P1", "P3", "P2"]
+    for col, suite in enumerate(["campus", "pantry"]):
+        rows = numbers[suite]
+        ncases = rows["P2"]["ncases"]
+        runs = rows["all"]["recorded"]
+        name = "Campus event" if suite == "campus" else "Food pantry"
+        title = f"{name}: {ncases} cases, {runs} runs"
+        labels = col == 0 or stacked
+        if col == 0:
+            place = "name=campus"
+        elif stacked:
+            place = "name=pantry, at={(campus.south west)}, anchor=north west, yshift=-3.6cm"
+        else:
+            place = "name=pantry, at={(campus.south east)}, anchor=south west, xshift=1.9cm"
+        opts = [
+            "planb", place, "scale only axis",
+            f"width={'7.2cm' if stacked else '4.7cm'}", f"height={'5.2cm' if stacked else '5.0cm'}",
+            "xbar, bar width=" + ("20pt" if stacked else "17pt"),
+            "xmin=0, xmax=100, xtick={0,25,50,75,100}",
+            "xticklabels={0\\%,25\\%,50\\%,75\\%,100\\%}",
+            "xmajorgrids, axis x line*=bottom, axis y line*=left",
+            "ytick={1,2,3,4}, y dir=reverse, ymin=0.45, ymax=4.55, ytick style={draw=none}",
+            "yticklabels={" + ",".join(
+                ("{\\bfseries\\color{primary}" + PLAIN[p] + "}" if p == "P2" else "{" + PLAIN[p] + "}") for p in order
+            ) + "}" if labels else "yticklabels={}",
+            "xlabel={runs that met the expected outcome}",
+            "clip=false",
+        ]
+        parts.append("\\begin{axis}[" + ",\n  ".join(opts) + "]")
+        for i, policy in enumerate(order, start=1):
+            row = rows[policy]
+            share = 100 * int(row["metk"]) / int(row["metn"])
+            fill = "primary" if policy == "P2" else "quiet"
+            parts.append(f"\\addplot[draw=none, fill={fill}, bar shift=0pt] coordinates {{({share:.4f},{i})}};")
+            weight = "\\bfseries" if policy == "P2" else ""
+            parts.append(
+                f"\\node[anchor=west, text=ink] at (axis cs:{share:.4f},{i}) {{{weight}\\,{row['metk']} of {row['metn']}}};"
+            )
+        parts.append("\\end{axis}")
+        panel = "campus" if col == 0 else "pantry"
+        parts.append(f"\\node[anchor=south west, text=ink] at ({panel}.outer north west) {{\\bfseries {title}}};")
+    parts += ["\\end{tikzpicture}", "\\end{document}", ""]
+    return "\n".join(parts)
+
 
 def main() -> None:
     numbers = {suite: suite_numbers(suite) for suite in ["campus", "pantry"]}
@@ -230,6 +327,13 @@ def main() -> None:
         **{key: {"run_id": V12_RUNS[key], "source": f"apps/plan_b/evaluation/results/{V12_RUNS[key]}", **n} for key, n in sets.items()},
     }
     (HERE / "documentation/results_v12.json").write_text(json.dumps(v12, indent=2) + "\n", encoding="utf-8")
+    # The final system's evaluation (the fresh held-out run) as the deck, poster and document
+    # show it, and the earlier 12-case test in the same style for the document's full record.
+    figures = HERE / "slides/figures"
+    (figures / "fig_result.tex").write_text(chart(sets["fresh"], V12_RUNS["fresh"]), encoding="utf-8")
+    (figures / "fig_result_v.tex").write_text(chart(sets["fresh"], V12_RUNS["fresh"], stacked=True), encoding="utf-8")
+    (figures / "fig_result_record.tex").write_text(chart(numbers, RUN_ID), encoding="utf-8")
+    (figures / "results_numbers_final.tex").write_text(final_macros(sets["fresh"], numbers), encoding="utf-8")
     for key, n in sets.items():
         for suite in n:
             print(key, suite, " ".join(f"{p} {n[suite][p]['met']}" for p in POLICIES), "all", n[suite]["all"])

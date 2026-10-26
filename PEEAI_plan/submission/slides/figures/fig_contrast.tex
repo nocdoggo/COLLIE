@@ -1,0 +1,49 @@
+% One incoming text, two ways to handle it. Top: an illustration of an agent with no gate (not one
+% of the tested systems). Bottom: Plan B. Both lanes share three columns so the comparison reads
+% column by column.
+\documentclass[border=3pt]{standalone}
+\input{planb_figstyle}
+\begin{document}
+\begin{tikzpicture}[font=\small]
+  \tikzset{
+    stp/.style={anchor=west, align=left, inner sep=0pt},
+    warn/.style={anchor=north west, align=left, inner sep=0pt, font=\footnotesize, text=ink},
+    lane/.style={anchor=south west, inner sep=0pt, align=left},
+  }
+  \def\ca{4.4}  \def\cb{8.9}  \def\cc{13.4}   % the three columns
+  \def\ty{5.5}  \def\by{1.6}                 % lane rows
+  % ---------- the incoming text ----------
+  \draw[accent, line width=2pt] (0,4.4) -- (0,2.7);
+  \node[anchor=north west, align=left, text width=3.05cm, inner sep=0pt] (msg) at (0.25,4.4) {%
+    {\color{accent}\faCommentDots\ \bfseries 16:40}\\[2pt]
+    The projector may be about 25 minutes late.};
+  \coordinate (fork) at (3.8,3.55);
+  \draw[accent, line width=0.9pt] (3.45,3.55) -- (fork);
+
+  % ---------- top lane: no gate ----------
+  \node[lane, text=muted] at (\ca,\ty+0.6) {{\bfseries Illustration:} an AI agent with no gate (not one of the tested systems)};
+  \node[stp, text=muted] (t1) at (\ca,\ty) {believes the text};
+  \node[stp, text=muted] (t2) at (\cb,\ty) {books the \$35 backup};
+  \node[stp, text=muted] (t3) at (\cc,\ty) {reshuffles the whole program};
+  \node[warn] at (\ca,\ty-0.4) {{\color{accent}\faExclamationTriangle}\ a claim taken as fact};
+  \node[warn] at (\cb,\ty-0.4) {{\color{accent}\faExclamationTriangle}\ money spent without a person};
+  \node[warn] at (\cc,\ty-0.4) {{\color{accent}\faExclamationTriangle}\ a change nobody checked};
+  \draw[link] (fork) |- ($(t1.west)+(-0.15,0)$);
+  \draw[link] ($(t1.east)+(0.15,0)$) -- ($(t2.west)+(-0.15,0)$);
+  \draw[link] ($(t2.east)+(0.15,0)$) -- ($(t3.west)+(-0.15,0)$);
+
+  % a hairline between the lanes
+  \draw[gridgrey, line width=0.5pt] (\ca,3.55) -- (17.75,3.55);
+
+  % ---------- bottom lane: Plan B ----------
+  \node[lane, text=primary, font=\small\bfseries] at (\ca,\by+0.8) {Plan B};
+  \node[stp] (b1) at (\ca,\by) {checks the one fact\\ that matters {\color{muted}(ETA 17:25)}};
+  \node[stp] (b2) at (\cb,\by) {the model picks one\\ option the server checked};
+  \node[stp] (b3) at (\cc,\by) {the gate writes a receipt\\ {\color{muted}(swap two activities, \$0)}};
+  \node[anchor=west, text=ok, inner sep=0pt, font=\Large] (rc) at ($(b3.east)+(0.75,0)$) {\faReceipt};
+  \draw[syslink] (fork) |- ($(b1.west)+(-0.15,0)$);
+  \draw[syslink] ($(b1.east)+(0.15,0)$) -- ($(b2.west)+(-0.15,0)$);
+  \draw[syslink] ($(b2.east)+(0.15,0)$) -- ($(b3.west)+(-0.15,0)$);
+  \draw[oklink] ($(b3.east)+(0.15,0)$) -- (rc.west);
+\end{tikzpicture}
+\end{document}

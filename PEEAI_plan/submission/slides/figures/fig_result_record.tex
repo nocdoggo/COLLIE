@@ -1,0 +1,54 @@
+% Written by make_results.py from wave3_heldout_20261025T1625Z/<suite>/report/metrics.json. Do not edit.
+% Share of recorded runs that met the case's outcome, per policy and suite.
+\documentclass[border=3pt]{standalone}
+\input{planb_figstyle}
+\begin{document}
+\begin{tikzpicture}[font=\small]
+\begin{axis}[planb,
+  name=campus,
+  scale only axis,
+  width=4.7cm,
+  height=5.0cm,
+  xbar, bar width=17pt,
+  xmin=0, xmax=100, xtick={0,25,50,75,100},
+  xticklabels={0\%,25\%,50\%,75\%,100\%},
+  xmajorgrids, axis x line*=bottom, axis y line*=left,
+  ytick={1,2,3,4}, y dir=reverse, ymin=0.45, ymax=4.55, ytick style={draw=none},
+  yticklabels={{Fixed rules (baseline)},{Tool-calling model},{Check-all variant},{\bfseries\color{primary}Our coordinator: picks checked options}},
+  xlabel={runs that met the expected outcome},
+  clip=false]
+\addplot[draw=none, fill=quiet, bar shift=0pt] coordinates {(75.0000,1)};
+\node[anchor=west, text=ink] at (axis cs:75.0000,1) {\,6 of 8};
+\addplot[draw=none, fill=quiet, bar shift=0pt] coordinates {(100.0000,2)};
+\node[anchor=west, text=ink] at (axis cs:100.0000,2) {\,24 of 24};
+\addplot[draw=none, fill=quiet, bar shift=0pt] coordinates {(87.5000,3)};
+\node[anchor=west, text=ink] at (axis cs:87.5000,3) {\,21 of 24};
+\addplot[draw=none, fill=primary, bar shift=0pt] coordinates {(75.0000,4)};
+\node[anchor=west, text=ink] at (axis cs:75.0000,4) {\bfseries\,18 of 24};
+\end{axis}
+\node[anchor=south west, text=ink] at (campus.outer north west) {\bfseries Campus event: 8 cases, 80 runs};
+\begin{axis}[planb,
+  name=pantry, at={(campus.south east)}, anchor=south west, xshift=1.9cm,
+  scale only axis,
+  width=4.7cm,
+  height=5.0cm,
+  xbar, bar width=17pt,
+  xmin=0, xmax=100, xtick={0,25,50,75,100},
+  xticklabels={0\%,25\%,50\%,75\%,100\%},
+  xmajorgrids, axis x line*=bottom, axis y line*=left,
+  ytick={1,2,3,4}, y dir=reverse, ymin=0.45, ymax=4.55, ytick style={draw=none},
+  yticklabels={},
+  xlabel={runs that met the expected outcome},
+  clip=false]
+\addplot[draw=none, fill=quiet, bar shift=0pt] coordinates {(100.0000,1)};
+\node[anchor=west, text=ink] at (axis cs:100.0000,1) {\,4 of 4};
+\addplot[draw=none, fill=quiet, bar shift=0pt] coordinates {(50.0000,2)};
+\node[anchor=west, text=ink] at (axis cs:50.0000,2) {\,6 of 12};
+\addplot[draw=none, fill=quiet, bar shift=0pt] coordinates {(50.0000,3)};
+\node[anchor=west, text=ink] at (axis cs:50.0000,3) {\,6 of 12};
+\addplot[draw=none, fill=primary, bar shift=0pt] coordinates {(75.0000,4)};
+\node[anchor=west, text=ink] at (axis cs:75.0000,4) {\bfseries\,9 of 12};
+\end{axis}
+\node[anchor=south west, text=ink] at (pantry.outer north west) {\bfseries Food pantry: 4 cases, 40 runs};
+\end{tikzpicture}
+\end{document}

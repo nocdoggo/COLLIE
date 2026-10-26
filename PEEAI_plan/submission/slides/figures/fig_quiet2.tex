@@ -1,0 +1,29 @@
+% Four messages, zero changes: development case dev04 in the order it happened (notice texts from
+% scenarios/private/dev04.json, verdicts from story_08). Decided by the rule baseline in an
+% automated run of the app.
+\documentclass[border=3pt]{standalone}
+\input{planb_figstyle}
+\begin{document}
+\begin{tikzpicture}[font=\small, x=1cm, y=1cm]
+  % the clock axis, 16:38 to 16:50
+  \draw[muted, line width=0.5pt] (0,0) -- (16.6,0);
+  \foreach \m in {0,...,12}{\draw[muted, line width=0.5pt] ({\m*1.3+0.6},0) -- ({\m*1.3+0.6},-0.1);}
+  \foreach \m/\l in {0/16:38,2/16:40,4/16:42,6/16:44,8/16:46,10/16:48,12/16:50}{
+    \node[text=muted, font=\footnotesize, anchor=north] at ({\m*1.3+0.6},-0.12) {\l};}
+  % message marks (minute positions 2, 6, 8, 9)
+  \foreach \m in {2,6,8,9}{\fill[accent] ({\m*1.3+0.6},0) circle (2.6pt);}
+  % the three verdict columns
+  \foreach \x/\time/\msg/\check/\verdict in {
+    3.2/16:40/{``The projector may be\\about 25 minutes late.''}/{status check:\\on schedule, ETA 16:58}/{A false alarm},
+    8.4/16:44/{``An order for the\\October 29 workshop\\was cancelled.''}/{another order,\\another date}/{Does not apply},
+    12.8/{16:46 and 16:47}/{The same reminder again,\\then a volunteer's\\forwarded copy}/{one source,\\repeated}/{A duplicate}}{
+    \node[anchor=south west, text=accent, font=\small\bfseries] (t) at (\x-1.3,2.85) {\faCommentDots\enspace\time};
+    \node[anchor=north west, text=ink, align=left, font=\small] (m) at (\x-1.3,2.8) {\msg};
+    \node[anchor=north west, text=muted, align=left, font=\small] at (\x-1.3,-0.75) {\check};
+    \node[anchor=north west, text=primary, font=\bfseries] at (\x-1.3,-1.75) {\verdict};
+  }
+  \foreach \m/\x in {2/3.2,6/8.4,8/12.8,9/12.8}{\draw[rulegrey, line width=0.5pt] ({\m*1.3+0.6},0.1) -- ({\m*1.3+0.6},1.25);}
+  % the outcome
+  \node[anchor=west, text=primary, font=\bfseries, align=left] at (0.6,-2.75) {\faCheck\enspace The plan is kept: no hold, no spending, no change.};
+\end{tikzpicture}
+\end{document}

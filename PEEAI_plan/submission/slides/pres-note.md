@@ -3,98 +3,83 @@
 Plan B: The Show Must Go On
 Noctis Zhang, University of Massachusetts Boston, Paul English Applied AI Institute (PEAAII) Hackathon, October 2026
 
-Every held-out number in this script comes from a committed run in apps/plan_b/evaluation/results/, through make_results.py. Slides 9 to 11 use wave3_heldout_20261025T1625Z, the held-out test of version 1.1 and the evaluation of record. Slide 12 uses wave3b_fresh_20261025T2327Z, the held-out test of version 1.2 on six fresh cases. The rerun of version 1.2 on the twelve spent cases (wave3b_rerun_spent_20261025T2345Z) is a post-hoc diagnostic rerun, not a held-out result, and is shown only on a backup slide. Never call it held-out. Say "held-out" only for the first two runs. Everything before slide 9 is development evidence.
+This script is identical to the \note blocks of slides.tex. The story follows STORY_PLAN.md: one volunteer organizer (Jordan, an illustration), twenty minutes to doors open, the decision, the receipt, then the design, the evidence and what is next. Every evaluation number on the slides comes from make_results.py. The evaluation shown is the final system on six new held-out cases (wave3b_fresh_20261025T2327Z), written by a separate worker before the final freeze and locked in the same commit seven seconds after it, before the first model call. The earlier 12-case test (wave3_heldout_20261025T1625Z) is named once, as the test that found the defects fixed before the freeze. A rerun on its spent cases is a diagnostic and appears only on a backup slide. Never call it held-out.
 
-Read each paragraph at a steady, clear pace, about 140 words a minute. The full script is about 930 words, about six minutes forty, which leaves about twenty seconds to point and to change slides inside the seven minutes. Time each rehearsal with rehearsal_timer.py. Pause briefly each time you advance a slide. The sentence marked "skip if late" (slide 6) can be dropped without losing the story. The bold checkpoints are the clock times of the seven-minute plan. If you are behind at a checkpoint, skip the marked sentences of the next slide.
+Slide numbers here count the title as slide 1. The footer counter on the slides does not count the title, so slide 7 here shows 6/9 in its footer.
 
-Everything shown is a fictional local sandbox. Say "recorded" whenever you show a recorded run, and never call it live.
+Read each paragraph at a steady, clear pace, about 140 words a minute. The script fits inside seven minutes with time to point and change slides. Pause briefly each time you advance a slide. The bold checkpoints are the clock times of the plan. Say the policies by their plain names: the fixed rules, the tool-calling model, our coordinator, the check-all variant. Say "recorded" whenever you show a recorded run, and never call it live.
 
 ## Slide 1. Title
-_about 10 seconds_
+_about 8 seconds_
 
-Hello, I am Noctis Zhang from UMass Boston. This is Plan B. It decides what to verify, what to prepare, and when to commit a change.
+Hello, I am Noctis Zhang from UMass Boston. This is Plan B. The show must go on.
 
-## Slide 2. Twenty minutes before opening, the projector may be late
+**Checkpoint 0:08.**
+
+## Slide 2. 16:40. Twenty minutes to doors open
+_about 28 seconds_
+
+Meet Jordan, a volunteer organizer. Jordan is an illustration, and the event is simulated. It is four forty. In twenty minutes the doors of a campus showcase open, and student teams are ready to demo. Then a text arrives: the projector may be twenty five minutes late. Events like this have no operations staff. Would you wait, check, or book a backup?
+
+**Checkpoint 0:36.**
+
+## Slide 3. An agent that acts on a text can spend money on a rumor, so Plan B checks first
+_about 45 seconds_
+
+Here is the risk. An AI agent with tools can read that text and act at once. It believes the claim, books the thirty five dollar backup, and reshuffles the whole program. That top lane is an illustration, not one of the systems I tested. Plan B works differently. First it checks the one fact that matters. Then the server builds the possible fixes and checks each one. The language model only picks one of them. And every change passes one gate that writes a receipt, the server's own record of the change. The model chooses. The server decides what is allowed.
+
+**Checkpoint 1:21.**
+
+## Slide 4. Plan B checked one fact, swapped two activities, and the doors opened on time
+_about 56 seconds_
+
+Here is what Plan B did. At four forty the text arrives. Plan B treats it as a claim, not a fact. It makes one status check, which means asking the supplier's tracking. The answer is delayed, with a reported arrival at five twenty five. That is still a report, not an arrival. Now the planner builds the possible fixes, sixteen of them, and checks each against the deadline, the people, and the budget. Three pass. The best one is free. The demonstrations and the skills exchange swap places, so the demos start at five thirty, after the reported arrival. At four forty three the change is made, and the server writes a receipt. The doors open on time at five, and no money is spent.
+
+**Checkpoint 2:17.**
+
+## Slide 5. Most messages should change nothing, so Plan B checks only what could change the decision
 _about 27 seconds_
 
-Imagine you organize a campus showcase. It opens at five and must end by six. At four forty, a message says the projector may be twenty five minutes late. Change too much and people lose time. Wait too long and the demos fail. AI agents now act on messages like this. Would you wait, check, or prepare a backup?
+Knowing when not to act matters just as much. In another practice case four messages arrive. The first is a false alarm, because the check says on schedule. The second is about another order on another date. The last two are one source, repeated. Plan B changes nothing. Checks are selective. It verifies only what could change the decision.
 
-**Checkpoint 0:37.**
+**Checkpoint 2:44.**
 
-## Slide 3. The coordinator may check, hold and make free changes, not spend
-_about 30 seconds_
+## Slide 6. The model only picks among options the server built and checked, and one gate writes every receipt
+_about 60 seconds_
 
-Plan B is a coordinator, an AI agent with written limits. It may check sources, compare options, place a hold, and make a change that costs nothing. A hold is a free reservation of a backup that expires on its own, here worth up to thirty five dollars. It cannot spend a cent without the organizer. Everything runs in a fictional local sandbox.
+Here is how it works. Think of a restaurant. The kitchen decides what can be served, the waiter picks from the menu, a manager signs off on anything that costs money, and every order gets a ticket. In Plan B the server is the kitchen. Its planner builds the options and checks each one. The language model is the waiter. Its only outputs are a checked reading of the message and one option from the server's list. It holds no tool that writes. Every change, from the model or a person, passes one gate. Is it allowed for this role? Is the plan still current? Is it within budget? Spending starts as a hold, a free reservation that expires on its own, until a person approves. The gate writes the receipt.
 
-**Checkpoint 1:07.**
+**Checkpoint 3:44.**
 
-## Slide 4. A message is a claim, not a fact
-_about 31 seconds_
+## Slide 7. On 6 new cases, 59 of 60 runs met the expected outcome, and the one miss was the fixed rules
+_about 64 seconds_
 
-Here is the notice, from the delivery contact. Plan B treats it as a claim, not a fact. Before changing anything, it checks the one fact that could change the decision. A status check asks the supplier's status service. The answer is delayed, with a reported arrival at five twenty five. Even that is a report, not an arrival, so the plan must still work if it slips.
+Does it work? I froze the code, the prompts, the model and the limits. Then I ran six new cases, written by a separate worker before the freeze and locked with it. Fixed rules ran once per case, the model approaches three times each. Fifty nine of sixty runs met the expected outcome. Our coordinator met all eighteen of its runs, and so did the other two model approaches. The one miss was the fixed rules, in a case where a volunteer runs late, because a person's own delay is a message its rules cannot read. No action ever broke a rule in these runs, because every change passes the one gate. It refused six attempts and recorded each. With six cases there is no ranking. The point is safety and reliability. An earlier, larger test is how I found and fixed real defects before this freeze.
 
-## Slide 5. One checked change, one receipt
-_about 44 seconds_
+**Checkpoint 4:48.**
 
-The planner builds the allowed repairs from fixed templates and checks each against the deadline, the people, and the budget. Sixteen are built and three pass. The best is free: swap the demonstrations with the skills exchange, so the demos start at five thirty, after the reported arrival. It is applied at four forty three, and the server writes a receipt, its own record of the change. The AI cannot write it. These frames show my rule baseline. In a recorded run, the AI coordinator made the same check and the same swap.
-
-**Checkpoint 2:22.**
-
-## Slide 6. Four messages, zero changes
-_about 47 seconds_
-
-Not acting is the harder skill. Here is a second practice case. First, the same delay notice, but the status check says on schedule, arriving at four fifty eight. A false alarm, so the plan stays. Then a reminder that order P nine for an October workshop was cancelled. That is another order on another date, so it does not apply. (Skip if late: It arrives again, and a volunteer forwards it. One source repeated is still one source.) In the end there is no hold, no spending and no change. Three of my twelve final test cases are quiet ones like this.
-
-**Checkpoint 3:09.**
-
-## Slide 7. Verify, prepare, commit
-_about 26 seconds_
-
-Verify one fact that could change the decision. Prepare a backup while a fact or an approval is pending. In another case the projector arrives too late, so Plan B holds the backup until four fifty five and asks the organizer for thirty five dollars. Commit only a plan the server checked. Or keep the plan.
-
-## Slide 8. The model chooses, the server checks
-_about 30 seconds_
-
-A policy is the rule that picks the next step. P zero is fixed rules, which only read the messages they were written for. P one lets a model call the tools freely. P two, mine, lets the model pick from options the server built and checked. P three is P two with every relevant check run first. Every policy passes the same gate.
-
-**Checkpoint 4:05.**
-
-## Slide 9. Held-out test of version 1.1: zero violations, no clear winner
-_about 38 seconds_
-
-Everything so far came from practice cases I built with. Then I froze version one point one, its code, prompts, model and limits, and ran twelve held-out cases, hidden from every policy. All one hundred twenty runs were recorded. No policy executed a violation or changed a quiet event. But my P two showed no consistent advantage. P one met the expected outcome in all twenty four campus runs, at three times P two's model cost. These are descriptive counts only.
-
-## Slide 10. One failure: a correct reading that never reached the planner
-_about 26 seconds_
-
-In one held-out case a volunteer says they will be late. P two and P three read the message correctly. But my frozen rule passes only equipment claims to the planner, so the plan was never questioned. All six of their runs stay in the count. P one met this case every time.
-
-**Checkpoint 5:09.**
-
-## Slide 11. Same loop, a new rule: 40 kits for a fictional pantry
-_about 40 seconds_
-
-The same loop runs a fictional pantry. Staff need forty kits by one forty. Twenty four are on the shelf. Twenty more are late, and late stock does not count. Sixteen wait in a partner pool. Plan B holds those sixteen. Only staff record the handoff and the distribution. On four held-out pantry cases, fixed rules met all four runs, and the model policies six to nine of twelve, partly because of a defect in my frozen planner. No kit was counted twice.
-
-**Checkpoint 5:49.**
-
-## Slide 12. Version 1.2: the fixes, then six fresh held-out cases
+## Slide 8. The same loop runs a food pantry, where food counts only once it is on the shelf
 _about 39 seconds_
 
-Version one point two targets those failures. A person's own delay now reaches the planner, and a pool checked as unavailable is no longer offered. The old cases were spent, so six fresh ones were written without the new code, and locked before any call. Version one point two met fifty nine of sixty runs. Fixed rules missed one late volunteer. The other policies met every run, so this small set cannot rank them. The cases differ, so this is not a before and after.
+The same loop runs a second domain, a food pantry. Staff need forty kits by one forty. Twenty four are on the shelf. Twenty more are on a late truck, and late stock does not count. Sixteen wait in a partner pool nearby, and Plan B holds them. Only staff can record the handoff and the distribution, so the AI can never claim food that is not there. The two new pantry cases were part of the test you just saw, and no kit was counted twice in these runs.
 
-**Checkpoint 6:28.**
+**Checkpoint 5:27.**
 
-## Slide 13. What works today, and what is next
-_about 32 seconds_
+## Slide 9. Next: real feeds as context, and a pilot where Plan B proposes and the organizer acts
+_about 44 seconds_
 
-Today Plan B verifies, prepares and commits in a local sandbox. Every accepted change has a receipt, and people approve spending. In both held-out tests no policy executed a violation, and my policy showed no consistent advantage.
+What is next? Today three interfaces are connected: the OpenRouter model API, the sandbox's own tool API, and the board where people approve and report. Next come real feeds. The MBTA's transit alerts are designed in, but the adapter is not built yet. Even then, a late train is only context. It never proves that a person is late. A supplier's real tracking page would replace the simulated status check. Then a pilot with a campus event series, where Plan B proposes and the organizer acts, and I count the messages, checks, changes and approvals. No community has used it yet.
 
-In real life a message is a text, a status check is a tracking page, and a hold is a refundable reservation. No community has used it yet. Next, I want to review it with community staff. Thank you.
+**Checkpoint 6:11.**
 
-**End 7:00.**
+## Slide 10. 16:40 again. Check first, then change
+_about 30 seconds_
+
+So, back to four forty, twenty minutes to doors open. Would you wait, check, or book a backup? Plan B checks the one fact that matters, prepares what it can undo, and commits only a change the server has checked, with a receipt. It helps a community event stay on track by deciding what to verify, what to prepare, and when to commit a change. Thank you.
+
+**Checkpoint 6:41.**
 
 ## Backup slides
 _about 0 seconds_
 
-_Not timed, and not read out. Use them only to answer a question: one recorded model decision, the report's per-case figures for campus and pantry, what the held-out runs cost, what the held-out numbers do not show, the post-hoc diagnostic rerun of version 1.2 on the spent cases (say "diagnostic, not held-out" whenever you show it), a development failure kept on record, a participant's own check-in, a partial pantry handoff, and the frozen configuration._
+_Not timed, and not read out. Use them only to answer a question: what the new test cost per run, what these numbers do not show (including the earlier test and the diagnostic rerun on its spent cases), a partial pantry handoff, and the frozen configuration._

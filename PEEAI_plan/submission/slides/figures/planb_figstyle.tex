@@ -1,0 +1,65 @@
+% Shared style of every Plan B figure (the deck, the poster and the documentation).
+% Type is near-black and grey on white. UMB blue is the brand and the system. One warm accent
+% marks tension only (the incoming message, the clock). Green marks only an accepted receipt or
+% a met run. Square corners, thin rules, no shadows, no gradients.
+\usepackage[T1]{fontenc}
+\usepackage[scaled]{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{fontawesome5}
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
+\usetikzlibrary{arrows.meta,positioning,calc,fit,backgrounds}
+
+% Colours
+\definecolor{primary}{HTML}{08457E}   % UMB blue: the system, Plan B's own policy
+\definecolor{primarysoft}{HTML}{E7EEF5}
+\definecolor{accent}{HTML}{E8701A}    % tension only: the message, the clock
+\definecolor{accentsoft}{HTML}{FCEBDD}
+\definecolor{ok}{HTML}{2E7D32}        % an accepted receipt, a met run
+\definecolor{oksoft}{HTML}{E5F1E6}
+\definecolor{ink}{HTML}{1F1F1F}
+\definecolor{muted}{HTML}{6B6B6B}
+\definecolor{quiet}{HTML}{9A9A9A}     % other policies, context
+\definecolor{rulegrey}{HTML}{C4C4C4}
+\definecolor{gridgrey}{HTML}{E4E4E4}
+\definecolor{faint}{HTML}{F4F4F4}
+
+\tikzset{
+  >={Stealth[length=2.4mm,width=1.8mm]},
+  every picture/.style={line cap=butt, line join=miter},
+  % text styles
+  hd/.style={font=\bfseries, text=ink, align=left},
+  sub/.style={text=muted, align=left},
+  % shapes: square or 1 pt corners, thin rules
+  card/.style={draw=rulegrey, line width=0.5pt, fill=white, rounded corners=1pt, inner sep=5pt, align=left, text=ink},
+  sys/.style={draw=primary, line width=0.8pt, fill=white, rounded corners=1pt, inner sep=5pt, align=center, text=ink},
+  sysfill/.style={draw=primary, line width=0.8pt, fill=primary, rounded corners=1pt, inner sep=5pt, align=center, text=white},
+  warm/.style={draw=accent, line width=0.8pt, fill=accentsoft, rounded corners=1pt, inner sep=5pt, align=left, text=ink},
+  receipt/.style={draw=ok, line width=0.8pt, fill=oksoft, rounded corners=1pt, inner sep=5pt, align=left, text=ink},
+  planned/.style={draw=muted, line width=0.6pt, dash pattern=on 3pt off 2pt, fill=white, rounded corners=1pt, inner sep=5pt, align=left, text=muted},
+  % connectors
+  link/.style={->, draw=muted, line width=0.6pt},
+  syslink/.style={->, draw=primary, line width=0.9pt},
+  oklink/.style={->, draw=ok, line width=0.9pt},
+  warmlink/.style={->, draw=accent, line width=0.9pt},
+  nextlink/.style={->, draw=muted, line width=0.6pt, dash pattern=on 3pt off 2pt},
+}
+
+% Charts: a real axis, few light gridlines, no frame on the top and right.
+\pgfplotsset{
+  planb/.style={
+    axis line style={draw=muted, line width=0.5pt},
+    tick style={draw=muted, line width=0.5pt},
+    major tick length=3pt,
+    tick label style={text=ink, /pgf/number format/assume math mode=true},
+    label style={text=ink},
+    title style={font=\bfseries, text=ink},
+    grid style={draw=gridgrey, line width=0.4pt},
+    every axis plot/.append style={line width=0.6pt},
+    legend style={draw=none, fill=none, text=ink},
+    legend cell align=left,
+  },
+}

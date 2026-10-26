@@ -22,7 +22,7 @@ HERE = Path(__file__).resolve().parent
 PDFS = ["slides/slides.pdf", "poster/poster.pdf"]
 DOCX = ["documentation/Plan_B_Project_Documentation.docx"]
 SCRIPTS = ["slides/pres-note.md", "poster/poster-note.md"]
-READMES = ["README.md", "DRAFT.md"] + sorted(
+READMES = ["README.md", "DRAFT.md", "STORY_PLAN.md"] + sorted(
     f"../handoffs/wave_3/{path.name}" for path in (HERE / "../handoffs/wave_3").glob("*.md")
 )
 FORBIDDEN = re.compile(r"[\u2012\u2013\u2014\u2015\u2212]|--|;")
