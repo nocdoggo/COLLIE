@@ -1,0 +1,23 @@
+start 2026-10-25T23:35:38Z suite=pantry jobs=1 cap=40
+ev_y3k__P0__once: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=0 tool_calls=26 cost_usd=0
+ev_y3k__P2__s303: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=6 tool_calls=23 cost_usd=0.064668
+ev_y3k__P3__s202: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=6 tool_calls=27 cost_usd=0.066716
+ev_y3k__P1__s303: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=6 tool_calls=21 cost_usd=0.173954
+ev_y3k__P1__s101: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=6 tool_calls=21 cost_usd=0.176094
+ev_y3k__P2__s101: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=6 tool_calls=23 cost_usd=0.064658
+ev_y3k__P2__s202: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=6 tool_calls=23 cost_usd=0.063878
+ev_y3k__P3__s303: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=6 tool_calls=27 cost_usd=0.068026
+ev_y3k__P1__s202: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=6 tool_calls=21 cost_usd=0.175244
+ev_y3k__P3__s101: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=6 tool_calls=27 cost_usd=0.064276
+ev_u5b__P3__s202: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=4 tool_calls=25 cost_usd=0.04031
+ev_u5b__P1__s202: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=7 tool_calls=28 cost_usd=0.227878
+ev_u5b__P2__s303: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=7 tool_calls=32 cost_usd=0.075624
+ev_u5b__P1__s303: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=7 tool_calls=25 cost_usd=0.21027
+ev_u5b__P3__s101: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=4 tool_calls=25 cost_usd=0.03933
+ev_u5b__P0__once: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=0 tool_calls=21 cost_usd=0
+ev_u5b__P2__s202: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=7 tool_calls=32 cost_usd=0.075064
+ev_u5b__P3__s303: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=4 tool_calls=25 cost_usd=0.03934
+ev_u5b__P1__s101: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=6 tool_calls=26 cost_usd=0.186222
+ev_u5b__P2__s101: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=7 tool_calls=32 cost_usd=0.075274
+20 planned, 0 already finished, 20 run: {'completed': 20}
+end 2026-10-25T23:44:59Z suite=pantry rc=0

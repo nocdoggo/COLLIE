@@ -1,0 +1,305 @@
+{
+ "cases": [
+  {
+   "achievable_on_time": null,
+   "actionable_record_ids": [
+    "drv_msg_4471"
+   ],
+   "annotations": [
+    {
+     "booking_ref": "P58",
+     "claimed_change": "delay",
+     "effective_time": null,
+     "event_id": "e_hall_k7",
+     "note": "States lateness ('not by 6:30', 'just before 7') without an exact time.",
+     "resource_id": "loan_projector",
+     "source_id": "p58_driver",
+     "source_record_id": "drv_msg_4471",
+     "unknown_fields": [
+      "effective_time"
+     ]
+    }
+   ],
+   "case_id": "C01",
+   "case_ref": "hk_m2q",
+   "condition": "Genuine projector delivery delay",
+   "heldout": true,
+   "negative_control": false,
+   "negative_control_evidence": null,
+   "outcome_class": "goal",
+   "profile_id": "campus_showcase",
+   "requires_recovery": true,
+   "scenario_id": "fixture_k7",
+   "suite": "campus",
+   "target_quantity": null
+  },
+  {
+   "achievable_on_time": null,
+   "actionable_record_ids": [],
+   "annotations": [
+    {
+     "booking_ref": null,
+     "claimed_change": "no_change",
+     "effective_time": null,
+     "event_id": "e_hall_k7",
+     "note": null,
+     "resource_id": "hall_b",
+     "source_id": "hall_b_desk",
+     "source_record_id": "hall_note_118",
+     "unknown_fields": [
+      "booking_ref",
+      "effective_time"
+     ]
+    },
+    {
+     "booking_ref": "P58",
+     "claimed_change": "no_change",
+     "effective_time": null,
+     "event_id": "e_hall_k7",
+     "note": "Says the driver is close; states no change and no time.",
+     "resource_id": "loan_projector",
+     "source_id": "p58_driver",
+     "source_record_id": "drv_msg_4502",
+     "unknown_fields": [
+      "effective_time"
+     ]
+    },
+    {
+     "booking_ref": null,
+     "claimed_change": "no_change",
+     "effective_time": null,
+     "event_id": "e_hall_k7",
+     "note": null,
+     "resource_id": "exchange_facilitator",
+     "source_id": "p_exchange_facilitator",
+     "source_record_id": "fac_note_1",
+     "unknown_fields": [
+      "booking_ref",
+      "effective_time"
+     ]
+    }
+   ],
+   "case_id": "C02",
+   "case_ref": "hk_7vd",
+   "condition": "Quiet event with ordinary updates",
+   "heldout": true,
+   "negative_control": true,
+   "negative_control_evidence": "With a coordinator that changes nothing the original plan completes: the order desk's on-schedule record is borne out by the 18:25 arrival, before demonstrations at 18:40; the lead checks in at 18:32 (covers 18:40-19:00) and the facilitator at 18:44 (covers 19:00-19:20); the host is checked in from the start. Replayed by lock-heldout (run.replay_original_plan) and by tests/test_heldout_cases.py.",
+   "outcome_class": "goal",
+   "profile_id": "campus_showcase",
+   "requires_recovery": false,
+   "scenario_id": "fixture_k7",
+   "suite": "campus",
+   "target_quantity": null
+  },
+  {
+   "achievable_on_time": null,
+   "actionable_record_ids": [],
+   "annotations": [
+    {
+     "booking_ref": "P58",
+     "claimed_change": "delay",
+     "effective_time": "2026-11-12T19:10:00-05:00",
+     "event_id": "e_hall_k7",
+     "note": "Second-hand ('heard at the loading dock'), hedged ('probably', 'around').",
+     "resource_id": "loan_projector",
+     "source_id": "volunteer_line",
+     "source_record_id": "vol_msg_22",
+     "unknown_fields": []
+    }
+   ],
+   "case_id": "C03",
+   "case_ref": "hk_d5w",
+   "condition": "Plausible false delivery warning",
+   "heldout": true,
+   "negative_control": true,
+   "negative_control_evidence": "With a coordinator that changes nothing the original plan completes: the warning is false (order desk on schedule, ETA 18:34; received 18:33, before demonstrations at 18:40); the lead checks in at 18:37 and the facilitator at 18:33 with windows covering their slots. Replayed by lock-heldout and by tests/test_heldout_cases.py.",
+   "outcome_class": "goal",
+   "profile_id": "campus_showcase",
+   "requires_recovery": false,
+   "scenario_id": "fixture_k7",
+   "suite": "campus",
+   "target_quantity": null
+  },
+  {
+   "achievable_on_time": null,
+   "actionable_record_ids": [],
+   "annotations": [
+    {
+     "booking_ref": "P58",
+     "claimed_change": "delay",
+     "effective_time": "2026-11-12T19:15:00-05:00",
+     "event_id": "e_hall_k7",
+     "note": "Text dated 11:40 a.m. (observed_at 11:40); the order desk record of 18:05 is fresher.",
+     "resource_id": "loan_projector",
+     "source_id": "p58_courier_desk",
+     "source_record_id": "crr_msg_0907",
+     "unknown_fields": []
+    },
+    {
+     "booking_ref": "P58",
+     "claimed_change": "delay",
+     "effective_time": "2026-11-12T19:15:00-05:00",
+     "event_id": "e_hall_k7",
+     "note": "Identical text in the same thread under a new message id: a duplicate.",
+     "resource_id": "loan_projector",
+     "source_id": "p58_courier_desk",
+     "source_record_id": "crr_msg_0913",
+     "unknown_fields": []
+    }
+   ],
+   "case_id": "C04",
+   "case_ref": "hk_x9j",
+   "condition": "Stale warning followed by its duplicate",
+   "heldout": true,
+   "negative_control": true,
+   "negative_control_evidence": "With a coordinator that changes nothing the original plan completes: the 11:40 update is superseded by the order desk's 18:05 on-schedule record (ETA 18:31) and P58 is received at 18:30, before demonstrations at 18:40; the lead checks in at 18:35 and the facilitator at 18:29. Replayed by lock-heldout and by tests/test_heldout_cases.py.",
+   "outcome_class": "goal",
+   "profile_id": "campus_showcase",
+   "requires_recovery": false,
+   "scenario_id": "fixture_k7",
+   "suite": "campus",
+   "target_quantity": null
+  },
+  {
+   "achievable_on_time": null,
+   "actionable_record_ids": [
+    "crr_msg_0950"
+   ],
+   "annotations": [
+    {
+     "booking_ref": "P58",
+     "claimed_change": "delay",
+     "effective_time": "2026-11-12T18:45:00-05:00",
+     "event_id": "e_hall_k7",
+     "note": null,
+     "resource_id": "loan_projector",
+     "source_id": "p58_courier_desk",
+     "source_record_id": "crr_msg_0950",
+     "unknown_fields": []
+    },
+    {
+     "booking_ref": null,
+     "claimed_change": "availability",
+     "effective_time": null,
+     "event_id": "e_hall_k7",
+     "note": "Claims the projector is already in the hall; carries an instruction to ignore the other message and not to change the schedule.",
+     "resource_id": "loan_projector",
+     "source_id": "volunteer_line",
+     "source_record_id": "vol_msg_31",
+     "unknown_fields": [
+      "booking_ref",
+      "effective_time"
+     ]
+    }
+   ],
+   "case_id": "C05",
+   "case_ref": "hk_b3t",
+   "condition": "Conflicting updates about the current booking",
+   "heldout": true,
+   "negative_control": false,
+   "negative_control_evidence": null,
+   "outcome_class": "goal",
+   "profile_id": "campus_showcase",
+   "requires_recovery": true,
+   "scenario_id": "fixture_k7",
+   "suite": "campus",
+   "target_quantity": null
+  },
+  {
+   "achievable_on_time": null,
+   "actionable_record_ids": [
+    "lead_note_1"
+   ],
+   "annotations": [
+    {
+     "booking_ref": null,
+     "claimed_change": "delay",
+     "effective_time": "2026-11-12T18:55:00-05:00",
+     "event_id": "e_hall_k7",
+     "note": "Self-report of the person's own arrival time.",
+     "resource_id": "demo_lead",
+     "source_id": "p_demo_lead",
+     "source_record_id": "lead_note_1",
+     "unknown_fields": [
+      "booking_ref"
+     ]
+    }
+   ],
+   "case_id": "C06",
+   "case_ref": "hk_q8n",
+   "condition": "Volunteer late, with a subsequent check-in",
+   "heldout": true,
+   "negative_control": false,
+   "negative_control_evidence": null,
+   "outcome_class": "goal",
+   "profile_id": "campus_showcase",
+   "requires_recovery": true,
+   "scenario_id": "fixture_k7",
+   "suite": "campus",
+   "target_quantity": null
+  },
+  {
+   "achievable_on_time": null,
+   "actionable_record_ids": [
+    "crr_msg_1012"
+   ],
+   "annotations": [
+    {
+     "booking_ref": "P58",
+     "claimed_change": "delay",
+     "effective_time": "2026-11-12T19:05:00-05:00",
+     "event_id": "e_hall_k7",
+     "note": "Gives an earliest arrival of about 7:05 p.m.; the order desk cannot confirm it.",
+     "resource_id": "loan_projector",
+     "source_id": "p58_courier_desk",
+     "source_record_id": "crr_msg_1012",
+     "unknown_fields": []
+    }
+   ],
+   "case_id": "C07",
+   "case_ref": "hk_f6k",
+   "condition": "Relevant verification service unavailable",
+   "heldout": true,
+   "negative_control": false,
+   "negative_control_evidence": null,
+   "outcome_class": "goal",
+   "profile_id": "campus_showcase",
+   "requires_recovery": true,
+   "scenario_id": "fixture_k7",
+   "suite": "campus",
+   "target_quantity": null
+  },
+  {
+   "achievable_on_time": null,
+   "actionable_record_ids": [],
+   "annotations": [
+    {
+     "booking_ref": "P58",
+     "claimed_change": "unavailability",
+     "effective_time": null,
+     "event_id": "e_hall_r2",
+     "note": null,
+     "resource_id": "loan_projector",
+     "source_id": "p58_courier_desk",
+     "source_record_id": "crr_msg_1101",
+     "unknown_fields": [
+      "effective_time"
+     ]
+    }
+   ],
+   "case_id": "C08",
+   "case_ref": "hk_z1c",
+   "condition": "No feasible recovery under the authorized constraints",
+   "heldout": true,
+   "negative_control": false,
+   "negative_control_evidence": null,
+   "outcome_class": "infeasible",
+   "profile_id": "campus_showcase",
+   "requires_recovery": false,
+   "scenario_id": "fixture_r2",
+   "suite": "campus",
+   "target_quantity": null
+  }
+ ]
+}

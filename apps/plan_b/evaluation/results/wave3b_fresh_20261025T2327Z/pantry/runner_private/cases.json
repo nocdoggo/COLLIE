@@ -1,0 +1,88 @@
+{
+ "cases": [
+  {
+   "achievable_on_time": 40,
+   "actionable_record_ids": [
+    "rack_count_4"
+   ],
+   "annotations": [
+    {
+     "booking_ref": "LT62",
+     "claimed_change": "delay",
+     "effective_time": null,
+     "event_id": "e_lower_hall_05",
+     "note": "Vague ('before lunchtime'); no exact time.",
+     "resource_id": "main_rack",
+     "source_id": "lt62_driver",
+     "source_record_id": "lt62_driver_sms_1",
+     "unknown_fields": [
+      "effective_time"
+     ]
+    }
+   ],
+   "case_id": "T05",
+   "case_ref": "ev_y3k",
+   "condition": "Primary 20-kit shipment cannot arrive by the deadline; the alternate 16 can be verified, reserved and physically received in time",
+   "heldout": true,
+   "negative_control": false,
+   "negative_control_evidence": null,
+   "outcome_class": "target",
+   "profile_id": "pantry_continuity",
+   "requires_recovery": true,
+   "scenario_id": "fixture_p6",
+   "suite": "pantry",
+   "target_quantity": 40
+  },
+  {
+   "achievable_on_time": 24,
+   "actionable_record_ids": [],
+   "annotations": [
+    {
+     "booking_ref": "LT62",
+     "claimed_change": "availability",
+     "effective_time": "2026-12-05T09:31:00-05:00",
+     "event_id": "e_lower_hall_05",
+     "note": "Receipt claim from the vendor's sales rep, who does not record receipts; cites a tracking scan, not a crew count.",
+     "resource_id": "main_rack",
+     "source_id": "vendor_sales",
+     "source_record_id": "sales_rep_txt_88",
+     "unknown_fields": []
+    },
+    {
+     "booking_ref": "LT62",
+     "claimed_change": "availability",
+     "effective_time": "2026-12-05T08:05:00-05:00",
+     "event_id": "e_lower_hall_05",
+     "note": "Auto-generated proof of delivery dated 8:05 a.m. (observed_at 08:05), before any arrival.",
+     "resource_id": "main_rack",
+     "source_id": "vendor_portal",
+     "source_record_id": "portal_pod_0805",
+     "unknown_fields": []
+    },
+    {
+     "booking_ref": "LT62",
+     "claimed_change": "availability",
+     "effective_time": "2026-12-05T11:02:00-05:00",
+     "event_id": "e_lower_hall_05",
+     "note": "The loading door's sign-off of LT62 at 11:02, after the 10:50 deadline; no crew receipt follows in the session.",
+     "resource_id": "main_rack",
+     "source_id": "loading_door",
+     "source_record_id": "door_sheet_2211",
+     "unknown_fields": []
+    }
+   ],
+   "case_id": "T06",
+   "case_ref": "ev_u5b",
+   "condition": "Stale or wrong-source receipt claim before physical delivery; authoritative receipt after the deadline",
+   "heldout": true,
+   "negative_control": false,
+   "negative_control_evidence": null,
+   "outcome_class": "partial",
+   "profile_id": "pantry_continuity",
+   "requires_recovery": false,
+   "scenario_id": "fixture_p6",
+   "suite": "pantry",
+   "target_quantity": 40
+  }
+ ]
+}

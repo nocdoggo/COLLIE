@@ -1,0 +1,198 @@
+{
+ "case_ref": "ev_u5b",
+ "choice": "tool-use",
+ "dry_run": false,
+ "episode_caps": {
+  "max_model_calls": 8,
+  "max_tool_calls": 48,
+  "model_calls": 6,
+  "phase": "frozen",
+  "reached": [],
+  "tool_calls": 26
+ },
+ "errors": [],
+ "finished_at": "2026-10-25T23:44:31Z",
+ "key": "ev_u5b__P1__s101",
+ "measured_files_sha256": "c3ad3118a4a1ab349c0404e84b1c3a4607d389a872e83ebc4dd1deabbf92488a",
+ "mode_label": "Tool-use agent \u00b7 anthropic/claude-sonnet-5.5",
+ "model": {
+  "by_purpose": {
+   "tool_turn": 6
+  },
+  "calls": 6,
+  "completion_tokens": 4901,
+  "cost_basis": [
+   "provider_usage"
+  ],
+  "cost_usd": 0.186222,
+  "failed": 0,
+  "latency_ms": 43306,
+  "max_tokens": [
+   4096
+  ],
+  "outcomes": {
+   "ok": 6
+  },
+  "prompt_tokens": 68606,
+  "reasoning_tokens": 3211,
+  "retries": 0,
+  "returned": [
+   "anthropic/claude-sonnet-5.5"
+  ],
+  "seed_fields": [
+   {
+    "seed": 101,
+    "seed_echo": null,
+    "seed_sent": false
+   }
+  ]
+ },
+ "model_source": "provider",
+ "order_position": 9,
+ "outcome": {
+  "activities": [
+   {
+    "activity_id": "setup",
+    "completed_at": "2026-12-05T15:00:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-12-05T14:50:00Z"
+   },
+   {
+    "activity_id": "briefing",
+    "completed_at": "2026-12-05T15:10:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-12-05T15:00:00Z"
+   },
+   {
+    "activity_id": "distribution",
+    "completed_at": "2026-12-05T15:50:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-12-05T15:10:00Z"
+   },
+   {
+    "activity_id": "reconciliation",
+    "completed_at": "2026-12-05T16:10:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-12-05T15:50:00Z"
+   }
+  ],
+  "applied_plans": 1,
+  "changed_assignments": 0,
+  "committed_cents": 0,
+  "duplicate_records_rejected": 0,
+  "episode_caps": {
+   "max_model_calls": 8,
+   "max_tool_calls": 48,
+   "model_calls": 6,
+   "phase": "frozen",
+   "reached": [],
+   "tool_calls": 26
+  },
+  "episode_id": "ep_afdc7fe8c5df",
+  "failed_status_queries": 0,
+  "final_clock": "2026-12-05T16:10:00Z",
+  "final_revision": 23,
+  "goal_complete": false,
+  "holds": {
+   "active_at_end": 0,
+   "committed": 1,
+   "created": 1,
+   "expired": 0,
+   "fulfilled": 0,
+   "released": 0
+  },
+  "infeasibility_reported": true,
+  "mode_label": "Tool-use agent \u00b7 anthropic/claude-sonnet-5.5",
+  "policy_id": "tool-use/1.2.0",
+  "recovery_delay_minutes": null,
+  "rejected_attempts_without_receipt": 0,
+  "rejected_receipts": 1,
+  "report_version": "1.0.0",
+  "reserved_cents_at_end": 0,
+  "scenario_id": "fixture_p6",
+  "service": [
+   {
+    "attained": false,
+    "distributed_quantity": 24,
+    "late_quantity": 0,
+    "on_time_quantity": 24,
+    "original_quantity": 40,
+    "supply_gap_quantity": 16,
+    "target_id": "kits_morning",
+    "unfulfilled_quantity": 16,
+    "unit": "standard_kit"
+   }
+  ],
+  "staff_confirmations": 1,
+  "status_queries": 2,
+  "stock": [
+   {
+    "closing_on_hand_quantity": 0,
+    "conserved": true,
+    "distributed_quantity": 24,
+    "expected_unreceived_quantity": 20,
+    "opening_quantity": 24,
+    "received_quantity": 0,
+    "resource_id": "main_rack",
+    "transferred_out_quantity": 0
+   },
+   {
+    "closing_on_hand_quantity": 16,
+    "conserved": true,
+    "distributed_quantity": 0,
+    "expected_unreceived_quantity": 0,
+    "opening_quantity": 16,
+    "received_quantity": 0,
+    "resource_id": "loft_rack",
+    "transferred_out_quantity": 0
+   }
+  ],
+  "unnecessary_reservations": 0,
+  "violations": []
+ },
+ "policy": "P1",
+ "policy_id": "tool-use/1.2.0",
+ "record": "plan_b.eval_episode/1.0.0",
+ "seed": 101,
+ "seed_passed": true,
+ "started_at": "2026-10-25T23:43:44Z",
+ "status": "completed",
+ "suite": "pantry",
+ "tool_calls": {
+  "by_status": {
+   "rejected": 1,
+   "succeeded": 25
+  },
+  "by_tool": {
+   "apply_plan": 1,
+   "evaluate_candidates": 9,
+   "get_event_state": 12,
+   "hold_resource": 2,
+   "query_status": 2
+  },
+  "rejected": [
+   {
+    "call_id": "call_00004",
+    "error_code": "RESOURCE_UNAVAILABLE",
+    "tool": "hold_resource"
+   }
+  ],
+  "total": 26
+ },
+ "trace": {
+  "bytes": 1978698,
+  "file": "trace.json.gz",
+  "sha256": "1b49b60bda9cca4d3e1031ef010bfb6ef9c7bea136ea41836315908ec5770839",
+  "verify": "intact"
+ },
+ "trial": 1,
+ "wall_seconds": 46.2
+}

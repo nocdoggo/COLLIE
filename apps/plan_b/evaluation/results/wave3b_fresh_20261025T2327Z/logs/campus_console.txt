@@ -1,0 +1,43 @@
+start 2026-10-25T23:27:31Z suite=campus jobs=1 cap=40
+ev_r4h__P2__s101: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=4 tool_calls=32 cost_usd=0.052586
+ev_r4h__P2__s202: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=4 tool_calls=30 cost_usd=0.050486
+ev_r4h__P1__s202: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=4 tool_calls=25 cost_usd=0.131898
+ev_r4h__P3__s303: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=3 tool_calls=29 cost_usd=0.03483
+ev_r4h__P3__s101: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=3 tool_calls=29 cost_usd=0.03612
+ev_r4h__P1__s303: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=4 tool_calls=24 cost_usd=0.125466
+ev_r4h__P0__once: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=0 tool_calls=30 cost_usd=0
+ev_r4h__P2__s303: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=4 tool_calls=30 cost_usd=0.049166
+ev_r4h__P1__s101: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=7 tool_calls=31 cost_usd=0.226904
+ev_r4h__P3__s202: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=3 tool_calls=29 cost_usd=0.03605
+ev_j8p__P2__s101: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=2 tool_calls=25 cost_usd=0.024052
+ev_j8p__P1__s303: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=2 tool_calls=21 cost_usd=0.065944
+ev_j8p__P3__s101: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=1 tool_calls=25 cost_usd=0.007698
+ev_j8p__P0__once: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=0 tool_calls=25 cost_usd=0
+ev_j8p__P3__s303: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=1 tool_calls=25 cost_usd=0.007828
+ev_j8p__P1__s101: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=2 tool_calls=20 cost_usd=0.062584
+ev_j8p__P1__s202: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=2 tool_calls=21 cost_usd=0.06416
+ev_j8p__P2__s303: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=2 tool_calls=25 cost_usd=0.022892
+ev_j8p__P3__s202: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=1 tool_calls=25 cost_usd=0.007918
+ev_j8p__P2__s202: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=2 tool_calls=25 cost_usd=0.023022
+ev_w2n__P1__s202: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=3 tool_calls=20 cost_usd=0.101484
+ev_w2n__P3__s101: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=2 tool_calls=26 cost_usd=0.019334
+ev_w2n__P3__s303: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=2 tool_calls=26 cost_usd=0.019414
+ev_w2n__P1__s303: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=3 tool_calls=20 cost_usd=0.10219
+ev_w2n__P2__s101: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=2 tool_calls=26 cost_usd=0.019154
+ev_w2n__P1__s101: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=3 tool_calls=20 cost_usd=0.10296
+ev_w2n__P3__s202: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=2 tool_calls=26 cost_usd=0.019144
+ev_w2n__P2__s303: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=2 tool_calls=26 cost_usd=0.019164
+ev_w2n__P0__once: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=0 tool_calls=22 cost_usd=0
+ev_w2n__P2__s202: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=2 tool_calls=26 cost_usd=0.019154
+ev_s6d__P2__s202: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=2 tool_calls=21 cost_usd=0.020998
+ev_s6d__P0__once: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=0 tool_calls=22 cost_usd=0
+ev_s6d__P2__s101: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=2 tool_calls=21 cost_usd=0.021008
+ev_s6d__P3__s303: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=1 tool_calls=21 cost_usd=0.007516
+ev_s6d__P3__s202: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=1 tool_calls=21 cost_usd=0.007386
+ev_s6d__P2__s303: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=2 tool_calls=21 cost_usd=0.020718
+ev_s6d__P3__s101: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=1 tool_calls=21 cost_usd=0.007386
+ev_s6d__P1__s303: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=2 tool_calls=18 cost_usd=0.06207
+ev_s6d__P1__s101: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=2 tool_calls=18 cost_usd=0.0615
+ev_s6d__P1__s202: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=2 tool_calls=18 cost_usd=0.06114
+40 planned, 0 already finished, 40 run: {'completed': 40}
+end 2026-10-25T23:35:38Z suite=campus rc=0

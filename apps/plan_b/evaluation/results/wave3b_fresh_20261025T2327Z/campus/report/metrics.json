@@ -1,0 +1,3820 @@
+{
+ "aborted": [],
+ "by_case": {
+  "ev_j8p": {
+   "case_id": "C10",
+   "negative_control": true,
+   "outcome_class": "goal",
+   "policies": {
+    "P0": {
+     "n": 1,
+     "planned": 1,
+     "status_checks_mean": 1.0,
+     "success": 1,
+     "unnecessary_changes": 0
+    },
+    "P1": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 2.0,
+     "success": 3,
+     "unnecessary_changes": 0
+    },
+    "P2": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 1.0,
+     "success": 3,
+     "unnecessary_changes": 0
+    },
+    "P3": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 2.0,
+     "success": 3,
+     "unnecessary_changes": 0
+    }
+   }
+  },
+  "ev_r4h": {
+   "case_id": "C09",
+   "negative_control": false,
+   "outcome_class": "goal",
+   "policies": {
+    "P0": {
+     "n": 1,
+     "planned": 1,
+     "status_checks_mean": 2.0,
+     "success": 1,
+     "unnecessary_changes": null
+    },
+    "P1": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 1.6666666666666667,
+     "success": 3,
+     "unnecessary_changes": null
+    },
+    "P2": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 1.3333333333333333,
+     "success": 3,
+     "unnecessary_changes": null
+    },
+    "P3": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 2.0,
+     "success": 3,
+     "unnecessary_changes": null
+    }
+   }
+  },
+  "ev_s6d": {
+   "case_id": "C12",
+   "negative_control": false,
+   "outcome_class": "infeasible",
+   "policies": {
+    "P0": {
+     "n": 1,
+     "planned": 1,
+     "status_checks_mean": 1.0,
+     "success": 1,
+     "unnecessary_changes": null
+    },
+    "P1": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 1.0,
+     "success": 3,
+     "unnecessary_changes": null
+    },
+    "P2": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 1.0,
+     "success": 3,
+     "unnecessary_changes": null
+    },
+    "P3": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 2.0,
+     "success": 3,
+     "unnecessary_changes": null
+    }
+   }
+  },
+  "ev_w2n": {
+   "case_id": "C11",
+   "negative_control": false,
+   "outcome_class": "goal",
+   "policies": {
+    "P0": {
+     "n": 1,
+     "planned": 1,
+     "status_checks_mean": 0.0,
+     "success": 0,
+     "unnecessary_changes": null
+    },
+    "P1": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 0.0,
+     "success": 3,
+     "unnecessary_changes": null
+    },
+    "P2": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 0.0,
+     "success": 3,
+     "unnecessary_changes": null
+    },
+    "P3": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 0.0,
+     "success": 3,
+     "unnecessary_changes": null
+    }
+   }
+  }
+ },
+ "by_policy": {
+  "P0": {
+   "aborted": 0,
+   "appropriate_infeasibility": {
+    "cases": [
+     "C12"
+    ],
+    "k": 1,
+    "n": 1
+   },
+   "capped": 0,
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 0,
+    "cost_usd": 0,
+    "latency_ms": 0,
+    "model_calls": 0,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 0,
+    "reasoning_tokens": 0,
+    "tool_calls": 99,
+    "wall_seconds": 10.899999999999999
+   },
+   "computation_measured": 4,
+   "decided_by": {
+    "policy": 1
+   },
+   "executed_violations": 0,
+   "extraction": {
+    "abstained": 4
+   },
+   "goal_completion": {
+    "cases": [
+     "C09",
+     "C10",
+     "C11"
+    ],
+    "k": 2,
+    "n": 3
+   },
+   "incomplete": 0,
+   "invalid_attempts": 0,
+   "missing": 0,
+   "modeled_cost_cents": 0,
+   "pantry": null,
+   "plan_churn": 1,
+   "planned": 4,
+   "preparation": {
+    "expired_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "unreleased_holds": 0
+   },
+   "recorded": 4,
+   "recovery": {
+    "max_minutes": 3,
+    "median_is_lower_bound": true,
+    "median_minutes": 39.5,
+    "median_recovered_minutes": 3,
+    "median_unbounded": false,
+    "min_minutes": 3,
+    "recovered": 1,
+    "required": 2,
+    "unrecovered": 1,
+    "unrecovered_horizons": [
+     76
+    ],
+    "unrecovered_unmeasured": 0
+   },
+   "scored": 4,
+   "statuses": {
+    "completed": 4
+   },
+   "unnecessary_changes": {
+    "cases": [
+     "C10"
+    ],
+    "committed_changes": 0,
+    "episodes_with_change": 0,
+    "n": 1
+   },
+   "verification": {
+    "distinct_sources": 3,
+    "failed_checks": 0,
+    "repeated_checks": 1,
+    "simulated_minutes": 8,
+    "status_checks": 4
+   }
+  },
+  "P1": {
+   "aborted": 0,
+   "appropriate_infeasibility": {
+    "cases": [
+     "C12"
+    ],
+    "k": 3,
+    "n": 3
+   },
+   "capped": 0,
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 22793,
+    "cost_usd": 1.1683,
+    "latency_ms": 204479,
+    "model_calls": 36,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 470185,
+    "reasoning_tokens": 14107,
+    "tool_calls": 256,
+    "wall_seconds": 239.39999999999998
+   },
+   "computation_measured": 12,
+   "decided_by": {
+    "model": 3
+   },
+   "executed_violations": 0,
+   "extraction": {
+    "not_recorded": 12
+   },
+   "goal_completion": {
+    "cases": [
+     "C09",
+     "C10",
+     "C11"
+    ],
+    "k": 9,
+    "n": 9
+   },
+   "incomplete": 0,
+   "invalid_attempts": 0,
+   "missing": 0,
+   "modeled_cost_cents": 0,
+   "pantry": null,
+   "plan_churn": 12,
+   "planned": 12,
+   "preparation": {
+    "expired_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "unreleased_holds": 0
+   },
+   "recorded": 12,
+   "recovery": {
+    "max_minutes": 3,
+    "median_is_lower_bound": false,
+    "median_minutes": 2.0,
+    "median_recovered_minutes": 2.0,
+    "median_unbounded": false,
+    "min_minutes": 1,
+    "recovered": 6,
+    "required": 6,
+    "unrecovered": 0,
+    "unrecovered_horizons": [],
+    "unrecovered_unmeasured": 0
+   },
+   "scored": 12,
+   "statuses": {
+    "completed": 12
+   },
+   "unnecessary_changes": {
+    "cases": [
+     "C10"
+    ],
+    "committed_changes": 0,
+    "episodes_with_change": 0,
+    "n": 3
+   },
+   "verification": {
+    "distinct_sources": 12,
+    "failed_checks": 0,
+    "repeated_checks": 2,
+    "simulated_minutes": 28,
+    "status_checks": 14
+   }
+  },
+  "P2": {
+   "aborted": 0,
+   "appropriate_infeasibility": {
+    "cases": [
+     "C12"
+    ],
+    "k": 3,
+    "n": 3
+   },
+   "capped": 0,
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 7360,
+    "cost_usd": 0.34240000000000004,
+    "latency_ms": 89201,
+    "model_calls": 30,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 134400,
+    "reasoning_tokens": 1287,
+    "tool_calls": 308,
+    "wall_seconds": 125.09999999999998
+   },
+   "computation_measured": 12,
+   "decided_by": {
+    "server": 3
+   },
+   "executed_violations": 0,
+   "extraction": {
+    "correct": 12
+   },
+   "goal_completion": {
+    "cases": [
+     "C09",
+     "C10",
+     "C11"
+    ],
+    "k": 9,
+    "n": 9
+   },
+   "incomplete": 0,
+   "invalid_attempts": 0,
+   "missing": 0,
+   "modeled_cost_cents": 0,
+   "pantry": null,
+   "plan_churn": 12,
+   "planned": 12,
+   "preparation": {
+    "expired_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "unreleased_holds": 0
+   },
+   "recorded": 12,
+   "recovery": {
+    "max_minutes": 3,
+    "median_is_lower_bound": false,
+    "median_minutes": 2.0,
+    "median_recovered_minutes": 2.0,
+    "median_unbounded": false,
+    "min_minutes": 1,
+    "recovered": 6,
+    "required": 6,
+    "unrecovered": 0,
+    "unrecovered_horizons": [],
+    "unrecovered_unmeasured": 0
+   },
+   "scored": 12,
+   "statuses": {
+    "completed": 12
+   },
+   "unnecessary_changes": {
+    "cases": [
+     "C10"
+    ],
+    "committed_changes": 0,
+    "episodes_with_change": 0,
+    "n": 3
+   },
+   "verification": {
+    "distinct_sources": 9,
+    "failed_checks": 0,
+    "repeated_checks": 1,
+    "simulated_minutes": 20,
+    "status_checks": 10
+   }
+  },
+  "P3": {
+   "aborted": 0,
+   "appropriate_infeasibility": {
+    "cases": [
+     "C12"
+    ],
+    "k": 3,
+    "n": 3
+   },
+   "capped": 0,
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 5937,
+    "cost_usd": 0.210624,
+    "latency_ms": 65090,
+    "model_calls": 21,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 75627,
+    "reasoning_tokens": 1334,
+    "tool_calls": 303,
+    "wall_seconds": 99.39999999999999
+   },
+   "computation_measured": 12,
+   "decided_by": {
+    "server": 3
+   },
+   "executed_violations": 0,
+   "extraction": {
+    "correct": 12
+   },
+   "goal_completion": {
+    "cases": [
+     "C09",
+     "C10",
+     "C11"
+    ],
+    "k": 9,
+    "n": 9
+   },
+   "incomplete": 0,
+   "invalid_attempts": 0,
+   "missing": 0,
+   "modeled_cost_cents": 0,
+   "pantry": null,
+   "plan_churn": 12,
+   "planned": 12,
+   "preparation": {
+    "expired_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "unreleased_holds": 0
+   },
+   "recorded": 12,
+   "recovery": {
+    "max_minutes": 5,
+    "median_is_lower_bound": false,
+    "median_minutes": 3.0,
+    "median_recovered_minutes": 3.0,
+    "median_unbounded": false,
+    "min_minutes": 1,
+    "recovered": 6,
+    "required": 6,
+    "unrecovered": 0,
+    "unrecovered_horizons": [],
+    "unrecovered_unmeasured": 0
+   },
+   "scored": 12,
+   "statuses": {
+    "completed": 12
+   },
+   "unnecessary_changes": {
+    "cases": [
+     "C10"
+    ],
+    "committed_changes": 0,
+    "episodes_with_change": 0,
+    "n": 3
+   },
+   "verification": {
+    "distinct_sources": 18,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 36,
+    "status_checks": 18
+   }
+  }
+ },
+ "episodes": [
+  {
+   "caps_reached": [],
+   "case_id": "C09",
+   "case_ref": "ev_r4h",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1341,
+    "cost_usd": 0.052586,
+    "latency_ms": 17323,
+    "model_calls": 4,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 19588,
+    "reasoning_tokens": 545,
+    "tool_calls": 32,
+    "wall_seconds": 20.6
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "van_txt_3082"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_r4h__P2__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 1,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 1,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 3,
+    "horizon_minutes": 84,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-12-03T22:16:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 1,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 20.6
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C09",
+   "case_ref": "ev_r4h",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1131,
+    "cost_usd": 0.050486,
+    "latency_ms": 13220,
+    "model_calls": 4,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 19588,
+    "reasoning_tokens": 370,
+    "tool_calls": 30,
+    "wall_seconds": 16.5
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "van_txt_3082"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_r4h__P2__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 1,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 2,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 3,
+    "horizon_minutes": 84,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-12-03T22:16:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 16.5
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C09",
+   "case_ref": "ev_r4h",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 2420,
+    "cost_usd": 0.131898,
+    "latency_ms": 21914,
+    "model_calls": 4,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 53849,
+    "reasoning_tokens": 1379,
+    "tool_calls": 25,
+    "wall_seconds": 25.8
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "van_txt_3082"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_r4h__P1__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 1,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 3,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 3,
+    "horizon_minutes": 84,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-12-03T22:16:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 25.8
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C09",
+   "case_ref": "ev_r4h",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 960,
+    "cost_usd": 0.03483,
+    "latency_ms": 11083,
+    "model_calls": 3,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 12615,
+    "reasoning_tokens": 383,
+    "tool_calls": 29,
+    "wall_seconds": 14.1
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "van_txt_3082"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_r4h__P3__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 1,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 4,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 5,
+    "horizon_minutes": 84,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-12-03T22:16:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 14.1
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C09",
+   "case_ref": "ev_r4h",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1089,
+    "cost_usd": 0.03612,
+    "latency_ms": 11345,
+    "model_calls": 3,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 12615,
+    "reasoning_tokens": 475,
+    "tool_calls": 29,
+    "wall_seconds": 14.6
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "van_txt_3082"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_r4h__P3__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 1,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 5,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 5,
+    "horizon_minutes": 84,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-12-03T22:16:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 14.6
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C09",
+   "case_ref": "ev_r4h",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 2192,
+    "cost_usd": 0.125466,
+    "latency_ms": 20162,
+    "model_calls": 4,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 51773,
+    "reasoning_tokens": 1367,
+    "tool_calls": 24,
+    "wall_seconds": 23.2
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "van_txt_3082"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_r4h__P1__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 1,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 6,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 3,
+    "horizon_minutes": 84,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-12-03T22:16:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 23.2
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C09",
+   "case_ref": "ev_r4h",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 0,
+    "cost_usd": 0,
+    "latency_ms": 0,
+    "model_calls": 0,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 0,
+    "reasoning_tokens": 0,
+    "tool_calls": 30,
+    "wall_seconds": 2.9
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "abstained",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "van_txt_3082"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_r4h__P0__once",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 1,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P0",
+   "policy_id": "rules/1.0.0",
+   "position": 7,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 3,
+    "horizon_minutes": 84,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-12-03T22:16:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": null,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 1,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 2.9
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C09",
+   "case_ref": "ev_r4h",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 999,
+    "cost_usd": 0.049166,
+    "latency_ms": 11544,
+    "model_calls": 4,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 19588,
+    "reasoning_tokens": 259,
+    "tool_calls": 30,
+    "wall_seconds": 14.7
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "van_txt_3082"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_r4h__P2__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 1,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 8,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 3,
+    "horizon_minutes": 84,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-12-03T22:16:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 14.7
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C09",
+   "case_ref": "ev_r4h",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 4262,
+    "cost_usd": 0.226904,
+    "latency_ms": 40155,
+    "model_calls": 7,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 92142,
+    "reasoning_tokens": 2699,
+    "tool_calls": 31,
+    "wall_seconds": 43.6
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "van_txt_3082"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_r4h__P1__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 1,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 9,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 3,
+    "horizon_minutes": 84,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-12-03T22:16:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 2,
+    "simulated_minutes": 6,
+    "status_checks": 3
+   },
+   "violations": [],
+   "wall_seconds": 43.6
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C09",
+   "case_ref": "ev_r4h",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1082,
+    "cost_usd": 0.03605,
+    "latency_ms": 10917,
+    "model_calls": 3,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 12615,
+    "reasoning_tokens": 476,
+    "tool_calls": 29,
+    "wall_seconds": 13.9
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "van_txt_3082"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_r4h__P3__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 1,
+    "committed_revisions": 1,
+    "previously_valid_altered": 0,
+    "total": 1
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 10,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 5,
+    "horizon_minutes": 84,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-12-03T22:16:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 13.9
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C10",
+   "case_ref": "ev_j8p",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 552,
+    "cost_usd": 0.024052,
+    "latency_ms": 6589,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 9266,
+    "reasoning_tokens": 113,
+    "tool_calls": 25,
+    "wall_seconds": 9.5
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "desk_relay_57"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_j8p__P2__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 1,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 9.5
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C10",
+   "case_ref": "ev_j8p",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1280,
+    "cost_usd": 0.065944,
+    "latency_ms": 11151,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 26572,
+    "reasoning_tokens": 694,
+    "tool_calls": 21,
+    "wall_seconds": 13.8
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "desk_relay_57"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_j8p__P1__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 2,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 13.8
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C10",
+   "case_ref": "ev_j8p",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 251,
+    "cost_usd": 0.007698,
+    "latency_ms": 2519,
+    "model_calls": 1,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 2594,
+    "reasoning_tokens": 0,
+    "tool_calls": 25,
+    "wall_seconds": 5.2
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "desk_relay_57"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_j8p__P3__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 3,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 5.2
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C10",
+   "case_ref": "ev_j8p",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 0,
+    "cost_usd": 0,
+    "latency_ms": 0,
+    "model_calls": 0,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 0,
+    "reasoning_tokens": 0,
+    "tool_calls": 25,
+    "wall_seconds": 2.6
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "abstained",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "desk_relay_57"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_j8p__P0__once",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P0",
+   "policy_id": "rules/1.0.0",
+   "position": 4,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": null,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 2.6
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C10",
+   "case_ref": "ev_j8p",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 264,
+    "cost_usd": 0.007828,
+    "latency_ms": 2653,
+    "model_calls": 1,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 2594,
+    "reasoning_tokens": 0,
+    "tool_calls": 25,
+    "wall_seconds": 5.3
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "desk_relay_57"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_j8p__P3__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 5,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 5.3
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C10",
+   "case_ref": "ev_j8p",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1085,
+    "cost_usd": 0.062584,
+    "latency_ms": 9890,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 25867,
+    "reasoning_tokens": 657,
+    "tool_calls": 20,
+    "wall_seconds": 12.5
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "desk_relay_57"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_j8p__P1__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 6,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 12.5
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C10",
+   "case_ref": "ev_j8p",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1102,
+    "cost_usd": 0.06416,
+    "latency_ms": 8434,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 26570,
+    "reasoning_tokens": 498,
+    "tool_calls": 21,
+    "wall_seconds": 11.2
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "desk_relay_57"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_j8p__P1__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 7,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 11.2
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C10",
+   "case_ref": "ev_j8p",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 436,
+    "cost_usd": 0.022892,
+    "latency_ms": 5265,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 9266,
+    "reasoning_tokens": 0,
+    "tool_calls": 25,
+    "wall_seconds": 8.2
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "desk_relay_57"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_j8p__P2__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 8,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 8.2
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C10",
+   "case_ref": "ev_j8p",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 273,
+    "cost_usd": 0.007918,
+    "latency_ms": 2102,
+    "model_calls": 1,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 2594,
+    "reasoning_tokens": 0,
+    "tool_calls": 25,
+    "wall_seconds": 5.0
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "desk_relay_57"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_j8p__P3__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 9,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 5.0
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C10",
+   "case_ref": "ev_j8p",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 449,
+    "cost_usd": 0.023022,
+    "latency_ms": 4677,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 9266,
+    "reasoning_tokens": 0,
+    "tool_calls": 25,
+    "wall_seconds": 7.5
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "desk_relay_57"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_j8p__P2__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 10,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 7.5
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C11",
+   "case_ref": "ev_w2n",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 2351,
+    "cost_usd": 0.101484,
+    "latency_ms": 20229,
+    "model_calls": 3,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 38987,
+    "reasoning_tokens": 1565,
+    "tool_calls": 20,
+    "wall_seconds": 23.1
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "fac_note_2"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_w2n__P1__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 2,
+    "total": 3
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 1,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 1,
+    "horizon_minutes": 76,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-12-03T22:24:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 0,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 0,
+    "status_checks": 0
+   },
+   "violations": [],
+   "wall_seconds": 23.1
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C11",
+   "case_ref": "ev_w2n",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 449,
+    "cost_usd": 0.019334,
+    "latency_ms": 6486,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 7422,
+    "reasoning_tokens": 0,
+    "tool_calls": 26,
+    "wall_seconds": 9.5
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "fac_note_2"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_w2n__P3__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 2,
+    "total": 3
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 2,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 1,
+    "horizon_minutes": 76,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-12-03T22:24:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 0,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 0,
+    "status_checks": 0
+   },
+   "violations": [],
+   "wall_seconds": 9.5
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C11",
+   "case_ref": "ev_w2n",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 457,
+    "cost_usd": 0.019414,
+    "latency_ms": 5877,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 7422,
+    "reasoning_tokens": 0,
+    "tool_calls": 26,
+    "wall_seconds": 8.8
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "fac_note_2"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_w2n__P3__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 2,
+    "total": 3
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 3,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 1,
+    "horizon_minutes": 76,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-12-03T22:24:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 0,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 0,
+    "status_checks": 0
+   },
+   "violations": [],
+   "wall_seconds": 8.8
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C11",
+   "case_ref": "ev_w2n",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 2422,
+    "cost_usd": 0.10219,
+    "latency_ms": 22128,
+    "model_calls": 3,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 38985,
+    "reasoning_tokens": 1671,
+    "tool_calls": 20,
+    "wall_seconds": 25.0
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "fac_note_2"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_w2n__P1__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 2,
+    "total": 3
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 4,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 1,
+    "horizon_minutes": 76,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-12-03T22:24:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 0,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 0,
+    "status_checks": 0
+   },
+   "violations": [],
+   "wall_seconds": 25.0
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C11",
+   "case_ref": "ev_w2n",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 431,
+    "cost_usd": 0.019154,
+    "latency_ms": 5056,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 7422,
+    "reasoning_tokens": 0,
+    "tool_calls": 26,
+    "wall_seconds": 8.1
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "fac_note_2"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_w2n__P2__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 2,
+    "total": 3
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 5,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 1,
+    "horizon_minutes": 76,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-12-03T22:24:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 0,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 0,
+    "status_checks": 0
+   },
+   "violations": [],
+   "wall_seconds": 8.1
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C11",
+   "case_ref": "ev_w2n",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 2499,
+    "cost_usd": 0.10296,
+    "latency_ms": 22355,
+    "model_calls": 3,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 38985,
+    "reasoning_tokens": 1757,
+    "tool_calls": 20,
+    "wall_seconds": 25.2
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "fac_note_2"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_w2n__P1__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 2,
+    "total": 3
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 6,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 1,
+    "horizon_minutes": 76,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-12-03T22:24:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 0,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 0,
+    "status_checks": 0
+   },
+   "violations": [],
+   "wall_seconds": 25.2
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C11",
+   "case_ref": "ev_w2n",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 430,
+    "cost_usd": 0.019144,
+    "latency_ms": 4871,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 7422,
+    "reasoning_tokens": 0,
+    "tool_calls": 26,
+    "wall_seconds": 7.8
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "fac_note_2"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_w2n__P3__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 2,
+    "total": 3
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 7,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 1,
+    "horizon_minutes": 76,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-12-03T22:24:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 0,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 0,
+    "status_checks": 0
+   },
+   "violations": [],
+   "wall_seconds": 7.8
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C11",
+   "case_ref": "ev_w2n",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 432,
+    "cost_usd": 0.019164,
+    "latency_ms": 4498,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 7422,
+    "reasoning_tokens": 0,
+    "tool_calls": 26,
+    "wall_seconds": 7.5
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "fac_note_2"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_w2n__P2__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 2,
+    "total": 3
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 8,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 1,
+    "horizon_minutes": 76,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-12-03T22:24:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 0,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 0,
+    "status_checks": 0
+   },
+   "violations": [],
+   "wall_seconds": 7.5
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C11",
+   "case_ref": "ev_w2n",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 0,
+    "cost_usd": 0,
+    "latency_ms": 0,
+    "model_calls": 0,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 0,
+    "reasoning_tokens": 0,
+    "tool_calls": 22,
+    "wall_seconds": 2.7
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "abstained",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "fac_note_2"
+    }
+   ],
+   "failure_reasons": [
+    "goal not complete"
+   ],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_w2n__P0__once",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P0",
+   "policy_id": "rules/1.0.0",
+   "position": 9,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 76,
+    "horizon_minutes": 76,
+    "note": "unrecovered: a failure, recorded with the horizon",
+    "recovered": false,
+    "required": true,
+    "update_at": "2026-12-03T22:24:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": null,
+   "status": "completed",
+   "success": false,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 0,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 0,
+    "status_checks": 0
+   },
+   "violations": [],
+   "wall_seconds": 2.7
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C11",
+   "case_ref": "ev_w2n",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 431,
+    "cost_usd": 0.019154,
+    "latency_ms": 5287,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 7422,
+    "reasoning_tokens": 0,
+    "tool_calls": 26,
+    "wall_seconds": 8.3
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "fac_note_2"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_w2n__P2__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 2,
+    "total": 3
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 10,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 1,
+    "horizon_minutes": 76,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-12-03T22:24:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 0,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 0,
+    "status_checks": 0
+   },
+   "violations": [],
+   "wall_seconds": 8.3
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C12",
+   "case_ref": "ev_s6d",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 395,
+    "cost_usd": 0.020998,
+    "latency_ms": 5992,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 8524,
+    "reasoning_tokens": 0,
+    "tool_calls": 21,
+    "wall_seconds": 8.8
+   },
+   "decided_by": "server",
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "lab_note_640"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_s6d__P2__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "infeasible",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 1,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 8.8
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C12",
+   "case_ref": "ev_s6d",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 0,
+    "cost_usd": 0,
+    "latency_ms": 0,
+    "model_calls": 0,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 0,
+    "reasoning_tokens": 0,
+    "tool_calls": 22,
+    "wall_seconds": 2.7
+   },
+   "decided_by": "policy",
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "abstained",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "lab_note_640"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_s6d__P0__once",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "infeasible",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P0",
+   "policy_id": "rules/1.0.0",
+   "position": 2,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": null,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 2.7
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C12",
+   "case_ref": "ev_s6d",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 396,
+    "cost_usd": 0.021008,
+    "latency_ms": 4997,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 8524,
+    "reasoning_tokens": 0,
+    "tool_calls": 21,
+    "wall_seconds": 7.8
+   },
+   "decided_by": "server",
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "lab_note_640"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_s6d__P2__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "infeasible",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 3,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 7.8
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C12",
+   "case_ref": "ev_s6d",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 236,
+    "cost_usd": 0.007516,
+    "latency_ms": 2471,
+    "model_calls": 1,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 2578,
+    "reasoning_tokens": 0,
+    "tool_calls": 21,
+    "wall_seconds": 5.2
+   },
+   "decided_by": "server",
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "lab_note_640"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_s6d__P3__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "infeasible",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 4,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 5.2
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C12",
+   "case_ref": "ev_s6d",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 223,
+    "cost_usd": 0.007386,
+    "latency_ms": 2375,
+    "model_calls": 1,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 2578,
+    "reasoning_tokens": 0,
+    "tool_calls": 21,
+    "wall_seconds": 5.0
+   },
+   "decided_by": "server",
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "lab_note_640"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_s6d__P3__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "infeasible",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 5,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 5.0
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C12",
+   "case_ref": "ev_s6d",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 367,
+    "cost_usd": 0.020718,
+    "latency_ms": 4753,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 8524,
+    "reasoning_tokens": 0,
+    "tool_calls": 21,
+    "wall_seconds": 7.6
+   },
+   "decided_by": "server",
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "lab_note_640"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_s6d__P2__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "infeasible",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 6,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 7.6
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C12",
+   "case_ref": "ev_s6d",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 223,
+    "cost_usd": 0.007386,
+    "latency_ms": 2391,
+    "model_calls": 1,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 2578,
+    "reasoning_tokens": 0,
+    "tool_calls": 21,
+    "wall_seconds": 5.0
+   },
+   "decided_by": "server",
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "lab_note_640"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_s6d__P3__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "infeasible",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 7,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 5.0
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C12",
+   "case_ref": "ev_s6d",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1110,
+    "cost_usd": 0.06207,
+    "latency_ms": 9489,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 25485,
+    "reasoning_tokens": 650,
+    "tool_calls": 18,
+    "wall_seconds": 12.1
+   },
+   "decided_by": "model",
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "lab_note_640"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_s6d__P1__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "infeasible",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 8,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 12.1
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C12",
+   "case_ref": "ev_s6d",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1053,
+    "cost_usd": 0.0615,
+    "latency_ms": 9897,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 25485,
+    "reasoning_tokens": 613,
+    "tool_calls": 18,
+    "wall_seconds": 12.4
+   },
+   "decided_by": "model",
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "lab_note_640"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_s6d__P1__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "infeasible",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 9,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 12.4
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C12",
+   "case_ref": "ev_s6d",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1017,
+    "cost_usd": 0.06114,
+    "latency_ms": 8675,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 25485,
+    "reasoning_tokens": 557,
+    "tool_calls": 18,
+    "wall_seconds": 11.5
+   },
+   "decided_by": "model",
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "lab_note_640"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "ev_s6d__P1__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "infeasible",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 10,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 11.5
+  }
+ ],
+ "heldout": true,
+ "missing": [],
+ "policies": [
+  "P0",
+  "P1",
+  "P2",
+  "P3"
+ ],
+ "seeds": [
+  101,
+  202,
+  303
+ ],
+ "suite": "campus",
+ "version": "plan_b.eval_metrics/1.0.0"
+}

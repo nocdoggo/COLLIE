@@ -1,0 +1,89 @@
+====================================================================================================
+hk_q8n__P0__once  C06 class=goal status=completed policy=P0 seed=None
+  failure_reasons=['goal not complete'] caps=[] decided_by=None infeas_reported=True goal=False
+  model outcomes={} calls=0 failed=0 usd=0
+  failed predicates: [('p_required', 'demonstrations is failed; closing is failed')]
+  extraction: [('lead_note_1', 'abstained', [])]
+  record errors: {}  invalid_attempts={'by_code': {}, 'by_tool': {}, 'count': 0}
+  churn={'altered_assignments': 0, 'committed_revisions': 0, 'previously_valid_altered': 0, 'total': 0} recovery={'delay_minutes': 76, 'horizon_minutes': 76, 'note': 'unrecovered: a failure, recorded with the horizon', 'recovered': False, 'required': True, 'update_at': '2026-11-12T23:14:00+00:00'}
+   dec_0001 23:10 keep        | Keep plan v1: it passes every hard check under its stated assumptions; loan_projector is expected (catalog) for demonstrations at 18:40.
+   dec_0002 23:14 unresolved  | Notice obs_0001 is outside the supported message forms, so it is not read as a claim; left unresolved. No plan change.
+   dec_0003 23:23 keep        | Keep plan v1: it passes every hard check under its stated assumptions; loan_projector is available (arrival observation) for demonstrations at 18:40.
+   dec_0004 23:40 infeasible  | No candidate in the declared action space (Templates keep; swap(demonstrations, skills_exchange); shift(demonstrations: -5, +5 min); shift(skills_exchange: -5, +5 min); substitute(demonstrations: loan_projector -> standby_projector); at most 2 combined edits; 
+   dec_0005 00:00 infeasible  | No candidate in the declared action space (Templates keep; swap(demonstrations, skills_exchange); shift(demonstrations: -5, +5 min); shift(skills_exchange: -5, +5 min); substitute(demonstrations: loan_projector -> standby_projector); at most 2 combined edits; 
+   dec_0006 00:20 keep        | No activity remains to re-plan in plan v1: completed setup, skills_exchange, welcome; in progress none; failed closing, demonstrations. No action can change these records.
+  receipts: [('23:14', 'p_demo_lead', 'submit_observation', 'applied', 'Recorded observation obs_0001 from p_demo_lead (content is data, not a command)')]
+====================================================================================================
+hk_f6k__P0__once  C07 class=goal status=completed policy=P0 seed=None
+  failure_reasons=['goal not complete'] caps=[] decided_by=None infeas_reported=True goal=False
+  model outcomes={} calls=0 failed=0 usd=0
+  failed predicates: [('p_required', 'demonstrations is failed; closing is failed'), ('p_spend', 'committed 0 cents; expected 2800')]
+  extraction: [('crr_msg_1012', 'abstained', [])]
+  record errors: {}  invalid_attempts={'by_code': {}, 'by_tool': {}, 'count': 0}
+  churn={'altered_assignments': 0, 'committed_revisions': 0, 'previously_valid_altered': 0, 'total': 0} recovery={'delay_minutes': 77, 'horizon_minutes': 77, 'note': 'unrecovered: a failure, recorded with the horizon', 'recovered': False, 'required': True, 'update_at': '2026-11-12T23:13:00+00:00'}
+   dec_0001 23:10 keep        | Keep plan v1: it passes every hard check under its stated assumptions; loan_projector is expected (catalog) for demonstrations at 18:40.
+   dec_0002 23:13 unresolved  | Notice obs_0001 is outside the supported message forms, so it is not read as a claim; left unresolved. No plan change.
+   dec_0003 23:37 verify      | loan_projector is still not available ahead of demonstrations at 18:40; fresh check of delivery_eta: unavailable (STATUS_UNAVAILABLE).
+   dec_0004 23:40 infeasible  | No candidate in the declared action space (Templates keep; swap(demonstrations, skills_exchange); shift(demonstrations: -5, +5 min); shift(skills_exchange: -5, +5 min); substitute(demonstrations: loan_projector -> standby_projector); at most 2 combined edits; 
+   dec_0005 00:00 infeasible  | No candidate in the declared action space (Templates keep; swap(demonstrations, skills_exchange); shift(demonstrations: -5, +5 min); shift(skills_exchange: -5, +5 min); substitute(demonstrations: loan_projector -> standby_projector); at most 2 combined edits; 
+   dec_0006 00:20 keep        | No activity remains to re-plan in plan v1: completed setup, skills_exchange, welcome; in progress none; failed closing, demonstrations. No action can change these records.
+  rejected tool calls: [(16, '23:35', 'query_status', 'STATUS_UNAVAILABLE')]
+  receipts: []
+====================================================================================================
+hk_f6k__P2__s101  C07 class=goal status=capped policy=P2 seed=101
+  failure_reasons=['goal not complete'] caps=['model_calls'] decided_by=None infeas_reported=False goal=False
+  model outcomes={'ok': 8} calls=8 failed=0 usd=0.119584
+  failed predicates: [('p_required', 'demonstrations is failed; closing is failed'), ('p_spend', 'committed 0 cents; expected 2800')]
+  extraction: [('crr_msg_1012', 'correct', [])]
+  record errors: {'model_call_cap': 2}  invalid_attempts={'by_code': {}, 'by_tool': {}, 'count': 0}
+  churn={'altered_assignments': 0, 'committed_revisions': 0, 'previously_valid_altered': 0, 'total': 0} recovery={'delay_minutes': 77, 'horizon_minutes': 77, 'note': 'unrecovered: a failure, recorded with the horizon', 'recovered': False, 'required': True, 'update_at': '2026-11-12T23:13:00+00:00'}
+   dec_0001 23:10 keep        by=server | Keep plan v1: it passes every hard check under its stated assumptions; loan_projector is expected (catalog) for demonstrations at 18:40.
+   dec_0002 23:15 verify      by=model | Checked loan_projector delivery_eta: unavailable (STATUS_UNAVAILABLE); the status stays unverified.
+   dec_0003 23:17 verify      by=model | Checked loan_projector delivery_eta: unavailable (STATUS_UNAVAILABLE); the status stays unverified.
+   dec_0004 23:18 prepare     by=model | Held standby_projector for demonstrations (hold hold_0001, expires 18:30) to keep Use standby_projector instead of loan_projector for demonstrations open; reserved 2800 cents, refundable on release or expiry.
+   dec_0005 23:20 verify      by=model | Checked standby_projector availability: available, available (obs_0002).
+   dec_0006 23:21 wait        by=model | Chose to wait: Change nothing now; look again until 18:35. Plan v1 is unchanged.
+   dec_0007 23:27 release     by=model | Released hold hold_0001 on standby_projector for demonstrations: active plan v1 does not use it.
+   dec_0008 23:28 prepare     by=model | Held standby_projector for demonstrations (hold hold_0002, expires 18:40) to keep Swap demonstrations and skills exchange + Use standby_projector instead of loan_projector for demonstrations open; reserved 2800 cents, refundable on release or expiry.
+   dec_0009 23:28 stop        failure=model_call_cap by=server | Stopped for this episode: the model-call cap of 8 for this episode is spent. No further model-chosen action is taken; the accepted plan and every commitment stay as they are.
+   dec_0010 23:28 stop        failure=model_call_cap | Episode cap reached: 8 of 8 model calls used (frozen-phase caps). The coordinator policy is not woken again in this episode; the accepted plan and every commitment stay as they are.
+  rejected tool calls: [(5, '23:13', 'query_status', 'STATUS_UNAVAILABLE'), (8, '23:15', 'query_status', 'STATUS_UNAVAILABLE')]
+  receipts: [('23:18', 'coordinator_k7', 'hold_resource', 'applied', 'Held standby_projector for demonstrations until 18:30 (2800 cents reserved, 0 cents fee)'), ('23:27', 'coordinator_k7', 'release_hold', 'applied', 'Released hold hold_0001; 2800 reserved cents returned'), ('23:28', 'coordinator_k7', 'hold_resource', 'applied', 'Held standby_projector for demonstrations until 18:40 (2800 cents reserved, 0 cents fee)')]
+====================================================================================================
+hk_f6k__P2__s202  C07 class=goal status=capped policy=P2 seed=202
+  failure_reasons=['goal not complete'] caps=['model_calls'] decided_by=None infeas_reported=False goal=False
+  model outcomes={'ok': 8} calls=8 failed=0 usd=0.118256
+  failed predicates: [('p_required', 'demonstrations is failed; closing is failed'), ('p_spend', 'committed 0 cents; expected 2800')]
+  extraction: [('crr_msg_1012', 'correct', [])]
+  record errors: {'model_call_cap': 1}  invalid_attempts={'by_code': {}, 'by_tool': {}, 'count': 0}
+  churn={'altered_assignments': 0, 'committed_revisions': 0, 'previously_valid_altered': 0, 'total': 0} recovery={'delay_minutes': 77, 'horizon_minutes': 77, 'note': 'unrecovered: a failure, recorded with the horizon', 'recovered': False, 'required': True, 'update_at': '2026-11-12T23:13:00+00:00'}
+   dec_0001 23:10 keep        by=server | Keep plan v1: it passes every hard check under its stated assumptions; loan_projector is expected (catalog) for demonstrations at 18:40.
+   dec_0002 23:15 verify      by=model | Checked loan_projector delivery_eta: unavailable (STATUS_UNAVAILABLE); the status stays unverified.
+   dec_0003 23:17 verify      by=model | Checked loan_projector delivery_eta: unavailable (STATUS_UNAVAILABLE); the status stays unverified.
+   dec_0004 23:18 prepare     by=model | Held standby_projector for demonstrations (hold hold_0001, expires 18:30) to keep Use standby_projector instead of loan_projector for demonstrations open; reserved 2800 cents, refundable on release or expiry.
+   dec_0005 23:20 verify      by=model | Checked standby_projector availability: available, available (obs_0002).
+   dec_0006 23:22 release     by=model | Released hold hold_0001 on standby_projector for demonstrations: active plan v1 does not use it.
+   dec_0007 23:23 prepare     by=model | Held standby_projector for demonstrations (hold hold_0002, expires 18:35) to keep Swap demonstrations and skills exchange + Use standby_projector instead of loan_projector for demonstrations open; reserved 2800 cents, refundable on release or expiry.
+   dec_0008 23:23 ask         by=model | Asked the organizer to raise max_total_committed_cents of grant_coordinator_k7 from 0 to 2800 cents so Swap demonstrations and skills exchange + Use standby_projector instead of loan_projector for demonstrations can be applied; hold hold_0002 keeps the option 
+   dec_0009 23:23 stop        failure=model_call_cap | Episode cap reached: 8 of 8 model calls used (frozen-phase caps). The coordinator policy is not woken again in this episode; the accepted plan and every commitment stay as they are.
+  rejected tool calls: [(5, '23:13', 'query_status', 'STATUS_UNAVAILABLE'), (8, '23:15', 'query_status', 'STATUS_UNAVAILABLE')]
+  receipts: [('23:18', 'coordinator_k7', 'hold_resource', 'applied', 'Held standby_projector for demonstrations until 18:30 (2800 cents reserved, 0 cents fee)'), ('23:22', 'coordinator_k7', 'release_hold', 'applied', 'Released hold hold_0001; 2800 reserved cents returned'), ('23:23', 'coordinator_k7', 'hold_resource', 'applied', 'Held standby_projector for demonstrations until 18:35 (2800 cents reserved, 0 cents fee)'), ('23:26', 'organizer_k7', 'update_grant', 'applied', 'Organizer updated grant_coordinator_k7: committed limit 0->2800, reserved limit 2800->2800 (Organizer approves authoriza')]
+====================================================================================================
+hk_f6k__P2__s303  C07 class=goal status=capped policy=P2 seed=303
+  failure_reasons=['goal not complete'] caps=['model_calls'] decided_by=None infeas_reported=False goal=False
+  model outcomes={'ok': 8} calls=8 failed=0 usd=0.120146
+  failed predicates: [('p_required', 'demonstrations is failed; closing is failed'), ('p_spend', 'committed 0 cents; expected 2800')]
+  extraction: [('crr_msg_1012', 'correct', [])]
+  record errors: {'model_call_cap': 1}  invalid_attempts={'by_code': {}, 'by_tool': {}, 'count': 0}
+  churn={'altered_assignments': 0, 'committed_revisions': 0, 'previously_valid_altered': 0, 'total': 0} recovery={'delay_minutes': 77, 'horizon_minutes': 77, 'note': 'unrecovered: a failure, recorded with the horizon', 'recovered': False, 'required': True, 'update_at': '2026-11-12T23:13:00+00:00'}
+   dec_0001 23:10 keep        by=server | Keep plan v1: it passes every hard check under its stated assumptions; loan_projector is expected (catalog) for demonstrations at 18:40.
+   dec_0002 23:15 verify      by=model | Checked loan_projector delivery_eta: unavailable (STATUS_UNAVAILABLE); the status stays unverified.
+   dec_0003 23:17 verify      by=model | Checked loan_projector delivery_eta: unavailable (STATUS_UNAVAILABLE); the status stays unverified.
+   dec_0004 23:18 prepare     by=model | Held standby_projector for demonstrations (hold hold_0001, expires 18:30) to keep Use standby_projector instead of loan_projector for demonstrations open; reserved 2800 cents, refundable on release or expiry.
+   dec_0005 23:20 verify      by=model | Checked standby_projector availability: available, available (obs_0002).
+   dec_0006 23:22 release     by=model | Released hold hold_0001 on standby_projector for demonstrations: active plan v1 does not use it.
+   dec_0007 23:23 prepare     by=model | Held standby_projector for demonstrations (hold hold_0002, expires 18:35) to keep Swap demonstrations and skills exchange + Use standby_projector instead of loan_projector for demonstrations open; reserved 2800 cents, refundable on release or expiry.
+   dec_0008 23:23 ask         by=model | Asked the organizer to raise max_total_committed_cents of grant_coordinator_k7 from 0 to 2800 cents so Swap demonstrations and skills exchange + Use standby_projector instead of loan_projector for demonstrations can be applied; hold hold_0002 keeps the option 
+   dec_0009 23:23 stop        failure=model_call_cap | Episode cap reached: 8 of 8 model calls used (frozen-phase caps). The coordinator policy is not woken again in this episode; the accepted plan and every commitment stay as they are.
+  rejected tool calls: [(5, '23:13', 'query_status', 'STATUS_UNAVAILABLE'), (8, '23:15', 'query_status', 'STATUS_UNAVAILABLE')]
+  receipts: [('23:18', 'coordinator_k7', 'hold_resource', 'applied', 'Held standby_projector for demonstrations until 18:30 (2800 cents reserved, 0 cents fee)'), ('23:22', 'coordinator_k7', 'release_hold', 'applied', 'Released hold hold_0001; 2800 reserved cents returned'), ('23:23', 'coordinator_k7', 'hold_resource', 'applied', 'Held standby_projector for demonstrations until 18:35 (2800 cents reserved, 0 cents fee)'), ('23:26', 'organizer_k7', 'update_grant', 'applied', 'Organizer updated grant_coordinator_k7: committed limit 0->2800, reserved limit 2800->2800 (Organizer approves authoriza')]

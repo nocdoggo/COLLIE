@@ -1,0 +1,15 @@
+====================================================================================================
+ev_w2n__P0__once  C11 class=goal status=completed policy=P0 seed=None
+  failure_reasons=['goal not complete'] caps=[] decided_by=None infeas_reported=True goal=False
+  model outcomes={} calls=0 failed=0 usd=0
+  failed predicates: [('p_required', 'skills_exchange is failed; closing is failed')]
+  extraction: [('fac_note_2', 'abstained', [])]
+  record errors: {}  invalid_attempts={'by_code': {}, 'by_tool': {}, 'count': 0}
+  churn={'altered_assignments': 0, 'committed_revisions': 0, 'previously_valid_altered': 0, 'total': 0} recovery={'delay_minutes': 76, 'horizon_minutes': 76, 'note': 'unrecovered: a failure, recorded with the horizon', 'recovered': False, 'required': True, 'update_at': '2026-12-03T22:24:00+00:00'}
+   dec_0001 22:10 keep        | Keep plan v1: it passes every hard check under its stated assumptions; lent_projector is expected (catalog) for demonstrations at 18:00.
+   dec_0002 22:22 keep        | Keep plan v1: it passes every hard check under its stated assumptions; lent_projector is available (arrival observation) for demonstrations at 18:00.
+   dec_0003 22:24 unresolved  | Notice obs_0002 is outside the supported message forms, so it is not read as a claim; left unresolved. No plan change.
+   dec_0004 22:40 infeasible  | No candidate in the declared action space (Templates keep; swap(demonstrations, skills_exchange); shift(demonstrations: +5, +10 min); shift(skills_exchange: +5, +10 min); substitute(demonstrations: lent_projector -> spare_projector); at most 2 combined edits; 
+   dec_0005 23:00 infeasible  | No candidate in the declared action space (Templates keep; swap(demonstrations, skills_exchange); shift(demonstrations: +5, +10 min); shift(skills_exchange: +5, +10 min); substitute(demonstrations: lent_projector -> spare_projector); at most 2 combined edits; 
+   dec_0006 23:30 keep        | No activity remains to re-plan in plan v1: completed demonstrations, setup, welcome; in progress none; failed closing, skills_exchange. No action can change these records.
+  receipts: [('22:24', 'p_swap_facilitator', 'submit_observation', 'applied', 'Recorded observation obs_0002 from p_swap_facilitator (content is data, not a command)')]

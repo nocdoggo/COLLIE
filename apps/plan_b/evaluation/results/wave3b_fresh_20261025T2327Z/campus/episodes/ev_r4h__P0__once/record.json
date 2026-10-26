@@ -1,0 +1,149 @@
+{
+ "case_ref": "ev_r4h",
+ "choice": "rules",
+ "dry_run": false,
+ "episode_caps": {
+  "max_model_calls": 8,
+  "max_tool_calls": 48,
+  "model_calls": 0,
+  "phase": "frozen",
+  "reached": [],
+  "tool_calls": 30
+ },
+ "errors": [],
+ "finished_at": "2026-10-25T23:29:31Z",
+ "key": "ev_r4h__P0__once",
+ "measured_files_sha256": "c3ad3118a4a1ab349c0404e84b1c3a4607d389a872e83ebc4dd1deabbf92488a",
+ "mode_label": "Deterministic policy",
+ "model": {
+  "by_purpose": {},
+  "calls": 0,
+  "completion_tokens": 0,
+  "cost_basis": [],
+  "cost_usd": 0,
+  "failed": 0,
+  "latency_ms": 0,
+  "max_tokens": [],
+  "outcomes": {},
+  "prompt_tokens": 0,
+  "reasoning_tokens": 0,
+  "retries": 0,
+  "returned": [],
+  "seed_fields": []
+ },
+ "model_source": "none",
+ "order_position": 7,
+ "outcome": {
+  "activities": [
+   {
+    "activity_id": "setup",
+    "completed_at": "2026-12-03T22:20:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-12-03T22:00:00Z"
+   },
+   {
+    "activity_id": "welcome",
+    "completed_at": "2026-12-03T22:40:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-12-03T22:30:00Z"
+   },
+   {
+    "activity_id": "demonstrations",
+    "completed_at": "2026-12-03T23:30:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-12-03T23:10:00Z"
+   },
+   {
+    "activity_id": "skills_exchange",
+    "completed_at": "2026-12-03T23:00:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-12-03T22:40:00Z"
+   },
+   {
+    "activity_id": "closing",
+    "completed_at": "2026-12-03T23:40:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-12-03T23:30:00Z"
+   }
+  ],
+  "applied_plans": 1,
+  "changed_assignments": 1,
+  "committed_cents": 0,
+  "duplicate_records_rejected": 0,
+  "episode_caps": {
+   "max_model_calls": 8,
+   "max_tool_calls": 48,
+   "model_calls": 0,
+   "phase": "frozen",
+   "reached": [],
+   "tool_calls": 30
+  },
+  "episode_id": "ep_c0e8c15145be",
+  "failed_status_queries": 0,
+  "final_clock": "2026-12-03T23:40:00Z",
+  "final_revision": 24,
+  "goal_complete": true,
+  "holds": {
+   "active_at_end": 0,
+   "committed": 0,
+   "created": 0,
+   "expired": 0,
+   "fulfilled": 0,
+   "released": 0
+  },
+  "infeasibility_reported": false,
+  "mode_label": "Deterministic policy",
+  "policy_id": "rules/1.0.0",
+  "recovery_delay_minutes": 3,
+  "rejected_attempts_without_receipt": 0,
+  "rejected_receipts": 0,
+  "report_version": "1.0.0",
+  "reserved_cents_at_end": 0,
+  "scenario_id": "fixture_w5",
+  "service": [],
+  "staff_confirmations": 0,
+  "status_queries": 2,
+  "stock": [],
+  "unnecessary_reservations": 0,
+  "violations": []
+ },
+ "policy": "P0",
+ "policy_id": "rules/1.0.0",
+ "record": "plan_b.eval_episode/1.0.0",
+ "seed": null,
+ "seed_passed": false,
+ "started_at": "2026-10-25T23:29:28Z",
+ "status": "completed",
+ "suite": "campus",
+ "tool_calls": {
+  "by_status": {
+   "succeeded": 30
+  },
+  "by_tool": {
+   "apply_plan": 1,
+   "evaluate_candidates": 12,
+   "get_event_state": 15,
+   "query_status": 2
+  },
+  "rejected": [],
+  "total": 30
+ },
+ "trace": {
+  "bytes": 3052255,
+  "file": "trace.json.gz",
+  "sha256": "71957199622d388463f30b6fe52d037cb8a2659e7c629f5bec4c9a6d82b9d0ba",
+  "verify": "intact"
+ },
+ "trial": 1,
+ "wall_seconds": 2.9
+}

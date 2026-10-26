@@ -1,0 +1,132 @@
+{
+ "cases": [
+  {
+   "achievable_on_time": null,
+   "actionable_record_ids": [
+    "van_txt_3082"
+   ],
+   "annotations": [
+    {
+     "booking_ref": "Q73",
+     "claimed_change": "delay",
+     "effective_time": null,
+     "event_id": "e_gallery_w5",
+     "note": "States lateness ('won't make your six o'clock slot', 'a few minutes after') without an exact time.",
+     "resource_id": "lent_projector",
+     "source_id": "q73_van",
+     "source_record_id": "van_txt_3082",
+     "unknown_fields": [
+      "effective_time"
+     ]
+    }
+   ],
+   "case_id": "C09",
+   "case_ref": "ev_r4h",
+   "condition": "Genuine projector delivery delay",
+   "heldout": true,
+   "negative_control": false,
+   "negative_control_evidence": null,
+   "outcome_class": "goal",
+   "profile_id": "campus_showcase",
+   "requires_recovery": true,
+   "scenario_id": "fixture_w5",
+   "suite": "campus",
+   "target_quantity": null
+  },
+  {
+   "achievable_on_time": null,
+   "actionable_record_ids": [],
+   "annotations": [
+    {
+     "booking_ref": null,
+     "claimed_change": "delay",
+     "effective_time": "2026-12-03T18:20:00-05:00",
+     "event_id": "e_gallery_w5",
+     "note": "Relayed anonymous call ('someone phoned', 'didn't leave a name'), hedged ('could be'); names no order.",
+     "resource_id": "lent_projector",
+     "source_id": "front_desk_line",
+     "source_record_id": "desk_relay_57",
+     "unknown_fields": [
+      "booking_ref"
+     ]
+    }
+   ],
+   "case_id": "C10",
+   "case_ref": "ev_j8p",
+   "condition": "Plausible false delivery warning",
+   "heldout": true,
+   "negative_control": true,
+   "negative_control_evidence": "With a coordinator that changes nothing the original plan completes: the warning is false (order desk on schedule, ETA 17:48, records observed at 17:09 and 17:29; checked in at 17:47, before demonstrations at 18:00); the facilitator checks in at 17:33 and the presenter at 17:51 with windows covering their slots. Replayed by tests/test_heldout2_cases.py.",
+   "outcome_class": "goal",
+   "profile_id": "campus_showcase",
+   "requires_recovery": false,
+   "scenario_id": "fixture_w5",
+   "suite": "campus",
+   "target_quantity": null
+  },
+  {
+   "achievable_on_time": null,
+   "actionable_record_ids": [
+    "fac_note_2"
+   ],
+   "annotations": [
+    {
+     "booking_ref": null,
+     "claimed_change": "delay",
+     "effective_time": "2026-12-03T17:55:00-05:00",
+     "event_id": "e_gallery_w5",
+     "note": "Self-report of the person's own arrival time.",
+     "resource_id": "swap_facilitator",
+     "source_id": "p_swap_facilitator",
+     "source_record_id": "fac_note_2",
+     "unknown_fields": [
+      "booking_ref"
+     ]
+    }
+   ],
+   "case_id": "C11",
+   "case_ref": "ev_w2n",
+   "condition": "Volunteer late, with a subsequent check-in",
+   "heldout": true,
+   "negative_control": false,
+   "negative_control_evidence": null,
+   "outcome_class": "goal",
+   "profile_id": "campus_showcase",
+   "requires_recovery": true,
+   "scenario_id": "fixture_w5",
+   "suite": "campus",
+   "target_quantity": null
+  },
+  {
+   "achievable_on_time": null,
+   "actionable_record_ids": [],
+   "annotations": [
+    {
+     "booking_ref": "Q81",
+     "claimed_change": "unavailability",
+     "effective_time": null,
+     "event_id": "e_gallery_h3",
+     "note": "The lender's own notice that the unit will not come.",
+     "resource_id": "lent_projector",
+     "source_id": "lab_front_desk",
+     "source_record_id": "lab_note_640",
+     "unknown_fields": [
+      "effective_time"
+     ]
+    }
+   ],
+   "case_id": "C12",
+   "case_ref": "ev_s6d",
+   "condition": "No feasible recovery under the authorized constraints",
+   "heldout": true,
+   "negative_control": false,
+   "negative_control_evidence": null,
+   "outcome_class": "infeasible",
+   "profile_id": "campus_showcase",
+   "requires_recovery": false,
+   "scenario_id": "fixture_h3",
+   "suite": "campus",
+   "target_quantity": null
+  }
+ ]
+}

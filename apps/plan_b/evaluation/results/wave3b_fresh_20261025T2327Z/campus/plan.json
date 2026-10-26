@@ -1,0 +1,414 @@
+{
+ "artifact": "plan_b.eval_run_plan",
+ "case_refs": [
+  "ev_r4h",
+  "ev_j8p",
+  "ev_w2n",
+  "ev_s6d"
+ ],
+ "created_at": "2026-10-25T23:27:31Z",
+ "dry_run": false,
+ "episode_caps": {
+  "max_model_calls": 8,
+  "max_tool_calls": 48,
+  "phase": "frozen"
+ },
+ "episode_timeout_s": 900.0,
+ "episodes": [
+  {
+   "case_ref": "ev_r4h",
+   "choice": "live",
+   "key": "ev_r4h__P2__s101",
+   "policy": "P2",
+   "position": 1,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "ev_r4h",
+   "choice": "live",
+   "key": "ev_r4h__P2__s202",
+   "policy": "P2",
+   "position": 2,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "ev_r4h",
+   "choice": "tool-use",
+   "key": "ev_r4h__P1__s202",
+   "policy": "P1",
+   "position": 3,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "ev_r4h",
+   "choice": "verify-all",
+   "key": "ev_r4h__P3__s303",
+   "policy": "P3",
+   "position": 4,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "ev_r4h",
+   "choice": "verify-all",
+   "key": "ev_r4h__P3__s101",
+   "policy": "P3",
+   "position": 5,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "ev_r4h",
+   "choice": "tool-use",
+   "key": "ev_r4h__P1__s303",
+   "policy": "P1",
+   "position": 6,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "ev_r4h",
+   "choice": "rules",
+   "key": "ev_r4h__P0__once",
+   "policy": "P0",
+   "position": 7,
+   "seed": null,
+   "trial": 1
+  },
+  {
+   "case_ref": "ev_r4h",
+   "choice": "live",
+   "key": "ev_r4h__P2__s303",
+   "policy": "P2",
+   "position": 8,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "ev_r4h",
+   "choice": "tool-use",
+   "key": "ev_r4h__P1__s101",
+   "policy": "P1",
+   "position": 9,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "ev_r4h",
+   "choice": "verify-all",
+   "key": "ev_r4h__P3__s202",
+   "policy": "P3",
+   "position": 10,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "ev_j8p",
+   "choice": "live",
+   "key": "ev_j8p__P2__s101",
+   "policy": "P2",
+   "position": 1,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "ev_j8p",
+   "choice": "tool-use",
+   "key": "ev_j8p__P1__s303",
+   "policy": "P1",
+   "position": 2,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "ev_j8p",
+   "choice": "verify-all",
+   "key": "ev_j8p__P3__s101",
+   "policy": "P3",
+   "position": 3,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "ev_j8p",
+   "choice": "rules",
+   "key": "ev_j8p__P0__once",
+   "policy": "P0",
+   "position": 4,
+   "seed": null,
+   "trial": 1
+  },
+  {
+   "case_ref": "ev_j8p",
+   "choice": "verify-all",
+   "key": "ev_j8p__P3__s303",
+   "policy": "P3",
+   "position": 5,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "ev_j8p",
+   "choice": "tool-use",
+   "key": "ev_j8p__P1__s101",
+   "policy": "P1",
+   "position": 6,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "ev_j8p",
+   "choice": "tool-use",
+   "key": "ev_j8p__P1__s202",
+   "policy": "P1",
+   "position": 7,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "ev_j8p",
+   "choice": "live",
+   "key": "ev_j8p__P2__s303",
+   "policy": "P2",
+   "position": 8,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "ev_j8p",
+   "choice": "verify-all",
+   "key": "ev_j8p__P3__s202",
+   "policy": "P3",
+   "position": 9,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "ev_j8p",
+   "choice": "live",
+   "key": "ev_j8p__P2__s202",
+   "policy": "P2",
+   "position": 10,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "ev_w2n",
+   "choice": "tool-use",
+   "key": "ev_w2n__P1__s202",
+   "policy": "P1",
+   "position": 1,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "ev_w2n",
+   "choice": "verify-all",
+   "key": "ev_w2n__P3__s101",
+   "policy": "P3",
+   "position": 2,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "ev_w2n",
+   "choice": "verify-all",
+   "key": "ev_w2n__P3__s303",
+   "policy": "P3",
+   "position": 3,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "ev_w2n",
+   "choice": "tool-use",
+   "key": "ev_w2n__P1__s303",
+   "policy": "P1",
+   "position": 4,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "ev_w2n",
+   "choice": "live",
+   "key": "ev_w2n__P2__s101",
+   "policy": "P2",
+   "position": 5,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "ev_w2n",
+   "choice": "tool-use",
+   "key": "ev_w2n__P1__s101",
+   "policy": "P1",
+   "position": 6,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "ev_w2n",
+   "choice": "verify-all",
+   "key": "ev_w2n__P3__s202",
+   "policy": "P3",
+   "position": 7,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "ev_w2n",
+   "choice": "live",
+   "key": "ev_w2n__P2__s303",
+   "policy": "P2",
+   "position": 8,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "ev_w2n",
+   "choice": "rules",
+   "key": "ev_w2n__P0__once",
+   "policy": "P0",
+   "position": 9,
+   "seed": null,
+   "trial": 1
+  },
+  {
+   "case_ref": "ev_w2n",
+   "choice": "live",
+   "key": "ev_w2n__P2__s202",
+   "policy": "P2",
+   "position": 10,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "ev_s6d",
+   "choice": "live",
+   "key": "ev_s6d__P2__s202",
+   "policy": "P2",
+   "position": 1,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "ev_s6d",
+   "choice": "rules",
+   "key": "ev_s6d__P0__once",
+   "policy": "P0",
+   "position": 2,
+   "seed": null,
+   "trial": 1
+  },
+  {
+   "case_ref": "ev_s6d",
+   "choice": "live",
+   "key": "ev_s6d__P2__s101",
+   "policy": "P2",
+   "position": 3,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "ev_s6d",
+   "choice": "verify-all",
+   "key": "ev_s6d__P3__s303",
+   "policy": "P3",
+   "position": 4,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "ev_s6d",
+   "choice": "verify-all",
+   "key": "ev_s6d__P3__s202",
+   "policy": "P3",
+   "position": 5,
+   "seed": 202,
+   "trial": 2
+  },
+  {
+   "case_ref": "ev_s6d",
+   "choice": "live",
+   "key": "ev_s6d__P2__s303",
+   "policy": "P2",
+   "position": 6,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "ev_s6d",
+   "choice": "verify-all",
+   "key": "ev_s6d__P3__s101",
+   "policy": "P3",
+   "position": 7,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "ev_s6d",
+   "choice": "tool-use",
+   "key": "ev_s6d__P1__s303",
+   "policy": "P1",
+   "position": 8,
+   "seed": 303,
+   "trial": 3
+  },
+  {
+   "case_ref": "ev_s6d",
+   "choice": "tool-use",
+   "key": "ev_s6d__P1__s101",
+   "policy": "P1",
+   "position": 9,
+   "seed": 101,
+   "trial": 1
+  },
+  {
+   "case_ref": "ev_s6d",
+   "choice": "tool-use",
+   "key": "ev_s6d__P1__s202",
+   "policy": "P1",
+   "position": 10,
+   "seed": 202,
+   "trial": 2
+  }
+ ],
+ "freeze_sha256": "cdc7a224c770bd4217002c5e3098a1ab96c963a48efe8e21069b289f852cb3bf",
+ "heldout": true,
+ "heldout_files_sha256": "ae805462c55116d3e6c8e9760facd1f42e5c5751e50adacccebdcc58d7a9000e",
+ "heldout_sha256": "a1aecb9f75a86777fe42940c2f5e9b6ecd4388433fa451f3272cc279ef4a68c2",
+ "measured_files_sha256": "c3ad3118a4a1ab349c0404e84b1c3a4607d389a872e83ebc4dd1deabbf92488a",
+ "model": {
+  "base_url": "https://openrouter.ai/api/v1",
+  "max_run_cost_usd": 0.5,
+  "model_id": "anthropic/claude-sonnet-5.5",
+  "provider": "openrouter"
+ },
+ "model_response_cache": false,
+ "order_over": [
+  "P0",
+  "P1",
+  "P2",
+  "P3"
+ ],
+ "order_seed": 20261025,
+ "policies": [
+  "P0",
+  "P1",
+  "P2",
+  "P3"
+ ],
+ "policy_factory": null,
+ "policy_subset": false,
+ "protocol_version": "plan_b.eval_protocol/1.0.0",
+ "seeds": [
+  101,
+  202,
+  303
+ ],
+ "start_method": "spawn",
+ "suite": "campus"
+}

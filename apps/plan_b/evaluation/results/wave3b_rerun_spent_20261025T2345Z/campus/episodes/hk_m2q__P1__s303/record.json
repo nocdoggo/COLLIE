@@ -1,0 +1,193 @@
+{
+ "case_ref": "hk_m2q",
+ "choice": "tool-use",
+ "dry_run": false,
+ "episode_caps": {
+  "max_model_calls": 8,
+  "max_tool_calls": 48,
+  "model_calls": 8,
+  "phase": "frozen",
+  "reached": [
+   "model_calls"
+  ],
+  "tool_calls": 30
+ },
+ "errors": [
+  {
+   "decision_id": "dec_0009",
+   "decision_kind": "wait",
+   "failure": "stale_revision",
+   "kind": "decision_failure",
+   "recorded_by": "policy"
+  },
+  {
+   "decision_id": "dec_0013",
+   "decision_kind": "stop",
+   "failure": "model_call_cap",
+   "kind": "decision_failure",
+   "recorded_by": "host"
+  }
+ ],
+ "finished_at": "2026-10-25T23:45:52Z",
+ "key": "hk_m2q__P1__s303",
+ "measured_files_sha256": "c3ad3118a4a1ab349c0404e84b1c3a4607d389a872e83ebc4dd1deabbf92488a",
+ "mode_label": "Tool-use agent \u00b7 anthropic/claude-sonnet-5.5",
+ "model": {
+  "by_purpose": {
+   "tool_turn": 8
+  },
+  "calls": 8,
+  "completion_tokens": 5233,
+  "cost_basis": [
+   "provider_usage"
+  ],
+  "cost_usd": 0.269058,
+  "failed": 0,
+  "latency_ms": 46546,
+  "max_tokens": [
+   4096
+  ],
+  "outcomes": {
+   "ok": 8
+  },
+  "prompt_tokens": 108364,
+  "reasoning_tokens": 3106,
+  "retries": 0,
+  "returned": [
+   "anthropic/claude-sonnet-5.5"
+  ],
+  "seed_fields": [
+   {
+    "seed": 303,
+    "seed_echo": null,
+    "seed_sent": false
+   }
+  ]
+ },
+ "model_source": "provider",
+ "order_position": 1,
+ "outcome": {
+  "activities": [
+   {
+    "activity_id": "setup",
+    "completed_at": "2026-11-12T23:20:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-12T23:00:00Z"
+   },
+   {
+    "activity_id": "welcome",
+    "completed_at": "2026-11-12T23:40:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-12T23:30:00Z"
+   },
+   {
+    "activity_id": "demonstrations",
+    "completed_at": "2026-11-13T00:20:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-13T00:00:00Z"
+   },
+   {
+    "activity_id": "skills_exchange",
+    "completed_at": "2026-11-13T00:00:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-12T23:40:00Z"
+   },
+   {
+    "activity_id": "closing",
+    "completed_at": "2026-11-13T00:30:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-11-13T00:20:00Z"
+   }
+  ],
+  "applied_plans": 1,
+  "changed_assignments": 2,
+  "committed_cents": 0,
+  "duplicate_records_rejected": 0,
+  "episode_caps": {
+   "max_model_calls": 8,
+   "max_tool_calls": 48,
+   "model_calls": 8,
+   "phase": "frozen",
+   "reached": [
+    "model_calls"
+   ],
+   "tool_calls": 30
+  },
+  "episode_id": "ep_ebe4f12f58ea",
+  "failed_status_queries": 0,
+  "final_clock": "2026-11-13T00:30:00Z",
+  "final_revision": 27,
+  "goal_complete": true,
+  "holds": {
+   "active_at_end": 0,
+   "committed": 0,
+   "created": 1,
+   "expired": 0,
+   "fulfilled": 0,
+   "released": 1
+  },
+  "infeasibility_reported": false,
+  "mode_label": "Tool-use agent \u00b7 anthropic/claude-sonnet-5.5",
+  "policy_id": "tool-use/1.2.0",
+  "recovery_delay_minutes": 5,
+  "rejected_attempts_without_receipt": 0,
+  "rejected_receipts": 1,
+  "report_version": "1.0.0",
+  "reserved_cents_at_end": 0,
+  "scenario_id": "fixture_k7",
+  "service": [],
+  "staff_confirmations": 0,
+  "status_queries": 3,
+  "stock": [],
+  "unnecessary_reservations": 0,
+  "violations": []
+ },
+ "policy": "P1",
+ "policy_id": "tool-use/1.2.0",
+ "record": "plan_b.eval_episode/1.0.0",
+ "seed": 303,
+ "seed_passed": true,
+ "started_at": "2026-10-25T23:45:01Z",
+ "status": "capped",
+ "suite": "campus",
+ "tool_calls": {
+  "by_status": {
+   "rejected": 1,
+   "succeeded": 29
+  },
+  "by_tool": {
+   "apply_plan": 1,
+   "evaluate_candidates": 10,
+   "get_event_state": 13,
+   "hold_resource": 1,
+   "query_status": 3,
+   "release_hold": 2
+  },
+  "rejected": [
+   {
+    "call_id": "call_00024",
+    "error_code": "REVISION_CONFLICT",
+    "tool": "release_hold"
+   }
+  ],
+  "total": 30
+ },
+ "trace": {
+  "bytes": 3537335,
+  "file": "trace.json.gz",
+  "sha256": "0a2d0a4e4a6aa392f1a57e3268606e3ed573727f90f43b453a388dfb6ec465b6",
+  "verify": "intact"
+ },
+ "trial": 3,
+ "wall_seconds": 50.3
+}

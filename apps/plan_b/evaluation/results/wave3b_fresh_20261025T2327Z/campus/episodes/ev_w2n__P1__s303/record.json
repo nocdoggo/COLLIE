@@ -1,0 +1,164 @@
+{
+ "case_ref": "ev_w2n",
+ "choice": "tool-use",
+ "dry_run": false,
+ "episode_caps": {
+  "max_model_calls": 8,
+  "max_tool_calls": 48,
+  "model_calls": 3,
+  "phase": "frozen",
+  "reached": [],
+  "tool_calls": 20
+ },
+ "errors": [],
+ "finished_at": "2026-10-25T23:33:16Z",
+ "key": "ev_w2n__P1__s303",
+ "measured_files_sha256": "c3ad3118a4a1ab349c0404e84b1c3a4607d389a872e83ebc4dd1deabbf92488a",
+ "mode_label": "Tool-use agent \u00b7 anthropic/claude-sonnet-5.5",
+ "model": {
+  "by_purpose": {
+   "tool_turn": 3
+  },
+  "calls": 3,
+  "completion_tokens": 2422,
+  "cost_basis": [
+   "provider_usage"
+  ],
+  "cost_usd": 0.10219,
+  "failed": 0,
+  "latency_ms": 22128,
+  "max_tokens": [
+   4096
+  ],
+  "outcomes": {
+   "ok": 3
+  },
+  "prompt_tokens": 38985,
+  "reasoning_tokens": 1671,
+  "retries": 0,
+  "returned": [
+   "anthropic/claude-sonnet-5.5"
+  ],
+  "seed_fields": [
+   {
+    "seed": 303,
+    "seed_echo": null,
+    "seed_sent": false
+   }
+  ]
+ },
+ "model_source": "provider",
+ "order_position": 4,
+ "outcome": {
+  "activities": [
+   {
+    "activity_id": "setup",
+    "completed_at": "2026-12-03T22:20:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-12-03T22:00:00Z"
+   },
+   {
+    "activity_id": "welcome",
+    "completed_at": "2026-12-03T22:40:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-12-03T22:30:00Z"
+   },
+   {
+    "activity_id": "demonstrations",
+    "completed_at": "2026-12-03T23:00:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-12-03T22:40:00Z"
+   },
+   {
+    "activity_id": "skills_exchange",
+    "completed_at": "2026-12-03T23:20:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-12-03T23:00:00Z"
+   },
+   {
+    "activity_id": "closing",
+    "completed_at": "2026-12-03T23:40:00Z",
+    "failure_reasons": [],
+    "lifecycle": "completed",
+    "required": true,
+    "started_at": "2026-12-03T23:30:00Z"
+   }
+  ],
+  "applied_plans": 1,
+  "changed_assignments": 2,
+  "committed_cents": 0,
+  "duplicate_records_rejected": 0,
+  "episode_caps": {
+   "max_model_calls": 8,
+   "max_tool_calls": 48,
+   "model_calls": 3,
+   "phase": "frozen",
+   "reached": [],
+   "tool_calls": 20
+  },
+  "episode_id": "ep_3f3c02e52017",
+  "failed_status_queries": 0,
+  "final_clock": "2026-12-03T23:40:00Z",
+  "final_revision": 23,
+  "goal_complete": true,
+  "holds": {
+   "active_at_end": 0,
+   "committed": 0,
+   "created": 0,
+   "expired": 0,
+   "fulfilled": 0,
+   "released": 0
+  },
+  "infeasibility_reported": false,
+  "mode_label": "Tool-use agent \u00b7 anthropic/claude-sonnet-5.5",
+  "policy_id": "tool-use/1.2.0",
+  "recovery_delay_minutes": 1,
+  "rejected_attempts_without_receipt": 0,
+  "rejected_receipts": 0,
+  "report_version": "1.0.0",
+  "reserved_cents_at_end": 0,
+  "scenario_id": "fixture_w5",
+  "service": [],
+  "staff_confirmations": 0,
+  "status_queries": 0,
+  "stock": [],
+  "unnecessary_reservations": 0,
+  "violations": []
+ },
+ "policy": "P1",
+ "policy_id": "tool-use/1.2.0",
+ "record": "plan_b.eval_episode/1.0.0",
+ "seed": 303,
+ "seed_passed": true,
+ "started_at": "2026-10-25T23:32:51Z",
+ "status": "completed",
+ "suite": "campus",
+ "tool_calls": {
+  "by_status": {
+   "succeeded": 20
+  },
+  "by_tool": {
+   "apply_plan": 1,
+   "evaluate_candidates": 7,
+   "get_event_state": 12
+  },
+  "rejected": [],
+  "total": 20
+ },
+ "trace": {
+  "bytes": 2391931,
+  "file": "trace.json.gz",
+  "sha256": "33d1b576f962f3a874be331439d5d1a9f7c0803bf5438d5eda1e2e07435d4c74",
+  "verify": "intact"
+ },
+ "trial": 3,
+ "wall_seconds": 25.0
+}

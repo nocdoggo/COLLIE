@@ -1,0 +1,43 @@
+start 2026-10-25T23:56:53Z suite=pantry jobs=2 cap=40
+hp_4ra__P2__s303: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=6 tool_calls=23 cost_usd=0.070222
+hp_4ra__P1__s101: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=6 tool_calls=26 cost_usd=0.185472
+hp_4ra__P2__s202: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=6 tool_calls=23 cost_usd=0.067242
+hp_4ra__P3__s202: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=5 tool_calls=27 cost_usd=0.05525
+hp_4ra__P2__s101: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=6 tool_calls=23 cost_usd=0.069652
+hp_4ra__P1__s303: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=7 tool_calls=25 cost_usd=0.20822
+hp_4ra__P3__s303: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=5 tool_calls=27 cost_usd=0.05606
+hp_4ra__P3__s101: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=5 tool_calls=27 cost_usd=0.05489
+hp_4ra__P0__once: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=0 tool_calls=26 cost_usd=0
+hp_4ra__P1__s202: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=5 tool_calls=20 cost_usd=0.151268
+hp_k2e__P1__s101: capped goal_complete=True infeasibility_reported=False violations=0 model_calls=8 tool_calls=21 cost_usd=0.230292
+hp_k2e__P0__once: completed goal_complete=True infeasibility_reported=False violations=0 model_calls=0 tool_calls=32 cost_usd=0
+hp_k2e__P3__s303: capped goal_complete=False infeasibility_reported=False violations=0 model_calls=8 tool_calls=24 cost_usd=0.082518
+hp_k2e__P2__s303: capped goal_complete=True infeasibility_reported=False violations=0 model_calls=8 tool_calls=21 cost_usd=0.081264
+hp_k2e__P3__s202: capped goal_complete=False infeasibility_reported=False violations=0 model_calls=8 tool_calls=24 cost_usd=0.084788
+hp_k2e__P2__s101: capped goal_complete=True infeasibility_reported=False violations=0 model_calls=8 tool_calls=21 cost_usd=0.081614
+hp_k2e__P3__s101: capped goal_complete=False infeasibility_reported=False violations=0 model_calls=8 tool_calls=24 cost_usd=0.086738
+hp_k2e__P1__s202: capped goal_complete=True infeasibility_reported=False violations=0 model_calls=8 tool_calls=21 cost_usd=0.226888
+hp_k2e__P1__s303: capped goal_complete=True infeasibility_reported=False violations=0 model_calls=8 tool_calls=21 cost_usd=0.228708
+hp_k2e__P2__s202: capped goal_complete=True infeasibility_reported=False violations=0 model_calls=8 tool_calls=21 cost_usd=0.080864
+hp_v7s__P0__once: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=0 tool_calls=21 cost_usd=0
+hp_v7s__P3__s303: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=4 tool_calls=25 cost_usd=0.047582
+hp_v7s__P3__s202: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=4 tool_calls=25 cost_usd=0.048042
+hp_v7s__P1__s202: capped goal_complete=False infeasibility_reported=True violations=0 model_calls=8 tool_calls=22 cost_usd=0.244066
+hp_v7s__P2__s101: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=7 tool_calls=32 cost_usd=0.086308
+hp_v7s__P3__s101: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=4 tool_calls=25 cost_usd=0.050092
+hp_v7s__P2__s303: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=7 tool_calls=32 cost_usd=0.084988
+hp_v7s__P1__s101: capped goal_complete=False infeasibility_reported=True violations=0 model_calls=8 tool_calls=21 cost_usd=0.249488
+hp_v7s__P1__s303: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=6 tool_calls=25 cost_usd=0.193496
+hp_v7s__P2__s202: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=7 tool_calls=32 cost_usd=0.085028
+hp_g9m__P3__s202: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=5 tool_calls=31 cost_usd=0.054854
+hp_g9m__P3__s303: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=5 tool_calls=31 cost_usd=0.056494
+hp_g9m__P1__s101: capped goal_complete=False infeasibility_reported=True violations=0 model_calls=8 tool_calls=26 cost_usd=0.250708
+hp_g9m__P2__s202: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=6 tool_calls=28 cost_usd=0.07515
+hp_g9m__P0__once: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=0 tool_calls=29 cost_usd=0
+hp_g9m__P2__s101: capped goal_complete=False infeasibility_reported=True violations=0 model_calls=8 tool_calls=30 cost_usd=0.101812
+hp_g9m__P3__s101: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=5 tool_calls=31 cost_usd=0.055364
+hp_g9m__P1__s303: capped goal_complete=False infeasibility_reported=False violations=0 model_calls=8 tool_calls=25 cost_usd=0.244458
+hp_g9m__P2__s303: completed goal_complete=False infeasibility_reported=True violations=0 model_calls=7 tool_calls=30 cost_usd=0.09127
+hp_g9m__P1__s202: capped goal_complete=False infeasibility_reported=False violations=0 model_calls=8 tool_calls=27 cost_usd=0.247858
+40 planned, 0 already finished, 40 run: {'completed': 25, 'capped': 15}
+end 2026-10-26T00:09:15Z suite=pantry rc=0

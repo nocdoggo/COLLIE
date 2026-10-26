@@ -1,0 +1,7638 @@
+{
+ "aborted": [],
+ "by_case": {
+  "hk_7vd": {
+   "case_id": "C02",
+   "negative_control": true,
+   "outcome_class": "goal",
+   "policies": {
+    "P0": {
+     "n": 1,
+     "planned": 1,
+     "status_checks_mean": 1.0,
+     "success": 1,
+     "unnecessary_changes": 0
+    },
+    "P1": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 1.3333333333333333,
+     "success": 3,
+     "unnecessary_changes": 0
+    },
+    "P2": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 1.0,
+     "success": 3,
+     "unnecessary_changes": 0
+    },
+    "P3": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 2.0,
+     "success": 3,
+     "unnecessary_changes": 0
+    }
+   }
+  },
+  "hk_b3t": {
+   "case_id": "C05",
+   "negative_control": false,
+   "outcome_class": "goal",
+   "policies": {
+    "P0": {
+     "n": 1,
+     "planned": 1,
+     "status_checks_mean": 1.0,
+     "success": 1,
+     "unnecessary_changes": null
+    },
+    "P1": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 1.0,
+     "success": 3,
+     "unnecessary_changes": null
+    },
+    "P2": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 2.0,
+     "success": 3,
+     "unnecessary_changes": null
+    },
+    "P3": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 4.0,
+     "success": 3,
+     "unnecessary_changes": null
+    }
+   }
+  },
+  "hk_d5w": {
+   "case_id": "C03",
+   "negative_control": true,
+   "outcome_class": "goal",
+   "policies": {
+    "P0": {
+     "n": 1,
+     "planned": 1,
+     "status_checks_mean": 1.0,
+     "success": 1,
+     "unnecessary_changes": 0
+    },
+    "P1": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 2.0,
+     "success": 3,
+     "unnecessary_changes": 0
+    },
+    "P2": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 1.0,
+     "success": 3,
+     "unnecessary_changes": 0
+    },
+    "P3": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 2.0,
+     "success": 3,
+     "unnecessary_changes": 0
+    }
+   }
+  },
+  "hk_f6k": {
+   "case_id": "C07",
+   "negative_control": false,
+   "outcome_class": "goal",
+   "policies": {
+    "P0": {
+     "n": 1,
+     "planned": 1,
+     "status_checks_mean": 1.0,
+     "success": 0,
+     "unnecessary_changes": null
+    },
+    "P1": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 2.3333333333333335,
+     "success": 3,
+     "unnecessary_changes": null
+    },
+    "P2": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 3.0,
+     "success": 0,
+     "unnecessary_changes": null
+    },
+    "P3": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 3.0,
+     "success": 3,
+     "unnecessary_changes": null
+    }
+   }
+  },
+  "hk_m2q": {
+   "case_id": "C01",
+   "negative_control": false,
+   "outcome_class": "goal",
+   "policies": {
+    "P0": {
+     "n": 1,
+     "planned": 1,
+     "status_checks_mean": 2.0,
+     "success": 1,
+     "unnecessary_changes": null
+    },
+    "P1": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 3.0,
+     "success": 3,
+     "unnecessary_changes": null
+    },
+    "P2": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 1.3333333333333333,
+     "success": 3,
+     "unnecessary_changes": null
+    },
+    "P3": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 2.0,
+     "success": 3,
+     "unnecessary_changes": null
+    }
+   }
+  },
+  "hk_q8n": {
+   "case_id": "C06",
+   "negative_control": false,
+   "outcome_class": "goal",
+   "policies": {
+    "P0": {
+     "n": 1,
+     "planned": 1,
+     "status_checks_mean": 0.0,
+     "success": 0,
+     "unnecessary_changes": null
+    },
+    "P1": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 1.0,
+     "success": 3,
+     "unnecessary_changes": null
+    },
+    "P2": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 0.0,
+     "success": 3,
+     "unnecessary_changes": null
+    },
+    "P3": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 0.0,
+     "success": 3,
+     "unnecessary_changes": null
+    }
+   }
+  },
+  "hk_x9j": {
+   "case_id": "C04",
+   "negative_control": true,
+   "outcome_class": "goal",
+   "policies": {
+    "P0": {
+     "n": 1,
+     "planned": 1,
+     "status_checks_mean": 0.0,
+     "success": 1,
+     "unnecessary_changes": 0
+    },
+    "P1": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 2.0,
+     "success": 3,
+     "unnecessary_changes": 0
+    },
+    "P2": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 1.0,
+     "success": 3,
+     "unnecessary_changes": 0
+    },
+    "P3": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 2.0,
+     "success": 3,
+     "unnecessary_changes": 0
+    }
+   }
+  },
+  "hk_z1c": {
+   "case_id": "C08",
+   "negative_control": false,
+   "outcome_class": "infeasible",
+   "policies": {
+    "P0": {
+     "n": 1,
+     "planned": 1,
+     "status_checks_mean": 1.0,
+     "success": 1,
+     "unnecessary_changes": null
+    },
+    "P1": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 1.6666666666666667,
+     "success": 3,
+     "unnecessary_changes": null
+    },
+    "P2": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 1.0,
+     "success": 3,
+     "unnecessary_changes": null
+    },
+    "P3": {
+     "n": 3,
+     "planned": 3,
+     "status_checks_mean": 2.0,
+     "success": 3,
+     "unnecessary_changes": null
+    }
+   }
+  }
+ },
+ "by_policy": {
+  "P0": {
+   "aborted": 0,
+   "appropriate_infeasibility": {
+    "cases": [
+     "C08"
+    ],
+    "k": 1,
+    "n": 1
+   },
+   "capped": 0,
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 0,
+    "cost_usd": 0,
+    "latency_ms": 0,
+    "model_calls": 0,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 0,
+    "reasoning_tokens": 0,
+    "tool_calls": 189,
+    "wall_seconds": 21.599999999999998
+   },
+   "computation_measured": 8,
+   "decided_by": {
+    "policy": 1
+   },
+   "executed_violations": 0,
+   "extraction": {
+    "abstained": 9,
+    "correct": 3
+   },
+   "goal_completion": {
+    "cases": [
+     "C01",
+     "C02",
+     "C03",
+     "C04",
+     "C05",
+     "C06",
+     "C07"
+    ],
+    "k": 5,
+    "n": 7
+   },
+   "incomplete": 0,
+   "invalid_attempts": 0,
+   "missing": 0,
+   "modeled_cost_cents": 0,
+   "pantry": null,
+   "plan_churn": 4,
+   "planned": 8,
+   "preparation": {
+    "expired_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "unreleased_holds": 0
+   },
+   "recorded": 8,
+   "recovery": {
+    "max_minutes": 25,
+    "median_is_lower_bound": true,
+    "median_minutes": 50.5,
+    "median_recovered_minutes": 14.0,
+    "median_unbounded": false,
+    "min_minutes": 3,
+    "recovered": 2,
+    "required": 4,
+    "unrecovered": 2,
+    "unrecovered_horizons": [
+     76,
+     77
+    ],
+    "unrecovered_unmeasured": 0
+   },
+   "scored": 8,
+   "statuses": {
+    "completed": 8
+   },
+   "unnecessary_changes": {
+    "cases": [
+     "C02",
+     "C03",
+     "C04"
+    ],
+    "committed_changes": 0,
+    "episodes_with_change": 0,
+    "n": 3
+   },
+   "verification": {
+    "distinct_sources": 6,
+    "failed_checks": 1,
+    "repeated_checks": 1,
+    "simulated_minutes": 14,
+    "status_checks": 7
+   }
+  },
+  "P1": {
+   "aborted": 0,
+   "appropriate_infeasibility": {
+    "cases": [
+     "C08"
+    ],
+    "k": 3,
+    "n": 3
+   },
+   "capped": 1,
+   "committed_cents": 8400,
+   "computation": {
+    "completion_tokens": 57841,
+    "cost_usd": 3.003018,
+    "latency_ms": 521546,
+    "model_calls": 90,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 1212304,
+    "reasoning_tokens": 34774,
+    "tool_calls": 558,
+    "wall_seconds": 668.9000000000001
+   },
+   "computation_measured": 24,
+   "decided_by": {
+    "model": 3
+   },
+   "executed_violations": 0,
+   "extraction": {
+    "not_recorded": 36
+   },
+   "goal_completion": {
+    "cases": [
+     "C01",
+     "C02",
+     "C03",
+     "C04",
+     "C05",
+     "C06",
+     "C07"
+    ],
+    "k": 21,
+    "n": 21
+   },
+   "incomplete": 0,
+   "invalid_attempts": 3,
+   "missing": 0,
+   "modeled_cost_cents": 8400,
+   "pantry": null,
+   "plan_churn": 30,
+   "planned": 24,
+   "preparation": {
+    "expired_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 23,
+    "holds": 7,
+    "unreleased_holds": 0
+   },
+   "recorded": 24,
+   "recovery": {
+    "max_minutes": 14,
+    "median_is_lower_bound": false,
+    "median_minutes": 4.0,
+    "median_recovered_minutes": 4.0,
+    "median_unbounded": false,
+    "min_minutes": 1,
+    "recovered": 12,
+    "required": 12,
+    "unrecovered": 0,
+    "unrecovered_horizons": [],
+    "unrecovered_unmeasured": 0
+   },
+   "scored": 24,
+   "statuses": {
+    "capped": 1,
+    "completed": 23
+   },
+   "unnecessary_changes": {
+    "cases": [
+     "C02",
+     "C03",
+     "C04"
+    ],
+    "committed_changes": 0,
+    "episodes_with_change": 0,
+    "n": 9
+   },
+   "verification": {
+    "distinct_sources": 39,
+    "failed_checks": 4,
+    "repeated_checks": 4,
+    "simulated_minutes": 86,
+    "status_checks": 43
+   }
+  },
+  "P2": {
+   "aborted": 0,
+   "appropriate_infeasibility": {
+    "cases": [
+     "C08"
+    ],
+    "k": 3,
+    "n": 3
+   },
+   "capped": 3,
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 27660,
+    "cost_usd": 1.044174,
+    "latency_ms": 293136,
+    "model_calls": 87,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 383787,
+    "reasoning_tokens": 9824,
+    "tool_calls": 617,
+    "wall_seconds": 444.20000000000005
+   },
+   "computation_measured": 24,
+   "decided_by": {
+    "server": 3
+   },
+   "executed_violations": 0,
+   "extraction": {
+    "correct": 33,
+    "incorrect": 3
+   },
+   "goal_completion": {
+    "cases": [
+     "C01",
+     "C02",
+     "C03",
+     "C04",
+     "C05",
+     "C06",
+     "C07"
+    ],
+    "k": 18,
+    "n": 21
+   },
+   "incomplete": 0,
+   "invalid_attempts": 0,
+   "missing": 0,
+   "modeled_cost_cents": 0,
+   "pantry": null,
+   "plan_churn": 21,
+   "planned": 24,
+   "preparation": {
+    "expired_holds": 3,
+    "hold_fee_cents": 0,
+    "hold_minutes": 53,
+    "holds": 6,
+    "unreleased_holds": 0
+   },
+   "recorded": 24,
+   "recovery": {
+    "max_minutes": 3,
+    "median_is_lower_bound": true,
+    "median_minutes": 3.0,
+    "median_recovered_minutes": 3,
+    "median_unbounded": false,
+    "min_minutes": 1,
+    "recovered": 9,
+    "required": 12,
+    "unrecovered": 3,
+    "unrecovered_horizons": [
+     77,
+     77,
+     77
+    ],
+    "unrecovered_unmeasured": 0
+   },
+   "scored": 24,
+   "statuses": {
+    "capped": 3,
+    "completed": 21
+   },
+   "unnecessary_changes": {
+    "cases": [
+     "C02",
+     "C03",
+     "C04"
+    ],
+    "committed_changes": 0,
+    "episodes_with_change": 0,
+    "n": 9
+   },
+   "verification": {
+    "distinct_sources": 24,
+    "failed_checks": 6,
+    "repeated_checks": 7,
+    "simulated_minutes": 62,
+    "status_checks": 31
+   }
+  },
+  "P3": {
+   "aborted": 0,
+   "appropriate_infeasibility": {
+    "cases": [
+     "C08"
+    ],
+    "k": 3,
+    "n": 3
+   },
+   "capped": 0,
+   "committed_cents": 8400,
+   "computation": {
+    "completion_tokens": 14012,
+    "cost_usd": 0.528386,
+    "latency_ms": 155063,
+    "model_calls": 54,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 194133,
+    "reasoning_tokens": 2042,
+    "tool_calls": 633,
+    "wall_seconds": 258.2
+   },
+   "computation_measured": 24,
+   "decided_by": {
+    "server": 3
+   },
+   "executed_violations": 0,
+   "extraction": {
+    "correct": 33,
+    "incorrect": 3
+   },
+   "goal_completion": {
+    "cases": [
+     "C01",
+     "C02",
+     "C03",
+     "C04",
+     "C05",
+     "C06",
+     "C07"
+    ],
+    "k": 21,
+    "n": 21
+   },
+   "incomplete": 0,
+   "invalid_attempts": 6,
+   "missing": 0,
+   "modeled_cost_cents": 8400,
+   "pantry": null,
+   "plan_churn": 30,
+   "planned": 24,
+   "preparation": {
+    "expired_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 12,
+    "holds": 3,
+    "unreleased_holds": 0
+   },
+   "recorded": 24,
+   "recovery": {
+    "max_minutes": 12,
+    "median_is_lower_bound": false,
+    "median_minutes": 7.5,
+    "median_recovered_minutes": 7.5,
+    "median_unbounded": false,
+    "min_minutes": 1,
+    "recovered": 12,
+    "required": 12,
+    "unrecovered": 0,
+    "unrecovered_horizons": [],
+    "unrecovered_unmeasured": 0
+   },
+   "scored": 24,
+   "statuses": {
+    "completed": 24
+   },
+   "unnecessary_changes": {
+    "cases": [
+     "C02",
+     "C03",
+     "C04"
+    ],
+    "committed_changes": 0,
+    "episodes_with_change": 0,
+    "n": 9
+   },
+   "verification": {
+    "distinct_sources": 42,
+    "failed_checks": 6,
+    "repeated_checks": 9,
+    "simulated_minutes": 102,
+    "status_checks": 51
+   }
+  }
+ },
+ "episodes": [
+  {
+   "caps_reached": [
+    "model_calls"
+   ],
+   "case_id": "C01",
+   "case_ref": "hk_m2q",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 5233,
+    "cost_usd": 0.269058,
+    "latency_ms": 46546,
+    "model_calls": 8,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 108364,
+    "reasoning_tokens": 3106,
+    "tool_calls": 30,
+    "wall_seconds": 50.3
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "drv_msg_4471"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {
+     "REVISION_CONFLICT": 1
+    },
+    "by_tool": {
+     "release_hold": 1
+    },
+    "count": 1
+   },
+   "key": "hk_m2q__P1__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 1,
+    "total": 2
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 1,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 4,
+    "holds": 1,
+    "released_holds": 1,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 5,
+    "horizon_minutes": 77,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:13:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 303,
+   "status": "capped",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 1,
+    "simulated_minutes": 6,
+    "status_checks": 3
+   },
+   "violations": [],
+   "wall_seconds": 50.3
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C01",
+   "case_ref": "hk_m2q",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1396,
+    "cost_usd": 0.05086,
+    "latency_ms": 15267,
+    "model_calls": 4,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 18450,
+    "reasoning_tokens": 620,
+    "tool_calls": 28,
+    "wall_seconds": 18.4
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "drv_msg_4471"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_m2q__P2__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 1,
+    "total": 2
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 2,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 3,
+    "horizon_minutes": 77,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:13:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 18.4
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C01",
+   "case_ref": "hk_m2q",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1105,
+    "cost_usd": 0.03536,
+    "latency_ms": 11394,
+    "model_calls": 3,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 12155,
+    "reasoning_tokens": 491,
+    "tool_calls": 28,
+    "wall_seconds": 14.3
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "drv_msg_4471"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_m2q__P3__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 1,
+    "total": 2
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 3,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 5,
+    "horizon_minutes": 77,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:13:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 14.3
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C01",
+   "case_ref": "hk_m2q",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1260,
+    "cost_usd": 0.0495,
+    "latency_ms": 13898,
+    "model_calls": 4,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 18450,
+    "reasoning_tokens": 495,
+    "tool_calls": 30,
+    "wall_seconds": 17.4
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "drv_msg_4471"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_m2q__P2__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 1,
+    "total": 2
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 4,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 3,
+    "horizon_minutes": 77,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:13:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 1,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 17.4
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C01",
+   "case_ref": "hk_m2q",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1081,
+    "cost_usd": 0.03512,
+    "latency_ms": 11633,
+    "model_calls": 3,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 12155,
+    "reasoning_tokens": 450,
+    "tool_calls": 28,
+    "wall_seconds": 23.9
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "drv_msg_4471"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_m2q__P3__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 1,
+    "total": 2
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 5,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 5,
+    "horizon_minutes": 77,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:13:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 23.9
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C01",
+   "case_ref": "hk_m2q",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1486,
+    "cost_usd": 0.05176,
+    "latency_ms": 15702,
+    "model_calls": 4,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 18450,
+    "reasoning_tokens": 724,
+    "tool_calls": 28,
+    "wall_seconds": 28.1
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "drv_msg_4471"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_m2q__P2__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 1,
+    "total": 2
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 6,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 3,
+    "horizon_minutes": 77,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:13:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 28.1
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C01",
+   "case_ref": "hk_m2q",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 0,
+    "cost_usd": 0,
+    "latency_ms": 0,
+    "model_calls": 0,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 0,
+    "reasoning_tokens": 0,
+    "tool_calls": 29,
+    "wall_seconds": 2.7
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "abstained",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "drv_msg_4471"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_m2q__P0__once",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 1,
+    "total": 2
+   },
+   "policy": "P0",
+   "policy_id": "rules/1.0.0",
+   "position": 7,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 25,
+    "horizon_minutes": 77,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:13:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": null,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 1,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 2.7
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C01",
+   "case_ref": "hk_m2q",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 985,
+    "cost_usd": 0.03416,
+    "latency_ms": 10401,
+    "model_calls": 3,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 12155,
+    "reasoning_tokens": 392,
+    "tool_calls": 28,
+    "wall_seconds": 13.2
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "drv_msg_4471"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_m2q__P3__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 1,
+    "total": 2
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 8,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 5,
+    "horizon_minutes": 77,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:13:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 13.2
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C01",
+   "case_ref": "hk_m2q",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 4526,
+    "cost_usd": 0.203624,
+    "latency_ms": 40098,
+    "model_calls": 6,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 79182,
+    "reasoning_tokens": 3084,
+    "tool_calls": 29,
+    "wall_seconds": 43.2
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "drv_msg_4471"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_m2q__P1__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 1,
+    "total": 2
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 9,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 5,
+    "horizon_minutes": 77,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:13:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 1,
+    "simulated_minutes": 6,
+    "status_checks": 3
+   },
+   "violations": [],
+   "wall_seconds": 43.2
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C01",
+   "case_ref": "hk_m2q",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 4585,
+    "cost_usd": 0.233018,
+    "latency_ms": 40652,
+    "model_calls": 7,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 93584,
+    "reasoning_tokens": 2614,
+    "tool_calls": 33,
+    "wall_seconds": 44.2
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "drv_msg_4471"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {
+     "REVISION_CONFLICT": 1
+    },
+    "by_tool": {
+     "release_hold": 1
+    },
+    "count": 1
+   },
+   "key": "hk_m2q__P1__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 1,
+    "total": 2
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 10,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 2,
+    "holds": 1,
+    "released_holds": 1,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 5,
+    "horizon_minutes": 77,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:13:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 1,
+    "simulated_minutes": 6,
+    "status_checks": 3
+   },
+   "violations": [],
+   "wall_seconds": 44.2
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C02",
+   "case_ref": "hk_7vd",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 820,
+    "cost_usd": 0.034092,
+    "latency_ms": 10266,
+    "model_calls": 4,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 12946,
+    "reasoning_tokens": 0,
+    "tool_calls": 27,
+    "wall_seconds": 13.8
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "hall_note_118"
+    },
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "drv_msg_4502"
+    },
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0006",
+     "source_record_id": "fac_note_1"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_7vd__P2__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 1,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 13.8
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C02",
+   "case_ref": "hk_7vd",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1967,
+    "cost_usd": 0.153116,
+    "latency_ms": 19661,
+    "model_calls": 5,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 66723,
+    "reasoning_tokens": 947,
+    "tool_calls": 24,
+    "wall_seconds": 22.8
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "hall_note_118"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0004",
+     "source_record_id": "drv_msg_4502"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0007",
+     "source_record_id": "fac_note_1"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_7vd__P1__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 2,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 22.8
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C02",
+   "case_ref": "hk_7vd",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 0,
+    "cost_usd": 0,
+    "latency_ms": 0,
+    "model_calls": 0,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 0,
+    "reasoning_tokens": 0,
+    "tool_calls": 27,
+    "wall_seconds": 2.7
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "hall_note_118"
+    },
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "drv_msg_4502"
+    },
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0006",
+     "source_record_id": "fac_note_1"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_7vd__P0__once",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P0",
+   "policy_id": "rules/1.0.0",
+   "position": 3,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": null,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 2.7
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C02",
+   "case_ref": "hk_7vd",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 664,
+    "cost_usd": 0.021954,
+    "latency_ms": 7806,
+    "model_calls": 3,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 7657,
+    "reasoning_tokens": 0,
+    "tool_calls": 26,
+    "wall_seconds": 10.8
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "hall_note_118"
+    },
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "drv_msg_4502"
+    },
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0007",
+     "source_record_id": "fac_note_1"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_7vd__P3__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 4,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 10.8
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C02",
+   "case_ref": "hk_7vd",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 816,
+    "cost_usd": 0.034052,
+    "latency_ms": 9444,
+    "model_calls": 4,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 12946,
+    "reasoning_tokens": 0,
+    "tool_calls": 27,
+    "wall_seconds": 12.5
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "hall_note_118"
+    },
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "drv_msg_4502"
+    },
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0006",
+     "source_record_id": "fac_note_1"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_7vd__P2__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 5,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 12.5
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C02",
+   "case_ref": "hk_7vd",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1784,
+    "cost_usd": 0.122698,
+    "latency_ms": 18427,
+    "model_calls": 4,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 52429,
+    "reasoning_tokens": 1024,
+    "tool_calls": 22,
+    "wall_seconds": 42.9
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "hall_note_118"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0003",
+     "source_record_id": "drv_msg_4502"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0006",
+     "source_record_id": "fac_note_1"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_7vd__P1__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 6,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 42.9
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C02",
+   "case_ref": "hk_7vd",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 659,
+    "cost_usd": 0.021904,
+    "latency_ms": 8156,
+    "model_calls": 3,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 7657,
+    "reasoning_tokens": 0,
+    "tool_calls": 26,
+    "wall_seconds": 32.6
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "hall_note_118"
+    },
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "drv_msg_4502"
+    },
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0007",
+     "source_record_id": "fac_note_1"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_7vd__P3__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 7,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 32.6
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C02",
+   "case_ref": "hk_7vd",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 660,
+    "cost_usd": 0.021914,
+    "latency_ms": 7629,
+    "model_calls": 3,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 7657,
+    "reasoning_tokens": 0,
+    "tool_calls": 26,
+    "wall_seconds": 10.5
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "hall_note_118"
+    },
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "drv_msg_4502"
+    },
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0007",
+     "source_record_id": "fac_note_1"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_7vd__P3__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 8,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 10.5
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C02",
+   "case_ref": "hk_7vd",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1471,
+    "cost_usd": 0.146674,
+    "latency_ms": 17541,
+    "model_calls": 5,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 65982,
+    "reasoning_tokens": 577,
+    "tool_calls": 24,
+    "wall_seconds": 21.4
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "hall_note_118"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0003",
+     "source_record_id": "drv_msg_4502"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0006",
+     "source_record_id": "fac_note_1"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_7vd__P1__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 9,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 21.4
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C02",
+   "case_ref": "hk_7vd",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 811,
+    "cost_usd": 0.034002,
+    "latency_ms": 9933,
+    "model_calls": 4,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 12946,
+    "reasoning_tokens": 0,
+    "tool_calls": 27,
+    "wall_seconds": 12.9
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "hall_note_118"
+    },
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "drv_msg_4502"
+    },
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0006",
+     "source_record_id": "fac_note_1"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_7vd__P2__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 10,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 12.9
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C03",
+   "case_ref": "hk_d5w",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 0,
+    "cost_usd": 0,
+    "latency_ms": 0,
+    "model_calls": 0,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 0,
+    "reasoning_tokens": 0,
+    "tool_calls": 21,
+    "wall_seconds": 3.5
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "abstained",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "vol_msg_22"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_d5w__P0__once",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P0",
+   "policy_id": "rules/1.0.0",
+   "position": 1,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": null,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 3.5
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C03",
+   "case_ref": "hk_d5w",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1493,
+    "cost_usd": 0.068494,
+    "latency_ms": 12702,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 26782,
+    "reasoning_tokens": 935,
+    "tool_calls": 18,
+    "wall_seconds": 25.6
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "vol_msg_22"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_d5w__P1__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 2,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 25.6
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C03",
+   "case_ref": "hk_d5w",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1294,
+    "cost_usd": 0.066508,
+    "latency_ms": 11441,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 26784,
+    "reasoning_tokens": 686,
+    "tool_calls": 18,
+    "wall_seconds": 24.1
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "vol_msg_22"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_d5w__P1__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 3,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 24.1
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C03",
+   "case_ref": "hk_d5w",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 705,
+    "cost_usd": 0.024078,
+    "latency_ms": 6887,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 8514,
+    "reasoning_tokens": 271,
+    "tool_calls": 21,
+    "wall_seconds": 11.1
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "vol_msg_22"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_d5w__P2__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 4,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 11.1
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C03",
+   "case_ref": "hk_d5w",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 646,
+    "cost_usd": 0.023488,
+    "latency_ms": 6609,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 8514,
+    "reasoning_tokens": 210,
+    "tool_calls": 21,
+    "wall_seconds": 10.7
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "vol_msg_22"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_d5w__P2__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 5,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 10.7
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C03",
+   "case_ref": "hk_d5w",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 254,
+    "cost_usd": 0.007694,
+    "latency_ms": 2567,
+    "model_calls": 1,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 2577,
+    "reasoning_tokens": 0,
+    "tool_calls": 20,
+    "wall_seconds": 6.1
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "vol_msg_22"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_d5w__P3__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 6,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 6.1
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C03",
+   "case_ref": "hk_d5w",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 270,
+    "cost_usd": 0.007854,
+    "latency_ms": 3051,
+    "model_calls": 1,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 2577,
+    "reasoning_tokens": 0,
+    "tool_calls": 20,
+    "wall_seconds": 6.6
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "vol_msg_22"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_d5w__P3__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 7,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 6.6
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C03",
+   "case_ref": "hk_d5w",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 638,
+    "cost_usd": 0.023408,
+    "latency_ms": 6886,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 8514,
+    "reasoning_tokens": 205,
+    "tool_calls": 21,
+    "wall_seconds": 9.5
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "vol_msg_22"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_d5w__P2__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 8,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 9.5
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C03",
+   "case_ref": "hk_d5w",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 267,
+    "cost_usd": 0.007824,
+    "latency_ms": 2413,
+    "model_calls": 1,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 2577,
+    "reasoning_tokens": 0,
+    "tool_calls": 20,
+    "wall_seconds": 4.9
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "vol_msg_22"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_d5w__P3__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 9,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 4.9
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C03",
+   "case_ref": "hk_d5w",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1413,
+    "cost_usd": 0.067688,
+    "latency_ms": 12153,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 26779,
+    "reasoning_tokens": 869,
+    "tool_calls": 18,
+    "wall_seconds": 14.7
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "vol_msg_22"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_d5w__P1__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 10,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 14.7
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C04",
+   "case_ref": "hk_x9j",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 265,
+    "cost_usd": 0.007776,
+    "latency_ms": 2795,
+    "model_calls": 1,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 2563,
+    "reasoning_tokens": 0,
+    "tool_calls": 23,
+    "wall_seconds": 5.4
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_0907"
+    },
+    {
+     "label": "incorrect",
+     "mismatched": [
+      "claimed_change"
+     ],
+     "observation_id": "obs_0004",
+     "source_record_id": "crr_msg_0913"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_x9j__P3__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 1,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 5.4
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C04",
+   "case_ref": "hk_x9j",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1258,
+    "cost_usd": 0.064494,
+    "latency_ms": 11991,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 25957,
+    "reasoning_tokens": 792,
+    "tool_calls": 20,
+    "wall_seconds": 15.7
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_0907"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0004",
+     "source_record_id": "crr_msg_0913"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_x9j__P1__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 2,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 15.7
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C04",
+   "case_ref": "hk_x9j",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 614,
+    "cost_usd": 0.02314,
+    "latency_ms": 6771,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 8500,
+    "reasoning_tokens": 177,
+    "tool_calls": 23,
+    "wall_seconds": 10.7
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_0907"
+    },
+    {
+     "label": "incorrect",
+     "mismatched": [
+      "claimed_change"
+     ],
+     "observation_id": "obs_0003",
+     "source_record_id": "crr_msg_0913"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_x9j__P2__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 3,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 10.7
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C04",
+   "case_ref": "hk_x9j",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 0,
+    "cost_usd": 0,
+    "latency_ms": 0,
+    "model_calls": 0,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 0,
+    "reasoning_tokens": 0,
+    "tool_calls": 20,
+    "wall_seconds": 2.6
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "abstained",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_0907"
+    },
+    {
+     "label": "abstained",
+     "mismatched": [],
+     "observation_id": "obs_0002",
+     "source_record_id": "crr_msg_0913"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_x9j__P0__once",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P0",
+   "policy_id": "rules/1.0.0",
+   "position": 4,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": null,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 0,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 0,
+    "status_checks": 0
+   },
+   "violations": [],
+   "wall_seconds": 2.6
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C04",
+   "case_ref": "hk_x9j",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 637,
+    "cost_usd": 0.02337,
+    "latency_ms": 6393,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 8500,
+    "reasoning_tokens": 196,
+    "tool_calls": 23,
+    "wall_seconds": 9.6
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_0907"
+    },
+    {
+     "label": "incorrect",
+     "mismatched": [
+      "claimed_change"
+     ],
+     "observation_id": "obs_0003",
+     "source_record_id": "crr_msg_0913"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_x9j__P2__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 5,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 9.6
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C04",
+   "case_ref": "hk_x9j",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1167,
+    "cost_usd": 0.063584,
+    "latency_ms": 11621,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 25957,
+    "reasoning_tokens": 695,
+    "tool_calls": 20,
+    "wall_seconds": 14.2
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_0907"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0004",
+     "source_record_id": "crr_msg_0913"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_x9j__P1__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 6,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 14.2
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C04",
+   "case_ref": "hk_x9j",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 579,
+    "cost_usd": 0.02279,
+    "latency_ms": 6423,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 8500,
+    "reasoning_tokens": 135,
+    "tool_calls": 23,
+    "wall_seconds": 9.2
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_0907"
+    },
+    {
+     "label": "incorrect",
+     "mismatched": [
+      "claimed_change"
+     ],
+     "observation_id": "obs_0003",
+     "source_record_id": "crr_msg_0913"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_x9j__P2__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 7,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 9.2
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C04",
+   "case_ref": "hk_x9j",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 248,
+    "cost_usd": 0.007606,
+    "latency_ms": 2956,
+    "model_calls": 1,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 2563,
+    "reasoning_tokens": 0,
+    "tool_calls": 23,
+    "wall_seconds": 5.6
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_0907"
+    },
+    {
+     "label": "incorrect",
+     "mismatched": [
+      "claimed_change"
+     ],
+     "observation_id": "obs_0004",
+     "source_record_id": "crr_msg_0913"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_x9j__P3__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 8,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 5.6
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C04",
+   "case_ref": "hk_x9j",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 263,
+    "cost_usd": 0.007756,
+    "latency_ms": 2759,
+    "model_calls": 1,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 2563,
+    "reasoning_tokens": 0,
+    "tool_calls": 23,
+    "wall_seconds": 5.5
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_0907"
+    },
+    {
+     "label": "incorrect",
+     "mismatched": [
+      "claimed_change"
+     ],
+     "observation_id": "obs_0004",
+     "source_record_id": "crr_msg_0913"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_x9j__P3__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 9,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 5.5
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C04",
+   "case_ref": "hk_x9j",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1036,
+    "cost_usd": 0.062274,
+    "latency_ms": 10146,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 25957,
+    "reasoning_tokens": 592,
+    "tool_calls": 20,
+    "wall_seconds": 13.8
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_0907"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0004",
+     "source_record_id": "crr_msg_0913"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_x9j__P1__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": true,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 10,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": {
+    "altered_assignments": 0,
+    "committed_cents": 0,
+    "committed_changes": 0
+   },
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 13.8
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C05",
+   "case_ref": "hk_b3t",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 680,
+    "cost_usd": 0.027784,
+    "latency_ms": 7602,
+    "model_calls": 3,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 10492,
+    "reasoning_tokens": 0,
+    "tool_calls": 31,
+    "wall_seconds": 11.4
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_0950"
+    },
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0004",
+     "source_record_id": "vol_msg_31"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {
+     "REVISION_CONFLICT": 1
+    },
+    "by_tool": {
+     "apply_plan": 1
+    },
+    "count": 1
+   },
+   "key": "hk_b3t__P3__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 1,
+    "total": 2
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 1,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 10,
+    "horizon_minutes": 78,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:12:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 2,
+    "simulated_minutes": 8,
+    "status_checks": 4
+   },
+   "violations": [],
+   "wall_seconds": 11.4
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C05",
+   "case_ref": "hk_b3t",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1263,
+    "cost_usd": 0.056802,
+    "latency_ms": 14725,
+    "model_calls": 5,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 22086,
+    "reasoning_tokens": 180,
+    "tool_calls": 31,
+    "wall_seconds": 27.2
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_0950"
+    },
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0003",
+     "source_record_id": "vol_msg_31"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_b3t__P2__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 1,
+    "total": 2
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 2,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 3,
+    "horizon_minutes": 78,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:12:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 1,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 27.2
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C05",
+   "case_ref": "hk_b3t",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1197,
+    "cost_usd": 0.056142,
+    "latency_ms": 14165,
+    "model_calls": 5,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 22086,
+    "reasoning_tokens": 155,
+    "tool_calls": 31,
+    "wall_seconds": 38.8
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_0950"
+    },
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0003",
+     "source_record_id": "vol_msg_31"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_b3t__P2__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 1,
+    "total": 2
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 3,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 3,
+    "horizon_minutes": 78,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:12:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 1,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 38.8
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C05",
+   "case_ref": "hk_b3t",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 0,
+    "cost_usd": 0,
+    "latency_ms": 0,
+    "model_calls": 0,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 0,
+    "reasoning_tokens": 0,
+    "tool_calls": 27,
+    "wall_seconds": 2.7
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "abstained",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_0950"
+    },
+    {
+     "label": "abstained",
+     "mismatched": [],
+     "observation_id": "obs_0003",
+     "source_record_id": "vol_msg_31"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_b3t__P0__once",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 1,
+    "total": 2
+   },
+   "policy": "P0",
+   "policy_id": "rules/1.0.0",
+   "position": 4,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 3,
+    "horizon_minutes": 78,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:12:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": null,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 2.7
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C05",
+   "case_ref": "hk_b3t",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 2031,
+    "cost_usd": 0.129998,
+    "latency_ms": 18585,
+    "model_calls": 4,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 54844,
+    "reasoning_tokens": 1055,
+    "tool_calls": 24,
+    "wall_seconds": 21.5
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_0950"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0003",
+     "source_record_id": "vol_msg_31"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_b3t__P1__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 1,
+    "total": 2
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 5,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 3,
+    "horizon_minutes": 78,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:12:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 21.5
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C05",
+   "case_ref": "hk_b3t",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1439,
+    "cost_usd": 0.058562,
+    "latency_ms": 14989,
+    "model_calls": 5,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 22086,
+    "reasoning_tokens": 369,
+    "tool_calls": 31,
+    "wall_seconds": 18.2
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_0950"
+    },
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0003",
+     "source_record_id": "vol_msg_31"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_b3t__P2__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 1,
+    "total": 2
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 6,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 3,
+    "horizon_minutes": 78,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:12:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 1,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 18.2
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C05",
+   "case_ref": "hk_b3t",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 721,
+    "cost_usd": 0.028194,
+    "latency_ms": 7986,
+    "model_calls": 3,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 10492,
+    "reasoning_tokens": 0,
+    "tool_calls": 31,
+    "wall_seconds": 10.8
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_0950"
+    },
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0004",
+     "source_record_id": "vol_msg_31"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {
+     "REVISION_CONFLICT": 1
+    },
+    "by_tool": {
+     "apply_plan": 1
+    },
+    "count": 1
+   },
+   "key": "hk_b3t__P3__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 1,
+    "total": 2
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 7,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 10,
+    "horizon_minutes": 78,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:12:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 2,
+    "simulated_minutes": 8,
+    "status_checks": 4
+   },
+   "violations": [],
+   "wall_seconds": 10.8
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C05",
+   "case_ref": "hk_b3t",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 688,
+    "cost_usd": 0.027864,
+    "latency_ms": 7381,
+    "model_calls": 3,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 10492,
+    "reasoning_tokens": 0,
+    "tool_calls": 31,
+    "wall_seconds": 10.2
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_0950"
+    },
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0004",
+     "source_record_id": "vol_msg_31"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {
+     "REVISION_CONFLICT": 1
+    },
+    "by_tool": {
+     "apply_plan": 1
+    },
+    "count": 1
+   },
+   "key": "hk_b3t__P3__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 1,
+    "total": 2
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 8,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 10,
+    "horizon_minutes": 78,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:12:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 2,
+    "simulated_minutes": 8,
+    "status_checks": 4
+   },
+   "violations": [],
+   "wall_seconds": 10.2
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C05",
+   "case_ref": "hk_b3t",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 2304,
+    "cost_usd": 0.132704,
+    "latency_ms": 20914,
+    "model_calls": 4,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 54832,
+    "reasoning_tokens": 1279,
+    "tool_calls": 24,
+    "wall_seconds": 46.2
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_0950"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0003",
+     "source_record_id": "vol_msg_31"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_b3t__P1__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 1,
+    "total": 2
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 9,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 3,
+    "horizon_minutes": 78,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:12:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 46.2
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C05",
+   "case_ref": "hk_b3t",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 2097,
+    "cost_usd": 0.130634,
+    "latency_ms": 19108,
+    "model_calls": 4,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 54832,
+    "reasoning_tokens": 1112,
+    "tool_calls": 24,
+    "wall_seconds": 31.3
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_0950"
+    },
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0003",
+     "source_record_id": "vol_msg_31"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_b3t__P1__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 1,
+    "total": 2
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 10,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 3,
+    "horizon_minutes": 78,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:12:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 31.3
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C06",
+   "case_ref": "hk_q8n",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 427,
+    "cost_usd": 0.020092,
+    "latency_ms": 5083,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 7911,
+    "reasoning_tokens": 0,
+    "tool_calls": 24,
+    "wall_seconds": 8.7
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "lead_note_1"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_q8n__P2__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 2,
+    "total": 3
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 1,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 1,
+    "horizon_minutes": 76,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:14:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 0,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 0,
+    "status_checks": 0
+   },
+   "violations": [],
+   "wall_seconds": 8.7
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C06",
+   "case_ref": "hk_q8n",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1876,
+    "cost_usd": 0.096264,
+    "latency_ms": 17035,
+    "model_calls": 3,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 38752,
+    "reasoning_tokens": 1232,
+    "tool_calls": 21,
+    "wall_seconds": 19.6
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "lead_note_1"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_q8n__P1__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 2,
+    "total": 3
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 2,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 1,
+    "horizon_minutes": 76,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:14:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 19.6
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C06",
+   "case_ref": "hk_q8n",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 417,
+    "cost_usd": 0.019992,
+    "latency_ms": 5000,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 7911,
+    "reasoning_tokens": 0,
+    "tool_calls": 24,
+    "wall_seconds": 7.8
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "lead_note_1"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_q8n__P3__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 2,
+    "total": 3
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 3,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 1,
+    "horizon_minutes": 76,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:14:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 0,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 0,
+    "status_checks": 0
+   },
+   "violations": [],
+   "wall_seconds": 7.8
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C06",
+   "case_ref": "hk_q8n",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 418,
+    "cost_usd": 0.020002,
+    "latency_ms": 4769,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 7911,
+    "reasoning_tokens": 0,
+    "tool_calls": 24,
+    "wall_seconds": 7.5
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "lead_note_1"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_q8n__P3__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 2,
+    "total": 3
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 4,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 1,
+    "horizon_minutes": 76,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:14:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 0,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 0,
+    "status_checks": 0
+   },
+   "violations": [],
+   "wall_seconds": 7.5
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C06",
+   "case_ref": "hk_q8n",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1393,
+    "cost_usd": 0.065794,
+    "latency_ms": 11801,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 25932,
+    "reasoning_tokens": 888,
+    "tool_calls": 19,
+    "wall_seconds": 15.2
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "lead_note_1"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_q8n__P1__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 2,
+    "total": 3
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 5,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 1,
+    "horizon_minutes": 76,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:14:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 15.2
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C06",
+   "case_ref": "hk_q8n",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 0,
+    "cost_usd": 0,
+    "latency_ms": 0,
+    "model_calls": 0,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 0,
+    "reasoning_tokens": 0,
+    "tool_calls": 20,
+    "wall_seconds": 2.5
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "abstained",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "lead_note_1"
+    }
+   ],
+   "failure_reasons": [
+    "goal not complete"
+   ],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_q8n__P0__once",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P0",
+   "policy_id": "rules/1.0.0",
+   "position": 6,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 76,
+    "horizon_minutes": 76,
+    "note": "unrecovered: a failure, recorded with the horizon",
+    "recovered": false,
+    "required": true,
+    "update_at": "2026-11-12T23:14:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": null,
+   "status": "completed",
+   "success": false,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 0,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 0,
+    "status_checks": 0
+   },
+   "violations": [],
+   "wall_seconds": 2.5
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C06",
+   "case_ref": "hk_q8n",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 442,
+    "cost_usd": 0.020242,
+    "latency_ms": 5070,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 7911,
+    "reasoning_tokens": 0,
+    "tool_calls": 24,
+    "wall_seconds": 8.8
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "lead_note_1"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_q8n__P3__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 2,
+    "total": 3
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 7,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 1,
+    "horizon_minutes": 76,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:14:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 0,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 0,
+    "status_checks": 0
+   },
+   "violations": [],
+   "wall_seconds": 8.8
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C06",
+   "case_ref": "hk_q8n",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 408,
+    "cost_usd": 0.019902,
+    "latency_ms": 4837,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 7911,
+    "reasoning_tokens": 0,
+    "tool_calls": 24,
+    "wall_seconds": 7.6
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "lead_note_1"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_q8n__P2__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 2,
+    "total": 3
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 8,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 1,
+    "horizon_minutes": 76,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:14:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 0,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 0,
+    "status_checks": 0
+   },
+   "violations": [],
+   "wall_seconds": 7.6
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C06",
+   "case_ref": "hk_q8n",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 428,
+    "cost_usd": 0.020102,
+    "latency_ms": 4659,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 7911,
+    "reasoning_tokens": 0,
+    "tool_calls": 24,
+    "wall_seconds": 10.6
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "lead_note_1"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_q8n__P2__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 2,
+    "total": 3
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 9,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 1,
+    "horizon_minutes": 76,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:14:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 0,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 0,
+    "status_checks": 0
+   },
+   "violations": [],
+   "wall_seconds": 10.6
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C06",
+   "case_ref": "hk_q8n",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1346,
+    "cost_usd": 0.065324,
+    "latency_ms": 11488,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 25932,
+    "reasoning_tokens": 813,
+    "tool_calls": 19,
+    "wall_seconds": 14.1
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "lead_note_1"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_q8n__P1__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 2,
+    "total": 3
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 10,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 1,
+    "horizon_minutes": 76,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:14:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 14.1
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C07",
+   "case_ref": "hk_f6k",
+   "committed_cents": 2800,
+   "computation": {
+    "completion_tokens": 1205,
+    "cost_usd": 0.049652,
+    "latency_ms": 12407,
+    "model_calls": 4,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 18801,
+    "reasoning_tokens": 351,
+    "tool_calls": 38,
+    "wall_seconds": 15.7
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_1012"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {
+     "REVISION_CONFLICT": 1
+    },
+    "by_tool": {
+     "hold_resource": 1
+    },
+    "count": 1
+   },
+   "key": "hk_f6k__P3__s101",
+   "modeled_cost_cents": 2800,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 2,
+    "total": 3
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 1,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 4,
+    "holds": 1,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 12,
+    "horizon_minutes": 77,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:13:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 2,
+    "repeated_checks": 1,
+    "simulated_minutes": 6,
+    "status_checks": 3
+   },
+   "violations": [],
+   "wall_seconds": 15.7
+  },
+  {
+   "caps_reached": [
+    "model_calls"
+   ],
+   "case_id": "C07",
+   "case_ref": "hk_f6k",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 3618,
+    "cost_usd": 0.120146,
+    "latency_ms": 35270,
+    "model_calls": 8,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 41983,
+    "reasoning_tokens": 2033,
+    "tool_calls": 29,
+    "wall_seconds": 47.8
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_1012"
+    }
+   ],
+   "failure_reasons": [
+    "goal not complete"
+   ],
+   "goal_complete": false,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_f6k__P2__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 2,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 1,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 16,
+    "holds": 2,
+    "released_holds": 1,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 77,
+    "horizon_minutes": 77,
+    "note": "unrecovered: a failure, recorded with the horizon",
+    "recovered": false,
+    "required": true,
+    "update_at": "2026-11-12T23:13:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 303,
+   "status": "capped",
+   "success": false,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 2,
+    "repeated_checks": 1,
+    "simulated_minutes": 6,
+    "status_checks": 3
+   },
+   "violations": [],
+   "wall_seconds": 47.8
+  },
+  {
+   "caps_reached": [
+    "model_calls"
+   ],
+   "case_id": "C07",
+   "case_ref": "hk_f6k",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 3797,
+    "cost_usd": 0.119584,
+    "latency_ms": 35587,
+    "model_calls": 8,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 40807,
+    "reasoning_tokens": 2192,
+    "tool_calls": 32,
+    "wall_seconds": 60.6
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_1012"
+    }
+   ],
+   "failure_reasons": [
+    "goal not complete"
+   ],
+   "goal_complete": false,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_f6k__P2__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 3,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 1,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 21,
+    "holds": 2,
+    "released_holds": 1,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 77,
+    "horizon_minutes": 77,
+    "note": "unrecovered: a failure, recorded with the horizon",
+    "recovered": false,
+    "required": true,
+    "update_at": "2026-11-12T23:13:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 101,
+   "status": "capped",
+   "success": false,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 2,
+    "repeated_checks": 1,
+    "simulated_minutes": 6,
+    "status_checks": 3
+   },
+   "violations": [],
+   "wall_seconds": 60.6
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C07",
+   "case_ref": "hk_f6k",
+   "committed_cents": 2800,
+   "computation": {
+    "completion_tokens": 5572,
+    "cost_usd": 0.227822,
+    "latency_ms": 46993,
+    "model_calls": 6,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 86051,
+    "reasoning_tokens": 3536,
+    "tool_calls": 32,
+    "wall_seconds": 50.4
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_1012"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_f6k__P1__s101",
+   "modeled_cost_cents": 2800,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 2,
+    "total": 3
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 4,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 5,
+    "holds": 2,
+    "released_holds": 1,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 11,
+    "horizon_minutes": 77,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:13:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 1,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 50.4
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C07",
+   "case_ref": "hk_f6k",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 0,
+    "cost_usd": 0,
+    "latency_ms": 0,
+    "model_calls": 0,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 0,
+    "reasoning_tokens": 0,
+    "tool_calls": 23,
+    "wall_seconds": 2.4
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "abstained",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_1012"
+    }
+   ],
+   "failure_reasons": [
+    "goal not complete"
+   ],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_f6k__P0__once",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P0",
+   "policy_id": "rules/1.0.0",
+   "position": 5,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 77,
+    "horizon_minutes": 77,
+    "note": "unrecovered: a failure, recorded with the horizon",
+    "recovered": false,
+    "required": true,
+    "update_at": "2026-11-12T23:13:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": null,
+   "status": "completed",
+   "success": false,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 1,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 2.4
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C07",
+   "case_ref": "hk_f6k",
+   "committed_cents": 2800,
+   "computation": {
+    "completion_tokens": 985,
+    "cost_usd": 0.047452,
+    "latency_ms": 11444,
+    "model_calls": 4,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 18801,
+    "reasoning_tokens": 157,
+    "tool_calls": 38,
+    "wall_seconds": 14.8
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_1012"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {
+     "REVISION_CONFLICT": 1
+    },
+    "by_tool": {
+     "hold_resource": 1
+    },
+    "count": 1
+   },
+   "key": "hk_f6k__P3__s303",
+   "modeled_cost_cents": 2800,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 2,
+    "total": 3
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 6,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 4,
+    "holds": 1,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 12,
+    "horizon_minutes": 77,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:13:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 2,
+    "repeated_checks": 1,
+    "simulated_minutes": 6,
+    "status_checks": 3
+   },
+   "violations": [],
+   "wall_seconds": 14.8
+  },
+  {
+   "caps_reached": [
+    "model_calls"
+   ],
+   "case_id": "C07",
+   "case_ref": "hk_f6k",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 3429,
+    "cost_usd": 0.118256,
+    "latency_ms": 34491,
+    "model_calls": 8,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 41983,
+    "reasoning_tokens": 1862,
+    "tool_calls": 29,
+    "wall_seconds": 37.8
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_1012"
+    }
+   ],
+   "failure_reasons": [
+    "goal not complete"
+   ],
+   "goal_complete": false,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_f6k__P2__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 7,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 1,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 16,
+    "holds": 2,
+    "released_holds": 1,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 77,
+    "horizon_minutes": 77,
+    "note": "unrecovered: a failure, recorded with the horizon",
+    "recovered": false,
+    "required": true,
+    "update_at": "2026-11-12T23:13:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 202,
+   "status": "capped",
+   "success": false,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 2,
+    "repeated_checks": 1,
+    "simulated_minutes": 6,
+    "status_checks": 3
+   },
+   "violations": [],
+   "wall_seconds": 37.8
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C07",
+   "case_ref": "hk_f6k",
+   "committed_cents": 2800,
+   "computation": {
+    "completion_tokens": 4207,
+    "cost_usd": 0.17566,
+    "latency_ms": 36878,
+    "model_calls": 5,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 66795,
+    "reasoning_tokens": 2800,
+    "tool_calls": 27,
+    "wall_seconds": 40.2
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_1012"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_f6k__P1__s303",
+   "modeled_cost_cents": 2800,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 2,
+    "total": 3
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 8,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 4,
+    "holds": 1,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 9,
+    "horizon_minutes": 77,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:13:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 1,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 40.2
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C07",
+   "case_ref": "hk_f6k",
+   "committed_cents": 2800,
+   "computation": {
+    "completion_tokens": 6297,
+    "cost_usd": 0.268088,
+    "latency_ms": 54166,
+    "model_calls": 7,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 102559,
+    "reasoning_tokens": 3995,
+    "tool_calls": 36,
+    "wall_seconds": 58.1
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_1012"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {
+     "REVISION_CONFLICT": 1
+    },
+    "by_tool": {
+     "apply_plan": 1
+    },
+    "count": 1
+   },
+   "key": "hk_f6k__P1__s202",
+   "modeled_cost_cents": 2800,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 2,
+    "total": 3
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 9,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 8,
+    "holds": 2,
+    "released_holds": 1,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 14,
+    "horizon_minutes": 77,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:13:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 2,
+    "repeated_checks": 1,
+    "simulated_minutes": 6,
+    "status_checks": 3
+   },
+   "violations": [],
+   "wall_seconds": 58.1
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C07",
+   "case_ref": "hk_f6k",
+   "committed_cents": 2800,
+   "computation": {
+    "completion_tokens": 1043,
+    "cost_usd": 0.048032,
+    "latency_ms": 12247,
+    "model_calls": 4,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 18801,
+    "reasoning_tokens": 201,
+    "tool_calls": 38,
+    "wall_seconds": 15.6
+   },
+   "decided_by": null,
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_1012"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": true,
+   "infeasibility_reported": false,
+   "invalid_attempts": {
+    "by_code": {
+     "REVISION_CONFLICT": 1
+    },
+    "by_tool": {
+     "hold_resource": 1
+    },
+    "count": 1
+   },
+   "key": "hk_f6k__P3__s202",
+   "modeled_cost_cents": 2800,
+   "negative_control": false,
+   "outcome_class": "goal",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 2,
+    "committed_revisions": 1,
+    "previously_valid_altered": 2,
+    "total": 3
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 10,
+   "preparation": {
+    "committed_holds": 1,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 4,
+    "holds": 1,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": {
+    "delay_minutes": 12,
+    "horizon_minutes": 77,
+    "note": null,
+    "recovered": true,
+    "required": true,
+    "update_at": "2026-11-12T23:13:00+00:00"
+   },
+   "requires_recovery": true,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 2,
+    "repeated_checks": 1,
+    "simulated_minutes": 6,
+    "status_checks": 3
+   },
+   "violations": [],
+   "wall_seconds": 15.6
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C08",
+   "case_ref": "hk_z1c",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 407,
+    "cost_usd": 0.019932,
+    "latency_ms": 5061,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 7931,
+    "reasoning_tokens": 0,
+    "tool_calls": 21,
+    "wall_seconds": 7.8
+   },
+   "decided_by": "server",
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_1101"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_z1c__P2__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "infeasible",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 1,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 7.8
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C08",
+   "case_ref": "hk_z1c",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1028,
+    "cost_usd": 0.061918,
+    "latency_ms": 9305,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 25819,
+    "reasoning_tokens": 570,
+    "tool_calls": 19,
+    "wall_seconds": 11.9
+   },
+   "decided_by": "model",
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_1101"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_z1c__P1__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "infeasible",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 2,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 11.9
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C08",
+   "case_ref": "hk_z1c",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 221,
+    "cost_usd": 0.00732,
+    "latency_ms": 2569,
+    "model_calls": 1,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 2555,
+    "reasoning_tokens": 0,
+    "tool_calls": 21,
+    "wall_seconds": 5.7
+   },
+   "decided_by": "server",
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_1101"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_z1c__P3__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "infeasible",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 3,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 5.7
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C08",
+   "case_ref": "hk_z1c",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 239,
+    "cost_usd": 0.0075,
+    "latency_ms": 2576,
+    "model_calls": 1,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 2555,
+    "reasoning_tokens": 0,
+    "tool_calls": 21,
+    "wall_seconds": 5.2
+   },
+   "decided_by": "server",
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_1101"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_z1c__P3__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "infeasible",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 4,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 5.2
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C08",
+   "case_ref": "hk_z1c",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 420,
+    "cost_usd": 0.020062,
+    "latency_ms": 4842,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 7931,
+    "reasoning_tokens": 0,
+    "tool_calls": 21,
+    "wall_seconds": 7.7
+   },
+   "decided_by": "server",
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_1101"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_z1c__P2__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "infeasible",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 5,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 7.7
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C08",
+   "case_ref": "hk_z1c",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 232,
+    "cost_usd": 0.00743,
+    "latency_ms": 2452,
+    "model_calls": 1,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 2555,
+    "reasoning_tokens": 0,
+    "tool_calls": 21,
+    "wall_seconds": 5.3
+   },
+   "decided_by": "server",
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_1101"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_z1c__P3__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "infeasible",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P3",
+   "policy_id": "verify-all/1.2.0",
+   "position": 6,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 5.3
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C08",
+   "case_ref": "hk_z1c",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1245,
+    "cost_usd": 0.064088,
+    "latency_ms": 11135,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 25819,
+    "reasoning_tokens": 761,
+    "tool_calls": 19,
+    "wall_seconds": 13.8
+   },
+   "decided_by": "model",
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_1101"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_z1c__P1__s303",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "infeasible",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 7,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 303,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 3,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 2,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 4,
+    "status_checks": 2
+   },
+   "violations": [],
+   "wall_seconds": 13.8
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C08",
+   "case_ref": "hk_z1c",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 0,
+    "cost_usd": 0,
+    "latency_ms": 0,
+    "model_calls": 0,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 0,
+    "reasoning_tokens": 0,
+    "tool_calls": 22,
+    "wall_seconds": 2.5
+   },
+   "decided_by": "policy",
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "abstained",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_1101"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_z1c__P0__once",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "infeasible",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P0",
+   "policy_id": "rules/1.0.0",
+   "position": 8,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": null,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 2.5
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C08",
+   "case_ref": "hk_z1c",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 1218,
+    "cost_usd": 0.063494,
+    "latency_ms": 11159,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 25657,
+    "reasoning_tokens": 812,
+    "tool_calls": 18,
+    "wall_seconds": 13.7
+   },
+   "decided_by": "model",
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "not_recorded",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_1101"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_z1c__P1__s101",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "infeasible",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P1",
+   "policy_id": "tool-use/1.2.0",
+   "position": 9,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 101,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 1,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 13.7
+  },
+  {
+   "caps_reached": [],
+   "case_id": "C08",
+   "case_ref": "hk_z1c",
+   "committed_cents": 0,
+   "computation": {
+    "completion_tokens": 419,
+    "cost_usd": 0.020052,
+    "latency_ms": 4948,
+    "model_calls": 2,
+    "model_failed_calls": 0,
+    "model_retries": 0,
+    "prompt_tokens": 7931,
+    "reasoning_tokens": 0,
+    "tool_calls": 21,
+    "wall_seconds": 7.5
+   },
+   "decided_by": "server",
+   "executed_violations": 0,
+   "extraction": [
+    {
+     "label": "correct",
+     "mismatched": [],
+     "observation_id": "obs_0001",
+     "source_record_id": "crr_msg_1101"
+    }
+   ],
+   "failure_reasons": [],
+   "goal_complete": false,
+   "infeasibility_reported": true,
+   "invalid_attempts": {
+    "by_code": {},
+    "by_tool": {},
+    "count": 0
+   },
+   "key": "hk_z1c__P2__s202",
+   "modeled_cost_cents": 0,
+   "negative_control": false,
+   "outcome_class": "infeasible",
+   "pantry": null,
+   "plan_churn": {
+    "altered_assignments": 0,
+    "committed_revisions": 0,
+    "previously_valid_altered": 0,
+    "total": 0
+   },
+   "policy": "P2",
+   "policy_id": "live/1.2.0",
+   "position": 10,
+   "preparation": {
+    "committed_holds": 0,
+    "expired_holds": 0,
+    "fulfilled_holds": 0,
+    "hold_fee_cents": 0,
+    "hold_minutes": 0,
+    "holds": 0,
+    "released_holds": 0,
+    "reserved_cents_at_end": 0,
+    "unreleased_holds": 0
+   },
+   "recovery": null,
+   "requires_recovery": false,
+   "seed": 202,
+   "status": "completed",
+   "success": true,
+   "trace_verify": "intact",
+   "trial": 2,
+   "unnecessary_committed_changes": null,
+   "verification": {
+    "distinct_sources": 1,
+    "failed_checks": 0,
+    "repeated_checks": 0,
+    "simulated_minutes": 2,
+    "status_checks": 1
+   },
+   "violations": [],
+   "wall_seconds": 7.5
+  }
+ ],
+ "heldout": true,
+ "missing": [],
+ "policies": [
+  "P0",
+  "P1",
+  "P2",
+  "P3"
+ ],
+ "seeds": [
+  101,
+  202,
+  303
+ ],
+ "suite": "campus",
+ "version": "plan_b.eval_metrics/1.0.0"
+}
