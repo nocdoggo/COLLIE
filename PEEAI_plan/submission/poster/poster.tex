@@ -21,7 +21,7 @@
 \usepackage[T1]{fontenc}
 % 48 x 27 inches, exactly 16:9, so it projects as one slide and prints as a flyer.
 % beamerposter's size=custom takes width and height literally in cm.
-\usepackage[orientation=landscape,size=custom,width=121.92,height=68.58,scale=1.75]{beamerposter}
+\usepackage[orientation=landscape,size=custom,width=121.92,height=68.58,scale=1.6]{beamerposter}
 \usetheme{gemini}
 \usecolortheme{umb}
 % Projection needs heavier strokes than the template's Lato Light.
@@ -57,13 +57,14 @@
 \setlength{\colB}{0.395\paperwidth}
 \setlength{\colC}{0.1975\paperwidth}
 % Two rows: 3 \sepwidth + \rowAa + \rowAb and 4 \sepwidth + \rowBa + \rowBb + \rowBc = \paperwidth.
-\newlength{\rowAa}\setlength{\rowAa}{0.513\paperwidth}
-\newlength{\rowAb}\setlength{\rowAb}{0.433\paperwidth}
-\newlength{\rowBa}\setlength{\rowBa}{0.40\paperwidth}
-\newlength{\rowBb}\setlength{\rowBb}{0.29\paperwidth}
-\newlength{\rowBc}\setlength{\rowBc}{0.238\paperwidth}
-\newlength{\toph}\setlength{\toph}{19.5cm}
-\newlength{\both}\setlength{\both}{13cm}
+\newlength{\rowAa}\setlength{\rowAa}{0.505\paperwidth}
+\newlength{\rowAb}\setlength{\rowAb}{0.441\paperwidth}
+\newlength{\rowBa}\setlength{\rowBa}{0.405\paperwidth}
+\newlength{\rowBb}\setlength{\rowBb}{0.335\paperwidth}
+\newlength{\rowBc}\setlength{\rowBc}{0.188\paperwidth}
+\newlength{\toph}\setlength{\toph}{22.6cm}
+\newlength{\tophd}\setlength{\tophd}{24.0cm}
+\newlength{\both}\setlength{\both}{13.4cm}
 
 \newcommand{\separatorcolumn}{\begin{column}{\sepwidth}\end{column}}
 
@@ -129,8 +130,7 @@
 \begin{column}{\rowAa}
   \begin{block}{16:40, twenty minutes to doors open}
     {\centering
-      \includegraphics[width=\linewidth,height=\toph,keepaspectratio]{fig_story.pdf}\\[0.3ex]
-      {\normalsize\color{planbmuted} Jordan is an illustration. A simulated event, run in the local sandbox.\par}
+      \includegraphics[width=\linewidth,height=\toph,keepaspectratio]{fig_story_poster.pdf}
     \par}
   \end{block}
 \end{column}
@@ -138,7 +138,7 @@
 \begin{column}{\rowAb}
   \begin{block}{The model only picks checked options. One gate decides.}
     {\centering
-      \includegraphics[width=\linewidth,height=\toph,keepaspectratio]{fig_design.pdf}
+      \includegraphics[width=\linewidth,height=\tophd,keepaspectratio]{fig_design.pdf}
     \par}
   \end{block}
 \end{column}
@@ -151,7 +151,7 @@
 \begin{column}{\rowBa}
   \begin{block}{\res{fresh:both:metk} of \res{fresh:both:metn} runs met the expected outcome on \res{final:cases} new cases}
     {\centering
-      \includegraphics[width=\linewidth,height=\both,keepaspectratio]{fig_result.pdf}
+      \includegraphics[width=\linewidth,height=\both,keepaspectratio]{fig_result_poster.pdf}
     \par}
   \end{block}
 \end{column}
@@ -159,18 +159,18 @@
 \begin{column}{\rowBb}
   \begin{block}{The same loop runs a food pantry}
     {\centering
-      \includegraphics[width=\linewidth,height=\both,keepaspectratio]{fig_pantry_chart.pdf}
+      \includegraphics[width=\linewidth,height=\both,keepaspectratio]{fig_pantry_chart_poster.pdf}
     \par}
   \end{block}
 \end{column}
 \separatorcolumn
 \begin{column}{\rowBc}
   \begin{block}{What it means}
-    {\small \textbf{No executed action broke a rule}, because every change passes the one gate.
-    The one miss: the fixed rules, when a volunteer runs late. The new cases repeat situations
-    seen in development, and six cases cannot rank the model approaches.\par}
-    {\small \textbf{Next:} MBTA transit alerts as context only, designed and not connected. A
-    pilot where Plan B proposes and the organizer acts.\par}
+    {\normalsize \textbf{No executed action broke a rule}: every change passes the one gate.
+    The one miss: the fixed rules, when a volunteer runs late. Six cases cannot rank the model
+    approaches.\par}
+    {\normalsize \textbf{Next:} MBTA transit alerts as context (designed, not connected) and a
+    pilot with an organizer.\par}
   \end{block}
 \end{column}
 \separatorcolumn

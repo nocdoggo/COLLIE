@@ -1,0 +1,121 @@
+% The hook and the vivid example of Plan B, as one storyboard: five beats on top, the same story
+% as the program on a real time axis below. Facts from the recorded development run (fictional
+% local sandbox): message 16:40, one status check (2 simulated minutes, delayed, ETA 17:25),
+% commit 16:43 (swap demonstrations and skills exchange, cost $0, receipt, plan version 1 to 2).
+\documentclass[border=3pt]{standalone}
+% Poster variant: the same figure with its type enlarged for reading at poster distance.
+\input{planb_figstyle}
+\newcommand{\bigicon}[2]{{\color{#1}\fontsize{26}{26}\selectfont #2}}
+\begin{document}
+\makeatletter
+\renewcommand\tiny{\@setfontsize\tiny{5.5}{6.6}}
+\renewcommand\scriptsize{\@setfontsize\scriptsize{7.7}{9.2}}
+\renewcommand\footnotesize{\@setfontsize\footnotesize{8.8}{10.6}}
+\renewcommand\small{\@setfontsize\small{9.9}{11.9}}
+\renewcommand\normalsize{\@setfontsize\normalsize{11.0}{13.2}}
+\renewcommand\large{\@setfontsize\large{13.2}{15.8}}
+\renewcommand\Large{\@setfontsize\Large{15.8}{19.0}}
+\makeatother
+\normalsize
+
+\begin{tikzpicture}[x=1cm, y=1cm, font=\small,
+  stamp/.style={anchor=north west, font=\normalsize\bfseries, text=ink, inner sep=0pt},
+  line/.style={anchor=north west, text width=3.15cm, align=left, text=ink, inner sep=0pt, font=\small},
+  note/.style={anchor=north west, text width=3.15cm, align=left, text=muted, inner sep=0pt, font=\footnotesize},
+  bar/.style={line width=0.6pt, rounded corners=0.6pt},
+  barlabel/.style={font=\footnotesize, text height=1.6ex, text depth=0.45ex},
+]
+  % ---------------------------------------------------------------- the persona
+  \node[anchor=west, inner sep=0pt, text=muted, font=\footnotesize] at (0,8.65)
+    {{\color{ink}\faUser}\hspace{0.45em}Jordan, volunteer organizer (an illustration)};
+
+  % ---------------------------------------------------------------- five beats
+  \def\iy{7.55}  % icon centre
+  \def\sy{6.85}  % stamp top
+  \def\ty{6.42}  % first text line top
+  \def\cs{3.7}  % column step
+  \foreach \i in {1,...,5}{
+    \coordinate (c\i) at ({(\i-1)*\cs},\iy);
+  }
+  % beat 1: the message
+  \node[anchor=west, inner sep=0pt] (i1) at (c1) {\bigicon{accent}{\faMobile*}};
+  \node[anchor=west, inner sep=0pt] at ($(i1.east)+(0.08,0.22)$) {\color{accent}\large\faCommentDots};
+  \node[stamp, text=accent] at (0,\sy) {16:40};
+  \node[line, text width=3.0cm, inner sep=3.5pt, anchor=north west] (msg) at (0,\ty-0.12)
+    {The projector may be about 25 minutes late.};
+  \begin{scope}[on background layer]
+    \draw[accent, line width=0.6pt, fill=accentsoft, line join=round]
+      (msg.north west) -- ($(msg.north west)+(0.18,0)$) -- ($(msg.north west)+(0.26,0.16)$)
+      -- ($(msg.north west)+(0.42,0)$) -- (msg.north east) -- (msg.south east) -- (msg.south west) -- cycle;
+  \end{scope}
+  \node[anchor=north west, inner sep=0pt, text=accent, font=\footnotesize\bfseries] at ($(msg.south west)+(0,-0.16)$)
+    {\faClock[regular]\hspace{0.35em}20 minutes to doors open};
+
+  % beat 2: one status check
+  \node[anchor=west, inner sep=0pt] (i2) at (c2) {\bigicon{primary}{\faTruck}};
+  \node[stamp] at (1*\cs,\sy) {One status check};
+  \node[line, text width=3.4cm] (t2) at (1*\cs,\ty) {of the supplier's tracking:};
+  \node[line, font=\small\bfseries] (u2) at ($(t2.south west)+(0,-0.06)$) {delayed, ETA 17:25};
+  \node[note] at ($(u2.south west)+(0,-0.1)$) {2 simulated minutes};
+
+  % beat 3: the commit and the receipt
+  \node[anchor=west, inner sep=0pt] (i3) at (c3) {\bigicon{primary}{\faExchange*}\hspace{0.3em}\bigicon{ok}{\faReceipt}};
+  \node[stamp] at (2*\cs,\sy) {16:43};
+  \node[line] (t3) at (2*\cs,\ty) {Swap two activities.\\ Cost \$0.};
+  \node[line, text=ok] at ($(t3.south west)+(0,-0.16)$) {Receipt written\\ for the new plan};
+
+  % beat 4: doors open
+  \node[anchor=west, inner sep=0pt] (i4) at (c4) {\bigicon{primary}{\faDoorOpen}};
+  \node[stamp] at (3*\cs,\sy) {17:00};
+  \node[line] at (3*\cs,\ty) {Doors open on time};
+
+  % beat 5: demonstrations
+  \node[anchor=west, inner sep=0pt] (i5) at (c5) {\bigicon{primary}{\faChalkboardTeacher}};
+  \node[stamp] at (4*\cs,\sy) {17:30};
+  \node[line] at (4*\cs,\ty) {Demonstrations start after the reported arrival};
+
+  % connectors between beats, on a regular grid
+  \foreach \a/\b in {1/2, 2/3, 3/4, 4/5}{
+    \draw[link] ($(c\a)+(1.95,0)$) -- ($(c\b)+(-0.3,0)$);
+  }
+
+  % ---------------------------------------------------------------- the program on a time axis
+  \def\xo{2.3}      % x of 16:30
+  \def\sc{0.17}     % cm per minute
+  \def\yb{3.05}     % Before row centre
+  \def\ya{1.95}     % After row centre
+  \def\bh{0.25}     % half bar height
+  \def\yx{1.3}      % axis line
+  % gridlines and axis
+  \foreach \m in {0,10,...,90}{
+    \draw[gridgrey, line width=0.4pt] (\xo+\m*\sc,\yx) -- (\xo+\m*\sc,3.55);
+    \draw[muted, line width=0.5pt] (\xo+\m*\sc,\yx) -- (\xo+\m*\sc,\yx-0.09);
+  }
+  \draw[muted, line width=0.5pt] (\xo,\yx) -- (\xo+90*\sc,\yx);
+  \foreach \m/\l in {0/16:30, 30/17:00, 60/17:30, 90/18:00}{
+    \node[anchor=north, text=ink, font=\footnotesize, inner sep=0pt] (tl\m) at (\xo+\m*\sc,\yx-0.17) {\l};
+  }
+  \node[anchor=north, text=muted, font=\footnotesize, inner sep=0pt] at ($(tl30.south)+(0,-0.1)$) {doors open};
+  \node[anchor=north east, text=muted, font=\footnotesize, inner sep=0pt] at ($(tl90.south east)+(0,-0.1)$) {must finish};
+  % row labels
+  \node[anchor=east, inner sep=0pt, font=\small\bfseries, text=ink] at (\xo-0.25,\yb+0.1) {Before};
+  \node[anchor=east, inner sep=0pt, font=\footnotesize, text=muted] at (\xo-0.25,\yb-0.22) {the plan at 16:40};
+  \node[anchor=east, inner sep=0pt, font=\small\bfseries, text=primary] at (\xo-0.25,\ya+0.1) {After};
+  \node[anchor=east, inner sep=0pt, font=\footnotesize, text=muted] at (\xo-0.25,\ya-0.22) {the plan at 16:43};
+  % the reported ETA, behind the bars
+  \draw[accent, line width=0.9pt] (\xo+55*\sc,\yx) -- (\xo+55*\sc,3.55);
+  \node[anchor=south, inner sep=1.5pt, text=accent, font=\footnotesize\bfseries] at (\xo+55*\sc,3.55) {reported ETA 17:25};
+  % the swap, between the two rows
+  \draw[primary, line width=0.6pt, -{Stealth[length=1.6mm,width=1.3mm]}] (\xo+50*\sc,\yb-\bh-0.04) -- (\xo+70*\sc,\ya+\bh+0.04);
+  \draw[primary, line width=0.6pt, -{Stealth[length=1.6mm,width=1.3mm]}] (\xo+70*\sc,\yb-\bh-0.04) -- (\xo+50*\sc,\ya+\bh+0.04);
+  % Before: grey outlines, the demonstrations clash with the ETA
+  \foreach \a/\b/\n in {0/20/Prepare the event, 30/40/Welcome, 60/80/Skills exchange, 80/90/Closing}{
+    \draw[bar, draw=quiet, fill=white] (\xo+\a*\sc+0.03,\yb-\bh) rectangle node[barlabel, text=muted] {\n} (\xo+\b*\sc-0.03,\yb+\bh);
+  }
+  \draw[bar, draw=accent, line width=0.9pt, fill=white] (\xo+40*\sc+0.03,\yb-\bh) rectangle node[barlabel, text=accent, font=\footnotesize\bfseries] {Demonstrations} (\xo+60*\sc-0.03,\yb+\bh);
+  % After: Plan B's program
+  \foreach \a/\b/\n in {0/20/Prepare the event, 30/40/Welcome, 40/60/Skills exchange, 60/80/Demonstrations, 80/90/Closing}{
+    \draw[bar, draw=primary, fill=primary] (\xo+\a*\sc+0.03,\ya-\bh) rectangle node[barlabel, text=white] {\n} (\xo+\b*\sc-0.03,\ya+\bh);
+  }
+\end{tikzpicture}
+\end{document}
