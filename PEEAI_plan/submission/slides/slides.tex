@@ -172,10 +172,10 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
 \begin{frame}{The model only picks among options the server built and checked, and one gate writes every receipt}
   \vspace{0.05cm}
   \begin{center}
-    \includegraphics[width=0.93\textwidth]{fig_design.pdf}
+    \includegraphics[width=0.84\textwidth]{fig_design.pdf}
   \end{center}
   \vfill
-  \support{Spending starts as a \textbf{hold}, a free reservation that expires on its own, until a person approves.}
+  \support{\textbf{The model}: Claude Sonnet 5.5 (\texttt{anthropic/claude-sonnet-5.5}) through the OpenRouter API, the same model and settings for all three model approaches. Only how the model is used differs. Spending starts as a \textbf{hold}, a free reservation that expires on its own, until a person approves.}
   \vspace{0.2cm}
   \note{
     \textbf{(60s, ends 3:44)} Here is how it works. Think of a restaurant. The kitchen decides
@@ -194,16 +194,16 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
 % 7. THE EVIDENCE (68 s)
 \begin{frame}{On \res{final:cases} new cases, \res{fresh:both:metk} of \res{fresh:both:metn} runs met the expected outcome, and the one miss was the fixed rules}
   \begin{center}
-    \includegraphics[width=\textwidth]{fig_result.pdf}
+    \includegraphics[width=\textwidth,height=4.15cm,keepaspectratio]{fig_result.pdf}
   \end{center}
-  \vspace{-0.1cm}
-  \support{\textbf{No executed action broke a rule}: all four approaches share the planner and the gate, which refused \res{fresh:both:refused} attempted actions and recorded each. Six cases cannot rank the three model approaches.}
+  \vspace{-0.15cm}
+  \support{\textbf{The runs}: each new case ran 10 times, the fixed rules once (no model) and each model approach 3 times, all on Claude Sonnet 5.5 through OpenRouter. 4 campus cases make 40 runs, 2 pantry cases make 20. \textbf{No executed action broke a rule}: the gate refused \res{fresh:both:refused} attempts and recorded each.}
   \vspace{0.05cm}
-  \figcaption{Six new cases, locked before the first model call and never read by the author of the code changes. An earlier test (\res{dev:cases} cases) found real defects, fixed before the freeze, and its cases are now development cases.}
+  \figcaption{\textbf{The six new cases.} Campus: a real projector delay, a believable false alarm, a volunteer who runs late and then checks in, and a disruption with no allowed fix. Pantry: a late shipment while a partner can lend kits, and a false ``it arrived'' claim. Written and locked before the first model call. An earlier \res{dev:cases}-case test found real defects, fixed before the freeze.}
   \note{
     \textbf{(64s, ends 4:48)} Does it work? I froze the code, the prompts, the model and the
     limits. Then I ran six new cases, written by a separate worker before the freeze and
-    locked with it. Fixed rules ran once per case, the model approaches three times each. Fifty nine of sixty runs met the expected
+    locked with it. Fixed rules ran once per case, the model approaches three times each, all on the same model, Claude Sonnet 5.5. Fifty nine of sixty runs met the expected
     outcome. Our coordinator met all eighteen of its runs, and so did the other two model
     approaches. The one miss was the fixed rules, in a case where a volunteer runs late,
     because a person's own delay is a message its rules cannot read. No action ever broke a
@@ -292,6 +292,25 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % BACKUP SLIDES (not timed)
 \appendix
+\begin{frame}{Backup: the six new cases and the sixty runs, one by one}
+  \vspace{0.1cm}
+  {\scriptsize
+  \renewcommand{\arraystretch}{1.25}\begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.5cm}>{\raggedright\arraybackslash}p{4.3cm}>{\raggedright\arraybackslash}p{3.9cm}cc@{}}
+    \toprule
+    \textbf{New case} & \textbf{What happens} & \textbf{The right outcome} & \textbf{Fixed rules} & \textbf{Each model approach}\\
+    \midrule
+    Campus, real delay & The projector delivery will miss its slot & Move the demonstrations ten minutes and finish on time & met, 1 of 1 & met, 3 of 3\\
+    Campus, false alarm & A relayed call says the delivery is late, the order desk says on schedule & Change nothing & met, 1 of 1 & met, 3 of 3\\
+    Campus, late volunteer & The leader of the first activity reports a late bus, then checks in & Adjust from the check-in and still finish & \textbf{missed}, 0 of 1 & met, 3 of 3\\
+    Campus, no allowed fix & The projector order is withdrawn and the spare needs confirming too far ahead & Report that no allowed fix exists and change nothing invalid & met, 1 of 1 & met, 3 of 3\\
+    Pantry, late shipment & The main shipment arrives after service, a partner can lend 16 kits & Hold and receive the 16, reach the 40-kit target & met, 1 of 1 & met, 3 of 3\\
+    Pantry, false claim & A sales rep says ``delivered'', the real shipment comes after the deadline & Serve the 24 kits on hand and report the 16-kit gap & met, 1 of 1 & met, 3 of 3\\
+    \bottomrule
+  \end{tabular}\par}
+  \vspace{0.25cm}
+  \support{\textbf{Four approaches.} Fixed rules: written rules, no model. Tool-calling model: the model calls the sandbox tools itself. Check-all variant: the server runs every relevant status check first, then the model picks. Our coordinator: the model picks one option from the menu the server built and checked. The three model approaches all use Claude Sonnet 5.5 through OpenRouter.}
+\end{frame}
+
 \begin{frame}{Backup: what the new test cost, per run}
   \vspace{0.3cm}
   \begin{center}
