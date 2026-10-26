@@ -38,7 +38,7 @@ has a status from the template's list and its evidence. Paths starting with `res
 | The primary comparison covers 80 held-out episodes | measured in the scenario bank | `results/campus/report/evaluation_results.md`: "80 of 80 planned episodes recorded". 0 missing, 0 aborted, 3 capped (P2, kept in the denominator) | 8 cases × (1 P0 run + 3 LLM policies × 3 trials). Attempt 2 only. Attempt 1 voided and kept | "All 80 planned campus runs were recorded." |
 | The pantry transfer comparison covers 40 separate episodes | measured in the scenario bank | `results/pantry/report/evaluation_results.md`: 40 of 40 recorded. 18 capped, in the denominators | Never pooled with campus | "All 40 planned pantry runs were recorded, scored separately." |
 | All compared policies have the same tools, rights, start state and candidates | verified in a test | `apps/plan_b/tests/test_policy_parity.py::test_each_policy_reads_the_same_grant_tools_and_candidates` (P0 to P3 on dev01, skills_dev01 and pantry_dev01). freeze.json (one registry, grants, candidates, caps and model for all). `results/README.md`: identical model settings on 482/482 calls | Within each suite, tested on development cases. The post-run audit's held-out comparison of grants, tool lists and candidate sets is not in a committed file. Prompts differ by policy design (P1 generic. P2 and P3 have pantry guidance). P1 calls tools directly and does not use the menu | "Same tools, same rights, same gate, same model." |
-| A verification badge has supporting provenance | verified in a test | `apps/plan_b/docs/RELEASE_CHECKS.md` functional check 11 | Only **partly covered**: no runtime test resolves every verify decision to a matching successful check | "In the tested paths, a verified badge links to a successful status check." Use only with the board |
+| A verification badge has supporting provenance | verified in a test | `apps/plan_b/docs/RELEASE_CHECKS.md` functional check 11. `apps/plan_b/tests/test_release_failures.py` (the provenance walk added in the Wave 3b polish: every verify decision of P0 on seven development cases and of P1 to P3 with the scripted provider on dev01 and pantry_dev01 resolves to a successful check of the same entity and fact, plus a forged-label and a quoted-status test) | Covered by tests on development cases. No tested run has a stale record, so staleness is checked through the freshness formula only. The tests cover the v1.1 code at `26cf424` | "In the tested paths, a verified badge links to a successful status check." Use only with the board |
 | The live model failure is visible and replaced by a labeled replay | verified in a test | `evidence/rehearsal/rehearsal_report.json` rehearsal 2: a `provider_error` card after 0.2 s. Plan, holds, budget and receipts unchanged. 1 transport-failure call at $0. The replay ready after 0.8 s with "Integrity check passed" | Automated rehearsal with a closed local port, not a real outage, not a human rehearsal | "If the model fails, nothing is invented. We switch to a recorded run." |
 | The showcase's app path ran three times in a row from a clean reset | verified in a test | `REHEARSALS.md`. `evidence/rehearsal/rehearsal_report.json` | Automated internal rehearsals of the app path. Nobody spoke | "The board story was run three times in a row from a clean reset, automatically." |
 | The talk was rehearsed three times | unresolved | No human rehearsal yet (`REHEARSALS.md`) | **Human rehearsals pending** | Do not claim human rehearsals |
@@ -50,6 +50,40 @@ has a status from the template's list and its evidence. Paths starting with `res
 | Prior inventory guarantees apply to event or pantry recovery | unsupported | none | Different transition models | Omit |
 | An operator wants to pilot the workflow | unresolved | No consent or outreach recorded | none | "The next step is a workflow review with community staff. No partnership is claimed." |
 
+## Wave 3b: version 1.2 claims
+
+Paths starting with `fresh/` are under
+`apps/plan_b/evaluation/results/wave3b_fresh_20261025T2327Z/` and paths starting with `rerun/`
+under `apps/plan_b/evaluation/results/wave3b_rerun_spent_20261025T2345Z/` (both in commit
+`f715dfc`). The submission items read the same numbers from
+`PEEAI_plan/submission/documentation/results_v12.json` and
+`slides/figures/results_numbers_v12.tex` (keys `fresh:` and `rerun:`), written by
+`make_results.py` from the two `metrics.json` files of each run.
+
+| Field | Fresh held-out run (layer ii) | Post-hoc diagnostic rerun on spent cases (layer iii) |
+| --- | --- | --- |
+| Run | `wave3b_fresh_20261025T2327Z`, 60 of 60 recorded, all completed | `wave3b_rerun_spent_20261025T2345Z`, 120 of 120 recorded (101 completed, 19 capped). **Not a held-out result** |
+| Code | `freeze_v1_2.json` (23:23:47Z, git head `1ea8ea1`, 76 files), commit `5955243` | the same freeze |
+| Cases | C09 to C12 (C10 the negative control), T05, T06, locked in `heldout2.json` (23:23:54Z) before the first 1.2 call (23:27:31Z) | the spent C01 to C08 and T01 to T04, through a scratch case lock (`rerun/manifests/diagnostic_lock_spent_v1_2.json`) |
+| Policy versions | P0 `rules/1.0.0` (pantry `pantry-rules/1.1.0`) on planner `plan_b.planner/1.2.0`, P1 `tool-use/1.2.0`, P2 `live/1.2.0`, P3 `verify-all/1.2.0` | the same |
+| Model and caps | the same as v1.1: `anthropic/claude-sonnet-5.5` via OpenRouter, 8 model calls, 48 tool calls, 0.50 USD per run, 900 s | the same |
+| Concurrency | `--jobs 1`, 0 HTTP 429 answers | `--jobs 2`, 61 HTTP 429 answers on 28 calls, waited out at 0 USD |
+| Aggregation | counts only, as in v1.1. Not comparable with the v1.1 counts, because the cases differ | counts only. Never presented as an improvement over v1.1 |
+
+| Proposed claim | Status | Evidence/run/source | Scope and important boundary | Approved wording |
+| --- | --- | --- | --- | --- |
+| Version 1.2 met the outcome in 59 of 60 fresh held-out runs | measured in the scenario bank | `fresh/campus/report/metrics.json` and `fresh/pantry/report/metrics.json` (`res:fresh:both:metk` 59, `metn` 60). Recount by audit_eval2: no mismatches | Six small cases whose conditions repeat the spent ones (C09 is C01's, C10 C03's, C11 C06's, C12 C08's, T05 T01's, T06 T03's). New instances of known conditions, not new conditions | "On six fresh held-out cases, version 1.2 met the expected outcome in 59 of 60 runs." |
+| Fresh campus counts | measured in the scenario bank | `fresh/campus/report/evaluation_results.md`: P0 3/4, P1 12/12, P2 12/12, P3 12/12 (goal completion P0 2/3, P1 to P3 9/9. Appropriate infeasibility, C12, 1/1 and 3/3 each) | Four cases. Descriptive counts | "On the four fresh campus cases, P1, P2 and P3 met all 12 runs each, and P0 met 3 of 4." |
+| Fresh pantry counts | measured in the scenario bank | `fresh/pantry/report/evaluation_results.md`: P0 2/2, P1 6/6, P2 6/6, P3 6/6 (original target T05 and supported partial T06, 1/1 and 3/3 each) | Two cases, scored separately from campus. 0 conservation failures | "On the two fresh pantry cases, every run met its outcome." |
+| The one fresh miss is C11 under P0 | measured in the scenario bank | `fresh/FAILURES.md` (`ev_w2n__P0__once`, earliest broken stage interpretation) | P0's frozen parser cannot read the facilitator's self-report, the same gap as C06 in v1.1 | "The only miss was the fixed-rules baseline on the late-volunteer case, which it cannot read." |
+| No unnecessary change on the fresh negative control | measured in the scenario bank | `fresh/campus/report/metrics.json` `by_case.ev_j8p`: 0 unnecessary changes for P0 (n=1) and P1 to P3 (n=3 each) | One quiet case, 10 runs | "No policy made an unnecessary change on the fresh quiet case." |
+| No executed violation under 1.2 | measured in the scenario bank | `fresh/*/report` and `rerun/*/report`: executed violations 0 for every policy. Refused requests on the fresh pantry: P0 1, P1 2, P2 3, P3 0 | Defined invariants only. Zero is enforced by design | "In the 60 fresh runs and the 120 rerun runs, no invalid request was executed." |
+| P2 has an advantage under 1.2 | unsupported | Fresh: P1, P2 and P3 all met every run. Rerun: campus P2 21/24 against P1 and P3 24/24, pantry P2 12/12 against P1 10/12 and P3 9/12 | Small fresh set. The rerun is diagnostic | "P2 still shows no consistent advantage." |
+| Post-hoc diagnostic rerun counts on the spent cases | measured in the scenario bank (diagnostic, not held-out) | `rerun/campus/report` and `rerun/pantry/report`: campus P0 6/8, P1 24/24, P2 21/24, P3 24/24. Pantry P0 4/4, P1 10/12, P2 12/12, P3 9/12. `rerun/FAILURES.md`: 10 misses (C06 P0, C07 P0, C07 P2 x3, T02 P3 x3, T04 P1 x2), each in a pair that also missed in v1.1 | The fixes were written from these cases' failures. Its harness files say "held-out" only because of the scratch lock (`rerun/README.md`) | "On a post-hoc diagnostic rerun on the spent cases, not a held-out result, the C06 failures of P2 and P3 and the T03 failures did not recur, consistent with the fixes." |
+| Version 1.2 is better than version 1.1 | unsupported | Layers (i) and (ii) use different cases. Layer (iii) reruns the cases the fixes came from | none | Omit. Never "the fixes removed" |
+| The fresh run cost 3.61 USD | measured in the scenario bank | `fresh/spend_extract.json` and the fresh README "Spend": 3.608150 USD for 194 calls. P1 2.317962, P2 0.761566, P3 0.528622 over both suites | Provider-reported computation cost only | "The fresh check cost about 3.61 USD in model calls." |
+| The rerun cost 8.94 USD | measured in the scenario bank | `rerun/spend_extract.json`: 8.944586 USD for 469 calls. The ledger then stood at 26.433970 USD | Diagnostic run | "The diagnostic rerun cost about 8.94 USD." |
+
 ## Evidence categories (kept separate)
 
 1. **Prior COLLIE inventory findings:** not used in any claim here.
@@ -60,3 +94,5 @@ has a status from the template's list and its evidence. Paths starting with `res
    Wave 3 release checks.
 5. **Measured secondary transfer results:** the pantry suite of the same run.
 6. **Untested deployment hypotheses:** community staff review, real integrations, pilot.
+7. **Measured version 1.2 results (Wave 3b):** the fresh held-out run (a separate, small
+   held-out check) and, apart from it, the post-hoc diagnostic rerun on spent cases.

@@ -9,7 +9,13 @@ the Wave 2 runbook [`../wave_2/DEMO.md`](../wave_2/DEMO.md) and on
 Everything shown is a **fictional, local sandbox**. Every Wave 3 number comes from one committed
 run, `wave3_heldout_20261025T1625Z`
 ([README](../../../apps/plan_b/evaluation/results/wave3_heldout_20261025T1625Z/README.md),
-committed in `c052338`). Every row of [`CLAIMS.md`](CLAIMS.md) names its source.
+committed in `c052338`), the evaluation of record of version 1.1. Wave 3b adds version 1.2 and two
+labelled runs (commit `f715dfc`): the held-out run on six fresh cases,
+[`wave3b_fresh_20261025T2327Z`](../../../apps/plan_b/evaluation/results/wave3b_fresh_20261025T2327Z/README.md)
+(slide 12), and a post-hoc diagnostic rerun on the twelve spent cases,
+[`wave3b_rerun_spent_20261025T2345Z`](../../../apps/plan_b/evaluation/results/wave3b_rerun_spent_20261025T2345Z/README.md),
+which is not a held-out result and appears only on a backup slide. Every row of
+[`CLAIMS.md`](CLAIMS.md) names its source.
 
 ## 1. The message, and what the judges should retell
 
@@ -26,13 +32,14 @@ The audience should be able to retell four things:
 4. **One failure on record, and the honest tradeoff.** My selective controller (P2) showed no
    consistent advantage ("no clear winner"). It was cheaper per run, but it met fewer cases than
    the tool-use agent (P1) on campus. One held-out failure: a correct reading that never reached
-   the planner.
+   the planner. Version 1.2 then met 59 of 60 runs on six fresh held-out cases, too few to rank
+   the model policies.
 
 ## 2. Operating mode: say it before you start
 
 | Part | Default mode | Label on screen | Evidence the mode works |
 | --- | --- | --- | --- |
-| Slides 1 to 12 | The deck alone (PDF). It needs no server | none | the deck file |
+| Slides 1 to 13 | The deck alone (PDF). It needs no server | none | the deck file |
 | Optional board, slides 3 to 7 | **Deterministic policy** acting on the sandbox (`rules/1.0.0`), no model call | Header badge "Deterministic policy" | 3 automated rehearsals ([REHEARSALS.md](REHEARSALS.md)) |
 | Optional board, slide 8 | **Recorded replay** of a real paid development run (`live_p2-live_dev02_trace.json`, `live/1.0.0`) | Purple "Recorded replay" banner. "Integrity check passed" | rehearsals, and the storyboard check |
 | Optional board, slide 11 (pantry cameo) | **Live sandbox tools with the deterministic pantry policy** (`pantry-rules/1.1.0`), no model call | "Fictional pantry sandbox". Header "Deterministic policy" | rehearsals (40 of 40 on time in all three) |
@@ -76,12 +83,13 @@ backup slide "the report's per-case figure, campus" shows the same figure).
 
 **Clicks** are deck advances or board actions. Board actions are optional. The deck alone tells
 the story. **Point at** is what to show. **Say** follows `pres-note.md`, about 140 words per
-minute. The spoken script is 953 words, an estimated 408 s against the 420 s plan, so board
+minute. The spoken script is 932 words, an estimated 399 s against the 420 s plan, so board
 actions are spoken over and never paused for. If the board is used, drop the "skip if late"
-sentences of slides 3, 6 and 8.
+sentence of slide 6.
 
-Slide numbers here follow `pres-note.md` and the PDF pages. The deck's footer counts only the 11
-slides after the title, so slide 9 here shows "8 / 11" in the footer.
+Slide numbers here follow `pres-note.md` and the PDF pages. The deck's footer counts only the 12
+slides after the title, so slide 9 here shows "8 / 12" in the footer. Slide 12 (version 1.2) was
+added in Wave 3b.
 
 ### Slide 1 · 0:00 to 0:10 · Title (10 s)
 
@@ -96,21 +104,21 @@ slides after the title, so slide 9 here shows "8 / 11" in the footer.
 - **Say:** the hook, then the question: "Would you wait, check, or prepare a backup?" Wait for
   a show of hands. Nobody needs a phone.
 
-### Slide 3 · 0:37 to 1:12 · The coordinator may check, hold and make free changes, not spend (35 s)
+### Slide 3 · 0:37 to 1:07 · The coordinator may check, hold and make free changes, not spend (30 s)
 
 - **Point at:** the roles figure, and the hold limit of $35.
 - **Optional board (T1):** load case `dev01`. Show the `agent_demo` grant: "Committed $0.00 of
   $0.00 · held $0.00 of $35.00".
 - **Say:** "It cannot spend a cent without the organizer."
 
-### Slide 4 · 1:12 to 1:47 · A message is a claim, not a fact (35 s)
+### Slide 4 · 1:07 to 1:38 · A message is a claim, not a fact (31 s)
 
 - **Optional board:** **Run deterministic policy**, once.
 - **Point at:** the notice from `delivery_contact`. Then the status check: delayed, reported
   ETA 17:25, and the board's note that a reported ETA is not an arrival.
 - **Say:** "Before changing anything, it checks the one fact that could change the decision."
 
-### Slide 5 · 1:47 to 2:35 · One checked change, one receipt (48 s)
+### Slide 5 · 1:38 to 2:22 · One checked change, one receipt (44 s)
 
 - **Point at:** the swap figure. "16 built, 3 pass". The receipt line "Plan version 1 → 2,
   applied at 16:43 by receipt `rcpt_0001`".
@@ -118,23 +126,23 @@ slides after the title, so slide 9 here shows "8 / 11" in the footer.
   Then: "These frames show my rule baseline. In a recorded run, the AI coordinator made the same
   check and the same swap." (as in `pres-note.md` slide 5)
 
-### Slide 6 · 2:35 to 3:25 · Four messages, zero changes (50 s)
+### Slide 6 · 2:22 to 3:09 · Four messages, zero changes (47 s)
 
 - **Optional board:** load `dev04` → **Run deterministic policy** → *Minutes* `8` → **Run 8
   minutes with policy**. This fast-forwards the scenario clock. Say "fast-forward".
 - **Point at:** "does not apply" (order P09, another date), "duplicate" (one source repeated),
   and "Plan version 1 kept: no hold, no spending, no change".
-- **Say:** "Three of my eight final test cases are quiet ones like this." Results tie-in, from the committed run: **no policy made an unnecessary change on
+- **Say:** "Three of my twelve final test cases are quiet ones like this." Results tie-in, from the committed run: **no policy made an unnecessary change on
   those three quiet cases** (0 committed changes over 3, 9, 9 and 9 episodes).
 
-### Slide 7 · 3:25 to 3:53 · Verify, prepare, commit (28 s)
+### Slide 7 · 3:09 to 3:35 · Verify, prepare, commit (26 s)
 
 - **Optional board:** load `dev02` → **Run deterministic policy**. Point at "Held `hold_0001`,
   Hold expires 16:55" and the ask for $35.
 - **Say:** walk the loop once. "Prepare" is the paid backup case: the backup is held until 16:55
   and the organizer is asked to approve $35.
 
-### Slide 8 · 3:53 to 4:23 · The model chooses, the server checks (30 s)
+### Slide 8 · 3:35 to 4:05 · The model chooses, the server checks (30 s)
 
 - **Optional board (T2, Recorded replay):** the **Commit** card shows `live/1.0.0 · chosen by a
   model call`, latency 3.75 s, cost $0.0135, receipt `rcpt_0003`. The rationale is labeled
@@ -143,7 +151,7 @@ slides after the title, so slide 9 here shows "8 / 11" in the footer.
   the server built and checked). "Every policy passes the same gate." Say "recorded" whenever a
   replay is on screen.
 
-### Slide 9 · 4:23 to 5:13 · Held-out test: zero violations, no clear winner (50 s), the results
+### Slide 9 · 4:05 to 4:43 · Held-out test of version 1.1: zero violations, no clear winner (38 s), the results of record
 
 What to point at:
 
@@ -185,13 +193,15 @@ Per case, pantry:
 
 **Say** (the deck's line, `pres-note.md` slide 9):
 
-> "Everything so far came from development cases, practice cases I built with. Then I froze the
-> code, the prompts, the model and the limits, and ran held-out cases, hidden from every policy.
-> A first attempt hit the provider's rate limit, so I voided it and kept it on record. In the
-> reported run all one hundred twenty runs were recorded. The server refused fifty five requests
-> in all, and no policy executed a violation or changed a quiet event. But my P two showed no
-> consistent advantage. P one, the model calling tools freely, met all twenty four campus runs,
-> at three times P two's model cost. On the pantry, fixed rules met every run."
+> "Everything so far came from practice cases I built with. Then I froze version one point one,
+> its code, prompts, model and limits, and ran twelve held-out cases, hidden from every policy.
+> All one hundred twenty runs were recorded. No policy executed a violation or changed a quiet
+> event. But my P two showed no consistent advantage. P one met the expected outcome in all
+> twenty four campus runs, at three times P two's model cost. These are descriptive counts
+> only."
+
+The voided first attempt and the 55 refused requests are no longer spoken. They stay on the
+slide (refusals) and on the backup slide "what the held-out runs cost" (the void).
 
 "Three times" checks out: P1's provider-reported campus cost is $3.006960 against P2's
 $1.004722, about 2.99 times.
@@ -214,7 +224,7 @@ $1.004722, about 2.99 times.
   - A frozen-code defect: a pool checked as unavailable stays a requestable handoff. It was the
     earliest broken stage of all six P2 and P3 T03 failures. The results stand as measured.
 
-### Slide 10 · 5:13 to 5:39 · One failure: a correct reading that never reached the planner (26 s)
+### Slide 10 · 4:43 to 5:09 · One failure: a correct reading that never reached the planner (26 s)
 
 **The failure trace (the deck's choice):** `hk_q8n__P2__s101`, case C06, the protocol
 condition "volunteer late, with a subsequent check-in". Its earliest broken stage is planner
@@ -239,7 +249,7 @@ case lock, before the runs.
   "in the count".
 - **Say** (the deck's line):
 
-> "Here is one failure. In one held-out case a volunteer says they will be late. P two and P
+> "In one held-out case a volunteer says they will be late. P two and P
 > three read the message correctly. But my frozen rule passes only equipment claims to the
 > planner, so the plan was never questioned. All six of their runs stay in the count. P one met
 > this case every time."
@@ -259,7 +269,7 @@ trials repeat it.
 
 There was no violation and no invented confirmation.
 
-### Slide 11 · 5:39 to 6:29 · Same loop, a new rule: 40 kits for a fictional pantry (50 s)
+### Slide 11 · 5:09 to 5:49 · Same loop, a new rule: 40 kits for a fictional pantry (40 s)
 
 **Clicks (optional board, as in DEMO.md's pantry segment):**
 
@@ -280,15 +290,59 @@ held-out pantry cases, fixed rules met all four runs, and the model policies six
 twelve, partly because of a defect in my frozen planner. No kit was counted twice." That matches `pantry/report`: P0 4/4. P1 6/12, P2 9/12,
 P3 6/12. 0 duplicate or unauthorized credits. 0 conservation failures.
 
-### Slide 12 · 6:29 to 7:00 · What works today, and what is next (31 s)
+### Slide 12 · 5:49 to 6:28 · Version 1.2: the fixes, then six fresh held-out cases (39 s)
 
-- **Point at:** the QR code (it opens `apps/plan_b` on the branch, once pushed) and "12 held-out
-  cases (120 runs)".
+Added in Wave 3b. Sources: `apps/plan_b/evaluation/results/wave3b_fresh_20261025T2327Z/`
+(README.md, FAILURES.md, `{campus,pantry}/report/metrics.json`), read by `make_results.py` into
+`slides/figures/results_numbers_v12.tex`.
+
+- **Point at:** the two-row table. Row 1 is the v1.1 record (12 cases). Row 2 is version 1.2 on
+  six fresh held-out cases (C09 to C12, T05, T06), locked at 23:23:54Z, before the first 1.2
+  call at 23:27:31Z. Then "59 of 60 fresh runs met" and the caption "not a before and after".
+
+| Version 1.2, fresh held-out (60 runs) | P0 rules | P1 tool use | P2 selective | P3 verify-all |
+| --- | --- | --- | --- | --- |
+| Campus episodes (C09 to C12) | 3/4 | 12/12 | 12/12 | 12/12 |
+| Pantry episodes (T05, T06) | 2/2 | 6/6 | 6/6 | 6/6 |
+| Executed violations | 0 | 0 | 0 | 0 |
+
+The miss is C11 under P0 (`ev_w2n__P0__once`, interpretation: P0's frozen parser does not read
+a person's own delay report). C10, the negative control, had 0 unnecessary changes in 10 of 10
+runs. The fresh run cost 3.608150 USD.
+
+- **Say** (the deck's line, `pres-note.md` slide 12):
+
+> "Version one point two targets those failures. A person's own delay now reaches the planner,
+> and a pool checked as unavailable is no longer offered. The old cases were spent, so six fresh
+> ones were written without the new code, and locked before any call. Version one point two met
+> fifty nine of sixty runs. Fixed rules missed one late volunteer. The other policies met every
+> run, so this small set cannot rank them. The cases differ, so this is not a before and after."
+
+**For questions only:**
+
+- The fresh cases repeat known conditions (C11 is the C06 condition, T06 is T03), with near
+  copies of the spent wording, so they test new instances of known conditions. The cases' author
+  saw a prose list of the planned fixes but no 1.2 code. The policy author never read the cases.
+- Five limits of 1.2 found by the audit before the freeze (A1 to A5, `RUNTIME_CONTRACT.md`
+  section 21) stayed frozen, because the auditor had seen the fresh cases.
+- **The rerun on the spent cases** (`wave3b_rerun_spent_20261025T2345Z`, backup slide "version
+  1.2 on the spent cases, a diagnostic rerun"): always say "post-hoc diagnostic rerun after
+  fixes, on spent cases, not held-out". Campus P0 6/8, P1 24/24, P2 21/24, P3 24/24. Pantry P0
+  4/4, P1 10/12, P2 12/12, P3 9/12. The C06 misses of P2 and P3 and the T03 misses did not
+  recur, consistent with the fixes. C07 under P2, T02 under P3, T04 under P1 (2 of 3) and P0 on
+  C06 and C07 still miss. It ran two jobs at a time and waited out 61 HTTP 429 answers at no
+  cost. Its generated files say held-out only because of the harness path (its README explains).
+- P2 still shows no consistent advantage.
+
+### Slide 13 · 6:28 to 7:00 · What works today, and what is next (32 s)
+
+- **Point at:** the QR code (it opens `apps/plan_b` on the pushed branch) and "12 held-out
+  cases (120 runs), then version 1.2 on 6 fresh ones (60 runs)".
 - **Say** (the deck's line): "Today Plan B verifies, prepares and commits in a local sandbox.
-  Every accepted change has a receipt, and people approve spending. On held-out cases no policy
-  executed a violation, but my policy showed no consistent advantage over the others." Then the
-  real-life mapping
-  and "Next, I want to review these workflows with community staff. Thank you."
+  Every accepted change has a receipt, and people approve spending. In both held-out tests no
+  policy executed a violation, and my policy showed no consistent advantage." Then the
+  real-life mapping, "No community has used it yet." and "Next, I want to review it with
+  community staff. Thank you."
 
 ## 5. Forced-failure fallback (the live model, if it is ever used on stage)
 
