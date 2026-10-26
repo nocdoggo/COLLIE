@@ -41,8 +41,8 @@ V12 = json.loads((HERE / "results_v12.json").read_text(encoding="utf-8"))
 
 TITLE = "Plan B: The Show Must Go On"
 AUTHOR = "Noctis Zhang"
-REPO = "https://github.com/nocdoggo/COLLIE"
-APP_URL = f"{REPO}/tree/hackathon/peeaai-plan/apps/plan_b"
+REPO = "https://github.com/nocdoggo/FA26-COLLIE"
+APP_URL = REPO
 
 
 def render_figures() -> None:
@@ -70,7 +70,7 @@ def title_block(doc) -> None:
             ["Institution", "University of Massachusetts Boston"],
             ["Event", "Paul English Applied AI Institute (PEAAII) Hackathon, UMass Boston, October 2026"],
             ["Repository", f"<<{APP_URL}>>"],
-            ["Branch and app path", "branch `hackathon/peeaai-plan` of the repository `nocdoggo/COLLIE`, app in `apps/plan_b`"],
+            ["App and submission paths", "the app is in `apps/plan_b` and the submission items are in `PEEAI_plan/submission` of the repository `nocdoggo/FA26-COLLIE`"],
         ],
         [1.6, 4.9],
     )
@@ -831,8 +831,8 @@ def how_to_run(doc) -> None:
     code_block(
         doc,
         [
-            f"git clone --branch hackathon/peeaai-plan {REPO}",
-            "cd COLLIE/apps/plan_b",
+            f"git clone {REPO}",
+            "cd FA26-COLLIE/apps/plan_b",
             "unset VIRTUAL_ENV",
             "uv sync --all-groups --locked",
             "(cd web && npm ci && npm run build)",
@@ -844,7 +844,7 @@ def how_to_run(doc) -> None:
         "Open http://127.0.0.1:8765 in a browser. Sign in with the moderator code in "
         "`var/moderator_code.txt`, which the server writes on its first start. Choose case `dev01`, "
         "click **Load episode**, then **Run deterministic policy**. The server keeps its terminal busy, "
-        "so run the next commands in a second terminal in `COLLIE/apps/plan_b`.",
+        "so run the next commands in a second terminal in `FA26-COLLIE/apps/plan_b`.",
     )
     para(
         doc,
@@ -879,7 +879,7 @@ def how_to_run(doc) -> None:
     )
     para(
         doc,
-        "The tests behind section 12.6, from `COLLIE/apps/plan_b` (the browser walkthroughs are in "
+        "The tests behind section 12.6, from `FA26-COLLIE/apps/plan_b` (the browser walkthroughs are in "
         "`tests/e2e/`):",
     )
     code_block(doc, ["uv run pytest -q", "(cd web && npm test)"])

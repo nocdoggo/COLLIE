@@ -11,6 +11,10 @@ https://github.com/nocdoggo/COLLIE at `26cf424`, and the direct link
 https://github.com/nocdoggo/COLLIE/tree/hackathon/peeaai-plan/apps/plan_b resolved (HTTP 200,
 checked by the owner at 18:20 EDT). The build has submitted nothing to Canvas.
 
+At 23:10 EDT the owner asked for a clean export into the new repository
+https://github.com/nocdoggo/FA26-COLLIE. The documentation, the deck and the poster (and both QR
+codes) now link to it.
+
 | # | Required item | File | Status | What the owner must still do |
 | --- | --- | --- | --- | --- |
 | 1 | **Project Documentation** as a Word document, **plus the GitHub repository link** | [`submission/documentation/Plan_B_Project_Documentation.docx`](../../submission/documentation/Plan_B_Project_Documentation.docx). Link in the document: https://github.com/nocdoggo/COLLIE/tree/hackathon/peeaai-plan/apps/plan_b (clickable) | **Ready.** The Word file meets the confirmed format. The link points at the pushed branch, because the repository's default branch is a different project. Checked through a pandoc render, since Word is not available on the build machine | Open the .docx once in Word and page through it. Paste the same link into the platform's repository field |

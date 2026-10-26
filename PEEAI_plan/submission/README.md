@@ -9,9 +9,10 @@ team name). Paul English Applied AI Institute (PEAAII) Hackathon, UMass Boston, 
 | 2 | The 7-Minute Project Presentation | `slides/slides.pdf`, spoken script `slides/pres-note.md` | `slides/slides.tex` |
 | 3 | The 2-Minute, One-Slide Presentation (horizontal, 16:9) | `poster/poster.pdf`, spoken script `poster/poster-note.md` | `poster/poster.tex` |
 
-**Repository**: https://github.com/nocdoggo/COLLIE, branch `hackathon/peeaai-plan`, app in
-`apps/plan_b`. The link in the documentation and both QR codes point straight at the app:
-https://github.com/nocdoggo/COLLIE/tree/hackathon/peeaai-plan/apps/plan_b
+**Repository**: https://github.com/nocdoggo/FA26-COLLIE, a clean export of the hackathon work
+(the app in `apps/plan_b`, the plan, packets and these submission items in `PEEAI_plan`). The link
+in the documentation and both QR codes point at it. The work was developed on the branch
+`hackathon/peeaai-plan` of https://github.com/nocdoggo/COLLIE, which keeps the full history.
 
 **Push status**: the owner pushed the branch to `origin` at `26cf424` on October 25, 2026, and
 the direct link resolved (HTTP 200, 18:20 EDT). The repository's default branch is a different
