@@ -3,7 +3,7 @@
 This is the tooling for the Wave 3 comparison: the freeze, the held-out suites, the episode
 runner, the metrics and the report. The protocol itself (policies P0–P3, common conditions,
 cases C01–C08 and T01–T04, metric definitions, reporting gates) is
-[`PEEAI_plan/08_evaluation.md`](../../../PEEAI_plan/08_evaluation.md); where this file and the
+[`PEEAI_plan/08_evaluation.md`](https://github.com/nocdoggo/COLLIE/blob/hackathon/peeaai-plan/PEEAI_plan/08_evaluation.md); where this file and the
 protocol disagree, the protocol wins and this file is wrong. Nothing here claims a result: the
 commands below produce results only when they are run, and a development dry run is never a
 reported result.
@@ -240,7 +240,7 @@ gives. No composite score is computed and no significance is claimed.
 
 `plan-b eval report --results <dir>` writes `<dir>/report/metrics.json`,
 `<dir>/report/evaluation_results.md` (the
-[results template](../../../PEEAI_plan/templates/evaluation_results.md): run manifest, the suite's
+[results template](https://github.com/nocdoggo/COLLIE/blob/hackathon/peeaai-plan/PEEAI_plan/templates/evaluation_results.md): run manifest, the suite's
 aggregate display, counts and denominators per policy, verification and cost, the per-case
 table, the pantry quantity and receipt ledger, extraction labels, missing episodes) and
 `<dir>/report/figure.svg`: per case, for each policy, the episodes that met the case's outcome

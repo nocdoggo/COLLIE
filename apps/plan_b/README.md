@@ -20,10 +20,10 @@ with consumable stock and staff-only attestations, participant check-ins and res
 and per-episode caps for every policy.
 
 Contract: [docs/RUNTIME_CONTRACT.md](docs/RUNTIME_CONTRACT.md) (runtime 1.1.0). Planning source:
-[`PEEAI_plan/`](../../PEEAI_plan/README.md). Audit packets:
-[`PEEAI_plan/handoffs/wave_1/`](../../PEEAI_plan/handoffs/wave_1/README.md) and
-[`PEEAI_plan/handoffs/wave_2/`](../../PEEAI_plan/handoffs/wave_2/README.md) and
-[`PEEAI_plan/handoffs/wave_3/`](../../PEEAI_plan/handoffs/wave_3/README.md).
+[`PEEAI_plan/`](https://github.com/nocdoggo/COLLIE/blob/hackathon/peeaai-plan/PEEAI_plan/README.md). Audit packets:
+[`PEEAI_plan/handoffs/wave_1/`](https://github.com/nocdoggo/COLLIE/blob/hackathon/peeaai-plan/PEEAI_plan/handoffs/wave_1/README.md) and
+[`PEEAI_plan/handoffs/wave_2/`](https://github.com/nocdoggo/COLLIE/blob/hackathon/peeaai-plan/PEEAI_plan/handoffs/wave_2/README.md) and
+[`PEEAI_plan/handoffs/wave_3/`](https://github.com/nocdoggo/COLLIE/blob/hackathon/peeaai-plan/PEEAI_plan/handoffs/wave_3/README.md).
 
 ## Requirements
 
@@ -214,7 +214,7 @@ path. A host or user name that is an ordinary word can be exempted with
   improvement. `uv run plan-b eval verify-freeze --freeze freeze_v1_2.json --heldout
   heldout2.json --require-heldout` checks the 1.2 freeze and lock.
 * **Showcase.** The seven-minute script and runbook, the claims ledger and the rehearsal record
-  are in [`PEEAI_plan/handoffs/wave_3/`](../../PEEAI_plan/handoffs/wave_3/SHOWCASE.md).
+  are in [`PEEAI_plan/handoffs/wave_3/`](https://github.com/nocdoggo/COLLIE/blob/hackathon/peeaai-plan/PEEAI_plan/handoffs/wave_3/SHOWCASE.md).
   `uv run python tests/e2e/rehearsal.py --out <dir>` runs three automated rehearsals from a
   clean reset (one with a forced provider failure and the switch to the recorded replay);
   `tests/e2e/keyboard.py --out <dir>` is the keyboard check.
