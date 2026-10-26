@@ -9,9 +9,9 @@ It (re)creates ``<dest>`` with two directories:
 * ``state/``: an empty state directory. ``plan-b serve --var <dest>/state`` creates a fresh
   SQLite database in it, and a moderator code in ``state/moderator_code.txt`` (mode 0600) unless
   ``PLAN_B_MODERATOR_CODE`` is set.
-* ``replays/``: copies of the recorded traces of the Wave 2 packet
-  (``PEEAI_plan/handoffs/wave_2/evidence/traces/``), each checked with the same integrity rules
-  as ``plan-b verify-trace``; a trace that fails is not copied. These are what the board's
+* ``replays/``: copies of the recorded traces in ``data/recorded/`` (from the Wave 2
+  packet), each checked with the same integrity rules as ``plan-b verify-trace``; a trace
+  that fails is not copied. These are what the board's
   **Recorded replay** lists for the offline fallback. They are recordings of runs that happened,
   never a new trial.
 
@@ -34,7 +34,7 @@ from pathlib import Path
 
 APP = Path(__file__).resolve().parents[1]
 REPO = APP.parents[1]
-EVIDENCE_TRACES = REPO / "PEEAI_plan/handoffs/wave_2/evidence/traces"
+EVIDENCE_TRACES = APP / "data" / "recorded"
 MARKER = ".demo_prep"
 DEFAULT_PORT = 8790
 # The traces the runbook opens by name (DEMO.md): the live agent's (P2) paid-backup run, P3's run

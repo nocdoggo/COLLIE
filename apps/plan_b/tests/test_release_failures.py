@@ -45,7 +45,7 @@ from tests.test_pantry_fixture import DISTRIBUTION_WINDOW, EVENT, PantrySandbox,
 APP = Path(__file__).resolve().parents[1]
 PKG = APP / "plan_b"
 # The recorded paid runs of the Wave 2 packet; read here, never written.
-RECORDED = APP.parents[1] / "PEEAI_plan/handoffs/wave_2/evidence/traces"
+RECORDED = APP / "data" / "recorded"
 MUTATIONS = ("hold_resource", "apply_plan", "release_hold", "update_grant", "update_goal")
 
 

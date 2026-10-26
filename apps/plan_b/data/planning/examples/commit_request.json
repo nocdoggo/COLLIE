@@ -1,0 +1,14 @@
+{
+  "artifact_type": "mutation_request",
+  "schema_version": "0.2.0",
+  "tool": "apply_plan",
+  "event_id": "e_showcase_01",
+  "expected_revision": 4,
+  "idempotency_key": "demo_commit_swap_001",
+  "grant_id": "grant_coordinator_demo",
+  "arguments": {
+    "candidate_plan_id": "candidate_swap_01",
+    "constraint_report_ref": "check_swap_rev4"
+  },
+  "expected_goal_version": 1
+}

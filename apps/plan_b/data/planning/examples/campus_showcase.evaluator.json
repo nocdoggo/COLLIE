@@ -1,0 +1,43 @@
+{
+  "artifact_type": "private_evaluator",
+  "schema_version": "0.2.0",
+  "scenario_id": "dev_fixture_01",
+  "case_id": "DEV01",
+  "never_expose_to_agent": true,
+  "ground_truth_note": "Authored development fixture for walkthrough and integration checks. Exclude it from held-out evaluation. The status tool reveals only the current reported ETA. Actual arrival remains hidden until observed.",
+  "events": [
+    {
+      "at": "2026-11-05T16:40:00-05:00",
+      "event_kind": "tool_response_available",
+      "entity_id": "projector",
+      "payload": {
+        "tool": "query_status",
+        "order_id": "P17",
+        "status": "delayed",
+        "reported_eta": "2026-11-05T17:25:00-05:00",
+        "source_record_id": "order_P17_revision_4",
+        "requested_fact": "delivery_eta"
+      },
+      "visibility": "tool_only"
+    },
+    {
+      "at": "2026-11-05T17:24:00-05:00",
+      "event_kind": "resource_arrival",
+      "entity_id": "projector",
+      "payload": {
+        "status": "available",
+        "source_record_id": "receipt_P17"
+      },
+      "visibility": "observation_on_delivery"
+    }
+  ],
+  "outcome_checks": [
+    "All required activities complete by 18:00 in the main room.",
+    "Welcome starts at 17:00.",
+    "An equipment-dependent activity cannot execute before actual resource arrival.",
+    "No resource, role, program, or budget constraint is violated.",
+    "No committed spending exceeds the active grant.",
+    "Queries and planning tools never expose future resource_arrival events."
+  ],
+  "candidate_expectation": "Swapping demonstrations and skills_exchange is one candidate to evaluate after checking the delay. It remains conditional on resource arrival before the revised start. Do not hard-code this candidate or assume it succeeds in every variant."
+}

@@ -36,7 +36,7 @@ from tests.conftest import Sandbox, at
 from tests.test_api import CODE, _auth, _moderator
 from tests.test_planning_map import validate
 
-EXAMPLES = Path(__file__).resolve().parents[3] / "PEEAI_plan" / "examples"
+EXAMPLES = Path(__file__).resolve().parents[1] / "data" / "planning" / "examples"
 TIMESTAMP = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})$")
 
 

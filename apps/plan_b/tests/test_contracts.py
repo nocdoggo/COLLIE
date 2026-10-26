@@ -14,7 +14,7 @@ from plan_b.world.world import available_cases, case_path, load_case
 from tests.test_planning_map import FORMATS
 
 REPO = Path(__file__).resolve().parents[3]
-PLAN = REPO / "PEEAI_plan"
+PLAN = REPO / "apps" / "plan_b" / "data" / "planning"
 EXAMPLES = PLAN / "examples"
 
 

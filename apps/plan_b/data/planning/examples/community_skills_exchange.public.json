@@ -1,0 +1,449 @@
+{
+  "artifact_type": "public_scenario",
+  "schema_version": "0.2.0",
+  "scenario_id": "dev_fixture_02",
+  "profile_id": "community_skills_exchange",
+  "fictional": true,
+  "timezone": "America/New_York",
+  "goal": {
+    "goal_id": "goal_community_skills",
+    "version": 1,
+    "description": "Complete demonstration, guided practice, and peer exchange for a community learning session, respecting dependencies, the fixed room, and the budget.",
+    "required_activity_ids": [
+      "setup",
+      "welcome",
+      "skills_demo",
+      "practice",
+      "peer_exchange",
+      "closing"
+    ],
+    "public_start": "2026-11-07T10:00:00-05:00",
+    "hard_end": "2026-11-07T12:00:00-05:00",
+    "budget_cents": 8000,
+    "attendance_target": 24,
+    "fixed_venue_id": "community_room",
+    "priorities": [
+      "preserve required guided practice",
+      "satisfy time and resource constraints",
+      "minimize cost and unnecessary schedule changes",
+      "minimize participant interruption"
+    ]
+  },
+  "initial_state": {
+    "event_id": "e_skills_01",
+    "revision": 1,
+    "clock": "2026-11-07T09:20:00-05:00",
+    "committed_cents": 0,
+    "reserved_cents": 0,
+    "activities": [
+      {
+        "activity_id": "setup",
+        "label": "Prepare the community room",
+        "duration_minutes": 20,
+        "window": {
+          "start": "2026-11-07T09:30:00-05:00",
+          "end": "2026-11-07T10:00:00-05:00"
+        },
+        "predecessors": [],
+        "required_resources": [
+          "community_room"
+        ],
+        "required": true,
+        "started": false
+      },
+      {
+        "activity_id": "welcome",
+        "label": "Welcome and explain the shared activity",
+        "duration_minutes": 10,
+        "window": {
+          "start": "2026-11-07T10:00:00-05:00",
+          "end": "2026-11-07T10:10:00-05:00"
+        },
+        "predecessors": [
+          "setup"
+        ],
+        "required_resources": [
+          "community_room",
+          "host"
+        ],
+        "required": true,
+        "started": false
+      },
+      {
+        "activity_id": "skills_demo",
+        "label": "Demonstrate the learning kit",
+        "duration_minutes": 30,
+        "window": {
+          "start": "2026-11-07T10:10:00-05:00",
+          "end": "2026-11-07T11:00:00-05:00"
+        },
+        "predecessors": [
+          "welcome"
+        ],
+        "required_resources": [
+          "community_room",
+          "learning_kit",
+          "mentor"
+        ],
+        "required": true,
+        "started": false
+      },
+      {
+        "activity_id": "practice",
+        "label": "Guided practice",
+        "duration_minutes": 40,
+        "window": {
+          "start": "2026-11-07T10:40:00-05:00",
+          "end": "2026-11-07T11:40:00-05:00"
+        },
+        "predecessors": [
+          "skills_demo"
+        ],
+        "required_resources": [
+          "community_room",
+          "learning_kit",
+          "mentor"
+        ],
+        "required": true,
+        "started": false
+      },
+      {
+        "activity_id": "peer_exchange",
+        "label": "Peer knowledge exchange",
+        "duration_minutes": 20,
+        "window": {
+          "start": "2026-11-07T10:10:00-05:00",
+          "end": "2026-11-07T11:40:00-05:00"
+        },
+        "predecessors": [
+          "welcome"
+        ],
+        "required_resources": [
+          "community_room",
+          "peer_lead"
+        ],
+        "required": true,
+        "started": false
+      },
+      {
+        "activity_id": "closing",
+        "label": "Share feedback and return resources",
+        "duration_minutes": 20,
+        "window": {
+          "start": "2026-11-07T11:40:00-05:00",
+          "end": "2026-11-07T12:00:00-05:00"
+        },
+        "predecessors": [
+          "practice",
+          "peer_exchange"
+        ],
+        "required_resources": [
+          "community_room",
+          "host"
+        ],
+        "required": true,
+        "started": false
+      }
+    ],
+    "resources": [
+      {
+        "resource_id": "community_room",
+        "label": "Confirmed community room",
+        "kind": "space",
+        "capacity": 40,
+        "status": "available",
+        "window": {
+          "start": "2026-11-07T09:30:00-05:00",
+          "end": "2026-11-07T12:00:00-05:00"
+        },
+        "booking_cost_cents": 0,
+        "source_ref": "community_fixture_catalog_v1",
+        "capabilities": [
+          "community_room"
+        ],
+        "approved_substitute_ids": []
+      },
+      {
+        "resource_id": "learning_kit",
+        "label": "Registered shared learning kit",
+        "kind": "equipment",
+        "capacity": 1,
+        "status": "expected",
+        "window": {
+          "start": "2026-11-07T09:30:00-05:00",
+          "end": "2026-11-07T12:00:00-05:00"
+        },
+        "booking_cost_cents": 0,
+        "source_ref": "community_fixture_catalog_v1",
+        "capabilities": [
+          "guided_learning"
+        ],
+        "approved_substitute_ids": [
+          "backup_learning_kit"
+        ]
+      },
+      {
+        "resource_id": "backup_learning_kit",
+        "label": "Compatible community backup kit",
+        "kind": "equipment",
+        "capacity": 1,
+        "status": "unknown",
+        "window": {
+          "start": "2026-11-07T09:30:00-05:00",
+          "end": "2026-11-07T12:00:00-05:00"
+        },
+        "booking_cost_cents": 4000,
+        "source_ref": "community_fixture_catalog_v1",
+        "capabilities": [
+          "guided_learning"
+        ],
+        "approved_substitute_ids": []
+      },
+      {
+        "resource_id": "host",
+        "label": "Session host",
+        "kind": "person",
+        "capacity": 1,
+        "status": "available",
+        "window": {
+          "start": "2026-11-07T09:30:00-05:00",
+          "end": "2026-11-07T12:00:00-05:00"
+        },
+        "booking_cost_cents": 0,
+        "source_ref": "community_fixture_catalog_v1",
+        "capabilities": [
+          "host"
+        ],
+        "approved_substitute_ids": []
+      },
+      {
+        "resource_id": "mentor",
+        "label": "Registered workshop mentor",
+        "kind": "person",
+        "capacity": 1,
+        "status": "available",
+        "window": {
+          "start": "2026-11-07T09:30:00-05:00",
+          "end": "2026-11-07T12:00:00-05:00"
+        },
+        "booking_cost_cents": 0,
+        "source_ref": "community_fixture_catalog_v1",
+        "capabilities": [
+          "mentor"
+        ],
+        "approved_substitute_ids": []
+      },
+      {
+        "resource_id": "peer_lead",
+        "label": "Peer exchange facilitator",
+        "kind": "person",
+        "capacity": 1,
+        "status": "available",
+        "window": {
+          "start": "2026-11-07T09:30:00-05:00",
+          "end": "2026-11-07T12:00:00-05:00"
+        },
+        "booking_cost_cents": 0,
+        "source_ref": "community_fixture_catalog_v1",
+        "capabilities": [
+          "peer_lead"
+        ],
+        "approved_substitute_ids": []
+      }
+    ],
+    "assignments": [
+      {
+        "activity_id": "setup",
+        "start": "2026-11-07T09:30:00-05:00",
+        "end": "2026-11-07T09:50:00-05:00",
+        "resource_ids": [
+          "community_room"
+        ]
+      },
+      {
+        "activity_id": "welcome",
+        "start": "2026-11-07T10:00:00-05:00",
+        "end": "2026-11-07T10:10:00-05:00",
+        "resource_ids": [
+          "community_room",
+          "host"
+        ]
+      },
+      {
+        "activity_id": "skills_demo",
+        "start": "2026-11-07T10:10:00-05:00",
+        "end": "2026-11-07T10:40:00-05:00",
+        "resource_ids": [
+          "community_room",
+          "learning_kit",
+          "mentor"
+        ]
+      },
+      {
+        "activity_id": "practice",
+        "start": "2026-11-07T10:40:00-05:00",
+        "end": "2026-11-07T11:20:00-05:00",
+        "resource_ids": [
+          "community_room",
+          "learning_kit",
+          "mentor"
+        ]
+      },
+      {
+        "activity_id": "peer_exchange",
+        "start": "2026-11-07T11:20:00-05:00",
+        "end": "2026-11-07T11:40:00-05:00",
+        "resource_ids": [
+          "community_room",
+          "peer_lead"
+        ]
+      },
+      {
+        "activity_id": "closing",
+        "start": "2026-11-07T11:40:00-05:00",
+        "end": "2026-11-07T12:00:00-05:00",
+        "resource_ids": [
+          "community_room",
+          "host"
+        ]
+      }
+    ],
+    "holds": [],
+    "checked_in_roles": []
+  },
+  "visible_observations": [
+    {
+      "observation_id": "obs_community_offer_01",
+      "event_id": "e_skills_01",
+      "entity_id": "backup_learning_kit",
+      "kind": "resource_offer",
+      "source_id": "participant_kit_steward",
+      "source_record_id": "offer_01",
+      "correlation_group": "community_backup_kit",
+      "observed_at": "2026-11-07T09:20:00-05:00",
+      "received_at": "2026-11-07T09:20:00-05:00",
+      "valid_window": {
+        "start": "2026-11-07T09:20:00-05:00",
+        "end": "2026-11-07T12:00:00-05:00"
+      },
+      "authority_scope": "self_report",
+      "text": "I may be able to bring the registered backup learning kit by 10:20. I will confirm availability through the participant page.",
+      "supersedes": []
+    }
+  ],
+  "authority_grants": [
+    {
+      "grant_id": "grant_community_agent",
+      "event_id": "e_skills_01",
+      "principal_id": "agent_demo",
+      "principal_role": "coordinator_agent",
+      "allowed_tools": [
+        "get_event_state",
+        "list_resources",
+        "query_status",
+        "evaluate_candidates",
+        "hold_resource",
+        "release_hold",
+        "apply_plan",
+        "get_action_receipt"
+      ],
+      "resource_ids": [
+        "community_room",
+        "learning_kit",
+        "backup_learning_kit",
+        "host",
+        "mentor",
+        "peer_lead"
+      ],
+      "activity_ids": [
+        "setup",
+        "welcome",
+        "skills_demo",
+        "practice",
+        "peer_exchange",
+        "closing"
+      ],
+      "max_total_committed_cents": 0,
+      "max_total_reserved_cents": 4000,
+      "expires_at": "2026-11-07T12:00:00-05:00",
+      "review_required_for": [
+        "increase committed spending",
+        "remove required practice",
+        "change fixed venue"
+      ]
+    },
+    {
+      "grant_id": "grant_peer_self",
+      "event_id": "e_skills_01",
+      "principal_id": "participant_peer_lead",
+      "principal_role": "participant",
+      "allowed_tools": [
+        "get_event_state",
+        "check_in",
+        "submit_observation",
+        "get_action_receipt"
+      ],
+      "resource_ids": [
+        "peer_lead"
+      ],
+      "activity_ids": [
+        "peer_exchange"
+      ],
+      "max_total_committed_cents": 0,
+      "max_total_reserved_cents": 0,
+      "expires_at": "2026-11-07T12:00:00-05:00",
+      "review_required_for": [
+        "change another participant record",
+        "change plan or organizer goal"
+      ]
+    },
+    {
+      "grant_id": "grant_kit_offer",
+      "event_id": "e_skills_01",
+      "principal_id": "participant_kit_steward",
+      "principal_role": "participant",
+      "allowed_tools": [
+        "get_event_state",
+        "submit_observation",
+        "get_action_receipt"
+      ],
+      "resource_ids": [
+        "backup_learning_kit"
+      ],
+      "activity_ids": [],
+      "max_total_committed_cents": 0,
+      "max_total_reserved_cents": 0,
+      "expires_at": "2026-11-07T12:00:00-05:00",
+      "review_required_for": [
+        "allocate equipment",
+        "change plan or organizer goal"
+      ]
+    }
+  ],
+  "declared_assumptions": [
+    {
+      "assumption_id": "c_shared_kit",
+      "description": "The learning kit is one preconfigured shared workshop resource. This fixture does not infer per-person needs or equipment access.",
+      "basis": "scenario_design",
+      "source_ref": "community_fixture_catalog_v1"
+    },
+    {
+      "assumption_id": "c_sequence",
+      "description": "Guided practice requires the demonstration to finish. Peer exchange can move independently after welcome.",
+      "basis": "scenario_design",
+      "source_ref": "community_fixture_catalog_v1"
+    },
+    {
+      "assumption_id": "c_offer",
+      "description": "The community offer is tentative. Registered capability does not establish availability, arrival, or allocation permission.",
+      "basis": "scenario_design",
+      "source_ref": "community_fixture_catalog_v1"
+    },
+    {
+      "assumption_id": "c_occupancy",
+      "description": "The fixed room supports one main activity at a time. Attendance capacity is checked separately from program concurrency.",
+      "basis": "scenario_design",
+      "source_ref": "community_fixture_catalog_v1"
+    }
+  ]
+}

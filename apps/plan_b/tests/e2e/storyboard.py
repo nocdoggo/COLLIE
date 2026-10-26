@@ -4,8 +4,8 @@ Not part of the default pytest run. Usage (from apps/plan_b, after `npm run buil
 
     uv run python tests/e2e/storyboard.py [--out <dir>] [--port 8791]
 
-The default ``--out`` is PEEAI_plan/handoffs/wave_2/evidence/storyboard/. It follows the runbook
-in PEEAI_plan/handoffs/wave_2/DEMO.md from a clean start: ``scripts/demo_prep.py`` prepares an
+The default ``--out`` is var/storyboard/ (the evidence collectors pass their own).
+It follows the Wave 2 demo runbook from a clean start: ``scripts/demo_prep.py`` prepares an
 empty state directory and the verified recorded traces, then ``plan-b serve`` runs on 127.0.0.1
 (stopped afterwards; the state directory is removed). It clicks what the presenter clicks, in
 the order of the story, and only on deterministic and replay paths: the deterministic policies
@@ -66,7 +66,7 @@ from walkthrough_wave2 import (  # noqa: E402
 sys.path.insert(0, str(APP / "scripts"))
 from demo_prep import prepare  # noqa: E402
 
-DEFAULT_OUT = APP.parents[1] / "PEEAI_plan/handoffs/wave_2/evidence/storyboard"
+DEFAULT_OUT = APP / "var" / "storyboard"
 DEFAULT_PORT = 8791
 # 1920x1080 at the 125 % browser zoom the runbook recommends for a projector.
 VIEWPORT: ViewportSize = {"width": 1536, "height": 864}

@@ -36,7 +36,7 @@ from plan_b.world.validate import validate_case
 from plan_b.world.world import NO_CASE, load_case
 
 REPO = Path(__file__).resolve().parents[3]
-EXAMPLES = REPO / "PEEAI_plan" / "examples"
+EXAMPLES = REPO / "apps" / "plan_b" / "data" / "planning" / "examples"
 SCENARIO = "dev_fixture_03"
 EVENT = "e_pantry_01"
 DAY = "2026-11-09"
@@ -460,7 +460,7 @@ def test_stock_contract_problems_refuse_the_load() -> None:
 
 
 def test_runtime_1_0_0_records_still_parse() -> None:
-    trace_dir = REPO / "PEEAI_plan" / "handoffs" / "wave_1" / "evidence" / "traces"
+    trace_dir = REPO / "apps" / "plan_b" / "data" / "recorded" / "wave_1"
     trace = json.loads(next(iter(sorted(trace_dir.glob("*.json")))).read_text())
     assert trace["runtime_version"] == "1.0.0"
     final = EventStateView.model_validate(trace["final_state"])

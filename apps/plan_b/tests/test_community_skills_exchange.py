@@ -49,7 +49,15 @@ from plan_b.world.world import NO_CASE, available_cases, load_case
 from tests.conftest import Sandbox
 
 REPO = Path(__file__).resolve().parents[3]
-PLANNING = REPO / "PEEAI_plan" / "examples" / "community_skills_exchange.public.json"
+PLANNING = (
+    REPO
+    / "apps"
+    / "plan_b"
+    / "data"
+    / "planning"
+    / "examples"
+    / "community_skills_exchange.public.json"
+)
 SCENARIO = "dev_fixture_02"
 EVENT = "e_skills_01"
 DAY = "2026-11-07"

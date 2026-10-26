@@ -1,0 +1,67 @@
+{
+  "artifact_type": "constraint_report",
+  "schema_version": "0.2.0",
+  "report_id": "check_swap_rev4",
+  "event_id": "e_showcase_01",
+  "candidate_plan_id": "candidate_swap_01",
+  "state_revision": 4,
+  "goal_version": 1,
+  "checked_at": "2026-11-05T16:42:00-05:00",
+  "result": "feasible_under_assumptions",
+  "checks": [
+    {
+      "constraint_id": "required_activities",
+      "passed": true,
+      "detail": "All five required activities are retained."
+    },
+    {
+      "constraint_id": "start_and_end",
+      "passed": true,
+      "detail": "Welcome starts at 17:00 and closing ends at 18:00."
+    },
+    {
+      "constraint_id": "dependencies",
+      "passed": true,
+      "detail": "Welcome precedes both middle activities, and both precede closing."
+    },
+    {
+      "constraint_id": "fixed_venue",
+      "passed": true,
+      "detail": "Every activity retains main_room."
+    },
+    {
+      "constraint_id": "program_exclusivity",
+      "passed": true,
+      "detail": "No main-program activities overlap."
+    },
+    {
+      "constraint_id": "capacity",
+      "passed": true,
+      "detail": "The modeled room capacity of 80 exceeds the attendance target of 60."
+    },
+    {
+      "constraint_id": "availability_windows",
+      "passed": true,
+      "detail": "Assigned windows fit declared availability, subject to the stated arrival assumption."
+    },
+    {
+      "constraint_id": "budget_and_grant",
+      "passed": true,
+      "detail": "The change adds zero spending and fits the active zero-spend coordinator grant."
+    },
+    {
+      "constraint_id": "started_activity",
+      "passed": true,
+      "detail": "Setup timing is unchanged."
+    }
+  ],
+  "assumptions": [
+    "The projector will be ready before the revised demonstration start at 17:30.",
+    "The registered presenter and facilitator remain available for their revised windows."
+  ],
+  "execution_preconditions": [
+    "Observe actual projector availability before starting demonstrations.",
+    "Confirm assigned people are checked in and ready before their activities.",
+    "Revalidate current revision, goal version, grant, and resource conflicts at apply_plan."
+  ]
+}

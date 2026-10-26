@@ -1,0 +1,47 @@
+{
+  "artifact_type": "action_receipt",
+  "schema_version": "0.2.0",
+  "receipt_id": "receipt_swap_001",
+  "event_id": "e_showcase_01",
+  "tool": "apply_plan",
+  "request_idempotency_key": "demo_commit_swap_001",
+  "grant_id": "grant_coordinator_demo",
+  "status": "applied",
+  "revision_before": 4,
+  "revision_after": 5,
+  "executed_at": "2026-11-05T16:43:00-05:00",
+  "simulation": true,
+  "state_changes": [
+    {
+      "entity_id": "demonstrations",
+      "field": "scheduled_window",
+      "before": {
+        "start": "2026-11-05T17:10:00-05:00",
+        "end": "2026-11-05T17:30:00-05:00"
+      },
+      "after": {
+        "start": "2026-11-05T17:30:00-05:00",
+        "end": "2026-11-05T17:50:00-05:00"
+      }
+    },
+    {
+      "entity_id": "skills_exchange",
+      "field": "scheduled_window",
+      "before": {
+        "start": "2026-11-05T17:30:00-05:00",
+        "end": "2026-11-05T17:50:00-05:00"
+      },
+      "after": {
+        "start": "2026-11-05T17:10:00-05:00",
+        "end": "2026-11-05T17:30:00-05:00"
+      }
+    }
+  ],
+  "committed_delta_cents": 0,
+  "reserved_delta_cents": 0,
+  "related_plan_id": "candidate_swap_01",
+  "constraint_report_ref": "check_swap_rev4",
+  "error_code": null,
+  "actor_id": "agent_demo",
+  "request_digest": "eb37a6040c1590eb8216265918b0f0264d68754bf26069c0d2c1eec03d22a123"
+}

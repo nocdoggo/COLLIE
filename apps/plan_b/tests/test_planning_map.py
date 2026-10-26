@@ -34,7 +34,7 @@ from plan_b.domain.planning_map import (
 from plan_b.domain.projection import initial_snapshot
 
 SCHEMA_PATH = (
-    Path(__file__).resolve().parents[3] / "PEEAI_plan" / "schemas" / "planning.schema.json"
+    Path(__file__).resolve().parents[1] / "data" / "planning" / "schemas" / "planning.schema.json"
 )
 SCHEMA: dict[str, Any] = json.loads(SCHEMA_PATH.read_text())
 SCENARIO = load_public_scenario()
