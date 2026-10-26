@@ -8,6 +8,12 @@ suite, as written by `plan-b eval report`. Nothing is typed in by hand. The scri
   policy, per suite), side by side for the slides and stacked for the poster;
 - `documentation/results.json`: the same numbers for `build_doc.py`.
 
+Wave 3b adds two more sources and never replaces the first. The fresh held-out run of policy
+1.2 (`wave3b_fresh_20261025T2327Z`, cases C09 to C12, T05 and T06) gives the keys
+`\\res{fresh:campus:P2:met}`, and the post-hoc diagnostic rerun of 1.2 on the spent cases
+(`wave3b_rerun_spent_20261025T2345Z`, not a held-out result) gives `\\res{rerun:campus:P2:met}`.
+They go to `slides/figures/results_numbers_v12.tex` and `documentation/results_v12.json`.
+
     python3 make_results.py
 """
 
@@ -18,6 +24,11 @@ HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
 RUN_ID = "wave3_heldout_20261025T1625Z"
 RUN = REPO / "apps/plan_b/evaluation/results" / RUN_ID
+# Wave 3b, policy 1.2: the fresh held-out run and the post-hoc diagnostic rerun on spent cases.
+V12_RUNS = {
+    "fresh": "wave3b_fresh_20261025T2327Z",
+    "rerun": "wave3b_rerun_spent_20261025T2345Z",
+}
 POLICIES = ["P0", "P1", "P2", "P3"]
 NAMES = {
     "P0": "P0 fixed rules",
@@ -34,8 +45,8 @@ CLASSES = {
 }
 
 
-def suite_numbers(suite: str) -> dict[str, dict[str, object]]:
-    metrics = json.loads((RUN / suite / "report" / "metrics.json").read_text(encoding="utf-8"))
+def suite_numbers(suite: str, run: Path = RUN) -> dict[str, dict[str, object]]:
+    metrics = json.loads((run / suite / "report" / "metrics.json").read_text(encoding="utf-8"))
     out: dict[str, dict[str, object]] = {}
     for policy in POLICIES:
         p = metrics["by_policy"][policy]
@@ -105,6 +116,40 @@ def macros(numbers: dict[str, dict[str, dict[str, object]]]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def v12_macros(sets: dict[str, dict[str, dict[str, dict[str, object]]]]) -> str:
+    """The Wave 3b numbers under their own prefixes (`fresh:` and `rerun:`), so no key of the
+    v1.1 record is shadowed."""
+    lines = [
+        "% Written by make_results.py from "
+        + ", ".join(f"{V12_RUNS[k]} ({k})" for k in sets)
+        + ", <suite>/report/metrics.json. Do not edit.",
+        "\\providecommand{\\res}[1]{\\csname res:#1\\endcsname}",
+    ]
+    for prefix, numbers in sets.items():
+        for suite, rows in numbers.items():
+            for policy, row in rows.items():
+                for key, value in row.items():
+                    lines.append(
+                        f"\\expandafter\\def\\csname res:{prefix}:{suite}:{policy}:{key}\\endcsname{{{value}}}"
+                    )
+        both = {
+            key: sum(int(numbers[s]["all"][key]) for s in numbers)
+            for key in ("recorded", "planned", "viol", "refused", "stale", "unnec", "capped")
+        }
+        run = REPO / "apps/plan_b/evaluation/results" / V12_RUNS[prefix]
+        cost = sum(
+            json.loads((run / s / "report" / "metrics.json").read_text(encoding="utf-8"))["by_policy"][p]["computation"]["cost_usd"]
+            for s in numbers
+            for p in POLICIES
+        )
+        both["usd"] = f"{cost:.2f}"
+        both["metk"] = sum(int(numbers[s][p]["metk"]) for s in numbers for p in POLICIES)
+        both["metn"] = sum(int(numbers[s][p]["metn"]) for s in numbers for p in POLICIES)
+        for key, value in both.items():
+            lines.append(f"\\expandafter\\def\\csname res:{prefix}:both:{key}\\endcsname{{{value}}}")
+    return "\n".join(lines) + "\n"
+
+
 def figure(numbers: dict[str, dict[str, dict[str, object]]], stacked: bool = False) -> str:
     """Two panels of horizontal bars, side by side or stacked: the share of recorded runs that
     met the case's outcome, per policy, labelled with the count. The stacked one is for the
@@ -113,6 +158,7 @@ def figure(numbers: dict[str, dict[str, dict[str, object]]], stacked: bool = Fal
     labels = 4.9 if stacked else 4.1
     step = 0.85 if stacked else 1.0
     half = 0.28 if stacked else 0.32
+    title_font = "\\large" if stacked else ""
     parts = [
         f"% Written by make_results.py from {RUN_ID}/<suite>/report/metrics.json. Do not edit.",
         "% Runs that met the case's outcome, per policy and suite (held-out, one run of the protocol).",
@@ -137,7 +183,7 @@ def figure(numbers: dict[str, dict[str, dict[str, object]]], stacked: bool = Fal
         x0 = 0.0 if stacked else col * (labels + width + 2.6)
         y0 = -col * 4.7 if stacked else 0.0
         parts.append(
-            f"\\node[anchor=west, font=\\bfseries\\color{{primary}}] at ({x0 - labels:.2f},{y0 + 0.8:.2f}) {{{titles[suite]}}};"
+            f"\\node[anchor=west, font={title_font}\\bfseries\\color{{primary}}] at ({x0 - labels:.2f},{y0 + 0.8:.2f}) {{{titles[suite]}}};"
         )
         for i, policy in enumerate(POLICIES):
             row = numbers[suite][policy]
@@ -173,6 +219,20 @@ def main() -> None:
     (HERE / "slides/figures/fig_results_v.tex").write_text(figure(numbers, stacked=True), encoding="utf-8")
     payload = {"run_id": RUN_ID, "source": f"apps/plan_b/evaluation/results/{RUN_ID}", **numbers}
     (HERE / "documentation/results.json").write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    sets = {
+        key: {suite: suite_numbers(suite, REPO / "apps/plan_b/evaluation/results" / run) for suite in ["campus", "pantry"]}
+        for key, run in V12_RUNS.items()
+    }
+    (HERE / "slides/figures/results_numbers_v12.tex").write_text(v12_macros(sets), encoding="utf-8")
+    v12 = {
+        "note": "fresh is the held-out result of policy 1.2 on C09 to C12, T05 and T06. "
+        "rerun is a post-hoc diagnostic rerun after fixes, on spent cases, not a held-out result.",
+        **{key: {"run_id": V12_RUNS[key], "source": f"apps/plan_b/evaluation/results/{V12_RUNS[key]}", **n} for key, n in sets.items()},
+    }
+    (HERE / "documentation/results_v12.json").write_text(json.dumps(v12, indent=2) + "\n", encoding="utf-8")
+    for key, n in sets.items():
+        for suite in n:
+            print(key, suite, " ".join(f"{p} {n[suite][p]['met']}" for p in POLICIES), "all", n[suite]["all"])
     for suite in numbers:
         for policy in POLICIES:
             row = numbers[suite][policy]

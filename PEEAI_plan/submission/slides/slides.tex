@@ -3,13 +3,16 @@
 % To view a copy of this license, visit http://creativecommons.org/licenses/by/4.0/ or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA.
 %
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% Plan B: The Show Must Go On. Seven-minute hackathon presentation (420 s, 12 slides plus
+% Plan B: The Show Must Go On. Seven-minute hackathon presentation (420 s, 13 slides plus
 % backup slides). Author: Noctis Zhang, University of Massachusetts Boston.
 % Speaker notes for each slide live in the \note{...} blocks and match pres-note.md.
 % Uncomment the \setbeameroption line below to see them.
 %
 % Every held-out number comes from figures/results_numbers.tex and figures/fig_results.tex, which
-% ../make_results.py writes from the committed run wave3_heldout_20261025T1625Z (metrics.json).
+% ../make_results.py writes from the committed run wave3_heldout_20261025T1625Z (metrics.json),
+% the evaluation of record of version 1.1. The version 1.2 numbers come from
+% figures/results_numbers_v12.tex: fresh: is the held-out run wave3b_fresh_20261025T2327Z, and
+% rerun: is wave3b_rerun_spent_20261025T2345Z, a post-hoc diagnostic rerun on spent cases.
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 \documentclass[
@@ -22,6 +25,7 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
 \input{loadslides.tex} % Loads packages and some defined commands
 \usepackage{appendixnumberbeamer} % backups are not counted in the slide total
 \input{figures/results_numbers.tex} % Held-out numbers, read as \res{suite:policy:key}
+\input{figures/results_numbers_v12.tex} % Version 1.2, read as \res{fresh:suite:policy:key}
 
 % \setbeameroption{show notes} % uncomment to render speaker notes alongside slides
 
@@ -77,15 +81,15 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
     \includegraphics[width=0.86\textwidth]{fig_timeline.pdf}
   \end{center}
   \note{
-    \textbf{(27s, ends 0:37)} Imagine you organize a campus showcase. It opens at five and must
-    end by six. At four forty, a message says the projector may be twenty five minutes late.
-    Change too much and people lose time. Wait too long and the demos fail. AI agents now act on
-    messages like this. Would you wait, check, or prepare a backup?
+    \textbf{(27s, ends 0:37)} Imagine you organize a campus showcase. It opens at five and
+    must end by six. At four forty, a message says the projector may be twenty five minutes
+    late. Change too much and people lose time. Wait too long and the demos fail. AI agents
+    now act on messages like this. Would you wait, check, or prepare a backup?
   }
 \end{frame}
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% 3. AUTHORITY (35 s)
+% 3. AUTHORITY (30 s)
 \begin{frame}{The coordinator may check, hold and make free changes, not spend}
   \begin{itemize}
     \item Plan B is a \textbf{coordinator}: an AI agent with written limits.
@@ -98,17 +102,16 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
     \includegraphics[width=0.97\textwidth]{fig_roles.pdf}
   \end{center}
   \note{
-    \textbf{(35s, ends 1:12)} Plan B is a coordinator, an AI agent with written limits. It may
-    check sources, compare options, and place a hold. A hold is a free reservation of a backup
-    that expires on its own, here worth up to thirty five dollars. It may also make a change
-    that costs nothing. It cannot spend a cent without the organizer. Everything runs in a
-    fictional local sandbox. [Skip if late: Participants and staff have their own narrow
-    rights.]
+    \textbf{(30s, ends 1:07)} Plan B is a coordinator, an AI agent with written limits. It
+    may check sources, compare options, place a hold, and make a change that costs nothing.
+    A hold is a free reservation of a backup that expires on its own, here worth up to
+    thirty five dollars. It cannot spend a cent without the organizer. Everything runs in a
+    fictional local sandbox.
   }
 \end{frame}
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% 4. VERIFY (35 s)
+% 4. VERIFY (31 s)
 \begin{frame}{A message is a claim, not a fact}
   \begin{itemize}
     \item A \textbf{status check} asks the supplier's status service. It takes \emphasize{two simulated minutes} and returns a report, \textbf{not an arrival}.
@@ -119,16 +122,16 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
     \figcaption{Crops of the real app, from an automated run of development case dev01.}
   \end{center}
   \note{
-    \textbf{(35s, ends 1:47)} Here is the notice, from the delivery contact. Plan B treats it as
-    a claim, not a fact. Before changing anything, it checks the one fact that could change the
-    decision. A status check asks the supplier's status service. In this sandbox that takes two
-    simulated minutes. The answer is delayed, with a reported arrival at five twenty five. Even
-    that is a report, not an arrival, so the plan must still work if it slips.
+    \textbf{(31s, ends 1:38)} Here is the notice, from the delivery contact. Plan B treats
+    it as a claim, not a fact. Before changing anything, it checks the one fact that could
+    change the decision. A status check asks the supplier's status service. The answer is
+    delayed, with a reported arrival at five twenty five. Even that is a report, not an
+    arrival, so the plan must still work if it slips.
   }
 \end{frame}
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% 5. COMMIT (48 s)
+% 5. COMMIT (44 s)
 \begin{frame}{One checked change, one receipt}
   \begin{itemize}
     \item The \textbf{planner} builds the allowed repairs and checks each: \emphasize{16 built, 3 pass}. Best: a swap that \emphasize{costs \$0}.
@@ -141,18 +144,18 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
     \figcaption{Shown: my fixed-rule baseline in an automated run. In a recorded practice run, the AI coordinator made the same check and the same swap at 16:43.}
   \end{center}
   \note{
-    \textbf{(48s, ends 2:35)} Now the planner builds the allowed repairs from fixed templates,
-    like a swap or a ten minute shift, and checks each against the deadline, the people, and the
-    budget. Sixteen are built and three pass. The best is free: swap the demonstrations with the
-    skills exchange, so the demos start at five thirty, after the reported arrival. It is
-    applied at four forty three, and the server writes a receipt, its own record of the change.
-    The AI cannot write it. These frames show my rule baseline. In a recorded run, the AI
-    coordinator made the same check and the same swap.
+    \textbf{(44s, ends 2:22)} The planner builds the allowed repairs from fixed templates
+    and checks each against the deadline, the people, and the budget. Sixteen are built and
+    three pass. The best is free: swap the demonstrations with the skills exchange, so the
+    demos start at five thirty, after the reported arrival. It is applied at four forty
+    three, and the server writes a receipt, its own record of the change. The AI cannot
+    write it. These frames show my rule baseline. In a recorded run, the AI coordinator made
+    the same check and the same swap.
   }
 \end{frame}
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% 6. KEEP (50 s)
+% 6. KEEP (47 s)
 \begin{frame}{Four messages, zero changes}
   \begin{itemize}
     \item A second practice case, \textbf{in the order it happened}.
@@ -164,18 +167,18 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
     \figcaption{Development case dev04, decided by the rule baseline in an automated run of the app.}
   \end{center}
   \note{
-    \textbf{(50s, ends 3:25)} Not acting is the harder skill. Here is a second practice case, in
-    the order it happened. First, the same delay notice, but the status check says on schedule,
-    arriving at four fifty eight. A false alarm, so the plan stays. Then a reminder that order P
-    nine for an October workshop was cancelled. That is another order on another date, so it
-    does not apply. [Skip if late: It arrives again, and a volunteer forwards it. One source
-    repeated is still one source.] In the end there is no hold, no spending and no change. Three
-    of my eight final test cases are quiet ones like this.
+    \textbf{(47s, ends 3:09)} Not acting is the harder skill. Here is a second practice
+    case. First, the same delay notice, but the status check says on schedule, arriving at
+    four fifty eight. A false alarm, so the plan stays. Then a reminder that order P nine
+    for an October workshop was cancelled. That is another order on another date, so it does
+    not apply. [Skip if late: It arrives again, and a volunteer forwards it. One source
+    repeated is still one source.] In the end there is no hold, no spending and no change.
+    Three of my twelve final test cases are quiet ones like this.
   }
 \end{frame}
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% 7. THE LOOP (28 s)
+% 7. THE LOOP (26 s)
 \begin{frame}{Verify, prepare, commit}
   \vspace{-0.1cm}
   \begin{center}
@@ -186,10 +189,10 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
     \item \textbf{Prepare} example: the projector arrives too late, so the backup is \emphasize{held until 16:55} while the organizer decides on \$35.
   \end{itemize}
   \note{
-    \textbf{(28s, ends 3:53)} So the loop is simple. Verify one fact that could change the
-    decision. Prepare a backup while a fact or an approval is pending. In another case the
-    projector arrives too late, so Plan B holds the backup until four fifty five and asks the
-    organizer for thirty five dollars. Commit only a plan the server checked. Or keep the plan.
+    \textbf{(26s, ends 3:35)} Verify one fact that could change the decision. Prepare a
+    backup while a fact or an approval is pending. In another case the projector arrives too
+    late, so Plan B holds the backup until four fifty five and asks the organizer for thirty
+    five dollars. Commit only a plan the server checked. Or keep the plan.
   }
 \end{frame}
 
@@ -204,17 +207,17 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
     \includegraphics[width=0.9\textwidth]{fig_architecture.pdf}
   \end{center}
   \note{
-    \textbf{(30s, ends 4:23)} A policy is the rule that picks the next step. P zero is fixed
-    rules, which only read the messages they were written for. P one lets a model call the tools
-    freely. P two, mine, lets the model pick from options the server built and checked. [Skip if
-    late: P three is P two with every relevant check run first.] Every policy passes the same
-    gate.
+    \textbf{(30s, ends 4:05)} A policy is the rule that picks the next step. P zero is fixed
+    rules, which only read the messages they were written for. P one lets a model call the
+    tools freely. P two, mine, lets the model pick from options the server built and
+    checked. P three is P two with every relevant check run first. Every policy passes the
+    same gate.
   }
 \end{frame}
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% 9. THE HELD-OUT TEST (50 s)
-\begin{frame}{Held-out test: zero violations, no clear winner}
+% 9. THE HELD-OUT TEST, VERSION 1.1 (38 s)
+\begin{frame}{Held-out test of version 1.1: zero violations, no clear winner}
   \begin{itemize}
     \item \textbf{Held-out cases}: locked before the test and hidden from every policy. Code, prompts, model and limits were \textbf{frozen} first. A run is \textbf{met} when its final state and receipts show the case's outcome.
   \end{itemize}
@@ -227,14 +230,12 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
     \item \emphasize{No consistent advantage for P2.} Campus model cost: P1 met \res{campus:P1:metk} of \res{campus:P1:metn} runs for \$\res{campus:P1:usd}, P3 \res{campus:P3:metk} for \$\res{campus:P3:usd}, P2 \res{campus:P2:metk} for \$\res{campus:P2:usd}. Fixed rules met every pantry run.
   \end{itemize}
   \note{
-    \textbf{(50s, ends 5:13)} Everything so far came from development cases, practice cases I
-    built with. Then I froze the code, the prompts, the model and the limits, and ran held-out
-    cases, hidden from every policy. A first attempt hit the provider's rate limit, so I voided
-    it and kept it on record. In the reported run all one hundred twenty runs were recorded. The
-    server refused fifty five requests in all, and no policy executed a violation or changed a
-    quiet event. But my P two showed no consistent advantage. P one, the model calling tools
-    freely, met all twenty four campus runs, at three times P two's model cost. On the pantry,
-    fixed rules met every run.
+    \textbf{(38s, ends 4:43)} Everything so far came from practice cases I built with. Then
+    I froze version one point one, its code, prompts, model and limits, and ran twelve
+    held-out cases, hidden from every policy. All one hundred twenty runs were recorded. No
+    policy executed a violation or changed a quiet event. But my P two showed no consistent
+    advantage. P one met the expected outcome in all twenty four campus runs, at three times
+    P two's model cost. These are descriptive counts only.
   }
 \end{frame}
 
@@ -252,18 +253,18 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
   \end{center}
   \vspace{0.2cm}
   \begin{itemize}
-    \item The reading was right. It was lost before the planner saw it (\textbf{planner input}), a limit disclosed before the runs.
+    \item The reading was right. My frozen rule dropped it before the planner (the \textbf{planner input} stage), a limit disclosed before the runs.
   \end{itemize}
   \note{
-    \textbf{(26s, ends 5:39)} Here is one failure. In one held-out case a volunteer says they
-    will be late. P two and P three read the message correctly. But my frozen rule passes only
-    equipment claims to the planner, so the plan was never questioned. All six of their runs
-    stay in the count. P one met this case every time.
+    \textbf{(26s, ends 5:09)} In one held-out case a volunteer says they will be late. P two
+    and P three read the message correctly. But my frozen rule passes only equipment claims
+    to the planner, so the plan was never questioned. All six of their runs stay in the
+    count. P one met this case every time.
   }
 \end{frame}
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% 11. PANTRY (50 s)
+% 11. PANTRY (40 s)
 \begin{frame}{Same loop, a new rule: 40 kits for a fictional pantry}
   \begin{itemize}
     \item Staff need \textbf{40 kits by 13:40}. 24 are on the shelf, \emphasize{20 are late and do not count}, 16 wait in a partner pool.
@@ -276,34 +277,70 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
   \end{center}
   \vspace{-0.1cm}
   \begin{itemize}
-    \item \textbf{Held-out pantry}: rules met \res{pantry:P0:metk} of \res{pantry:P0:metn} runs, model policies \res{pantry:P1:metk} to \res{pantry:P2:metk} of 12, partly from a frozen planner defect (T03). \emphasize{No kit counted twice.}
+    \item \textbf{Held-out pantry, version 1.1}: rules met \res{pantry:P0:metk} of \res{pantry:P0:metn} runs, model policies \res{pantry:P1:metk} to \res{pantry:P2:metk} of 12, partly from a frozen planner defect (T03). \emphasize{No kit counted twice.}
   \end{itemize}
   \note{
-    \textbf{(50s, ends 6:29)} The same loop also runs a fictional pantry, with a new rule about
-    quantities. Staff need forty kits by one forty. Twenty four are on the shelf. Twenty more
-    are late, and late stock does not count. Sixteen wait in a partner pool at the same venue.
-    Plan B holds those sixteen. Only staff can record the handoff, which fills the shelf to
-    forty. And only the recorded distribution brings the kits not yet handed out to zero. On
-    four held-out pantry cases, fixed rules met all four runs, and the model policies six to
-    nine of twelve, partly because of a defect in my frozen planner. No kit was counted twice.
+    \textbf{(40s, ends 5:49)} The same loop runs a fictional pantry. Staff need forty kits
+    by one forty. Twenty four are on the shelf. Twenty more are late, and late stock does
+    not count. Sixteen wait in a partner pool. Plan B holds those sixteen. Only staff record
+    the handoff and the distribution. On four held-out pantry cases, fixed rules met all
+    four runs, and the model policies six to nine of twelve, partly because of a defect in
+    my frozen planner. No kit was counted twice.
   }
 \end{frame}
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-% 12. CLOSE (31 s)
+% 12. VERSION 1.2 (39 s)
+\begin{frame}{Version 1.2: the fixes, then six fresh held-out cases}
+  \begin{itemize}
+    \item \textbf{Fixed after the held-out failures}: a person's own delay now reaches the planner (C06), a pool checked as unavailable is no longer offered (T03), a menu the model declined is not sent again, and a rate limit is waited out.
+    \item \textbf{Fresh held-out set}: 6 new cases, C09 to C12, T05 and T06, written without the new code and \textbf{locked before the first 1.2 call}. Same model and limits.
+  \end{itemize}
+  \vspace{0.1cm}
+  \begin{center}
+  {\small
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{@{}lcccc@{\hspace{12pt}}cccc@{}}
+    \toprule
+    & \multicolumn{4}{c}{\textbf{Campus runs met}} & \multicolumn{4}{c}{\textbf{Pantry runs met}} \\
+    & P0 & P1 & P2 & P3 & P0 & P1 & P2 & P3 \\
+    \midrule
+    Version 1.1: 12 cases, the record & \res{campus:P0:met} & \res{campus:P1:met} & \res{campus:P2:met} & \res{campus:P3:met} & \res{pantry:P0:met} & \res{pantry:P1:met} & \res{pantry:P2:met} & \res{pantry:P3:met} \\
+    Version 1.2: 6 different, fresh cases & \res{fresh:campus:P0:met} & \res{fresh:campus:P1:met} & \res{fresh:campus:P2:met} & \res{fresh:campus:P3:met} & \res{fresh:pantry:P0:met} & \res{fresh:pantry:P1:met} & \res{fresh:pantry:P2:met} & \res{fresh:pantry:P3:met} \\
+    \bottomrule
+  \end{tabular}\par}
+  \end{center}
+  \vspace{0.05cm}
+  \begin{itemize}
+    \item \emphasize{\res{fresh:both:metk} of \res{fresh:both:metn} fresh runs met}, \res{fresh:both:viol} executed violations. The miss: P0 on C11, a person's own delay that its rules cannot read. P1 to P3 met every run, so this small set \textbf{cannot rank them}.
+  \end{itemize}
+  \vspace{0.05cm}
+  \figcaption{Different cases, so the two rows are not a before and after. The fresh cases repeat known conditions (C11 is the C06 condition, T06 is T03). Descriptive counts, no significance test. A post-hoc rerun of 1.2 on the spent cases is diagnostic only, not held-out (backup).}
+  \note{
+    \textbf{(39s, ends 6:28)} Version one point two targets those failures. A person's own
+    delay now reaches the planner, and a pool checked as unavailable is no longer offered.
+    The old cases were spent, so six fresh ones were written without the new code, and
+    locked before any call. Version one point two met fifty nine of sixty runs. Fixed rules
+    missed one late volunteer. The other policies met every run, so this small set cannot
+    rank them. The cases differ, so this is not a before and after.
+  }
+\end{frame}
+
+% ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+% 13. CLOSE (32 s)
 \begin{frame}{What works today, and what is next}
   \begin{columns}[T,onlytextwidth]
     \column{0.7\textwidth}
       \begin{itemize}
         \item \textbf{Works}: verify, prepare, commit in a local sandbox. Every accepted change has a \emphasize{receipt}, and people approve spending.
-        \item \textbf{Tested} on 12 held-out cases (\res{both:recorded} runs): \emphasize{zero executed violations}, and no clear winner among the four policies.
+        \item \textbf{Tested} on 12 held-out cases (\res{both:recorded} runs), then version 1.2 on 6 fresh ones (\res{fresh:both:recorded} runs): \emphasize{zero executed violations}, and no clear winner among the policies.
         \item \textbf{In real life} a message is a text, a status check is a tracking page, a hold is a refundable reservation.
-        \item \textbf{Not shown}: real bookings, real stock, community validation. \textbf{Next}: review the workflows with community staff.
+        \item \textbf{Not shown}: real bookings, real stock, a community pilot. \textbf{Next}: review the workflows with community staff.
       \end{itemize}
     \column{0.28\textwidth}
       \centering
-      \includegraphics[width=0.8\textwidth]{fig_qr.pdf}\\[2pt]
-      {\scriptsize github.com/nocdoggo/COLLIE\\ branch hackathon/peeaai-plan\\ app in apps/plan\_b\par}
+      \includegraphics[width=1.0\textwidth]{fig_qr.pdf}\\[2pt]
+      {\footnotesize github.com/nocdoggo/COLLIE\\ branch hackathon/peeaai-plan\\ app in apps/plan\_b\par}
   \end{columns}
   \vfill
   \begin{columns}[c,onlytextwidth]
@@ -314,12 +351,12 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
       \hfill\includegraphics[height=1.0cm]{Blue-UMB-logo-lockup.png}
   \end{columns}
   \note{
-    \textbf{(31s, ends 7:00)} Today Plan B verifies, prepares and commits in a local sandbox.
-    Every accepted change has a receipt, and people approve spending. On held-out cases no
-    policy executed a violation, but my policy showed no consistent advantage over the others.
-    In real life a message is a text, a status check is a tracking page, and a hold is a
-    refundable reservation. Next, I want to review these workflows with community staff. Thank
-    you.
+    \textbf{(32s, ends 7:00)} Today Plan B verifies, prepares and commits in a local
+    sandbox. Every accepted change has a receipt, and people approve spending. In both
+    held-out tests no policy executed a violation, and my policy showed no consistent
+    advantage. In real life a message is a text, a status check is a tracking page, and a
+    hold is a refundable reservation. No community has used it yet. Next, I want to review
+    it with community staff. Thank you.
   }
 \end{frame}
 
@@ -331,7 +368,7 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
     \column{0.42\textwidth}
       \begin{itemize}
         \item A \textbf{replay} re-shows a recorded run. It never calls a tool and is never a new trial.
-        \item Wave 2 development run of P2 (\texttt{live/1.0.0}) on case dev02.
+        \item A development run of P2 on case dev02, recorded with an earlier version (\texttt{live/1.0.0}) before the freeze.
         \item The model chose one option the server built. The server checked it and wrote the receipt. The model's own rationale is shown as \emphasize{untrusted text}.
       \end{itemize}
     \column{0.56\textwidth}
@@ -342,15 +379,15 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
 
 \begin{frame}{Backup: the report's per-case figure, campus}
   \begin{center}
-    \includegraphics[height=8.6cm]{report_campus.pdf}\\[2pt]
-    \figcaption{\texttt{campus/report/figure.svg} of run wave3\_heldout\_20261025T1625Z, printed to PDF. Case order as in the report.}
+    \includegraphics[height=8.2cm]{report_campus.pdf}\\[2pt]
+    \figcaption{\texttt{campus/report/figure.svg} of run wave3\_heldout\_20261025T1625Z, printed to PDF. Case order as in the report. Legend: P1 tool use is P1 model calls tools, P2 selective is P2 model picks options, P3 verify-all is P3 every check first.}
   \end{center}
 \end{frame}
 
 \begin{frame}{Backup: the report's per-case figure, pantry}
   \begin{center}
     \includegraphics[width=0.92\textwidth]{report_pantry.pdf}\\[2pt]
-    \figcaption{\texttt{pantry/report/figure.svg} of the same run, printed to PDF.}
+    \figcaption{\texttt{pantry/report/figure.svg} of the same run, printed to PDF. Case order as in the report.}
   \end{center}
 \end{frame}
 
@@ -371,8 +408,8 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
   \end{tabular}\par}
   \end{center}
   \begin{itemize}
-    \item Provider-reported cost of the reported run. Runs stopped by the 8-call limit: campus \res{campus:all:capped}, pantry \res{pantry:all:capped}. They stay in the counts.
-    \item A first attempt was \textbf{voided} before the reported run began: the provider's rate limit (20 requests a minute) answered most calls with an error. It is kept on record, the void departs from the frozen status rules, and the whole protocol was rerun one run at a time.
+    \item Provider-reported cost of the reported run of version 1.1. Version 1.2 cost \$\res{fresh:both:usd} for the \res{fresh:both:recorded} fresh held-out runs and \$\res{rerun:both:usd} for the \res{rerun:both:recorded} runs of the diagnostic rerun. Runs of 1.1 stopped by the 8-call limit: campus \res{campus:all:capped}, pantry \res{pantry:all:capped}, so \res{both:capped} runs, 15 of them among the 26 failed runs. All stay in the counts.
+    \item A first attempt was \textbf{voided} before the reported run began: the provider's rate limit (20 requests a minute) answered most calls with an error. It is kept on record. The frozen status rules would have scored its capped runs, so the void is a disclosed departure from them. The whole protocol was rerun one run at a time.
   \end{itemize}
 \end{frame}
 
@@ -380,15 +417,41 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
   \begin{itemize}
     \item \textbf{The case is the unit}: 8 campus and 4 pantry cases. Three runs of a case are repeated trials. No significance test.
     \item \textbf{C06} is out of reach for P0, P2 and P3 by a frozen rule, disclosed before the runs.
-    \item \textbf{Pantry}: only P2 and P3 had pantry guidance in their prompts. A defect in my frozen planner kept a pool checked as unavailable on offer, and it is the first break of all six P2 and P3 failures on case T03.
+    \item \textbf{Pantry}: only P2 and P3 had pantry guidance in their prompts. A defect in my frozen planner kept a pool checked as unavailable on offer, and it is where each of the six P2 and P3 failures on case T03 first went wrong.
     \item The 8 model calls per run come from development and ended 15 of the 26 failed runs.
-    \item These held-out cases are now spent. A new version needs new cases and a new freeze.
+    \item These 12 cases are now spent. Version 1.2 got 6 new cases and a new freeze.
+    \item \textbf{Version 1.2}: 6 cases are few, and they repeat known conditions with near copies of the old wording. Five limits found by the audit before the freeze stay frozen, so that no one who had seen the new cases changed a policy.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Backup: version 1.2 on the spent cases, a diagnostic rerun}
+  \begin{itemize}
+    \item \textbf{Post-hoc diagnostic rerun after fixes, on spent cases. Not a held-out result.} The fixes were made after reading these failures.
+  \end{itemize}
+  \vspace{0.1cm}
+  \begin{center}
+  {\small
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{@{}lcccc@{\hspace{12pt}}cccc@{}}
+    \toprule
+    & \multicolumn{4}{c}{\textbf{Campus runs met}} & \multicolumn{4}{c}{\textbf{Pantry runs met}} \\
+    & P0 & P1 & P2 & P3 & P0 & P1 & P2 & P3 \\
+    \midrule
+    Version 1.1, held-out record & \res{campus:P0:met} & \res{campus:P1:met} & \res{campus:P2:met} & \res{campus:P3:met} & \res{pantry:P0:met} & \res{pantry:P1:met} & \res{pantry:P2:met} & \res{pantry:P3:met} \\
+    Version 1.2, diagnostic rerun & \res{rerun:campus:P0:met} & \res{rerun:campus:P1:met} & \res{rerun:campus:P2:met} & \res{rerun:campus:P3:met} & \res{rerun:pantry:P0:met} & \res{rerun:pantry:P1:met} & \res{rerun:pantry:P2:met} & \res{rerun:pantry:P3:met} \\
+    \bottomrule
+  \end{tabular}\par}
+  \end{center}
+  \vspace{0.05cm}
+  \begin{itemize}
+    \item Consistent with the fixes: P1 to P3 met every run on C06 and T03. Still failing, as in 1.1: C07 under P2 (the call budget spent on hold churn), T02 under P3 (a stale apply), T04 under P1 in 2 of 3 runs, and P0 on C06 and C07.
+    \item Run two at a time: \res{rerun:both:capped} runs stopped at the 8-call limit, and 61 rate-limit answers were waited out at no cost. \res{rerun:both:viol} executed violations.
   \end{itemize}
 \end{frame}
 
 \begin{frame}{Backup: a development failure, kept on record}
   \begin{itemize}
-    \item Wave 2, P1's first run on the pantry practice case: the executor \textbf{refused 6 holds}, the model call limit was reached, \emphasize{0 of 40} kits were served.
+    \item In development, P1's first run on the pantry practice case: the executor \textbf{refused 6 holds}, the model call limit was reached, \emphasize{0 of 40} kits were served.
     \item Cause: a defect in my P1 harness. The prompt never said which time window a hold covers, and the reply limit counted the model's reasoning.
     \item Fixed in the prompt and the limit. The rerun served \emphasize{40 of 40}. The failed run is kept.
   \end{itemize}
@@ -397,7 +460,7 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
 \begin{frame}{Backup: a participant's own check-in changes the plan}
   \begin{center}
     \includegraphics[height=7.6cm]{community_replanned.png}\\[3pt]
-    \figcaption{Development case skills\_dev01: the peer lead can stay only until 11:05, so the plan swaps two activities. Rule baseline, automated run.}
+    \figcaption{Development case skills\_dev01: the peer lead can stay only until 11:05, so the plan swaps two activities. P0 fixed rules, automated run.}
   \end{center}
 \end{frame}
 
@@ -405,17 +468,18 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
   \begin{itemize}
     \item Development case pantry\_dev02: staff hand off only \textbf{10 of the 16} kits.
     \item \emphasize{34 kits} are distributed and a \emphasize{6-kit deficit} is reported. The target stays 40.
-    \item Stock is conserved: 34 handed out plus 6 left in the partner pool make 40. The late 20 never count.
+    \item Stock is conserved: 34 handed out plus 6 left in the partner pool make 40. The 20 kits of the late shipment never count as stock.
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Backup: the frozen configuration}
+\begin{frame}{Backup: the frozen configurations}
   \begin{itemize}
     \item \textbf{Policies}: P0 \texttt{rules/1.0.0} and \texttt{pantry-rules/1.1.0}, P1 \texttt{tool-use/1.1.0}, P2 \texttt{live/1.1.0}, P3 \texttt{verify-all/1.1.0}.
     \item \textbf{Model}: \texttt{anthropic/claude-sonnet-5.5} through OpenRouter, the same for P1 to P3.
     \item \textbf{Limits per run}: 48 tool calls, 8 model calls, \$0.50, 900 seconds.
     \item \textbf{Seeds} 101, 202 and 303 are recorded but not sent, because the model's endpoints refuse a seed. The three runs of a case are repeated trials, not reproducible ones.
     \item Frozen by hash in \texttt{freeze.json} before the first held-out call.
+    \item \textbf{Version 1.2}: P1 \texttt{tool-use/1.2.0}, P2 \texttt{live/1.2.0}, P3 \texttt{verify-all/1.2.0}, P0 unchanged on planner 1.2.0. Same model and limits. Frozen in \texttt{freeze\_v1\_2.json} at 23:23:47 UTC, the fresh cases locked at 23:23:54, the first call at 23:27:31.
   \end{itemize}
 \end{frame}
 

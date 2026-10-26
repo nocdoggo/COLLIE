@@ -7,7 +7,10 @@ with pdftoppm, and crops of the Wave 2 storyboard frames (../slides/figures/fram
 
 Every held-out number comes from results.json, which ../make_results.py writes from the committed
 run wave3_heldout_20261025T1625Z (its two report/metrics.json files). The rest of section 12
-cites that run's README.md and FAILURES.md.
+cites that run's README.md and FAILURES.md. That run stays the evaluation of record. Section 12.7
+adds version 1.2 (Wave 3b) from results_v12.json, which the same script writes from the fresh
+held-out run wave3b_fresh_20261025T2327Z and from the post-hoc diagnostic rerun on the spent cases
+wave3b_rerun_spent_20261025T2345Z (not a held-out result).
 """
 
 import json
@@ -22,6 +25,7 @@ from docx_helpers import (
     new_document,
     numbered,
     para,
+    rich,
     table,
 )
 
@@ -31,6 +35,9 @@ FRAMES = FIGURES / "frames"
 PNG = HERE / "figures"
 OUT = HERE / "Plan_B_Project_Documentation.docx"
 RESULTS = json.loads((HERE / "results.json").read_text(encoding="utf-8"))
+# Wave 3b, policy 1.2: "fresh" is held-out (C09 to C12, T05, T06), "rerun" is a post-hoc
+# diagnostic rerun on the spent cases and never a held-out result.
+V12 = json.loads((HERE / "results_v12.json").read_text(encoding="utf-8"))
 
 TITLE = "Plan B: The Show Must Go On"
 AUTHOR = "Noctis Zhang"
@@ -69,6 +76,18 @@ def title_block(doc) -> None:
     )
 
 
+def _v12_met(layer: str) -> tuple[int, int]:
+    """Runs met and recorded over both suites and all policies of one Wave 3b layer."""
+    rows = [V12[layer][s][p] for s in ("campus", "pantry") for p in ("P0", "P1", "P2", "P3")]
+    return sum(int(r["metk"]) for r in rows), sum(int(r["metn"]) for r in rows)
+
+
+def table_caption(doc, text: str) -> None:
+    paragraph = doc.add_paragraph(style="Caption")
+    rich(paragraph, text)
+    paragraph.paragraph_format.keep_with_next = True  # the caption stays with its table
+
+
 def abstract(doc) -> None:
     doc.add_heading("Abstract", level=1)
     para(
@@ -81,10 +100,15 @@ def abstract(doc) -> None:
         "backup open while a fact or an approval is pending, and every accepted change returns a "
         "**receipt**. I built Plan B as a fictional local sandbox with a campus showcase, a community "
         "skills exchange and a fictional pantry, and compared four coordinator policies on held-out "
-        "cases that were locked before the test. In 120 held-out runs no policy executed a violation "
+        "cases that were locked before the test. In 120 held-out runs of version 1.1, the evaluation of "
+        "record, no policy executed a violation "
         "or changed a quiet event, but my policy showed no consistent advantage: a model calling the "
         "tools freely met every campus run at three times my policy's model cost, and fixed rules met "
-        "every pantry run. Everything is fictional and local, the case set is small, and no community "
+        "every pantry run. That run exposed defects, so I made version 1.2 and tested it on a fresh "
+        "held-out set of six cases, locked before any 1.2 call. It met the expected outcome in "
+        f"{_v12_met('fresh')[0]} of {_v12_met('fresh')[1]} runs, and the one miss was the fixed rules on a late-volunteer case. "
+        "That set is small and repeats known conditions in new cases, so it is not comparable with "
+        "the first run. Everything is fictional and local, the case set is small, and no community "
         "pilot has been run.",
     )
     figure(doc, PNG / "fig_strip.png", "Figure 1. One recovery in four steps (development case dev01).")
@@ -121,7 +145,11 @@ def problem(doc) -> None:
 
 def different(doc) -> None:
     doc.add_heading("2. What is different here", level=1)
-    para(doc, "Plan B combines known ideas in one bounded workflow. It does not claim to be the first of its kind.")
+    para(
+        doc,
+        "Plan B combines known ideas in one bounded workflow. It does not claim to be the first of its "
+        "kind. P0 to P3 are the four coordinator policies compared in section 7.",
+    )
     bullets(
         doc,
         [
@@ -162,6 +190,12 @@ def what_it_does(doc) -> None:
         doc,
         "Everything runs in a **fictional local sandbox**. Every action is a real change to a local "
         "SQLite database and nothing else. No university booking, purchase, delivery or message is made.",
+    )
+    para(
+        doc,
+        "I built Plan B in three waves: the campus sandbox (Wave 1), the model policies, community roles "
+        "and pantry (Wave 2), and the frozen held-out comparison (Wave 3). Each wave ended with an audit "
+        "packet of evidence in `PEEAI_plan/handoffs/`, which later sections cite.",
     )
 
 
@@ -249,7 +283,11 @@ def architecture(doc) -> None:
 def decision_policy(doc) -> None:
     doc.add_heading("6. The decision policy", level=1)
     figure(doc, PNG / "fig_loop.png", "Figure 8. Verify, prepare, commit, keep, with this event's examples.")
-    para(doc, "The selective policy P2 follows these steps for each wake:")
+    para(
+        doc,
+        "The selective policy P2 follows these steps each time the runner wakes it, that is, gives it a "
+        "turn because the shared state changed or a wait it set has passed:",
+    )
     numbered(
         doc,
         [
@@ -299,8 +337,8 @@ def policies(doc) -> None:
             "reproducible.",
             "**P1 is a serious baseline.** It sees the objective, the budget, the tools and the "
             "candidates, and may verify and hold like P2.",
-            "**P3 is an ablation.** Its checks are made by the server, so its fewer model calls do not "
-            "mean less checking.",
+            "**P3 is an ablation.** Its checks are made by the server, so its lower model-call count on "
+            "campus does not mean less checking.",
         ],
     )
 
@@ -324,6 +362,7 @@ def community(doc) -> None:
         doc,
         FRAMES / "community_replanned.png",
         "Figure 9. Development case skills_dev01: the peer lead's own check-in moves two activities (automated run).",
+        5.0,
     )
 
 
@@ -380,7 +419,8 @@ def safety(doc) -> None:
             "**Public and evaluator-only data are separate.** Hidden expectations never reach a policy or "
             "the browser.",
             "**Spend caps and a ledger** bound every paid model call. The key is read by the server's "
-            "provider at call time. The audit scripts' reads of the key are disclosed in the Wave 2 packet.",
+            "provider at call time. The audit scripts' reads of the key are disclosed in the Wave 2 audit packet "
+            "(`PEEAI_plan/handoffs/wave_2/`).",
         ],
     )
 
@@ -426,6 +466,9 @@ def protocol(doc) -> None:
             "committed changes on the quiet cases (C02 to C04), refused requests, executed violations, "
             "status checks, recovery delay, model calls and cost, and for the pantry target attainment, "
             "supported partial fulfillment and stock conservation.",
+            "**Capped runs**: a run that reaches the limit of 8 model calls stops there and is scored "
+            "from its final state like any other run, so it stays in the denominator. The results "
+            "tables count them in the column \"Runs capped\".",
         ],
     )
 
@@ -445,7 +488,9 @@ def results(doc) -> None:
         f"campus runs and all {pantry['all']['recorded']} planned pantry runs were recorded, with none "
         "missing, aborted, timed out or crashed. These are descriptive counts from one reported run on 8 campus "
         "and 4 pantry cases. The case is the unit, the three runs of a case are repeated trials, and no "
-        "significance test is made. The two suites are separate.",
+        "significance test is made. The two suites are separate. Section 12.7 adds version 1.2 "
+        "(Wave 3b): a fresh held-out check on six new cases and a post-hoc diagnostic rerun on these "
+        "spent cases. Neither replaces this run.",
     )
     para(
         doc,
@@ -461,6 +506,7 @@ def results(doc) -> None:
     )
     figure(doc, PNG / "fig_results.png", "Figure 12. Held-out runs that met the case's outcome, per policy and suite.")
     doc.add_heading("12.1 Campus suite (8 cases, 80 runs)", level=2)
+    table_caption(doc, "Table 1. Campus outcomes per policy, version 1.1, held-out.")
     table(
         doc,
         ["Policy", "Met / recorded", "Cases fully met", "Goal met C01 to C07", "Infeasibility C08", "Changes on C02 to C04"],
@@ -471,6 +517,7 @@ def results(doc) -> None:
         ],
         [1.5, 0.9, 0.9, 1.0, 1.0, 1.2],
     )
+    table_caption(doc, "Table 2. Campus integrity and model use per policy, version 1.1, held-out.")
     table(
         doc,
         ["Policy", "Refused requests", "Executed violations", "Status checks per run", "Model calls", "Model USD", "Runs capped"],
@@ -487,6 +534,7 @@ def results(doc) -> None:
         "requests were made on a state that had changed meanwhile, which is retryable by design.",
     )
     doc.add_heading("12.2 Pantry suite (4 cases, 40 runs)", level=2)
+    table_caption(doc, "Table 3. Pantry outcomes per policy, version 1.1, held-out.")
     table(
         doc,
         ["Policy", "Met / recorded", "Cases fully met", "Target met T01, T02", "Supported partial T03, T04", "Kits on time / target"],
@@ -496,6 +544,7 @@ def results(doc) -> None:
         ],
         [1.5, 0.9, 0.9, 1.0, 1.1, 1.1],
     )
+    table_caption(doc, "Table 4. Pantry integrity and model use per policy, version 1.1, held-out.")
     table(
         doc,
         ["Policy", "Refused requests", "Executed violations", "Conservation failures", "Duplicate credits", "Model USD", "Runs capped"],
@@ -582,10 +631,12 @@ def results(doc) -> None:
             "**The limits are development values**: 8 model calls and 48 tool calls per run, not tuned on "
             "held-out cases. The 8-call limit was reached in 21 of the 120 runs.",
             "**No backoff on a rate-limit error** in the frozen provider. A live demo runs one model "
-            "episode at a time, with the recorded replay as the fallback.",
+            "episode at a time, with the recorded replay as the fallback. Version 1.2 adds one "
+            "(section 12.7).",
             "**Reproducibility.** Seeds were recorded but not sent, the temperature is the provider "
             "default, and the provider's upstream route was not recorded.",
-            "**These held-out cases are now spent.** A revised policy needs new cases and a new freeze.",
+            "**These held-out cases are now spent.** A revised policy needs new cases and a new freeze. "
+            "Section 12.7 reports both for version 1.2.",
         ],
     )
     doc.add_heading("12.6 Functional evidence", level=2)
@@ -601,9 +652,132 @@ def results(doc) -> None:
             "Wave 1 rejection demo: 20 steps, each with its expected result.",
             "Rehearsals: three automated rehearsals of the showcase's board path passed, one of them "
             "with a forced provider failure and a switch to the labelled replay (Wave 3 packet, "
-            "`PEEAI_plan/handoffs/wave_3/REHEARSALS.md`). No human rehearsal had been done when this "
-            "document was written. The spoken script is "
-            "953 words, about 6 minutes 48 seconds at 140 words a minute.",
+            "`PEEAI_plan/handoffs/wave_3/REHEARSALS.md`). The spoken script is 932 words, about 6 "
+            "minutes 39 seconds at 140 words a minute, inside the 7 minutes.",
+        ],
+    )
+    wave3b(doc)
+
+
+def wave3b(doc) -> None:
+    """Section 12.7: version 1.2 in two layers that stay apart from the v1.1 record."""
+    fresh, rerun = V12["fresh"], V12["rerun"]
+    pols = ["P0", "P1", "P2", "P3"]
+    fk, fn = _v12_met("fresh")
+    calls = sum(int(fresh[s][p]["calls"]) for s in ("campus", "pantry") for p in pols)
+    usd = {k: sum(float(V12[k][s][p]["usd"]) for s in ("campus", "pantry") for p in pols) for k in ("fresh", "rerun")}
+    by_policy = {p: sum(float(fresh[s][p]["usd"]) for s in ("campus", "pantry")) for p in ("P1", "P2", "P3")}
+    doc.add_heading("12.7 Wave 3b: version 1.2", level=2)
+    para(
+        doc,
+        "**What changed and why.** The held-out run above exposed defects in the frozen 1.1 policies, "
+        "and its `FAILURES.md` names them. Version 1.2 (P1 `tool-use/1.2.0`, P2 `live/1.2.0`, P3 "
+        "`verify-all/1.2.0`) fixes them. `apps/plan_b/docs/RUNTIME_CONTRACT.md` section 21 lists each "
+        "fix with its test.",
+    )
+    bullets(
+        doc,
+        [
+            "**A person's delay** (C06). In 1.1 only equipment notices were material, so a volunteer's "
+            "own report never reached the planner. In 1.2 a notice about a person that a not-started "
+            "activity uses is material, and the claimed arrival time reaches the planner as a hypothesis.",
+            "**An unavailable pool** (T03). In 1.1 a pool checked as unavailable stayed a ranked handoff "
+            "option, and the shortfall report waited on it. In 1.2 the planner fails that handoff unless "
+            "it is already held.",
+            "**Calls with no progress** (the runs that used up the 8-call limit). In 1.2 the model is not "
+            "called again on a menu it already passed on in the same state (the same revision, goal "
+            "version and options).",
+            "**A stale refusal** (T02). In 1.1 a choice refused only because the state had changed went "
+            "back to the model. In 1.2 P2 and P3 send it again without a model call when the re-read "
+            "menu still offers it.",
+            "**Rate limits.** In 1.1 an HTTP 429 answer used up a model call. In 1.2 the provider waits "
+            "and sends the same request again inside the call (3 s, doubled up to 20 s, at most 60 s of "
+            "waiting a call), so a 429 uses no model call.",
+            "P0's code and ids are unchanged, but it shares the planner, so the freeze records the "
+            "planner version `plan_b.planner/1.2.0`. The model, the output limit and every cap are the "
+            "same as in 1.1.",
+        ],
+    )
+    para(
+        doc,
+        "**How the new held-out result was kept apart.** The twelve cases above are spent, because the "
+        "fixes were made after reading their failures. A separate worker wrote six fresh cases (campus "
+        "C09 to C12, with C10 a quiet negative control, and pantry T05 and T06). They were locked "
+        "with the 1.2 freeze (`freeze_v1_2.json` at 23:23:47 UTC, `heldout2.json` at 23:23:54 UTC, "
+        "commit 5955243) before the first 1.2 model call on them (23:27:31 UTC). Whoever changed the "
+        "policies never read those cases. Two limits remain. The case author read the prose list of "
+        "planned fixes, but no code. The audit before the freeze had seen the cases, so it changed no "
+        "policy behavior and left five known limits of 1.2 frozen (section 13).",
+    )
+    layers = [
+        ("v1.1 held-out, evaluation of record: campus C01 to C08", RESULTS, "campus"),
+        ("v1.1 held-out, evaluation of record: pantry T01 to T04", RESULTS, "pantry"),
+        ("v1.2 fresh held-out: campus C09 to C12", fresh, "campus"),
+        ("v1.2 fresh held-out: pantry T05, T06", fresh, "pantry"),
+        ("v1.2 post-hoc diagnostic rerun on spent cases, not held-out: campus C01 to C08", rerun, "campus"),
+        ("v1.2 post-hoc diagnostic rerun on spent cases, not held-out: pantry T01 to T04", rerun, "pantry"),
+    ]
+    table_caption(doc, "Table 5. Runs that met the case's outcome over recorded runs, per policy, in three separately labelled layers.")
+    table(
+        doc,
+        ["Layer and cases", "Runs", "P0 rules", "P1 tool use", "P2 selective (mine)", "P3 verify all"],
+        [[label, str(src[suite]["all"]["recorded"]), *[str(src[suite][p]["met"]) for p in pols]] for label, src, suite in layers],
+        [2.6, 0.5, 0.8, 0.8, 1.0, 0.8],
+    )
+
+    def quiet(src: dict, suite: str) -> str:
+        n = sum(int(src[suite][p]["unnecn"]) for p in pols)
+        return f"{src[suite]['all']['unnec']} in {n} runs" if n else "no quiet case"
+
+    table_caption(doc, "Table 6. Integrity measures in the same layers, summed over the four policies.")
+    table(
+        doc,
+        ["Layer and cases", "Executed violations", "Refused requests", "Runs capped", "Changes on quiet cases"],
+        [
+            [label, str(src[suite]["all"]["viol"]), str(src[suite]["all"]["refused"]), str(src[suite]["all"]["capped"]), quiet(src, suite)]
+            for label, src, suite in layers
+        ],
+        [2.6, 0.95, 0.95, 0.9, 1.1],
+    )
+    para(doc, "**What these numbers show and do not show.**")
+    bullets(
+        doc,
+        [
+            "**Descriptive counts only.** Each layer is one run of the protocol. The case is the unit, "
+            "the three seeds are repeated trials, and no significance test is made. The suites are "
+            "separate.",
+            f"**The fresh held-out check** (`wave3b_fresh_20261025T2327Z`). Version 1.2 met the outcome "
+            f"in {fk} of {fn} runs. The one miss is P0 on C11, a late volunteer whose own report P0's "
+            "frozen parser does not read, the same gap by construction as P0 on C06. P1, P2 and P3 met "
+            f"every run, {fresh['campus']['P2']['met']} each on campus and {fresh['pantry']['P2']['met']} "
+            f"each on the pantry. No run reached the 8-call limit, all {calls} model calls were "
+            "answered, and the negative control C10 had no committed change in any of its 10 runs.",
+            "**Small, and close to the spent cases.** Six cases is a small set. Its wording is close to "
+            "the spent templates, and its conditions repeat spent ones (C11 repeats the C06 condition, "
+            "T06 the T03 condition). So it tests new instances of known conditions, not new conditions. "
+            "It is not comparable with the v1.1 counts, because the cases differ.",
+            "**P2 still shows no consistent advantage.** P1, P2 and P3 all met every fresh run, so the "
+            "fresh set cannot separate them. Model charges over both fresh suites were "
+            f"${by_policy['P1']:.2f} for P1, ${by_policy['P2']:.2f} for P2 and ${by_policy['P3']:.2f} for P3.",
+            "**The rerun on the spent cases is diagnostic, not held-out** "
+            "(`wave3b_rerun_spent_20261025T2345Z`). Its counts are consistent with the fixes on the "
+            "failures that motivated them: the C06 misses of P2 and P3 and the T03 misses did not "
+            "recur. The C07 failure of P2 (a hold made, released and made again until the call limit) "
+            "and the T02 failure of P3 (an apply refused as stale, whose retry needed a model call that "
+            "the limit did not leave) remain, and P1 missed "
+            "T04 in two of three runs. The fixes were made after reading these cases, so the rerun "
+            "cannot show that 1.2 is better.",
+            "**Harness labels.** The rerun used a case-scoped lock written outside the repository, so "
+            "its generated files (`plan.json`, `metrics.json` and the report text) say held-out. Its "
+            "README says in its first line that it is not a held-out result, and every table here "
+            "labels it so.",
+            "**Run conditions.** The fresh run went one episode at a time and met no rate limit. The "
+            "rerun ran two at a time and waited out 61 HTTP 429 answers on 28 calls, each unbilled and "
+            f"using no model call. {rerun['campus']['all']['capped'] + rerun['pantry']['all']['capped']} "
+            "rerun episodes reached the 8-call limit.",
+            f"**Zero executed violations** in all three layers. **Spend:** the fresh run cost "
+            f"{usd['fresh']:.2f} USD and the rerun {usd['rerun']:.2f} USD in provider-reported model "
+            "charges, and the spend ledger stood at 26.43 USD after both, under the 40 USD limit.",
         ],
     )
 
@@ -614,8 +788,19 @@ def limitations(doc) -> None:
         doc,
         [
             "**Fictional sandbox.** No real bookings, rooms, purchases, messages, people or stock.",
-            "**Small case set.** Eight campus and four pantry held-out cases. The case is the unit, and "
-            "three runs are not three worlds. No significance is claimed.",
+            "**Small case set.** Eight campus and four pantry held-out cases in the evaluation of "
+            "record, and six fresh cases for version 1.2. The case is the unit, and three runs are "
+            "not three worlds. No significance is claimed.",
+            "**Version 1.2 has five known limits**, found by the audit before the freeze and left "
+            "frozen: a person's delay hypothesis outlives a later check-in, the declined-menu rule "
+            "holds no time (so a timed wake with the same options gets no model call), P1 notes a "
+            "declined menu with the view after its turn, a stale re-send is recorded as a model "
+            "choice, and a long `Retry-After` is cut to 20 s (`RUNTIME_CONTRACT.md` section 21).",
+            "**The fresh held-out set** has four campus and two pantry cases. Its wording is close to "
+            "the spent templates, its conditions repeat spent ones, and its author read the prose list "
+            "of planned fixes.",
+            "**The diagnostic rerun's generated files say held-out** because of the harness path. Its "
+            "README says it is not a held-out result, and any quote of it must keep that label.",
             "**One model**, one provider, seeds not supported, so runs are repeated trials and not "
             "reproducible.",
             "**No comparative claim beyond the counts.** A P2 versus P0 difference does not separate the "
@@ -637,7 +822,12 @@ def limitations(doc) -> None:
 
 def how_to_run(doc) -> None:
     doc.add_heading("14. How to run it", level=1)
-    para(doc, "Requirements: Python 3.12 with uv, and Node.js 22 with npm. Get the code and start the board:")
+    para(doc, f"Repository: <<{APP_URL}>>")
+    para(
+        doc,
+        "Requirements: a bash shell (tested on Linux), Python 3.11 or 3.12 with uv (tested with uv "
+        "0.9.18), and Node.js 22.18 or newer with npm. Get the code and start the board:",
+    )
     code_block(
         doc,
         [
@@ -651,20 +841,34 @@ def how_to_run(doc) -> None:
     )
     para(
         doc,
-        "Sign in with the moderator code from `var/moderator_code.txt`, choose case `dev01`, click "
-        "**Load episode**, then **Run deterministic policy**.",
+        "Open http://127.0.0.1:8765 in a browser. Sign in with the moderator code in "
+        "`var/moderator_code.txt`, which the server writes on its first start. Choose case `dev01`, "
+        "click **Load episode**, then **Run deterministic policy**. The server keeps its terminal busy, "
+        "so run the next commands in a second terminal in `COLLIE/apps/plan_b`.",
     )
-    para(doc, "Deterministic development cases and the freeze check:")
+    para(
+        doc,
+        "Deterministic development cases and the freeze check. All nine case lines should end with "
+        "`matches_expectation=True`, and the check should print `verified` for `freeze.json` and "
+        "`heldout.json`:",
+    )
     code_block(doc, ["uv run plan-b run-case all", "uv run plan-b eval verify-freeze --require-heldout"])
     para(doc, "Recompute the held-out reports from the committed records, with no model call:")
     code_block(
         doc,
         [
-            "uv run plan-b eval report --results evaluation/results/wave3_heldout_20261025T1625Z/campus --out /tmp/campus_report",
-            "uv run plan-b eval report --results evaluation/results/wave3_heldout_20261025T1625Z/pantry --out /tmp/pantry_report",
+            "R=evaluation/results/wave3_heldout_20261025T1625Z",
+            "uv run plan-b eval report --results $R/campus --out /tmp/campus_report",
+            "uv run plan-b eval report --results $R/pantry --out /tmp/pantry_report",
         ],
     )
-    para(doc, "The demo setup, with a fresh state and verified recorded traces:")
+    para(
+        doc,
+        "The demo setup, with a fresh state and verified recorded traces, on its own port. Replace "
+        "`<choose one>` with any code, open http://127.0.0.1:8790 and sign in with it. "
+        "The recorded runs play back with no key, for example "
+        "http://127.0.0.1:8790/#/replay/live_p2-live_dev02_trace.json.",
+    )
     code_block(
         doc,
         [
@@ -675,9 +879,16 @@ def how_to_run(doc) -> None:
     )
     para(
         doc,
-        "The model policies make paid calls and need the endpoint settings in "
-        "`.local/keys/model_endpoint.env` and a key file, read only by the server. The evaluation "
-        "commands are in `apps/plan_b/docs/EVALUATION.md`.",
+        "The tests behind section 12.6, from `COLLIE/apps/plan_b` (the browser walkthroughs are in "
+        "`tests/e2e/`):",
+    )
+    code_block(doc, ["uv run pytest -q", "(cd web && npm test)"])
+    para(
+        doc,
+        "The model policies P1 to P3 make paid calls. They need an OpenAI-compatible endpoint such as "
+        "OpenRouter, set in `.local/keys/model_endpoint.env` at the repository root (the names are in "
+        "`apps/plan_b/.env.example`), and a key file that only the server reads. Everything above runs "
+        "without a key. The evaluation commands are in `apps/plan_b/docs/EVALUATION.md`.",
     )
 
 
@@ -754,6 +965,8 @@ def appendices(doc) -> None:
             ["Policy", "The rule that picks the next step: P0 to P3"],
             ["P0, P1, P2, P3", "Fixed rules, a model calling tools, a model picking checked options, and P2 with every check"],
             ["Development case", "A practice case used to build and debug"],
+            ["Episode", "One run of one policy on one case"],
+            ["Wake", "A turn the runner gives the coordinator when the state changed or its wait has passed"],
             ["Held-out case", "A case locked before the test and hidden from every policy"],
             ["Replay", "A re-showing of a recorded run that calls no tool"],
             ["Met", "The run's final state and receipts show the outcome its case requires"],
@@ -761,6 +974,8 @@ def appendices(doc) -> None:
             ["Executed violation", "An accepted action that left the state breaking a rule on rights, stock or resources"],
             ["Refused request", "A request the server turned away, so nothing it asked for happened"],
             ["Capped run", "A run stopped by the limit of 8 model calls, scored as it stands"],
+            ["Appropriate infeasibility", "With no recovery inside the limits, the coordinator names the blocking constraints and changes nothing invalid"],
+            ["Earliest broken stage", "Where a failed run first went wrong: interpretation, planner input, action selection or execution"],
             ["Attention rule", "The P2 and P3 rule that decides whether a reading is material and needs the model"],
             ["Planner input", "The step where a reading becomes a question for the planner"],
             ["Supply shortfall", "Kits still missing from the pantry shelf"],
@@ -789,16 +1004,19 @@ def appendices(doc) -> None:
         doc,
         ["Number in this document", "Source"],
         [
-            ["dev01 notice, check, 16 built and 3 feasible, swap at 16:43, `rcpt_0001`", "Wave 2 storyboard frames 4 to 7 and `storyboard_report.json`"],
+            ["dev01 notice, check, 16 built and 3 feasible, swap at 16:43, `rcpt_0001`", "Wave 2 storyboard frames 4 to 7 and `PEEAI_plan/handoffs/wave_2/evidence/storyboard/storyboard_report.json`"],
             ["P2 on dev01: same check and swap, 3 model calls, $0.0366", "`apps/plan_b/plan_b/evaluation/development/README.md`"],
             ["dev02 hold until 16:55, $35.00 committed once", "Wave 2 storyboard frames 9 to 11, Wave 1 README"],
-            ["dev04 messages and verdicts", "`scenarios/private/dev04.json` (development), storyboard frame 8"],
-            ["Pantry 24, 20, 16, 40 and the counters", "Wave 2 `DEMO.md` section 4, `pantry_accounting.json`"],
+            ["dev04 messages and verdicts", "`apps/plan_b/plan_b/scenarios/private/dev04.json` (development), storyboard frame 8"],
+            ["Pantry 24, 20, 16, 40 and the counters", "`PEEAI_plan/handoffs/wave_2/DEMO.md` section 4, `PEEAI_plan/handoffs/wave_2/evidence/reports/pantry_accounting.json`"],
             ["Partial handoff, 34 distributed, 6-kit deficit", "Wave 2 README (pantry_dev02)"],
             ["Frozen policies, model, limits, seeds", "`freeze.json`, `RUNTIME_CONTRACT.md` section 20"],
             ["Wave 2 test counts", "Wave 2 README and `VERIFICATION.md`"],
             ["Wave 3 test counts (section 12.6)", "`PEEAI_plan/handoffs/wave_3/evidence/reports/checks.json` (clean checkout of 3442874)"],
             ["Held-out results (section 12)", "`apps/plan_b/evaluation/results/wave3_heldout_20261025T1625Z/` (commit c052338): `campus/report/metrics.json`, `pantry/report/metrics.json`, `README.md`, `FAILURES.md`, read by `PEEAI_plan/submission/make_results.py`"],
+            ["Version 1.2 fresh held-out results (section 12.7)", "`apps/plan_b/evaluation/results/wave3b_fresh_20261025T2327Z/` (commit f715dfc): `campus/report/metrics.json`, `pantry/report/metrics.json`, `README.md`, `FAILURES.md`, read by `make_results.py` into `documentation/results_v12.json`"],
+            ["Version 1.2 post-hoc diagnostic rerun on spent cases, not held-out (section 12.7)", "`apps/plan_b/evaluation/results/wave3b_rerun_spent_20261025T2345Z/` (commit f715dfc): the same files, and its README's first line says it is not a held-out result"],
+            ["Version 1.2 fixes, known limits, freeze and lock", "`apps/plan_b/docs/RUNTIME_CONTRACT.md` section 21, `apps/plan_b/docs/EVALUATION.md`, `freeze_v1_2.json` and `heldout2.json` (commit 5955243)"],
         ],
         [3.3, 3.2],
     )

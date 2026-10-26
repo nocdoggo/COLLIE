@@ -202,12 +202,23 @@ def table(doc: Document, header: list[str], rows: list[list[str]], widths_in: li
                 _shade(cell, "E6EEF6")
     for column, width in zip(grid.columns, widths_in):
         column.width = Inches(width)
+    _keep_rows_whole(grid)
     doc.add_paragraph()
+
+
+def _keep_rows_whole(grid) -> None:
+    """Word repeats the header row on each page a table spans, and never splits a row."""
+    for index, row in enumerate(grid.rows):
+        trPr = row._tr.get_or_add_trPr()
+        trPr.append(OxmlElement("w:cantSplit"))
+        if index == 0:
+            trPr.append(OxmlElement("w:tblHeader"))
 
 
 def figure(doc: Document, image: Path, caption: str, width_in: float = TEXT_WIDTH_IN) -> None:
     doc.add_picture(str(image), width=Inches(width_in))
     doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
+    doc.paragraphs[-1].paragraph_format.keep_with_next = True  # the caption stays with its picture
     paragraph = doc.add_paragraph(style="Caption")
     rich(paragraph, caption)
     paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER

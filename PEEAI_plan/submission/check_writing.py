@@ -1,10 +1,10 @@
 """The owner's writing-rule check for the three submission items.
 
 Every PDF (pdftotext), the Word document's text (document.xml, its headers and footers, core
-properties), the spoken scripts, this directory's README and the Wave 3 handoff packet's Markdown
-must contain no em dash, no en dash (nor any other typographic dash or minus sign), no "--" and
-no semicolon. In the Word document, text in the two monospace code styles (command lines and
-identifiers) is not prose and is skipped. In the Markdown files, code blocks and inline code are
+properties), the spoken scripts, this directory's README and DRAFT.md, and the Wave 3 handoff
+packet's Markdown must contain no em dash, no en dash (nor any other typographic dash or minus
+sign), no "--" and no semicolon. In the Word document, text in the two monospace code styles
+(command lines and identifiers) is not prose and is skipped. In the Markdown files, code blocks and inline code are
 skipped for the same reason.
 Prints each hit with its file and line, and exits 1 when there is any.
 
@@ -22,7 +22,7 @@ HERE = Path(__file__).resolve().parent
 PDFS = ["slides/slides.pdf", "poster/poster.pdf"]
 DOCX = ["documentation/Plan_B_Project_Documentation.docx"]
 SCRIPTS = ["slides/pres-note.md", "poster/poster-note.md"]
-READMES = ["README.md"] + sorted(
+READMES = ["README.md", "DRAFT.md"] + sorted(
     f"../handoffs/wave_3/{path.name}" for path in (HERE / "../handoffs/wave_3").glob("*.md")
 )
 FORBIDDEN = re.compile(r"[\u2012\u2013\u2014\u2015\u2212]|--|;")

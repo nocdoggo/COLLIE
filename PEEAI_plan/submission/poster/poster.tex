@@ -5,7 +5,9 @@
 % Build: latexmk -pdflatex='lualatex -interaction nonstopmode' -pdf poster.tex
 %
 % The held-out numbers come from ../slides/figures/results_numbers.tex and fig_results_v.tex, which
-% ../make_results.py writes from the committed run wave3_heldout_20261025T1625Z (metrics.json).
+% ../make_results.py writes from the committed run wave3_heldout_20261025T1625Z (metrics.json),
+% the evaluation of record of version 1.1. The version 1.2 numbers (fresh:) come from
+% results_numbers_v12.tex, written from the held-out run wave3b_fresh_20261025T2327Z.
 
 \documentclass[final]{beamer}
 % Keep the PDF metadata to title and author: no producer, creator or embedded file info.
@@ -57,6 +59,7 @@
 
 % Held-out numbers, read as \res{suite:policy:key}.
 \input{../slides/figures/results_numbers.tex}
+\input{../slides/figures/results_numbers_v12.tex}
 
 % ====================
 % Title
@@ -99,9 +102,9 @@
 \begin{columns}[t]
 \separatorcolumn
 \begin{column}{\fullwidth}
-  \begin{alertblock}{Plan B decides what to verify, what to prepare, and when to commit a change}
+  \begin{alertblock}{\Large An AI event coordinator that decides what to verify, what to prepare, and when to commit a change}
     \centering
-    Tested on 12 held-out cases (\res{both:recorded} runs): no executed violation, no change on the 3 cases that needed none, and no clear winner.
+    Version 1.1 on 12 held-out cases (\res{both:recorded} runs): no executed action broke a limit, no clear winner. Version 1.2 on 6 fresh held-out cases: \res{fresh:both:metk} of \res{fresh:both:metn} runs met.
   \end{alertblock}
 \end{column}
 \separatorcolumn
@@ -118,7 +121,7 @@
     Twenty minutes before a campus showcase opens, a message says the projector may be late.
     \begin{center}
       \includegraphics[width=0.8\linewidth]{fig_strip_v.pdf}\\[2pt]
-      {\small Practice case dev01, rule baseline, automated run.\par}
+      {\small Practice case dev01, an automated P0 run.\par}
     \end{center}
     In another practice case, a stale reminder and its forwarded copy \textbf{change nothing}.
   \end{block}
@@ -134,7 +137,7 @@
     \begin{center}
       \includegraphics[width=0.96\linewidth]{fig_loop_poster.pdf}
     \end{center}
-    A language model picks one option. The server built the options, checks every action,
+    A language model picks one option. The server builds the options, checks every action
     and writes the \textbf{receipt}. Spending needs a person.
   \end{block}
 \end{column}
@@ -146,12 +149,12 @@
 % -------------------------------------------------------------------
 \begin{column}{\colwidth}
   \begin{exampleblock}{Tested on cases it never saw}
-    Frozen first, then \textbf{held-out cases}. Runs that met their outcome:
+    Version 1.1 frozen, then \textbf{held-out cases}. Runs met, my P2 in dark:
     \begin{center}
-      \includegraphics[width=0.97\linewidth]{fig_results_v.pdf}
+      \includegraphics[width=0.78\linewidth]{fig_results_v.pdf}
     \end{center}
-    \textbf{No consistent advantage for my P2.} P1 met every campus run, at three times
-    P2's model cost.
+    \textbf{No consistent advantage for my P2.} P1 met all \res{campus:P1:cases} campus cases, at three times
+    P2's model cost. \textbf{Version 1.2} on 6 fresh cases: P1 to P3 met every run, too few to rank.
   \end{exampleblock}
 \end{column}
 
@@ -161,20 +164,20 @@
 % Column 4: the pantry, what I built, and the limits (the link is in the footer)
 % -------------------------------------------------------------------
 \begin{column}{\colwidth}
-  \begin{block}{Same loop, a new rule}
-    In a fictional pantry, late stock does not count, and only staff record a handoff or a
-    distribution. \textbf{No kit was counted twice} in any held-out run.
+  \begin{block}{Same loop, a fictional pantry}
+    In a fictional pantry, late stock does not count and only staff record a handoff.
+    \textbf{No kit was counted twice} in any held-out run.
   \end{block}
 
   \begin{block}{What I built}
-    A local server and board with a checked executor, a planner, holds, receipts, four
-    policies and a frozen test harness.
+    A local server and board, a checked executor, a planner, four policies and a frozen test
+    harness.
   \end{block}
 
   \begin{block}{Limits}
-    Fictional sandbox, 12 held-out cases, one model, one reported run after a voided first
-    attempt. My P2 missed cases through a frozen rule, choices that used up the 8 model calls,
-    and a planner defect. No community pilot yet.
+    Fictional sandbox, 12 held-out cases and 6 fresh ones for 1.2, one model, a voided first
+    attempt. In 1.1 my P2 missed cases through a frozen rule, its 8-call limit and a
+    planner defect. A 1.2 rerun on spent cases is diagnostic only. No pilot yet.
   \end{block}
 \end{column}
 

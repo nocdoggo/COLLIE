@@ -17,12 +17,12 @@
     {\bfseries\color{umbdark} Participant}\\[2pt]
     Checks in for themselves\\
     Offers a listed resource\\[2pt]
-    {\color{muted} Cannot change anyone else}};
+    {\color{umborange} May not: change anyone else}};
   \node[role] (staff) at (11.85,0) {%
     {\bfseries\color{umbdark} Pantry staff}\\[2pt]
     Records stock that physically arrived\\
     Records a distribution\\[2pt]
-    {\color{muted} Only staff can}};
+    {\color{umborange} Only staff can}};
   \node[okbox, minimum width=15.4cm, below=7mm of org.south west, anchor=north west, xshift=-3.95cm,
         font=\small\bfseries] (exec)
     {The server checks every request against the role's rights, the current state version and the budget};

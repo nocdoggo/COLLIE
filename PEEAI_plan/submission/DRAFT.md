@@ -2,7 +2,9 @@
 
 Status: plan and draft, written 2026-10-25 while the Wave 3 held-out evaluation was still
 running. The final step (section 13) filled every placeholder from the committed run and revised
-the plan where the results changed the story. Sections 1 to 12 are kept as written.
+the plan where the results changed the story. Sections 1 to 12 are kept as written. Wave 3b later
+added version 1.2 and slide 12 on its fresh held-out cases (see `README.md`, "Where the numbers
+come from").
 Nothing in sections 1 to 12 is a Wave 3 result. Every Wave 3 number is a named placeholder with the
 file it must come from. A later worker (`submission`) fills the placeholders from the committed
 results and finishes the items. This is the revised plan: the three critiques of the first
@@ -12,8 +14,8 @@ The three required items:
 
 1. **Project Documentation**: a Word document (`documentation/Plan_B_Project_Documentation.docx`)
    plus the GitHub repository link: https://github.com/nocdoggo/COLLIE, branch
-   `hackathon/peeaai-plan`, app path `apps/plan_b`. The branch is local until the owner pushes it,
-   so the link does not show the app yet.
+   `hackathon/peeaai-plan`, app path `apps/plan_b`. The owner pushed the branch at `26cf424`, and
+   the direct link opens the app.
 2. **The 7-Minute Project Presentation**: the slide deck `slides/slides.pdf` with speaker notes
    and the spoken script `slides/pres-note.md`.
 3. **The 2-Minute One-Slide Presentation**: a horizontal (16:9) poster `poster/poster.pdf` and its
@@ -84,7 +86,7 @@ there is time to point and switch. Whole script about 830 words, rehearsed to ab
 | 4 | 1:10 to 1:50 | 40 | 79 | A message is a claim, not a fact | The notice comes from the delivery contact at 16:40. One **status check** (asking the supplier's status service, two simulated minutes): delayed, reported ETA 17:25. A reported time is still not an arrival | Two tight real crops joined by a TikZ arrow: the notice (`story_04`) and the status check line (`story_05`), arrow label "1 status check, 2 simulated minutes" | "Before changing anything, it checks the one fact that could change the decision." |
 | 5 | 1:50 to 2:40 | 50 | 99 | One checked change, one receipt | The **planner** builds the allowed repairs from fixed templates (keep, swap, shift by ten minutes, the approved backup) and checks each against the deadline, people and budget: 16 built, 3 pass. Best: swap demonstrations and skills exchange, cost $0. Made official at 16:43 with a **receipt** (the server's record of an accepted change), plan version 1 to 2. Shown here: the rule baseline. The AI coordinator made the same check and the same swap at 16:43 in a recorded development run | `fig_swap` (Gantt before and after with the 17:25 ETA line) and the real receipt line crop from `story_07` | "The receipt is the evidence. The server writes it, the AI cannot." |
 | 6 | 2:40 to 3:35 | 55 | 109 | Three messages, zero changes | Case dev04, in the order it happened: (1) the same delay notice, but the status check says on schedule, ETA 16:58: a false alarm, keep the plan. (2) A reminder that order P09 for an October 29 workshop was cancelled: another order, another date, so it **does not apply**. (3) The reminder again, then a volunteer's forwarded copy: one source repeated is one source, a **duplicate**. Plan version 1 kept, no hold, no spending | `fig_quiet` (TikZ: three message cards in time order, each with its verdict, ending in "plan version 1 kept") | "Three of the eight test cases are quiet ones like this. Changing nothing is the right answer." [skip if late: the re-delivery] |
-| 7 | 3:35 to 4:05 | 30 | 60 | Verify, prepare, commit | **Verify** one fact that could change the decision. **Prepare** a backup while a fact or an approval is pending. **Commit** only a plan the server checked. **Keep** the plan when nothing should change. Every step returns to the next decision with what actually happened | `fig_loop` with this event's examples on each branch (verify: delayed, 17:25; prepare: with a 17:45 ETA the backup is held until 16:55 and the organizer is asked to approve $35; commit: the swap at 16:43; keep: the stale reminder) | Walk the loop once. "Prepare" is the paid backup case in one sentence |
+| 7 | 3:35 to 4:05 | 30 | 60 | Verify, prepare, commit | **Verify** one fact that could change the decision. **Prepare** a backup while a fact or an approval is pending. **Commit** only a plan the server checked. **Keep** the plan when nothing should change. Every step returns to the next decision with what actually happened | `fig_loop` with this event's examples on each branch (verify: delayed, 17:25. Prepare: with a 17:45 ETA the backup is held until 16:55 and the organizer is asked to approve $35. Commit: the swap at 16:43. Keep: the stale reminder) | Walk the loop once. "Prepare" is the paid backup case in one sentence |
 | 8 | 4:05 to 4:30 | 25 | 50 | The model chooses, the server checks | A **policy** is the rule that picks the next step. **P0** fixed rules. **P1** a language model that calls the tools itself. **P2** (ours) a model that picks one of the options the server built. **P3** P2 with every relevant status check run first. Same tools, same rights, same gate. Why a model: rules only read message forms they were written for. One real decision from a recorded development run | `fig_architecture` (four policies, one gate, state and receipts, the planner feeding the options) and a small TikZ callout of the recorded card (`story_12`): "model chose: apply the backup projector, 3.75 s, $0.0135. Server checked it, receipt rcpt_0003" | Contrast only P1 and P2 aloud. "Whatever the model says, only checked actions reach the state." [skip if late: P3] |
 | 9 | 4:30 to 5:15 | 45 | 89 | [Result headline, set from the counts] | Fair test strip: practice on **development cases** (cases I built with) → **freeze** code, prompts, model and limits → run **held-out cases** (written and locked before the test, never seen in development, hidden from every policy) once, three trials per model policy. Planned 80 campus and 40 pantry runs, completed [R_CAMPUS_COMPLETED] and [R_PANTRY_COMPLETED]. Four-row table in words: goal completion on C01 to C07, unnecessary changes on the quiet cases C02 to C04, refused requests and executed violations | `fig_freeze` strip on top, the four-row k/n table below (placeholders) | Read two numbers and the tradeoff in plain words. No claim beyond the counts |
 | 10 | 5:15 to 5:40 | 25 | 50 | One failure, on record | One held-out run that missed its goal or added cost: what the policy did, where it first went wrong, what the receipts show. Kept in the denominator | A short step list drawn from the public trace, no case contents ([R_FAILURE]) | "We keep failures in the count." |
@@ -148,7 +150,7 @@ Documentation" and author "Noctis Zhang". About 12 to 16 pages.
 
 | Section | What goes in it |
 | --- | --- |
-| Title block | Title, subtitle, Noctis Zhang, University of Massachusetts Boston, the repository link, branch and app path, the push status note |
+| Title block | Title, subtitle, Noctis Zhang, University of Massachusetts Boston, the repository link, branch and app path |
 | Abstract | Five sentences: problem, idea, what was built, how it was tested (held-out placeholders), the main limit |
 | 1. Problem and motivation | Small community events run on volunteers and fixed rooms. Messages are claims of mixed quality. Changing too much costs people time, waiting too long breaks the event. Why an agent that acts needs bounded authority |
 | 2. What is different here | Related approaches in plain words (ordinary tool-calling agents, rule systems, plan repair) and what Plan B does differently: the model picks only among options the server built and checked, holds make preparation reversible, and every accepted change has a receipt. No claim of being first |
@@ -226,7 +228,7 @@ Policies P0 `rules/1.0.0` and `pantry-rules/1.1.0`, P1 `tool-use/1.1.0` (prompt 
 P2 `live/1.1.0`, P3 `verify-all/1.1.0` (relevance rule `verify-all-relevance/1.0.0`). Model
 `anthropic/claude-sonnet-5.5` through OpenRouter. Limits: 48 tool calls and 8 model calls per
 episode, 0.50 USD per episode, 900 s wall time. Seeds 101, 202, 303 recorded but not sent (the
-model's endpoints refuse a seed), so the three trials are independent runs. Policy order seed
+model's endpoints refuse a seed), so the three trials are repeated runs within a case, not independent units. Policy order seed
 20261025. Sources: `apps/plan_b/plan_b/evaluation/manifests/freeze.json` and
 RUNTIME_CONTRACT section 20. The Wave 2 frames and the recorded card show the pre-freeze
 versions (`live/1.0.0` and so on), and are labelled Wave 2 development.
@@ -308,15 +310,17 @@ so the real paths come from the Wave 3 packet and the `audit_eval` report. `M` i
    2026-10-25 as the submission date).
 5. Resolved by the run coordinator: the deck must work alone. A live switch to the board stays
    optional in the Wave 3 runbook.
-6. The link works only after the owner pushes the branch. The QR code encodes the repository
-   root `https://github.com/nocdoggo/COLLIE`. The branch URL would be
-   `https://github.com/nocdoggo/COLLIE/tree/hackathon/peeaai-plan/apps/plan_b`.
+6. Resolved: the owner pushed the branch at `26cf424`. The QR codes encode the direct link
+   `https://github.com/nocdoggo/COLLIE/tree/hackathon/peeaai-plan/apps/plan_b`, which resolves.
 7. Resolved by the run coordinator: PDF for the deck and the poster, .docx for the
    documentation, unless the owner says otherwise.
 8. Whether to keep real app crops at all on slides 4 and 5 (they prove the app is real) or redraw
    them. The crops chosen contain no dash characters.
 
 ## 10. Build status of this draft (2026-10-25)
+
+This table is the state of the first draft and is kept as it was. The final items are described
+in `README.md` (the deck has 23 pages with 10 backup slides, and the document has 15 figures).
 
 | Item | File | State |
 | --- | --- | --- |
@@ -376,20 +380,20 @@ the poster column (`fig_strip_v`, `fig_loop_poster`). Body text projects at abou
   live card figures are in DEMO.md section 4, not 7.
 - Overstated:
   - the dev04 status check answered the false alarm, not the P09 reminder, and the reminder is
-    about a cancelled order for an October 29 workshop;
-  - the coordinator may also apply free changes;
-  - "every action has a receipt" is false for reads and some refusals;
-  - the planner builds a bounded template set, not "every allowed repair";
-  - P3's checks are run by the server under a relevance rule;
-  - the model-call rule wording was wrong;
-  - only the skills exchange's kit steward can offer a resource;
-  - "prepare while unsure" should read "while a fact or an approval is pending";
+    about a cancelled order for an October 29 workshop.
+  - the coordinator may also apply free changes.
+  - "every action has a receipt" is false for reads and some refusals.
+  - the planner builds a bounded template set, not "every allowed repair".
+  - P3's checks are run by the server under a relevance rule.
+  - the model-call rule wording was wrong.
+  - only the skills exchange's kit steward can offer a resource.
+  - "prepare while unsure" should read "while a fact or an approval is pending".
   - the key-read statement needs the audit disclosure.
-- Placeholder paths: the results path is a convention; `decided_by` must be filtered to C08;
-  `verification` holds totals; the pantry keys are `target_attainment` and `supported_partial`.
-- Missing caveats: the frames are P0; the Wave 2 live runs used pre-freeze versions; P3's call
-  counts; P2 versus P0; unsigned hashes and a single hand-run browser model check; the browser's
-  staff latency; scripted failure paths; and B5 (now B6) must be labelled development.
+- Placeholder paths: the results path is a convention. `decided_by` must be filtered to C08.
+  `verification` holds totals. The pantry keys are `target_attainment` and `supported_partial`.
+- Missing caveats: the frames are P0, the Wave 2 live runs used pre-freeze versions, P3's call
+  counts, P2 versus P0, unsigned hashes and a single hand-run browser model check, the browser's
+  staff latency, scripted failure paths, and B5 (now B6) must be labelled development.
 - It confirmed the freeze values against `freeze.json` (committed in 3de5962).
 
 ## 12. Decisions taken from the critique and the run coordinator
@@ -441,8 +445,8 @@ no consistent advantage, so the plan was revised as follows.
   large type. It states "No consistent advantage for P2" and the cost tradeoff.
 - **F3 Slide 10 shows C06**, a P2 and P3 failure told with the protocol's public condition only
   (a volunteer will be late). The earliest broken stage is planner input, from `FAILURES.md`.
-- **F4 Pantry and close** carry one held-out line each. The close says plainly that my policy did
-  not beat the simpler ones.
+- **F4 Pantry and close** carry one held-out line each. The close says plainly that my policy showed
+  no consistent advantage over the others.
 - **F5 Backups**: the report's two per-case figures (printed from `figure.svg`), the cost table
   with the voided first attempt, and a slide of what the numbers do not show (unit of analysis,
   C06, the pantry prompt difference and planner defect, the call limit, spent cases). The
