@@ -27,7 +27,7 @@ _about 22 seconds_
 
 I froze the system and ran six new cases it had never seen, close to situations from development. Fifty nine of sixty runs met the expected outcome. The one miss was the fixed rules, when a volunteer ran late. No action broke a rule. Six cases are too few to rank anything.
 
-## Next
-_about 13 seconds_
+## Who it helps and what is next
+_about 25 seconds_
 
-The same loop already runs a food pantry. Next come transit alerts as context, and a pilot with real organizers. The code is behind the QR code.
+It is built for student organizers, clubs, volunteers and pantry staff. It runs on one laptop with one command, with any model or none, and the same core already runs a food pantry. Next come transit alerts as context, and a pilot with real organizers. The code is behind the QR code.

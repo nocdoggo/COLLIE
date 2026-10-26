@@ -236,24 +236,28 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
 
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % 9. WHAT IS NEXT (45 s)
-\begin{frame}{Next: real feeds as context, and a pilot where Plan B proposes and the organizer acts}
-  \vspace{0.3cm}
-  \begin{center}
-    \includegraphics[width=\textwidth]{fig_next.pdf}
-  \end{center}
+\begin{frame}{Plan B helps the people who run community events, runs on one laptop, and adapts to new events}
+  \vspace{0.1cm}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.56\textwidth}
+      \centering
+      \includegraphics[width=\linewidth,height=5.9cm,keepaspectratio]{../screenshots/shot_campus_trail.png}\par
+      \figcaption{The running board on one laptop at 16:43 (screenshot of the projector case): the check, the change and the receipt.}
+    \column{0.41\textwidth}
+      \textbf{\color{primary}Who it helps}\par
+      {\small Student organizers, clubs, volunteers and pantry staff. Fewer last-minute scrambles, no surprise spending, a receipt for every change.\par}
+      \vspace{0.18cm}
+      \textbf{\color{primary}Easy to run}\par
+      {\small One laptop, local storage, one command to start. No network without a model. Any OpenAI-compatible model can plug in.\par}
+      \vspace{0.18cm}
+      \textbf{\color{primary}Adaptive}\par
+      {\small One core ran a campus showcase, a skills exchange and a food pantry. A new event is a configuration file.\par}
+  \end{columns}
   \vfill
-  \support{A late train could only ever be context. It never proves that a person is late.}
-  \figcaption{Everything shown runs in a local sandbox. No real bookings, stock or partners, and no community has used it yet.}
-  \vspace{0.15cm}
+  \figcaption{Next: real feeds such as MBTA alerts as context only, and a pilot where Plan B proposes and the organizer acts. Everything shown runs in a local sandbox, and no community has used it yet.}
+  \vspace{0.1cm}
   \note{
-    \textbf{(44s, ends 6:11)} What is next? Today three interfaces are connected: the
-    OpenRouter model API, the sandbox's own tool API, and the board where people approve
-    and report. Next come real feeds. The MBTA's transit alerts are designed in, but the
-    adapter is not built yet. Even then, a late train is only context. It never proves that
-    a person is late. A supplier's real tracking page would replace the simulated status
-    check. Then a pilot with a campus event series, where Plan B proposes and the organizer
-    acts, and I count the messages, checks, changes and approvals. No community has used it
-    yet.
+    \textbf{(48s, ends 6:15)} Who does this help? Student organizers, clubs, volunteers and pantry staff, the people who run events with little time. It means fewer last-minute scrambles, no surprise spending, and a receipt for every change. It is easy to run. This is the real board on one laptop: install, then one command starts it. Without a model it needs no network at all, and any OpenAI-compatible model can plug in. And it adapts. The same core ran a campus showcase, a skills exchange and a food pantry. Next come real feeds, such as MBTA alerts as context only, and a pilot where Plan B proposes and the organizer acts. No community has used it yet.
   }
 \end{frame}
 
@@ -309,6 +313,25 @@ t,11pt,notheorems,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang},pdftitle=
   \end{tabular}\par}
   \vspace{0.25cm}
   \support{\textbf{Four approaches.} Fixed rules: written rules, no model. Tool-calling model: the model calls the sandbox tools itself. Check-all variant: the server runs every relevant status check first, then the model picks. Our coordinator: the model picks one option from the menu the server built and checked. The three model approaches all use Claude Sonnet 5.5 through OpenRouter.}
+\end{frame}
+
+\begin{frame}{Backup: the running board, food pantry}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.49\textwidth}
+      \includegraphics[width=\linewidth,height=6.4cm,keepaspectratio]{../screenshots/shot_pantry_trail.png}
+    \column{0.49\textwidth}
+      \includegraphics[width=\linewidth,height=6.4cm,keepaspectratio]{../screenshots/shot_pantry_stock.png}
+  \end{columns}
+  \vfill
+  \figcaption{Screenshots of the running board, the pantry practice case run by the fixed rules: check, hold the partner's 16 kits, ask staff for the handoff, receipt. The counters show the supply shortfall and the service deficit.}
+\end{frame}
+
+\begin{frame}{Backup: the interfaces connected today and next}
+  \begin{center}
+    \includegraphics[width=\textwidth,height=6.2cm,keepaspectratio]{fig_next.pdf}
+  \end{center}
+  \vfill
+  \figcaption{Connected today: the OpenRouter model API, the sandbox tool API and the board HTTP API. Designed, not connected: the MBTA V3 transit alerts, as context only.}
 \end{frame}
 
 \begin{frame}{Backup: what the new test cost, per run}

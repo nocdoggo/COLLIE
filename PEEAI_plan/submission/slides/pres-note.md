@@ -65,12 +65,12 @@ The same loop runs a second domain, a food pantry. Staff need forty kits by one 
 
 **Checkpoint 5:27.**
 
-## Slide 9. Next: real feeds as context, and a pilot where Plan B proposes and the organizer acts
-_about 44 seconds_
+## Slide 9. Plan B helps the people who run community events, runs on one laptop, and adapts to new events
+_about 48 seconds_
 
-What is next? Today three interfaces are connected: the OpenRouter model API, the sandbox's own tool API, and the board where people approve and report. Next come real feeds. The MBTA's transit alerts are designed in, but the adapter is not built yet. Even then, a late train is only context. It never proves that a person is late. A supplier's real tracking page would replace the simulated status check. Then a pilot with a campus event series, where Plan B proposes and the organizer acts, and I count the messages, checks, changes and approvals. No community has used it yet.
+Who does this help? Student organizers, clubs, volunteers and pantry staff, the people who run events with little time. It means fewer last-minute scrambles, no surprise spending, and a receipt for every change. It is easy to run. This is the real board on one laptop: install, then one command starts it. Without a model it needs no network at all, and any OpenAI-compatible model can plug in. And it adapts. The same core ran a campus showcase, a skills exchange and a food pantry. Next come real feeds, such as MBTA alerts as context only, and a pilot where Plan B proposes and the organizer acts. No community has used it yet.
 
-**Checkpoint 6:11.**
+**Checkpoint 6:15.**
 
 ## Slide 10. 16:40 again. Check first, then change
 _about 30 seconds_

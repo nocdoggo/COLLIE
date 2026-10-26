@@ -32,6 +32,7 @@ from docx_helpers import (
 HERE = Path(__file__).resolve().parent
 FIGURES = HERE.parent / "slides" / "figures"
 FRAMES = FIGURES / "frames"
+SHOTS = HERE.parent / "screenshots"
 PNG = HERE / "figures"
 OUT = HERE / "Plan_B_Project_Documentation.docx"
 RESULTS = json.loads((HERE / "results.json").read_text(encoding="utf-8"))
@@ -49,6 +50,8 @@ def render_figures() -> None:
     """Render each TikZ and pgfplots figure PDF to a 300 dpi PNG for the Word document."""
     PNG.mkdir(exist_ok=True)
     for pdf in sorted(FIGURES.glob("fig_*.pdf")):
+        if pdf.stem.endswith("_poster"):  # the poster's larger-type variants are not used here
+            continue
         target = PNG / f"{pdf.stem}.png"
         if target.exists() and target.stat().st_mtime >= pdf.stat().st_mtime:
             continue
@@ -109,7 +112,9 @@ def abstract(doc) -> None:
         "a **receipt**, a **hold** keeps a backup open for free while a fact or an approval is pending, "
         "and checks are selective, so only a fact that could change the decision is verified. I built "
         "Plan B as a fictional local sandbox with a campus showcase, a community skills exchange and a "
-        f"fictional pantry. The final system was frozen and run on {cases} new cases, written by a "
+        f"fictional pantry. It is meant for student organizers, clubs, volunteers and pantry staff, runs on "
+        "one laptop with local storage, works with no model at all, and one core served all three settings. "
+        "The final system was frozen and run on {cases} new cases, written by a "
         "separate worker before the final freeze and locked in the same commit, before the first model "
         "call. The author of the code changes never read them."
         f" {fk} of {fn} runs met the expected outcome. Our coordinator met all {ours} of its "
@@ -206,8 +211,50 @@ def what_it_does(doc) -> None:
         doc,
         "I built Plan B in three waves: the campus sandbox (Wave 1), the model policies, community roles "
         "and pantry (Wave 2), and the frozen held-out comparison (Wave 3). Each wave ended with an audit "
-        "packet of evidence in `PEEAI_plan/handoffs/`, which later sections cite.",
+        "packet of evidence in `PEEAI_plan/handoffs/`, which later sections cite. The packets and the "
+        "plan are kept in the development repository, https://github.com/nocdoggo/COLLIE (branch "
+        "`hackathon/peeaai-plan`). The hackathon repository keeps the app and these final files.",
     )
+    benefits(doc)
+
+
+def benefits(doc) -> None:
+    doc.add_heading("3.1 Who it helps", level=2)
+    para(
+        doc,
+        "Plan B is meant for the people who keep community events running with little time: student "
+        "organizers, clubs, campus offices, volunteers and the staff of a food pantry. For them it means "
+        "fewer last-minute scrambles, no surprise spending, and a receipt for every change, so anyone can "
+        "see later what changed and why. Participants can help too: a volunteer checks in from a phone "
+        "link, and a partner can offer a listed resource, without any right to spend or to change the plan.",
+    )
+    doc.add_heading("3.2 Easy to deploy", level=2)
+    bullets(
+        doc,
+        [
+            "**One laptop.** The server needs Python with uv and Node.js with npm. Install with two commands, "
+            "then one command starts the board in a browser (section 14).",
+            "**Light and local.** Its runtime libraries are FastAPI, uvicorn and Pydantic, and its data is one "
+            "local SQLite file. There is no cloud service to set up.",
+            "**A model is optional.** The fixed-rules policy runs with no model and no network. Any "
+            "OpenAI-compatible endpoint can serve the model policies. The one used here was Claude Sonnet 5.5 "
+            "through OpenRouter, with a spend cap.",
+            "**Safe to try.** Everything happens in a sandbox, and the moderator can reset an episode at any time.",
+        ],
+    )
+    figure(doc, SHOTS / "shot_campus_trail.png", "Figure 3a. The running board at 16:43, newest entry on top: the status check, the decision, the change and its receipt (screenshot of the projector practice case, fixed rules).", 6.0)
+    doc.add_heading("3.3 Adaptive and versatile", level=2)
+    para(
+        doc,
+        "One core runs different settings. The campus showcase and the community skills exchange are two "
+        "event configurations of the same event model: a new event of that kind is a configuration file with "
+        "its activities, people, resources, rules and budget. A new domain needs an adapter for its own rules. "
+        "The food pantry added one for stock, where late stock does not count and only staff record a "
+        "handoff or a distribution, and it reused the same decision loop, gate and receipts. The policies "
+        "are interchangeable too: fixed rules, a model that calls tools freely, or the coordinator that picks "
+        "checked options, behind the same gate.",
+    )
+    figure(doc, SHOTS / "shot_pantry_trail.png", "Figure 3b. The same board running the fictional pantry: check, hold the partner's 16 kits, ask staff for the handoff, receipt (screenshot of a practice case, fixed rules).", 6.0)
 
 
 def walkthrough(doc) -> None:
@@ -1039,9 +1086,9 @@ def appendices(doc) -> None:
             ["`apps/plan_b/docs/EVALUATION.md`", "The evaluation harness and its commands"],
             ["`apps/plan_b/plan_b/evaluation/manifests/`", "The frozen `freeze.json` and the held-out lock"],
             ["`apps/plan_b/plan_b/evaluation/development/`", "The development runs of the three model approaches"],
-            ["`PEEAI_plan/`", "The plan: protocol, presentation plan, wave tasks"],
-            ["`PEEAI_plan/handoffs/`", "The audit packets of each wave, with their evidence"],
-            ["`PEEAI_plan/submission/`", "These submission items and their sources"],
+            ["`PEEAI_plan/`", "The plan: protocol, presentation plan, wave tasks (development repository only)"],
+            ["`PEEAI_plan/handoffs/`", "The audit packets of each wave, with their evidence (development repository only)"],
+            ["`PEEAI_plan/submission/`", "These submission items (their sources are in the development repository)"],
         ],
         [3.0, 3.5],
     )
