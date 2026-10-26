@@ -201,6 +201,18 @@ path. A host or user name that is an ordinary word can be exempted with
   and [`FAILURES.md`](evaluation/results/wave3_heldout_20261025T1625Z/FAILURES.md).
   `uv run plan-b eval report --results <suite dir> --out <dir>` recomputes a report from the
   committed raw records without a model call.
+  This run of policy 1.1 stays the evaluation of record, and its 12 cases are spent.
+* **Wave 3b, policy 1.2.** The fixes are in [`docs/RUNTIME_CONTRACT.md`](docs/RUNTIME_CONTRACT.md)
+  section 21, frozen in `plan_b/evaluation/manifests/freeze_v1_2.json` with six fresh cases
+  locked in `heldout2.json` (commit `5955243`), both before the first 1.2 model call. Two runs,
+  labeled differently:
+  [`evaluation/results/wave3b_fresh_20261025T2327Z/`](evaluation/results/wave3b_fresh_20261025T2327Z/README.md)
+  is a new, small held-out check on C09 to C12, T05 and T06 (60 of 60 episodes recorded, 59 met
+  their outcome). [`evaluation/results/wave3b_rerun_spent_20261025T2345Z/`](evaluation/results/wave3b_rerun_spent_20261025T2345Z/README.md)
+  is a post-hoc diagnostic rerun after the fixes, on the spent cases. It is not a held-out
+  result. Both give descriptive counts only and are not comparable with the 1.1 counts as an
+  improvement. `uv run plan-b eval verify-freeze --freeze freeze_v1_2.json --heldout
+  heldout2.json --require-heldout` checks the 1.2 freeze and lock.
 * **Showcase.** The seven-minute script and runbook, the claims ledger and the rehearsal record
   are in [`PEEAI_plan/handoffs/wave_3/`](../../PEEAI_plan/handoffs/wave_3/SHOWCASE.md).
   `uv run python tests/e2e/rehearsal.py --out <dir>` runs three automated rehearsals from a
@@ -239,5 +251,5 @@ uv run mypy
 | `web/` | React + TypeScript board and replay |
 | `scripts/` | Evidence collectors (Waves 1-3), the Wave 1 manifest writer, recorded live runs, the development results writer, the demo preparation and the release builder |
 | `release/` | The release allowlist (`manifest.json`) read by `scripts/build_release.py` |
-| `evaluation/results/` | The Wave 3 held-out results (outside the frozen tree) |
+| `evaluation/results/` | The Wave 3 held-out results and the Wave 3b version 1.2 runs (outside the frozen tree) |
 | `tests/` | Focused tests against the real store and executor |

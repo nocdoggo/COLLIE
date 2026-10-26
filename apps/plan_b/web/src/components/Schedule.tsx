@@ -133,8 +133,8 @@ function ResourceLine({
       <strong>{def.label}</strong> <StatusBadge label={RESOURCE_STATUS_LABEL[resource.status]} />
       {resource.reported_eta !== null ? (
         <Tag tone="warn" icon="◷">
-          Reported ETA <When iso={resource.reported_eta} text={fmtTime(resource.reported_eta, tz)} />{" "}
-          — a reported ETA is not an arrival
+          Reported ETA <When iso={resource.reported_eta} text={fmtTime(resource.reported_eta, tz)} />. A
+          reported ETA is not an arrival
         </Tag>
       ) : null}
       {def.terms.booking_required ? (

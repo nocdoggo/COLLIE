@@ -86,7 +86,7 @@ export function checkInCoverage(
 
 /**
  * Tag text for a coverage result. With `activityLabel`, a gap names the activity it leaves
- * uncovered ("… does not cover Community demonstrations 17:10–17:30").
+ * uncovered ("… Does not cover Community demonstrations 17:10–17:30").
  */
 export function coverageLabel(
   coverage: CheckInCoverage,
@@ -112,7 +112,7 @@ export function coverageLabel(
       const bound = late
         ? `from ${fmtTime(checkin.available.start, tz)}`
         : `until ${fmtTime(checkin.available.end, tz)}`;
-      return { text: `Check-in available ${bound} — does not cover ${what}`, icon: "⚠", tone: "warn" };
+      return { text: `Check-in available ${bound}. Does not cover ${what}`, icon: "⚠", tone: "warn" };
     }
   }
 }

@@ -9,7 +9,7 @@ import { Code, When } from "./ui";
 export type BoardMode = "live" | "replay";
 
 export const PRODUCT_NAME = "Plan B: The Show Must Go On";
-export const SANDBOX_NOTICE = "Fictional sandbox — no real bookings, purchases, or messages";
+export const SANDBOX_NOTICE = "Fictional sandbox: no real bookings, purchases, or messages";
 
 /** The policy label: which coordinator policy ran ("Deterministic policy", "Live agent · <model>"). */
 export function PolicyLabel({ policy, mode }: { policy: PolicyMode; mode: BoardMode }) {

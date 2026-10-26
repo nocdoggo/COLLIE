@@ -86,7 +86,7 @@ test("an applied receipt is neutral until a fresh state read contains it", () =>
   const receipt = makeReceipt();
   const phase: SubmissionPhase = { kind: "receipt", receipt, replayed: false, via: "response" };
   const pending = statusHtml(makeView(), phase);
-  assert.ok(textOf(pending).includes("⧗ Applied — confirming in a fresh state read"), textOf(pending));
+  assert.ok(textOf(pending).includes("⧗ Applied, confirming in a fresh state read"), textOf(pending));
   assert.ok(!pending.includes("badge tone-ok"));
 
   const confirmed = statusHtml(makeView({ receipts: [receipt] }), phase);

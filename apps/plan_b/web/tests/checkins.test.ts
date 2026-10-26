@@ -53,13 +53,13 @@ test("coverage of a slot requires the whole window", () => {
   assert.equal(short.kind, "not_covered");
   assert.equal(
     coverageLabel(short, TZ).text,
-    "Check-in available until 16:45 — does not cover 17:10–17:30",
+    "Check-in available until 16:45. Does not cover 17:10–17:30",
   );
   assert.equal(coverageLabel(short, TZ).tone, "warn");
   const stopsEarly = checkInCoverage([checkin("presenter", "16:40", "17:15")], "presenter", needs);
   assert.equal(
     coverageLabel(stopsEarly, TZ, () => "Community demonstrations").text,
-    "Check-in available until 17:15 — does not cover Community demonstrations 17:10–17:30",
+    "Check-in available until 17:15. Does not cover Community demonstrations 17:10–17:30",
   );
   const full = checkInCoverage([checkin("presenter", "16:40", "17:30")], "presenter", needs);
   assert.equal(full.kind, "covered");
@@ -74,7 +74,7 @@ test("with no slot left, the check-in must cover the clock", () => {
   const needs = roleNeeds(done, "presenter", view.clock);
   assert.deepEqual(needs, [{ activityId: null, window: { start: local("16:50"), end: local("16:50") } }]);
   const ended = checkInCoverage([checkin("presenter", "16:40", "16:45")], "presenter", needs);
-  assert.equal(coverageLabel(ended, TZ).text, "Check-in available until 16:45 — does not cover 16:50 (now)");
+  assert.equal(coverageLabel(ended, TZ).text, "Check-in available until 16:45. Does not cover 16:50 (now)");
   assert.equal(checkInCoverage([checkin("presenter", "16:40", "17:00")], "presenter", needs).kind, "covered");
 });
 
@@ -91,7 +91,7 @@ test("role readiness warns when the check-in ended before the slot", () => {
   const entry = roleEntry(roleText(view), "Demonstration lead", "Skills facilitator");
   assert.ok(!entry.includes("✓ Checked in"), entry);
   assert.ok(
-    entry.includes("⚠ Check-in available until 16:45 — does not cover Community demonstrations 17:10–17:30"),
+    entry.includes("⚠ Check-in available until 16:45. Does not cover Community demonstrations 17:10–17:30"),
     entry,
   );
   const html = renderToStaticMarkup(createElement(RoleReadiness, { view }));
@@ -105,7 +105,7 @@ test("the schedule's person line matches the slot it sits in", () => {
   const view = makeView({ clock: local("16:50"), checkins: [checkin("presenter", "16:40", "16:45")] });
   const text = scheduleText(view);
   assert.ok(!text.includes("✓ Checked in at 16:40"), text);
-  assert.ok(text.includes("Demonstration lead ⚠ Check-in available until 16:45 — does not cover 17:10–17:30"));
+  assert.ok(text.includes("Demonstration lead ⚠ Check-in available until 16:45. Does not cover 17:10–17:30"));
 
   const covered = makeView({ clock: local("16:50"), checkins: [checkin("presenter", "16:40", "18:00")] });
   assert.ok(scheduleText(covered).includes("Demonstration lead ✓ Checked in at 16:40 , available 16:40–18:00"));

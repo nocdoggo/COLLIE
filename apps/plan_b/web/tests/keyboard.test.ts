@@ -10,8 +10,8 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { BoardJumps, BoardView } from "../src/board/BoardView.tsx";
-import { makeView } from "./support/view.ts";
-import { makePantryView } from "./support/wave2.ts";
+import { local, makeView, textOf } from "./support/view.ts";
+import { liveDecision, makePantryView } from "./support/wave2.ts";
 
 function jumps(html: string): string[] {
   const nav = /<nav class="board-jumps" aria-label="Board sections">(.*?)<\/nav>/s.exec(html);
@@ -37,4 +37,14 @@ test("the section links are buttons, so they work with Tab and Enter without a r
   const html = renderToStaticMarkup(createElement(BoardJumps, { view: makeView() }));
   assert.equal((html.match(/<button type="button" class="link-button">/g) ?? []).length, 4);
   assert.ok(!html.includes("href="));
+});
+
+// tests/e2e/keyboard.py checks the next wake only when the API reports one, and the
+// deterministic policy sets none, so the board's wake text is checked here.
+test("the latest decision names its next wake on the board", () => {
+  const view = makeView({
+    decisions: [liveDecision({ kind: "wait", summary: "Waiting for the projector's ETA.", wait_until: local("17:25") })],
+  });
+  const text = textOf(renderToStaticMarkup(createElement(BoardView, { view, mode: "live" })));
+  assert.ok(text.includes("waiting until 17:25"), text);
 });

@@ -10,13 +10,20 @@ afterwards) and uses only the deterministic policies: no model is called. Pointe
 used for setup only (loading a case, issuing a join code); every check below is reached with the
 keyboard (Tab, Shift+Tab, Enter) and compares what the focused page shows with fresh API reads:
 
-* sign-in and the skip link work from the keyboard;
+* sign-in (the code field is reached by Tab) and the skip link work from the keyboard;
 * on the campus board, the current plan, the evidence, the latest decision with its next wake
-  and the action status are each reached by Tab, show a visible focus ring and say what the API
-  says;
+  and the action status are each reached by Tab, show a visible focus outline and say what the
+  API says. The section links work with Enter and with Space, and the section they land on
+  shows the outline too;
+* a receipt's evidence button, reached by Tab, moves focus to a receipt the API reports;
+* Shift+Tab visits the same stops in exactly the reverse order;
 * the pantry board's quantities are reached by Tab and keep expected, held, received, committed
-  and distributed apart, with the values the API reports;
+  and distributed apart, with the values the API reports for every stock row;
 * a second signed-in view of the same episode agrees on the revision and the receipts.
+
+The board has no modal or menu (only native ``<details>``), so there is no Escape check. The
+deterministic policy sets no next wake, so the wake text is checked in
+``web/tests/keyboard.test.ts`` and here only when the API reports one.
 
 ``keyboard_report.json`` lists every check. Exit code 0 only if every check held.
 """
@@ -26,6 +33,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -68,8 +76,9 @@ FOCUSED = """() => {
   if (!again) window.__kbdOrder.set(el, window.__kbdNext++);
   const section = el.closest("section[id]");
   const style = getComputedStyle(el);
-  const ring = (style.outlineStyle !== "none" && parseFloat(style.outlineWidth) >= 2)
-    || style.boxShadow !== "none";
+  // The board's focus style is a 3px outline (styles.css). A box shadow is not a focus ring:
+  // selected tabs carry one at rest.
+  const ring = style.outlineStyle !== "none" && parseFloat(style.outlineWidth) >= 2;
   const label = el.getAttribute("aria-label") || el.textContent || el.getAttribute("value") || "";
   return {
     tag: el.tagName.toLowerCase(),
@@ -108,9 +117,8 @@ def tab_walk(page: Page, *, backwards: bool = False) -> list[dict[str, Any]]:
     return seen
 
 
-def jump_by_keyboard(page: Page, label: str) -> str | None:
-    """Tab from the skip link to the board's section link ``label``, press Enter and return the
-    id of the element that then has focus (None if the link was not reached)."""
+def tab_to(page: Page, label: str, section: str | None) -> bool:
+    """Tab from the skip link until the element named ``label`` in ``section`` has focus."""
     page.evaluate(FROM_THE_TOP)
     for _ in range(MAX_TABS):
         page.keyboard.press("Tab")
@@ -118,12 +126,29 @@ def jump_by_keyboard(page: Page, label: str) -> str | None:
         if here is None:
             continue
         if here["again"]:
-            return None
-        if here["text"] == label and here["section"] is None:
-            page.keyboard.press("Enter")
-            page.wait_for_timeout(200)
-            return str(page.evaluate("() => document.activeElement?.id || ''")) or None
-    return None
+            return False
+        if here["text"] == label and here["section"] == section:
+            return True
+    return False
+
+
+def jump_by_keyboard(page: Page, label: str, key: str = "Enter") -> str | None:
+    """Tab from the skip link to the board's section link ``label``, press ``key`` and return
+    the id of the element that then has focus (None if the link was not reached)."""
+    if not tab_to(page, label, None):
+        return None
+    page.keyboard.press(key)
+    page.wait_for_timeout(200)
+    return str(page.evaluate("() => document.activeElement?.id || ''")) or None
+
+
+# Whether the element that has focus shows the board's focus outline.
+LANDING_RING = """() => {
+  const el = document.activeElement;
+  if (el === null || el === document.body) return false;
+  const style = getComputedStyle(el);
+  return style.outlineStyle !== "none" && parseFloat(style.outlineWidth) >= 2;
+}"""
 
 
 def latest_decision(state: dict[str, Any]) -> dict[str, Any]:
@@ -154,6 +179,7 @@ def sign_in_by_keyboard(browser: Browser, base: str, report: Report) -> Page:
         first is not None and "Skip to content" in first["text"],
         json.dumps(first),
     )
+    reached = False
     for _ in range(20):
         if (
             page.evaluate(
@@ -162,16 +188,21 @@ def sign_in_by_keyboard(browser: Browser, base: str, report: Report) -> Page:
             ).find("Moderator code")
             >= 0
         ):
+            reached = True
             break
         page.keyboard.press("Tab")
     page.keyboard.type(CODE)
     page.keyboard.press("Enter")
-    ok = True
+    ok = reached
     try:
         expect(page.get_by_role("heading", name="Moderator controls")).to_be_visible(timeout=10000)
     except AssertionError:
         ok = False
-    report.check("the moderator signs in with the keyboard only (Tab, type, Enter)", ok)
+    report.check(
+        "the moderator signs in with the keyboard only (Tab to the code field, type, Enter)",
+        ok,
+        f"code field reached by Tab: {reached}",
+    )
     return page
 
 
@@ -216,6 +247,7 @@ def campus(browser: Browser, base: str, report: Report) -> None:
     # The current plan.
     plan = in_section(stops, "schedule")
     landed = jump_by_keyboard(mod, "Current plan")
+    rings = {"schedule": mod.evaluate(LANDING_RING)}
     schedule = section_text(mod, "schedule")
     starts = [(a["activity_id"], local_time(a["start"], tz)) for a in state["plan"]["assignments"]]
     report.check(
@@ -233,17 +265,25 @@ def campus(browser: Browser, base: str, report: Report) -> None:
     # The evidence.
     evidence = in_section(stops, "status-checks", "observations", "evidence")
     landed = jump_by_keyboard(mod, "Evidence")
+    rings["status-checks"] = mod.evaluate(LANDING_RING)
     report.check(
         "the evidence (status checks, incoming updates, raw evidence) is reached by keyboard",
         landed == "status-checks" and bool(evidence),
         f"'Evidence' moves focus to {landed!r}; {len(evidence)} Tab stops in "
         f"{sorted({s['section'] for s in evidence})}",
     )
-    checks_text = section_text(mod, "status-checks")
+    spaced = jump_by_keyboard(mod, "Evidence", key="Space")
     report.check(
-        "the status checks show the checked entity",
-        "projector" in checks_text.lower(),
-        checks_text.splitlines()[0] if checks_text else "",
+        "a section link also works with Space",
+        spaced == "status-checks",
+        f"Space on 'Evidence' moves focus to {spaced!r}",
+    )
+    checks_text = section_text(mod, "status-checks")
+    entities = sorted({c["entity_id"] for c in state["status_checks"] if c["entity_id"]})
+    report.check(
+        "the status checks show every entity the API reports as checked",
+        bool(entities) and all(e.lower() in checks_text.lower() for e in entities),
+        f"checked {entities}; " + (checks_text.splitlines()[0] if checks_text else ""),
     )
 
     # The latest decision and its next wake.
@@ -251,6 +291,7 @@ def campus(browser: Browser, base: str, report: Report) -> None:
     latest = latest_decision(state)
     summary = section_text(mod, "what-changed")
     landed = jump_by_keyboard(mod, "Latest decision")
+    rings["what-changed"] = mod.evaluate(LANDING_RING)
     report.check(
         "the latest decision and the decision list are reached by keyboard",
         landed == "what-changed" and bool(in_section(stops, "decisions")),
@@ -271,6 +312,7 @@ def campus(browser: Browser, base: str, report: Report) -> None:
     history = section_text(mod, "action-history")
     receipts = state["receipts"]
     landed = jump_by_keyboard(mod, "Action status")
+    rings["action-history"] = mod.evaluate(LANDING_RING)
     report.check(
         "the action status (Action history) is reached by keyboard",
         landed == "action-history" and bool(actions),
@@ -282,20 +324,36 @@ def campus(browser: Browser, base: str, report: Report) -> None:
         f"{len(receipts)} receipts: {[(r['tool'], r['status']) for r in receipts]}",
     )
 
-    # Enter on a receipt's evidence button moves focus to that receipt.
-    jumped = _enter_on_jump(mod, "what-changed", "evidence")
     report.check(
-        "Enter on a receipt's evidence button moves focus to that receipt",
-        jumped is not None and jumped.startswith("rcpt-"),
-        f"focus moved to {jumped}",
+        "every section a link lands on shows the focus outline",
+        all(rings.values()),
+        json.dumps(rings),
     )
 
-    # Shift+Tab walks the same stops backwards.
-    back = tab_walk(mod, backwards=True)
+    # A receipt's evidence button, reached by Tab, moves focus to a receipt the API reports.
+    reached = tab_to(mod, "evidence", "what-changed")
+    jumped = None
+    if reached:
+        mod.keyboard.press("Enter")
+        mod.wait_for_timeout(200)
+        jumped = mod.evaluate("() => document.activeElement?.id || null")
+    receipt_ids = {f"rcpt-{r['receipt_id']}" for r in receipts}
     report.check(
-        "Shift+Tab reaches the same stops in reverse",
-        {s["text"] + str(s["section"]) for s in back}
-        == {s["text"] + str(s["section"]) for s in stops},
+        "Enter on a receipt's evidence button (reached by Tab) moves focus to that receipt",
+        reached and jumped in receipt_ids,
+        f"reached by Tab: {reached}; focus moved to {jumped}; receipts {sorted(receipt_ids)}",
+    )
+
+    # Shift+Tab walks the same stops backwards, in exactly the reverse order. Both walks start
+    # at the skip link, so the backward walk is compared from its second stop.
+    back = tab_walk(mod, backwards=True)
+
+    def key(s: dict[str, Any]) -> tuple[Any, ...]:
+        return (s["tag"], s["id"], s["text"], s["section"])
+
+    report.check(
+        "Shift+Tab reaches the same stops in exactly the reverse order",
+        [key(s) for s in back[1:]] == [key(s) for s in reversed(stops[1:])],
         f"{len(back)} backwards, {len(stops)} forwards",
     )
 
@@ -312,8 +370,8 @@ def campus(browser: Browser, base: str, report: Report) -> None:
         a["revision"] == b["revision"]
         and sorted(r["receipt_id"] for r in a["receipts"])
         == sorted(r["receipt_id"] for r in b["receipts"])
-        and str(a["revision"]) in org_header
-        and str(a["revision"]) in mod_header,
+        and re.search(rf"STATE REVISION\s*{a['revision']}\b", org_header, re.I) is not None
+        and re.search(rf"STATE REVISION\s*{a['revision']}\b", mod_header, re.I) is not None,
         f"revision {a['revision']} / {b['revision']}; headers {mod_header!r} / {org_header!r}",
     )
     org.context.close()
@@ -328,8 +386,8 @@ def pantry(browser: Browser, base: str, report: Report) -> None:
     expect(mod.get_by_role("heading", name="Moderator controls")).to_be_visible()
     load_case(mod, "pantry_dev01")
     token = token_of(mod)
-    # Deterministic pantry policy and the labeled staff simulator, to 12:47: the partner hold,
-    # its staff receipt and the committed plan, before any distribution.
+    # Deterministic pantry policy and the labeled staff simulator, twelve scenario minutes in:
+    # the partner hold is placed, and nothing is received, committed or distributed yet.
     run = _post(base, "api/moderator/run", token, {"minutes": 12})
     poll(lambda: api(base, "api/state", token), lambda s: s["revision"] == run["revision"])
     mod.wait_for_timeout(int(POLL_S * 2000))
@@ -340,10 +398,12 @@ def pantry(browser: Browser, base: str, report: Report) -> None:
     )
     board = in_section(stops, "pantry-board")
     landed = jump_by_keyboard(mod, "Stock and service")
+    ring = mod.evaluate(LANDING_RING)
     report.check(
-        "the pantry stock and service board is reached by keyboard",
-        landed == "pantry-board",
-        f"'Stock and service' moves focus to {landed!r}; {len(board)} Tab stops inside",
+        "the pantry stock and service board is reached by keyboard and shows the focus outline",
+        landed == "pantry-board" and ring,
+        f"'Stock and service' moves focus to {landed!r} (outline {ring}); "
+        f"{len(board)} Tab stops inside",
     )
     text = section_text(mod, "pantry-board")
     labels = (
@@ -362,23 +422,30 @@ def pantry(browser: Browser, base: str, report: Report) -> None:
     )
     stock = state["stock"]
     service = stock["service"][0]
-    pool = next(b for b in stock["balances"] if b["resource_id"] == "pantry_stock")
-    row = mod.locator("tr[data-stock='pantry_stock']")
-    shown = {
-        q: row.locator(f"td[data-quantity='{q}']").inner_text().split("\n")[0].strip()
-        for q in ("on_hand", "reserved", "available", "expected", "distributed")
-    }
-    api_values = {
-        "on_hand": str(pool["on_hand_quantity"]),
-        "reserved": str(pool["reserved_quantity"]),
-        "available": str(pool["available_quantity"]),
-        "expected": str(pool["expected_quantity"]),
-        "distributed": str(pool["distributed_quantity"]),
-    }
+    shown: dict[str, dict[str, str]] = {}
+    api_values: dict[str, dict[str, str]] = {}
+    split_ok = True
+    for pool in stock["balances"]:
+        rid = pool["resource_id"]
+        row = mod.locator(f"tr[data-stock='{rid}']")
+        cells = {
+            q: row.locator(f"td[data-quantity='{q}']").inner_text()
+            for q in ("on_hand", "reserved", "available", "expected", "distributed")
+        }
+        shown[rid] = {q: text.split("\n")[0].strip() for q, text in cells.items()}
+        api_values[rid] = {
+            "on_hand": str(pool["on_hand_quantity"]),
+            "reserved": str(pool["reserved_quantity"]),
+            "available": str(pool["available_quantity"]),
+            "expected": str(pool["expected_quantity"]),
+            "distributed": str(pool["distributed_quantity"]),
+        }
+        split = f"{pool['held_quantity']} held, {pool['committed_quantity']} committed"
+        split_ok = split_ok and split in cells["reserved"]
     report.check(
-        "the pantry pool row shows the quantities the API reports",
-        shown == api_values,
-        f"shown {shown}; api {api_values}",
+        "every stock row shows the quantities the API reports, with held and committed apart",
+        bool(shown) and shown == api_values and split_ok,
+        f"shown {shown}; api {api_values}; held and committed split shown: {split_ok}",
     )
     report.check(
         "the target stays 40 and the deficit is visible before any distribution",
@@ -389,16 +456,6 @@ def pantry(browser: Browser, base: str, report: Report) -> None:
         f"committed {service['committed_quantity']}",
     )
     mod.context.close()
-
-
-def _enter_on_jump(page: Page, section_id: str, name: str) -> str | None:
-    button = page.locator(f"section#{section_id}").get_by_role("button", name=name).first
-    if button.count() == 0:
-        return None
-    button.focus()
-    page.keyboard.press("Enter")
-    page.wait_for_timeout(200)
-    return page.evaluate("() => document.activeElement?.id || null")
 
 
 def _post(base: str, path: str, token: str, body: dict[str, Any]) -> Any:

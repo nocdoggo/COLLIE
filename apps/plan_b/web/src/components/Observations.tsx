@@ -54,8 +54,8 @@ export function StatusFactsLine({
           <StatusBadge label={RESOURCE_STATUS_LABEL[facts.domain_status]} />
           {facts.reported_eta !== null ? (
             <Tag tone="warn" icon="◷">
-              Reported ETA <When iso={facts.reported_eta} text={fmtTime(facts.reported_eta, tz)} /> —
-              a reported ETA is not an arrival
+              Reported ETA <When iso={facts.reported_eta} text={fmtTime(facts.reported_eta, tz)} />. A
+              reported ETA is not an arrival
             </Tag>
           ) : null}
         </p>
@@ -68,7 +68,7 @@ export function StatusFactsLine({
         {" · "}
         {mode === "replay" ? (
           <strong className="recorded-label">
-            Recorded at <When iso={obs.received_at} text={fmtTime(obs.received_at, tz)} /> — not
+            Recorded at <When iso={obs.received_at} text={fmtTime(obs.received_at, tz)} />, not
             re-queried
           </strong>
         ) : (
@@ -180,9 +180,9 @@ export function Observations({ view, mode }: { view: EventStateView; mode: Board
 /** The status query results and arrival records, and each equipment resource's current status. */
 const QUERY_OUTCOME: Record<string, { label: string; tone: "ok" | "warn" | "bad" | "neutral"; icon: string }> = {
   succeeded: { label: "Answered", tone: "ok", icon: "✓" },
-  unknown: { label: "Unknown — source had no answer", tone: "warn", icon: "?" },
+  unknown: { label: "Unknown: source had no answer", tone: "warn", icon: "?" },
   unavailable: { label: "Unavailable — service did not respond", tone: "bad", icon: "✕" },
-  rejected: { label: "Rejected — not executed", tone: "bad", icon: "✕" },
+  rejected: { label: "Rejected: not executed", tone: "bad", icon: "✕" },
 };
 
 /** Every status query with its actual outcome. Unknown and unavailable are not an all-clear. */
@@ -225,13 +225,13 @@ function StatusQueries({ view, mode }: { view: EventStateView; mode: BoardMode }
             {check.error_code !== null ? (
               <p className="muted">
                 <code>{check.error_code}</code>
-                {check.reason !== null ? <> — {check.reason}</> : null}
+                {check.reason !== null ? <>: {check.reason}</> : null}
               </p>
             ) : null}
             {mode === "replay" && check.completed_at !== null ? (
               <p>
                 <strong className="recorded-label">
-                  Recorded at <When iso={check.completed_at} text={fmtTime(check.completed_at, tz)} /> — not
+                  Recorded at <When iso={check.completed_at} text={fmtTime(check.completed_at, tz)} />, not
                   re-queried
                 </strong>
               </p>
@@ -274,7 +274,7 @@ export function StatusChecks({ view, mode }: { view: EventStateView; mode: Board
             </span>
             {r.reported_eta !== null ? (
               <Tag tone="warn" icon="◷">
-                Reported ETA <When iso={r.reported_eta} text={fmtTime(r.reported_eta, tz)} /> — not an
+                Reported ETA <When iso={r.reported_eta} text={fmtTime(r.reported_eta, tz)} />, not an
                 arrival
               </Tag>
             ) : null}

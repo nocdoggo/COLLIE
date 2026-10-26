@@ -180,7 +180,7 @@ export const RECEIPT_STATUS_LABEL: Record<ReceiptStatus, StatusLabel> = {
 
 /** An applied receipt that no fresh state read has shown yet: not success until it does. */
 export const APPLIED_UNCONFIRMED_LABEL: StatusLabel = {
-  text: "Applied — confirming in a fresh state read",
+  text: "Applied, confirming in a fresh state read",
   icon: "⧗",
   tone: "neutral",
 };

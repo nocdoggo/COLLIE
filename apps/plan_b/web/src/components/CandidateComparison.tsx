@@ -39,7 +39,7 @@ function CheckLine({ check }: { check: CandidateCheck }) {
   return (
     <>
       <StatusBadge label={CHECK_STATUS_LABEL[check.status]} /> {checkName(check.constraint_id)}
-      {check.detail ? <span className="muted"> — {check.detail}</span> : null}
+      {check.detail ? <span className="muted">: {check.detail}</span> : null}
     </>
   );
 }
@@ -212,7 +212,7 @@ function CandidateCard({
               {groups.underAssumption.map(({ check, assumptions }) => (
                 <li key={check.constraint_id}>
                   <StatusBadge label={PASSES_UNDER_ASSUMPTION_LABEL} /> {checkName(check.constraint_id)}
-                  {check.detail ? <span className="muted"> — {check.detail}</span> : null}
+                  {check.detail ? <span className="muted">: {check.detail}</span> : null}
                   <ul className="fact-list sub">
                     {assumptions.map((a) => (
                       <li key={a.assumption_id}>Assumes: {a.text}</li>
@@ -273,14 +273,14 @@ function RejectedCard({ candidate }: { candidate: CandidateResult }) {
           <li key={c.constraint_id}>
             <span aria-hidden="true">✖ </span>
             <strong>Fails: {checkName(c.constraint_id)}</strong>
-            {c.detail ? <> — {c.detail}</> : null}
+            {c.detail ? <> ({c.detail})</> : null}
           </li>
         ))}
         {unsupported.map((c) => (
           <li key={c.constraint_id}>
             <span aria-hidden="true">? </span>
             <strong>Unsupported: {checkName(c.constraint_id)}</strong>
-            {c.detail ? <> — {c.detail}</> : null}
+            {c.detail ? <> ({c.detail})</> : null}
           </li>
         ))}
       </ul>

@@ -282,7 +282,7 @@ function RecordedToolCalls({ calls, tz }: { calls: readonly ToolCallRecord[]; tz
               </span>
             </p>
             <p className="recorded-label small">
-              Recorded at {at !== null ? <When iso={at} text={fmtTime(at, tz)} /> : "an unrecorded time"} — not re-queried
+              Recorded at {at !== null ? <When iso={at} text={fmtTime(at, tz)} /> : "an unrecorded time"}, not re-queried
             </p>
             {freshness !== null ? (
               <p className="small">
