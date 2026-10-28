@@ -1,6 +1,6 @@
 # Poster pitch, Plan B, The Show Must Go On
 
-Noctis Zhang, Department of Computer Science, University of Massachusetts Boston, PEAAII AI Applications Hackathon 2026, October 2026
+Noctis Zhang and Zhen Lu, Department of Computer Science, University of Massachusetts Boston. Yinzhi Jin, Department of Management Information Systems, Carnegie Mellon University. PEAAII AI Applications Hackathon 2026, October 2026
 
 > Speak at about 140 words a minute. The first part is the short version. If the visitor has only half a minute, say it alone while pointing at the top left panel. For the full pitch, go on and point at each panel as you reach it.
 

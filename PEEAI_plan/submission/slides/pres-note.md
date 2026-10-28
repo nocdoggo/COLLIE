@@ -1,6 +1,6 @@
 # Plan B, The Show Must Go On. The seven-minute script
 
-> Noctis Zhang, Department of Computer Science, University of Massachusetts Boston. PEAAII AI Applications Hackathon 2026, October 2026.
+> Noctis Zhang and Zhen Lu, Department of Computer Science, University of Massachusetts Boston. Yinzhi Jin, Department of Management Information Systems, Carnegie Mellon University. PEAAII AI Applications Hackathon 2026, October 2026.
 > Fourteen slides, at most 420 seconds at 140 words a minute (the timing tool prints the count). The italic line under each heading is a stage direction (the planned seconds and the clock at the end of the slide). It is not spoken, and the timing tool skips it.
 > The speaker notes in the deck source say exactly what this file says. The sync tool in the tools folder copies them, and the writing check compares them.
 > Three ideas carry the talk. Check the fact. Pick only what fits. Leave a receipt, and money waits for a person's OK. Slide 3 announces them, slides 4 to 6 deliver them on Jordan's evening, slide 7 shows the real board, and slide 14 repeats them.

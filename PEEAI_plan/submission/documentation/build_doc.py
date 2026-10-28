@@ -54,8 +54,11 @@ PROMISE = "Plan B checks before it changes anything."
 TAGLINE = "Check the fact. Pick only what fits. Leave a receipt."
 MONEY = "Money waits for a person's OK."
 STUDENT = "It checks the text before you spend club money, and leaves the treasurer a record of why."
-AUTHOR = "Noctis Zhang"
-AFFILIATION = "Department of Computer Science, University of Massachusetts Boston"
+AUTHOR = "Noctis Zhang, Zhen Lu and Yinzhi Jin"
+AUTHOR_LINES = (
+    "**Noctis Zhang** and **Zhen Lu**, Department of Computer Science, University of Massachusetts Boston",
+    "**Yinzhi Jin**, Department of Management Information Systems, Carnegie Mellon University",
+)
 EVENT = "PEAAII AI Applications Hackathon 2026, October 2026"
 REPO = "https://github.com/nocdoggo/FA26-COLLIE"
 
@@ -165,7 +168,7 @@ def title_block(doc) -> None:
     run.font.size = Pt(14)
     para(doc, f"**{TAGLINE}** {MONEY}")
     para(doc, "Project documentation")
-    for line in (f"**{AUTHOR}**", AFFILIATION, EVENT):
+    for line in (*AUTHOR_LINES, EVENT):
         p = para(doc, line)
         p.paragraph_format.space_after = Pt(0)
     para(doc, f"Code and these documents, <<{REPO}>>").paragraph_format.space_before = Pt(6)

@@ -1,5 +1,6 @@
 % Plan B, The Show Must Go On. One-slide two-minute poster (horizontal, 16:9).
-% Authors Noctis Zhang and Zhen Lu, Department of Computer Science, University of Massachusetts Boston.
+% Authors Noctis Zhang and Zhen Lu, Department of Computer Science, University of Massachusetts Boston,
+% and Yinzhi Jin, Department of Management Information Systems, Carnegie Mellon University.
 % Built on the Gemini beamerposter theme (https://github.com/anishathalye/gemini, MIT License,
 % see LICENSE-gemini.md) with the UMass Boston colour theme of the Overleaf template.
 % Build: latexmk -pdflatex='lualatex -interaction nonstopmode' -pdf poster.tex
@@ -12,7 +13,7 @@
 % results_numbers_v12.tex (fresh:, the six new held-out cases of wave3b_fresh_20261025T2327Z),
 % results_numbers_final.tex and the chart fig_result_v.tex, all written by ../make_results.py.
 
-\documentclass[final,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang and Zhen Lu},pdftitle={Plan B, The Show Must Go On}}]{beamer}
+\documentclass[final,usepdftitle=false,hyperref={pdfauthor={Noctis Zhang, Zhen Lu and Yinzhi Jin},pdftitle={Plan B, The Show Must Go On}}]{beamer}
 % Keep the PDF metadata to title and author: no producer, creator or embedded file info.
 \pdfvariable suppressoptionalinfo 1023
 \hypersetup{pdfcreator={},pdfproducer={}}
@@ -66,7 +67,7 @@
 \newlength{\rBone}\setlength{\rBone}{0.372\paperwidth}
 \newlength{\rBtwo}\setlength{\rBtwo}{0.285\paperwidth}
 \newlength{\rBthree}\setlength{\rBthree}{0.288\paperwidth}
-\newlength{\hA}\setlength{\hA}{21.7cm}
+\newlength{\hA}\setlength{\hA}{20.6cm}
 \newlength{\hB}\setlength{\hB}{15.3cm}
 \newlength{\rowAa}\setlength{\rowAa}{0.505\paperwidth}
 \newlength{\rowAb}\setlength{\rowAb}{0.441\paperwidth}
@@ -100,9 +101,9 @@
 
 \title{Plan B, The Show Must Go On}
 
-\author{Noctis Zhang and Zhen Lu}
+\author{Noctis Zhang\textsuperscript{1}, Zhen Lu\textsuperscript{1} and Yinzhi Jin\textsuperscript{2}}
 
-\institute{Department of Computer Science, University of Massachusetts Boston \enspace$\bullet$\enspace PEAAII AI Applications Hackathon 2026, October 2026}
+\institute{{\small\textsuperscript{1}Department of Computer Science, University of Massachusetts Boston \enspace\enspace \textsuperscript{2}Department of Management Information Systems, Carnegie Mellon University}\\ PEAAII AI Applications Hackathon 2026, October 2026}
 
 % ====================
 % Footer

@@ -75,7 +75,7 @@ IDENTIFIER = re.compile(
     r"\b[a-z]+_[a-z0-9_]+\b|\b(cand|rcpt|obs)_|\b[CT]\d{2}\b|\b[\w-]+\.(py|tex|md|json|pdf|txt|sql)\b"
 )
 PLACEHOLDER = re.compile(r"\{[A-Za-z_][A-Za-z0-9_]*\}")
-OTHER_AUTHORS = re.compile(r"\bZhen\b|\bet al\b", re.I)
+OTHER_AUTHORS = re.compile(r"\bet al\b", re.I)
 STRICT = [
     ("colon", re.compile(r":")),
     ("web address with https", re.compile(r"https?://", re.I)),
