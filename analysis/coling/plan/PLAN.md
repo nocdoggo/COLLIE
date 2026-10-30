@@ -3719,3 +3719,23 @@ the stricter operational limit. The current model cap in the study ledger does n
 an appropriate declaration records this amendment. This entry records the owner's budget
 decision, not a finding that checkpoint preservation, historical charges, physical-request
 accounting, provider retention or worker quiescence have been verified.
+
+### A3. Copy-only checkpoint preservation (30 October 2026)
+
+Before any later original gpt-oss resumption, preserve the existing partial-run checkpoints in
+a new private, non-overwriting snapshot. The copy-only reader checks the F1 launch-plan and
+manifest identities and the existing OpenRouter lane locks, then copies the named readings,
+responses, run manifests, spend logs and invocation records for the identified partial runs.
+It does not write to an original file, read a cache, credential, item file or sealed outcome,
+send a request, or rerun the registered evaluator. Run names and file hashes remain in the
+private snapshot journal; the public output is aggregate only. A changed or unsafe source
+stops the copy, and an interrupted snapshot is kept for review rather than overwritten.
+
+- Backup source SHA256: `12947a37cad865ec8b72ea781bd08ff40a04a64b9efa7e6db8b08de198c32e51`
+- Backup fixture tests SHA256: `df645080be36f9fa11c1d70d822d49cafc8c3dc4199080b27fd7afe82f0272b2`
+
+The source is `analysis/coling/followup/oss_checkpoint_backup.py` and its invented-fixture
+tests are `analysis/coling/followup/test_oss_checkpoint_backup.py`. This amendment names the
+copy-only reader and its scope; it does not authorize a model request or establish that caches,
+provider charges, retention, direct workers or an interrupted filesystem are safe. Existing
+registered results, human annotations and Task E remain unchanged.
