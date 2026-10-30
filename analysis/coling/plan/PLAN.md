@@ -3694,3 +3694,28 @@ it. They apply as if they stood in the guide's changelog, from the adjudication 
 task on. No frame, sample, weight or prompt changes. The anonymised copy of the plan as amended
 is made by the script of F1.1 with the list of F1; its hash stands in
 `analysis/coling/plan/anonymised/HASHES.txt`.
+
+### A2. Prospective budgets for original gpt-oss continuation (30 October 2026)
+
+After the original evaluator results had been recorded, the owner directed the unfinished
+`gpt-oss-20b` runs to continue and approved raising that model's F1.8 cap from **$6.00 to
+$10.00**, and the section 9 study-wide cap from **$200.00 to $225.00**. These amounts are
+total ceilings, not additional allowances. The change is prospective: it takes effect only
+after this amendment is pushed, and all earlier spending, open-run holds, retries, failures and
+outstanding liabilities remain counted. Section 9's list-price accounting definition, including
+reasoning, is unchanged. Account and key spending limits apply separately.
+
+Other original model caps, the assigned runs and samples, model and provider pin, prompts,
+decoding, cache identity and retry rules are not changed by this budget decision. A separately
+registered follow-up does not obtain an extra allowance above the applicable study and model
+caps. Existing registered results, completed human annotations and Task E remain unchanged;
+this amendment does not authorize rerunning the registered evaluator, reading a sealed outcome,
+or retrospectively revising a frozen result. Any changed frozen implementation, output projection,
+decoding or analysis requires its own applicable prospective amendment and exact identities.
+
+The F1-frozen reader still refuses a study cap above $200, so it cannot use the new $225
+study ceiling without a separately specified implementation; until then its $200 check remains
+the stricter operational limit. The current model cap in the study ledger does not change until
+an appropriate declaration records this amendment. This entry records the owner's budget
+decision, not a finding that checkpoint preservation, historical charges, physical-request
+accounting, provider retention or worker quiescence have been verified.
