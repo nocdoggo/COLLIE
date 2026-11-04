@@ -61,6 +61,11 @@ that date additionally requires a separately recorded owner renewal; the fresh
 key-status check below forces the dispatch chain to run within 300 seconds of
 that renewal."""
 _DEADLINE = _AUTHORITY_BOUND
+_KEY_LIMIT_CEILING = Decimal("250")
+"""The provider-reported limit of the owner-installed replacement key of
+4 November 2026 (stated to expire in about ten days). The earlier key's
+owner-stated ceiling was $225; the A2 model cap, the $225 protocol study
+ceiling and the frozen reader's stricter $200 check are unchanged."""
 _STAGE_NAME = "OSS_ONE_SHOT_STAGE"
 
 
@@ -342,7 +347,7 @@ def _check_recent_key_status(raw: bytes, expected_sha256: str, now: datetime) ->
     if (stamp.tzinfo is None or stamp.utcoffset() != timedelta(0) or not 0 <= (now - stamp).total_seconds() <= 300
             or result.get("http_status") != 200 or result.get("metadata_valid") is not True
             or any(not value.is_finite() or value < 0 for value in (limit, usage, remaining))
-            or limit > Decimal("225") or usage > limit or remaining < Decimal("0.10")
+            or limit > _KEY_LIMIT_CEILING or usage > limit or remaining < Decimal("0.10")
             or abs((limit - usage) - remaining) > Decimal("0.000001")):
         raise ResumeRefusal("recent key headroom or status is insufficient")
 
@@ -438,11 +443,18 @@ def _verify_registration() -> dict:
             or selected.get("f1_operational_study_cap_usd") != "200"
             or verified.get("source_and_snapshot_hashes_match") is not True):
         raise ResumeRefusal("selection or backup authority differs")
+    status_gets = budget.get("verification", {}).get("one_shot_key_status_attempts_reserved")
+    status_hold = budget.get("nonfinal_programme_liability_holds", {}).get("one_shot_key_status_get_usd")
+    if (type(status_gets) is not int or status_gets not in (1, 2) or type(status_hold) is not str):
+        raise ResumeRefusal("one-shot attempt or liability reservations differ")
+    try:
+        status_hold_amount = Decimal(status_hold)
+    except InvalidOperation:
+        raise ResumeRefusal("one-shot attempt or liability reservations differ") from None
     if (budget.get("verification", {}).get("a4_git_registration_attempt_slots_reserved") != 20
             or budget.get("verification", {}).get("one_shot_physical_attempts_reserved") != 1
-            or budget.get("verification", {}).get("one_shot_key_status_attempts_reserved") != 1
             or budget.get("nonfinal_programme_liability_holds", {}).get("one_shot_original_attempt_usd") != "0.10"
-            or budget.get("nonfinal_programme_liability_holds", {}).get("one_shot_key_status_get_usd") != "0.10"):
+            or not status_hold_amount.is_finite() or status_hold_amount != Decimal("0.10") * status_gets):
         raise ResumeRefusal("one-shot attempt or liability reservations differ")
     status_record = budget.get("one_shot_key_status_preflight", {})
     with ExitStack() as stack:

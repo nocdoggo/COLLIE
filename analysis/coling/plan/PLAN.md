@@ -3768,3 +3768,20 @@ sealed outcome.
 - Transport source SHA256: `3a8567fe946922d1b41ca048a94102ecf0b8fa34a1fc8120ba92bdb002e1c64c`
 - Transport fixture tests SHA256: `72d86361bae8871ac4e3d9d663bf74ff64852c35671b708fa20c5b289e9cbab4`
 - One-shot selection SHA256: `5c8b5f558be8b1f6d8dd124bc306232ceec89a968634fe9bc78c92d2f4ca2475`
+
+### A5. One-shot key-limit ceiling and second status GET (4 November 2026)
+
+The owner renewed dispatch authority on 4 November and installed a replacement designated key,
+stated to expire in about ten days, whose provider-reported limit is **$250** with no recorded
+usage. The one-shot gate's key-limit ceiling is therefore raised from $225 to $250, matching the
+owner-configured limit of the installed key; the A2 model cap, the $225 protocol study ceiling
+and the frozen reader's stricter $200 operational check are unchanged. Because the first
+pre-dispatch status GET revealed this ceiling only after A4 had been pushed, the gate now
+permits exactly one or two pre-dispatch status GETs, each retaining a $0.10 hold, and requires
+the recorded hold to equal $0.10 per GET. This amendment supersedes A4's resume source and
+fixture-test hashes only; every other A4 identity stands, and all A4 restrictions — the
+single-physical-attempt limit, the ≤300-second fresh key status, and the separately recorded
+owner renewal required after the delegation expired — remain in force.
+
+- Resume source SHA256: `d2da6f3b749d748ad356cda74fe5aff712724d7f2a9881bdf4e2b2263b1915e4`
+- Resume fixture tests SHA256: `1f60d3e7b8daefe3e17c48bafab50573e49a940630fda55704746f6804b24dbe`

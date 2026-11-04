@@ -252,15 +252,21 @@ def test_recent_key_status_is_verified_as_a_separate_headroom_check():
 
 
 @pytest.mark.parametrize(('changes', 'time_shift'), [
-    ({}, 301), ({}, -1), ({'limit_usd': '226'}, 0), ({'limit_remaining_usd': '0.09'}, 0),
+    ({}, 301), ({}, -1), ({'limit_usd': '251'}, 0), ({'limit_remaining_usd': '0.09'}, 0),
     ({'limit_remaining_usd': '15'}, 0), ({'metadata_valid': False}, 0), ({'http_status': 403}, 0),
-    ({'usage_usd': '221'}, 0), ({'usage_usd': True}, 0), ({'limit_usd': 'NaN'}, 0),
+    ({'usage_usd': '251'}, 0), ({'usage_usd': True}, 0), ({'limit_usd': 'NaN'}, 0),
 ])
 def test_stale_inconsistent_or_insufficient_key_status_is_refused(changes, time_shift):
     now = datetime.now(timezone.utc)
     raw = key_status(now - timedelta(seconds=time_shift), **changes)
     with pytest.raises(resume.ResumeRefusal):
         resume._check_recent_key_status(raw, sha256(raw).hexdigest(), now)
+
+
+def test_owner_replacement_key_limit_of_250_is_accepted():
+    now = datetime.now(timezone.utc)
+    raw = key_status(now, limit_usd='250', usage_usd='0', limit_remaining_usd='250')
+    resume._check_recent_key_status(raw, sha256(raw).hexdigest(), now)
 
 
 def test_key_status_hash_and_event_order_are_required():
@@ -582,6 +588,10 @@ def fake_registration(tmp_path, monkeypatch, defect=None):
                     'one_shot_key_status_attempts_reserved': 1}
     if defect == 'budget_fields':
         verification.pop('one_shot_physical_attempts_reserved')
+    if defect == 'budget_three_gets':
+        verification['one_shot_key_status_attempts_reserved'] = 3
+    if defect == 'budget_hold_mismatch':
+        verification['one_shot_key_status_attempts_reserved'] = 2
     manifest = {'verification': verification, 'nonfinal_programme_liability_holds': holds,
                 'one_shot_key_status_preflight': {'journal_sha256': sha256(status_rows).hexdigest()}}
     (private / 'EXECUTION_MANIFEST_DRAFT.json').write_bytes((json.dumps(manifest, sort_keys=True,
@@ -652,7 +662,8 @@ def test_registration_accepts_exact_pushed_identities_and_fresh_key_status(tmp_p
 
 @pytest.mark.parametrize('defect', ['prefix', 'a4_heading', 'selection_line', 'resume_source', 'running_module',
                                     'backup_code', 'read_source', 'selection_record', 'backup_verification',
-                                    'a4_record_commit', 'budget_fields', 'key_status_stale', 'key_status_missing',
+                                    'a4_record_commit', 'budget_fields', 'budget_three_gets', 'budget_hold_mismatch',
+                                    'key_status_stale', 'key_status_missing',
                                     'env', 'deadline', 'tracking', 'branch', 'ancestor', 'dirty', 'f1_changed',
                                     'absent_blob', 'blob_differs'])
 def test_registration_refuses_every_identity_or_authority_defect(tmp_path, monkeypatch, defect):
