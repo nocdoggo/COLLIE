@@ -445,7 +445,7 @@ def _verify_registration() -> dict:
         raise ResumeRefusal("selection or backup authority differs")
     status_gets = budget.get("verification", {}).get("one_shot_key_status_attempts_reserved")
     status_hold = budget.get("nonfinal_programme_liability_holds", {}).get("one_shot_key_status_get_usd")
-    if (type(status_gets) is not int or status_gets not in (1, 2) or type(status_hold) is not str):
+    if (type(status_gets) is not int or status_gets not in (1, 2, 3) or type(status_hold) is not str):
         raise ResumeRefusal("one-shot attempt or liability reservations differ")
     try:
         status_hold_amount = Decimal(status_hold)

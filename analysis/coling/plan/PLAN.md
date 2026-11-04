@@ -3800,3 +3800,17 @@ and the required owner renewal — is unchanged.
 
 - Resume source SHA256: `9a61dd08e7e8ae020a2a6dd5793cbd4dfeedc6ae6d8d7d2151046b9f2656ffa6`
 - Resume fixture tests SHA256: `362d3b60a299d94b5cbbb9ac4df190b4bf7b0f447866f56081b13a15b85a0972`
+
+### A7. Third pre-dispatch status GET and journal label (4 November 2026)
+
+The second pre-dispatch status GET returned HTTP 200 with a $250 limit and no usage, but its
+journal writer omitted the `result` event label on the third row, so the registration gate
+correctly refused the dispatch as structurally incomplete before any request was made; no
+physical attempt was consumed and no stage was created. Rather than edit a journal of a sent
+GET, the gate now permits exactly one, two or three pre-dispatch status GETs, each retaining a
+$0.10 hold (the recorded hold must equal $0.10 per GET), and the preflight writer is corrected
+to label its result row. This amendment supersedes A6's resume source and fixture-test hashes
+only; every other identity and restriction of A4, A5 and A6 is unchanged.
+
+- Resume source SHA256: `cb23017e63dfaa2ad6813d4b0ea972643858b7380e9deb3e400f2df3b433838c`
+- Resume fixture tests SHA256: `07f0b18430989d4dcbe2d98ad6975403fa9f9ebfcc1d2570c92f5c65485290b2`
