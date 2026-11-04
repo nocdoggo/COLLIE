@@ -730,8 +730,12 @@ def _install_hooks(read_module, endpoints_module, openai_module, httpx_module, c
     def sidecar(rows, reader, *, out_dir, local_dir, meta, items, samples):
         # F1 writes no original reading/response/manifest in this mode. Its
         # returned ``complete=False`` also prevents closing the original run.
-        if (Path(out_dir) != Path(read_module.OUT_ROOT) / run_name
-                or Path(local_dir) != Path(read_module.LOCAL_ROOT) / run_name
+        # The frozen harness passes the plan's RELATIVE roots; the module
+        # constants are absolute, so compare on normalized absolute paths.
+        expected_out = Path(os.path.abspath(read_module.OUT_ROOT)) / run_name
+        expected_local = Path(os.path.abspath(read_module.LOCAL_ROOT)) / run_name
+        if (Path(os.path.abspath(out_dir)) != expected_out
+                or Path(os.path.abspath(local_dir)) != expected_local
                 or Path(out_dir).name != run_name):
             raise ResumeRefusal("F1 output roots or run identity differ")
         del meta, items, samples

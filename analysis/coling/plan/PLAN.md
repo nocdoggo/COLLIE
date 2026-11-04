@@ -3785,3 +3785,18 @@ owner renewal required after the delegation expired — remain in force.
 
 - Resume source SHA256: `d2da6f3b749d748ad356cda74fe5aff712724d7f2a9881bdf4e2b2263b1915e4`
 - Resume fixture tests SHA256: `1f60d3e7b8daefe3e17c48bafab50573e49a940630fda55704746f6804b24dbe`
+
+### A6. Sidecar output-root normalization (4 November 2026)
+
+Pre-dispatch review found that the frozen harness passes the launch plan's **relative** output
+and local roots, while the continuation module's constants are absolute; the A4/A5 sidecar hook
+compared the two forms directly and would have refused the sidecar write after a request had
+already been spent. The hook now compares normalized absolute paths and still refuses any
+mismatched run identity or root. Its fixture test reproduces the real relative-root call form
+against absolute module constants and adds mismatch refusals. This amendment supersedes A5's
+resume source and fixture-test hashes only; every other identity and restriction of A4 and A5 —
+including the single physical attempt, the two-GET status allowance, the $250 key-limit ceiling
+and the required owner renewal — is unchanged.
+
+- Resume source SHA256: `9a61dd08e7e8ae020a2a6dd5793cbd4dfeedc6ae6d8d7d2151046b9f2656ffa6`
+- Resume fixture tests SHA256: `362d3b60a299d94b5cbbb9ac4df190b4bf7b0f447866f56081b13a15b85a0972`

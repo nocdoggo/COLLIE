@@ -320,7 +320,8 @@ def test_exact_hooks_preserve_f1_request_shape_and_filter_old_pairs(stage, tmp_p
                              _sha256_file=lambda *_: (_ for _ in ()).throw(AssertionError('unexpected hash')),
                              ReadItem=FakeItem, SpendCapReached=SpendCapReached,
                              CallCapReached=CallCapReached, ServedModelMismatch=ServedModelMismatch,
-                             OUT_ROOT=Path('analysis/coling/out/read'), LOCAL_ROOT=Path('results/coling/read'))
+                             OUT_ROOT=tmp_path / 'workspace/analysis/coling/out/read',
+                             LOCAL_ROOT=tmp_path / 'workspace/results/coling/read')
     endpoints = SimpleNamespace(EMPTY_ECHO_RETRIES=3)
     openai_module = SimpleNamespace(OpenAI=openai.OpenAI)
     fake_cache = SimpleNamespace(REAL_ROOT='/synthetic-fixed-cache',
@@ -343,6 +344,8 @@ def test_exact_hooks_preserve_f1_request_shape_and_filter_old_pairs(stage, tmp_p
     index = resume.CheckpointIndex(frozenset({('SYNTH-A', 0)}), frozenset({('SYNTH-B', 0)}))
     input_raw = jsonl({'item_id': 'SYNTH-A'}, {'item_id': 'SYNTH-B'}, {'item_id': 'SYNTH-C'})
     monkeypatch.setattr(resume, '_DEADLINE', datetime.now(timezone.utc) + timedelta(hours=1))
+    (tmp_path / 'workspace').mkdir()
+    monkeypatch.chdir(tmp_path / 'workspace')
     try:
         client = resume._install_hooks(module, endpoints, openai_module, httpx_module, fake_cache, transport,
                                        index=index, stage_fd=stage_fd, journal_fd=journal_fd,
@@ -374,6 +377,12 @@ def test_exact_hooks_preserve_f1_request_shape_and_filter_old_pairs(stage, tmp_p
             result = module.write_run(rows, reader, out_dir=Path('analysis/coling/out/read/SYNTH-RUN'),
                                       local_dir=Path('results/coling/read/SYNTH-RUN'), meta={}, items=items, samples=1)
             assert result['complete'] is False and (stage_path / 'sidecar_manifest.json').is_file()
+            with pytest.raises(resume.ResumeRefusal, match='output roots'):
+                module.write_run(rows, reader, out_dir=Path('analysis/coling/out/read/OTHER-RUN'),
+                                 local_dir=Path('results/coling/read/SYNTH-RUN'), meta={}, items=items, samples=1)
+            with pytest.raises(resume.ResumeRefusal, match='output roots'):
+                module.write_run(rows, reader, out_dir=Path('elsewhere/SYNTH-RUN'),
+                                 local_dir=Path('results/coling/read/SYNTH-RUN'), meta={}, items=items, samples=1)
             sdk = openai_module.OpenAI(api_key='synthetic-only-key', base_url='https://openrouter.ai/api/v1',
                                        timeout=180, max_retries=0)
             reply = sdk.chat.completions.create(model=transport.MODEL,
