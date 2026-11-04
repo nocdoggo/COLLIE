@@ -43,7 +43,12 @@ _DIR = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC
 _READ = os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC
 _CREATE = os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW | os.O_CLOEXEC
 _ITEM = re.compile(r"[A-Za-z0-9_.:-]{1,256}", re.ASCII)
-_WORKSPACE = "/data/noctis/GitHub-Data/COLLIE-coling"
+_WORKSPACE = "/home/noctis/GitHub/COLLIE-coling"
+"""The registered spelling of the study worktree: the one the original runs used
+and that the frozen reader's shared-roots anchor pins. The follow-up session's
+``/data/noctis/GitHub-Data/COLLIE-coling`` spelling names the same directory
+(same device and inode), but the frozen ``check_roots`` compares resolved path
+strings, so the continuation must run from the registered spelling."""
 _PRIVATE = "/data/noctis/GitHub-Data/COLLIE/owner_review/14_2026-10-29_execution"
 _SELECTION_SHA = "5c8b5f558be8b1f6d8dd124bc306232ceec89a968634fe9bc78c92d2f4ca2475"
 _PLAN_SHA = "2bf32748015d21d891b661da1149aef5dd7aa7dce7af61b83a70b30d4da7ffd4"
@@ -445,7 +450,7 @@ def _verify_registration() -> dict:
         raise ResumeRefusal("selection or backup authority differs")
     status_gets = budget.get("verification", {}).get("one_shot_key_status_attempts_reserved")
     status_hold = budget.get("nonfinal_programme_liability_holds", {}).get("one_shot_key_status_get_usd")
-    if (type(status_gets) is not int or status_gets not in (1, 2, 3) or type(status_hold) is not str):
+    if (type(status_gets) is not int or status_gets not in (1, 2, 3, 4) or type(status_hold) is not str):
         raise ResumeRefusal("one-shot attempt or liability reservations differ")
     try:
         status_hold_amount = Decimal(status_hold)

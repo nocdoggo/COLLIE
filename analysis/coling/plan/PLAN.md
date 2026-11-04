@@ -3814,3 +3814,19 @@ only; every other identity and restriction of A4, A5 and A6 is unchanged.
 
 - Resume source SHA256: `cb23017e63dfaa2ad6813d4b0ea972643858b7380e9deb3e400f2df3b433838c`
 - Resume fixture tests SHA256: `07f0b18430989d4dcbe2d98ad6975403fa9f9ebfcc1d2570c92f5c65485290b2`
+
+### A8. Registered worktree spelling and fourth status GET (4 November 2026)
+
+The frozen reader's shared-roots anchor pins the original worktree spelling
+`/home/noctis/GitHub/COLLIE-coling`; the follow-up session's
+`/data/noctis/GitHub-Data/COLLIE-coling` spelling names the same directory (same device and
+inode), but `check_roots` compares resolved path strings and refused the continuation before
+any request, ledger write or sidecar — only an unused private stage with an unconsumed
+reservation exists, now archived. The continuation's workspace constant is therefore set to
+the registered spelling, and because this correction cycle expires the 300-second freshness of
+the latest status GET, the gate permits exactly one through four pre-dispatch status GETs,
+each retaining a $0.10 hold. This amendment supersedes A7's resume source and fixture-test
+hashes only; every other identity and restriction of A4 through A7 is unchanged.
+
+- Resume source SHA256: `4b49721ee01cea64ebf2366695ac7ab21c87c796582e23d23df9578b4349d5c6`
+- Resume fixture tests SHA256: `eab191e4ffe57bec5f01867c1de2cb9fd6219d083a4379d67d7b41edf0e4c492`
