@@ -3830,3 +3830,23 @@ hashes only; every other identity and restriction of A4 through A7 is unchanged.
 
 - Resume source SHA256: `4b49721ee01cea64ebf2366695ac7ab21c87c796582e23d23df9578b4349d5c6`
 - Resume fixture tests SHA256: `eab191e4ffe57bec5f01867c1de2cb9fd6219d083a4379d67d7b41edf0e4c492`
+
+### A9. Worktree spelling correction, roots-anchor update and fifth status GET (4 November 2026)
+
+A8 assumed the original spelling `/home/noctis/GitHub/COLLIE-coling` was still a real directory;
+it is now a **symlink** to `/data/noctis/GitHub-Data/COLLIE-coling` (the storage was reorganized
+after the original runs), so no resolved path can reproduce the frozen shared-roots anchor's old
+spelling from either side, and the continuation's no-follow directory opens rightly refuse the
+symlink. The workspace constant therefore returns to the real directory, and the frozen
+reader's shared-roots anchor `coling-read-roots.json` is updated to the current canonical
+spelling **after inode verification** that each new path names the very directory the anchor
+already pinned; the old anchor content, the inode evidence and the atomic replacement are
+recorded in `ROOTS_ANCHOR_UPDATE_2026-11-04_PRIVATE.json`. The anchor's purpose — one shared
+output root and one shared local root for every paid run — is unchanged; only the spelling
+follows the reorganized storage. Because this correction cycle also expires the latest status
+GET's freshness, the gate permits exactly one through five pre-dispatch status GETs, each
+retaining a $0.10 hold. This amendment supersedes A8's resume source and fixture-test hashes
+only; every other identity and restriction of A4 through A8 is unchanged.
+
+- Resume source SHA256: `75ec9b834a7f4fe467de28bc80b0d749e246b9878c095ca1557bde8cdfd6105c`
+- Resume fixture tests SHA256: `22f0ec08938205cf6876770fb5518e1199c015b2aa25ffd23898fba24d23ff9f`

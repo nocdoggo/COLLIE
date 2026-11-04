@@ -597,8 +597,8 @@ def fake_registration(tmp_path, monkeypatch, defect=None):
                     'one_shot_key_status_attempts_reserved': 1}
     if defect == 'budget_fields':
         verification.pop('one_shot_physical_attempts_reserved')
-    if defect == 'budget_five_gets':
-        verification['one_shot_key_status_attempts_reserved'] = 5
+    if defect == 'budget_six_gets':
+        verification['one_shot_key_status_attempts_reserved'] = 6
     if defect == 'budget_hold_mismatch':
         verification['one_shot_key_status_attempts_reserved'] = 2
     manifest = {'verification': verification, 'nonfinal_programme_liability_holds': holds,
@@ -671,7 +671,7 @@ def test_registration_accepts_exact_pushed_identities_and_fresh_key_status(tmp_p
 
 @pytest.mark.parametrize('defect', ['prefix', 'a4_heading', 'selection_line', 'resume_source', 'running_module',
                                     'backup_code', 'read_source', 'selection_record', 'backup_verification',
-                                    'a4_record_commit', 'budget_fields', 'budget_five_gets', 'budget_hold_mismatch',
+                                    'a4_record_commit', 'budget_fields', 'budget_six_gets', 'budget_hold_mismatch',
                                     'key_status_stale', 'key_status_missing',
                                     'env', 'deadline', 'tracking', 'branch', 'ancestor', 'dirty', 'f1_changed',
                                     'absent_blob', 'blob_differs'])
