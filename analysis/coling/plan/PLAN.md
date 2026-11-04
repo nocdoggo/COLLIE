@@ -3739,3 +3739,32 @@ tests are `analysis/coling/followup/test_oss_checkpoint_backup.py`. This amendme
 copy-only reader and its scope; it does not authorize a model request or establish that caches,
 provider charges, retention, direct workers or an interrupted filesystem are safe. Existing
 registered results, human annotations and Task E remain unchanged.
+
+### A4. One-physical-attempt original continuation (4 November 2026)
+
+One partial original gpt-oss run may continue under a separately registered wrapper that sends
+**at most one physical HTTP request**, with the SDK's echo retries and the guard's transient
+retries disabled, the exact research user agent, and the original model, provider pin, prompt,
+item list, temperature and provider-default reasoning. The selection is fixed privately by
+metadata before any item or response content is read; its identity is pinned below. Completed
+and orphaned historical item/sample pairs are skipped, never re-sent. Original readings,
+responses and run manifests are never opened for writing; the continuation writes only a new
+private, non-authoritative sidecar marked not-complete, and a new cache entry is created only
+when no entry exists. The frozen reader's ledger declaration, spend log and invocations log are
+appended under their registered F1 rules, with the A2 model cap and the reader's stricter $200
+operational study check. A provisional $0.10 hold covers the single attempt; it is not a proven
+billable maximum, and historical charges, account privacy settings and provider enforcement
+remain unreconciled. Dispatch additionally requires a fresh key-status check no older than 300
+seconds and, because the original 24-hour delegation expired on 30 October, a separately
+recorded owner renewal. This amendment registers the mechanism only; it does not close the
+original run, authorize a second request, rerun the registered evaluator, or permit reading a
+sealed outcome.
+
+- Package initializer SHA256: `3c6f507291a061e070feff1b10c7d8e0a520b2a3d20150144a84eec171ff2c4c`
+- Resume source SHA256: `e09a6b3f104a371dec1a1d7f1727c6781cc15eca381eee13fbc76f8c07110c06`
+- Resume fixture tests SHA256: `c11c36cb2dbf380265657dd33b95f128a774fe54c9a786ae5e5dac2282fc89ae`
+- Cache source SHA256: `a0804e4355ff7037294daeb53aede017d6c41df47618d7325aa30a29bba943b9`
+- Cache fixture tests SHA256: `3d9714f9dbc1773001d058e016abd48c126954df426a88495149941acf04a58a`
+- Transport source SHA256: `3a8567fe946922d1b41ca048a94102ecf0b8fa34a1fc8120ba92bdb002e1c64c`
+- Transport fixture tests SHA256: `72d86361bae8871ac4e3d9d663bf74ff64852c35671b708fa20c5b289e9cbab4`
+- One-shot selection SHA256: `5c8b5f558be8b1f6d8dd124bc306232ceec89a968634fe9bc78c92d2f4ca2475`
