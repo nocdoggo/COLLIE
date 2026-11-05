@@ -467,6 +467,21 @@ def test_selected_context_uses_only_matching_snapshot_and_skips_orphan(selected_
         assert b'SYNTH-C' in raw_items and cap == '0.250000' and calls == 1
 
 
+def test_selected_context_accepts_registered_appends_but_refuses_rewrites(selected_fixture):
+    data = selected_fixture
+    spend = data['output'] / 'SYNTH-RUN' / 'spend_log.jsonl'
+    appended = spend.read_bytes() + b'{"event":"error","error":"sanitized"}\n'
+    spend.write_bytes(appended)
+    data['selected']['spend_log_sha256'] = sha256(appended).hexdigest()
+    with ExitStack() as stack:
+        resume._selected_context(data['selected'], stack)  # a registered append is accepted
+    rewritten = b'X' + appended[1:]
+    spend.write_bytes(rewritten)
+    data['selected']['spend_log_sha256'] = sha256(rewritten).hexdigest()
+    with ExitStack() as stack, pytest.raises(resume.ResumeRefusal, match='rewrote history'):
+        resume._selected_context(data['selected'], stack)
+
+
 @pytest.mark.parametrize('defect', ['reading', 'response', 'manifest', 'spend', 'invocations', 'ledger',
                                     'item_content', 'item_link', 'output_link', 'held_lock', 'run_name'])
 def test_selected_context_refuses_changed_or_unsafe_sources(selected_fixture, defect):
@@ -597,8 +612,8 @@ def fake_registration(tmp_path, monkeypatch, defect=None):
                     'one_shot_key_status_attempts_reserved': 1}
     if defect == 'budget_fields':
         verification.pop('one_shot_physical_attempts_reserved')
-    if defect == 'budget_six_gets':
-        verification['one_shot_key_status_attempts_reserved'] = 6
+    if defect == 'budget_seven_gets':
+        verification['one_shot_key_status_attempts_reserved'] = 7
     if defect == 'budget_hold_mismatch':
         verification['one_shot_key_status_attempts_reserved'] = 2
     manifest = {'verification': verification, 'nonfinal_programme_liability_holds': holds,
@@ -671,7 +686,7 @@ def test_registration_accepts_exact_pushed_identities_and_fresh_key_status(tmp_p
 
 @pytest.mark.parametrize('defect', ['prefix', 'a4_heading', 'selection_line', 'resume_source', 'running_module',
                                     'backup_code', 'read_source', 'selection_record', 'backup_verification',
-                                    'a4_record_commit', 'budget_fields', 'budget_six_gets', 'budget_hold_mismatch',
+                                    'a4_record_commit', 'budget_fields', 'budget_seven_gets', 'budget_hold_mismatch',
                                     'key_status_stale', 'key_status_missing',
                                     'env', 'deadline', 'tracking', 'branch', 'ancestor', 'dirty', 'f1_changed',
                                     'absent_blob', 'blob_differs'])

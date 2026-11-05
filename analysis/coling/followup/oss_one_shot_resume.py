@@ -51,7 +51,7 @@ reproduce the anchor's old spelling. The frozen reader's shared-roots anchor was
 updated to this spelling after inode verification, recorded in
 ROOTS_ANCHOR_UPDATE_2026-11-04_PRIVATE.json and disclosed in amendment A9."""
 _PRIVATE = "/data/noctis/GitHub-Data/COLLIE/owner_review/14_2026-10-29_execution"
-_SELECTION_SHA = "5c8b5f558be8b1f6d8dd124bc306232ceec89a968634fe9bc78c92d2f4ca2475"
+_SELECTION_SHA = "673607af1b3bccd48a770b36476b080f22791099fc2d12d379e65ede9aa8d7cc"
 _PLAN_SHA = "2bf32748015d21d891b661da1149aef5dd7aa7dce7af61b83a70b30d4da7ffd4"
 _BACKUP_COMMIT = "6d39ce603c8ba5efda3c19d29adc1c505ac09b4c"
 _BACKUP_CODE_SHA = "12947a37cad865ec8b72ea781bd08ff40a04a64b9efa7e6db8b08de198c32e51"
@@ -451,7 +451,7 @@ def _verify_registration() -> dict:
         raise ResumeRefusal("selection or backup authority differs")
     status_gets = budget.get("verification", {}).get("one_shot_key_status_attempts_reserved")
     status_hold = budget.get("nonfinal_programme_liability_holds", {}).get("one_shot_key_status_get_usd")
-    if (type(status_gets) is not int or status_gets not in (1, 2, 3, 4, 5) or type(status_hold) is not str):
+    if (type(status_gets) is not int or status_gets not in (1, 2, 3, 4, 5, 6) or type(status_hold) is not str):
         raise ResumeRefusal("one-shot attempt or liability reservations differ")
     try:
         status_hold_amount = Decimal(status_hold)
@@ -559,9 +559,16 @@ def _selected_context(selected: dict, stack: ExitStack):
     for original, saved, filename, field in checks:
         raw = _read_safe(original, filename, _MAX_CHECKPOINT)
         backup_raw = _read_safe(saved, filename, _MAX_CHECKPOINT, private=True)
-        if raw != backup_raw or sha256(raw).hexdigest() != selected.get(field):
+        if filename in ("spend_log.jsonl", "invocations.jsonl"):
+            # Registered append-only logs: each attempt appends rows under the
+            # frozen reader's rules, so only rewrite-of-history is refused.
+            if not raw.startswith(backup_raw):
+                raise ResumeRefusal("an append-only original log rewrote history")
+        elif raw != backup_raw:
             raise ResumeRefusal("selected original file differs from its verified snapshot")
-        contents[filename] = backup_raw
+        if sha256(raw).hexdigest() != selected.get(field):
+            raise ResumeRefusal("selected original file differs from its current pin")
+        contents[filename] = raw
     manifest = _decode_object(contents["run_manifest.json"])
     if manifest.get("complete") is not False or type(manifest.get("readings")) is not int:
         raise ResumeRefusal("selected original run is no longer partial")

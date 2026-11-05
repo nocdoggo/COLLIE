@@ -3850,3 +3850,21 @@ only; every other identity and restriction of A4 through A8 is unchanged.
 
 - Resume source SHA256: `75ec9b834a7f4fe467de28bc80b0d749e246b9878c095ca1557bde8cdfd6105c`
 - Resume fixture tests SHA256: `22f0ec08938205cf6876770fb5518e1199c015b2aa25ffd23898fba24d23ff9f`
+
+### A10. Retry selection, append-only log rule and sixth status GET (5 November 2026)
+
+The owner renewed authority for one more attempt after the 4 November single request was
+rate-limited (HTTP 429, no usage recorded, no retry sent). A fresh metadata-only selection
+re-pins the same partial run against its **current** state — the append-only spend and
+invocation logs legitimately gained the registered rows of the 429 attempt, so the gate now
+requires those logs to preserve the A3 snapshot as a prefix (refusing any rewrite of history)
+while readings, the run manifest and responses must remain byte-identical; a new fixture test
+covers both sides of that rule. The prior selection record is archived privately. Because this
+correction cycle expires the latest status GET's freshness, the gate permits exactly one
+through six pre-dispatch status GETs, each retaining a $0.10 hold. This amendment supersedes
+A9's resume source and fixture-test hashes and A4's selection SHA256 only; every other
+identity and restriction of A4 through A9 is unchanged.
+
+- Resume source SHA256: `263524612bb50b64b5f9c4a7d76f96cf1675784feaa12d30536bd17822a000c6`
+- Resume fixture tests SHA256: `72e0bd2c7e2f2db6f18043deffd506f050d29971ebdab68b70d4332f51c8ca95`
+- One-shot selection SHA256: `673607af1b3bccd48a770b36476b080f22791099fc2d12d379e65ede9aa8d7cc`
