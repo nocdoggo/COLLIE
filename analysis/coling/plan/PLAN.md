@@ -3944,3 +3944,38 @@ continuation mechanism.
 - Batch source SHA256: `2d1807b41a7845ce7f8665ed71242f04c38d3e4bc7d001fe0e026ca3c77debfe`
 - Batch fixture tests SHA256: `2aa3c317a4299b0004b002d5f782d1a17cf4e0474c3306825c84d0118821b63b`
 - Batch selection SHA256: `81d227093d28a883ab76940aaf2819b2d2e313836a0c39b097bcef9d87431e40`
+### A12. Send-journal open flags repaired after the stopped first dispatch (5 November 2026)
+
+The first dispatch of the A11 batch (private stage `OSS_BATCH_STAGE_20261105T213709Z`,
+21:37 UTC) stopped one second after reservation, before any request was sent: zero
+physical sends and zero batch cost, console message "Paced batch continuation stopped;
+review private state before any retry." The root cause was reproduced read-only: the
+batch module's `main()` opened the stage's send journal write-only (`O_WRONLY` with
+append/create/exclusive/no-follow/close-on-exec), while the registered counted transport
+requires a read-write journal because it preads the reservation row and fstats before and
+after to verify the journal's identity. The fixture suites had passed because every test
+opened its journal read-write; no test pinned main()'s open flags.
+
+This amendment repairs the defect and locks the contract: the send-journal open flags are
+now one shared module constant (`O_RDWR` with append/create/exclusive/no-follow/
+close-on-exec), and two fixture tests pin both directions — the shared flags satisfy the
+counted transport, and a write-only journal is still refused. Nothing else in the A11
+design changes.
+
+State at re-registration: the stopped dispatch's reservation release completed
+idempotently before the stop (12 of the 16 blocked partial runs re-declared at their
+recorded spend; the other 4 held no headroom), so the study ledger gained those
+declare-only rows. A fresh selection record is registered, pinning the current ledger
+hash; every per-run target, cap, projection and original-run pin is unchanged (the
+originals remain byte-identical to the verified A3 snapshot, and no continuation run
+directory exists). The target set remains the same 3,205 item/sample pairs; the 4
+historical orphaned pairs remain unasked per the A4 rule. The seventh pre-dispatch status
+GET (HTTP 200) recorded limit $250 / usage $0.000751501 / remaining $249.999248499; the
+tiny usage is attributed to the three owner-directed route-change probes of 15:40-15:41
+UTC, which postdate the sixth GET that reported zero, and it is not from the batch (no
+request was ever sent). The re-dispatch uses a further fresh status GET under the
+registered twelve-GET allowance.
+
+- Batch source SHA256: `dbd84e1e2fc33cc5ce000214b2147ad22a89e7a088ef9a1744f351de90f6e541`
+- Batch fixture tests SHA256: `8fe24535f220fa82e46ecd84cc52e929e6abbd61863baf22096c0ef058bc41b1`
+- Batch selection SHA256: `3c1f1d2ee2d88f923f011ff07b3fbaa2ea7e546031036c6e6aa5eab4fc887aaa`

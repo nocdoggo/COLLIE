@@ -674,6 +674,43 @@ def test_hooks_pin_inputs_and_file_hashes(tmp_path, monkeypatch):
     os.close(fd)
 
 
+def test_mains_send_journal_open_flags_satisfy_the_counted_transport(tmp_path):
+    """The 5 November 2026 dispatch stopped pre-send: main() opened the send
+    journal write-only while the counted transport preads its reservation row,
+    so the shared flags must open the journal for reading as well as appending."""
+    import httpx as httpx_module
+    planned = 11
+    journal = tmp_path / 'send.journal.jsonl'
+    fd = os.open(journal, batch._SEND_JOURNAL_OPEN, 0o600)
+    try:
+        os.write(fd, transport.batch_reservation_bytes('0' * 64, planned, 2 * planned + 600))
+        os.fsync(fd)
+        transport.CountedPacedTransport(
+            httpx_module.HTTPTransport(verify=True, trust_env=False, retries=0), fd,
+            selection_sha256='0' * 64, planned_targets=planned, max_sends=2 * planned + 600,
+            stop_after_utc=datetime(2027, 1, 4, 23, 59, 49, tzinfo=timezone.utc))
+    finally:
+        os.close(fd)
+
+
+def test_a_write_only_send_journal_is_refused_by_the_counted_transport(tmp_path):
+    """The inverse pin: a write-only journal fd must keep being refused."""
+    import httpx as httpx_module
+    planned = 11
+    journal = tmp_path / 'send.journal.jsonl'
+    journal.write_bytes(transport.batch_reservation_bytes('0' * 64, planned, 2 * planned + 600))
+    journal.chmod(0o600)
+    fd = os.open(journal, os.O_WRONLY | os.O_APPEND | os.O_NOFOLLOW | os.O_CLOEXEC)
+    try:
+        with pytest.raises(transport.BatchRefusal, match='private send journal is unsafe'):
+            transport.CountedPacedTransport(
+                httpx_module.HTTPTransport(verify=True, trust_env=False, retries=0), fd,
+                selection_sha256='0' * 64, planned_targets=planned, max_sends=2 * planned + 600,
+                stop_after_utc=datetime(2027, 1, 4, 23, 59, 49, tzinfo=timezone.utc))
+    finally:
+        os.close(fd)
+
+
 def test_filtered_reader_completes_exactly_the_target_set(tmp_path, monkeypatch):
     items = [SimpleNamespace(item_id=name) for name in ('SYNTH-A-1', 'SYNTH-A-2', 'SYNTH-A-9',
                                                         'SYNTH-A-3', 'SYNTH-A-4')]

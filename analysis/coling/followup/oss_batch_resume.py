@@ -60,7 +60,7 @@ _ROUTE = {
     "price_date": "2026-10-30",
 }
 _PRICE = (0.029, 0.14, "2026-10-30")
-_BATCH_SELECTION_SHA = "81d227093d28a883ab76940aaf2819b2d2e313836a0c39b097bcef9d87431e40"
+_BATCH_SELECTION_SHA = "3c1f1d2ee2d88f923f011ff07b3fbaa2ea7e546031036c6e6aa5eab4fc887aaa"
 _TEMPLATES = ("probe-v1", "predictive-v1", "predictive-track-v1")
 _MAX_RUNS = 64
 _BATCH_FILES = (
@@ -69,6 +69,10 @@ _BATCH_FILES = (
     ("analysis/coling/followup/oss_batch_resume.py", "Batch source SHA256"),
     ("analysis/coling/followup/test_oss_batch_resume.py", "Batch fixture tests SHA256"),
 )
+# The counted transport preads the send journal to verify its reservation row,
+# so the journal must be opened for reading as well as appending; the first
+# dispatch (5 November 2026) stopped pre-send when these flags were write-only.
+_SEND_JOURNAL_OPEN = os.O_RDWR | os.O_APPEND | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW | os.O_CLOEXEC
 
 
 class BatchStop(RuntimeError):
@@ -774,8 +778,7 @@ def main() -> None:
                 | os.O_EXCL | os.O_NOFOLLOW | os.O_CLOEXEC, 0o600, dir_fd=stage)
             stack.callback(os.close, batch_journal)
             send_journal = os.open(
-                "send.journal.jsonl", os.O_WRONLY | os.O_APPEND | os.O_CREAT
-                | os.O_EXCL | os.O_NOFOLLOW | os.O_CLOEXEC, 0o600, dir_fd=stage)
+                "send.journal.jsonl", _SEND_JOURNAL_OPEN, 0o600, dir_fd=stage)
             stack.callback(os.close, send_journal)
             _journal_rows(batch_journal, [
                 {"event": "reserved", "selection_sha256": _BATCH_SELECTION_SHA,
