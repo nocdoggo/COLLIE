@@ -4008,3 +4008,31 @@ force.
 - Batch source SHA256: `5eb33aeafae75ca0443bc0db50df6e67d31303d5fba75299f4eec4844decdfe9`
 - Batch fixture tests SHA256: `282bc70c839fa86de39686b3a1e42359071c4af9276d7b6bafd87647a9996f4e`
 - Batch selection SHA256: `c09e2fa45ff6bc887f73d5869063818d42d1d11595320de92d6f324707cb5515`
+### A14. Pinned-key path normalization after the named third-dispatch stop (6 November 2026)
+
+The A13 instrumentation named the recurring end-of-run stop: the third dispatch (stage
+`OSS_BATCH_STAGE_20261105T231047Z`, 23:10 UTC) replayed run `e4-probe-gpt-oss-20b.dk` from
+cache without a single new send and the reader raised `BatchStop: F1 requested an
+unregistered file hash` at the same place — the second dispatch's silent "withheld"
+exception is thereby identified retroactively. The cause is a spelling mismatch inside the
+batch wrapper's pinned hooks: the frozen harness passes the plan's RELATIVE roots
+(`analysis/coling/out/read/...`) while the wrapper built its absolute allowlist keys from
+the module constants, so the reader's end-of-run hash of the continuation run's
+`readings.jsonl` — spelled relatively at runtime — was refused. The one-shot wrapper had
+met and documented the same trap (it normalizes with `os.path.abspath`, and replaces
+`write_run` entirely); the batch wrapper lets the frozen `write_run` run and had not
+normalized. Nothing about the data is wrong: both dispatches' 125 answers are cached, the
+readings and responses files are written, and no continuation run was ever closed in the
+ledger.
+
+This amendment normalizes every pinned-key comparison (items, track, readings, the reader
+source) onto `os.path.abspath`, which is lexical and asks nothing of the filesystem, and
+adds a fixture test that hashes the readings file through its RELATIVE harness spelling. A
+fresh selection record pins the current ledger (the third dispatch re-declared run 1);
+targets, caps and projections are unchanged; run 1's 125 prior calls are counted. Nothing
+else changes; the one-shot chain files are untouched and their A4-heading hashes remain in
+force.
+
+- Batch source SHA256: `42d90e8eab626d6dc3218ea2ef3f53e3916444a545859a6345ffa5c64a7400f2`
+- Batch fixture tests SHA256: `634105cd02eaf2f358cee5fa53ab8f8d970cb5131cff8a805fcb52ea179c625c`
+- Batch selection SHA256: `d9fd83d05ff2bd897538ec26e01858b038379caec3b7f065bd01163e5ef5b91d`

@@ -674,6 +674,26 @@ def test_hooks_pin_inputs_and_file_hashes(tmp_path, monkeypatch):
     os.close(fd)
 
 
+def test_hooks_accept_the_harness_relative_root_spellings(tmp_path, monkeypatch):
+    """The third dispatch stopped because pinned_sha compared the harness's RELATIVE root
+    spelling of the readings file against absolute allowlist keys; every pinned-key
+    comparison is now made on the normalized absolute spelling."""
+    spec = spec_pair()
+    read, client, physical, state, fd = installed(tmp_path, monkeypatch, specs=[spec])
+    assert read._sha256_file(Path(spec.items_path)) == sha256(spec.items_raw).hexdigest()
+    state['spec'] = spec
+    readings = Path(read.OUT_ROOT) / 'synth-a.dk/readings.jsonl'
+    readings.parent.mkdir(parents=True, exist_ok=True)
+    readings.write_bytes(b'{"synthetic": true}\n')
+    monkeypatch.chdir(tmp_path)
+    relative = readings.relative_to(tmp_path)
+    assert read._sha256_file(relative) == sha256(b'{"synthetic": true}\n').hexdigest()
+    with pytest.raises(batch.BatchStop):
+        read._sha256_file(Path('unregistered') / 'relative.jsonl')
+    client.close()
+    os.close(fd)
+
+
 def test_mains_send_journal_open_flags_satisfy_the_counted_transport(tmp_path):
     """The 5 November 2026 dispatch stopped pre-send: main() opened the send
     journal write-only while the counted transport preads its reservation row,

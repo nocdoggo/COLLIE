@@ -60,7 +60,7 @@ _ROUTE = {
     "price_date": "2026-10-30",
 }
 _PRICE = (0.029, 0.14, "2026-10-30")
-_BATCH_SELECTION_SHA = "c09e2fa45ff6bc887f73d5869063818d42d1d11595320de92d6f324707cb5515"
+_BATCH_SELECTION_SHA = "d9fd83d05ff2bd897538ec26e01858b038379caec3b7f065bd01163e5ef5b91d"
 _TEMPLATES = ("probe-v1", "predictive-v1", "predictive-track-v1")
 _MAX_RUNS = 64
 _BATCH_FILES = (
@@ -564,12 +564,18 @@ def _install_batch_hooks(read_module, endpoints_module, openai_module, httpx_mod
     original_openai = openai_module.OpenAI
     original_sha = read_module._sha256_file
     original_track = read_module.load_track_record
-    items_by_path = {spec.items_path: (spec.items_raw, sha256(spec.items_raw).hexdigest()) for spec in specs}
-    items_list_by_path = {spec.items_path: one_shot._pinned_items(read_module, spec.items_raw, spec.items_path)
+    # The frozen harness passes the plan's RELATIVE roots while the module constants are
+    # absolute (the one-shot wrapper hit the same trap); every pinned-key comparison is
+    # therefore made on the normalized absolute spelling, which asks nothing of the
+    # filesystem.
+    items_by_path = {os.path.abspath(spec.items_path): (spec.items_raw, sha256(spec.items_raw).hexdigest())
+                     for spec in specs}
+    items_list_by_path = {os.path.abspath(spec.items_path): one_shot._pinned_items(read_module, spec.items_raw, spec.items_path)
                           for spec in specs}
-    track_paths = {spec.track_path for spec in specs if spec.track_path is not None}
-    readings_paths = {str(Path(read_module.OUT_ROOT) / spec.new_run / "readings.jsonl") for spec in specs}
-    read_path = str(Path(read_module.__file__))
+    track_paths = {os.path.abspath(spec.track_path) for spec in specs if spec.track_path is not None}
+    readings_paths = {str(Path(os.path.abspath(read_module.OUT_ROOT)) / spec.new_run / "readings.jsonl")
+                      for spec in specs}
+    read_path = os.path.abspath(read_module.__file__)
     state = {"spec": None}
 
     class PinnedCache(original_cache):
@@ -618,22 +624,23 @@ def _install_batch_hooks(read_module, endpoints_module, openai_module, httpx_mod
         return original_openai(**kwargs)
 
     def pinned_load(path):
-        key = str(path)
+        key = os.path.abspath(os.fspath(path))
         if key not in items_by_path:
             raise BatchStop("F1 requested an unregistered input path")
         return list(items_list_by_path[key])
 
     def pinned_track(path):
-        key = str(path)
+        key = os.path.abspath(os.fspath(path))
         if key not in track_paths:
             raise BatchStop("F1 requested an unregistered track path")
         raw = Path(key).read_bytes()
-        if sha256(raw).hexdigest() != next(spec.track_sha for spec in specs if spec.track_path == key):
+        if sha256(raw).hexdigest() != next(spec.track_sha for spec in specs
+                                           if os.path.abspath(spec.track_path) == key):
             raise BatchStop("a track file changed after verification")
         return original_track(Path(key))
 
     def pinned_sha(path):
-        key = str(path)
+        key = os.path.abspath(os.fspath(path))
         if key in items_by_path:
             return items_by_path[key][1]
         if key == read_path:
