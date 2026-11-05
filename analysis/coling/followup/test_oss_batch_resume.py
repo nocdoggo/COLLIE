@@ -849,7 +849,7 @@ def test_run_loop_stops_after_an_exception_and_never_continues(tmp_path):
     assert result['stopped_run'] == 'synth-a.dk' and read.closed == []
     assert [call[call.index('--run-name') + 1] for call in read.main_calls] == ['synth-a.dk']
     rows = [json.loads(line) for line in journal.read_text().splitlines() if line.strip()]
-    assert rows[1]['error_type'] == 'withheld'
+    assert rows[1]['error_type'] == 'raised RuntimeError: synthetic failure'
 
 
 def test_run_loop_refuses_a_target_shortfall(tmp_path):

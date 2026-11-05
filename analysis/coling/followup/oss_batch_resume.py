@@ -60,7 +60,7 @@ _ROUTE = {
     "price_date": "2026-10-30",
 }
 _PRICE = (0.029, 0.14, "2026-10-30")
-_BATCH_SELECTION_SHA = "3c1f1d2ee2d88f923f011ff07b3fbaa2ea7e546031036c6e6aa5eab4fc887aaa"
+_BATCH_SELECTION_SHA = "c09e2fa45ff6bc887f73d5869063818d42d1d11595320de92d6f324707cb5515"
 _TEMPLATES = ("probe-v1", "predictive-v1", "predictive-track-v1")
 _MAX_RUNS = 64
 _BATCH_FILES = (
@@ -712,8 +712,8 @@ def _run_batch(read_module, launch_module, plan: dict, specs: list[RunSpec], sta
         try:
             with redirect_stdout(stdout), redirect_stderr(stderr):
                 code = read_module.main(args)
-        except Exception:
-            error_type = "withheld"
+        except Exception as error:
+            error_type = f"raised {type(error).__name__}: {error}"[:200]
         out_dir = Path(read_module.OUT_ROOT) / spec.new_run
         try:
             manifest = json.loads((out_dir / "run_manifest.json").read_text())

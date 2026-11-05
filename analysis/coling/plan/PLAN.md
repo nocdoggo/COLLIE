@@ -3979,3 +3979,32 @@ registered twelve-GET allowance.
 - Batch source SHA256: `dbd84e1e2fc33cc5ce000214b2147ad22a89e7a088ef9a1744f351de90f6e541`
 - Batch fixture tests SHA256: `8fe24535f220fa82e46ecd84cc52e929e6abbd61863baf22096c0ef058bc41b1`
 - Batch selection SHA256: `3c1f1d2ee2d88f923f011ff07b3fbaa2ea7e546031036c6e6aa5eab4fc887aaa`
+### A13. Run-failure capture and re-dispatch after the stopped second dispatch (5 November 2026)
+
+The second dispatch (stage `OSS_BATCH_STAGE_20261105T215400Z`, 21:53:58 UTC) completed run
+`e4-probe-gpt-oss-20b.dk`'s item loop — 125 physical sends, every one HTTP 200, no retries,
+124 of 124 target readings recorded and both output files written, $0.053580 of the $0.159438
+run cap — but the frozen reader then raised an exception inside its end-of-run write path
+after the readings and responses files and before `run_manifest.json`, so the batch's
+stop-on-shortfall rule stopped the whole batch with no further run started
+(`execution_summary.json`: `stopped_run` set, `complete_runs` 0). The wrapper recorded only
+`withheld` for the exception, hiding its class and message by design; this amendment
+replaces that with the exception's class and coded message, truncated to 200 characters
+(the reader's refusals are coded strings and no response content is ever recorded), so that
+a re-dispatch meeting the same condition names it in the private journal instead of
+stopping silently again.
+
+All 125 answered pairs are cached under the dekallm route tag (the no-overwrite cache took
+every one; verified by counting cache entries written during the dispatch), so the
+re-dispatch replays run 1 without re-asking anything and proceeds to the remaining sixteen
+runs. Per-run targets, caps and projections are unchanged — the observed per-call cost
+($0.000429 mean) is far inside the historical projection the caps were derived from — and a
+fresh selection record pins the current ledger, which the dispatch changed by declaring run
+1. The context verification accepts the existing continuation directory with its dekallm
+identity and counts its 125 prior calls toward the per-run physical-call ceiling. Nothing
+else changes; the one-shot chain files are untouched and their A4-heading hashes remain in
+force.
+
+- Batch source SHA256: `5eb33aeafae75ca0443bc0db50df6e67d31303d5fba75299f4eec4844decdfe9`
+- Batch fixture tests SHA256: `282bc70c839fa86de39686b3a1e42359071c4af9276d7b6bafd87647a9996f4e`
+- Batch selection SHA256: `c09e2fa45ff6bc887f73d5869063818d42d1d11595320de92d6f324707cb5515`
