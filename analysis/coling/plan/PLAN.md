@@ -3868,3 +3868,79 @@ identity and restriction of A4 through A9 is unchanged.
 - Resume source SHA256: `263524612bb50b64b5f9c4a7d76f96cf1675784feaa12d30536bd17822a000c6`
 - Resume fixture tests SHA256: `72e0bd2c7e2f2db6f18043deffd506f050d29971ebdab68b70d4332f51c8ca95`
 - One-shot selection SHA256: `673607af1b3bccd48a770b36476b080f22791099fc2d12d379e65ede9aa8d7cc`
+
+### A11. Paced dekallm batch continuation of the original condition (5 November 2026)
+
+Nine owner-directed diagnostic probes established that the 429 failures of 4-5 November are
+content-based blocking of medication-notice-shaped text specific to the pinned
+`deepinfra/bf16` endpoint, and that `siliconflow/fp8`, `amazon-bedrock` and `dekallm/bf16`
+all serve the same request class. The owner selected **`dekallm/bf16`** (bf16 precision,
+the same 117,964-token completion ceiling as the original, $0.029/$0.14 per million tokens,
+price date 2026-10-30 from the cached endpoint listing). This amendment registers a paced,
+counted batch continuation that completes only the missing item/sample pairs of the original
+gpt-oss-20b condition on that endpoint.
+
+**Disclosed condition change.** The served endpoint changes from `deepinfra/bf16` to
+`dekallm/bf16`; the model id (`openai/gpt-oss-20b`), template, prompts and decoding
+(temperature 0, one sample) are unchanged. The frozen reader and launcher sources are not
+edited: the route is overridden at runtime by the registered continuation wrapper, exactly
+as its reviewed, hash-pinned source below implements. Because a run name keeps one provider
+pin (the frozen `_check_run_identity` rule), each continuation runs under a NEW name,
+`<original>.dk`, with the same items, shard, template and track record as the original run's
+plan row; analysis pools runs by model and condition, so the original 6,010 recorded rows and
+the continuation rows form one condition. The continuation requests ONLY the 3,205 pairs
+that no original run recorded; the cache key embeds the provider pin, so no answer crosses
+routes and nothing completed is re-asked. The 4 historical orphaned pairs (answered but never
+recorded) are not re-asked, per the A4 rule, and are reported as absent from the pooled
+condition.
+
+**Originals stay untouched.** The 16 partial original runs' readings, run manifests and
+responses must remain byte-identical to the verified A3 snapshot, and their spend and
+invocation logs append-only (the A10 prefix rule), verified before every dispatch. The
+never-invoked run `e3-b-gpt-oss-20b.s7` (341 planned rows, no output, never declared) is
+continued the same way.
+
+**Budget reservations.** Before any continuation request, the batch idempotently re-declares
+the 16 blocked original runs at their recorded spend (declare-only ledger appends; no result
+file, spend log or invocation log of an original run is written). Those runs can never make
+another call on the content-blocked endpoint, and their open caps ($2.039411 unspent) would
+otherwise exhaust the owner's $10 model cap; the release is a ledger-only operation, recorded
+in the batch journal and reversible by a later amendment. The 17 continuation runs are then
+declared ONE AT A TIME and each is closed in the ledger when it completes its target set, so
+at most one continuation cap is reserved beyond banked spend (total caps $6.386108 against a
+projected $4.650848 at each run's own historical per-call cost; worst-moment model check
+$4.032015 + $4.650848 + $0.227823 = $8.910686 against the $10 cap). The frozen reader's own
+declaration check enforces the running bound during the batch; the stricter F1 $200 study
+ceiling and the $0.10 provisional-hold rule are unchanged.
+
+**Paced, counted transport.** Every physical send passes a counted, paced transport: an
+append-only per-send journal with monotonic ordinals (statuses and rate-limit headers only,
+never content), a 4-second minimum spacing between sends, a hard send budget of twice the
+target pairs plus 12 per run plus 600, a wall-clock stop ten seconds before the authority
+bound, and a consecutive-refusal fence. Retry and backoff remain where the frozen reader put
+them: the guarded transport is forced to at most 6 attempts per call with an 8-second base
+delay and a 240-second cap, honoring the provider's Retry-After. Any run that does not
+complete its exact target set stops the whole batch; there is no automatic retry. A crash is
+resumed by a fresh selection record pinning the then-current state and a fresh status GET
+under a further registered attempt; answers already cached under the dekallm route tag are
+never re-asked.
+
+**Per-session key status.** The pre-dispatch status-GET allowance is raised from six to
+twelve (each retains a $0.10 hold, $1.20 total): one fresh GET at each dispatch session's
+start satisfies the 300-second freshness gate, and the paced batch then runs under that
+session's authority until completion, a stop condition, or the authority bound of
+2027-01-04 23:59:59 UTC. The batch module's registration gate requires this amendment pushed
+and remotely verified, every registered file's current hash named after the A4 heading, the
+fresh status journal, the batch selection record's exact hash, and a clean environment, all
+fail-closed.
+
+This amendment adds the four batch files below and changes no earlier identity: the A4
+through A10 one-shot chain files are unchanged and their A4-heading hashes remain in force;
+the one-shot path's two dispatched attempts are spent and the batch is the active
+continuation mechanism.
+
+- Batch transport source SHA256: `cf204306d2f9efe2961724cf5e1ee5aad1a45c8481e38c461519dd0ad5fd4701`
+- Batch transport fixture tests SHA256: `2d5365ced4d65e5d90409157dc33171ac18bf3d0c4a07c86d101d857f356a4cc`
+- Batch source SHA256: `2d1807b41a7845ce7f8665ed71242f04c38d3e4bc7d001fe0e026ca3c77debfe`
+- Batch fixture tests SHA256: `2aa3c317a4299b0004b002d5f782d1a17cf4e0474c3306825c84d0118821b63b`
+- Batch selection SHA256: `81d227093d28a883ab76940aaf2819b2d2e313836a0c39b097bcef9d87431e40`
