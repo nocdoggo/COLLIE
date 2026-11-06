@@ -60,7 +60,7 @@ _ROUTE = {
     "price_date": "2026-10-30",
 }
 _PRICE = (0.029, 0.14, "2026-10-30")
-_BATCH_SELECTION_SHA = "b029d0fcfa6fbbbe55a5354d614956d7d4667e65556be84d6004e1eb6de4e3a9"
+_BATCH_SELECTION_SHA = "9537340e8abf429c091a320eb1ae27dee27133a8af2853d2a0f57315d2775074"
 _TEMPLATES = ("probe-v1", "predictive-v1", "predictive-track-v1")
 _MAX_RUNS = 64
 _BATCH_FILES = (
@@ -510,8 +510,8 @@ def _release_reservations(read_module, launch_module, plan: dict, specs: list[Ru
         try:
             with redirect_stdout(stdout), redirect_stderr(stderr):
                 code = read_module.main(args)
-        except Exception:
-            raise BatchStop("reservation release failed; details withheld") from None
+        except (Exception, SystemExit) as error:
+            raise BatchStop(("reservation release refused: " + str(error))[:200]) from None
         if code != 0:
             raise BatchStop("reservation release returned a refusal")
         released.append((spec.original, f"{spent:.6f}"))
@@ -719,7 +719,7 @@ def _run_batch(read_module, launch_module, plan: dict, specs: list[RunSpec], sta
         try:
             with redirect_stdout(stdout), redirect_stderr(stderr):
                 code = read_module.main(args)
-        except Exception as error:
+        except (Exception, SystemExit) as error:
             error_type = f"raised {type(error).__name__}: {error}"[:200]
         out_dir = Path(read_module.OUT_ROOT) / spec.new_run
         try:
@@ -735,7 +735,7 @@ def _run_batch(read_module, launch_module, plan: dict, specs: list[RunSpec], sta
         if ok:
             try:
                 calls, spent = _spend_calls((out_dir / "spend_log.jsonl").read_bytes())
-            except (OSError, one_shot.ResumeRefusal) as exc:
+            except (OSError, one_shot.ResumeRefusal, BatchStop) as exc:
                 row["close_error"] = type(exc).__name__
                 row["closed"] = False
                 stopped = spec.new_run
@@ -809,7 +809,7 @@ def main() -> None:
                        "originals_untouched": True, "released_reservations": len(released)}
             one_shot._exclusive(stage, "execution_summary.json",
                                 (json.dumps(summary, sort_keys=True, indent=2) + "\n").encode())
-    except Exception:
+    except (Exception, SystemExit):
         raise SystemExit("Paced batch continuation stopped; review private state before any retry.") from None
     print("Paced batch continuation ended; inspect the private journals and summary for its recorded outcome.")
     print("No registered evaluator or sealed outcome was read; original runs were not modified.")

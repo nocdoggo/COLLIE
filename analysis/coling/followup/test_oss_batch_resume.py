@@ -788,12 +788,15 @@ class RunLoopRead:
         out_dir = Path(self.OUT_ROOT) / new_run
         out_dir.mkdir(parents=True, exist_ok=True)
         if behavior['fail']:
-            raise RuntimeError('synthetic failure')
+            raise SystemExit('refused: synthetic refusal') if behavior['fail'] == 'exit' else RuntimeError('synthetic failure')
         manifest = {'status': behavior['status'], 'readings': behavior['readings'],
                     'complete': False, 'guard': {'physical_calls_total': behavior['readings']}}
         (out_dir / 'run_manifest.json').write_text(json.dumps(manifest, sort_keys=True))
-        (out_dir / 'spend_log.jsonl').write_bytes(
-            jsonl(*[{'event': 'call', 'usd': 0.01} for _ in range(behavior.get('calls', behavior['readings']))]))
+        if behavior.get('bad_spend'):
+            (out_dir / 'spend_log.jsonl').write_bytes(b'{"event": "call"}\n')
+        else:
+            (out_dir / 'spend_log.jsonl').write_bytes(
+                jsonl(*[{'event': 'call', 'usd': 0.01} for _ in range(behavior.get('calls', behavior['readings']))]))
         return behavior['code']
 
     def close_run(self, out_root, *, run, model, spent_usd):
@@ -870,6 +873,41 @@ def test_run_loop_stops_after_an_exception_and_never_continues(tmp_path):
     assert [call[call.index('--run-name') + 1] for call in read.main_calls] == ['synth-a.dk']
     rows = [json.loads(line) for line in journal.read_text().splitlines() if line.strip()]
     assert rows[1]['error_type'] == 'raised RuntimeError: synthetic failure'
+
+
+def test_run_loop_records_a_reader_systemexit_refusal_and_stops_cleanly(tmp_path):
+    """The frozen reader signals refusals with SystemExit, which the loop must record as a
+    named failure — not let it escape and lose the run_result and batch_stopped rows."""
+    read = RunLoopRead({'synth-a.dk': {'status': 'refused', 'readings': 0, 'code': None, 'fail': 'exit'},
+                        'synth-c.dk': {'status': 'complete', 'readings': 1, 'code': 0, 'fail': False}},
+                       tmp_path)
+    specs = run_loop_specs()
+    journal = tmp_path / 'batch.journal.jsonl'
+    journal.write_bytes(b'')
+    fd = os.open(journal, os.O_WRONLY | os.O_APPEND | os.O_NOFOLLOW | os.O_CLOEXEC)
+    result = batch._run_batch(read, RunLoopLaunch, {}, specs, {'spec': None}, FakePhysical(), None, fd)
+    os.close(fd)
+    assert result['stopped_run'] == 'synth-a.dk' and read.closed == []
+    rows = [json.loads(line) for line in journal.read_text().splitlines() if line.strip()]
+    assert rows[1]['error_type'] == 'raised SystemExit: refused: synthetic refusal'
+    assert rows[1]['closed'] is False and rows[2]['event'] == 'batch_stopped'
+
+
+def test_run_loop_records_close_error_on_a_malformed_spend_row(tmp_path):
+    """A spend log the wrapper's own validator rejects (BatchStop) is journalled as a
+    close_error stop, not an unrecorded crash."""
+    read = RunLoopRead({'synth-a.dk': {'status': 'complete', 'readings': 2, 'code': 0, 'fail': False,
+                                       'bad_spend': True}}, tmp_path)
+    specs = run_loop_specs()[:1]
+    journal = tmp_path / 'batch.journal.jsonl'
+    journal.write_bytes(b'')
+    fd = os.open(journal, os.O_WRONLY | os.O_APPEND | os.O_NOFOLLOW | os.O_CLOEXEC)
+    result = batch._run_batch(read, RunLoopLaunch, {}, specs, {'spec': None}, FakePhysical(), None, fd)
+    os.close(fd)
+    assert result['stopped_run'] == 'synth-a.dk' and read.closed == []
+    rows = [json.loads(line) for line in journal.read_text().splitlines() if line.strip()]
+    assert rows[1]['close_error'] == 'BatchStop' and rows[1]['closed'] is False
+    assert rows[2]['event'] == 'batch_stopped'
 
 
 def test_run_loop_refuses_a_target_shortfall(tmp_path):

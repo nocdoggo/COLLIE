@@ -810,7 +810,7 @@ def main() -> None:
             try:
                 with redirect_stdout(stdout), redirect_stderr(stderr):
                     result = read.main(args)
-            except Exception as exc:
+            except (Exception, SystemExit) as exc:
                 error_type = type(exc).__name__
             # Do not persist or print F1 stdout, stderr, exception text, prompts,
             # responses or credentials. The one-shot sidecar and journal remain
@@ -819,7 +819,7 @@ def main() -> None:
                        "f1_return_code": result, "error_type": error_type,
                        "original_run_closed": False, "automatic_retry": False}
             _exclusive(stage, "execution_summary.json", (json.dumps(summary, sort_keys=True, indent=2) + "\n").encode())
-    except Exception:
+    except (Exception, SystemExit):
         raise SystemExit("One-shot continuation stopped; review private state before any retry.") from None
     print("One-shot continuation ended; inspect the private journal and sidecar for its recorded outcome.")
     print("No registered evaluator or sealed outcome was read; the original run was not marked complete.")

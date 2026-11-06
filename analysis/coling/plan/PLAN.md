@@ -4058,3 +4058,39 @@ re-dispatch under a successor amendment.
 - Batch source SHA256: `d28ec07ec4b95e73d4347d0b5da3794a27901c39cad3e666fc81586487734323`
 - Batch fixture tests SHA256: `634105cd02eaf2f358cee5fa53ab8f8d970cb5131cff8a805fcb52ea179c625c`
 - Batch selection SHA256: `b029d0fcfa6fbbbe55a5354d614956d7d4667e65556be84d6004e1eb6de4e3a9`
+### A16. Refusal containment, pooling semantics, and re-dispatch after the connection-error stop (6 November 2026)
+
+The fifth dispatch (stage `OSS_BATCH_STAGE_20261106T010612Z`) ran 16.5 hours and closed
+eight runs completely — `e4-probe` plus `e3-a` s0 through s6, 1,574 physical sends, every
+one HTTP 200 — before run `e3-a-gpt-oss-20b.s7.dk` stopped on a transient
+`APIConnectionError: Connection error.` after the frozen guard's retry budget was
+exhausted (58 sends, 57 of 297 readings recorded and cached). The stop was designed and
+clean: the error is named in the run_result row, `batch_stopped` and
+`execution_summary.json` were written, no automatic retry, originals untouched. The
+comprehensive audit of the same day (recorded privately as AUDIT_2026-11-06) verified
+two containment gaps in the wrapper while confirming the rest of the design: the frozen
+reader signals refusals with `SystemExit`, which `except Exception` handlers cannot
+catch, so a reader refusal mid-batch would previously have escaped without writing its
+stop records; and the wrapper's own `BatchStop` from a malformed spend log was not
+caught by the close-path handler.
+
+This amendment repairs both, symmetrically in the batch and one-shot wrappers: the
+reservation release translates a reader `SystemExit` into a coded `BatchStop`, the run
+loop records `raised SystemExit: <message>` like any exception, the close path catches
+its own `BatchStop` as a `close_error` stop, and each `main` writes its execution
+summary even when a `SystemExit` propagates. Two fixture tests pin the new behavior (a
+`SystemExit`-raising fake reader and a malformed spend row). Recorded semantics for the
+completed continuation runs: each `.dk` run's manifest reports the ORIGINAL run's
+planned row count as `expected_rows`, so `complete` is false there even when the run
+met its registered target exactly — pooling and any downstream completeness check must
+judge a continuation run by readings equal to its selection target, never by the
+manifest's `complete` flag; and the never-invoked original `e3-b...s7`, whose planned
+count equals its target, will be closed both by the frozen reader and by the wrapper —
+two close rows, accounting-safe under the ledger's held-by-run maximum, recorded here
+as expected audit noise. A fresh selection record pins the current ledger (eight runs
+closed); targets, caps and projections are unchanged; the twelfth and final registered
+status GET accompanies this dispatch.
+- Batch source SHA256: `c6a1b289a24d36f055569c722919d512a2bbe08ead86af6f9c3c112820969772`
+- Batch fixture tests SHA256: `9ccadd174963cbd8275e87481812b9208d9f03e5e72a5ca1f3b90924e953cf8d`
+- Resume source SHA256: `31407beb34a585d482a0cbb8384398daee3eb1a07e850a877a0399a8e2ad3c4f`
+- Batch selection SHA256: `9537340e8abf429c091a320eb1ae27dee27133a8af2853d2a0f57315d2775074`
