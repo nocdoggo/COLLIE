@@ -4036,3 +4036,25 @@ force.
 - Batch source SHA256: `42d90e8eab626d6dc3218ea2ef3f53e3916444a545859a6345ffa5c64a7400f2`
 - Batch fixture tests SHA256: `634105cd02eaf2f358cee5fa53ab8f8d970cb5131cff8a805fcb52ea179c625c`
 - Batch selection SHA256: `d9fd83d05ff2bd897538ec26e01858b038379caec3b7f065bd01163e5ef5b91d`
+### A15. Re-dispatch after the hard-killed fourth dispatch (6 November 2026)
+
+The fourth dispatch (stage `OSS_BATCH_STAGE_20261105T231751Z`) proved the A14 repair
+end-to-end: run `e4-probe-gpt-oss-20b.dk` closed complete from its cache replay with zero
+re-sends, and run `e3-a-gpt-oss-20b.s0.dk` was sending live (96 physical sends, every one
+HTTP 200) when the driver process died abruptly between 23:39:45 and 23:40:18 UTC — no
+invocation row for run 2, no run_result or batch_stopped rows, an empty console: a
+SIGKILL-class death, not a designed stop. The owner has confirmed the re-dispatch. No
+kernel OOM-kill record is readable (systemd-oomd shows only service restarts; the machine
+shows 13 GB used of 515 GB), so the killer is unconfirmed; the batch design is idempotent
+against exactly this (run 2's 95 answers are cached; the context verification counts its
+95 prior calls toward the per-run physical-call ceiling).
+
+This amendment makes no behavioral change: a fresh selection record pins the current
+ledger (the fourth dispatch declared runs 1 and 2), targets, caps and projections are
+unchanged, and the module's selection constant is updated accordingly. If the same
+hard-kill recurs, the remaining status-GET budget (one of twelve) covers one further
+re-dispatch under a successor amendment.
+
+- Batch source SHA256: `d28ec07ec4b95e73d4347d0b5da3794a27901c39cad3e666fc81586487734323`
+- Batch fixture tests SHA256: `634105cd02eaf2f358cee5fa53ab8f8d970cb5131cff8a805fcb52ea179c625c`
+- Batch selection SHA256: `b029d0fcfa6fbbbe55a5354d614956d7d4667e65556be84d6004e1eb6de4e3a9`
