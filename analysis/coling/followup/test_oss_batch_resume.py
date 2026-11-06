@@ -220,7 +220,7 @@ def fake_batch_world(tmp_path, monkeypatch, defect=None):
     (private / 'ONE_SHOT_KEY_STATUS_PRIVATE.jsonl').write_bytes(status_rows)
     (private / 'ONE_SHOT_KEY_STATUS_PRIVATE.jsonl').chmod(0o600)
 
-    gets = 13 if defect == 'budget_thirteen_gets' else 12
+    gets = 37 if defect == 'budget_thirteen_gets' else 36
     verification = {'a4_git_registration_attempt_slots_reserved': 20,
                     'one_shot_physical_attempts_reserved': 1,
                     'one_shot_key_status_attempts_reserved': gets,

@@ -60,7 +60,7 @@ _ROUTE = {
     "price_date": "2026-10-30",
 }
 _PRICE = (0.029, 0.14, "2026-10-30")
-_BATCH_SELECTION_SHA = "9537340e8abf429c091a320eb1ae27dee27133a8af2853d2a0f57315d2775074"
+_BATCH_SELECTION_SHA = "0116a01fe559dadc29bd2bfe68b787b919bc1af3897ba6220800a15c3ed1bd36"
 _TEMPLATES = ("probe-v1", "predictive-v1", "predictive-track-v1")
 _MAX_RUNS = 64
 _BATCH_FILES = (
@@ -292,7 +292,7 @@ def _verify_batch_registration_inner() -> dict:
     holds = budget.get("nonfinal_programme_liability_holds", {})
     status_gets = verification.get("one_shot_key_status_attempts_reserved")
     status_hold = holds.get("one_shot_key_status_get_usd")
-    if (type(status_gets) is not int or status_gets not in range(1, 13) or type(status_hold) is not str
+    if (type(status_gets) is not int or status_gets not in range(1, 37) or type(status_hold) is not str
             or verification.get("a4_git_registration_attempt_slots_reserved") != 20
             or verification.get("one_shot_physical_attempts_reserved") != 1
             or verification.get("a11_git_registration_attempt_slots_reserved") != 20

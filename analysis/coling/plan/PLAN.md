@@ -4094,3 +4094,24 @@ status GET accompanies this dispatch.
 - Batch fixture tests SHA256: `9ccadd174963cbd8275e87481812b9208d9f03e5e72a5ca1f3b90924e953cf8d`
 - Resume source SHA256: `31407beb34a585d482a0cbb8384398daee3eb1a07e850a877a0399a8e2ad3c4f`
 - Batch selection SHA256: `9537340e8abf429c091a320eb1ae27dee27133a8af2853d2a0f57315d2775074`
+### A17. Status-GET ceiling raised after the provider connection hiccup (6 November 2026)
+
+Dispatch five stopped at 18:34 UTC on run `e3-a-gpt-oss-20b.s7.dk` with
+`APIConnectionError: Connection error.` after the guard's retry budget was exhausted (58
+sends, 57 of 297 readings recorded and cached), and dispatch six — taken under A16 with the
+twelfth and then-final registered status GET — made ZERO new sends: the 57 cached readings
+replayed and the first live request failed through five connection retries in four minutes.
+A public unauthenticated models-endpoint GET with the study user agent returned HTTP 200 in
+0.15 s a minute after the stop, so the failures were a transient provider-side connectivity
+hiccup, roughly 18:30-18:47 UTC, not a study defect and not a poison item.
+
+That consumed the twelve-get allowance registered in A11. This amendment raises the
+pre-dispatch status-GET allowance from twelve to THIRTY-SIX (each retains its $0.10 hold;
+$3.60 total, total known holds $5.10), keeping every other freshness, headroom and
+string-amount rule unchanged. A fresh selection record pins the current ledger (dispatch
+six re-declared run s7; eight runs remain complete and closed); targets, caps and
+projections are unchanged; the context verification counts 1,574 prior dk calls.
+
+- Batch source SHA256: `66068c239fbc2c660432964a98f4a6317fb0cc2a8dcf17dca533c7fd32ad933d`
+- Batch fixture tests SHA256: `f63e3ddcac8cc2126de90edcd80c12aed9a02cf6f29d3dc7ba27556ee61a2513`
+- Batch selection SHA256: `0116a01fe559dadc29bd2bfe68b787b919bc1af3897ba6220800a15c3ed1bd36`
