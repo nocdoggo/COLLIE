@@ -4115,3 +4115,18 @@ projections are unchanged; the context verification counts 1,574 prior dk calls.
 - Batch source SHA256: `66068c239fbc2c660432964a98f4a6317fb0cc2a8dcf17dca533c7fd32ad933d`
 - Batch fixture tests SHA256: `f63e3ddcac8cc2126de90edcd80c12aed9a02cf6f29d3dc7ba27556ee61a2513`
 - Batch selection SHA256: `0116a01fe559dadc29bd2bfe68b787b919bc1af3897ba6220800a15c3ed1bd36`
+### A18. Fresh selection after the refused eighth dispatch (6 November 2026)
+
+Dispatch seven (under A17) stopped at 18:57 UTC on the same transient
+`APIConnectionError` window (`e3-a-gpt-oss-20b.s7.dk`, zero new sends, 57 readings
+replayed from cache); its re-declaration of run s7 appended ledger rows, so the eighth
+launch was correctly REFUSED by the registration gate ("the study ledger changed after
+selection") within twenty seconds and without any request. This amendment pins a fresh
+selection record against the current ledger. No behavioral change; targets, caps,
+projections and the 36-get allowance are unchanged. Probes with the study user agent
+(direct IPv4 curl and an httpx client configured exactly like the batch's) both reached
+OpenRouter at 18:59 UTC, so the connectivity window that stopped dispatches five through
+seven is treated as closed.
+
+- Batch source SHA256: `b252e62748d064a8824d3e58ba605ea2af34ada83b94455579ecc7fb0ce2e581`
+- Batch selection SHA256: `6e1506fefc7ac9c7d0c4e19ba4dcbc79918c3f00b16880b59b7f7afa7281dc44`
