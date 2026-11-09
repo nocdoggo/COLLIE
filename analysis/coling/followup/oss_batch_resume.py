@@ -60,7 +60,7 @@ _ROUTE = {
     "price_date": "2026-10-30",
 }
 _PRICE = (0.029, 0.14, "2026-10-30")
-_BATCH_SELECTION_SHA = "6e1506fefc7ac9c7d0c4e19ba4dcbc79918c3f00b16880b59b7f7afa7281dc44"
+_BATCH_SELECTION_SHA = "f439cccb8f1be11e807105965a8a55afafa131c6ecb2f9eb5a7db2cef069ca7a"
 _TEMPLATES = ("probe-v1", "predictive-v1", "predictive-track-v1")
 _MAX_RUNS = 64
 _BATCH_FILES = (
@@ -608,11 +608,15 @@ def _install_batch_hooks(read_module, endpoints_module, openai_module, httpx_mod
             return super()._log(sanitized)
 
     inner = httpx_module.HTTPTransport(verify=True, trust_env=False, retries=0)
+    # A19: the only addresses a send may carry are the public contact addresses of the
+    # hash-pinned items themselves; the earlier body-wide "@" ban refused one of them.
+    allowed_addresses = frozenset().union(
+        *(batch_transport_module.public_addresses(spec.items_raw) for spec in specs))
     physical = batch_transport_module.CountedPacedTransport(
         inner, send_journal_fd, selection_sha256=_BATCH_SELECTION_SHA,
         planned_targets=sum(spec.target for spec in specs),
         max_sends=2 * sum(spec.target for spec in specs) + 12 * len(specs) + 600,
-        stop_after_utc=stop_after_utc)
+        stop_after_utc=stop_after_utc, allowed_addresses=allowed_addresses)
     client = httpx_module.Client(transport=physical, trust_env=False, follow_redirects=False, timeout=240.0)
 
     def pinned_openai(*args, **kwargs):

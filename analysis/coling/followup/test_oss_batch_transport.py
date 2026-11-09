@@ -69,12 +69,14 @@ class MockInner(httpx.BaseTransport):
         pass
 
 
-def make_transport(tmp_path, inner=None, *, max_sends=40, targets=10, stop=None, clock=None, sleep=None):
+def make_transport(tmp_path, inner=None, *, max_sends=40, targets=10, stop=None, clock=None, sleep=None,
+                   allowed=frozenset()):
     fd, path = make_journal(tmp_path, targets=targets, max_sends=max_sends)
     transport = batch.CountedPacedTransport(
         inner if inner is not None else MockInner(), fd, selection_sha256=SELECTION,
         planned_targets=targets, max_sends=max_sends, stop_after_utc=stop,
-        clock=clock if clock is not None else FakeClock(), sleep=sleep if sleep is not None else RecordingSleep())
+        clock=clock if clock is not None else FakeClock(), sleep=sleep if sleep is not None else RecordingSleep(),
+        allowed_addresses=allowed)
     return transport, fd, path
 
 
@@ -129,6 +131,65 @@ def test_validator_refuses_wrong_user_agent_and_header_email():
 def test_user_agent_matches_the_registered_research_agent():
     assert batch.USER_AGENT == one_shot.USER_AGENT
     assert batch.USER_AGENT == 'collie-research-fetch/0.1 (academic research; polite, cached)'
+
+
+# --- address provenance (A19) --------------------------------------------------------------
+
+def pinned_request(content):
+    return make_request(messages=[{'role': 'user', 'content': content}])
+
+
+def test_public_addresses_are_the_pinned_items_email_like_tokens():
+    raw = (b'{"item_id": "SYNTH-1", "related_information": "write to synth@example.test"}\n'
+           b'{"item_id": "SYNTH-2", "presentation": "10 mg @ 2x daily"}\n')
+    assert batch.public_addresses(raw) == frozenset({'synth@example.test'})
+    assert batch.public_addresses(b'') == frozenset()
+    with pytest.raises(batch.BatchRefusal):
+        batch.public_addresses('not bytes')
+    with pytest.raises(batch.BatchRefusal):
+        batch.public_addresses(b'{"item_id": broken\n')
+
+
+def test_validator_accepts_a_pinned_address_and_refuses_every_other_at_sign():
+    pinned = frozenset({'synth@example.test'})
+    batch._validate(pinned_request('SYNTHETIC contact: synth@example.test'), pinned)
+    # an address outside the pin, even beside a pinned one
+    with pytest.raises(batch.BatchRefusal):
+        batch._validate(pinned_request('SYNTHETIC synth@example.test other@example.test'), pinned)
+    # a look-alike that merely embeds the pinned address
+    with pytest.raises(batch.BatchRefusal):
+        batch._validate(pinned_request('SYNTHETIC xsynth@example.test'), pinned)
+    # a bare "@" that is not an email-like address
+    with pytest.raises(batch.BatchRefusal):
+        batch._validate(pinned_request('SYNTHETIC dose 10 mg @ 2x'), pinned)
+    # the default pin carries no address at all
+    with pytest.raises(batch.BatchRefusal):
+        batch._validate(pinned_request('SYNTHETIC synth@example.test'))
+
+
+@pytest.mark.parametrize('bad', [{'synth@example.test'}, frozenset({'no-at-sign'}),
+                                 frozenset({3}), ('synth@example.test',)])
+def test_transport_refuses_an_invalid_address_pin(tmp_path, bad):
+    with pytest.raises(batch.BatchRefusal):
+        make_transport(tmp_path, allowed=bad)
+
+
+def test_transport_sends_an_address_that_comes_from_the_pin(tmp_path):
+    inner = MockInner()
+    transport, fd, path = make_transport(tmp_path, inner, allowed=frozenset({'synth@example.test'}))
+    try:
+        transport.set_run('synth-a.dk')
+        response = transport.handle_request(pinned_request('contact synth@example.test'))
+        assert response.status_code == 200 and len(inner.seen) == 1
+        refused = pinned_request('contact other@example.test')
+        with pytest.raises(batch.BatchRefusal):
+            transport.handle_request(refused)
+        assert len(inner.seen) == 1
+        events = [row['event'] for row in journal_rows(path)]
+        assert events == ['reserved', 'send_intent', 'send_status']
+    finally:
+        transport.close()
+        os.close(fd)
 
 
 # --- reservation ---------------------------------------------------------------------------

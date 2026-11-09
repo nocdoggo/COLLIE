@@ -4130,3 +4130,53 @@ seven is treated as closed.
 
 - Batch source SHA256: `b252e62748d064a8824d3e58ba605ea2af34ada83b94455579ecc7fb0ce2e581`
 - Batch selection SHA256: `6e1506fefc7ac9c7d0c4e19ba4dcbc79918c3f00b16880b59b7f7afa7281dc44`
+
+### A19. The item-58 stop was the address fence, not the network; address provenance pin (9 November 2026)
+
+Dispatches five through nine all stopped on the re-send of item 58 of
+`e3-a-gpt-oss-20b.s7.dk` (zero-based pending index 0 of the 240 pairs still missing).
+Dispatch five's response to that item died mid-download at ~18:30Z on 6 November (HTTP
+200 journaled, no reading); dispatches six through nine each failed in exactly 248.1 s
+with zero send rows and `raised APIConnectionError: Connection error.`. A17 read those
+five instant failures as a transient provider window. That attribution was WRONG for
+dispatches six through nine and is corrected here: the OpenAI SDK wraps any exception
+from `client.send()` as `APIConnectionError` (`openai/_base_client.py:1014`), and the
+248.1 s is exactly the frozen guard's five-retry backoff (8+16+32+64+128 s) over a send
+that was refused locally before it left the process.
+
+Audit finding F6 and its diagnosis. The instrumented capture registered privately as
+`CAPTURE_ITEM58_2026-11-06` drove the frozen reader through the 57 cached pairs to the
+first live send with the innermost HTTP transport stubbed out (no socket, no key, no
+inference) and printed the exception chain: `openai.APIConnectionError: Connection
+error.` caused by `oss_batch_transport.BatchRefusal: request message is invalid or may
+contain an email address`; the paced transport was entered six times and the inner stub
+zero times. The fence was `_validate`'s body-wide `@` ban. The item's notice text carries
+one public contact address in its `related_information` field (email-like, 26
+characters) — corpus content, not the owner's identity: 16 other registered `e3` runs
+of every model (including the original `e3-c-gpt-oss-20b.s7`) already transmitted that
+same hash-pinned item. The capture never reached the stub, so no request or response
+content was captured, printed or persisted; it did re-declare run s7 in the study
+ledger and append invocation and spend error rows, which the fresh selection below pins.
+
+This amendment replaces the body-wide `@` ban with an ADDRESS PROVENANCE PIN. The counted
+transport now receives `allowed_addresses`, computed at hook installation by
+`public_addresses` over the raw bytes of every registered items file (the email-like
+tokens of the pinned corpus — exactly one address for the current 17-run selection). A
+send is refused if its message carries any email-like address outside that pin, or any
+`@` at all that is not part of a pinned address; headers may still carry no `@`. The
+message structure pin (one user message with `role`/`content`), the model, provider,
+precision, temperature and `max_tokens` pins are unchanged, and the `synthetic@@invalid`
+refusal keeps its test. The fence now names the only addresses a send may carry instead
+of banning the pinned corpus, and it still fails closed on anything the pins do not name.
+
+A fresh selection record pins the current ledger (the capture re-declared run s7); all 17
+targets, caps and projections are unchanged, and the context verification counts 1,574
+prior `.dk` calls (run s7's own prior calls are 58: 57 sends plus dispatch five's
+indeterminate send). Next status GET is attempt 16 of the 36 registered in A17. Nothing
+was written under `reports/`, no registered evaluator or sealed outcome was read, and the
+original runs remain byte-identical to the A3 snapshot.
+- Batch transport source SHA256: `2915cfbecbfec03a47b46cfc923c481c89912361f76e00953f1478bc2fa1c03d`
+- Batch transport fixture tests SHA256: `ad4c4121b5bcc8988efb373494e9f11769f186a4df0b691b63a4f4f198e00b76`
+- Batch source SHA256: `328169a893ecc4c597541b70a355c81f57337bab209da92af1842a09b1381252`
+- Batch fixture tests SHA256: `ecce1cafe22e64f05f3ecfc0384f8c6767ade5f4f55b39395b9242be02d8bade`
+- Batch selection SHA256: `f439cccb8f1be11e807105965a8a55afafa131c6ecb2f9eb5a7db2cef069ca7a`

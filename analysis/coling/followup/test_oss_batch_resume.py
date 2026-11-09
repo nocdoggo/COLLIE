@@ -694,6 +694,22 @@ def test_hooks_accept_the_harness_relative_root_spellings(tmp_path, monkeypatch)
     os.close(fd)
 
 
+def test_hooks_pin_the_addresses_of_the_registered_items(tmp_path, monkeypatch):
+    """A19: the counted transport may carry only the public contact addresses of the
+    hash-pinned items. The body-wide "@" ban refused item 58 of e3-a.s7.dk, whose
+    notice text carries one such address, so the pin is derived from the items here."""
+    import dataclasses
+    spec = dataclasses.replace(spec_pair(), items_raw=jsonl(
+        {'item_id': 'SYNTH-A-1', 'related_information': 'write to synth@example.test'},
+        {'item_id': 'SYNTH-A-2'}))
+    read, client, physical, state, fd = installed(tmp_path, monkeypatch, specs=[spec])
+    try:
+        assert physical._allowed_addresses == frozenset({'synth@example.test'})
+    finally:
+        client.close()
+        os.close(fd)
+
+
 def test_mains_send_journal_open_flags_satisfy_the_counted_transport(tmp_path):
     """The 5 November 2026 dispatch stopped pre-send: main() opened the send
     journal write-only while the counted transport preads its reservation row,

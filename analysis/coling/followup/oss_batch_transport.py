@@ -13,10 +13,15 @@ including those retries.
 
 The request validator accepts only the original model and decoding with the
 re-pinned provider object: one endpoint, fallbacks off, the bf16 precision
-filter, temperature 0, a single user message without ``@``, the required
-research user agent and no ``max_tokens`` cap. It records only non-content
-metadata (HTTP status, rate-limit-related headers) in an already-created
-owner-only journal and never prints or retains response content. Tests use
+filter, temperature 0, a single user message, the required research user
+agent and no ``max_tokens`` cap. An address fence keeps the owner's identity
+out of the traffic: headers may carry no ``@`` at all, and a message may carry
+no ``@`` except inside the email-like addresses of the pinned public items
+(amendment A19: the earlier body-wide ban refused a public contact address in
+one eligible notice, so the fence now names the only addresses a send may
+carry instead of banning the corpus). It records only non-content metadata
+(HTTP status, rate-limit-related headers) in an already-created owner-only
+journal and never prints or retains response content. Tests use
 invented requests and HTTPX's mock transport; they make no network or
 credential access. These fences do not prove provider billing bounds, retention
 or a completed run, and a different process can bypass them.
@@ -46,6 +51,7 @@ MAX_BODY = 1_000_000
 MAX_JOURNAL = 8_000_000
 MIN_SPACING_S = 4.0
 RUN_LABEL = re.compile(r"[a-z0-9][a-z0-9._-]{0,160}", re.ASCII)
+ADDRESS = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", re.ASCII)
 _LOCK_TYPE = type(threading.Lock())
 
 
@@ -62,17 +68,42 @@ def _unique(pairs: list[tuple[str, object]]) -> dict:
     return result
 
 
-def _contains_at(value: object) -> bool:
+def _strings(value: object):
     if type(value) is str:
-        return "@" in value
-    if type(value) is list:
-        return any(_contains_at(item) for item in value)
-    if type(value) is dict:
-        return any(_contains_at(key) or _contains_at(item) for key, item in value.items())
-    return False
+        yield value
+    elif type(value) is list:
+        for item in value:
+            yield from _strings(item)
+    elif type(value) is dict:
+        for key, item in value.items():
+            yield from _strings(key)
+            yield from _strings(item)
 
 
-def _validate(request: httpx.Request) -> None:
+def public_addresses(raw: bytes) -> frozenset[str]:
+    """The email-like addresses of a pinned items file: the only ones a send may carry.
+
+    Amendment A19 replaces the body-wide ``@`` ban with this provenance pin. The
+    item that stopped dispatches 5-9 carries a public contact address in its
+    notice text (``related_information``), and the original registered runs of
+    every other model already transmitted that same pinned text.
+    """
+    if type(raw) is not bytes:
+        raise BatchRefusal("pinned items bytes are required")
+    found = set()
+    for line in raw.splitlines():
+        if not line.strip():
+            continue
+        try:
+            row = json.loads(line)
+        except (ValueError, UnicodeError, RecursionError):
+            raise BatchRefusal("a pinned items file is not valid JSON") from None
+        for text in _strings(row):
+            found.update(ADDRESS.findall(text))
+    return frozenset(found)
+
+
+def _validate(request: httpx.Request, allowed_addresses: frozenset[str] = frozenset()) -> None:
     if type(request) is not httpx.Request or request.method != "POST" or str(request.url) != URL:
         raise BatchRefusal("request is not the pinned HTTPS endpoint")
     if request.headers.get("user-agent") != USER_AGENT:
@@ -97,8 +128,11 @@ def _validate(request: httpx.Request) -> None:
     messages = parsed["messages"]
     if (type(messages) is not list or len(messages) != 1 or type(messages[0]) is not dict
             or set(messages[0]) != {"role", "content"} or messages[0]["role"] != "user"
-            or type(messages[0]["content"]) is not str or _contains_at(parsed)):
-        raise BatchRefusal("request message is invalid or may contain an email address")
+            or type(messages[0]["content"]) is not str):
+        raise BatchRefusal("request message is invalid")
+    content = messages[0]["content"]
+    if set(ADDRESS.findall(content)) - allowed_addresses or "@" in ADDRESS.sub("", content):
+        raise BatchRefusal("request message carries an address outside the pinned items")
 
 
 def _journal(fd: int, expected_identity: tuple[int, int], expected_size: int, event: dict) -> int:
@@ -140,7 +174,8 @@ class CountedPacedTransport(httpx.BaseTransport):
 
     def __init__(self, inner: httpx.BaseTransport, journal_fd: int, *, selection_sha256: str,
                  planned_targets: int, max_sends: int, stop_after_utc: datetime | None = None,
-                 clock: object = time.monotonic, sleep: object = time.sleep) -> None:
+                 clock: object = time.monotonic, sleep: object = time.sleep,
+                 allowed_addresses: frozenset[str] = frozenset()) -> None:
         if not isinstance(inner, httpx.BaseTransport) or type(journal_fd) is not int:
             raise BatchRefusal("an HTTPX transport and private journal are required")
         if stop_after_utc is not None and (type(stop_after_utc) is not datetime
@@ -148,6 +183,10 @@ class CountedPacedTransport(httpx.BaseTransport):
             raise BatchRefusal("batch deadline must be an exact UTC datetime")
         if not callable(clock) or not callable(sleep):
             raise BatchRefusal("a monotonic clock and a sleep are required")
+        if (type(allowed_addresses) is not frozenset
+                or any(type(address) is not str or ADDRESS.fullmatch(address) is None
+                       for address in allowed_addresses)):
+            raise BatchRefusal("the allowed address pin is invalid")
         expected = batch_reservation_bytes(selection_sha256, planned_targets, max_sends)
         info = os.fstat(journal_fd)
         flags = fcntl.fcntl(journal_fd, fcntl.F_GETFL)
@@ -177,6 +216,7 @@ class CountedPacedTransport(httpx.BaseTransport):
         self._run = None
         self._sends = 0
         self._max_sends = max_sends
+        self._allowed_addresses = allowed_addresses
         self._consecutive_refusals = 0
         self._last_send = None
         self._stop_after_utc = stop_after_utc
@@ -217,7 +257,7 @@ class CountedPacedTransport(httpx.BaseTransport):
                 raise BatchRefusal("the batch authorization deadline has passed")
             if self._consecutive_refusals >= 30:
                 raise BatchRefusal("too many consecutive refused sends; the batch stops")
-            _validate(request)
+            _validate(request, self._allowed_addresses)
             self._wait_spacing()
             # Count and journal the send before it leaves: a crash between the
             # journal write and the response leaves an indeterminate charge on
