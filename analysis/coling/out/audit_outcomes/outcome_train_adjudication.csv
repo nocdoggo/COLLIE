@@ -1,0 +1,2 @@
+"audit_id","definition","shown_type","shown_lower","shown_upper","shown_censor","A1_verdict","A1_codes","A1_true","A1_note_codes","A1_note","A2_verdict","A2_codes","A2_true","A2_note_codes","A2_note","decision","confirmed_codes","cause","adj_note"
+"Q7d21bfff","A","censored","2021-01-17","","absent_generic_current","cannot_tell","","","N1;N2","A: from 2021-04-12 a withheld other_thread row has old NDC 0409-6637-34 and new 0409-6637-14. Its status is hidden, so cannot tell whether A relinks. B not affected.","","","","","","","","",""

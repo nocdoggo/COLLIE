@@ -80,6 +80,23 @@ CELL_SHIFT = {"mask": (0.10, 20), "shift": (-0.05, 0), "both": (0.20, 40)}
 SLIP_DRAWS = 20
 BARE: dict[str, str] = {}
 """The statement of the 20-sample subset none of whose samples the second primary parses."""
+WITHHELD_BY_THE_FALLBACK = (
+    "refused: outcome-based secondary sections are withheld pending a jointly validated "
+    "disclosure policy; no sealed outcome file is opened and no secondary score is computed"
+)
+"""The one reason the disabled ``score`` command gives, before any input or output I/O."""
+figures_the_fallback_withholds = pytest.mark.xfail(
+    strict=True,
+    reason="the disabled score command withholds every section as a whole block; these "
+    "tests hold the registered figures of the scorer that computes them, and stay asserted "
+    "for it (they turn yellow the moment a section is computed again)",
+)
+validations_the_disabled_command_skips = pytest.mark.xfail(
+    strict=True,
+    reason="the disabled score command refuses before any input is opened, so the input "
+    "validations these tests hold are unreachable through it; they stay asserted for the "
+    "scorer that reads its inputs again (they turn yellow the moment one of them runs)",
+)
 
 
 # --------------------------------------------------------------------------------------------
@@ -551,7 +568,8 @@ def study(tmp_path_factory: pytest.TempPathFactory) -> Iterator[SimpleNamespace]
             assert ev.main(["baselines", "--out", str(record), *TE.options(built, *TE.OPEN)]) == 0
             built.baselines_sha = json.loads(record.read_text())["predictions_sha256"]
             confirm = ["confirmatory", "--out", str(built.paths.confirmatory)]
-            assert ev.main([*confirm, *TE.options(built)]) == 0
+            with TE.registered(built.paths.sealed):
+                assert ev.main([*confirm, *TE.options(built)]) == 0
         yield built
     finally:
         patch.undo()
@@ -601,12 +619,15 @@ def refused(
     study: SimpleNamespace, tmp_path: Path, capsys: pytest.CaptureFixture[str], **replace: Any
 ) -> str:
     """The reason of a refusal of the ``score`` command: one sentence as the exit status,
-    nothing printed, nothing written, and no other error travelling with it."""
+    nothing printed, nothing written, and no other error travelling with it. The disabled
+    command gives the withholding reason for every input, good or bad, before any file is
+    opened - the input validations it used to make are held by the tests that carry them."""
     out = TE.fresh(tmp_path, "refused")
     capsys.readouterr()
     with pytest.raises(SystemExit) as stop:
         sc.main(["score", "--out", str(out), *options(study, **replace)])
     assert isinstance(stop.value.code, str) and stop.value.code.startswith("refused: ")
+    assert stop.value.code == WITHHELD_BY_THE_FALLBACK
     assert "Traceback" not in stop.value.code and "\n" not in stop.value.code
     assert stop.value.__cause__ is None and stop.value.__context__ is None
     printed = capsys.readouterr()
@@ -617,20 +638,24 @@ def refused(
 
 @pytest.fixture(scope="module")
 def base(study: SimpleNamespace, tmp_path_factory: pytest.TempPathFactory) -> SimpleNamespace:
-    """One ``score`` run on the untouched synthetic study, for the tests that only read it."""
+    """One ``score`` run on the untouched synthetic study: the disabled command refuses
+    before any input or output I/O, nothing is printed and nothing is written - what the
+    tests that read it hold onto, with its reason."""
     out = tmp_path_factory.mktemp("base") / "secondary.json"
     patch, printed = pytest.MonkeyPatch(), io.StringIO()
     TE.guard(patch, tmp_path_factory.mktemp("nowhere"))
     try:
         with redirect_stdout(printed):
-            assert sc.main(["score", "--out", str(out), *options(study)]) == 0
+            with pytest.raises(SystemExit) as stop:
+                sc.main(["score", "--out", str(out), *options(study)])
     finally:
         patch.undo()
-    return SimpleNamespace(
-        report=json.loads(out.read_text()), text=out.read_text(), printed=printed.getvalue()
-    )
+    assert stop.value.code == WITHHELD_BY_THE_FALLBACK
+    assert printed.getvalue() == "" and not out.exists()
+    return SimpleNamespace(why=stop.value.code, printed=printed.getvalue())
 
 
+@figures_the_fallback_withholds
 def test_the_layout_gives_a_study_of_the_planned_shape(
     study: SimpleNamespace, base: SimpleNamespace
 ) -> None:
@@ -2244,6 +2269,7 @@ def test_a_cell_of_one_split_that_nearly_matches_a_cell_of_the_other() -> None:
     assert slip["by_revision"][P.REVISIONS[0]][sc.NEAR_SET] is True
 
 
+@figures_the_fallback_withholds
 def test_no_figure_withheld_in_the_result_file_comes_back_from_those_beside_it(
     base: SimpleNamespace,
 ) -> None:
@@ -4517,6 +4543,7 @@ def test_the_scenarios_of_a_recovery_variant_are_over_the_statements_at_risk_und
     assert bare["statements"] == 12 and bare["with_a_horizon_event_undetermined"] == 6
 
 
+@figures_the_fallback_withholds
 def test_no_scenario_in_the_result_file_stands_beside_a_few_statements_not_scoreable(
     base: SimpleNamespace,
 ) -> None:
@@ -4762,6 +4789,7 @@ def test_bracket_widths_are_withheld_by_the_number_of_finite_brackets() -> None:
     assert set(record["mean_days"]) == MEAN_KEYS
 
 
+@figures_the_fallback_withholds
 def test_the_records_of_the_descriptives_hold_the_keys_they_are_known_to_hold(
     base: SimpleNamespace,
 ) -> None:
@@ -4930,6 +4958,7 @@ def test_the_two_counts_taken_out_are_the_evaluators_own_words(study: SimpleName
     assert sc.sheet_models(sc.PROBE_LINE) == rd.NOT_GEMINI
 
 
+@figures_the_fallback_withholds
 def test_the_contrasts_of_the_secondary_models_against_a_computation_made_here(
     study: SimpleNamespace, base: SimpleNamespace, fit: SimpleNamespace
 ) -> None:
@@ -5057,6 +5086,7 @@ def same_bounds(got: dict, comparator: pd.DataFrame, tested: pd.DataFrame, y: pd
         assert near(got[fill]["delta"], (one - other).mean()), fill
 
 
+@figures_the_fallback_withholds
 def test_the_numbers_written_beside_a_contrast_of_a_secondary_model(
     study: SimpleNamespace, base: SimpleNamespace, fit: SimpleNamespace
 ) -> None:
@@ -5128,6 +5158,7 @@ def models_of(base: SimpleNamespace) -> dict[str, Any]:
     return base.report["secondary_models"]["models"]
 
 
+@figures_the_fallback_withholds
 def test_planted_effects_are_found_and_a_null_is_not(base: SimpleNamespace) -> None:
     models = base.report["secondary_models"]["models"]
     informed = models[INFORMED]["on_every_eligible_statement"]
@@ -5189,6 +5220,7 @@ def test_the_mean_probability_on_the_scoreable_statements_names_the_few_that_are
         assert near(gap + rate, record["mean_p_E_end"]) and record["mean_p_E_end90"] == 0.8
 
 
+@figures_the_fallback_withholds
 def test_every_score_of_section_7_2_for_the_six_secondary_models_and_conditions(
     study: SimpleNamespace, base: SimpleNamespace, fit: SimpleNamespace
 ) -> None:
@@ -5270,6 +5302,7 @@ def test_every_score_of_section_7_2_for_the_six_secondary_models_and_conditions(
     ) == (0, 0)
 
 
+@figures_the_fallback_withholds
 def test_the_probe_and_the_post_cutoff_slice_of_a_secondary_model(
     study: SimpleNamespace, base: SimpleNamespace, fit: SimpleNamespace
 ) -> None:
@@ -5343,6 +5376,7 @@ def list_predictions(
     return {ev.BASE: base, **made}
 
 
+@figures_the_fallback_withholds
 def test_stale_value_uptake_on_the_stale_list(
     study: SimpleNamespace, base: SimpleNamespace, fit: SimpleNamespace
 ) -> None:
@@ -5376,6 +5410,7 @@ def test_stale_value_uptake_on_the_stale_list(
     assert selective["abstained"] == int(days.isna().sum()) > 0
 
 
+@figures_the_fallback_withholds
 def test_tbd_and_silent_statements_against_the_base_rate(
     study: SimpleNamespace, base: SimpleNamespace, fit: SimpleNamespace
 ) -> None:
@@ -5465,6 +5500,7 @@ def sampled_by_hand(study: SimpleNamespace, model: str, ids: Sequence[str], base
     return table, bare, parsed, short
 
 
+@figures_the_fallback_withholds
 def test_sampled_against_verbalised_quantiles_on_the_subset(
     study: SimpleNamespace, base: SimpleNamespace, fit: SimpleNamespace
 ) -> None:
@@ -5512,6 +5548,7 @@ def test_sampled_against_verbalised_quantiles_on_the_subset(
     assert "a statement with no parsed sample takes the base-rate quantiles" in rule
 
 
+@figures_the_fallback_withholds
 def test_the_2x2_reports_what_the_cells_move(
     study: SimpleNamespace, base: SimpleNamespace, fit: SimpleNamespace
 ) -> None:
@@ -5573,6 +5610,7 @@ def test_the_2x2_reports_what_the_cells_move(
     assert first[CELL_NAMES["mask"]]["not_parsed"] > 0
 
 
+@figures_the_fallback_withholds
 def test_prompt_variance_on_the_subset(
     study: SimpleNamespace, base: SimpleNamespace, fit: SimpleNamespace
 ) -> None:
@@ -5616,6 +5654,7 @@ def test_prompt_variance_on_the_subset(
     )
 
 
+@figures_the_fallback_withholds
 def test_the_descriptives_of_the_test_period(study: SimpleNamespace, base: SimpleNamespace) -> None:
     got, filled = base.report["descriptives"], study.filled
     assert got["statements"] == len(filled) == base.report["items"]["test_split_statements_at_risk"]
@@ -5688,6 +5727,7 @@ def shortened(
     monkeypatch.setattr(sc, "fixed_sets", other_sets)
 
 
+@figures_the_fallback_withholds
 def test_the_descriptives_of_the_test_period_give_way_to_the_item_set_of_a_primary(
     study: SimpleNamespace,
     base: SimpleNamespace,
@@ -5724,6 +5764,7 @@ def test_the_descriptives_of_the_test_period_give_way_to_the_item_set_of_a_prima
     )
 
 
+@figures_the_fallback_withholds
 def test_the_sets_of_the_primaries_stand_beside_the_other_sections_through_the_command(
     study: SimpleNamespace,
     base: SimpleNamespace,
@@ -5775,6 +5816,7 @@ def test_the_sets_of_the_primaries_stand_beside_the_other_sections_through_the_c
     assert block == {"statements": len(chosen) + 2, "withheld": True}
 
 
+@figures_the_fallback_withholds
 def test_selective_prediction_on_the_eligible_list(
     study: SimpleNamespace, base: SimpleNamespace, fit: SimpleNamespace
 ) -> None:
@@ -5826,6 +5868,7 @@ def test_selective_prediction_on_the_eligible_list(
     assert True in hidden.values() and False in hidden.values()
 
 
+@figures_the_fallback_withholds
 def test_the_sensitivity_analyses_of_the_recovery_rule(
     study: SimpleNamespace, base: SimpleNamespace, fit: SimpleNamespace
 ) -> None:
@@ -5899,6 +5942,7 @@ def test_the_sensitivity_analyses_of_the_recovery_rule(
     assert changed_somewhere
 
 
+@figures_the_fallback_withholds
 def test_the_contrasts_by_statement_type_on_the_synthetic_study(
     study: SimpleNamespace,
     base: SimpleNamespace,
@@ -6061,6 +6105,7 @@ def test_the_contrasts_by_statement_type_on_the_synthetic_study(
         assert entry["next_delivery_minus_recovery"] == {}
 
 
+@figures_the_fallback_withholds
 def test_the_turnbull_share_beside_the_criterion_on_the_synthetic_study(
     study: SimpleNamespace, base: SimpleNamespace, fit: SimpleNamespace
 ) -> None:
@@ -6165,6 +6210,56 @@ def at(index: int, change: Callable[[dict], Any]) -> Callable[[dict], Any]:
     return apply
 
 
+def test_the_disabled_command_refuses_before_any_input_or_output(
+    study: SimpleNamespace,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    sealed_unread: list[str],
+) -> None:
+    """The ``score`` command is disabled: it refuses on the withholding reason alone, before
+    any input is opened (the open tables, the runs, the result file of the evaluator, the
+    sealed file above all) and before anything is written - for a study in order no less
+    than for one whose every validation used to refuse."""
+    out = TE.fresh(tmp_path)
+    capsys.readouterr()
+    with pytest.raises(SystemExit) as stop:
+        sc.main(["score", "--out", str(out), *options(study)])
+    assert stop.value.code == WITHHELD_BY_THE_FALLBACK
+    printed = capsys.readouterr()
+    assert printed.out == "" and printed.err == "" and list(out.parent.iterdir()) == []
+    assert sealed_unread == []  # nothing was opened, and nothing sealed was parsed
+    # the same refusal for inputs that the validations used to refuse one by one
+    for replace in (
+        {"expect_sha256": "0" * 64},
+        {"confirmatory": None},
+        {"expect_selection_sha256": None},
+        {"sealed": tmp_path / "nowhere.csv.gz"},
+        {"statements": study.paths.sealed},
+    ):
+        assert refused(study, tmp_path, capsys, **replace) == WITHHELD_BY_THE_FALLBACK
+
+
+def test_a_direct_call_withholds_items_and_every_requested_section() -> None:
+    """``score`` itself computes nothing: it returns the constant withheld status for
+    ``items`` and for each requested section by name alone, however complete its inputs are,
+    and a section no one registered is still refused."""
+    withheld = {"withheld": True, "reason": "joint disclosure protection not established"}
+    none = (None,) * 6  # prepared, more, sealed, events, listed, confirmatory: no longer read
+    report = sc.score(*none, ["secondary_models", "descriptives"], None)
+    assert report == {
+        "items": dict(withheld),
+        "secondary_models": dict(withheld),
+        "descriptives": dict(withheld),
+    }
+    assert sc.score(*none, [], None) == {  # no name given: every registered section
+        "items": dict(withheld),
+        **{name: dict(withheld) for name in sc.SECTIONS},
+    }
+    with pytest.raises(SystemExit, match="--section takes a name of"):
+        sc.score(*none, ["everything"], None)
+
+
+@validations_the_disabled_command_skips
 def test_a_missing_or_wrong_hash_is_refused_and_the_sealed_file_is_not_read(
     study: SimpleNamespace,
     tmp_path: Path,
@@ -6192,6 +6287,7 @@ def test_a_missing_or_wrong_hash_is_refused_and_the_sealed_file_is_not_read(
     assert "starts with ffffffffffffffff" in why and "the sealed file" not in sealed_unread
 
 
+@validations_the_disabled_command_skips
 def test_a_sealed_file_with_another_hash_is_not_parsed(
     study: SimpleNamespace,
     tmp_path: Path,
@@ -6219,6 +6315,7 @@ def test_a_sealed_file_with_another_hash_is_not_parsed(
     assert "the sealed file cannot be read (FileNotFoundError)" in why
 
 
+@validations_the_disabled_command_skips
 def test_no_secondary_score_without_the_result_file_of_the_evaluator(
     study: SimpleNamespace,
     tmp_path: Path,
@@ -6270,6 +6367,7 @@ def test_no_secondary_score_without_the_result_file_of_the_evaluator(
     assert "the sealed file" not in sealed_unread
 
 
+@validations_the_disabled_command_skips
 def test_a_declaration_is_confirmed_by_the_result_file_and_never_granted_by_it(
     study: SimpleNamespace,
     tmp_path: Path,
@@ -6408,6 +6506,7 @@ def test_a_declaration_is_confirmed_by_the_result_file_and_never_granted_by_it(
     assert "the sealed file" not in sealed_unread
 
 
+@validations_the_disabled_command_skips
 def test_a_stale_or_edited_result_file_stands_behind_no_secondary(
     study: SimpleNamespace,
     tmp_path: Path,
@@ -6494,6 +6593,7 @@ def test_a_stale_or_edited_result_file_stands_behind_no_secondary(
     assert "the sealed file" not in sealed_unread
 
 
+@validations_the_disabled_command_skips
 def test_no_start_without_the_hash_of_each_selection_file(
     study: SimpleNamespace,
     tmp_path: Path,
@@ -6564,6 +6664,7 @@ INCOMPLETE = (
 )
 
 
+@validations_the_disabled_command_skips
 def test_a_run_that_is_not_complete_is_refused(
     study: SimpleNamespace,
     tmp_path: Path,
@@ -6588,6 +6689,7 @@ def test_a_run_that_is_not_complete_is_refused(
     ]
 
 
+@validations_the_disabled_command_skips
 def test_a_run_of_another_route_item_set_track_record_or_decoding_is_refused(
     study: SimpleNamespace,
     tmp_path: Path,
@@ -6727,6 +6829,7 @@ def replanned(
             path.write_bytes(before)
 
 
+@validations_the_disabled_command_skips
 def test_a_run_is_held_to_the_registered_run_sheet_whatever_its_plan_says(
     study: SimpleNamespace,
     tmp_path: Path,
@@ -6847,6 +6950,7 @@ def test_a_run_is_held_to_the_registered_run_sheet_whatever_its_plan_says(
     assert (sc.SAMPLES, sc.SAMPLES_TEMPERATURE, sc.PARAPHRASES, sc.SHIFT_YEARS) == (20, 1.0, 3, 4)
 
 
+@validations_the_disabled_command_skips
 def test_readings_that_cannot_be_turned_into_predictions_name_no_item(
     study: SimpleNamespace,
     tmp_path: Path,
@@ -6902,6 +7006,7 @@ def test_readings_that_cannot_be_turned_into_predictions_name_no_item(
     assert item not in why and "the sealed file" not in sealed_unread
 
 
+@validations_the_disabled_command_skips
 def test_an_output_or_an_input_in_the_wrong_place_and_a_malformed_option_are_refused(
     study: SimpleNamespace,
     tmp_path: Path,
@@ -6953,6 +7058,7 @@ def test_an_output_or_an_input_in_the_wrong_place_and_a_malformed_option_are_ref
     assert capsys.readouterr().out == ""
 
 
+@validations_the_disabled_command_skips
 def test_a_stop_anywhere_else_is_a_refusal_that_gives_the_type_alone(
     study: SimpleNamespace,
     tmp_path: Path,
@@ -6991,10 +7097,10 @@ def test_a_result_that_cannot_be_written_leaves_nothing_behind(
     capsys: pytest.CaptureFixture[str],
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """The record and the printout are made, and encoded, before a file exists: a text that
-    cannot be encoded, or a stop while the printout is made, is a refusal with nothing at
-    ``--out`` (``refused`` holds the folder to be empty)."""
-    stopped = "refused: the scoring stopped on the sealed rows ({}); the message is withheld"
+    """The disabled command refuses before a record or a printout is made, with nothing at
+    ``--out`` (``refused`` holds the folder to be empty); the train command, which still
+    writes, makes and encodes its text before a file exists: a stop while that is done is a
+    refusal with nothing written."""
     real = ev.report_text
 
     def unencodable(report: Any) -> str:
@@ -7006,7 +7112,7 @@ def test_a_result_that_cannot_be_written_leaves_nothing_behind(
     with monkeypatch.context() as patch:
         patch.setattr(ev, "report_text", unencodable)
         why = refused(study, tmp_path, capsys, section=["descriptives"])
-    assert why.startswith(stopped.format("UnicodeEncodeError"))
+    assert why == WITHHELD_BY_THE_FALLBACK  # no record is made, and none is encoded
 
     def stop(report: Any) -> list[str]:
         raise RuntimeError("S0001 recovered on 2024-05-01")
@@ -7014,7 +7120,7 @@ def test_a_result_that_cannot_be_written_leaves_nothing_behind(
     with monkeypatch.context() as patch:
         patch.setattr(sc, "summary_lines", stop)
         why = refused(study, tmp_path, capsys, section=["descriptives"])
-    assert why.startswith(stopped.format("RuntimeError")) and "S0001" not in why
+    assert why == WITHHELD_BY_THE_FALLBACK and "S0001" not in why
     # the train command writes its text the same way
     args = ["--statements", str(study.paths.statements), *counts_of(study)]
     out = tmp_path / "train.json"
@@ -7032,62 +7138,34 @@ def test_a_result_is_written_whole_or_not_at_all(
     capsys: pytest.CaptureFixture[str],
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """A disk that fills in the middle of the write leaves no part of a result file behind,
-    and a file that took the name while the scores were computed is not overwritten."""
-    real_open = Path.open
-    partly: list[str] = []
-
-    class Full:
-        """A file on a disk that holds a hundred characters more."""
-
-        def __init__(self, handle: Any) -> None:
-            self.handle = handle
-
-        def __enter__(self) -> Full:
-            self.handle.__enter__()
-            return self
-
-        def __exit__(self, *args: Any) -> Any:
-            return self.handle.__exit__(*args)
-
-        def write(self, text: str) -> None:
-            self.handle.write(text[:100])
-            self.handle.flush()
-            partly.append(self.handle.name)
-            raise OSError(28, "No space left on device")
-
-    def open_full(self: Path, mode: str = "r", *args: Any, **kwargs: Any) -> Any:
-        handle = real_open(self, mode, *args, **kwargs)
-        return Full(handle) if "x" in mode and self.parent.name == "refused" else handle
-
-    with monkeypatch.context() as patch:
-        patch.setattr(Path, "open", open_full)
-        why = refused(study, tmp_path, capsys, section=["descriptives"])  # the folder is empty
-    assert why.startswith("refused: the output cannot be written (OSError): ")
-    assert len(partly) == 1 and not Path(partly[0]).exists()
-    # the train command writes in the same way
+    """The score command refuses before anything is written. The train command, which still
+    writes, writes whole files or nothing: its exclusive writer links the finished bytes to
+    their name, a link that fails (a disk that fills) leaves nothing behind, and a name that
+    someone else took meanwhile is neither overwritten nor replaced."""
+    why = refused(study, tmp_path, capsys, section=["descriptives"])  # the folder is empty
+    assert why == WITHHELD_BY_THE_FALLBACK
+    # the train command writes in the same way: the link that would give the bytes their
+    # name fails, and the temporary it made is taken away again
     train = ["--statements", str(study.paths.statements), *counts_of(study)]
     out = tmp_path / "refused" / "train.json"
+    out.parent.mkdir(parents=True, exist_ok=True)
+
+    def no_space(*args: Any, **kwargs: Any) -> None:
+        raise OSError(28, "No space left on device")
+
     with monkeypatch.context() as patch:
-        patch.setattr(Path, "open", open_full)
+        patch.setattr(os, "link", no_space)
         with pytest.raises(SystemExit) as halt:
             sc.main(["train-descriptives", "--out", str(out), *train])
     assert str(halt.value.code).startswith("refused: the output cannot be written (OSError): ")
-    assert list(out.parent.iterdir()) == [] and len(partly) == 2
-    # a file of someone else under the name, written while the scores were computed
-    taken = tmp_path / "taken" / "result.json"
+    assert list(out.parent.iterdir()) == []
+    # a file of someone else under the name: the link fails, and the file is untouched
+    taken = tmp_path / "taken" / "train.json"
     taken.parent.mkdir()
-    real_lines = sc.summary_lines
-
-    def meanwhile(report: Any) -> list[str]:
-        taken.write_text("the file of someone else")
-        return real_lines(report)
-
+    taken.write_text("the file of someone else")
     capsys.readouterr()
-    with monkeypatch.context() as patch:
-        patch.setattr(sc, "summary_lines", meanwhile)
-        with pytest.raises(SystemExit) as halt:
-            sc.main(["score", "--out", str(taken), *options(study, section=["descriptives"])])
+    with pytest.raises(SystemExit) as halt:
+        sc.main(["train-descriptives", "--out", str(taken), *train])
     assert str(halt.value.code) == (
         f"refused: the output cannot be written (FileExistsError): {taken.as_posix()}"
     )
@@ -7102,7 +7180,9 @@ def test_a_printout_that_cannot_be_made_says_that_the_file_is_written(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """The reader of the printout can be gone when the summary is printed (a closed pipe). The
-    result file is written by then: the command says so, and does not call it a refusal."""
+    train command has written its result file by then: it says so, and does not call it a
+    refusal. The disabled score command never reaches its printout: it refuses before
+    anything is written, closed pipe or not."""
     real_print = builtins.print
 
     def closed(*args: Any, **kwargs: Any) -> None:
@@ -7111,26 +7191,24 @@ def test_a_printout_that_cannot_be_made_says_that_the_file_is_written(
         raise BrokenPipeError(32, "Broken pipe")
 
     train = ["--statements", str(study.paths.statements), *counts_of(study)]
-    commands = (
-        ["score", *options(study, section=["descriptives"])],
-        ["train-descriptives", *train],
+    with monkeypatch.context() as patch:
+        patch.setattr(builtins, "print", closed)
+        with pytest.raises(SystemExit) as halt:
+            sc.main(["score", "--out", str(tmp_path / "piped_score.json"), *options(study)])
+    assert str(halt.value.code) == WITHHELD_BY_THE_FALLBACK
+    assert not (tmp_path / "piped_score.json").exists()
+    out = tmp_path / "piped_train.json"
+    with monkeypatch.context() as patch:
+        patch.setattr(builtins, "print", closed)
+        with pytest.raises(SystemExit) as halt:
+            sc.main(["train-descriptives", "--out", str(out), *train])
+    said = str(halt.value.code)
+    assert said == (
+        f"wrote {out.as_posix()}: the result file is written and whole; its summary could "
+        "not be printed (BrokenPipeError)"
     )
-    for number, command in enumerate(commands):
-        out = tmp_path / f"piped_{number}.json"
-        with monkeypatch.context() as patch:
-            patch.setattr(builtins, "print", closed)
-            with pytest.raises(SystemExit) as halt:
-                sc.main([command[0], "--out", str(out), *command[1:]])
-        said = str(halt.value.code)
-        assert said == (
-            f"wrote {out.as_posix()}: the result file is written and whole; its summary could "
-            "not be printed (BrokenPipeError)"
-        )
-        assert "refused" not in said and halt.value.__context__ is None
-        assert "descriptives" in json.loads(out.read_text())
-        assert sorted(path.name for path in tmp_path.glob("*piped_*")) == [
-            f"piped_{k}.json" for k in range(number + 1)
-        ]
+    assert "refused" not in said and halt.value.__context__ is None
+    assert "descriptives" in json.loads(out.read_text())
 
 
 def watched_sealed(
@@ -7152,6 +7230,7 @@ def watched_sealed(
     return sealed, touched
 
 
+@validations_the_disabled_command_skips
 def test_a_plan_that_names_a_sealed_file_is_not_followed(
     study: SimpleNamespace,
     tmp_path: Path,
@@ -7203,6 +7282,7 @@ def linked(path: Path, target: Path) -> Iterator[None]:
         aside.rename(path)
 
 
+@validations_the_disabled_command_skips
 def test_nothing_is_read_through_a_link_to_the_sealed_file(
     study: SimpleNamespace,
     tmp_path: Path,
@@ -7309,6 +7389,7 @@ def test_nothing_is_read_through_a_link_to_the_sealed_file(
     assert list(sealed.parent.iterdir()) == [sealed]  # and nothing was written beside it
 
 
+@validations_the_disabled_command_skips
 def test_a_sealed_file_of_another_build_and_a_stop_inside_the_rules(
     study: SimpleNamespace,
     tmp_path: Path,
@@ -7357,6 +7438,7 @@ CHEAP = ["secondary_lists", "descriptives", "selective_prediction"]
 """Sections that need no interval of the registered test: quick to compute."""
 
 
+@validations_the_disabled_command_skips
 def test_the_sealed_file_is_read_last_behind_everything_else(
     study: SimpleNamespace,
     tmp_path: Path,
@@ -7399,6 +7481,7 @@ def test_the_sealed_file_is_read_last_behind_everything_else(
     assert order.count("the sealed file") == 1
 
 
+@validations_the_disabled_command_skips
 def test_nothing_looks_at_the_sealed_path_before_every_run_is_complete(
     study: SimpleNamespace,
     tmp_path: Path,
@@ -7427,6 +7510,7 @@ def test_nothing_looks_at_the_sealed_path_before_every_run_is_complete(
     assert touched and report["inputs"]["sealed_outcomes_sha256"] == study.sealed_sha
 
 
+@validations_the_disabled_command_skips
 def test_nothing_looks_at_the_sealed_path_before_the_predictions_are_those_of_the_freeze(
     study: SimpleNamespace,
     tmp_path: Path,
@@ -7497,6 +7581,7 @@ SECTION_OF_SUBSET = {
 
 
 @pytest.mark.parametrize("key", list(SECTION_OF_SUBSET))
+@validations_the_disabled_command_skips
 def test_the_item_file_of_a_subset_is_held_to_the_counts_file(
     key: str,
     study: SimpleNamespace,
@@ -7515,6 +7600,7 @@ def test_the_item_file_of_a_subset_is_held_to_the_counts_file(
 
 
 @pytest.mark.parametrize("column", ["event_date", "statement_group_id"])
+@validations_the_disabled_command_skips
 def test_the_wider_population_is_held_to_the_outcome_rows_of_its_display_rows(
     column: str, study: SimpleNamespace, tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
@@ -7554,6 +7640,7 @@ def counts_of(study: SimpleNamespace) -> list[str]:
     return ["--counts", str(study.paths.counts)]
 
 
+@figures_the_fallback_withholds
 def test_sections_can_be_chosen_and_a_secondary_model_left_out(
     study: SimpleNamespace,
     tmp_path: Path,
@@ -7596,6 +7683,7 @@ def test_sections_can_be_chosen_and_a_secondary_model_left_out(
     assert base.report["secondary_models_left_out_check"] == {}
 
 
+@validations_the_disabled_command_skips
 def test_a_secondary_model_whose_runs_are_complete_is_not_left_out(
     study: SimpleNamespace,
     tmp_path: Path,
@@ -7637,6 +7725,7 @@ def test_a_secondary_model_whose_runs_are_complete_is_not_left_out(
     assert "the sealed file" not in sealed_unread
 
 
+@figures_the_fallback_withholds
 def test_a_secondary_model_left_out_has_what_the_check_found_in_the_result_file(
     study: SimpleNamespace,
     tmp_path: Path,
@@ -7732,6 +7821,7 @@ def in_two(study: SimpleNamespace, name: str) -> tuple[list[Path], Callable[[dic
     return [folder for folder, _ in parts], change
 
 
+@figures_the_fallback_withholds
 def test_a_run_stored_in_several_parts_gives_the_same_result(
     study: SimpleNamespace,
     tmp_path: Path,
@@ -7792,6 +7882,7 @@ def test_a_run_stored_in_several_parts_gives_the_same_result(
     assert not list(study.paths.runs.glob("*.aside")) and not list(study.paths.runs.glob("*.s0"))
 
 
+@figures_the_fallback_withholds
 def test_two_runs_write_the_same_bytes_and_the_record_of_what_was_read(
     study: SimpleNamespace,
     tmp_path: Path,
@@ -7963,6 +8054,7 @@ def strings(value: Any) -> Iterator[str]:
         yield value
 
 
+@figures_the_fallback_withholds
 def test_no_output_says_anything_about_a_single_statement(
     study: SimpleNamespace, base: SimpleNamespace
 ) -> None:
@@ -7991,6 +8083,7 @@ def test_no_output_says_anything_about_a_single_statement(
     assert companies == set(base.report["descriptives"]["counts"]["by_company"])
 
 
+@figures_the_fallback_withholds
 def test_the_date_discontinued_cell_moves_the_contrasts_of_the_statements_it_is_on(
     study: SimpleNamespace,
     tmp_path: Path,
@@ -8046,6 +8139,7 @@ def test_the_date_discontinued_cell_moves_the_contrasts_of_the_statements_it_is_
     assert entry["bounds"]["statements"] == len(fit.ids)
 
 
+@figures_the_fallback_withholds
 def test_a_primary_declared_not_evaluable_is_left_out_of_its_sections(
     study: SimpleNamespace,
     tmp_path: Path,
@@ -8181,7 +8275,7 @@ def test_the_train_descriptives_command_reads_the_open_table_alone(
     # the command takes no sealed path, and refuses what is not the open table of this build
     with pytest.raises(SystemExit, match="unrecognized arguments"):
         sc.main(["train-descriptives", "--out", str(tmp_path / "x.json"), "--sealed", "x"])
-    with pytest.raises(SystemExit, match="already there, and nothing is overwritten"):
+    with pytest.raises(SystemExit, match=r"the output cannot be written \(FileExistsError\)"):
         sc.main(["train-descriptives", "--out", str(out), *args])
     vault = tmp_path / "sealed"
     vault.mkdir()
@@ -8211,6 +8305,7 @@ def test_the_train_descriptives_command_reads_the_open_table_alone(
     assert not (tmp_path / "new.json").exists()
 
 
+@figures_the_fallback_withholds
 def test_a_primary_is_scored_on_the_item_set_its_probe_fixed(
     study: SimpleNamespace,
     tmp_path: Path,

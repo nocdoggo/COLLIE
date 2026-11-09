@@ -1,0 +1,96 @@
+{
+  "by_echo": {
+    "ok": 120
+  },
+  "by_status": {
+    "failed": 4,
+    "ok": 116
+  },
+  "complete": true,
+  "condition": "literal-v1|det-v1|mask=0|shift=0|track=-",
+  "expected_rows": 120,
+  "fallbacks": 4,
+  "git": {
+    "branch": "followup/coling-2027",
+    "f1": "a7dcb774a6c06e542d83077434ae35d71e9058be",
+    "read_py_modified": false,
+    "registration": "0c2579a6eb98d1ed844bea4f45cdb159283bb25f",
+    "sha": "3ed1308cb9ba45fa2f0f5170bdc41298df8b9a45"
+  },
+  "guard": {
+    "max_physical_calls": 20000,
+    "physical_calls_this_invocation": 124,
+    "physical_calls_total": 124,
+    "refusals_this_invocation": 0,
+    "retries_this_invocation": 0,
+    "spend_cap_usd": 0.0384,
+    "usd_this_invocation": 0.02495895000000001,
+    "usd_total": 0.02495895000000001
+  },
+  "item_ids_sha256": "0707d836e05867fde429c74dce4522b54bd764615d69c69df6fd9496ea643788",
+  "items": 120,
+  "items_in_file": 120,
+  "items_sha256": "9c6639a46323197952d3992418207cd0b5cb406657c530845501c1813630e935",
+  "ladder_rung": {
+    "model_id": "openai/gpt-4o-mini",
+    "name": "gpt-4o-mini",
+    "price_input_per_mtok": 0.15,
+    "price_output_per_mtok": 0.6,
+    "provider": "openrouter",
+    "released": "2024-07",
+    "served_as": [
+      "openai/gpt-4o-mini"
+    ],
+    "tier": "legacy"
+  },
+  "limit": null,
+  "mask_names": false,
+  "model": "gpt-4o-mini",
+  "model_id": "openai/gpt-4o-mini",
+  "price_date": "2026-10-01",
+  "provider_object": {
+    "allow_fallbacks": false,
+    "order": [
+      "openai"
+    ]
+  },
+  "python": "3.12.11",
+  "read_py_sha256": "54d171783601e72994f960cbe7b5adba157f6061ba3c9a1da30fd23e23be244f",
+  "readings": 120,
+  "readings_sha256": "0c05e8b9005d8d7c6ee1d102e1c0e8c41ca828b255aa562246ab288c9299951a",
+  "roots": {
+    "local_root": "/home/noctis/GitHub/COLLIE-coling/results/coling/read",
+    "out_root": "/home/noctis/GitHub/COLLIE-coling/analysis/coling/out/read"
+  },
+  "route": {
+    "also_served_as": [],
+    "also_served_by": [],
+    "model_id": "openai/gpt-4o-mini",
+    "price": [
+      0.15,
+      0.6,
+      "2026-10-01"
+    ],
+    "provider": "openai",
+    "quantization": null
+  },
+  "run_name": "e2-literal-gpt-4o-mini",
+  "samples": 1,
+  "served_as": [
+    "openai/gpt-4o-mini"
+  ],
+  "shard": null,
+  "shift_years": 0,
+  "spend_cap_usd": 0.0384,
+  "status": "complete",
+  "temperature": 0.0,
+  "template": "literal-v1",
+  "template_sha256": "855244013a7614501ebdd6fbb45c8998f102a877e1299a6d86f81e1359934b27",
+  "track_record": null,
+  "track_record_sha256": null,
+  "track_record_split": null,
+  "usd_per_mtok": [
+    0.15,
+    0.6
+  ]
+}

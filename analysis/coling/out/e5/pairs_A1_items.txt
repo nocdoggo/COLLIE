@@ -1,0 +1,1801 @@
+Task C, minimal pairs: the items of pairs_A1.csv, in the order of the sheet.
+
+=== 1 of 60: Pa359ae990b (seed S1cce7a6a1282) ===
+factor: certainty; level: tbd
+
+Seed entry
+- Drug: Hulorbrin Tablets
+- Company: Kirkmere Pharma
+- Presentation: Tablets 12.5mg 100 (NDC 00000-7917-95)
+- Therapeutic category: Psychiatry
+- Initial posting date: 2019-09-12
+- Type of update: Revised
+- Date of update: 2020-09-04
+- Availability information: "Unavailable"
+- Related information: "Resupply end of Sep/early Oct 2020"
+- Reason for shortage: "Other"
+Seed gold: recovery; 2020-09-21 to 2020-10-10; asserted; not stale; distractors: none
+
+Edited entry
+- Drug: Hulorbrin Tablets
+- Company: Kirkmere Pharma
+- Presentation: Tablets 12.5mg 100 (NDC 00000-7917-95)
+- Therapeutic category: Psychiatry
+- Initial posting date: 2019-09-12
+- Type of update: Revised
+- Date of update: 2020-09-04
+- Availability information: "Unavailable"
+- Related information: "Resupply TBD"
+- Reason for shortage: "Other"
+Gold of the edited entry: recovery; abstain; undetermined; not stale; distractors: none
+Attested text: Out of stock. Resupply TBD
+
+=== 2 of 60: P2837591950 (seed S245dea14b314) ===
+factor: granularity; level: mid
+
+Seed entry
+- Drug: Jorebrin Injection
+- Company: Stanbury Pharma
+- Presentation: 1% 2 mL Single Dose Vial (NDC 00000-542-29)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2018-02-20
+- Type of update: Revised
+- Date of update: 2022-09-28
+- Availability information: "Currently on backorder - next shipment anticipated End Oct"
+- Related information: (blank)
+- Reason for shortage: "Demand increase for the drug"
+Seed gold: next_delivery; 2022-10-21 to 2022-10-31; estimated; not stale; distractors: none
+
+Edited entry
+- Drug: Jorebrin Injection
+- Company: Stanbury Pharma
+- Presentation: 1% 2 mL Single Dose Vial (NDC 00000-542-29)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2018-02-20
+- Type of update: Revised
+- Date of update: 2022-09-28
+- Availability information: "Currently on backorder - next shipment anticipated Mid Oct"
+- Related information: (blank)
+- Reason for shortage: "Demand increase for the drug"
+Gold of the edited entry: next_delivery; 2022-10-11 to 2022-10-20; estimated; not stale; distractors: none
+Attested text: Currently on backorder - next shipment anticipated Mid Oct
+
+=== 3 of 60: P9256e1a9f7 (seed S7b8334f8df18) ===
+factor: distractor; level: expiry
+
+Seed entry
+- Drug: Calovex Injection
+- Company: Yeldbury Pharma
+- Presentation: 25 mg per 5 mL Multi-Dose Vial (NDC 00000-634-03)
+- Therapeutic category: Anesthesia;Neurology
+- Initial posting date: 2020-04-02
+- Type of update: Revised
+- Date of update: 2020-05-11
+- Availability information: "No stock available. Resupply July 2020"
+- Related information: "Marketing partner: Uxcombe Pharmaceutical Division, LLC."
+- Reason for shortage: "Demand increase for the drug"
+Seed gold: recovery; 2020-07-01 to 2020-07-31; asserted; not stale; distractors: none
+
+Edited entry
+- Drug: Calovex Injection
+- Company: Yeldbury Pharma
+- Presentation: 25 mg per 5 mL Multi-Dose Vial (NDC 00000-634-03)
+- Therapeutic category: Anesthesia;Neurology
+- Initial posting date: 2020-04-02
+- Type of update: Revised
+- Date of update: 2020-05-11
+- Availability information: "4 month dating available by request (expiry 9/30/2020). No stock available. Resupply July 2020"
+- Related information: "Marketing partner: Uxcombe Pharmaceutical Division, LLC."
+- Reason for shortage: "Demand increase for the drug"
+Gold of the edited entry: recovery; 2020-07-01 to 2020-07-31; asserted; not stale; distractors: expiry
+Attested text: 8 month dating available by request (expiry 5/31/2021)
+
+=== 4 of 60: P866076a5e4 (seed See0fa7df92e7) ===
+factor: surface_form; level: no_year
+
+Seed entry
+- Drug: Zilarlox Injection
+- Company: Norcombe Laboratories
+- Presentation: 2 g vial (NDC 00000-447-79)
+- Therapeutic category: Anti-Infective;Pediatric
+- Initial posting date: 2015-07-22
+- Type of update: Revised
+- Date of update: 2020-03-31
+- Availability information: "Available. On allocation. Estimated availibility April 2020"
+- Related information: (blank)
+- Reason for shortage: (blank)
+Seed gold: recovery; 2020-04-01 to 2020-04-30; estimated; not stale; distractors: none
+
+Edited entry
+- Drug: Zilarlox Injection
+- Company: Norcombe Laboratories
+- Presentation: 2 g vial (NDC 00000-447-79)
+- Therapeutic category: Anti-Infective;Pediatric
+- Initial posting date: 2015-07-22
+- Type of update: Revised
+- Date of update: 2020-03-31
+- Availability information: "Available. On allocation. Estimated availibility April"
+- Related information: (blank)
+- Reason for shortage: (blank)
+Gold of the edited entry: recovery; 2020-04-01 to 2020-04-30; estimated; not stale; distractors: none
+Attested text: Backordered — next shipment June
+
+=== 5 of 60: P026b220c6e (seed S9e9b05ee3b88) ===
+factor: stale; level: stale
+
+Seed entry
+- Drug: Tovumtril Injectable Emulsion
+- Company: Wyngarth Pharma
+- Presentation: 200mg/20mL vial, 25ct (NDC 00000-360-45)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2020-04-10
+- Type of update: Revised
+- Date of update: 2021-11-08
+- Availability information: "No current supply"
+- Related information: "Partial shipments on allocation April-December 2021"
+- Reason for shortage: "Demand increase for the drug. Manufacturer extended lead times."
+Seed gold: next_delivery; 2021-04-01 to 2021-12-31; asserted; not stale; distractors: none
+
+Edited entry
+- Drug: Tovumtril Injectable Emulsion
+- Company: Wyngarth Pharma
+- Presentation: 200mg/20mL vial, 25ct (NDC 00000-360-45)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2020-04-10
+- Type of update: Reverified
+- Date of update: 2022-01-16
+- Availability information: "No current supply"
+- Related information: "Partial shipments on allocation April-December 2021"
+- Reason for shortage: "Demand increase for the drug. Manufacturer extended lead times."
+Gold of the edited entry: next_delivery; 2021-04-01 to 2021-12-31; asserted; stale; distractors: none
+Attested text: (nothing inserted)
+
+=== 6 of 60: Pb2ef37cf43 (seed S516344a9b5ee) ===
+factor: granularity; level: timeframe
+
+Seed entry
+- Drug: Tovorsant Tablets
+- Company: Norholt Pharma
+- Presentation: 5 mg tablet; bottle of 50 (NDC 00000-7302-8)
+- Therapeutic category: Endocrinology/Metabolism
+- Initial posting date: 2020-04-02
+- Type of update: Reverified
+- Date of update: 2021-07-27
+- Availability information: "Next Delivery: July 2021; Estimated Recovery: December 2021"
+- Related information: "Shortage per Manufacturer: Manufacturing Delay"
+- Reason for shortage: "Other"
+Seed gold: recovery; 2021-12-01 to 2021-12-31; estimated; not stale; distractors: none
+
+Edited entry
+- Drug: Tovorsant Tablets
+- Company: Norholt Pharma
+- Presentation: 5 mg tablet; bottle of 50 (NDC 00000-7302-8)
+- Therapeutic category: Endocrinology/Metabolism
+- Initial posting date: 2020-04-02
+- Type of update: Reverified
+- Date of update: 2021-07-27
+- Availability information: "Next Delivery: July 2021; Estimated Recovery: in the December 2021 timeframe"
+- Related information: "Shortage per Manufacturer: Manufacturing Delay"
+- Reason for shortage: "Other"
+Gold of the edited entry: recovery; 2021-12-01 to 2021-12-31; estimated; not stale; distractors: none
+Attested text: Additional lots will be available in the June 2021 timeframe. Product will be made available as it is released.
+
+=== 7 of 60: P86e90c4498 (seed Sb1ea42161c22) ===
+factor: granularity; level: early
+
+Seed entry
+- Drug: Jororphor Injection
+- Company: Haxthorpe Laboratories
+- Presentation: 2 mg/mL, 2 mL vial, 25 count (NDC 00000-113-63)
+- Therapeutic category: Gastroenterology
+- Initial posting date: 2018-04-11
+- Type of update: Revised
+- Date of update: 2019-10-07
+- Availability information: "Currently on backorder, next shipment expected Dec. 2019"
+- Related information: "Intermittent availability expected"
+- Reason for shortage: "Demand increase for the drug"
+Seed gold: next_delivery; 2019-12-01 to 2019-12-31; estimated; not stale; distractors: none
+
+Edited entry
+- Drug: Jororphor Injection
+- Company: Haxthorpe Laboratories
+- Presentation: 2 mg/mL, 2 mL vial, 25 count (NDC 00000-113-63)
+- Therapeutic category: Gastroenterology
+- Initial posting date: 2018-04-11
+- Type of update: Revised
+- Date of update: 2019-10-07
+- Availability information: "Currently on backorder, next shipment expected early Dec 2019"
+- Related information: "Intermittent availability expected"
+- Reason for shortage: "Demand increase for the drug"
+Gold of the edited entry: next_delivery; 2019-12-01 to 2019-12-10; estimated; not stale; distractors: none
+Attested text: Available, though pharmacies may experience delays in receiving full shipments until early Jan 2023
+
+=== 8 of 60: Pb32dbdb809 (seed Sc32ebe4ce3c5) ===
+factor: certainty; level: no_estimated_date
+
+Seed entry
+- Drug: Ulvorsant Injection
+- Company: Pellcroft Pharma
+- Presentation: 2 mg/mL, 5 mL Single-dose vial (NDC 0000-7297-39, 0000-6305-31, 0000-2082-50)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2020-04-08
+- Type of update: Revised
+- Date of update: 2021-05-19
+- Availability information: "Available. Next release June 2021"
+- Related information: "Please check with your wholesaler for available inventory"
+- Reason for shortage: "Demand increase for the drug"
+Seed gold: next_delivery; 2021-06-01 to 2021-06-30; asserted; not stale; distractors: none
+
+Edited entry
+- Drug: Ulvorsant Injection
+- Company: Pellcroft Pharma
+- Presentation: 2 mg/mL, 5 mL Single-dose vial (NDC 0000-7297-39, 0000-6305-31, 0000-2082-50)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2020-04-08
+- Type of update: Revised
+- Date of update: 2021-05-19
+- Availability information: "Available. No estimated release date available"
+- Related information: "Please check with your wholesaler for available inventory"
+- Reason for shortage: "Demand increase for the drug"
+Gold of the edited entry: next_delivery; abstain; undetermined; not stale; distractors: none
+Attested text: Currently out of stock. No estimated release date available.
+
+=== 9 of 60: P2503d23903 (seed S5b2a38fb2074) ===
+factor: distractor; level: expiry
+
+Seed entry
+- Drug: Lumentril Injection
+- Company: Fengarth Pharmaceuticals
+- Presentation: 3 Months 22.5 mg Kit (NDC 0000-1135-94)
+- Therapeutic category: Endocrinology/Metabolism;Oncology
+- Initial posting date: 2020-07-24
+- Type of update: Revised
+- Date of update: 2021-01-08
+- Availability information: "Available; Additional units expected to release in mid-January 2021"
+- Related information: (blank)
+- Reason for shortage: (blank)
+Seed gold: next_delivery; 2021-01-11 to 2021-01-20; estimated; not stale; distractors: none
+
+Edited entry
+- Drug: Lumentril Injection
+- Company: Fengarth Pharmaceuticals
+- Presentation: 3 Months 22.5 mg Kit (NDC 0000-1135-94)
+- Therapeutic category: Endocrinology/Metabolism;Oncology
+- Initial posting date: 2020-07-24
+- Type of update: Revised
+- Date of update: 2021-01-08
+- Availability information: "2 month dating available by request (expiry 3/31/2021). Available; Additional units expected to release in mid-January 2021"
+- Related information: (blank)
+- Reason for shortage: (blank)
+Gold of the edited entry: next_delivery; 2021-01-11 to 2021-01-20; estimated; not stale; distractors: expiry
+Attested text: 8 month dating available by request (expiry 5/31/2021)
+
+=== 10 of 60: P42a8ce1d59 (seed S37d74a315ab5) ===
+factor: silent; level: silent
+
+Seed entry
+- Drug: Tovaquel Injection
+- Company: Veymere Pharmaceuticals
+- Presentation: 100 mg/vial Lyophilized Powder (NDC 00000-5380-58)
+- Therapeutic category: Oncology
+- Initial posting date: 2020-12-22
+- Type of update: Revised
+- Date of update: 2021-04-29
+- Availability information: "Currently unavailable. Resupply Late-April 2021."
+- Related information: "Product is manufactured and labeled for Dunwick Laboratories"
+- Reason for shortage: (blank)
+Seed gold: recovery; 2021-04-21 to 2021-04-30; asserted; not stale; distractors: none
+
+Edited entry
+- Drug: Tovaquel Injection
+- Company: Veymere Pharmaceuticals
+- Presentation: 100 mg/vial Lyophilized Powder (NDC 00000-5380-58)
+- Therapeutic category: Oncology
+- Initial posting date: 2020-12-22
+- Type of update: Revised
+- Date of update: 2021-04-29
+- Availability information: "Currently unavailable."
+- Related information: "Product is manufactured and labeled for Dunwick Laboratories"
+- Reason for shortage: (blank)
+Gold of the edited entry: none; abstain; no_statement; not stale; distractors: none
+Attested text: (nothing inserted)
+
+=== 11 of 60: Pcbc8be66d8 (seed Sd014e3d594b1) ===
+factor: certainty; level: expected
+
+Seed entry
+- Drug: Vaxillox Injection
+- Company: Mertleigh Therapeutics
+- Presentation: 20% IV 250 mL, (NDC 0000-816-882)
+- Therapeutic category: Endocrinology/Metabolism;Gastroenterology;Total Parenteral Nutrition
+- Initial posting date: 2021-10-25
+- Type of update: Revised
+- Date of update: 2021-11-23
+- Availability information: "Limited Supply on Allocation, Recovery Q4"
+- Related information: "NDC 0000-816-882. Kirkthorpe is the NDA holder and Mertleigh is the distributor."
+- Reason for shortage: "Demand Increase"
+Seed gold: recovery; 2021-10-01 to 2021-12-31; asserted; not stale; distractors: none
+
+Edited entry
+- Drug: Vaxillox Injection
+- Company: Mertleigh Therapeutics
+- Presentation: 20% IV 250 mL, (NDC 0000-816-882)
+- Therapeutic category: Endocrinology/Metabolism;Gastroenterology;Total Parenteral Nutrition
+- Initial posting date: 2021-10-25
+- Type of update: Revised
+- Date of update: 2021-11-23
+- Availability information: "Limited Supply on Allocation, Recovery expected Q4"
+- Related information: "NDC 0000-816-882. Kirkthorpe is the NDA holder and Mertleigh is the distributor."
+- Reason for shortage: "Demand Increase"
+Gold of the edited entry: recovery; 2021-10-01 to 2021-12-31; estimated; not stale; distractors: none
+Attested text: Limit availability / Recovery expected Q4
+
+=== 12 of 60: Pc00a771844 (seed S21109caee150) ===
+factor: silent; level: silent
+
+Seed entry
+- Drug: Moratril Capsules
+- Company: Uxleigh Pharma
+- Presentation: 50 mg, 100 count bottle (NDC 0000-4434-87)
+- Therapeutic category: Psychiatry
+- Initial posting date: 2019-11-25
+- Type of update: Revised
+- Date of update: 2020-03-03
+- Availability information: "Allocating Inventory"
+- Related information: "Additional lots are scheduled for release in the April timeframe. Product will be made available as it is released."
+- Reason for shortage: "Other"
+Seed gold: next_delivery; 2020-04-01 to 2020-04-30; asserted; not stale; distractors: none
+
+Edited entry
+- Drug: Moratril Capsules
+- Company: Uxleigh Pharma
+- Presentation: 50 mg, 100 count bottle (NDC 0000-4434-87)
+- Therapeutic category: Psychiatry
+- Initial posting date: 2019-11-25
+- Type of update: Revised
+- Date of update: 2020-03-03
+- Availability information: "Allocating Inventory"
+- Related information: (blank)
+- Reason for shortage: "Other"
+Gold of the edited entry: none; abstain; no_statement; not stale; distractors: none
+Attested text: (nothing inserted)
+
+=== 13 of 60: Pae0da421f5 (seed Sf402362a7efd) ===
+factor: distractor; level: expiry
+
+Seed entry
+- Drug: Wenotane Injection
+- Company: Branwick Pharma
+- Presentation: 1% (300 mg per 30 mL), (10 mg per mL), SDV, (NDC 00000-8680-32)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2021-07-14
+- Type of update: Revised
+- Date of update: 2022-09-14
+- Availability information: "Backordered. Next release October 2022."
+- Related information: "Check wholesaler inventory"
+- Reason for shortage: (blank)
+Seed gold: next_delivery; 2022-10-01 to 2022-10-31; asserted; not stale; distractors: none
+
+Edited entry
+- Drug: Wenotane Injection
+- Company: Branwick Pharma
+- Presentation: 1% (300 mg per 30 mL), (10 mg per mL), SDV, (NDC 00000-8680-32)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2021-07-14
+- Type of update: Revised
+- Date of update: 2022-09-14
+- Availability information: "3 month dating available by request (expiry 12/31/2022). Backordered. Next release October 2022."
+- Related information: "Check wholesaler inventory"
+- Reason for shortage: (blank)
+Gold of the edited entry: recovery; 2022-10-01 to 2022-10-31; asserted; not stale; distractors: expiry
+Attested text: 8 month dating available by request (expiry 5/31/2021)
+
+=== 14 of 60: Paa2c7fa465 (seed S6ca7562d4e2e) ===
+factor: certainty; level: tbd
+
+Seed entry
+- Drug: Hulovex Injection
+- Company: Kirkstead Therapeutics
+- Presentation: 250 mg/20 mL (12.5 mg/mL); Single Dose Glass Fliptop Vial (NDC 00000-5859-36)
+- Therapeutic category: Cardiovascular;Pediatric;Renal
+- Initial posting date: 2017-11-06
+- Type of update: Revised
+- Date of update: 2020-03-27
+- Availability information: "Limited Supply Available. Next Delivery and Estimated Recovery: June 2020"
+- Related information: "Check Wholesaler for Availablility Shortage per Manufacturer: Manufacturing Delay"
+- Reason for shortage: "Other"
+Seed gold: recovery; 2020-06-01 to 2020-06-30; estimated; not stale; distractors: none
+
+Edited entry
+- Drug: Hulovex Injection
+- Company: Kirkstead Therapeutics
+- Presentation: 250 mg/20 mL (12.5 mg/mL); Single Dose Glass Fliptop Vial (NDC 00000-5859-36)
+- Therapeutic category: Cardiovascular;Pediatric;Renal
+- Initial posting date: 2017-11-06
+- Type of update: Revised
+- Date of update: 2020-03-27
+- Availability information: "Limited Supply Available. Next Delivery and Estimated Recovery: TBD"
+- Related information: "Check Wholesaler for Availablility Shortage per Manufacturer: Manufacturing Delay"
+- Reason for shortage: "Other"
+Gold of the edited entry: recovery; abstain; undetermined; not stale; distractors: none
+Attested text: Next Delivery and Estimated Recovery: TBD
+
+=== 15 of 60: P951bd3f914 (seed S1accc89c11fa) ===
+factor: surface_form; level: abbreviated_month
+
+Seed entry
+- Drug: Vaxuquel Injection
+- Company: Oakstead Pharma
+- Presentation: 2 mg per mL / 0.2% (400 mg per 200 mL), Single Dose Infusion Bottle (NDC 00000-528-59)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2018-03-23
+- Type of update: Revised
+- Date of update: 2021-03-15
+- Availability information: "Backordered. Next release April 2021."
+- Related information: "Check wholesaler for inventory"
+- Reason for shortage: "Available"
+Seed gold: next_delivery; 2021-04-01 to 2021-04-30; asserted; not stale; distractors: none
+
+Edited entry
+- Drug: Vaxuquel Injection
+- Company: Oakstead Pharma
+- Presentation: 2 mg per mL / 0.2% (400 mg per 200 mL), Single Dose Infusion Bottle (NDC 00000-528-59)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2018-03-23
+- Type of update: Revised
+- Date of update: 2021-03-15
+- Availability information: "Backordered. Next release Apr 2021."
+- Related information: "Check wholesaler for inventory"
+- Reason for shortage: "Available"
+Gold of the edited entry: next_delivery; 2021-04-01 to 2021-04-30; asserted; not stale; distractors: none
+Attested text: Backordered. Next release Oct 2020
+
+=== 16 of 60: P60d145d549 (seed Sc32ebe4ce3c5) ===
+factor: silent; level: silent
+
+Seed entry
+- Drug: Ulvorsant Injection
+- Company: Pellcroft Pharma
+- Presentation: 2 mg/mL, 5 mL Single-dose vial (NDC 0000-7297-39, 0000-6305-31, 0000-2082-50)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2020-04-08
+- Type of update: Revised
+- Date of update: 2021-05-19
+- Availability information: "Available. Next release June 2021"
+- Related information: "Please check with your wholesaler for available inventory"
+- Reason for shortage: "Demand increase for the drug"
+Seed gold: next_delivery; 2021-06-01 to 2021-06-30; asserted; not stale; distractors: none
+
+Edited entry
+- Drug: Ulvorsant Injection
+- Company: Pellcroft Pharma
+- Presentation: 2 mg/mL, 5 mL Single-dose vial (NDC 0000-7297-39, 0000-6305-31, 0000-2082-50)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2020-04-08
+- Type of update: Revised
+- Date of update: 2021-05-19
+- Availability information: "Available."
+- Related information: "Please check with your wholesaler for available inventory"
+- Reason for shortage: "Demand increase for the drug"
+Gold of the edited entry: none; abstain; no_statement; not stale; distractors: none
+Attested text: (nothing inserted)
+
+=== 17 of 60: P62675ff92d (seed S6994a9942ccc) ===
+factor: distractor; level: available_until
+
+Seed entry
+- Drug: Quelarlox Ophthalmic Solution
+- Company: Thornwick Pharmaceuticals
+- Presentation: 22.3 mg/mL and 6.8 mg/mL, 10 mL (NDC 00000-866-53)
+- Therapeutic category: Ophthalmology
+- Initial posting date: 2018-01-24
+- Type of update: Revised
+- Date of update: 2019-12-13
+- Availability information: "Intermittent backorders through Q1 2020. Estimated availability: Late January 2020/February 2020"
+- Related information: "Marketed by Thornwick & Veyleigh Inc. To order, contact Thornwick & Veyleigh, a division of Quinstead Pharmaceuticals North America at info@thornwick.example"
+- Reason for shortage: "Other"
+Seed gold: recovery; 2020-01-21 to 2020-02-29; estimated; not stale; distractors: none
+
+Edited entry
+- Drug: Quelarlox Ophthalmic Solution
+- Company: Thornwick Pharmaceuticals
+- Presentation: 22.3 mg/mL and 6.8 mg/mL, 10 mL (NDC 00000-866-53)
+- Therapeutic category: Ophthalmology
+- Initial posting date: 2018-01-24
+- Type of update: Revised
+- Date of update: 2019-12-13
+- Availability information: "Product is available with an expected supply duration until Dec 2019. Intermittent backorders through Q1 2020. Estimated availability: Late January 2020/February 2020"
+- Related information: "Marketed by Thornwick & Veyleigh Inc. To order, contact Thornwick & Veyleigh, a division of Quinstead Pharmaceuticals North America at info@thornwick.example"
+- Reason for shortage: "Other"
+Gold of the edited entry: recovery; 2020-01-21 to 2020-02-29; estimated; not stale; distractors: depletion
+Attested text: Product is available with an expected supply duration until AUG 2022. No future production expected for an extended period.
+
+=== 18 of 60: P7964ac38d1 (seed S4ea072faca31) ===
+factor: distractor; level: available_until
+
+Seed entry
+- Drug: Ulvilphor Injection
+- Company: Branbury Laboratories
+- Presentation: Injection NDC (0000-9974-48), 320 mg/1 mL, INJECTION, SOLUTION, IV
+- Therapeutic category: Medical Imaging
+- Initial posting date: 2022-05-09
+- Type of update: Revised
+- Date of update: 2022-09-02
+- Availability information: "Backordered. Product will be available for order October 10, 2022."
+- Related information: (blank)
+- Reason for shortage: "Other"
+Seed gold: recovery; 2022-10-10 to 2022-10-10; asserted; not stale; distractors: none
+
+Edited entry
+- Drug: Ulvilphor Injection
+- Company: Branbury Laboratories
+- Presentation: Injection NDC (0000-9974-48), 320 mg/1 mL, INJECTION, SOLUTION, IV
+- Therapeutic category: Medical Imaging
+- Initial posting date: 2022-05-09
+- Type of update: Revised
+- Date of update: 2022-09-02
+- Availability information: "Stock anticipated to be available through September 2022. Backordered. Product will be available for order October 10, 2022."
+- Related information: (blank)
+- Reason for shortage: "Other"
+Gold of the edited entry: recovery; 2022-10-10 to 2022-10-10; asserted; not stale; distractors: depletion
+Attested text: Stock anticipated to be available through June 2022
+
+=== 19 of 60: P7cca66e271 (seed S3d672ad55954) ===
+factor: certainty; level: tbd
+
+Seed entry
+- Drug: Nevequel Strips
+- Company: Radleigh Pharmaceuticals
+- Presentation: 1.0 mg 100 sterile strips (NDC 00000-113-92)
+- Therapeutic category: Ophthalmology
+- Initial posting date: 2018-02-06
+- Type of update: Reverified
+- Date of update: 2019-06-21
+- Availability information: "On backorder"
+- Related information: "Availability Q12020"
+- Reason for shortage: "Other"
+Seed gold: recovery; 2020-01-01 to 2020-03-31; asserted; not stale; distractors: none
+
+Edited entry
+- Drug: Nevequel Strips
+- Company: Radleigh Pharmaceuticals
+- Presentation: 1.0 mg 100 sterile strips (NDC 00000-113-92)
+- Therapeutic category: Ophthalmology
+- Initial posting date: 2018-02-06
+- Type of update: Reverified
+- Date of update: 2019-06-21
+- Availability information: "On backorder"
+- Related information: "Availability unknown"
+- Reason for shortage: "Other"
+Gold of the edited entry: recovery; abstain; undetermined; not stale; distractors: none
+Attested text: Availability unknown
+
+=== 20 of 60: Pedb8732787 (seed Seddaf191d9a9) ===
+factor: granularity; level: quarter
+
+Seed entry
+- Drug: Dovilbrin Injection
+- Company: Oakbury Therapeutics
+- Presentation: 2% 5 mL vial, Preservative Free (NDC 0000-6157-74)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2018-06-13
+- Type of update: Revised
+- Date of update: 2022-10-13
+- Availability information: "This presentation is temporarily on backorder."
+- Related information: "Additional lots are scheduled for manufacturing and will be available in the December 2022 timeframe. Product will be made available as it is released."
+- Reason for shortage: "Demand increase for the drug"
+Seed gold: next_delivery; 2022-12-01 to 2022-12-31; asserted; not stale; distractors: none
+
+Edited entry
+- Drug: Dovilbrin Injection
+- Company: Oakbury Therapeutics
+- Presentation: 2% 5 mL vial, Preservative Free (NDC 0000-6157-74)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2018-06-13
+- Type of update: Revised
+- Date of update: 2022-10-13
+- Availability information: "This presentation is temporarily on backorder."
+- Related information: "Additional lots are scheduled for manufacturing and will be available in the Q4 2022 timeframe. Product will be made available as it is released."
+- Reason for shortage: "Demand increase for the drug"
+Gold of the edited entry: next_delivery; 2022-10-01 to 2022-12-31; asserted; not stale; distractors: none
+Attested text: Q1 2023
+
+=== 21 of 60: P7bb56594ae (seed S1cce7a6a1282) ===
+factor: stale; level: stale
+
+Seed entry
+- Drug: Hulorbrin Tablets
+- Company: Kirkmere Pharma
+- Presentation: Tablets 12.5mg 100 (NDC 00000-7917-95)
+- Therapeutic category: Psychiatry
+- Initial posting date: 2019-09-12
+- Type of update: Revised
+- Date of update: 2020-09-04
+- Availability information: "Unavailable"
+- Related information: "Resupply end of Sep/early Oct 2020"
+- Reason for shortage: "Other"
+Seed gold: recovery; 2020-09-21 to 2020-10-10; asserted; not stale; distractors: none
+
+Edited entry
+- Drug: Hulorbrin Tablets
+- Company: Kirkmere Pharma
+- Presentation: Tablets 12.5mg 100 (NDC 00000-7917-95)
+- Therapeutic category: Psychiatry
+- Initial posting date: 2019-09-12
+- Type of update: Reverified
+- Date of update: 2020-10-26
+- Availability information: "Unavailable"
+- Related information: "Resupply end of Sep/early Oct 2020"
+- Reason for shortage: "Other"
+Gold of the edited entry: recovery; 2020-09-21 to 2020-10-10; asserted; stale; distractors: none
+Attested text: (nothing inserted)
+
+=== 22 of 60: P5d30ea8bae (seed See5fd766d856) ===
+factor: surface_form; level: unit
+
+Seed entry
+- Drug: Breartane Tablet
+- Company: Norstead Laboratories
+- Presentation: Tablet, 5 mg; 5 mg; 5 mg; 5 mg (NDC 00000-412-77)
+- Therapeutic category: Psychiatry
+- Initial posting date: 2022-10-12
+- Type of update: Revised
+- Date of update: 2026-03-05
+- Availability information: "Limited Availability"
+- Related information: "Estimated availability: 3 weeks"
+- Reason for shortage: "Demand increase for the drug"
+Seed gold: recovery; 2026-03-26 to 2026-03-26; estimated; not stale; distractors: none
+
+Edited entry
+- Drug: Breartane Tablet
+- Company: Norstead Laboratories
+- Presentation: Tablet, 5 mg; 5 mg; 5 mg; 5 mg (NDC 00000-412-77)
+- Therapeutic category: Psychiatry
+- Initial posting date: 2022-10-12
+- Type of update: Revised
+- Date of update: 2026-03-05
+- Availability information: "Limited Availability"
+- Related information: "Estimated availability: 21 days"
+- Reason for shortage: "Demand increase for the drug"
+Gold of the edited entry: recovery; 2026-03-26 to 2026-03-26; estimated; not stale; distractors: none
+Attested text: Limited supply / out of stock. Cannot support monthly demand. Estimated shortage duration: 90 days.
+
+=== 23 of 60: P609bbd483c (seed Sfeeb5cfa085b) ===
+factor: stale; level: stale
+
+Seed entry
+- Drug: Iskedran Injection
+- Company: Langbury Pharmaceuticals
+- Presentation: 20 mg/vial, packages of 10 (NDC 00000-109-89)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2020-05-06
+- Type of update: Revised
+- Date of update: 2020-11-20
+- Availability information: "Currently on backorder - next shipment anticipated Jan 21"
+- Related information: "Intermittent availability expected"
+- Reason for shortage: "Demand increase for the drug"
+Seed gold: next_delivery; 2021-01-01 to 2021-01-31; estimated; not stale; distractors: none
+
+Edited entry
+- Drug: Iskedran Injection
+- Company: Langbury Pharmaceuticals
+- Presentation: 20 mg/vial, packages of 10 (NDC 00000-109-89)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2020-05-06
+- Type of update: Reverified
+- Date of update: 2021-02-16
+- Availability information: "Currently on backorder - next shipment anticipated Jan 21"
+- Related information: "Intermittent availability expected"
+- Reason for shortage: "Demand increase for the drug"
+Gold of the edited entry: next_delivery; 2021-01-01 to 2021-01-31; estimated; stale; distractors: none
+Attested text: (nothing inserted)
+
+=== 24 of 60: P47fb8690b7 (seed Sd8b786f579cd) ===
+factor: silent; level: silent
+
+Seed entry
+- Drug: Iskotane Tablets
+- Company: Jesmere Therapeutics
+- Presentation: 25 mg, 100 tablets (NDC 0000-6114-24)
+- Therapeutic category: Psychiatry
+- Initial posting date: 2020-03-09
+- Type of update: Revised
+- Date of update: 2021-11-08
+- Availability information: "On backorder"
+- Related information: "Recovery Dec 2021"
+- Reason for shortage: "Other"
+Seed gold: recovery; 2021-12-01 to 2021-12-31; asserted; not stale; distractors: none
+
+Edited entry
+- Drug: Iskotane Tablets
+- Company: Jesmere Therapeutics
+- Presentation: 25 mg, 100 tablets (NDC 0000-6114-24)
+- Therapeutic category: Psychiatry
+- Initial posting date: 2020-03-09
+- Type of update: Revised
+- Date of update: 2021-11-08
+- Availability information: "On backorder"
+- Related information: (blank)
+- Reason for shortage: "Other"
+Gold of the edited entry: none; abstain; no_statement; not stale; distractors: none
+Attested text: (nothing inserted)
+
+=== 25 of 60: P9a3bd2d689 (seed S71e0fef1e3ec) ===
+factor: granularity; level: early
+
+Seed entry
+- Drug: Iskorquel Injection
+- Company: Jescroft Pharmaceuticals
+- Presentation: 2 g SDV (NDC 00000-6276-73)
+- Therapeutic category: Anti-Infective
+- Initial posting date: 2014-08-14
+- Type of update: Revised
+- Date of update: 2020-08-13
+- Availability information: "Backordered. Next release September 2020."
+- Related information: "Check wholesalers for inventory"
+- Reason for shortage: "Manufacturing delay"
+Seed gold: next_delivery; 2020-09-01 to 2020-09-30; asserted; not stale; distractors: none
+
+Edited entry
+- Drug: Iskorquel Injection
+- Company: Jescroft Pharmaceuticals
+- Presentation: 2 g SDV (NDC 00000-6276-73)
+- Therapeutic category: Anti-Infective
+- Initial posting date: 2014-08-14
+- Type of update: Revised
+- Date of update: 2020-08-13
+- Availability information: "Backordered. Next release early September 2020."
+- Related information: "Check wholesalers for inventory"
+- Reason for shortage: "Manufacturing delay"
+Gold of the edited entry: next_delivery; 2020-09-01 to 2020-09-10; asserted; not stale; distractors: none
+Attested text: Available on allocation for direct and drop ship orders. Please contact customer service (888)-386-1300. Next release early November 2019.
+
+=== 26 of 60: Pa150ccc29f (seed Sae425252894c) ===
+factor: distractor; level: expiry
+
+Seed entry
+- Drug: Kelilsant Injectable Emulsion
+- Company: Fenbury Therapeutics
+- Presentation: 1000 mg/100 mL (10 mg/mL) Single Use Vial containing 0.005% (NDC 00000-4299-68)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2020-04-10
+- Type of update: Revised
+- Date of update: 2021-09-09
+- Availability information: "Limited Supply Available. Next Delivery: Next Delivery and Estimated Recovery: September 2021"
+- Related information: (blank)
+- Reason for shortage: "Demand increase for the drug"
+Seed gold: recovery; 2021-09-01 to 2021-09-30; estimated; not stale; distractors: none
+
+Edited entry
+- Drug: Kelilsant Injectable Emulsion
+- Company: Fenbury Therapeutics
+- Presentation: 1000 mg/100 mL (10 mg/mL) Single Use Vial containing 0.005% (NDC 00000-4299-68)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2020-04-10
+- Type of update: Revised
+- Date of update: 2021-09-09
+- Availability information: "2 month dating available by request (expiry 11/30/2021). Limited Supply Available. Next Delivery: Next Delivery and Estimated Recovery: September 2021"
+- Related information: (blank)
+- Reason for shortage: "Demand increase for the drug"
+Gold of the edited entry: recovery; 2021-09-01 to 2021-09-30; estimated; not stale; distractors: expiry
+Attested text: 8 month dating available by request (expiry 5/31/2021)
+
+=== 27 of 60: P8fd4d90577 (seed S7b8334f8df18) ===
+factor: certainty; level: estimated
+
+Seed entry
+- Drug: Calovex Injection
+- Company: Yeldbury Pharma
+- Presentation: 25 mg per 5 mL Multi-Dose Vial (NDC 00000-634-03)
+- Therapeutic category: Anesthesia;Neurology
+- Initial posting date: 2020-04-02
+- Type of update: Revised
+- Date of update: 2020-05-11
+- Availability information: "No stock available. Resupply July 2020"
+- Related information: "Marketing partner: Uxcombe Pharmaceutical Division, LLC."
+- Reason for shortage: "Demand increase for the drug"
+Seed gold: recovery; 2020-07-01 to 2020-07-31; asserted; not stale; distractors: none
+
+Edited entry
+- Drug: Calovex Injection
+- Company: Yeldbury Pharma
+- Presentation: 25 mg per 5 mL Multi-Dose Vial (NDC 00000-634-03)
+- Therapeutic category: Anesthesia;Neurology
+- Initial posting date: 2020-04-02
+- Type of update: Revised
+- Date of update: 2020-05-11
+- Availability information: "No stock available. Estimated resupply July 2020"
+- Related information: "Marketing partner: Uxcombe Pharmaceutical Division, LLC."
+- Reason for shortage: "Demand increase for the drug"
+Gold of the edited entry: recovery; 2020-07-01 to 2020-07-31; estimated; not stale; distractors: none
+Attested text: Backorder, Estimated Resupply February 2020
+
+=== 28 of 60: Pba3da9241a (seed Sfefd9f0f62ee) ===
+factor: distractor; level: depletion
+
+Seed entry
+- Drug: Zilenphor Tablets
+- Company: Aldleigh Therapeutics
+- Presentation: Tablets, 500 mg, 500 count (NDC 0000-4095-92)
+- Therapeutic category: Neurology
+- Initial posting date: 2019-04-04
+- Type of update: Reverified
+- Date of update: 2019-10-18
+- Availability information: "Unavailable, recover in Q4 2019"
+- Related information: (blank)
+- Reason for shortage: "Shortage of active ingredient"
+Seed gold: recovery; 2019-10-01 to 2019-12-31; asserted; not stale; distractors: none
+
+Edited entry
+- Drug: Zilenphor Tablets
+- Company: Aldleigh Therapeutics
+- Presentation: Tablets, 500 mg, 500 count (NDC 0000-4095-92)
+- Therapeutic category: Neurology
+- Initial posting date: 2019-04-04
+- Type of update: Reverified
+- Date of update: 2019-10-18
+- Availability information: "Estimated inventory depletion: January 2020. Unavailable, recover in Q4 2019"
+- Related information: (blank)
+- Reason for shortage: "Shortage of active ingredient"
+Gold of the edited entry: recovery; 2019-10-01 to 2019-12-31; asserted; not stale; distractors: depletion
+Attested text: Estimated Inventory Depletion: May 2020
+
+=== 29 of 60: Pc412e0ec9b (seed S22b401bbd8c2) ===
+factor: surface_form; level: abbreviated_month
+
+Seed entry
+- Drug: Wenumdran Injection
+- Company: Ingthorpe Pharmaceuticals
+- Presentation: 1.2 g, pharmacy bulk package, tray of 6 vials (NDC 00000-803-69)
+- Therapeutic category: Anti-Infective;Pediatric
+- Initial posting date: 2020-08-24
+- Type of update: Revised
+- Date of update: 2020-12-11
+- Availability information: "Backordered. Next release expected December 2020."
+- Related information: (blank)
+- Reason for shortage: "Manufacturing delay"
+Seed gold: next_delivery; 2020-12-01 to 2020-12-31; estimated; not stale; distractors: none
+
+Edited entry
+- Drug: Wenumdran Injection
+- Company: Ingthorpe Pharmaceuticals
+- Presentation: 1.2 g, pharmacy bulk package, tray of 6 vials (NDC 00000-803-69)
+- Therapeutic category: Anti-Infective;Pediatric
+- Initial posting date: 2020-08-24
+- Type of update: Revised
+- Date of update: 2020-12-11
+- Availability information: "Backordered. Next release expected Dec 2020."
+- Related information: (blank)
+- Reason for shortage: "Manufacturing delay"
+Gold of the edited entry: next_delivery; 2020-12-01 to 2020-12-31; estimated; not stale; distractors: none
+Attested text: Recovery Aug 2021
+
+=== 30 of 60: Pf926a6b17a (seed S8fa0e951af6c) ===
+factor: distractor; level: expiry
+
+Seed entry
+- Drug: Joredran Injection
+- Company: Radbury Pharma
+- Presentation: 3 mL (100 mg/mL) ampules, box of 10 (NDC 00000-306-07)
+- Therapeutic category: Hematology;Other
+- Initial posting date: 2020-05-11
+- Type of update: Revised
+- Date of update: 2020-09-16
+- Availability information: "Product is currently on backorder. Estimated shortage duration is until November 2020."
+- Related information: "Estimated recovery 3Q2020"
+- Reason for shortage: "Other"
+Seed gold: recovery; 2020-07-01 to 2020-09-30; estimated; not stale; distractors: none
+
+Edited entry
+- Drug: Joredran Injection
+- Company: Radbury Pharma
+- Presentation: 3 mL (100 mg/mL) ampules, box of 10 (NDC 00000-306-07)
+- Therapeutic category: Hematology;Other
+- Initial posting date: 2020-05-11
+- Type of update: Revised
+- Date of update: 2020-09-16
+- Availability information: "2 month dating (expiry 11/30/2020) available by request. Product is currently on backorder. Estimated shortage duration is until November 2020."
+- Related information: "Estimated recovery 3Q2020"
+- Reason for shortage: "Other"
+Gold of the edited entry: recovery; 2020-07-01 to 2020-09-30; estimated; not stale; distractors: depletion
+Attested text: 7 month dating (expiry 7/31/2021) available by request.
+
+=== 31 of 60: P0f01cbde39 (seed S8d8b16526633) ===
+factor: stale; level: stale
+
+Seed entry
+- Drug: Morutane Injection
+- Company: Ingleigh Therapeutics
+- Presentation: 2 g/20 mL (100 mg/mL), single dose vial (NDC 00000-375-45)
+- Therapeutic category: Oncology;Pediatric
+- Initial posting date: 2021-09-24
+- Type of update: New
+- Date of update: 2021-09-24
+- Availability information: "Backordered. Next release October 2021."
+- Related information: "Manufacturing delay. Check wholesaler inventory"
+- Reason for shortage: "Other"
+Seed gold: next_delivery; 2021-10-01 to 2021-10-31; asserted; not stale; distractors: none
+
+Edited entry
+- Drug: Morutane Injection
+- Company: Ingleigh Therapeutics
+- Presentation: 2 g/20 mL (100 mg/mL), single dose vial (NDC 00000-375-45)
+- Therapeutic category: Oncology;Pediatric
+- Initial posting date: 2021-09-24
+- Type of update: Reverified
+- Date of update: 2021-11-16
+- Availability information: "Backordered. Next release October 2021."
+- Related information: "Manufacturing delay. Check wholesaler inventory"
+- Reason for shortage: "Other"
+Gold of the edited entry: next_delivery; 2021-10-01 to 2021-10-31; asserted; stale; distractors: none
+Attested text: (nothing inserted)
+
+=== 32 of 60: Pc5d96a6d27 (seed S19d9e91d77ec) ===
+factor: silent; level: silent
+
+Seed entry
+- Drug: Ulvilvane Injection
+- Company: Haxcombe Laboratories
+- Presentation: 40 mg, 10 vials NDC 0000-5236-07
+- Therapeutic category: Gastroenterology
+- Initial posting date: 2019-05-28
+- Type of update: Revised
+- Date of update: 2019-10-07
+- Availability information: "Next Delivery: October 2019; Estimated Recovery: March 2020"
+- Related information: "Please check with wholesaler for available inventory. Shortage per Manufacturer: Manufacturing Delay"
+- Reason for shortage: "Other"
+Seed gold: recovery; 2020-03-01 to 2020-03-31; estimated; not stale; distractors: none
+
+Edited entry
+- Drug: Ulvilvane Injection
+- Company: Haxcombe Laboratories
+- Presentation: 40 mg, 10 vials NDC 0000-5236-07
+- Therapeutic category: Gastroenterology
+- Initial posting date: 2019-05-28
+- Type of update: Revised
+- Date of update: 2019-10-07
+- Availability information: (blank)
+- Related information: "Please check with wholesaler for available inventory. Shortage per Manufacturer: Manufacturing Delay"
+- Reason for shortage: "Other"
+Gold of the edited entry: none; abstain; no_statement; not stale; distractors: none
+Attested text: (nothing inserted)
+
+=== 33 of 60: Pf53df1e9a3 (seed S2d840263b317) ===
+factor: surface_form; level: full_month
+
+Seed entry
+- Drug: Morenvex Injection
+- Company: Elkbury Laboratories
+- Presentation: 5 mL ampule 10 pack (NDC 00000-7136-05)
+- Therapeutic category: Analgesia/Addiction;Pediatric
+- Initial posting date: (blank)
+- Type of update: Revised
+- Date of update: 2020-12-08
+- Availability information: "On backorder. Expected release - 12/18/2020"
+- Related information: (blank)
+- Reason for shortage: "Other"
+Seed gold: next_delivery; 2020-12-18 to 2020-12-18; estimated; not stale; distractors: none
+
+Edited entry
+- Drug: Morenvex Injection
+- Company: Elkbury Laboratories
+- Presentation: 5 mL ampule 10 pack (NDC 00000-7136-05)
+- Therapeutic category: Analgesia/Addiction;Pediatric
+- Initial posting date: (blank)
+- Type of update: Revised
+- Date of update: 2020-12-08
+- Availability information: "On backorder. Expected release - December 18, 2020"
+- Related information: (blank)
+- Reason for shortage: "Other"
+Gold of the edited entry: next_delivery; 2020-12-18 to 2020-12-18; estimated; not stale; distractors: none
+Attested text: Expecting new shipment July 15, 2020
+
+=== 34 of 60: Pe4a41202f6 (seed S4ed3c5990374) ===
+factor: silent; level: silent
+
+Seed entry
+- Drug: Yarolox
+- Company: Langstead Pharmaceuticals
+- Presentation: Single Dose Glass Fliptop Vial (NDC 00000-6542-30)
+- Therapeutic category: Gastroenterology;Pediatric;Total Parenteral Nutrition
+- Initial posting date: (blank)
+- Type of update: Revised
+- Date of update: 2019-12-20
+- Availability information: "Next Delivery: November 2020; Estimated Recovery: December 2020"
+- Related information: "Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay"
+- Reason for shortage: "Other"
+Seed gold: recovery; 2020-12-01 to 2020-12-31; estimated; not stale; distractors: none
+
+Edited entry
+- Drug: Yarolox
+- Company: Langstead Pharmaceuticals
+- Presentation: Single Dose Glass Fliptop Vial (NDC 00000-6542-30)
+- Therapeutic category: Gastroenterology;Pediatric;Total Parenteral Nutrition
+- Initial posting date: (blank)
+- Type of update: Revised
+- Date of update: 2019-12-20
+- Availability information: (blank)
+- Related information: "Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay"
+- Reason for shortage: "Other"
+Gold of the edited entry: none; abstain; no_statement; not stale; distractors: none
+Attested text: (nothing inserted)
+
+=== 35 of 60: Pe857927433 (seed S3f8ed840df81) ===
+factor: stale; level: stale
+
+Seed entry
+- Drug: Iskidran Injection
+- Company: Yeldthorpe Pharma
+- Presentation: 800 mg per 20 mL (40 mg per mL), MDV, (NDC 00000-889-20)
+- Therapeutic category: Anti-Infective
+- Initial posting date: 2021-07-23
+- Type of update: Revised
+- Date of update: 2022-09-14
+- Availability information: "Backordered. Next release October 2022."
+- Related information: (blank)
+- Reason for shortage: "Demand increase for the drug"
+Seed gold: next_delivery; 2022-10-01 to 2022-10-31; asserted; not stale; distractors: none
+
+Edited entry
+- Drug: Iskidran Injection
+- Company: Yeldthorpe Pharma
+- Presentation: 800 mg per 20 mL (40 mg per mL), MDV, (NDC 00000-889-20)
+- Therapeutic category: Anti-Infective
+- Initial posting date: 2021-07-23
+- Type of update: Reverified
+- Date of update: 2022-11-16
+- Availability information: "Backordered. Next release October 2022."
+- Related information: (blank)
+- Reason for shortage: "Demand increase for the drug"
+Gold of the edited entry: next_delivery; 2022-10-01 to 2022-10-31; asserted; stale; distractors: none
+Attested text: (nothing inserted)
+
+=== 36 of 60: P171ffeb2e1 (seed Sc7f1b3f641a2) ===
+factor: distractor; level: depletion
+
+Seed entry
+- Drug: Morosant Injectable Emulsion
+- Company: Garrstead Therapeutics
+- Presentation: 200 mg/20 mL (10 mg/mL) Single Dose/Single Use Glass Fliptop Vial (NDC 00000-1265-90)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2020-04-10
+- Type of update: Revised
+- Date of update: 2020-11-20
+- Availability information: "Limited Supply Available. Next Delivery: November 2020; Estimated Recovery: March 2021"
+- Related information: (blank)
+- Reason for shortage: "Demand increase for the drug"
+Seed gold: recovery; 2021-03-01 to 2021-03-31; estimated; not stale; distractors: none
+
+Edited entry
+- Drug: Morosant Injectable Emulsion
+- Company: Garrstead Therapeutics
+- Presentation: 200 mg/20 mL (10 mg/mL) Single Dose/Single Use Glass Fliptop Vial (NDC 00000-1265-90)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2020-04-10
+- Type of update: Revised
+- Date of update: 2020-11-20
+- Availability information: "Remaining inventory estimated to last until February 2021. Limited Supply Available. Next Delivery: November 2020; Estimated Recovery: March 2021"
+- Related information: (blank)
+- Reason for shortage: "Demand increase for the drug"
+Gold of the edited entry: recovery; 2021-03-01 to 2021-03-31; estimated; not stale; distractors: depletion
+Attested text: Actively selling. Remaining inventory estimated to last until April 2020
+
+=== 37 of 60: P60732f5c8c (seed Sea264841bcd0) ===
+factor: stale; level: stale
+
+Seed entry
+- Drug: Wenilox Injection
+- Company: Norgarth Laboratories
+- Presentation: 0.25 mg/mL, 4 mL vial (NDC 0000-1691-00)
+- Therapeutic category: Cardiovascular
+- Initial posting date: 2018-01-31
+- Type of update: Revised
+- Date of update: 2019-12-13
+- Availability information: "Temporary back-order, additional lots available end of December/January 2020"
+- Related information: (blank)
+- Reason for shortage: "Demand increase for the drug"
+Seed gold: next_delivery; 2019-12-21 to 2020-01-31; asserted; not stale; distractors: none
+
+Edited entry
+- Drug: Wenilox Injection
+- Company: Norgarth Laboratories
+- Presentation: 0.25 mg/mL, 4 mL vial (NDC 0000-1691-00)
+- Therapeutic category: Cardiovascular
+- Initial posting date: 2018-01-31
+- Type of update: Reverified
+- Date of update: 2020-02-16
+- Availability information: "Temporary back-order, additional lots available end of December/January 2020"
+- Related information: (blank)
+- Reason for shortage: "Demand increase for the drug"
+Gold of the edited entry: next_delivery; 2019-12-21 to 2020-01-31; asserted; stale; distractors: none
+Attested text: (nothing inserted)
+
+=== 38 of 60: Pa89cf0b809 (seed S98143db3c552) ===
+factor: surface_form; level: separator
+
+Seed entry
+- Drug: Calosant Ophthalmic Ointment
+- Company: Fenleigh Therapeutics
+- Presentation: Ophthalmic Ointment 0.5%: 3.5 g tube (NDC 00000-653-97)
+- Therapeutic category: Ophthalmology; Pediatric
+- Initial posting date: 2022-07-06
+- Type of update: Revised
+- Date of update: 2022-08-01
+- Availability information: "Unavailable. Estimated availability 1Q2023."
+- Related information: "New manufacturing site being qualified."
+- Reason for shortage: "Discontinuation of manufacture of the drug (from existing site)."
+Seed gold: recovery; 2023-01-01 to 2023-03-31; estimated; not stale; distractors: none
+
+Edited entry
+- Drug: Calosant Ophthalmic Ointment
+- Company: Fenleigh Therapeutics
+- Presentation: Ophthalmic Ointment 0.5%: 3.5 g tube (NDC 00000-653-97)
+- Therapeutic category: Ophthalmology; Pediatric
+- Initial posting date: 2022-07-06
+- Type of update: Revised
+- Date of update: 2022-08-01
+- Availability information: "Unavailable. Estimated availability 1Q 2023."
+- Related information: "New manufacturing site being qualified."
+- Reason for shortage: "Discontinuation of manufacture of the drug (from existing site)."
+Gold of the edited entry: recovery; 2023-01-01 to 2023-03-31; estimated; not stale; distractors: none
+Attested text: Estimated availability in 4Q 2021
+
+=== 39 of 60: P3555a6df50 (seed S6e72589689e7) ===
+factor: granularity; level: early
+
+Seed entry
+- Drug: Iskentane Injection
+- Company: Corvholt Laboratories
+- Presentation: 10 g (NDC 00000-355-57)
+- Therapeutic category: Anti-Infective
+- Initial posting date: 2019-05-03
+- Type of update: Revised
+- Date of update: 2019-11-04
+- Availability information: "On backorder. Next release December."
+- Related information: "Please check wholesalers for available inventory."
+- Reason for shortage: "Demand increase for the drug"
+Seed gold: next_delivery; 2019-12-01 to 2019-12-31; asserted; not stale; distractors: none
+
+Edited entry
+- Drug: Iskentane Injection
+- Company: Corvholt Laboratories
+- Presentation: 10 g (NDC 00000-355-57)
+- Therapeutic category: Anti-Infective
+- Initial posting date: 2019-05-03
+- Type of update: Revised
+- Date of update: 2019-11-04
+- Availability information: "On backorder. Next release early December."
+- Related information: "Please check wholesalers for available inventory."
+- Reason for shortage: "Demand increase for the drug"
+Gold of the edited entry: next_delivery; 2019-12-01 to 2019-12-10; asserted; not stale; distractors: none
+Attested text: Backordered – Est date of availability Early July
+
+=== 40 of 60: P18d988d4c9 (seed S71e0fef1e3ec) ===
+factor: certainty; level: expected
+
+Seed entry
+- Drug: Iskorquel Injection
+- Company: Jescroft Pharmaceuticals
+- Presentation: 2 g SDV (NDC 00000-6276-73)
+- Therapeutic category: Anti-Infective
+- Initial posting date: 2014-08-14
+- Type of update: Revised
+- Date of update: 2020-08-13
+- Availability information: "Backordered. Next release September 2020."
+- Related information: "Check wholesalers for inventory"
+- Reason for shortage: "Manufacturing delay"
+Seed gold: next_delivery; 2020-09-01 to 2020-09-30; asserted; not stale; distractors: none
+
+Edited entry
+- Drug: Iskorquel Injection
+- Company: Jescroft Pharmaceuticals
+- Presentation: 2 g SDV (NDC 00000-6276-73)
+- Therapeutic category: Anti-Infective
+- Initial posting date: 2014-08-14
+- Type of update: Revised
+- Date of update: 2020-08-13
+- Availability information: "Backordered. Next release expected September 2020."
+- Related information: "Check wholesalers for inventory"
+- Reason for shortage: "Manufacturing delay"
+Gold of the edited entry: next_delivery; 2020-09-01 to 2020-09-30; estimated; not stale; distractors: none
+Attested text: Backordered. Next release expected July 2020.
+
+=== 41 of 60: Pda3b14cd7e (seed Sc7f1b3f641a2) ===
+factor: granularity; level: mid
+
+Seed entry
+- Drug: Morosant Injectable Emulsion
+- Company: Garrstead Therapeutics
+- Presentation: 200 mg/20 mL (10 mg/mL) Single Dose/Single Use Glass Fliptop Vial (NDC 00000-1265-90)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2020-04-10
+- Type of update: Revised
+- Date of update: 2020-11-20
+- Availability information: "Limited Supply Available. Next Delivery: November 2020; Estimated Recovery: March 2021"
+- Related information: (blank)
+- Reason for shortage: "Demand increase for the drug"
+Seed gold: recovery; 2021-03-01 to 2021-03-31; estimated; not stale; distractors: none
+
+Edited entry
+- Drug: Morosant Injectable Emulsion
+- Company: Garrstead Therapeutics
+- Presentation: 200 mg/20 mL (10 mg/mL) Single Dose/Single Use Glass Fliptop Vial (NDC 00000-1265-90)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2020-04-10
+- Type of update: Revised
+- Date of update: 2020-11-20
+- Availability information: "Limited Supply Available. Next Delivery: November 2020; Estimated Recovery: mid-March 2021"
+- Related information: (blank)
+- Reason for shortage: "Demand increase for the drug"
+Gold of the edited entry: recovery; 2021-03-01 to 2021-03-31; estimated; not stale; distractors: none
+Attested text: Resupply Mid-August 2021
+
+=== 42 of 60: P288a65c634 (seed S306d5c5648ce) ===
+factor: distractor; level: available_until
+
+Seed entry
+- Drug: Lumarquel Ophthalmic Ointment
+- Company: Wynthorpe Laboratories
+- Presentation: 1% (10 mg/g), 3.5 g tube (NDC 00000-826-15)
+- Therapeutic category: Ophthalmology
+- Initial posting date: 2019-10-18
+- Type of update: Revised
+- Date of update: 2021-01-07
+- Availability information: "Inventory will be available by end of Q1 2021"
+- Related information: "Currently qualifying alternate supplier of inactive ingredient"
+- Reason for shortage: "Shortage of an inactive ingredient"
+Seed gold: recovery; 2021-01-07 to 2021-03-31; asserted; not stale; distractors: none
+
+Edited entry
+- Drug: Lumarquel Ophthalmic Ointment
+- Company: Wynthorpe Laboratories
+- Presentation: 1% (10 mg/g), 3.5 g tube (NDC 00000-826-15)
+- Therapeutic category: Ophthalmology
+- Initial posting date: 2019-10-18
+- Type of update: Revised
+- Date of update: 2021-01-07
+- Availability information: "Stock anticipated to be available through April 2021. Inventory will be available by end of Q1 2021"
+- Related information: "Currently qualifying alternate supplier of inactive ingredient"
+- Reason for shortage: "Shortage of an inactive ingredient"
+Gold of the edited entry: recovery; 2021-01-07 to 2021-03-31; asserted; not stale; distractors: depletion
+Attested text: Stock anticipated to be available through June 2022
+
+=== 43 of 60: P9510999568 (seed S0c6d851dc552) ===
+factor: certainty; level: tbd
+
+Seed entry
+- Drug: Lumumquel Injection
+- Company: Ingholt Pharma
+- Presentation: Injection, 40 mg/1 mL (NDC 0000-7176-67)
+- Therapeutic category: Ophthalmology
+- Initial posting date: 2021-09-27
+- Type of update: Revised
+- Date of update: 2024-03-05
+- Availability information: "Unavailable"
+- Related information: "Estimated shortage duration: 3-18 months. There are no therapeutic equivalents."
+- Reason for shortage: "Requirements related to complying with good manufacturing practices"
+Seed gold: recovery; 2024-06-03 to 2025-08-27; estimated; not stale; distractors: none
+
+Edited entry
+- Drug: Lumumquel Injection
+- Company: Ingholt Pharma
+- Presentation: Injection, 40 mg/1 mL (NDC 0000-7176-67)
+- Therapeutic category: Ophthalmology
+- Initial posting date: 2021-09-27
+- Type of update: Revised
+- Date of update: 2024-03-05
+- Availability information: "Unavailable"
+- Related information: "Estimated shortage duration: TBD. There are no therapeutic equivalents."
+- Reason for shortage: "Requirements related to complying with good manufacturing practices"
+Gold of the edited entry: recovery; abstain; undetermined; not stale; distractors: none
+Attested text: Limited availability. Estimated shortage duration: TBD
+
+=== 44 of 60: P99aba818b1 (seed S63a7f475cbc4) ===
+factor: stale; level: stale
+
+Seed entry
+- Drug: Saborlox Tablets
+- Company: Garrwick Pharmaceuticals
+- Presentation: 40mg (NDC 0000-6293-92)
+- Therapeutic category: Cardiovascular
+- Initial posting date: 2019-03-12
+- Type of update: Reverified
+- Date of update: 2019-10-18
+- Availability information: "Out of Stock. Resupply is Q1 2020."
+- Related information: (blank)
+- Reason for shortage: "Other"
+Seed gold: recovery; 2020-01-01 to 2020-03-31; asserted; not stale; distractors: none
+
+Edited entry
+- Drug: Saborlox Tablets
+- Company: Garrwick Pharmaceuticals
+- Presentation: 40mg (NDC 0000-6293-92)
+- Therapeutic category: Cardiovascular
+- Initial posting date: 2019-03-12
+- Type of update: Reverified
+- Date of update: 2020-04-16
+- Availability information: "Out of Stock. Resupply is Q1 2020."
+- Related information: (blank)
+- Reason for shortage: "Other"
+Gold of the edited entry: recovery; 2020-01-01 to 2020-03-31; asserted; stale; distractors: none
+Attested text: (nothing inserted)
+
+=== 45 of 60: Pd166f94a0b (seed Sddbfbc1135bc) ===
+factor: surface_form; level: with_year
+
+Seed entry
+- Drug: Morephor Injection
+- Company: Garrbury Laboratories
+- Presentation: 100 mg per vial, (NDC 00000-208-99)
+- Therapeutic category: Oncology
+- Initial posting date: 2020-12-18
+- Type of update: Revised
+- Date of update: 2021-03-29
+- Availability information: "Low inventory"
+- Related information: "Partial shipments on allocation through April"
+- Reason for shortage: "Demand increase for the drug"
+Seed gold: recovery; 2021-04-01 to 2021-04-30; asserted; not stale; distractors: none
+
+Edited entry
+- Drug: Morephor Injection
+- Company: Garrbury Laboratories
+- Presentation: 100 mg per vial, (NDC 00000-208-99)
+- Therapeutic category: Oncology
+- Initial posting date: 2020-12-18
+- Type of update: Revised
+- Date of update: 2021-03-29
+- Availability information: "Low inventory"
+- Related information: "Partial shipments on allocation through April 2021"
+- Reason for shortage: "Demand increase for the drug"
+Gold of the edited entry: recovery; 2021-04-01 to 2021-04-30; asserted; not stale; distractors: none
+Attested text: Partial shipments on allocation through May 2021
+
+=== 46 of 60: P12985bc758 (seed S6db1d27131e6) ===
+factor: silent; level: silent
+
+Seed entry
+- Drug: Yarebrin Tablet
+- Company: Uxwick Pharmaceuticals
+- Presentation: Tablet, 7.5 mg; 7.5 mg; 7.5 mg; 7.5 mg (NDC 0000-2275-70)
+- Therapeutic category: Psychiatry
+- Initial posting date: 2022-10-12
+- Type of update: Revised
+- Date of update: 2025-01-24
+- Availability information: "Unavailable"
+- Related information: "Estimated recovery: 2 weeks"
+- Reason for shortage: "Regulatory delay"
+Seed gold: recovery; 2025-02-07 to 2025-02-07; estimated; not stale; distractors: none
+
+Edited entry
+- Drug: Yarebrin Tablet
+- Company: Uxwick Pharmaceuticals
+- Presentation: Tablet, 7.5 mg; 7.5 mg; 7.5 mg; 7.5 mg (NDC 0000-2275-70)
+- Therapeutic category: Psychiatry
+- Initial posting date: 2022-10-12
+- Type of update: Revised
+- Date of update: 2025-01-24
+- Availability information: "Unavailable"
+- Related information: (blank)
+- Reason for shortage: "Regulatory delay"
+Gold of the edited entry: none; abstain; no_statement; not stale; distractors: none
+Attested text: (nothing inserted)
+
+=== 47 of 60: Pc7ffb90ca0 (seed S6e72589689e7) ===
+factor: certainty; level: no_estimated_date
+
+Seed entry
+- Drug: Iskentane Injection
+- Company: Corvholt Laboratories
+- Presentation: 10 g (NDC 00000-355-57)
+- Therapeutic category: Anti-Infective
+- Initial posting date: 2019-05-03
+- Type of update: Revised
+- Date of update: 2019-11-04
+- Availability information: "On backorder. Next release December."
+- Related information: "Please check wholesalers for available inventory."
+- Reason for shortage: "Demand increase for the drug"
+Seed gold: next_delivery; 2019-12-01 to 2019-12-31; asserted; not stale; distractors: none
+
+Edited entry
+- Drug: Iskentane Injection
+- Company: Corvholt Laboratories
+- Presentation: 10 g (NDC 00000-355-57)
+- Therapeutic category: Anti-Infective
+- Initial posting date: 2019-05-03
+- Type of update: Revised
+- Date of update: 2019-11-04
+- Availability information: "On backorder. No estimated release date available."
+- Related information: "Please check wholesalers for available inventory."
+- Reason for shortage: "Demand increase for the drug"
+Gold of the edited entry: next_delivery; abstain; undetermined; not stale; distractors: none
+Attested text: Currently out of stock. No estimated release date available.
+
+=== 48 of 60: Pec35b5fd98 (seed Sec1889e8447a) ===
+factor: stale; level: stale
+
+Seed entry
+- Drug: Hulolox Injection
+- Company: Elkwick Therapeutics
+- Presentation: 50 mg per 10 mL Multi-Dose Vial (NDC 00000-597-37)
+- Therapeutic category: Anesthesia;Neurology
+- Initial posting date: 2020-04-02
+- Type of update: Revised
+- Date of update: 2021-05-21
+- Availability information: "Unavailable. Anticipated recovery: end of June 2021"
+- Related information: "Marketing partner: Langleigh Pharmaceutical Division, LLC."
+- Reason for shortage: "Demand increase for the drug"
+Seed gold: recovery; 2021-06-21 to 2021-06-30; estimated; not stale; distractors: none
+
+Edited entry
+- Drug: Hulolox Injection
+- Company: Elkwick Therapeutics
+- Presentation: 50 mg per 10 mL Multi-Dose Vial (NDC 00000-597-37)
+- Therapeutic category: Anesthesia;Neurology
+- Initial posting date: 2020-04-02
+- Type of update: Reverified
+- Date of update: 2021-07-16
+- Availability information: "Unavailable. Anticipated recovery: end of June 2021"
+- Related information: "Marketing partner: Langleigh Pharmaceutical Division, LLC."
+- Reason for shortage: "Demand increase for the drug"
+Gold of the edited entry: recovery; 2021-06-21 to 2021-06-30; estimated; stale; distractors: none
+Attested text: (nothing inserted)
+
+=== 49 of 60: P8a12bcd7b2 (seed S6d07e84d9748) ===
+factor: surface_form; level: no_year
+
+Seed entry
+- Drug: Hularlox Capsules
+- Company: Uxgarth Pharma
+- Presentation: 1 mg 100 count bottle (NDC 0000-9353-53)
+- Therapeutic category: Transplant
+- Initial posting date: 2019-05-17
+- Type of update: Revised
+- Date of update: 2020-12-16
+- Availability information: "Intermittent supply until February 2021"
+- Related information: (blank)
+- Reason for shortage: "Demand increase for the drug"
+Seed gold: recovery; 2021-02-01 to 2021-02-28; asserted; not stale; distractors: none
+
+Edited entry
+- Drug: Hularlox Capsules
+- Company: Uxgarth Pharma
+- Presentation: 1 mg 100 count bottle (NDC 0000-9353-53)
+- Therapeutic category: Transplant
+- Initial posting date: 2019-05-17
+- Type of update: Revised
+- Date of update: 2020-12-16
+- Availability information: "Intermittent supply until February"
+- Related information: (blank)
+- Reason for shortage: "Demand increase for the drug"
+Gold of the edited entry: recovery; 2021-02-01 to 2021-02-28; asserted; stale; distractors: none
+Attested text: Backordered — next shipment June
+
+=== 50 of 60: Pd95a6bc08e (seed S6608993e8c8c) ===
+factor: granularity; level: late
+
+Seed entry
+- Drug: Dovumsant Injection
+- Company: Thornstead Therapeutics
+- Presentation: 1 Month 3.75 mg Kit (NDC 0000-7674-90)
+- Therapeutic category: Endocrinology/Metabolism;Oncology
+- Initial posting date: 2020-07-24
+- Type of update: Revised
+- Date of update: 2021-03-12
+- Availability information: "Available; Additional units expected to be release Mid-March 2021"
+- Related information: (blank)
+- Reason for shortage: (blank)
+Seed gold: next_delivery; 2021-03-11 to 2021-03-20; estimated; not stale; distractors: none
+
+Edited entry
+- Drug: Dovumsant Injection
+- Company: Thornstead Therapeutics
+- Presentation: 1 Month 3.75 mg Kit (NDC 0000-7674-90)
+- Therapeutic category: Endocrinology/Metabolism;Oncology
+- Initial posting date: 2020-07-24
+- Type of update: Revised
+- Date of update: 2021-03-12
+- Availability information: "Available; Additional units expected to be release End of March 2021"
+- Related information: (blank)
+- Reason for shortage: (blank)
+Gold of the edited entry: next_delivery; 2021-03-21 to 2021-03-31; estimated; not stale; distractors: none
+Attested text: Resupply end of August 2021
+
+=== 51 of 60: Pe94729438c (seed S13a532cf0351) ===
+factor: silent; level: silent
+
+Seed entry
+- Drug: Nevorsant Ophthalmic Solution
+- Company: Yeldcroft Pharma
+- Presentation: Sol 0.5% 5mg/mL, 5mL, 1 Bottle/EA (NDC 00000-8071-45)
+- Therapeutic category: Ophthalmology
+- Initial posting date: 2020-05-29
+- Type of update: New
+- Date of update: 2020-05-29
+- Availability information: "Back-ordered, estimated availability May 2020"
+- Related information: (blank)
+- Reason for shortage: "Other"
+Seed gold: recovery; 2020-05-01 to 2020-05-31; estimated; not stale; distractors: none
+
+Edited entry
+- Drug: Nevorsant Ophthalmic Solution
+- Company: Yeldcroft Pharma
+- Presentation: Sol 0.5% 5mg/mL, 5mL, 1 Bottle/EA (NDC 00000-8071-45)
+- Therapeutic category: Ophthalmology
+- Initial posting date: 2020-05-29
+- Type of update: New
+- Date of update: 2020-05-29
+- Availability information: "Back-ordered"
+- Related information: (blank)
+- Reason for shortage: "Other"
+Gold of the edited entry: none; abstain; no_statement; not stale; distractors: none
+Attested text: (nothing inserted)
+
+=== 52 of 60: P0380a70a28 (seed S0dcf2d6803cc) ===
+factor: stale; level: stale
+
+Seed entry
+- Drug: Firiltril Injection
+- Company: Yeldmere Pharmaceuticals
+- Presentation: injection 350, 6 X 500 ML (NDC 0000-1400-18)
+- Therapeutic category: Medical Imaging
+- Initial posting date: 2022-07-14
+- Type of update: Reverified
+- Date of update: 2022-09-09
+- Availability information: "Estimated Availability: October 4, 2022"
+- Related information: "Yeldmere, in conjunction with FDA, has initiated a temporary importation of Oakholt® (firiltril injection) into the U.S. market to address drug shortages. To place an order, please contact Yeldmere Customer Service at 1-800-555-0173 or at info@yeldmere.example. For more information see Yeldmere’s website: www.yeldmere.example"
+- Reason for shortage: "Other"
+Seed gold: recovery; 2022-10-04 to 2022-10-04; estimated; not stale; distractors: none
+
+Edited entry
+- Drug: Firiltril Injection
+- Company: Yeldmere Pharmaceuticals
+- Presentation: injection 350, 6 X 500 ML (NDC 0000-1400-18)
+- Therapeutic category: Medical Imaging
+- Initial posting date: 2022-07-14
+- Type of update: Reverified
+- Date of update: 2022-10-20
+- Availability information: "Estimated Availability: October 4, 2022"
+- Related information: "Yeldmere, in conjunction with FDA, has initiated a temporary importation of Oakholt® (firiltril injection) into the U.S. market to address drug shortages. To place an order, please contact Yeldmere Customer Service at 1-800-555-0173 or at info@yeldmere.example. For more information see Yeldmere’s website: www.yeldmere.example"
+- Reason for shortage: "Other"
+Gold of the edited entry: recovery; 2022-10-04 to 2022-10-04; asserted; stale; distractors: none
+Attested text: (nothing inserted)
+
+=== 53 of 60: Pd2281ec1f2 (seed Se0b5b94f67a1) ===
+factor: granularity; level: early
+
+Seed entry
+- Drug: Pavorquel Injection
+- Company: Garrcombe Laboratories
+- Presentation: 100 mEq/50 mL (2 mEq/mL); Pharmacy Bulk Package Glass Fliptop Vial (NDC 0000-6386-27)
+- Therapeutic category: Endocrinology/Metabolism;Gastroenterology;Pediatric;Total Parenteral Nutrition
+- Initial posting date: 2016-02-03
+- Type of update: Revised
+- Date of update: 2022-09-12
+- Availability information: "Next Delivery and Estimated Recovery: November 2022"
+- Related information: "Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay"
+- Reason for shortage: "Other"
+Seed gold: recovery; 2022-11-01 to 2022-11-30; estimated; not stale; distractors: none
+
+Edited entry
+- Drug: Pavorquel Injection
+- Company: Garrcombe Laboratories
+- Presentation: 100 mEq/50 mL (2 mEq/mL); Pharmacy Bulk Package Glass Fliptop Vial (NDC 0000-6386-27)
+- Therapeutic category: Endocrinology/Metabolism;Gastroenterology;Pediatric;Total Parenteral Nutrition
+- Initial posting date: 2016-02-03
+- Type of update: Revised
+- Date of update: 2022-09-12
+- Availability information: "Next Delivery and Estimated Recovery: early November 2022"
+- Related information: "Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay"
+- Reason for shortage: "Other"
+Gold of the edited entry: recovery; 2022-11-01 to 2022-11-10; estimated; not stale; distractors: none
+Attested text: Backordered. Available early March 2022.
+
+=== 54 of 60: P67a3f37543 (seed S526ce634b46e) ===
+factor: distractor; level: expiry
+
+Seed entry
+- Drug: Yarardran Injection
+- Company: Quinwick Pharmaceuticals
+- Presentation: 0.5%, 150 mg/30 mL (5 mg/mL) single dose vial (NDC 00000-112-41)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2020-12-22
+- Type of update: Revised
+- Date of update: 2022-09-28
+- Availability information: "Available: Recovery Q1 2023"
+- Related information: (blank)
+- Reason for shortage: "Demand increase"
+Seed gold: recovery; 2023-01-01 to 2023-03-31; asserted; not stale; distractors: none
+
+Edited entry
+- Drug: Yarardran Injection
+- Company: Quinwick Pharmaceuticals
+- Presentation: 0.5%, 150 mg/30 mL (5 mg/mL) single dose vial (NDC 00000-112-41)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2020-12-22
+- Type of update: Revised
+- Date of update: 2022-09-28
+- Availability information: "8 month dating (expiry 5/31/2023) available by request. Available: Recovery Q1 2023"
+- Related information: (blank)
+- Reason for shortage: "Demand increase"
+Gold of the edited entry: recovery; 2023-01-01 to 2023-03-31; asserted; not stale; distractors: expiry
+Attested text: 7 month dating (expiry 7/31/2021) available by request.
+
+=== 55 of 60: P5c6da87637 (seed Scc666dfe2db2) ===
+factor: surface_form; level: abbreviated_month
+
+Seed entry
+- Drug: Firumtril Injection
+- Company: Thornthorpe Laboratories
+- Presentation: 100 mEq/50 mL (2 mEq/mL), Pharmacy Bulk Package Glass Fliptop Vial (NDC 00000-4770-21)
+- Therapeutic category: Endocrinology/Metabolism;Gastroenterology;Pediatric;Total Parenteral Nutrition
+- Initial posting date: 2019-06-10
+- Type of update: Revised
+- Date of update: 2020-03-25
+- Availability information: "Limited Supply Available. Next Delivery and Estimated Recovery: March 2020"
+- Related information: "Check Wholesaler for Availability Shortage per manufacturer: Manufacturing Delay"
+- Reason for shortage: "Other"
+Seed gold: recovery; 2020-03-01 to 2020-03-31; estimated; not stale; distractors: none
+
+Edited entry
+- Drug: Firumtril Injection
+- Company: Thornthorpe Laboratories
+- Presentation: 100 mEq/50 mL (2 mEq/mL), Pharmacy Bulk Package Glass Fliptop Vial (NDC 00000-4770-21)
+- Therapeutic category: Endocrinology/Metabolism;Gastroenterology;Pediatric;Total Parenteral Nutrition
+- Initial posting date: 2019-06-10
+- Type of update: Revised
+- Date of update: 2020-03-25
+- Availability information: "Limited Supply Available. Next Delivery and Estimated Recovery: Mar 2020"
+- Related information: "Check Wholesaler for Availability Shortage per manufacturer: Manufacturing Delay"
+- Reason for shortage: "Other"
+Gold of the edited entry: recovery; 2020-03-01 to 2020-03-31; estimated; not stale; distractors: none
+Attested text: Recovery Aug 2021
+
+=== 56 of 60: P16ae4947a7 (seed Sd75419580dc5) ===
+factor: certainty; level: no_estimated_date
+
+Seed entry
+- Drug: Jorendran Injection
+- Company: Quincroft Therapeutics
+- Presentation: 2g Vial 10 (NDC 00000-8602-09)
+- Therapeutic category: Anti-Infective
+- Initial posting date: 2015-12-17
+- Type of update: Revised
+- Date of update: 2020-03-31
+- Availability information: "Unavailable. Expecting new shipment June 15, 2020"
+- Related information: (blank)
+- Reason for shortage: (blank)
+Seed gold: next_delivery; 2020-06-15 to 2020-06-15; estimated; not stale; distractors: none
+
+Edited entry
+- Drug: Jorendran Injection
+- Company: Quincroft Therapeutics
+- Presentation: 2g Vial 10 (NDC 00000-8602-09)
+- Therapeutic category: Anti-Infective
+- Initial posting date: 2015-12-17
+- Type of update: Revised
+- Date of update: 2020-03-31
+- Availability information: "Unavailable. No estimated release date available"
+- Related information: (blank)
+- Reason for shortage: (blank)
+Gold of the edited entry: next_delivery; abstain; undetermined; not stale; distractors: none
+Attested text: Currently out of stock. No estimated release date available.
+
+=== 57 of 60: P33b259c5ba (seed Sf402362a7efd) ===
+factor: surface_form; level: abbreviated_month
+
+Seed entry
+- Drug: Wenotane Injection
+- Company: Branwick Pharma
+- Presentation: 1% (300 mg per 30 mL), (10 mg per mL), SDV, (NDC 00000-8680-32)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2021-07-14
+- Type of update: Revised
+- Date of update: 2022-09-14
+- Availability information: "Backordered. Next release October 2022."
+- Related information: "Check wholesaler inventory"
+- Reason for shortage: (blank)
+Seed gold: next_delivery; 2022-10-01 to 2022-10-31; asserted; not stale; distractors: none
+
+Edited entry
+- Drug: Wenotane Injection
+- Company: Branwick Pharma
+- Presentation: 1% (300 mg per 30 mL), (10 mg per mL), SDV, (NDC 00000-8680-32)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2021-07-14
+- Type of update: Revised
+- Date of update: 2022-09-14
+- Availability information: "Backordered. Next release Oct 2022."
+- Related information: "Check wholesaler inventory"
+- Reason for shortage: (blank)
+Gold of the edited entry: next_delivery; 2022-10-01 to 2022-10-31; asserted; not stale; distractors: none
+Attested text: Backordered. Next release Oct 2020
+
+=== 58 of 60: Pf387a4e88a (seed Sae425252894c) ===
+factor: silent; level: silent
+
+Seed entry
+- Drug: Kelilsant Injectable Emulsion
+- Company: Fenbury Therapeutics
+- Presentation: 1000 mg/100 mL (10 mg/mL) Single Use Vial containing 0.005% (NDC 00000-4299-68)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2020-04-10
+- Type of update: Revised
+- Date of update: 2021-09-09
+- Availability information: "Limited Supply Available. Next Delivery: Next Delivery and Estimated Recovery: September 2021"
+- Related information: (blank)
+- Reason for shortage: "Demand increase for the drug"
+Seed gold: recovery; 2021-09-01 to 2021-09-30; estimated; not stale; distractors: none
+
+Edited entry
+- Drug: Kelilsant Injectable Emulsion
+- Company: Fenbury Therapeutics
+- Presentation: 1000 mg/100 mL (10 mg/mL) Single Use Vial containing 0.005% (NDC 00000-4299-68)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2020-04-10
+- Type of update: Revised
+- Date of update: 2021-09-09
+- Availability information: "Limited Supply Available."
+- Related information: (blank)
+- Reason for shortage: "Demand increase for the drug"
+Gold of the edited entry: none; abstain; no_statement; not stale; distractors: none
+Attested text: (nothing inserted)
+
+=== 59 of 60: P5c93eb3616 (seed S2fc6c1380b78) ===
+factor: granularity; level: early
+
+Seed entry
+- Drug: Lumillox Tablet
+- Company: Thornleigh Therapeutics
+- Presentation: 0.45 20 mg; blister of 7 each (NDC 00000-312-18)
+- Therapeutic category: Reproductive
+- Initial posting date: 2022-09-21
+- Type of update: New
+- Date of update: 2022-09-21
+- Availability information: "Next Delivery and Estimated Recovery: Late Q3 2023"
+- Related information: "Shortage per Manufacturer: Manufacturing Delay"
+- Reason for shortage: (blank)
+Seed gold: recovery; 2023-09-01 to 2023-09-30; estimated; not stale; distractors: none
+
+Edited entry
+- Drug: Lumillox Tablet
+- Company: Thornleigh Therapeutics
+- Presentation: 0.45 20 mg; blister of 7 each (NDC 00000-312-18)
+- Therapeutic category: Reproductive
+- Initial posting date: 2022-09-21
+- Type of update: New
+- Date of update: 2022-09-21
+- Availability information: "Next Delivery and Estimated Recovery: Early Q3 2023"
+- Related information: "Shortage per Manufacturer: Manufacturing Delay"
+- Reason for shortage: (blank)
+Gold of the edited entry: recovery; 2023-07-01 to 2023-07-31; estimated; not stale; distractors: none
+Attested text: Backordered. Next release early Q3 2021.
+
+=== 60 of 60: P265c7b994c (seed S1a9e6d0dcab8) ===
+factor: stale; level: stale
+
+Seed entry
+- Drug: Elnodran Injection
+- Company: Pellstead Pharma
+- Presentation: 100 mg/10 mL (10 mg/mL); 10 mL Multiple Dose Glass Fliptop Vial (NDC 00000-6830-28)
+- Therapeutic category: Analgesia/Addiction
+- Initial posting date: 2019-10-11
+- Type of update: Revised
+- Date of update: 2020-03-25
+- Availability information: "Next Delivery and Estimated Recovery: August 2020"
+- Related information: "Shortage of an active ingredient"
+- Reason for shortage: "Other"
+Seed gold: recovery; 2020-08-01 to 2020-08-31; estimated; not stale; distractors: none
+
+Edited entry
+- Drug: Elnodran Injection
+- Company: Pellstead Pharma
+- Presentation: 100 mg/10 mL (10 mg/mL); 10 mL Multiple Dose Glass Fliptop Vial (NDC 00000-6830-28)
+- Therapeutic category: Analgesia/Addiction
+- Initial posting date: 2019-10-11
+- Type of update: Reverified
+- Date of update: 2020-09-16
+- Availability information: "Next Delivery and Estimated Recovery: August 2020"
+- Related information: "Shortage of an active ingredient"
+- Reason for shortage: "Other"
+Gold of the edited entry: recovery; 2020-08-01 to 2020-08-31; estimated; stale; distractors: none
+Attested text: (nothing inserted)

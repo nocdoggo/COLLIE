@@ -1,0 +1,41 @@
+item_id,annotator,statement_type,start,end,abstain,abstain_reason,certainty,quote,distractor_roles,distractor_quotes,hard,note,stale,start_offset_m,end_offset_m,start_offset_d,end_offset_d,check
+I04a7540172,A1,recovery,2020-07-28,2020-07-28,0,,estimated,Estimated shortage duration: 60 days,,,0,,0,2,2,60,60,ok
+I04a7540172,A2,recovery,2020-07-28,2020-07-28,0,,estimated,,,,0,,0,2,2,60,60,ok
+I0d8aa20b59,A1,next_delivery,2020-11-01,2020-11-30,0,,asserted,next shipment in November,,,0,,0,3,3,68,97,ok
+I0d8aa20b59,A2,next_delivery,2020-11-01,2020-11-30,0,,asserted,,,,0,,0,3,3,68,97,ok
+I123c083efe,A1,recovery,2020-06-11,2020-06-20,0,,asserted,Intermittent supply until the middle of June 2020,,,1,"""Intermittent supply until the middle of June 2020"": ""intermittent"" taken as the shortage word before ""until"" (3.6, depletion rule), so recovery rather than depletion. It is not one of the guide's examples (""limited supply"", ""not available""). Interval per C11 + C3.",0,0,0,9,18,ok
+I123c083efe,A2,recovery,2020-06-11,2020-06-20,0,,asserted,,,,0,,0,0,0,9,18,ok
+I1526c6d420,A1,none,,,1,no_statement,no_statement,,past,"as of July 1, 2022",0,,0,,,,,ok
+I1526c6d420,A2,none,,,1,no_statement,no_statement,,past,"as of July 1, 2022",0,,0,,,,,ok
+I33f1de2416,A1,recovery,2019-10-01,2019-10-01,0,,estimated,"Expected availability Oct 1, 2019",,,0,,0,1,1,8,8,ok
+I33f1de2416,A2,recovery,2019-10-01,2019-10-01,0,,estimated,,,,0,,0,1,1,8,8,ok
+I3a0cf1a792,A1,next_delivery,2021-04-01,2021-07-31,0,,asserted,Partial shipments on allocation April-July 2021,,,1,"""Partial shipments on allocation April-July 2021"": ""shipments"" is a next_delivery cue, but ""on allocation"" could be read as a shortage state ending at a time (recovery, cf. example 8). No ""through/until"", so read as next_delivery over the range (C9).",0,1,4,3,124,ok
+I3a0cf1a792,A2,recovery,2021-04-01,2021-07-31,0,,asserted,,,,0,,0,1,4,3,124,ok
+I3f39057f78,A1,recovery,2022-09-05,2022-09-05,0,,asserted,"Product will be available for order September 05, 2022",,,0,,0,0,0,3,3,ok
+I3f39057f78,A2,recovery,2022-09-05,2022-09-05,0,,asserted,,,,0,,0,0,0,3,3,ok
+I4ac5fa608f,A1,next_delivery,2021-04-01,2021-06-30,0,,asserted,Next release Q2 2021,,,0,,0,6,8,175,265,ok
+I4ac5fa608f,A2,next_delivery,2021-04-01,2021-06-30,0,,asserted,,,,0,,0,6,8,175,265,ok
+I4bd3ca983c,A1,recovery,2022-12-01,2022-12-31,0,,estimated,Estimated Recovery: December 2022,,,0,,0,3,3,80,110,ok
+I4bd3ca983c,A2,recovery,2022-12-01,2022-12-31,0,,estimated,Estimated Recovery: December 2022,,,0,,0,3,3,80,110,ok
+I5523d92c59,A1,next_delivery,,,1,no_date,undetermined,Product will be made available as it is released,,,0,,0,,,,,ok
+I5523d92c59,A2,next_delivery,,,1,no_date,undetermined,,,,0,,0,,,,,ok
+I59dfd93605,A1,next_delivery,,,1,no_date,undetermined,Releasing product as it becomes available,,,0,,0,,,,,ok
+I59dfd93605,A2,next_delivery,,,1,no_date,undetermined,,,,0,,0,,,,,ok
+I69570889bd,A1,next_delivery,,,1,tbd,undetermined,next shipment TBD,,,1,"Related ""Sporadic availability expected"" gives no time and does not say supply returns to normal, so not read as a recovery statement that would outrank next_delivery under 3.6 rule 1. Target: ""next shipment TBD"" (tbd).",0,,,,,ok
+I69570889bd,A2,next_delivery,,,1,tbd,undetermined,,,,0,,0,,,,,ok
+I6e56d23f17,A1,recovery,2021-10-01,2021-12-31,0,,estimated,Estimated recovery: Q4 2021,,,0,,0,7,9,203,294,ok
+I6e56d23f17,A2,recovery,2021-10-01,2021-12-31,0,,estimated,Estimated recovery: Q4 2021,,,0,,0,7,9,203,294,ok
+I889c03a3bb,A1,recovery,,,1,vague,estimated,product is/will be on/off backorder for few months,,,0,,0,,,,,ok
+I889c03a3bb,A2,recovery,,,1,vague,estimated,,,,0,,0,,,,,ok
+I921bee2f9e,A1,next_delivery,2021-10-21,2021-10-31,0,,estimated,next shipment anticipated end of October 2021,,,1,"Related ""Sporadic availability expected"" gives no time and does not say supply returns to normal, so not read as a recovery statement; if it were, 3.6 rule 1 would make the target an undated recovery (no_date). Target: ""next shipment anticipated end of October 2021"", C3.",0,0,0,13,23,ok
+I921bee2f9e,A2,next_delivery,2021-10-21,2021-10-31,0,,estimated,,,,0,,0,0,0,13,23,ok
+Iab02c6a957,A1,next_delivery,2021-02-01,2021-03-31,0,,asserted,Additional lots will be scheduled for manufacturing in the February - March 2021 timeframe,,,0,,0,0,1,-4,54,ok
+Iab02c6a957,A2,next_delivery,2021-02-01,2021-03-31,0,,asserted,,,,0,,0,0,1,-4,54,ok
+Iac2c11b30a,A1,discontinuation,,,1,no_date,undetermined,decision to discontinue manufacturing these products,,,0,,0,,,,,ok
+Iac2c11b30a,A2,discontinuation,,,1,no_date,undetermined,,,,0,,0,,,,,ok
+Ice2ee98963,A1,next_delivery,2021-08-01,2021-08-31,0,,asserted,Next release August 2021,expiry,4 & 5 month expiry (11& 12/2021 expiry),0,,0,1,1,10,40,ok
+Ice2ee98963,A2,next_delivery,2021-08-01,2021-08-31,0,,asserted,Next release August 2021,expiry,(11& 12/2021 expiry),0,,0,1,1,10,40,ok
+Ide64a0f9cf,A1,next_delivery,,,1,tbd,undetermined,Next release not available at this time,,,0,,0,,,,,ok
+Ide64a0f9cf,A2,next_delivery,,,1,tbd,undetermined,,,,0,,0,,,,,ok
+Iebea12f166,A1,next_delivery,2020-10-01,2020-10-31,0,,estimated,Units expected in October,,,0,,0,0,0,-27,3,ok
+Iebea12f166,A2,next_delivery,2020-10-01,2020-10-31,0,,estimated,,,,0,,0,0,0,-27,3,ok

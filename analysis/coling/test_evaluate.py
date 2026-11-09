@@ -671,6 +671,18 @@ def fresh(tmp_path: Path, name: str = "results") -> Path:
     return folder / f"confirmatory_{len(list(folder.iterdir()))}.json"
 
 
+@contextmanager
+def registered(sealed: Any) -> Iterator[None]:
+    """The sealed file a run of the tests registers as the outcome file: the evaluator reads
+    it only under the exact spelling it was registered at (``--sealed`` is held to
+    ``ev.SEALED``), behind its hash as before. ``None`` leaves the spelling of the enclosing
+    test in force, whatever it is."""
+    with pytest.MonkeyPatch.context() as patch:
+        if sealed is not None:
+            patch.setattr(ev, "SEALED", sealed)
+        yield
+
+
 def confirm(
     study: SimpleNamespace,
     tmp_path: Path,
@@ -682,7 +694,10 @@ def confirm(
     printout."""
     out = fresh(tmp_path)
     capsys.readouterr()
-    assert ev.main(["confirmatory", "--out", str(out), *options(study, **replace), *extra]) == 0
+    with registered(replace.get("sealed", study.paths.sealed)):
+        assert ev.main(
+            ["confirmatory", "--out", str(out), *options(study, **replace), *extra]
+        ) == 0
     printed = capsys.readouterr()
     assert printed.err == ""
     return json.loads(out.read_text()), out.with_suffix(".md").read_text(), printed.out
@@ -699,7 +714,7 @@ def refused(
     and no other error travelling with it."""
     out = fresh(tmp_path, "refused")
     capsys.readouterr()
-    with pytest.raises(SystemExit) as stop:
+    with pytest.raises(SystemExit) as stop, registered(replace.get("sealed", study.paths.sealed)):
         ev.main(["confirmatory", "--out", str(out), *options(study, **replace), *extra])
     assert isinstance(stop.value.code, str) and stop.value.code.startswith("refused: ")
     printed = capsys.readouterr()
@@ -781,7 +796,7 @@ def base(study: SimpleNamespace, tmp_path_factory: pytest.TempPathFactory) -> Si
     patch, printed = pytest.MonkeyPatch(), io.StringIO()
     guard(patch, tmp_path_factory.mktemp("nowhere"))
     try:
-        with redirect_stdout(printed):
+        with redirect_stdout(printed), registered(study.paths.sealed):
             assert ev.main(["confirmatory", "--out", str(out), *options(study)]) == 0
     finally:
         patch.undo()
@@ -3145,7 +3160,7 @@ def test_dev_command_refusals(
     # nothing is overwritten
     assert run_dev(study, out) == 0
     before = out.read_bytes()
-    with pytest.raises(SystemExit, match="already there, and nothing is overwritten"):
+    with pytest.raises(SystemExit, match=r"the output cannot be written \(FileExistsError\)"):
         run_dev(study, out)
     assert out.read_bytes() == before
     assert before == (study.paths.selections / ev.SELECTION_NAME.format(model=LLAMA)).read_bytes()
@@ -3300,11 +3315,15 @@ def linked(path: Path, target: Path) -> Iterator[None]:
         path.write_bytes(data)
 
 
-def test_a_path_is_resolved_part_by_part_without_a_look_at_the_sealed_folder(
+def test_the_path_guard_decides_by_spelling_alone_and_looks_at_nothing(
     study: SimpleNamespace, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """``is_sealed``: the sealed file, its folder and any folder named as the registered one,
-    as given or where a link leads, with no look at any of them."""
+    """``is_sealed``: the declared or configured sealed file by its own spelling, anything
+    that carries the sealed folder's registered name as a component, an unusable spelling
+    (parent traversal, or no spelling at all) and a declared spelling that is not one: all
+    refused, and nothing is asked of the file system to decide. A link whose own spelling is
+    clean is not classified - the writes' no-follow walk and the checked readers' hash gates
+    are what stands over its bytes now."""
     sealed, touched = watched_vault(study, tmp_path, monkeypatch)
     plain = tmp_path / "plain.csv"
     plain.write_text("open")
@@ -3318,42 +3337,47 @@ def test_a_path_is_resolved_part_by_part_without_a_look_at_the_sealed_folder(
     (tmp_path / "to_plain").symlink_to(plain)
     (tmp_path / "round").symlink_to(tmp_path / "about")
     (tmp_path / "about").symlink_to(tmp_path / "round")
-    led = [
-        sealed,
-        sealed.parent,
-        named / "items.jsonl",
+    held = [
+        sealed,  # the sealed file, as declared and as configured
+        named / "items.jsonl",  # the sealed folder's registered name as a component
+        study.paths.sealed,  # the synthetic study's sealed file, wherever it lies
+        study.paths.sealed.parent / "another.csv",
+        tmp_path / "open" / ".." / "to_file",  # parent traversal is never accepted
+    ]
+    for path in held:
+        assert ev.is_sealed(path) is True, path
+        assert ev.is_sealed(str(path), sealed) is True, path
+    for path in (  # clean spellings: admitted, whatever the links lead to
+        plain,
+        tmp_path / "to_plain",
+        tmp_path / "nothing" / "there.json",
+        tmp_path / "open" / "items.jsonl",
+        sealed.parent,  # the sealed folder itself, not named as the registered one
+        sealed.parent / "another.csv",  # the folder is not named as the registered one
+        tmp_path / "to_folder" / "another.csv",
         tmp_path / "to_file",
         tmp_path / "to_folder",
         tmp_path / "to_folder" / sealed.name,
         tmp_path / "to_named" / "items.jsonl",
         tmp_path / "second",
         tmp_path / "relative",
-        tmp_path / "open" / ".." / "to_file",
-        tmp_path / "round" / "items.jsonl",  # links in a circle: nothing is read through them
-    ]
-    for path in led:
-        assert ev.is_sealed(path) is True, path
-        assert ev.is_sealed(str(path), sealed) is True, path
-    for path in (
-        plain,
-        tmp_path / "to_plain",
-        tmp_path / "nothing" / "there.json",
-        tmp_path / "open" / "items.jsonl",
-        sealed.parent / "another.csv",  # the folder is not named as the registered one
-        tmp_path / "to_folder" / "another.csv",
+        tmp_path / "round" / "items.jsonl",  # links in a circle are not read through either
     ):
         assert ev.is_sealed(path) is False, path
-    assert ev.is_sealed(None) is False and ev.is_sealed(tmp_path / "to_plain", named) is False
-    assert ev.is_sealed(tmp_path / "to_plain", plain) is True
-    assert not [look for look in touched if look not in (str(sealed.parent / "another.csv"),)]
+    assert ev.is_sealed(None) is True  # no usable spelling: refused, fail closed
+    assert ev.is_sealed(tmp_path / "to_plain", named) is False
+    assert ev.is_sealed(plain, plain) is True  # the declared sealed file by its own spelling
+    assert ev.is_sealed(tmp_path / "to_plain", plain) is False  # an alias of it is not
+    assert touched == []  # the guard asked the file system for nothing
     assert ev.LINK_HOPS == 40 and S.SEALED_FOLDER == "sealed"
-    # the sealed file reached by another way to its folder: the way is resolved, not the folder
+    # the registered file is refused under its registered spelling, whatever ``sealed`` says
+    # (``same`` spells another way to its folder: an alias, and aliases are not classified)
     (tmp_path / "same").symlink_to(tmp_path, target_is_directory=True)
     assert ev.is_sealed(sealed, tmp_path / "same" / "vault" / sealed.name) is True
-    assert not [look for look in touched if look not in (str(sealed.parent / "another.csv"),)]
+    assert ev.is_sealed(str(sealed)) is True and touched == []
 
 
-def test_a_stored_file_that_leads_into_a_sealed_folder_through_a_link_is_not_read(
+def test_a_stored_file_that_is_a_link_to_the_sealed_file_never_scores(
     study: SimpleNamespace,
     tmp_path: Path,
     capsys: pytest.CaptureFixture[str],
@@ -3361,78 +3385,76 @@ def test_a_stored_file_that_leads_into_a_sealed_folder_through_a_link_is_not_rea
 ) -> None:
     """The plan, an item file, a track record, the readings and the manifest of a run, and a
     selection file, each in turn a symbolic link to the sealed file (directly, and by way of a
-    second link through its folder): every command refuses before the file is looked at, and
-    no character of the hash of the sealed file is printed, although the selection file is
-    held to a hash that the sealed bytes would not have."""
+    second link through its folder). Admission is by spelling alone, so a link of its own
+    clean spelling is not classified in advance; what the guard still owes is that the sealed
+    bytes never score: every command refuses (the completeness check reports the run not
+    ready) before anything is written, the sealed folder is asked for nothing under its own
+    spelling, and no character of the hash of the sealed file is printed - although the
+    selection file is held to a hash that the sealed bytes would not have."""
     sealed, touched = watched_vault(study, tmp_path, monkeypatch)
     (tmp_path / "way").symlink_to(sealed.parent, target_is_directory=True)
     second = tmp_path / "second"
     second.symlink_to(tmp_path / "way" / sealed.name)
     run, dev = run_folder(study, LLAMA, "e3-a"), run_folder(study, LLAMA, "dev-a")
-    named = "the plan of the runs names a path in a sealed folder; none of its files is read"
-    of_run = "leads into a sealed folder; none of the files of the run is read"
-    cases = {
-        lp.plan_path(study.paths.runs): "the plan of the runs leads into a sealed folder; it is",
-        Path(study.plan["lists"]["e3"]["path"]): named,
-        Path(study.plan["tracks"]["fit+dev"]["path"]): named,
-        run / "readings.jsonl": f"a stored file of run {run.name} {of_run}",
-        run / "run_manifest.json": f"a stored file of run {run.name} {of_run}",
-        study.paths.selections / ev.SELECTION_NAME.format(model=LLAMA): (
-            f"{LLAMA}: the H3 selection file leads into a sealed folder; it is not read"
-        ),
-    }
-    for path, said in cases.items():
+    cases = [
+        lp.plan_path(study.paths.runs),
+        Path(study.plan["lists"]["e3"]["path"]),
+        Path(study.plan["tracks"]["fit+dev"]["path"]),
+        run / "readings.jsonl",
+        run / "run_manifest.json",
+        study.paths.selections / ev.SELECTION_NAME.format(model=LLAMA),
+    ]
+    for path in cases:
         for target in (sealed, second):
             with linked(path, target):
                 code, out = check(study, capsys)
                 why = refused(study, tmp_path, capsys, sealed=None)
-            assert code == 3 and f"missing: {said}" in out and said in why, path
+            assert code == 3 and "missing:" in out, path
             assert touched == [], path
-            assert not [n for n in (6, 8, 16) if study.sealed_sha[:n] in out + why]
-    # the dev command: its plan, and a stored file of one of its runs
-    for path, said in (
-        (lp.plan_path(study.paths.runs), "the plan of the runs leads into a sealed folder"),
-        (dev / "readings.jsonl", f"a stored file of run {dev.name} {of_run}"),
-        (dev / "run_manifest.json", f"a stored file of run {dev.name} {of_run}"),
-    ):
+            assert not [n for n in (6, 8, 16) if study.sealed_sha[:n] in out + why], path
+    # the dev command: its plan, and a stored file of one of its runs, refuse as well, and
+    # the refusal names no value of the sealed file
+    for path in (lp.plan_path(study.paths.runs), dev / "readings.jsonl", dev / "run_manifest.json"):
         with linked(path, second), pytest.raises(SystemExit) as stop:
             run_dev(study, tmp_path / "selection.json")
-        assert said in str(stop.value.code) and touched == []
+        assert study.sealed_sha[:8] not in str(stop.value.code) and touched == []
     # the same with the sealed file given by its own option, wherever it lies
     other = tmp_path / "elsewhere" / "outcomes.csv.gz"
     other.parent.mkdir()
     other.write_bytes(sealed.read_bytes())
     touched.clear()
-    for path, said in ((run / "readings.jsonl", of_run), (list(cases)[-1], "it is not read")):
+    for path in (run / "readings.jsonl", cases[-1]):
         with linked(path, other):
             why = refused(study, tmp_path, capsys, sealed=other, expect_sha256=file_sha(other))
-        assert said in why and study.sealed_sha[:8] not in why
-    # an output that leads into the sealed folder is refused without a look at it either
+        assert study.sealed_sha[:8] not in why
+    # an output whose way leads into the sealed folder by a link: admitted by spelling, and
+    # stopped by the no-follow walk of the write, without a look at the sealed folder
     (tmp_path / "out").symlink_to(sealed.parent, target_is_directory=True)
-    with pytest.raises(SystemExit, match="--out lies in a sealed folder"):
-        ev.output_paths(tmp_path / "out" / sealed.name)
+    assert ev.output_paths(tmp_path / "out" / sealed.name) == (tmp_path / "out" / sealed.name, None)
+    with pytest.raises(SystemExit, match="the output cannot be written"):
+        ev.write_new(tmp_path / "out" / sealed.name, "{}")
     assert touched == [] and check(study, capsys)[0] == 0
-    # the study is whole again. An open file that fails its hash still shows its own; a file
-    # that leads to a sealed path shows none, and passes with the hash it has
+    # the study is whole again. An open file that fails its hash still shows its own; bytes
+    # declared to be the sealed file's show none of theirs, whatever the path says
     good, kept = (hashlib.sha256(data).hexdigest() for data in (b"open", b"kept"))
     assert ev.hash_required(b"open", good[:16], "an open file", tmp_path / "open.csv") == good
     with pytest.raises(SystemExit, match=f"its sha256 starts with {good[:16]}"):
         ev.hash_required(b"open", "0" * 16, "an open file", tmp_path / "open.csv")
     for wrong in ("0" * 16, kept[:15]):  # another hash, and one that is too short to count
         with pytest.raises(SystemExit, match="no character of the hash") as stop:
-            ev.hash_required(b"kept", wrong, "a sealed file", second)
+            ev.hash_required(b"kept", wrong, "a sealed file", second, of_sealed=True)
         assert kept[:6] not in str(stop.value.code)
-    assert ev.hash_required(b"kept", kept[:16], "a sealed file", second) == kept
+    assert ev.hash_required(b"kept", kept[:16], "a sealed file", second, of_sealed=True) == kept
 
 
 def test_no_spelling_of_the_sealed_path_has_its_hash_printed(
     study: SimpleNamespace, tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
     """The sealed file lies in a folder that is not named as the registered one, and
-    ``--sealed`` reaches it through a link and a step back: as text, the link and the step
-    cancel, and the path names a file that is not there. With a wrong hash the refusal still
-    prints no character of the hash of the file that was read, and the file is no open input
-    under that spelling."""
+    ``--sealed`` reaches it through a link and a step back. Only the registered outcome
+    spelling may be read, and one with parent traversal in it is refused before any hash is
+    asked of any file: no character of the hash of the sealed file is printed under any
+    spelling, and the bytes are those of a sealed file whatever a path says."""
     kept = tmp_path / "elsewhere" / "outcomes.csv.gz"
     (kept.parent / "inner").mkdir(parents=True)
     kept.write_bytes(study.paths.sealed.read_bytes())
@@ -3440,21 +3462,25 @@ def test_no_spelling_of_the_sealed_path_has_its_hash_printed(
     spelled = tmp_path / "way" / ".." / kept.name
     assert spelled.read_bytes() == kept.read_bytes() and ".." in str(spelled)
     assert not Path(os.path.abspath(spelled)).exists()
+    # a spelling with parent traversal in it is refused before any hash is asked of the file
     why = refused(study, tmp_path, capsys, sealed=spelled, expect_sha256="0" * 64)
-    assert "the sealed file is not the expected file: its sha256 is not the one given" in why
+    assert why.startswith("refused: --sealed must name the registered outcome file")
     assert not [n for n in (6, 8, 16) if study.sealed_sha[:n] in why]
     assert ev.is_sealed(spelled, spelled) and ev.is_sealed(str(spelled), spelled)
-    assert ev.is_sealed(spelled, kept) and not ev.is_sealed(kept.parent / "other.csv", spelled)
+    assert ev.is_sealed(spelled, kept) and ev.is_sealed(kept.parent / "other.csv", spelled)
     why = refused(study, tmp_path, capsys, sealed=spelled, statements=spelled)
-    assert "--statements would be read from a sealed folder" in why
+    assert why.startswith("refused: --sealed must name the registered outcome file")
     # whatever the path says, the bytes of the sealed file are those of a sealed file
     with pytest.raises(SystemExit, match="no character of the hash") as stop:
         ev.hash_required(
             b"kept", "0" * 16, "the sealed file", tmp_path / "open.csv", of_sealed=True
         )
     assert hashlib.sha256(b"kept").hexdigest()[:6] not in str(stop.value.code)
-    # with its own hash the file is read, and the evaluation is the one of the study
-    report, _, _ = confirm(study, tmp_path, capsys, sealed=spelled)
+    # only the registered spelling is read, with its own hash: the evaluation is the one of
+    # the study; the alias spelling is refused without any hash of the file being printed
+    with pytest.raises(SystemExit, match="--sealed must name the registered outcome file"):
+        confirm(study, tmp_path, capsys, sealed=spelled)
+    report, _, _ = confirm(study, tmp_path, capsys)
     assert report["inputs"]["sealed_outcomes_sha256"] == study.sealed_sha
 
 
@@ -3599,34 +3625,56 @@ def test_the_sealed_file_is_read_last_behind_everything_else(
     assert order.count("the sealed file") == 1
 
 
-def test_an_output_that_exists_or_lies_in_a_sealed_folder_is_refused(
+def test_an_output_that_lies_in_a_sealed_folder_or_is_no_name_is_refused_before_any_read(
     study: SimpleNamespace,
     tmp_path: Path,
     capsys: pytest.CaptureFixture[str],
     sealed_unread: list[str],
 ) -> None:
+    """Admission is lexical and asks nothing of the file system: a missing name, a sealed or
+    restricted component and a name that would end in .md beside a table are refused before
+    any input, sealed or open, is read."""
+
     def stops(out: Path | None, match: str) -> None:
         args = ["confirmatory", *options(study)] + ([] if out is None else ["--out", str(out)])
-        with pytest.raises(SystemExit, match=match) as stop:
+        with pytest.raises(SystemExit, match=match) as stop, registered(study.paths.sealed):
             ev.main(args)
         assert str(stop.value.code).startswith("refused: ")
 
     stops(None, "--out is required")
-    there = tmp_path / "there.json"
-    there.write_text("{}")
-    stops(there, "already there, and nothing is overwritten")
-    assert there.read_text() == "{}"
-    table = tmp_path / "new.md"
-    table.write_text("kept")
-    stops(tmp_path / "new.json", "already there, and nothing is overwritten")
-    assert table.read_text() == "kept" and not (tmp_path / "new.json").exists()
-    stops(tmp_path / "no_such_folder" / "r.json", "folder of the output does not exist")
     vault = tmp_path / "sealed"
     vault.mkdir()
     stops(vault / "r.json", "--out lies in a sealed folder")
     stops(tmp_path / "r.md", "cannot end in .md")
     assert list(vault.iterdir()) == [] and sealed_unread == []
     assert capsys.readouterr().out == ""
+
+
+def test_an_output_that_exists_or_has_no_folder_is_refused_by_the_write(
+    study: SimpleNamespace,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Whether the output or its folder is already there is decided by the exclusive write
+    itself, after the whole evaluation: an existing file is never overwritten (the link that
+    would give the new bytes its name fails), a missing folder refuses, and a refusal leaves
+    nothing of the pair behind - the result file no more than the table beside it."""
+
+    def stops(out: Path, match: str) -> None:
+        with pytest.raises(SystemExit, match=match) as stop, registered(study.paths.sealed):
+            ev.main(["confirmatory", "--out", str(out), *options(study)])
+        assert str(stop.value.code).startswith("refused: ")
+
+    there = tmp_path / "there.json"
+    there.write_text("{}")
+    stops(there, r"the output cannot be written \(FileExistsError\)")
+    assert there.read_text() == "{}"
+    table = tmp_path / "new.md"
+    table.write_text("kept")
+    stops(tmp_path / "new.json", r"the output cannot be written \(FileExistsError\)")
+    assert table.read_text() == "kept" and not (tmp_path / "new.json").exists()
+    stops(tmp_path / "no_such_folder" / "r.json", r"the output cannot be written")
+    capsys.readouterr()
 
 
 def test_an_open_input_in_a_sealed_folder_or_of_another_build_is_refused(
@@ -4764,7 +4812,7 @@ DECISIONS = (
     "the floor of five statements",
     "one pair of sets at a time",
     "that anyone can name",
-    "links in a circle count as sealed",
+    "the path guard decides by spelling alone",
 )
 """A phrase of every decision in ``evaluate.WHERE_THE_PLAN_IS_SILENT``."""
 STATED_BY_THE_PLAN = (
@@ -4883,11 +4931,11 @@ def test_the_list_of_decisions_holds_what_the_plan_does_not_say() -> None:
             "the counts of the contrast on the statements both sides parsed",
             "the counts of the six tests themselves stay as they are",
         ),
-        "links in a circle count as sealed": (
-            "as given or where a symbolic link on its way leads",
-            "the readings and the manifest of a run and a selection file",
-            "nothing is asked about a sealed path",
-            "an output is not written through one",
+        "the path guard decides by spelling alone": (
+            "restricted path classes",
+            "the writes' no-follow component walk and the checked readers' registered hash "
+            "gates",
+            "Only the registered outcome path is a read target",
             "prints no character of that hash",
         ),
     }.items():
@@ -4900,7 +4948,7 @@ def test_the_list_of_decisions_holds_what_the_plan_does_not_say() -> None:
         "The pinball losses and the coverage stay.",
         "Two sets, one pair at a time.",
         "The counts of the six tests stay.",
-        "asks the file system nothing about a sealed path",
+        "decides by spelling alone, with no filesystem call",
         "of the sealed file no character of its own hash is printed",
     ):
         assert phrase in described, phrase
@@ -7367,7 +7415,7 @@ def test_baselines_command_hashes_the_predictions_of_the_refit(
     moved = {name: frame.copy() for name, frame in held.items() if name in G.PREDICTORS}
     moved["base_rate"].iloc[0, 0] += 0.001
     assert ev.baseline_hash(moved, opened.study.probe["base_rate"]) != sha
-    with pytest.raises(SystemExit, match="already there"):
+    with pytest.raises(SystemExit, match=r"the output cannot be written \(FileExistsError\)"):
         ev.main(["baselines", "--out", str(out), *options(study, *OPEN)])
 
 
@@ -8205,29 +8253,45 @@ def test_a_definition_is_held_to_the_statements_whose_loss_it_changes(
 
 
 @pytest.mark.parametrize(("before", "given"), FEW_OR_NOT[1:])
-def test_figures_on_a_slice_that_lacks_a_few_statements_of_the_list_are_withheld(
+def test_figures_on_a_slice_that_lacks_a_few_statements_of_the_list_are_refused(
     before: int, given: bool
 ) -> None:
     """All statements but ``before`` are dated after the cutoff day of the first primary.
 
-    Not switched, it is tested on every statement and its tests are repeated on its slice,
-    which lacks ``before`` scoreable statements of the list. Switched, its item set is that
-    slice: the two contrasts of the decomposition that read no model then stand beside the
-    model-free contrasts on every eligible statement, and the base rate's figures beside its
-    own stand beside the base rate's record on every eligible statement."""
+    When ``before`` is a few (1 to 4), the eligible list and that slice differ by so few
+    statements: the same figures on both would give back the outcomes of those few, so the
+    evaluation is refused outright, before any figure is computed - on the direct entry as
+    on the command (the six tests are never withheld inside it instead). Not switched and
+    not a few, the primary is tested on every statement and its tests are repeated on its
+    slice, which lacks ``before`` scoreable statements of the list. Switched, its item set
+    is that slice: the two contrasts of the decomposition that read no model then stand
+    beside the model-free contrasts on every eligible statement, and the base rate's figures
+    beside its own stand beside the base rate's record on every eligible statement."""
     dates = np.where(np.arange(160) < before, "2023-06-01", "2024-06-01")
     held, rows = small_study(switched=())
     held.first["event_date"] = dates
-    report = ev.evaluate(held, rows, {}, "percentile", draws=300)
-    assert report["family"] == plain_family()
-    sliced = report["secondaries"]["post_cutoff_slice"]
-    assert list(sliced) == [f"{hypothesis} {LLAMA}" for hypothesis in ("H1", "H2", "H3")]
-    for record in sliced.values():
-        assert (record == {"withheld": True}) is not given
-        assert record.get("statements") == (144 - before if given else None)
+    if not given:
+        with pytest.raises(
+            SystemExit, match=f"differ by {before} statements: the same figures on both"
+        ):
+            ev.evaluate(held, rows, {}, "percentile", draws=300)
+    else:
+        report = ev.evaluate(held, rows, {}, "percentile", draws=300)
+        assert report["family"] == plain_family()
+        sliced = report["secondaries"]["post_cutoff_slice"]
+        assert list(sliced) == [f"{hypothesis} {LLAMA}" for hypothesis in ("H1", "H2", "H3")]
+        for record in sliced.values():
+            assert record != {"withheld": True}
+            assert record.get("statements") == 144 - before
 
     held, rows = small_study(switched=(LLAMA,))
     held.first["event_date"] = dates
+    if not given:
+        with pytest.raises(
+            SystemExit, match=f"differ by {before} statements: the same figures on both"
+        ):
+            ev.evaluate(held, rows, {}, "percentile", draws=300)
+        return
     report = ev.evaluate(held, rows, {}, "percentile", draws=300)
     chosen = report["item_sets"]
     assert (chosen[LLAMA]["items"], chosen[DEEPSEEK]["items"]) == (ev.SLICE_ITEMS, ev.ALL_ITEMS)
@@ -8688,7 +8752,8 @@ def test_two_runs_write_the_same_bytes(
     base: SimpleNamespace,
 ) -> None:
     out = fresh(tmp_path)
-    assert ev.main(["confirmatory", "--out", str(out), *options(study)]) == 0
+    with registered(study.paths.sealed):
+        assert ev.main(["confirmatory", "--out", str(out), *options(study)]) == 0
     again = json.loads(out.read_text())
     if again["inputs"]["code_sha256"] == base.report["inputs"]["code_sha256"]:
         assert out.read_text() == base.json_text

@@ -1,0 +1,6 @@
+"# task: A literal reading, check set (AUDIT_GUIDE.md sections 3 and 4)"
+"# sheet: check disagreements"
+"# seed: 20261001"
+"# items: 0"
+"# values of adj_decision: slip | gap"
+"item_id","drug","company","presentation","therapeutic_category","initial_posting_date","type_of_update","date_of_update","availability_information","related_information","reason_for_shortage","differs","A1_statement_type","A1_start","A1_end","A1_abstain","A1_abstain_reason","A1_certainty","A1_quote","A1_distractor_roles","A1_distractor_quotes","A1_hard","A1_note","A2_statement_type","A2_start","A2_end","A2_abstain","A2_abstain_reason","A2_certainty","A2_quote","A2_distractor_roles","A2_distractor_quotes","A2_hard","A2_note"

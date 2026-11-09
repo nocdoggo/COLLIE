@@ -1,0 +1,772 @@
+Task E, reference readings: the items of reference_A2.csv, in the order of the sheet.
+Verdicts go into the sheet; this file is for reading.
+
+=== 1 of 55: I9051a7f1af ===
+Entry
+- Drug: Amoxapine Tablets
+- Company: Teva Pharmaceuticals
+- Presentation: 150 mg, 30 tablets (NDC 00591-5716-30)
+- Therapeutic category: Psychiatry
+- Initial posting date: 2020-03-09
+- Type of update: Revised
+- Date of update: 2023-05-08
+- Availability information: "Unavailable; Estimated Recovery June 2023"
+- Related information: (blank)
+- Reason for shortage: (blank)
+Rule reading: recovery, 2023-06-01 to 2023-06-30, not stale
+
+=== 2 of 55: Id6dce50e5d ===
+Entry
+- Drug: Amphetamine Aspartate Monohydrate, Amphetamine Sulfate, Dextroamphetamine Saccharate, Dextroamphetamine Sulfate Tablet
+- Company: Teva Pharmaceuticals USA, Inc.
+- Presentation: Dextroamphetamine Saccharate, Amphetamine Aspartate, Dextroamphetamine Sulfate and Amphetamine Sulfate Tablets, Tablet, 2.5 mg; 2.5 mg; 2.5 mg; 2.5 mg (NDC 0555-0972-02)
+- Therapeutic category: Psychiatry
+- Initial posting date: 2022-10-12
+- Type of update: Revised
+- Date of update: 2025-02-14
+- Availability information: "Limited Availability"
+- Related information: "Estimated availability: May 2025"
+- Reason for shortage: "Other"
+Rule reading: recovery, 2025-05-01 to 2025-05-31, not stale
+
+=== 3 of 55: I479b164e32 ===
+Entry
+- Drug: Dopamine Hydrochloride Injection
+- Company: Hospira, Inc., a Pfizer Company
+- Presentation: Dopamine Hydrochloride In Dextrose 5% In Plastic Container, Injection, 800 mg/250 mL (3.2 mg/1 mL) (NDC 0409-7810-22)
+- Therapeutic category: Cardiovascular
+- Initial posting date: 2017-11-06
+- Type of update: Revised
+- Date of update: 2024-07-15
+- Availability information: "Unavailable"
+- Related information: "Next Delivery: July 2024; Estimated Recovery: September 2024"
+- Reason for shortage: "Demand increase for the drug"
+Rule reading: recovery, 2024-09-01 to 2024-09-30, not stale
+
+=== 4 of 55: I6060dafb19 ===
+Entry
+- Drug: Leucovorin Calcium Injection
+- Company: Hikma Pharmaceuticals USA, Inc.
+- Presentation: Leucovorin Calcium for Injection, USP, Injection, 100 mg/10 mL (NDC 0143-9554-01)
+- Therapeutic category: Oncology; Pediatric
+- Initial posting date: 2012-01-01
+- Type of update: Revised
+- Date of update: 2024-05-17
+- Availability information: "Unavailable"
+- Related information: "Additional lots are scheduled for manufacturing and will be available in the May - June 2024 timeframe. Product will be made available as it is released."
+- Reason for shortage: "Demand increase for the drug"
+Rule reading: next_delivery, 2024-05-01 to 2024-06-30, not stale
+
+=== 5 of 55: I12654a5c14 ===
+Entry
+- Drug: Carboplatin Injection
+- Company: Hospira, Inc., a Pfizer Company
+- Presentation: Injection, 450 mg/45 mL (10 mg/mL) (NDC 61703-262-05)
+- Therapeutic category: Oncology
+- Initial posting date: 2023-04-28
+- Type of update: Revised
+- Date of update: 2024-10-28
+- Availability information: "Limited Availability"
+- Related information: "Limited Supply Available. Next Delivery: November 2024; Estimated Recovery: December 2024"
+- Reason for shortage: "Other"
+Rule reading: recovery, 2024-12-01 to 2024-12-31, not stale
+
+=== 6 of 55: I4a26a0aac8 ===
+Entry
+- Drug: Dopamine Hydrochloride Injection
+- Company: Hikma Pharmaceuticals USA, Inc.
+- Presentation: Injection, 40 mg/1 mL (NDC 0143-9252-25)
+- Therapeutic category: Cardiovascular
+- Initial posting date: 2017-11-06
+- Type of update: Revised
+- Date of update: 2023-12-01
+- Availability information: "This presentation is temporarily on backorder."
+- Related information: "Additional lots are scheduled for manufacturing and will be available in the December 2023 - January 2024 timeframe. Product will be made available as it is released."
+- Reason for shortage: "Demand increase for the drug"
+Rule reading: next_delivery, 2023-12-01 to 2024-01-31, not stale
+
+=== 7 of 55: Ief34f2d906 ===
+Entry
+- Drug: Epinephrine Bitartrate, Lidocaine Hydrochloride Injection
+- Company: Fresenius Kabi USA, LLC
+- Presentation: Xylocaine, Injection, .005 mg/1 mL; 15 mg/1 mL (NDC 63323-488-17)
+- Therapeutic category: Anesthesia; Pediatric
+- Initial posting date: 2016-10-14
+- Type of update: Revised
+- Date of update: 2024-04-16
+- Availability information: "Unavailable"
+- Related information: "Backordered. Next release May 2024; Check wholesaler inventory"
+- Reason for shortage: "Delay in shipping of the drug"
+Rule reading: next_delivery, 2024-05-01 to 2024-05-31, not stale
+
+=== 8 of 55: I8128f96ebd ===
+Entry
+- Drug: Etomidate Injection
+- Company: Hikma Pharmaceuticals USA, Inc.
+- Presentation: Etomidate, Injection, 2 mg/1 mL (NDC 0143-9507-10)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2022-10-05
+- Type of update: Revised
+- Date of update: 2025-04-11
+- Availability information: "Unavailable"
+- Related information: "Additional lots will be available in the May 2025 timeframe. Product will be made available as it is released."
+- Reason for shortage: "Demand increase for the drug"
+Rule reading: next_delivery, 2025-05-01 to 2025-05-31, not stale
+
+=== 9 of 55: Ib1613e20bd ===
+Entry
+- Drug: Hydromorphone Hydrochloride Injection
+- Company: Teva Pharmaceuticals USA, Inc.
+- Presentation: Hydromorphone Hydrochloride, Injection, 10 mg/1 mL (NDC 0703-0113-03)
+- Therapeutic category: Analgesia/Addiction
+- Initial posting date: 2017-11-01
+- Type of update: Revised
+- Date of update: 2025-02-14
+- Availability information: "Limited Availability"
+- Related information: "Estimated availability: March 2025"
+- Reason for shortage: "Shortage of an active ingredient"
+Rule reading: recovery, 2025-03-01 to 2025-03-31, not stale
+
+=== 10 of 55: Ia0fc0e544f ===
+Entry
+- Drug: Dacarbazine Injection
+- Company: Fresenius Kabi USA, LLC
+- Presentation: Injection, 10 mg/1 mL (NDC 63323-127-10)
+- Therapeutic category: Oncology
+- Initial posting date: 2021-10-20
+- Type of update: Revised
+- Date of update: 2024-04-18
+- Availability information: "Unavailable"
+- Related information: "Backordered. Next release May 2024; Check wholesaler inventory"
+- Reason for shortage: "Demand increase for the drug"
+Rule reading: next_delivery, 2024-05-01 to 2024-05-31, not stale
+
+=== 11 of 55: I7ee52cfc22 ===
+Entry
+- Drug: Sodium Chloride 0.9% Injection
+- Company: Hospira, Inc., a Pfizer Company
+- Presentation: Sodium Chloride 0.9% In Plastic Container, Injection, 9% (9 mg/1 mL) (NDC 0409-4888-12)
+- Therapeutic category: Other
+- Initial posting date: 2018-06-21
+- Type of update: Revised
+- Date of update: 2024-07-15
+- Availability information: "Limited Availability"
+- Related information: "Limited Supply Available. Next Delivery: November 2024; Estimated Recovery: December 2024"
+- Reason for shortage: "Delay in shipping of the drug"
+Rule reading: recovery, 2024-12-01 to 2024-12-31, not stale
+
+=== 12 of 55: I0b75b9a077 ===
+Entry
+- Drug: Carboplatin Injection
+- Company: Hospira, Inc., a Pfizer company
+- Presentation: 50 mg/5 mL (10 mg/mL) Multiple Dose ONCO-TAIN™ Glass Fliptop Vial (NDC 61703-0339-18)
+- Therapeutic category: Oncology
+- Initial posting date: 2023-04-28
+- Type of update: New
+- Date of update: 2023-04-28
+- Availability information: "Limited Supply. Next delivery: July 2023; Estimated recovery: Q3 2023"
+- Related information: (blank)
+- Reason for shortage: "Demand increase"
+Rule reading: recovery, 2023-07-01 to 2023-09-30, not stale
+
+=== 13 of 55: Ia22c457465 ===
+Entry
+- Drug: Ketamine Hydrochloride Injection
+- Company: Hospira, Inc., a Pfizer Company
+- Presentation: Ketamine Hydrochloride, Injection, 50 mg/1 mL (NDC 0409-2053-10)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2018-02-16
+- Type of update: Revised
+- Date of update: 2023-11-03
+- Availability information: "Next Delivery: February 2025; Estimated Recovery: March 2025"
+- Related information: "Shortage per Manufacturer: Manufacturing Delay"
+- Reason for shortage: "Demand increase for the drug"
+Rule reading: recovery, 2025-03-01 to 2025-03-31, not stale
+
+=== 14 of 55: I5d0c358dc5 ===
+Entry
+- Drug: Amphetamine Aspartate Monohydrate, Amphetamine Sulfate, Dextroamphetamine Saccharate, Dextroamphetamine Sulfate Tablet
+- Company: Alvogen
+- Presentation: Dextroamp Saccharate, Amp Aspartate, Dextroamp Sulfate And Amp Sulfate, Tablet, 2.5 mg; 2.5 mg; 2.5 mg; 2.5 mg (NDC 47781-176-01)
+- Therapeutic category: Psychiatry
+- Initial posting date: 2022-10-12
+- Type of update: Revised
+- Date of update: 2024-10-02
+- Availability information: "Limited Availability"
+- Related information: "Supporting contracted business only; Resupply Late Oct 2024"
+- Reason for shortage: "Shortage of an active ingredient"
+Rule reading: recovery, 2024-10-21 to 2024-10-31, not stale
+
+=== 15 of 55: Icfaaf8e064 ===
+Entry
+- Drug: Bupivacaine Hydrochloride Injection
+- Company: Hospira, Inc., a Pfizer Company
+- Presentation: Marcaine, Injection, Marcaine 125 mg/50 mL (2.5 mg/mL) (NDC 0409-1587-50)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2018-02-20
+- Type of update: Revised
+- Date of update: 2025-07-31
+- Availability information: "Unavailable"
+- Related information: "Next Delivery: July 2025; Estimated Recovery: September 2025"
+- Reason for shortage: "Other"
+Rule reading: recovery, 2025-09-01 to 2025-09-30, not stale
+
+=== 16 of 55: I8c794b10fa ===
+Entry
+- Drug: Lidocaine Hydrochloride (Xylocaine) Injection
+- Company: Hospira, Inc.
+- Presentation: Xylocaine Cardiac 100 mg/5 mL (2%; 20 mg/mL); Ansyr Plastic Syringe (NDC 0409-1323-05)
+- Therapeutic category: Anesthesia;Pediatric
+- Initial posting date: 2012-02-22
+- Type of update: Revised
+- Date of update: 2023-02-22
+- Availability information: "Next Delivery: February 2023; Estimated Recovery: March 2024"
+- Related information: "Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay"
+- Reason for shortage: "Other"
+Rule reading: recovery, 2024-03-01 to 2024-03-31, not stale
+
+=== 17 of 55: I6df0c0ba54 ===
+Entry
+- Drug: Remifentanil Hydrochloride Injection
+- Company: Fresenius Kabi USA, LLC
+- Presentation: Remifentanil Hydrochloride, Injection, 1 mg/1 mL (NDC 63323-725-10)
+- Therapeutic category: Analgesia/Addiction
+- Initial posting date: 2022-06-28
+- Type of update: Revised
+- Date of update: 2025-05-14
+- Availability information: "Unavailable"
+- Related information: "Backordered. Next release June 2025; Check wholesalers for inventory."
+- Reason for shortage: "Demand increase for the drug"
+Rule reading: next_delivery, 2025-06-01 to 2025-06-30, not stale
+
+=== 18 of 55: I7ef7f84dee ===
+Entry
+- Drug: Lidocaine Hydrochloride Injection
+- Company: Hospira, Inc., a Pfizer Company
+- Presentation: Lidocaine Hydrochloride, Injection, 100 mg/5mL (2%, 20 mg/1 mL) Syringes (NDC 0409-4903-34)
+- Therapeutic category: Anesthesia; Pediatric
+- Initial posting date: 2012-02-22
+- Type of update: Revised
+- Date of update: 2025-05-23
+- Availability information: "Unavailable"
+- Related information: "Next Delivery: January 2026; Estimated Recovery: March 2026"
+- Reason for shortage: "Other"
+Rule reading: recovery, 2026-03-01 to 2026-03-31, not stale
+
+=== 19 of 55: I30d18a13f2 ===
+Entry
+- Drug: Lisdexamfetamine Dimesylate Tablet, Chewable
+- Company: Sun Pharmaceutical Industries, Inc.
+- Presentation: Lisdexamfetamine Dimesylate, Tablet, Chewable, 20 mg (NDC 57664-084-88)
+- Therapeutic category: Psychiatry
+- Initial posting date: 2023-07-14
+- Type of update: Revised
+- Date of update: 2025-11-22
+- Availability information: "Limited Availability"
+- Related information: "Available Q4 2025"
+- Reason for shortage: "Other"
+Rule reading: recovery, 2025-10-01 to 2025-12-31, not stale
+
+=== 20 of 55: I263301c18a ===
+Entry
+- Drug: Rocuronium Bromide Injection
+- Company: Hikma Pharmaceuticals USA Inc.
+- Presentation: 10 mg/mL, 5 mL vial (NDC 0143-9250-10)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2023-02-15
+- Type of update: New
+- Date of update: 2023-02-24
+- Availability information: "This presentation is temporarily on backorder."
+- Related information: "Additional lots will be available in the March 2023 timeframe. Product will be made available as it is released."
+- Reason for shortage: "Demand increase for the drug"
+Rule reading: next_delivery, 2023-03-01 to 2023-03-31, not stale
+
+=== 21 of 55: I997327f648 ===
+Entry
+- Drug: Bupivacaine Hydrochloride, Epinephrine Bitartrate Injection
+- Company: Hospira, Inc., a Pfizer Company
+- Presentation: Bupivacaine Hydrochloride and Epinephrine, Injection, 125 mg/50 mL (2.5 mg/mL) (NDC 0409-9043-01)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2018-02-20
+- Type of update: Revised
+- Date of update: 2025-03-11
+- Availability information: "Unavailable"
+- Related information: "Next Delivery: October 2025; Estimated Recovery: December 2025"
+- Reason for shortage: "Other"
+Rule reading: recovery, 2025-12-01 to 2025-12-31, not stale
+
+=== 22 of 55: I09d81e611c ===
+Entry
+- Drug: Etomidate Injection
+- Company: Eugia US, LLC (formerly AuroMedics Pharma LLC) [mfd. by Eugia Pharma Specialties, Ltd.)
+- Presentation: 2 mg/mL, 20 mL vial (NDC 55150-222-20)
+- Therapeutic category: Anesthesiology
+- Initial posting date: 2022-10-05
+- Type of update: Revised
+- Date of update: 2023-01-24
+- Availability information: "Currently on backorder - next shipment February 2023"
+- Related information: (blank)
+- Reason for shortage: "Other"
+Rule reading: next_delivery, 2023-02-01 to 2023-02-28, not stale
+
+=== 23 of 55: Ic2ef1ecc5e ===
+Entry
+- Drug: Bupivacaine Hydrochloride, Epinephrine Bitartrate Injection
+- Company: Hospira, Inc., a Pfizer Company
+- Presentation: Bupivacaine Hydrochloride And Epinephrine, Injection, 2.5 mg/1 mL; 5 ug/1 mL (NDC 0409-9042-01)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2018-02-20
+- Type of update: Revised
+- Date of update: 2024-03-28
+- Availability information: "Unavailable"
+- Related information: "Next Delivery: April 2025; Estimated Recovery: September 2025; Shortage per Manufacturer: Manufacturing Delay"
+- Reason for shortage: "Demand increase for the drug"
+Rule reading: recovery, 2025-09-01 to 2025-09-30, not stale
+
+=== 24 of 55: I3213fb171e ===
+Entry
+- Drug: Remifentanil Hydrochloride Injection
+- Company: Mylan Institutional, a Viatris Company
+- Presentation: Ultiva, Injection, 2 mg (NDC 72078-035-02)
+- Therapeutic category: Analgesia/Addiction
+- Initial posting date: 2022-06-28
+- Type of update: Revised
+- Date of update: 2024-05-30
+- Availability information: "Unavailable"
+- Related information: "Next supply in July 2024."
+- Reason for shortage: "Delay in shipping of the drug"
+Rule reading: next_delivery, 2024-07-01 to 2024-07-31, not stale
+
+=== 25 of 55: Ic686dde013 ===
+Entry
+- Drug: Sodium Chloride 0.9% Injection
+- Company: Baxter Healthcare
+- Presentation: Sodium Chloride 0.9% In Plastic Container, Injection, 900 mg/100 mL (NDC 0338-9159-30)
+- Therapeutic category: Gastroenterology; Other; Pediatric
+- Initial posting date: 2021-12-10
+- Type of update: Revised
+- Date of update: 2023-12-21
+- Availability information: "On Allocation, Q2 2024"
+- Related information: (blank)
+- Reason for shortage: "Demand increase for the drug"
+Rule reading: recovery, 2024-04-01 to 2024-06-30, not stale
+
+=== 26 of 55: Id2c86b93ad ===
+Entry
+- Drug: Sodium Bicarbonate Injection
+- Company: Hospira, Inc., a Pfizer company
+- Presentation: Infant 5 mEq/10 mL (0.5 mEq/mL) ABBOJECT® Glass Syringe (4.2% Concentration) (NDC 0409-5534-14) (old NDC 0409-5534-34)
+- Therapeutic category: Endocrinology/Metabolism;Gastroenterology;Pediatric
+- Initial posting date: 2017-03-01
+- Type of update: Revised
+- Date of update: 2023-04-28
+- Availability information: "Next Delivery: May 2023; Estimated Recovery: March 2024"
+- Related information: "Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay"
+- Reason for shortage: "Other"
+Rule reading: recovery, 2024-03-01 to 2024-03-31, not stale
+
+=== 27 of 55: I995f6e3120 ===
+Entry
+- Drug: Sodium Chloride 23.4% Injection
+- Company: Hospira, Inc., a Pfizer company
+- Presentation: 400 mEq/100 mL (4 mEq/mL); Pharmacy Bulk Package Glass Fliptop Vial (NDC 00409-1141-02)
+- Therapeutic category: Gastroenterology;Endocrinology/Metabolism;Total Parenteral Nutrition;Pediatric
+- Initial posting date: (blank)
+- Type of update: Revised
+- Date of update: 2023-04-28
+- Availability information: "Next Delivery: May 2023; Estimated Recovery: March 2024"
+- Related information: "Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay"
+- Reason for shortage: "Other"
+Rule reading: recovery, 2024-03-01 to 2024-03-31, not stale
+
+=== 28 of 55: Ia465dba7e2 ===
+Entry
+- Drug: Bupivacaine Hydrochloride Injection
+- Company: Hospira, Inc., a Pfizer company
+- Presentation: 225 mg/30 mL (7.5 mg/mL); Single Dose Glass Teartop Vial (NDC 00409-1165-02)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2018-02-20
+- Type of update: Revised
+- Date of update: 2023-03-17
+- Availability information: "Next Delivery: May 2023; Estimated Recovery: September 2023"
+- Related information: (blank)
+- Reason for shortage: "Demand increase for the drug"
+Rule reading: recovery, 2023-09-01 to 2023-09-30, not stale
+
+=== 29 of 55: Ic9d65ac100 ===
+Entry
+- Drug: Morphine Sulfate Injection
+- Company: Hospira, Inc., a Pfizer Company
+- Presentation: Morphine Sulfate, Injection, 4 mg/1 mL Syringes (NDC 0409-1891-01)
+- Therapeutic category: Analgesia/Addiction
+- Initial posting date: 2017-10-31
+- Type of update: Revised
+- Date of update: 2025-01-27
+- Availability information: "Unavailable"
+- Related information: "Next Delivery and Estimated Recovery: March 2025"
+- Reason for shortage: "Other"
+Rule reading: recovery, 2025-03-01 to 2025-03-31, not stale
+
+=== 30 of 55: I5800f1e4e2 ===
+Entry
+- Drug: Naltrexone Hydrochloride Tablet
+- Company: Sun Pharmaceutical Industries, Inc.
+- Presentation: Tablet, 50 mg (NDC 47335-326-83)
+- Therapeutic category: Analgesia/Addiction
+- Initial posting date: 2024-02-29
+- Type of update: Revised
+- Date of update: 2024-03-15
+- Availability information: "Limited Availability"
+- Related information: "Expected to release in March 2024"
+- Reason for shortage: "Shortage of an active ingredient"
+Rule reading: next_delivery, 2024-03-01 to 2024-03-31, not stale
+
+=== 31 of 55: Ib5fad5be6f ===
+Entry
+- Drug: Morphine Sulfate Injection
+- Company: Fresenius Kabi USA, LLC
+- Presentation: Morphine Sulfate, Injection, 2 mg/1 mL (NDC 63323-452-01)
+- Therapeutic category: Analgesia/Addiction
+- Initial posting date: 2017-10-31
+- Type of update: Revised
+- Date of update: 2025-07-15
+- Availability information: "Unavailable"
+- Related information: "Backordered. Next release August 2025. Check wholesalers for inventory."
+- Reason for shortage: "Demand increase for the drug"
+Rule reading: next_delivery, 2025-08-01 to 2025-08-31, not stale
+
+=== 32 of 55: Iff2dd9b855 ===
+Entry
+- Drug: Flurazepam Hydrochloride Capsule
+- Company: Rising Pharma Holdings, Inc.
+- Presentation: Flurazepam Hydrochloride, Capsule, 15 mg (NDC 0378-4415-01)
+- Therapeutic category: Neurology; Other
+- Initial posting date: 2022-08-03
+- Type of update: Revised
+- Date of update: 2025-01-14
+- Availability information: "Unavailable"
+- Related information: "Anticipated availability: Q3 2025; Delay is due to manufacturing delays at the contract manufacturing facility."
+- Reason for shortage: "Regulatory delay"
+Rule reading: recovery, 2025-07-01 to 2025-09-30, not stale
+
+=== 33 of 55: Ic7ca332943 ===
+Entry
+- Drug: Sodium Bicarbonate Injection
+- Company: Hospira, Inc.
+- Presentation: 50 mEq/50 mL (1 mEq/mL) Single Dose Vial Novaplus® (8.4% concentration) (NDC 0409-6625-35)
+- Therapeutic category: Endocrinology/Metabolism;Gastroenterology;Pediatric
+- Initial posting date: 2017-03-01
+- Type of update: Revised
+- Date of update: 2023-02-22
+- Availability information: "Limited Supply Available. Next Delivery: April 2023; Estimated Recovery: September 2023"
+- Related information: "Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay"
+- Reason for shortage: "Other"
+Rule reading: recovery, 2023-09-01 to 2023-09-30, not stale
+
+=== 34 of 55: I83939d0088 ===
+Entry
+- Drug: Furosemide Injection
+- Company: Hospira, Inc., a Pfizer company
+- Presentation: 100 mg/10 mL (10 mg/mL): Single Dose Glass Fliptop Vial (NDC 0409-6102-10)
+- Therapeutic category: Cardiovascular
+- Initial posting date: 2020-04-07
+- Type of update: Revised
+- Date of update: 2023-03-17
+- Availability information: "Limited Supply Available. Next Delivery: April 2023; Estimated Recovery: June 2023"
+- Related information: "Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay"
+- Reason for shortage: "Other"
+Rule reading: recovery, 2023-06-01 to 2023-06-30, not stale
+
+=== 35 of 55: I4859d73588 ===
+Entry
+- Drug: Sodium Acetate Injection
+- Company: Hospira, Inc., a Pfizer Company
+- Presentation: Injection, 40 mEq/20 mL (2 mEq/mL) (NDC 0409-7299-73)
+- Therapeutic category: Endocrinology/Metabolism; Gastroenterology; Pediatric; Total Parenteral Nutrition
+- Initial posting date: 2016-02-03
+- Type of update: Revised
+- Date of update: 2024-07-15
+- Availability information: "Unavailable"
+- Related information: "Next Delivery: August 2024; Estimated Recovery: December 2024"
+- Reason for shortage: "Demand increase for the drug"
+Rule reading: recovery, 2024-12-01 to 2024-12-31, not stale
+
+=== 36 of 55: I42917eb8be ===
+Entry
+- Drug: Penicillin G Benzathine Injection
+- Company: Pfizer Inc.
+- Presentation: Bicillin L-a, Injection, 600000 [iU]/1 mL (NDC 60793-700-10)
+- Therapeutic category: Anti-Infective
+- Initial posting date: 2023-04-26
+- Type of update: Revised
+- Date of update: 2023-12-27
+- Availability information: "Next Delivery: April 2024; Estimated Recovery: Q2 2024"
+- Related information: (blank)
+- Reason for shortage: "Demand increase for the drug"
+Rule reading: recovery, 2024-04-01 to 2024-06-30, not stale
+
+=== 37 of 55: Ib34e566917 ===
+Entry
+- Drug: Sodium Chloride 0.9% Injection
+- Company: Baxter Healthcare
+- Presentation: Sodium Chloride 0.9% In Plastic Container, Injection, 9 g/1000 mL (NDC 0338-0049-48)
+- Therapeutic category: Gastroenterology; Other; Pediatric
+- Initial posting date: 2021-12-10
+- Type of update: Revised
+- Date of update: 2025-02-20
+- Availability information: "Limited Availability"
+- Related information: "On allocation; Recovery May 2025"
+- Reason for shortage: "Demand increase for the drug"
+Rule reading: recovery, 2025-05-01 to 2025-05-31, not stale
+
+=== 38 of 55: I4aa3e3ac71 ===
+Entry
+- Drug: Naltrexone Hydrochloride Tablet
+- Company: SpecGx LLC
+- Presentation: Tablet, 50 mg (NDC 0406-1170-03)
+- Therapeutic category: Analgesia/Addiction
+- Initial posting date: 2024-02-29
+- Type of update: Revised
+- Date of update: 2024-08-15
+- Availability information: "Limited Availability"
+- Related information: "Long term allocations to primary customers with intermittent backorder expected through mid 2025."
+- Reason for shortage: "Demand increase for the drug"
+Rule reading: recovery, 2025-05-01 to 2025-08-31, not stale
+
+=== 39 of 55: Ic330352f96 ===
+Entry
+- Drug: Leucovorin Calcium Injection
+- Company: Fresenius Kabi USA, LLC
+- Presentation: Leucovorin Calcium, Injection, 10 mg/1 mL (NDC 63323-631-50)
+- Therapeutic category: Oncology; Pediatric
+- Initial posting date: 2018-03-23
+- Type of update: Revised
+- Date of update: 2024-06-05
+- Availability information: "Unavailable"
+- Related information: "Next release August 2024."
+- Reason for shortage: "Delay in shipping of the drug"
+Rule reading: next_delivery, 2024-08-01 to 2024-08-31, not stale
+
+=== 40 of 55: Ia4d576827c ===
+Entry
+- Drug: Methotrexate Injection
+- Company: Hospira, Inc., a Pfizer company
+- Presentation: 50 mg/2 mL (25 mg/mL) Multiple Dose Vial (NDC 61703-0350-38)
+- Therapeutic category: Rheumatology; Oncology
+- Initial posting date: 2023-03-13
+- Type of update: New
+- Date of update: 2023-03-13
+- Availability information: "Next delivery: April 2023; Estimated recovery: September 2023"
+- Related information: "Limited Supply Available. Weekly releases."
+- Reason for shortage: "Demand Increase for the drug"
+Rule reading: recovery, 2023-09-01 to 2023-09-30, not stale
+
+=== 41 of 55: If30ea48eef ===
+Entry
+- Drug: Amphetamine Aspartate Monohydrate, Amphetamine Sulfate, Dextroamphetamine Saccharate, Dextroamphetamine Sulfate Tablet
+- Company: Alvogen
+- Presentation: Dextroamp Saccharate, Amp Aspartate, Dextroamp Sulfate And Amp Sulfate, Tablet, 3.75 mg; 3.75 mg; 3.75 mg; 3.75 mg (NDC 47781-178-01)
+- Therapeutic category: Psychiatry
+- Initial posting date: 2022-10-12
+- Type of update: Revised
+- Date of update: 2025-01-14
+- Availability information: "Unavailable"
+- Related information: "Supporting contracted business only; Resupply February 2025"
+- Reason for shortage: "Other"
+Rule reading: recovery, 2025-02-01 to 2025-02-28, not stale
+
+=== 42 of 55: I10690715cd ===
+Entry
+- Drug: Amphetamine Aspartate Monohydrate, Amphetamine Sulfate, Dextroamphetamine Saccharate, Dextroamphetamine Sulfate Tablet
+- Company: Epic Pharma, LLC
+- Presentation: Dextroamp Saccharate, Amp Aspartate, Dextroamp Sulfate And Amp Sulfate, Tablet, 1.25 mg; 1.25 mg; 1.25 mg; 1.25 mg (NDC 42806-339-01)
+- Therapeutic category: Psychiatry
+- Initial posting date: 2022-10-12
+- Type of update: Revised
+- Date of update: 2025-07-24
+- Availability information: "Limited Availability"
+- Related information: "Limited availability until end of September 2025"
+- Reason for shortage: "Shortage of an active ingredient"
+Rule reading: recovery, 2025-09-21 to 2025-09-30, not stale
+
+=== 43 of 55: I1f42855a31 ===
+Entry
+- Drug: Hydrocortisone Sodium Succinate Injection
+- Company: Hospira, Inc., a Pfizer Company
+- Presentation: Solu-cortef, Injection, 100 mg/2 mL (NDC 0009-0825-01)
+- Therapeutic category: Pulmonary/Allergy; Dermatology; Endocrinology/Metabolism; Gastroenterology; Hematology; Neurology; Oncology; Ophthalmology; Pediatric; Renal; Rheumatology
+- Initial posting date: 2023-03-24
+- Type of update: Revised
+- Date of update: 2024-03-28
+- Availability information: "Limited Availability"
+- Related information: "Limited Supply Available. Next Delivery: March 2024; Estimated Recovery: June 2024; Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay"
+- Reason for shortage: "Delay in shipping of the drug"
+Rule reading: recovery, 2024-06-01 to 2024-06-30, not stale
+
+=== 44 of 55: I8fc2bb056a ===
+Entry
+- Drug: Bupivacaine Hydrochloride Injection
+- Company: Hospira, Inc., a Pfizer company
+- Presentation: Marcaine 50 mg/10 mL (5 mg/mL); Single Dose Glass Fliptop Vial (NDC 00409-1560-10)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2018-02-20
+- Type of update: Revised
+- Date of update: 2023-04-28
+- Availability information: "Next Delivery: June 2023; Estimated Recovery: March 2024"
+- Related information: "Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay"
+- Reason for shortage: "Other"
+Rule reading: recovery, 2024-03-01 to 2024-03-31, not stale
+
+=== 45 of 55: I6f9dc1e701 ===
+Entry
+- Drug: Bumetanide Injection
+- Company: Athenex Pharmaceutical Division, LLC (Athenex)
+- Presentation: 2.5mg/10mL vial (NDC 70860-406-10)
+- Therapeutic category: Cardiovascular
+- Initial posting date: 2018-01-31
+- Type of update: Reverified
+- Date of update: 2023-02-24
+- Availability information: "On backorder. Next shipment mid-March 2023"
+- Related information: (blank)
+- Reason for shortage: (blank)
+Rule reading: next_delivery, 2023-03-11 to 2023-03-20, not stale
+
+=== 46 of 55: I020e0446fd ===
+Entry
+- Drug: Midazolam Hydrochloride Injection
+- Company: Hospira, Inc., a Pfizer Company
+- Presentation: Injection, 50 mg/10 mL (5 mg/mL) (NDC 0409-2596-05)
+- Therapeutic category: Anesthesia; Neurology
+- Initial posting date: 2020-04-02
+- Type of update: Revised
+- Date of update: 2024-05-24
+- Availability information: "Unavailable"
+- Related information: "Next Delivery: July 2024; Estimated Recovery: September 2024; Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay"
+- Reason for shortage: "Delay in shipping of the drug"
+Rule reading: recovery, 2024-09-01 to 2024-09-30, not stale
+
+=== 47 of 55: Ia8bc18f5c3 ===
+Entry
+- Drug: Ketamine Hydrochloride Injection
+- Company: Hospira, Inc., a Pfizer Company
+- Presentation: Ketamine Hydrochloride, Injection, 500 mg/10 mL (50 mg/mL) (NDC 0409-2053-10)
+- Therapeutic category: Anesthesia
+- Initial posting date: 2018-02-16
+- Type of update: Revised
+- Date of update: 2024-07-15
+- Availability information: "Unavailable"
+- Related information: "Next Delivery: January 2025; Estimated Recovery: March 2025"
+- Reason for shortage: "Demand increase for the drug"
+Rule reading: recovery, 2025-03-01 to 2025-03-31, not stale
+
+=== 48 of 55: If7445a44da ===
+Entry
+- Drug: Sodium Acetate Injection
+- Company: Hospira, Inc., a Pfizer Company
+- Presentation: Injection, 40 mEq/20 mL (2 mEq/mL) (NDC 0409-7299-25)
+- Therapeutic category: Endocrinology/Metabolism; Gastroenterology; Pediatric; Total Parenteral Nutrition
+- Initial posting date: 2016-02-03
+- Type of update: Revised
+- Date of update: 2024-05-24
+- Availability information: "Unavailable"
+- Related information: "Next Delivery and Estimated Recovery: June 2024; Shortage per Manufacturer: Manufacturing Delay"
+- Reason for shortage: "Delay in shipping of the drug"
+Rule reading: recovery, 2024-06-01 to 2024-06-30, not stale
+
+=== 49 of 55: I352e00bea1 ===
+Entry
+- Drug: Morphine Sulfate Injection
+- Company: Hospira, Inc., a Pfizer Company
+- Presentation: Morphine Sulfate, Injection, 2 mg/1 mL Syringes (NDC 0409-1890-01)
+- Therapeutic category: Analgesia/Addiction
+- Initial posting date: 2017-10-31
+- Type of update: Revised
+- Date of update: 2025-06-09
+- Availability information: "Limited Availability"
+- Related information: "Limited Supply Available. Next Delivery: June 2025; Estimated Recovery: December 2025"
+- Reason for shortage: "Other"
+Rule reading: recovery, 2025-12-01 to 2025-12-31, not stale
+
+=== 50 of 55: Ice58cb206c ===
+Entry
+- Drug: Clindamycin Phosphate Injection
+- Company: Pfizer Inc.
+- Presentation: Cleocin Phosphate, Injection, 150 mg/1 mL (NDC 0009-0902-18)
+- Therapeutic category: Anti-Infective
+- Initial posting date: 2023-03-21
+- Type of update: Revised
+- Date of update: 2023-09-11
+- Availability information: "Limited Supply Available Next Delivery: October 2023; Estimated Recovery: December 2023"
+- Related information: (blank)
+- Reason for shortage: "Demand increase for the drug"
+Rule reading: recovery, 2023-12-01 to 2023-12-31, not stale
+
+=== 51 of 55: I642510d859 ===
+Entry
+- Drug: Leucovorin Calcium Lyophilized Powder for Injection
+- Company: Mylan Institutional, a Viatris company
+- Presentation: 200 mg vial (NDC 67457-529-20)
+- Therapeutic category: Oncology;Pediatric
+- Initial posting date: (blank)
+- Type of update: Revised
+- Date of update: 2023-02-14
+- Availability information: "Re-supply in May 2023"
+- Related information: (blank)
+- Reason for shortage: "Demand increase for the drug"
+Rule reading: recovery, 2023-05-01 to 2023-05-31, not stale
+
+=== 52 of 55: Ic4e65c8f92 ===
+Entry
+- Drug: Sodium Chloride 0.9% Injection
+- Company: Hospira, Inc., a Pfizer Company
+- Presentation: Bacteriostatic Sodium Chloride 0.9% In Plastic Container, Injection, 9% (9 mg/1 mL) (NDC 0409-1966-12)
+- Therapeutic category: Gastroenterology; Other; Pediatric
+- Initial posting date: 2021-12-08
+- Type of update: Revised
+- Date of update: 2024-07-15
+- Availability information: "Unavailable"
+- Related information: "Next Delivery: July 2024; Estimated Recovery: September 2024"
+- Reason for shortage: "Delay in shipping of the drug"
+Rule reading: recovery, 2024-09-01 to 2024-09-30, not stale
+
+=== 53 of 55: I7a013eea62 ===
+Entry
+- Drug: Clonazepam Tablet
+- Company: Teva Pharmaceuticals USA, Inc.
+- Presentation: Clonazepam Tablets, USP CIV, Tablet, 1 mg (NDC 0093-3212-05)
+- Therapeutic category: Neurology; Pediatric; Psychiatry
+- Initial posting date: 2023-03-10
+- Type of update: Revised
+- Date of update: 2024-07-10
+- Availability information: "Limited Availability"
+- Related information: "Estimated recovery: October 2024"
+- Reason for shortage: "Demand increase for the drug"
+Rule reading: recovery, 2024-10-01 to 2024-10-31, not stale
+
+=== 54 of 55: I73cf7fe723 ===
+Entry
+- Drug: Morphine Sulfate Injection
+- Company: Hospira, Inc., a Pfizer company
+- Presentation: 1,000 mg/20 mL (50 mg/mL); Single Dose Glass Fliptop Vial (NDC 00409-1134-03)
+- Therapeutic category: Analgesia/Addiction
+- Initial posting date: 2017-10-31
+- Type of update: Revised
+- Date of update: 2023-03-17
+- Availability information: "Next Delivery and Estimated Recovery: June 2023"
+- Related information: "Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay"
+- Reason for shortage: "Other"
+Rule reading: recovery, 2023-06-01 to 2023-06-30, not stale
+
+=== 55 of 55: Ie10943588c ===
+Entry
+- Drug: Ketorolac Tromethamine Injection
+- Company: Hospira, Inc., a Pfizer company
+- Presentation: 30 mg/mL (30 mg/mL); Single Dose Glass Fliptop Vial (NDC 00409-3795-01)
+- Therapeutic category: Analgesia/Addiction
+- Initial posting date: 2018-03-26
+- Type of update: Revised
+- Date of update: 2023-04-28
+- Availability information: "Next Delivery: April 2023; Estimated Recovery: September 2023"
+- Related information: "Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay"
+- Reason for shortage: "Other"
+Rule reading: recovery, 2023-09-01 to 2023-09-30, not stale

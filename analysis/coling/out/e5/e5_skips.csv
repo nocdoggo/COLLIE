@@ -1,0 +1,942 @@
+seed_id,factor,level,reason
+S069d94c7fb08,certainty,anticipated,no notice attests the wording
+S069d94c7fb08,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S069d94c7fb08,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S069d94c7fb08,certainty,tbd,"made but not kept: the seed's share of the factor, or the size of the file"
+S069d94c7fb08,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+S069d94c7fb08,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+S069d94c7fb08,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+S069d94c7fb08,granularity,range,no notice attests the wording
+S069d94c7fb08,granularity,timeframe,no notice attests the wording
+S069d94c7fb08,surface_form,hyphenated,"made but not kept: the seed's share of the factor, or the size of the file"
+S069d94c7fb08,surface_form,no_year,no notice attests the wording
+S069d94c7fb08,surface_form,numeric,no notice attests the wording
+S0c6d851dc552,certainty,anticipated,no notice attests the wording
+S0c6d851dc552,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S0c6d851dc552,certainty,expected,no notice attests the wording
+S0c6d851dc552,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S0c6d851dc552,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+S0c6d851dc552,granularity,,the seed's time has no finer or coarser grain here
+S0c6d851dc552,stale,stale,the period is counted from the Date of update
+S0c6d851dc552,surface_form,separator,no notice attests the wording
+S0dcf2d6803cc,certainty,anticipated,no notice attests the wording
+S0dcf2d6803cc,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S0dcf2d6803cc,certainty,expected,no notice attests the wording
+S0dcf2d6803cc,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S0dcf2d6803cc,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+S0dcf2d6803cc,granularity,,the seed's time has no finer or coarser grain here
+S0dcf2d6803cc,surface_form,abbreviated_month,no notice attests the wording
+S0dcf2d6803cc,surface_form,no_year,no notice attests the wording
+S13a532cf0351,certainty,anticipated,no notice attests the wording
+S13a532cf0351,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S13a532cf0351,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S13a532cf0351,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+S13a532cf0351,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+S13a532cf0351,granularity,quarter,"made but not kept: the seed's share of the factor, or the size of the file"
+S13a532cf0351,surface_form,no_year,"made but not kept: the seed's share of the factor, or the size of the file"
+S13a532cf0351,surface_form,numeric,no notice attests the wording
+S19bbd66e08e8,certainty,anticipated,no notice attests the wording
+S19bbd66e08e8,certainty,as_released,the seed makes another statement of the target's type
+S19bbd66e08e8,certainty,estimated,no notice attests the wording
+S19bbd66e08e8,certainty,expected,no notice attests the wording
+S19bbd66e08e8,certainty,no_estimated_date,the seed makes another statement of the target's type
+S19bbd66e08e8,certainty,tbd,the seed makes another statement of the target's type
+S19bbd66e08e8,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+S19bbd66e08e8,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+S19bbd66e08e8,granularity,,the seed's time has no finer or coarser grain here
+S19bbd66e08e8,surface_form,abbreviated_month,no notice attests the wording
+S19d9e91d77ec,certainty,anticipated,no notice attests the wording
+S19d9e91d77ec,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S19d9e91d77ec,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S19d9e91d77ec,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+S19d9e91d77ec,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+S19d9e91d77ec,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+S19d9e91d77ec,granularity,mid,"made but not kept: the seed's share of the factor, or the size of the file"
+S19d9e91d77ec,granularity,quarter,"made but not kept: the seed's share of the factor, or the size of the file"
+S19d9e91d77ec,granularity,timeframe,"made but not kept: the seed's share of the factor, or the size of the file"
+S19d9e91d77ec,surface_form,numeric,no notice attests the wording
+S1a9e6d0dcab8,certainty,anticipated,no notice attests the wording
+S1a9e6d0dcab8,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S1a9e6d0dcab8,certainty,expected,no notice attests the wording
+S1a9e6d0dcab8,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S1a9e6d0dcab8,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+S1a9e6d0dcab8,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+S1a9e6d0dcab8,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+S1a9e6d0dcab8,granularity,mid,"made but not kept: the seed's share of the factor, or the size of the file"
+S1a9e6d0dcab8,granularity,quarter,"made but not kept: the seed's share of the factor, or the size of the file"
+S1a9e6d0dcab8,surface_form,numeric,no notice attests the wording
+S1accc89c11fa,certainty,anticipated,no notice attests the wording
+S1accc89c11fa,certainty,estimated,no notice attests the wording
+S1accc89c11fa,certainty,expected,"made but not kept: the seed's share of the factor, or the size of the file"
+S1accc89c11fa,certainty,tbd,"the edited text is that of a statement the labellers read, a prompt shows or the guide works through"
+S1accc89c11fa,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+S1accc89c11fa,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+S1accc89c11fa,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+S1accc89c11fa,granularity,mid,"made but not kept: the seed's share of the factor, or the size of the file"
+S1accc89c11fa,granularity,range,"made but not kept: the seed's share of the factor, or the size of the file"
+S1accc89c11fa,surface_form,numeric,no notice attests the wording
+S1ae2e84aec3c,certainty,anticipated,no notice attests the wording
+S1ae2e84aec3c,certainty,as_released,the seed makes another statement of the target's type
+S1ae2e84aec3c,certainty,estimated,no notice attests the wording
+S1ae2e84aec3c,certainty,expected,no notice attests the wording
+S1ae2e84aec3c,certainty,no_estimated_date,the seed makes another statement of the target's type
+S1ae2e84aec3c,certainty,tbd,the seed makes another statement of the target's type
+S1ae2e84aec3c,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+S1ae2e84aec3c,granularity,,the seed's time has no finer or coarser grain here
+S1ae2e84aec3c,surface_form,abbreviated_month,no notice attests the wording
+S1cce7a6a1282,certainty,anticipated,no notice attests the wording
+S1cce7a6a1282,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S1cce7a6a1282,certainty,estimated,no notice attests the wording
+S1cce7a6a1282,certainty,expected,no notice attests the wording
+S1cce7a6a1282,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S1cce7a6a1282,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+S1cce7a6a1282,granularity,,the seed's time has no finer or coarser grain here
+S1cce7a6a1282,surface_form,,the seed's time is not a form this module rewrites
+S21109caee150,certainty,anticipated,no notice attests the wording
+S21109caee150,certainty,as_released,the seed makes another statement of the target's type
+S21109caee150,certainty,estimated,no notice attests the wording
+S21109caee150,certainty,expected,no notice attests the wording
+S21109caee150,certainty,no_estimated_date,the seed makes another statement of the target's type
+S21109caee150,certainty,tbd,the seed makes another statement of the target's type
+S21109caee150,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+S21109caee150,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+S21109caee150,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+S21109caee150,granularity,mid,"made but not kept: the seed's share of the factor, or the size of the file"
+S21109caee150,stale,stale,the year of the period is read from the Date of update
+S21109caee150,surface_form,abbreviated_month,no notice attests the wording
+S21213704b5fc,certainty,anticipated,no notice attests the wording
+S21213704b5fc,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S21213704b5fc,certainty,estimated,no notice attests the wording
+S21213704b5fc,certainty,expected,no notice attests the wording
+S21213704b5fc,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S21213704b5fc,certainty,tbd,no notice attests the wording
+S21213704b5fc,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+S21213704b5fc,granularity,,the seed's time has no finer or coarser grain here
+S22b401bbd8c2,certainty,anticipated,no notice attests the wording
+S22b401bbd8c2,certainty,estimated,no notice attests the wording
+S22b401bbd8c2,certainty,tbd,"the edited text is that of a statement the labellers read, a prompt shows or the guide works through"
+S22b401bbd8c2,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+S22b401bbd8c2,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+S22b401bbd8c2,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+S22b401bbd8c2,granularity,mid,"made but not kept: the seed's share of the factor, or the size of the file"
+S22b401bbd8c2,surface_form,numeric,no notice attests the wording
+S245dea14b314,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S245dea14b314,certainty,estimated,no notice attests the wording
+S245dea14b314,certainty,expected,no notice attests the wording
+S245dea14b314,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S245dea14b314,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+S245dea14b314,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+S245dea14b314,stale,stale,the year of the period is read from the Date of update
+S245dea14b314,surface_form,full_month,no notice attests the wording
+S245dea14b314,surface_form,two_digit_year,no notice attests the wording
+S273460dac417,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S273460dac417,certainty,estimated,no notice attests the wording
+S273460dac417,certainty,expected,no notice attests the wording
+S273460dac417,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S273460dac417,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+S273460dac417,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+S273460dac417,surface_form,hyphenated,no notice attests the wording
+S273460dac417,surface_form,part_word,no notice attests the wording
+S2d840263b317,certainty,anticipated,no notice attests the wording
+S2d840263b317,certainty,estimated,no notice attests the wording
+S2d840263b317,certainty,tbd,"made but not kept: the seed's share of the factor, or the size of the file"
+S2d840263b317,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+S2d840263b317,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+S2d840263b317,granularity,,the seed's time has no finer or coarser grain here
+S2d840263b317,surface_form,abbreviated_month,no notice attests the wording
+S2d840263b317,surface_form,two_digit_year,no notice attests the wording
+S2fc6c1380b78,certainty,anticipated,no notice attests the wording
+S2fc6c1380b78,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S2fc6c1380b78,certainty,expected,no notice attests the wording
+S2fc6c1380b78,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S2fc6c1380b78,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+S2fc6c1380b78,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+S2fc6c1380b78,granularity,mid,no notice attests the wording
+S2fc6c1380b78,surface_form,hyphenated,no notice attests the wording
+S2fc6c1380b78,surface_form,quarter_last,no notice attests the wording
+S2fc6c1380b78,surface_form,quarter_words,no notice attests the wording
+S306d5c5648ce,certainty,anticipated,no notice attests the wording
+S306d5c5648ce,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S306d5c5648ce,certainty,estimated,no notice attests the wording
+S306d5c5648ce,certainty,expected,no notice attests the wording
+S306d5c5648ce,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S306d5c5648ce,certainty,tbd,no notice attests the wording
+S306d5c5648ce,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+S306d5c5648ce,granularity,,the seed's time has no finer or coarser grain here
+S306d5c5648ce,stale,stale,"the period starts at the Date of update (""by"")"
+S306d5c5648ce,surface_form,,the seed's time is not a form this module rewrites
+S323d911bff31,certainty,anticipated,no notice attests the wording
+S323d911bff31,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S323d911bff31,certainty,estimated,no notice attests the wording
+S323d911bff31,certainty,expected,no notice attests the wording
+S323d911bff31,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S323d911bff31,certainty,tbd,no notice attests the wording
+S323d911bff31,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+S323d911bff31,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+S323d911bff31,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+S323d911bff31,granularity,quarter,"made but not kept: the seed's share of the factor, or the size of the file"
+S323d911bff31,granularity,range,"made but not kept: the seed's share of the factor, or the size of the file"
+S323d911bff31,granularity,timeframe,"made but not kept: the seed's share of the factor, or the size of the file"
+S323d911bff31,surface_form,numeric,no notice attests the wording
+S37778acd926e,certainty,anticipated,no notice attests the wording
+S37778acd926e,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S37778acd926e,certainty,estimated,no notice attests the wording
+S37778acd926e,certainty,expected,no notice attests the wording
+S37778acd926e,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S37778acd926e,certainty,tbd,no notice attests the wording
+S37778acd926e,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+S37778acd926e,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+S37778acd926e,granularity,,the seed's time has no finer or coarser grain here
+S37778acd926e,stale,stale,the period is counted from the Date of update
+S37778acd926e,surface_form,unit,no notice attests the wording
+S379614c35ec2,certainty,anticipated,no notice attests the wording
+S379614c35ec2,certainty,as_released,the seed makes another statement of the target's type
+S379614c35ec2,certainty,estimated,no notice attests the wording
+S379614c35ec2,certainty,expected,no notice attests the wording
+S379614c35ec2,certainty,no_estimated_date,the seed makes another statement of the target's type
+S379614c35ec2,certainty,tbd,the seed makes another statement of the target's type
+S379614c35ec2,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+S379614c35ec2,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+S379614c35ec2,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+S379614c35ec2,granularity,mid,"made but not kept: the seed's share of the factor, or the size of the file"
+S379614c35ec2,stale,stale,the year of the period is read from the Date of update
+S379614c35ec2,surface_form,abbreviated_month,no notice attests the wording
+S37d74a315ab5,certainty,anticipated,no notice attests the wording
+S37d74a315ab5,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S37d74a315ab5,certainty,estimated,no notice attests the wording
+S37d74a315ab5,certainty,expected,no notice attests the wording
+S37d74a315ab5,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S37d74a315ab5,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+S37d74a315ab5,granularity,,every other grain would end before the date
+S37d74a315ab5,surface_form,abbreviated_month,no notice attests the wording
+S37d74a315ab5,surface_form,no_year,no notice attests the wording
+S3c2b1f3d5d27,certainty,anticipated,no notice attests the wording
+S3c2b1f3d5d27,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S3c2b1f3d5d27,certainty,estimated,no notice attests the wording
+S3c2b1f3d5d27,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S3c2b1f3d5d27,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+S3c2b1f3d5d27,granularity,early,no notice attests the wording
+S3c2b1f3d5d27,granularity,late,no notice attests the wording
+S3c2b1f3d5d27,granularity,mid,no notice attests the wording
+S3c2b1f3d5d27,granularity,quarter,no notice attests the wording
+S3c2b1f3d5d27,granularity,timeframe,no notice attests the wording
+S3c2b1f3d5d27,surface_form,no_year,no notice attests the wording
+S3d0c9b45d106,certainty,anticipated,no notice attests the wording
+S3d0c9b45d106,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S3d0c9b45d106,certainty,expected,no notice attests the wording
+S3d0c9b45d106,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S3d0c9b45d106,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+S3d0c9b45d106,granularity,,the seed's time has no finer or coarser grain here
+S3d0c9b45d106,stale,stale,the period is counted from the Date of update
+S3d0c9b45d106,surface_form,number_word,no notice attests the wording
+S3d0c9b45d106,surface_form,unit,no notice attests the wording
+S3d672ad55954,certainty,anticipated,no notice attests the wording
+S3d672ad55954,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S3d672ad55954,certainty,estimated,no notice attests the wording
+S3d672ad55954,certainty,expected,no notice attests the wording
+S3d672ad55954,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S3d672ad55954,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+S3d672ad55954,granularity,,every other grain would end before the date
+S3d672ad55954,surface_form,no_year,"made but not kept: the seed's share of the factor, or the size of the file"
+S3d672ad55954,surface_form,separator,"made but not kept: the seed's share of the factor, or the size of the file"
+S3dcce03e0970,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S3dcce03e0970,certainty,estimated,no notice attests the wording
+S3dcce03e0970,certainty,expected,no notice attests the wording
+S3dcce03e0970,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S3dcce03e0970,certainty,tbd,"the edited text is that of a statement the labellers read, a prompt shows or the guide works through"
+S3dcce03e0970,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+S3dcce03e0970,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+S3dcce03e0970,surface_form,hyphenated,no notice attests the wording
+S3dcce03e0970,surface_form,no_year,"made but not kept: the seed's share of the factor, or the size of the file"
+S3f8ed840df81,certainty,anticipated,no notice attests the wording
+S3f8ed840df81,certainty,as_released,"made but not kept: the seed's share of the factor, or the size of the file"
+S3f8ed840df81,certainty,estimated,no notice attests the wording
+S3f8ed840df81,certainty,tbd,"the edited text is that of a statement the labellers read, a prompt shows or the guide works through"
+S3f8ed840df81,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+S3f8ed840df81,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+S3f8ed840df81,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+S3f8ed840df81,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+S3f8ed840df81,granularity,quarter,"the edited text is that of a statement the labellers read, a prompt shows or the guide works through"
+S3f8ed840df81,granularity,range,"made but not kept: the seed's share of the factor, or the size of the file"
+S3f8ed840df81,surface_form,numeric,no notice attests the wording
+S46f8f73b0888,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S46f8f73b0888,certainty,estimated,no notice attests the wording
+S46f8f73b0888,certainty,expected,no notice attests the wording
+S46f8f73b0888,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S46f8f73b0888,certainty,tbd,"the edited text is that of a statement the labellers read, a prompt shows or the guide works through"
+S46f8f73b0888,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+S46f8f73b0888,surface_form,hyphenated,no notice attests the wording
+S46f8f73b0888,surface_form,no_year,"made but not kept: the seed's share of the factor, or the size of the file"
+S4ea072faca31,certainty,anticipated,no notice attests the wording
+S4ea072faca31,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S4ea072faca31,certainty,estimated,no notice attests the wording
+S4ea072faca31,certainty,expected,no notice attests the wording
+S4ea072faca31,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S4ea072faca31,certainty,tbd,no notice attests the wording
+S4ea072faca31,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+S4ea072faca31,granularity,,the seed's time has no finer or coarser grain here
+S4ea072faca31,surface_form,abbreviated_month,no notice attests the wording
+S4ea072faca31,surface_form,no_year,no notice attests the wording
+S4ed3c5990374,certainty,anticipated,no notice attests the wording
+S4ed3c5990374,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S4ed3c5990374,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S4ed3c5990374,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+S4ed3c5990374,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+S4ed3c5990374,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+S4ed3c5990374,granularity,quarter,"made but not kept: the seed's share of the factor, or the size of the file"
+S4ed3c5990374,surface_form,numeric,no notice attests the wording
+S50f16f033135,certainty,,the target carries a hedge that is none of the three
+S50f16f033135,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S50f16f033135,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S50f16f033135,certainty,tbd,no notice attests the wording
+S50f16f033135,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+S50f16f033135,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+S50f16f033135,granularity,,the seed's time has no finer or coarser grain here
+S50f16f033135,stale,stale,the period is counted from the Date of update
+S50f16f033135,surface_form,digits,no notice attests the wording
+S516344a9b5ee,certainty,anticipated,no notice attests the wording
+S516344a9b5ee,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S516344a9b5ee,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S516344a9b5ee,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+S516344a9b5ee,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+S516344a9b5ee,granularity,mid,"made but not kept: the seed's share of the factor, or the size of the file"
+S516344a9b5ee,granularity,quarter,"made but not kept: the seed's share of the factor, or the size of the file"
+S516344a9b5ee,surface_form,numeric,no notice attests the wording
+S526ce634b46e,certainty,anticipated,no notice attests the wording
+S526ce634b46e,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S526ce634b46e,certainty,estimated,no notice attests the wording
+S526ce634b46e,certainty,expected,no notice attests the wording
+S526ce634b46e,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S526ce634b46e,certainty,tbd,no notice attests the wording
+S526ce634b46e,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+S526ce634b46e,granularity,mid,no notice attests the wording
+S526ce634b46e,silent,silent,nothing would be left in the two text fields
+S526ce634b46e,surface_form,no_year,"made but not kept: the seed's share of the factor, or the size of the file"
+S526ce634b46e,surface_form,quarter_words,no notice attests the wording
+S56329f8a645e,certainty,anticipated,no notice attests the wording
+S56329f8a645e,certainty,estimated,no notice attests the wording
+S56329f8a645e,certainty,expected,"made but not kept: the seed's share of the factor, or the size of the file"
+S56329f8a645e,certainty,tbd,"made but not kept: the seed's share of the factor, or the size of the file"
+S56329f8a645e,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+S56329f8a645e,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+S56329f8a645e,granularity,quarter,"made but not kept: the seed's share of the factor, or the size of the file"
+S56329f8a645e,granularity,range,"made but not kept: the seed's share of the factor, or the size of the file"
+S56329f8a645e,granularity,timeframe,"made but not kept: the seed's share of the factor, or the size of the file"
+S56329f8a645e,silent,silent,"the edited text is that of a statement the labellers read, a prompt shows or the guide works through"
+S56329f8a645e,surface_form,numeric,no notice attests the wording
+S5b2a38fb2074,certainty,anticipated,no notice attests the wording
+S5b2a38fb2074,certainty,estimated,no notice attests the wording
+S5b2a38fb2074,certainty,tbd,no notice attests the wording
+S5b2a38fb2074,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+S5b2a38fb2074,surface_form,abbreviated_month,no notice attests the wording
+S622003f01d48,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S622003f01d48,certainty,expected,no notice attests the wording
+S622003f01d48,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S622003f01d48,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+S622003f01d48,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+S622003f01d48,granularity,mid,"made but not kept: the seed's share of the factor, or the size of the file"
+S622003f01d48,granularity,quarter,"made but not kept: the seed's share of the factor, or the size of the file"
+S622003f01d48,granularity,range,"made but not kept: the seed's share of the factor, or the size of the file"
+S622003f01d48,surface_form,numeric,no notice attests the wording
+S624cb6a8da10,certainty,,the target carries a hedge that is none of the three
+S624cb6a8da10,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S624cb6a8da10,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S624cb6a8da10,certainty,tbd,no notice attests the wording
+S624cb6a8da10,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+S624cb6a8da10,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+S624cb6a8da10,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+S624cb6a8da10,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+S624cb6a8da10,granularity,mid,"made but not kept: the seed's share of the factor, or the size of the file"
+S624cb6a8da10,granularity,range,"made but not kept: the seed's share of the factor, or the size of the file"
+S624cb6a8da10,surface_form,numeric,no notice attests the wording
+S62fb44476c56,certainty,anticipated,no notice attests the wording
+S62fb44476c56,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S62fb44476c56,certainty,expected,no notice attests the wording
+S62fb44476c56,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S62fb44476c56,certainty,tbd,"the edited text is that of a statement the labellers read, a prompt shows or the guide works through"
+S62fb44476c56,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+S62fb44476c56,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+S62fb44476c56,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+S62fb44476c56,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+S62fb44476c56,granularity,mid,"made but not kept: the seed's share of the factor, or the size of the file"
+S62fb44476c56,granularity,quarter,"made but not kept: the seed's share of the factor, or the size of the file"
+S62fb44476c56,silent,silent,nothing would be left in the two text fields
+S62fb44476c56,surface_form,numeric,no notice attests the wording
+S63665e7a2241,certainty,anticipated,no notice attests the wording
+S63665e7a2241,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S63665e7a2241,certainty,estimated,no notice attests the wording
+S63665e7a2241,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S63665e7a2241,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+S63665e7a2241,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+S63665e7a2241,granularity,early,no notice attests the wording
+S63665e7a2241,granularity,late,no notice attests the wording
+S63665e7a2241,granularity,mid,no notice attests the wording
+S63665e7a2241,stale,stale,the year of the period is read from the Date of update
+S63665e7a2241,surface_form,quarter_last,no notice attests the wording
+S63a7f475cbc4,certainty,anticipated,no notice attests the wording
+S63a7f475cbc4,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S63a7f475cbc4,certainty,estimated,no notice attests the wording
+S63a7f475cbc4,certainty,expected,no notice attests the wording
+S63a7f475cbc4,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S63a7f475cbc4,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+S63a7f475cbc4,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+S63a7f475cbc4,granularity,mid,no notice attests the wording
+S63a7f475cbc4,surface_form,hyphenated,"the edited text is that of a statement the labellers read, a prompt shows or the guide works through"
+S63a7f475cbc4,surface_form,quarter_words,no notice attests the wording
+S641174e0ee21,certainty,,the target carries a hedge that is none of the three
+S641174e0ee21,certainty,as_released,the seed makes another statement of the target's type
+S641174e0ee21,certainty,no_estimated_date,the seed makes another statement of the target's type
+S641174e0ee21,certainty,tbd,the seed makes another statement of the target's type
+S641174e0ee21,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+S641174e0ee21,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+S641174e0ee21,granularity,mid,"made but not kept: the seed's share of the factor, or the size of the file"
+S641174e0ee21,granularity,range,"made but not kept: the seed's share of the factor, or the size of the file"
+S641174e0ee21,granularity,timeframe,no notice attests the wording
+S641174e0ee21,surface_form,no_year,no notice attests the wording
+S641174e0ee21,surface_form,numeric,no notice attests the wording
+S641174e0ee21,surface_form,two_digit_year,"made but not kept: the seed's share of the factor, or the size of the file"
+S6608993e8c8c,certainty,anticipated,no notice attests the wording
+S6608993e8c8c,certainty,estimated,no notice attests the wording
+S6608993e8c8c,certainty,tbd,no notice attests the wording
+S6608993e8c8c,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+S6608993e8c8c,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+S6608993e8c8c,surface_form,abbreviated_month,no notice attests the wording
+S681f7ab7e702,certainty,anticipated,no notice attests the wording
+S681f7ab7e702,certainty,as_released,the seed makes another statement of the target's type
+S681f7ab7e702,certainty,estimated,no notice attests the wording
+S681f7ab7e702,certainty,expected,no notice attests the wording
+S681f7ab7e702,certainty,no_estimated_date,the seed makes another statement of the target's type
+S681f7ab7e702,certainty,tbd,the seed makes another statement of the target's type
+S681f7ab7e702,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+S681f7ab7e702,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+S681f7ab7e702,granularity,,the seed's time has no finer or coarser grain here
+S681f7ab7e702,surface_form,abbreviated_month,no notice attests the wording
+S681f7ab7e702,surface_form,separator,"the edited text is that of a statement the labellers read, a prompt shows or the guide works through"
+S6994a9942ccc,certainty,anticipated,no notice attests the wording
+S6994a9942ccc,certainty,as_released,the seed makes another statement of the target's type
+S6994a9942ccc,certainty,expected,no notice attests the wording
+S6994a9942ccc,certainty,no_estimated_date,the seed makes another statement of the target's type
+S6994a9942ccc,certainty,tbd,the seed makes another statement of the target's type
+S6994a9942ccc,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+S6994a9942ccc,granularity,,the seed's time has no finer or coarser grain here
+S6994a9942ccc,surface_form,,the seed's time is not a form this module rewrites
+S6b586a205c92,certainty,anticipated,no notice attests the wording
+S6b586a205c92,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S6b586a205c92,certainty,estimated,no notice attests the wording
+S6b586a205c92,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S6b586a205c92,certainty,tbd,no notice attests the wording
+S6b586a205c92,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+S6b586a205c92,surface_form,no_year,"made but not kept: the seed's share of the factor, or the size of the file"
+S6be04d3ecfd3,certainty,anticipated,no notice attests the wording
+S6be04d3ecfd3,certainty,as_released,the seed makes another statement of the target's type
+S6be04d3ecfd3,certainty,estimated,no notice attests the wording
+S6be04d3ecfd3,certainty,expected,no notice attests the wording
+S6be04d3ecfd3,certainty,no_estimated_date,the seed makes another statement of the target's type
+S6be04d3ecfd3,certainty,tbd,the seed makes another statement of the target's type
+S6be04d3ecfd3,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+S6be04d3ecfd3,granularity,,the seed's time has no finer or coarser grain here
+S6be04d3ecfd3,surface_form,abbreviated_month,no notice attests the wording
+S6ca61b0e6baa,certainty,anticipated,no notice attests the wording
+S6ca61b0e6baa,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S6ca61b0e6baa,certainty,expected,no notice attests the wording
+S6ca61b0e6baa,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S6ca61b0e6baa,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+S6ca61b0e6baa,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+S6ca61b0e6baa,granularity,mid,"made but not kept: the seed's share of the factor, or the size of the file"
+S6ca61b0e6baa,granularity,quarter,"made but not kept: the seed's share of the factor, or the size of the file"
+S6ca61b0e6baa,surface_form,numeric,no notice attests the wording
+S6ca7562d4e2e,certainty,anticipated,no notice attests the wording
+S6ca7562d4e2e,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S6ca7562d4e2e,certainty,expected,no notice attests the wording
+S6ca7562d4e2e,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S6ca7562d4e2e,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+S6ca7562d4e2e,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+S6ca7562d4e2e,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+S6ca7562d4e2e,granularity,mid,"made but not kept: the seed's share of the factor, or the size of the file"
+S6ca7562d4e2e,granularity,timeframe,"made but not kept: the seed's share of the factor, or the size of the file"
+S6ca7562d4e2e,surface_form,numeric,no notice attests the wording
+S6d07e84d9748,certainty,anticipated,no notice attests the wording
+S6d07e84d9748,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S6d07e84d9748,certainty,estimated,no notice attests the wording
+S6d07e84d9748,certainty,expected,no notice attests the wording
+S6d07e84d9748,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S6d07e84d9748,certainty,tbd,no notice attests the wording
+S6d07e84d9748,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+S6d07e84d9748,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+S6d07e84d9748,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+S6d07e84d9748,granularity,mid,"made but not kept: the seed's share of the factor, or the size of the file"
+S6d07e84d9748,granularity,timeframe,"made but not kept: the seed's share of the factor, or the size of the file"
+S6d07e84d9748,silent,silent,nothing would be left in the two text fields
+S6d07e84d9748,surface_form,numeric,no notice attests the wording
+S6db1d27131e6,certainty,anticipated,no notice attests the wording
+S6db1d27131e6,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S6db1d27131e6,certainty,expected,no notice attests the wording
+S6db1d27131e6,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S6db1d27131e6,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+S6db1d27131e6,granularity,,the seed's time has no finer or coarser grain here
+S6db1d27131e6,stale,stale,the period is counted from the Date of update
+S6db1d27131e6,surface_form,number_word,no notice attests the wording
+S6e72589689e7,certainty,anticipated,no notice attests the wording
+S6e72589689e7,certainty,estimated,no notice attests the wording
+S6e72589689e7,certainty,expected,no notice attests the wording
+S6e72589689e7,certainty,tbd,"made but not kept: the seed's share of the factor, or the size of the file"
+S6e72589689e7,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+S6e72589689e7,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+S6e72589689e7,granularity,mid,"made but not kept: the seed's share of the factor, or the size of the file"
+S6e72589689e7,granularity,quarter,"made but not kept: the seed's share of the factor, or the size of the file"
+S6e72589689e7,silent,silent,"the edited text is that of a statement the labellers read, a prompt shows or the guide works through"
+S6e72589689e7,stale,stale,the year of the period is read from the Date of update
+S6e72589689e7,surface_form,abbreviated_month,no notice attests the wording
+S71e0fef1e3ec,certainty,anticipated,no notice attests the wording
+S71e0fef1e3ec,certainty,estimated,no notice attests the wording
+S71e0fef1e3ec,certainty,no_estimated_date,"made but not kept: the seed's share of the factor, or the size of the file"
+S71e0fef1e3ec,certainty,tbd,"the edited text is that of a statement the labellers read, a prompt shows or the guide works through"
+S71e0fef1e3ec,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+S71e0fef1e3ec,granularity,mid,"made but not kept: the seed's share of the factor, or the size of the file"
+S71e0fef1e3ec,granularity,quarter,"made but not kept: the seed's share of the factor, or the size of the file"
+S71e0fef1e3ec,granularity,range,"made but not kept: the seed's share of the factor, or the size of the file"
+S71e0fef1e3ec,granularity,timeframe,"made but not kept: the seed's share of the factor, or the size of the file"
+S71e0fef1e3ec,silent,silent,"the edited text is that of a statement the labellers read, a prompt shows or the guide works through"
+S71e0fef1e3ec,surface_form,numeric,no notice attests the wording
+S7241fc8e6a89,certainty,anticipated,no notice attests the wording
+S7241fc8e6a89,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S7241fc8e6a89,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S7241fc8e6a89,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+S7241fc8e6a89,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+S7241fc8e6a89,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+S7241fc8e6a89,granularity,quarter,"made but not kept: the seed's share of the factor, or the size of the file"
+S7241fc8e6a89,granularity,timeframe,"made but not kept: the seed's share of the factor, or the size of the file"
+S7241fc8e6a89,silent,silent,nothing would be left in the two text fields
+S7241fc8e6a89,surface_form,numeric,no notice attests the wording
+S74c2298263c6,certainty,anticipated,no notice attests the wording
+S74c2298263c6,certainty,estimated,no notice attests the wording
+S74c2298263c6,certainty,tbd,no notice attests the wording
+S74c2298263c6,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+S74c2298263c6,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+S74c2298263c6,surface_form,abbreviated_month,no notice attests the wording
+S782a1bbeb379,certainty,anticipated,no notice attests the wording
+S782a1bbeb379,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S782a1bbeb379,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S782a1bbeb379,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+S782a1bbeb379,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+S782a1bbeb379,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+S782a1bbeb379,granularity,quarter,"made but not kept: the seed's share of the factor, or the size of the file"
+S782a1bbeb379,surface_form,numeric,no notice attests the wording
+S7834ddd6c67b,certainty,anticipated,no notice attests the wording
+S7834ddd6c67b,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S7834ddd6c67b,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S7834ddd6c67b,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+S7834ddd6c67b,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+S7834ddd6c67b,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+S7834ddd6c67b,granularity,mid,"made but not kept: the seed's share of the factor, or the size of the file"
+S7834ddd6c67b,granularity,quarter,"made but not kept: the seed's share of the factor, or the size of the file"
+S7834ddd6c67b,granularity,timeframe,"made but not kept: the seed's share of the factor, or the size of the file"
+S7834ddd6c67b,surface_form,numeric,no notice attests the wording
+S7b7c777e9bbe,certainty,,the seed is read as a recovery only while its text holds a date and no cue
+S7b7c777e9bbe,distractor,,the seed is read as a recovery only while its text holds a date and no cue
+S7b7c777e9bbe,granularity,,the seed is read as a recovery only while its text holds a date and no cue
+S7b7c777e9bbe,stale,stale,the period is counted from the Date of update
+S7b7c777e9bbe,surface_form,,no other writing reads as the same period
+S7b8334f8df18,certainty,anticipated,no notice attests the wording
+S7b8334f8df18,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S7b8334f8df18,certainty,expected,"made but not kept: the seed's share of the factor, or the size of the file"
+S7b8334f8df18,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S7b8334f8df18,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+S7b8334f8df18,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+S7b8334f8df18,granularity,mid,"made but not kept: the seed's share of the factor, or the size of the file"
+S7b8334f8df18,granularity,quarter,"made but not kept: the seed's share of the factor, or the size of the file"
+S7b8334f8df18,granularity,timeframe,"made but not kept: the seed's share of the factor, or the size of the file"
+S7b8334f8df18,surface_form,numeric,no notice attests the wording
+S84a251b06b58,certainty,anticipated,no notice attests the wording
+S84a251b06b58,certainty,as_released,the seed makes another statement of the target's type
+S84a251b06b58,certainty,estimated,no notice attests the wording
+S84a251b06b58,certainty,expected,no notice attests the wording
+S84a251b06b58,certainty,no_estimated_date,the seed makes another statement of the target's type
+S84a251b06b58,certainty,tbd,the seed makes another statement of the target's type
+S84a251b06b58,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+S84a251b06b58,granularity,,the seed's time has no finer or coarser grain here
+S84a251b06b58,surface_form,abbreviated_month,no notice attests the wording
+S8d8b16526633,certainty,anticipated,no notice attests the wording
+S8d8b16526633,certainty,estimated,no notice attests the wording
+S8d8b16526633,certainty,expected,"made but not kept: the seed's share of the factor, or the size of the file"
+S8d8b16526633,certainty,tbd,"made but not kept: the seed's share of the factor, or the size of the file"
+S8d8b16526633,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+S8d8b16526633,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+S8d8b16526633,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+S8d8b16526633,granularity,mid,"made but not kept: the seed's share of the factor, or the size of the file"
+S8d8b16526633,granularity,range,"made but not kept: the seed's share of the factor, or the size of the file"
+S8d8b16526633,granularity,timeframe,"made but not kept: the seed's share of the factor, or the size of the file"
+S8d8b16526633,surface_form,numeric,no notice attests the wording
+S8da3c1db6a68,certainty,anticipated,no notice attests the wording
+S8da3c1db6a68,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S8da3c1db6a68,certainty,estimated,no notice attests the wording
+S8da3c1db6a68,certainty,expected,no notice attests the wording
+S8da3c1db6a68,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S8da3c1db6a68,certainty,tbd,no notice attests the wording
+S8da3c1db6a68,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+S8da3c1db6a68,granularity,timeframe,no notice attests the wording
+S8da3c1db6a68,silent,silent,nothing would be left in the two text fields
+S8da3c1db6a68,surface_form,numeric,no notice attests the wording
+S8fa0e951af6c,certainty,anticipated,no notice attests the wording
+S8fa0e951af6c,certainty,as_released,the seed makes another statement of the target's type
+S8fa0e951af6c,certainty,expected,no notice attests the wording
+S8fa0e951af6c,certainty,no_estimated_date,the seed makes another statement of the target's type
+S8fa0e951af6c,certainty,tbd,the seed makes another statement of the target's type
+S8fa0e951af6c,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+S8fa0e951af6c,granularity,late,no notice attests the wording
+S8fa0e951af6c,surface_form,no_year,no notice attests the wording
+S8fa0e951af6c,surface_form,two_digit_year,no notice attests the wording
+S8fb4e4db211b,certainty,anticipated,no notice attests the wording
+S8fb4e4db211b,certainty,as_released,the seed makes another statement of the target's type
+S8fb4e4db211b,certainty,estimated,no notice attests the wording
+S8fb4e4db211b,certainty,expected,no notice attests the wording
+S8fb4e4db211b,certainty,no_estimated_date,the seed makes another statement of the target's type
+S8fb4e4db211b,certainty,tbd,the seed makes another statement of the target's type
+S8fb4e4db211b,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+S8fb4e4db211b,granularity,,the seed's time has no finer or coarser grain here
+S8fb4e4db211b,stale,stale,the year of the period is read from the Date of update
+S8fb4e4db211b,surface_form,,no other writing reads as the same period
+S98143db3c552,certainty,anticipated,no notice attests the wording
+S98143db3c552,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S98143db3c552,certainty,expected,no notice attests the wording
+S98143db3c552,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S98143db3c552,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+S98143db3c552,granularity,early,no notice attests the wording
+S98143db3c552,granularity,late,no notice attests the wording
+S98143db3c552,granularity,mid,no notice attests the wording
+S98143db3c552,surface_form,no_year,no notice attests the wording
+S98143db3c552,surface_form,two_digit_year,no notice attests the wording
+S9e9b05ee3b88,certainty,anticipated,no notice attests the wording
+S9e9b05ee3b88,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S9e9b05ee3b88,certainty,estimated,no notice attests the wording
+S9e9b05ee3b88,certainty,expected,no notice attests the wording
+S9e9b05ee3b88,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S9e9b05ee3b88,certainty,tbd,no notice attests the wording
+S9e9b05ee3b88,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+S9e9b05ee3b88,granularity,,the seed's time has no finer or coarser grain here
+S9eed62a809c8,certainty,anticipated,no notice attests the wording
+S9eed62a809c8,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+S9eed62a809c8,certainty,estimated,no notice attests the wording
+S9eed62a809c8,certainty,expected,no notice attests the wording
+S9eed62a809c8,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+S9eed62a809c8,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+S9eed62a809c8,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+S9eed62a809c8,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+S9eed62a809c8,granularity,mid,"made but not kept: the seed's share of the factor, or the size of the file"
+S9eed62a809c8,granularity,quarter,"made but not kept: the seed's share of the factor, or the size of the file"
+S9eed62a809c8,surface_form,numeric,no notice attests the wording
+Sa892b3ac9b57,certainty,anticipated,no notice attests the wording
+Sa892b3ac9b57,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+Sa892b3ac9b57,certainty,estimated,no notice attests the wording
+Sa892b3ac9b57,certainty,expected,no notice attests the wording
+Sa892b3ac9b57,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+Sa892b3ac9b57,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+Sa892b3ac9b57,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+Sa892b3ac9b57,surface_form,abbreviated_month,"made but not kept: the seed's share of the factor, or the size of the file"
+Sac6655edeaa7,certainty,anticipated,no notice attests the wording
+Sac6655edeaa7,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+Sac6655edeaa7,certainty,expected,no notice attests the wording
+Sac6655edeaa7,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+Sac6655edeaa7,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+Sac6655edeaa7,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+Sac6655edeaa7,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+Sac6655edeaa7,granularity,quarter,"made but not kept: the seed's share of the factor, or the size of the file"
+Sac6655edeaa7,granularity,timeframe,"made but not kept: the seed's share of the factor, or the size of the file"
+Sac6655edeaa7,surface_form,numeric,no notice attests the wording
+Sae425252894c,certainty,anticipated,no notice attests the wording
+Sae425252894c,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+Sae425252894c,certainty,expected,no notice attests the wording
+Sae425252894c,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+Sae425252894c,certainty,tbd,no notice attests the wording
+Sae425252894c,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+Sae425252894c,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+Sae425252894c,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+Sae425252894c,granularity,mid,"made but not kept: the seed's share of the factor, or the size of the file"
+Sae425252894c,granularity,range,"made but not kept: the seed's share of the factor, or the size of the file"
+Sae425252894c,surface_form,numeric,no notice attests the wording
+Sb1ea42161c22,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+Sb1ea42161c22,certainty,estimated,no notice attests the wording
+Sb1ea42161c22,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+Sb1ea42161c22,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+Sb1ea42161c22,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+Sb1ea42161c22,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+Sb1ea42161c22,granularity,mid,"made but not kept: the seed's share of the factor, or the size of the file"
+Sb1ea42161c22,granularity,timeframe,no notice attests the wording
+Sb1ea42161c22,surface_form,full_month,"made but not kept: the seed's share of the factor, or the size of the file"
+Sb1ea42161c22,surface_form,no_year,no notice attests the wording
+Sb1ea42161c22,surface_form,numeric,no notice attests the wording
+Sb5e6b7ec7d90,certainty,anticipated,no notice attests the wording
+Sb5e6b7ec7d90,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+Sb5e6b7ec7d90,certainty,estimated,no notice attests the wording
+Sb5e6b7ec7d90,certainty,expected,no notice attests the wording
+Sb5e6b7ec7d90,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+Sb5e6b7ec7d90,certainty,tbd,no notice attests the wording
+Sb5e6b7ec7d90,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+Sb5e6b7ec7d90,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+Sb5e6b7ec7d90,stale,stale,the year of the period is read from the Date of update
+Sb5e6b7ec7d90,surface_form,abbreviated_month,no notice attests the wording
+Sb912f4428267,certainty,anticipated,no notice attests the wording
+Sb912f4428267,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+Sb912f4428267,certainty,estimated,no notice attests the wording
+Sb912f4428267,certainty,expected,no notice attests the wording
+Sb912f4428267,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+Sb912f4428267,certainty,tbd,no notice attests the wording
+Sb912f4428267,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+Sb912f4428267,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+Sb912f4428267,granularity,,the seed's time has no finer or coarser grain here
+Sb9750d0c48d2,certainty,anticipated,no notice attests the wording
+Sb9750d0c48d2,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+Sb9750d0c48d2,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+Sb9750d0c48d2,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+Sb9750d0c48d2,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+Sb9750d0c48d2,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+Sb9750d0c48d2,granularity,quarter,"made but not kept: the seed's share of the factor, or the size of the file"
+Sb9750d0c48d2,granularity,timeframe,"made but not kept: the seed's share of the factor, or the size of the file"
+Sb9750d0c48d2,surface_form,numeric,no notice attests the wording
+Sbc32860813b5,certainty,anticipated,no notice attests the wording
+Sbc32860813b5,certainty,estimated,no notice attests the wording
+Sbc32860813b5,certainty,expected,no notice attests the wording
+Sbc32860813b5,certainty,tbd,no notice attests the wording
+Sbc32860813b5,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+Sbc32860813b5,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+Sbc32860813b5,granularity,,the seed's time has no finer or coarser grain here
+Sbc32860813b5,stale,stale,the year of the period is read from the Date of update
+Sbc32860813b5,surface_form,,no other writing reads as the same period
+Sc32ebe4ce3c5,certainty,anticipated,no notice attests the wording
+Sc32ebe4ce3c5,certainty,estimated,no notice attests the wording
+Sc32ebe4ce3c5,certainty,expected,"made but not kept: the seed's share of the factor, or the size of the file"
+Sc32ebe4ce3c5,certainty,tbd,"made but not kept: the seed's share of the factor, or the size of the file"
+Sc32ebe4ce3c5,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+Sc32ebe4ce3c5,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+Sc32ebe4ce3c5,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+Sc32ebe4ce3c5,granularity,mid,"made but not kept: the seed's share of the factor, or the size of the file"
+Sc32ebe4ce3c5,granularity,range,"made but not kept: the seed's share of the factor, or the size of the file"
+Sc32ebe4ce3c5,surface_form,numeric,no notice attests the wording
+Sc409e2490686,certainty,anticipated,no notice attests the wording
+Sc409e2490686,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+Sc409e2490686,certainty,expected,no notice attests the wording
+Sc409e2490686,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+Sc409e2490686,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+Sc409e2490686,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+Sc409e2490686,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+Sc409e2490686,granularity,quarter,"made but not kept: the seed's share of the factor, or the size of the file"
+Sc409e2490686,granularity,timeframe,"made but not kept: the seed's share of the factor, or the size of the file"
+Sc409e2490686,surface_form,numeric,no notice attests the wording
+Sc4d18b7072dc,certainty,anticipated,no notice attests the wording
+Sc4d18b7072dc,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+Sc4d18b7072dc,certainty,expected,no notice attests the wording
+Sc4d18b7072dc,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+Sc4d18b7072dc,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+Sc4d18b7072dc,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+Sc4d18b7072dc,granularity,early,no notice attests the wording
+Sc7f1b3f641a2,certainty,anticipated,no notice attests the wording
+Sc7f1b3f641a2,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+Sc7f1b3f641a2,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+Sc7f1b3f641a2,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+Sc7f1b3f641a2,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+Sc7f1b3f641a2,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+Sc7f1b3f641a2,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+Sc7f1b3f641a2,granularity,range,"made but not kept: the seed's share of the factor, or the size of the file"
+Sc7f1b3f641a2,granularity,timeframe,"made but not kept: the seed's share of the factor, or the size of the file"
+Sc7f1b3f641a2,surface_form,numeric,no notice attests the wording
+Scc666dfe2db2,certainty,anticipated,no notice attests the wording
+Scc666dfe2db2,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+Scc666dfe2db2,certainty,expected,no notice attests the wording
+Scc666dfe2db2,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+Scc666dfe2db2,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+Scc666dfe2db2,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+Scc666dfe2db2,granularity,quarter,"made but not kept: the seed's share of the factor, or the size of the file"
+Scc666dfe2db2,surface_form,numeric,no notice attests the wording
+Scfa6c9b08262,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+Scfa6c9b08262,certainty,estimated,no notice attests the wording
+Scfa6c9b08262,certainty,expected,no notice attests the wording
+Scfa6c9b08262,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+Scfa6c9b08262,certainty,tbd,"the edited text is that of a statement the labellers read, a prompt shows or the guide works through"
+Scfa6c9b08262,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+Scfa6c9b08262,surface_form,four_digit_year,no notice attests the wording
+Scfa6c9b08262,surface_form,hyphenated,no notice attests the wording
+Scfa6c9b08262,surface_form,no_year,no notice attests the wording
+Sd014e3d594b1,certainty,anticipated,no notice attests the wording
+Sd014e3d594b1,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+Sd014e3d594b1,certainty,estimated,no notice attests the wording
+Sd014e3d594b1,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+Sd014e3d594b1,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+Sd014e3d594b1,granularity,late,no notice attests the wording
+Sd014e3d594b1,granularity,mid,no notice attests the wording
+Sd014e3d594b1,stale,stale,the year of the period is read from the Date of update
+Sd014e3d594b1,surface_form,quarter_last,no notice attests the wording
+Sd54b1fa3673c,certainty,anticipated,no notice attests the wording
+Sd54b1fa3673c,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+Sd54b1fa3673c,certainty,expected,no notice attests the wording
+Sd54b1fa3673c,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+Sd54b1fa3673c,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+Sd54b1fa3673c,granularity,,the seed's time has no finer or coarser grain here
+Sd54b1fa3673c,stale,stale,the period is counted from the Date of update
+Sd54b1fa3673c,surface_form,separator,no notice attests the wording
+Sd75419580dc5,certainty,,the target carries a hedge that is none of the three
+Sd75419580dc5,certainty,tbd,no notice attests the wording
+Sd75419580dc5,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+Sd75419580dc5,granularity,,the seed's time has no finer or coarser grain here
+Sd75419580dc5,surface_form,abbreviated_month,no notice attests the wording
+Sd75419580dc5,surface_form,no_year,no notice attests the wording
+Sd8b786f579cd,certainty,anticipated,no notice attests the wording
+Sd8b786f579cd,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+Sd8b786f579cd,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+Sd8b786f579cd,certainty,tbd,"made but not kept: the seed's share of the factor, or the size of the file"
+Sd8b786f579cd,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+Sd8b786f579cd,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+Sd8b786f579cd,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+Sd8b786f579cd,granularity,timeframe,no notice attests the wording
+Sd8b786f579cd,surface_form,hyphenated,"made but not kept: the seed's share of the factor, or the size of the file"
+Sd8b786f579cd,surface_form,no_year,no notice attests the wording
+Sd8b786f579cd,surface_form,numeric,no notice attests the wording
+Sd9cb1bbaf6d4,certainty,anticipated,no notice attests the wording
+Sd9cb1bbaf6d4,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+Sd9cb1bbaf6d4,certainty,expected,no notice attests the wording
+Sd9cb1bbaf6d4,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+Sd9cb1bbaf6d4,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+Sd9cb1bbaf6d4,granularity,early,no notice attests the wording
+Sddbfbc1135bc,certainty,anticipated,no notice attests the wording
+Sddbfbc1135bc,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+Sddbfbc1135bc,certainty,estimated,no notice attests the wording
+Sddbfbc1135bc,certainty,expected,no notice attests the wording
+Sddbfbc1135bc,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+Sddbfbc1135bc,certainty,tbd,no notice attests the wording
+Sddbfbc1135bc,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+Sddbfbc1135bc,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+Sddbfbc1135bc,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+Sddbfbc1135bc,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+Sddbfbc1135bc,granularity,mid,"made but not kept: the seed's share of the factor, or the size of the file"
+Sddbfbc1135bc,stale,stale,the year of the period is read from the Date of update
+Sddbfbc1135bc,surface_form,abbreviated_month,no notice attests the wording
+Se0b5b94f67a1,certainty,anticipated,no notice attests the wording
+Se0b5b94f67a1,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+Se0b5b94f67a1,certainty,expected,no notice attests the wording
+Se0b5b94f67a1,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+Se0b5b94f67a1,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+Se0b5b94f67a1,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+Se0b5b94f67a1,granularity,mid,"made but not kept: the seed's share of the factor, or the size of the file"
+Se0b5b94f67a1,granularity,range,"made but not kept: the seed's share of the factor, or the size of the file"
+Se0b5b94f67a1,granularity,timeframe,"made but not kept: the seed's share of the factor, or the size of the file"
+Se0b5b94f67a1,surface_form,numeric,no notice attests the wording
+Se6f0e6fb0564,certainty,anticipated,no notice attests the wording
+Se6f0e6fb0564,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+Se6f0e6fb0564,certainty,expected,no notice attests the wording
+Se6f0e6fb0564,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+Se6f0e6fb0564,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+Se6f0e6fb0564,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+Se6f0e6fb0564,granularity,mid,"made but not kept: the seed's share of the factor, or the size of the file"
+Se6f0e6fb0564,granularity,quarter,"made but not kept: the seed's share of the factor, or the size of the file"
+Se6f0e6fb0564,granularity,timeframe,"made but not kept: the seed's share of the factor, or the size of the file"
+Se6f0e6fb0564,surface_form,numeric,no notice attests the wording
+Sea264841bcd0,certainty,anticipated,no notice attests the wording
+Sea264841bcd0,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+Sea264841bcd0,certainty,estimated,no notice attests the wording
+Sea264841bcd0,certainty,expected,no notice attests the wording
+Sea264841bcd0,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+Sea264841bcd0,certainty,tbd,no notice attests the wording
+Sea264841bcd0,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+Sea264841bcd0,granularity,,the seed's time has no finer or coarser grain here
+Sea264841bcd0,surface_form,,the seed's time is not a form this module rewrites
+Sec1889e8447a,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+Sec1889e8447a,certainty,estimated,no notice attests the wording
+Sec1889e8447a,certainty,expected,no notice attests the wording
+Sec1889e8447a,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+Sec1889e8447a,certainty,tbd,no notice attests the wording
+Sec1889e8447a,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+Sec1889e8447a,surface_form,no_year,"made but not kept: the seed's share of the factor, or the size of the file"
+Sec82ad84c627,certainty,anticipated,no notice attests the wording
+Sec82ad84c627,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+Sec82ad84c627,certainty,expected,no notice attests the wording
+Sec82ad84c627,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+Sec82ad84c627,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+Sec82ad84c627,granularity,,the seed's time has no finer or coarser grain here
+Sec82ad84c627,stale,stale,the period is counted from the Date of update
+Sec82ad84c627,surface_form,separator,no notice attests the wording
+Seddaf191d9a9,certainty,anticipated,no notice attests the wording
+Seddaf191d9a9,certainty,as_released,the seed makes another statement of the target's type
+Seddaf191d9a9,certainty,estimated,no notice attests the wording
+Seddaf191d9a9,certainty,expected,no notice attests the wording
+Seddaf191d9a9,certainty,no_estimated_date,the seed makes another statement of the target's type
+Seddaf191d9a9,certainty,tbd,the seed makes another statement of the target's type
+Seddaf191d9a9,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+Seddaf191d9a9,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+Seddaf191d9a9,granularity,mid,"made but not kept: the seed's share of the factor, or the size of the file"
+Seddaf191d9a9,surface_form,numeric,no notice attests the wording
+See0fa7df92e7,certainty,anticipated,no notice attests the wording
+See0fa7df92e7,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+See0fa7df92e7,certainty,expected,no notice attests the wording
+See0fa7df92e7,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+See0fa7df92e7,certainty,tbd,no notice attests the wording
+See0fa7df92e7,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+See0fa7df92e7,distractor,expiry,"made but not kept: the seed's share of the factor, or the size of the file"
+See0fa7df92e7,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+See0fa7df92e7,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+See0fa7df92e7,granularity,mid,"made but not kept: the seed's share of the factor, or the size of the file"
+See0fa7df92e7,granularity,timeframe,"made but not kept: the seed's share of the factor, or the size of the file"
+See0fa7df92e7,surface_form,numeric,no notice attests the wording
+See5fd766d856,certainty,anticipated,no notice attests the wording
+See5fd766d856,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+See5fd766d856,certainty,expected,no notice attests the wording
+See5fd766d856,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+See5fd766d856,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+See5fd766d856,granularity,,the seed's time has no finer or coarser grain here
+See5fd766d856,stale,stale,the period is counted from the Date of update
+See5fd766d856,surface_form,number_word,no notice attests the wording
+Sf402362a7efd,certainty,anticipated,no notice attests the wording
+Sf402362a7efd,certainty,estimated,no notice attests the wording
+Sf402362a7efd,certainty,expected,"made but not kept: the seed's share of the factor, or the size of the file"
+Sf402362a7efd,certainty,tbd,"made but not kept: the seed's share of the factor, or the size of the file"
+Sf402362a7efd,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+Sf402362a7efd,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+Sf402362a7efd,granularity,mid,"made but not kept: the seed's share of the factor, or the size of the file"
+Sf402362a7efd,granularity,quarter,"made but not kept: the seed's share of the factor, or the size of the file"
+Sf402362a7efd,granularity,timeframe,"made but not kept: the seed's share of the factor, or the size of the file"
+Sf402362a7efd,surface_form,numeric,no notice attests the wording
+Sf41659f32ff1,certainty,anticipated,no notice attests the wording
+Sf41659f32ff1,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+Sf41659f32ff1,certainty,estimated,no notice attests the wording
+Sf41659f32ff1,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+Sf41659f32ff1,certainty,tbd,no notice attests the wording
+Sf41659f32ff1,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+Sf41659f32ff1,granularity,,every other grain would end before the date
+Sf41659f32ff1,surface_form,no_year,"made but not kept: the seed's share of the factor, or the size of the file"
+Sf80ffbc1f242,certainty,anticipated,no notice attests the wording
+Sf80ffbc1f242,certainty,as_released,"made but not kept: the seed's share of the factor, or the size of the file"
+Sf80ffbc1f242,certainty,estimated,no notice attests the wording
+Sf80ffbc1f242,certainty,tbd,"made but not kept: the seed's share of the factor, or the size of the file"
+Sf80ffbc1f242,distractor,available_until,the Availability information does not begin with a capital letter
+Sf80ffbc1f242,distractor,depletion,the Availability information does not begin with a capital letter
+Sf80ffbc1f242,distractor,expiry,the Availability information does not begin with a capital letter
+Sf80ffbc1f242,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+Sf80ffbc1f242,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+Sf80ffbc1f242,granularity,mid,"made but not kept: the seed's share of the factor, or the size of the file"
+Sf80ffbc1f242,surface_form,numeric,no notice attests the wording
+Sfda6468ff6b8,certainty,anticipated,no notice attests the wording
+Sfda6468ff6b8,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+Sfda6468ff6b8,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+Sfda6468ff6b8,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+Sfda6468ff6b8,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+Sfda6468ff6b8,granularity,late,"made but not kept: the seed's share of the factor, or the size of the file"
+Sfda6468ff6b8,granularity,quarter,"made but not kept: the seed's share of the factor, or the size of the file"
+Sfda6468ff6b8,granularity,range,"made but not kept: the seed's share of the factor, or the size of the file"
+Sfda6468ff6b8,surface_form,numeric,no notice attests the wording
+Sfeeb5cfa085b,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+Sfeeb5cfa085b,certainty,estimated,no notice attests the wording
+Sfeeb5cfa085b,certainty,expected,no notice attests the wording
+Sfeeb5cfa085b,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+Sfeeb5cfa085b,distractor,depletion,"made but not kept: the seed's share of the factor, or the size of the file"
+Sfeeb5cfa085b,granularity,early,"made but not kept: the seed's share of the factor, or the size of the file"
+Sfeeb5cfa085b,granularity,quarter,no notice attests the wording
+Sfeeb5cfa085b,granularity,timeframe,no notice attests the wording
+Sfeeb5cfa085b,surface_form,no_year,no notice attests the wording
+Sfefd9f0f62ee,certainty,anticipated,no notice attests the wording
+Sfefd9f0f62ee,certainty,as_released,the target is not a next delivery stated alone in a sentence of its own
+Sfefd9f0f62ee,certainty,estimated,no notice attests the wording
+Sfefd9f0f62ee,certainty,expected,no notice attests the wording
+Sfefd9f0f62ee,certainty,no_estimated_date,the target is not a next delivery stated alone in a sentence of its own
+Sfefd9f0f62ee,certainty,tbd,no notice attests the wording
+Sfefd9f0f62ee,distractor,available_until,"made but not kept: the seed's share of the factor, or the size of the file"
+Sfefd9f0f62ee,granularity,mid,no notice attests the wording
+Sfefd9f0f62ee,surface_form,no_year,"made but not kept: the seed's share of the factor, or the size of the file"
+Sfefd9f0f62ee,surface_form,quarter_words,no notice attests the wording

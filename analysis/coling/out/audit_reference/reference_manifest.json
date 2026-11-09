@@ -1,0 +1,69 @@
+{
+ "about": "Task E, the reference-reading check: blank sheets, submitted sheets, result.",
+ "inputs": {
+  "counts_sha256": "aefed7e410158cfd6980e234a67af0454bb21a3ffea9c587970a9372b520c377",
+  "eligible_sha256": "8c12fc3e940f250e0a3426ef74355177431273db02736357a946dabb97ef7482",
+  "events_sha256": "d8d970a91691e702bacc27ae4d0605122a4170d275f7786bf066212a8d8aa145",
+  "first_draw_lists_sha256": {
+   "check": "eb80b0fc1ceb2485747d1fd5f303bf66ce01f053fda93eaf2617cc8b60b4903d",
+   "literal": "05fcaf84b77406d79812b9ace8238be78942705ea832eea0281d1966faced28c",
+   "pilot": "edd0c9c477b83f79f55e5823aa63484aff50d4407ef1830f7f185175502709f6",
+   "reserve": "6be05e4f1a000cbd4eae3dd72eed5e1adc39a614fda7482b47de14d78527e747"
+  },
+  "forms.py_sha256": "b99502d348ea82bece639ef2da62ebc90914b6d04dc185d6bfcb805b6bab69fd",
+  "items_sha256": "c3af5f6299755768166e5860dc6ac945fda3b78a906de137a15cb271035eb674",
+  "rules.py_sha256": "6a810bcb1ae277b9f4f02e0cfcedc80c5011f902cf679012174a6047bec1b28a"
+ },
+ "sample": {
+  "assigned": {
+   "A1": 45,
+   "A2": 45,
+   "both": 10
+  },
+  "assignment_sha256": "dcc64d8b764fb0684e4c47ccecd1171ad569e6127a76ffa239bbaa9906fb9f68",
+  "by_form": {
+   "month_no_year": 1,
+   "month_year": 78,
+   "part_of_month": 7,
+   "quarter": 8,
+   "range": 4,
+   "year": 2
+  },
+  "by_year": {
+   "2023": 44,
+   "2024": 30,
+   "2025": 26
+  },
+  "final": true,
+  "ids_sha256": "d8227bd74cef24858e94361b4581aea2e30af53a0da6b1c342968b0c9766c961",
+  "left_off": [],
+  "registered": 100,
+  "statements": 100
+ },
+ "seed": 20261001,
+ "sheets": {
+  "files": {
+   "reference_A1.csv": "17f76e304104e1898ef998f4d43ffec809fcc3db104a6a6139b002e18f5c3be8",
+   "reference_A1_items.txt": "43d83f727aa7a69e9f5b87fbe8b517321d0b36ee5f8d69ea9821c93af48dd00b",
+   "reference_A2.csv": "115e1ad30ee116c6d969b5352c90c04683caad26e6e227fe9b50efb0c9582f5f",
+   "reference_A2_items.txt": "c7a36fd8d3854e6cea481628950393784f23f7f68ba9a4afb1ca465a9cabc4cb"
+  },
+  "guide": "v1 sha256 ce58129993b31d33",
+  "items_per_sheet": {
+   "A1": 55,
+   "A2": 55
+  },
+  "minutes_per_sheet": {
+   "A1": [
+    28,
+    18,
+    41
+   ],
+   "A2": [
+    28,
+    18,
+    41
+   ]
+  }
+ }
+}

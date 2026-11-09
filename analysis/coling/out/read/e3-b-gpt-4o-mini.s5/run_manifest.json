@@ -1,0 +1,95 @@
+{
+  "by_echo": {
+    "ok": 313
+  },
+  "by_status": {
+    "ok": 313
+  },
+  "complete": true,
+  "condition": "predictive-track-v1|det-v1|mask=0|shift=0|track=41648e5a49e7d296",
+  "expected_rows": 313,
+  "fallbacks": 0,
+  "git": {
+    "branch": "followup/coling-2027",
+    "f1": "a7dcb774a6c06e542d83077434ae35d71e9058be",
+    "read_py_modified": false,
+    "registration": "0c2579a6eb98d1ed844bea4f45cdb159283bb25f",
+    "sha": "3ed1308cb9ba45fa2f0f5170bdc41298df8b9a45"
+  },
+  "guard": {
+    "max_physical_calls": 20000,
+    "physical_calls_this_invocation": 313,
+    "physical_calls_total": 313,
+    "refusals_this_invocation": 0,
+    "retries_this_invocation": 0,
+    "spend_cap_usd": 0.155558,
+    "usd_this_invocation": 0.12798615000000002,
+    "usd_total": 0.12798615000000002
+  },
+  "item_ids_sha256": "3e1cbdcc51caf8145461b33e914bd9f326cf940bb7f987849fbc3c85ce4fae97",
+  "items": 313,
+  "items_in_file": 2593,
+  "items_sha256": "773707460d800e40c088b14807ff49ca33008710242ce68d078c8011e4f91a66",
+  "ladder_rung": {
+    "model_id": "openai/gpt-4o-mini",
+    "name": "gpt-4o-mini",
+    "price_input_per_mtok": 0.15,
+    "price_output_per_mtok": 0.6,
+    "provider": "openrouter",
+    "released": "2024-07",
+    "served_as": [
+      "openai/gpt-4o-mini"
+    ],
+    "tier": "legacy"
+  },
+  "limit": null,
+  "mask_names": false,
+  "model": "gpt-4o-mini",
+  "model_id": "openai/gpt-4o-mini",
+  "price_date": "2026-10-01",
+  "provider_object": {
+    "allow_fallbacks": false,
+    "order": [
+      "openai"
+    ]
+  },
+  "python": "3.12.11",
+  "read_py_sha256": "54d171783601e72994f960cbe7b5adba157f6061ba3c9a1da30fd23e23be244f",
+  "readings": 313,
+  "readings_sha256": "1df405224424d0c97241640e887a15361ab349f44d21e744b682ab4e6a0266e2",
+  "roots": {
+    "local_root": "/home/noctis/GitHub/COLLIE-coling/results/coling/read",
+    "out_root": "/home/noctis/GitHub/COLLIE-coling/analysis/coling/out/read"
+  },
+  "route": {
+    "also_served_as": [],
+    "also_served_by": [],
+    "model_id": "openai/gpt-4o-mini",
+    "price": [
+      0.15,
+      0.6,
+      "2026-10-01"
+    ],
+    "provider": "openai",
+    "quantization": null
+  },
+  "run_name": "e3-b-gpt-4o-mini.s5",
+  "samples": 1,
+  "served_as": [
+    "openai/gpt-4o-mini"
+  ],
+  "shard": "5/8",
+  "shift_years": 0,
+  "spend_cap_usd": 0.155558,
+  "status": "complete",
+  "temperature": 0.0,
+  "template": "predictive-track-v1",
+  "template_sha256": "d0384c1f860d734bd26fa197de0a99e1bcdf520392941b399ef9d0f7b3213483",
+  "track_record": "analysis/coling/out/items/track_fit_dev.json",
+  "track_record_sha256": "41648e5a49e7d296a3ca2c49b61d7df3607eb8fe43f9f01daa136d9b0c3dc098",
+  "track_record_split": "fit+dev",
+  "usd_per_mtok": [
+    0.15,
+    0.6
+  ]
+}

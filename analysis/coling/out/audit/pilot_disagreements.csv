@@ -1,0 +1,7 @@
+"# task: A literal reading, pilot (AUDIT_GUIDE.md sections 3 and 4)"
+"# sheet: pilot disagreements"
+"# seed: 20261001"
+"# items: 1"
+"# values of adj_decision: slip | gap"
+"item_id","drug","company","presentation","therapeutic_category","initial_posting_date","type_of_update","date_of_update","availability_information","related_information","reason_for_shortage","differs","A1_statement_type","A1_start","A1_end","A1_abstain","A1_abstain_reason","A1_certainty","A1_quote","A1_distractor_roles","A1_distractor_quotes","A1_hard","A1_note","A2_statement_type","A2_start","A2_end","A2_abstain","A2_abstain_reason","A2_certainty","A2_quote","A2_distractor_roles","A2_distractor_quotes","A2_hard","A2_note"
+"I3a0cf1a792","Propofol Injectable Emulsion","Dr. Reddy's Laboratories, Inc.","500mg/50mL vial, individual (NDC 43598-548-50)","Anesthesia","2020-04-10","Revised","2021-03-29","No current supply","Partial shipments on allocation April-July 2021","Demand increase for the drug","statement_type","next_delivery","2021-04-01","2021-07-31","0","","asserted","Partial shipments on allocation April-July 2021","","","1","""Partial shipments on allocation April-July 2021"": ""shipments"" is a next_delivery cue, but ""on allocation"" could be read as a shortage state ending at a time (recovery, cf. example 8). No ""through/until"", so read as next_delivery over the range (C9).","recovery","2021-04-01","2021-07-31","0","","asserted","","","","0",""

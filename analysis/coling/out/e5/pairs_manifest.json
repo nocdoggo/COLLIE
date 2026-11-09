@@ -1,0 +1,83 @@
+{
+ "about": "Task C, the minimal-pair audit; made by analysis.coling.minimal_pairs.",
+ "sample": {
+  "gold_sha256": "0c165a7604f848410f62c00e925fe64759a673491bb0734a7ab672f7c42eff32",
+  "items_sha256": "5acc3a0af1fd13afe339701754167b8b03bbfd277dd12e23752f64df431af396",
+  "key": "external_data/annotation/keys/e5_pairs_key.csv",
+  "key_sha256": "ecc3d423794db58055de38f3288dfb4c43165ea73cd05c6b3c7e86d9e0e11bda",
+  "max_per_seed": 2,
+  "planted_items": 10,
+  "real_items": 100,
+  "round": 1,
+  "sizes": {
+   "own": 45,
+   "planted_per_auditor": 5,
+   "shared": 10
+  },
+  "strata": [
+   {
+    "drawn": 17,
+    "factor": "certainty",
+    "pool": 94,
+    "quota": 17
+   },
+   {
+    "drawn": 17,
+    "factor": "surface_form",
+    "pool": 147,
+    "quota": 17
+   },
+   {
+    "drawn": 17,
+    "factor": "granularity",
+    "pool": 124,
+    "quota": 17
+   },
+   {
+    "drawn": 16,
+    "factor": "stale",
+    "pool": 80,
+    "quota": 16
+   },
+   {
+    "drawn": 17,
+    "factor": "distractor",
+    "pool": 163,
+    "quota": 17
+   },
+   {
+    "drawn": 16,
+    "factor": "silent",
+    "pool": 92,
+    "quota": 16
+   }
+  ]
+ },
+ "seed": 20261001,
+ "sheets": {
+  "files": {
+   "pairs_A1.csv": "3f570c55b6db8a47bb47289c098cfd9a72ba2c2f72b302f4164ec6151ab0bb49",
+   "pairs_A1_items.txt": "8a0e91d6a3049d929dc036678c39c29d6bdcfc2bdbff5897feb42eb85f0fbc22",
+   "pairs_A2.csv": "71af5fa34861fc01d7ac39e7d923dc059bbbe306333918c216005350f3a80ceb",
+   "pairs_A2_items.txt": "8017b44a39429ac34cc681a677c880cdd66f4322097107eccdaee1e24d23b100"
+  },
+  "guide": "v1 sha256 ce58129993b31d33",
+  "items_per_sheet": {
+   "A1": 60,
+   "A2": 60
+  },
+  "key_sha256": "ecc3d423794db58055de38f3288dfb4c43165ea73cd05c6b3c7e86d9e0e11bda",
+  "minutes_per_sheet": {
+   "A1": [
+    40,
+    20,
+    60
+   ],
+   "A2": [
+    40,
+    20,
+    60
+   ]
+  }
+ }
+}

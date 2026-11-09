@@ -1,0 +1,872 @@
+# task: B outcome audit (AUDIT_GUIDE.md section 6)
+# auditor: A1
+# half: train
+# status: final
+# draw: train
+# seed: 20261001
+# guide: v1 draft sha256 2758c375ef5b41a8
+# corpus_py: sha256 a44cd27ccddad604
+# corpus_docstring: sha256 deb2de56a85a6e5c
+# followed_to: 2022-10-06
+# items: 33
+
+=== Qfde67997 (item 1 of 33)
+generic: Latanoprost Ophthalmic Solution 0.005%
+company: Pfizer Pharmaceuticals
+presentation: 2.5 mL fill, 0.005% (50 mcg/mL): Package of 1 bottle (NDC 59762-0333-2)
+statement: Next Delivery: October 2019; Estimated Recovery: Q2 2020 || Limited Supply Available. Please check with your wholesaler for available inventory
+statement date 2019-10-07; c0 2019-10-20; followed to 2022-10-06
+derived B: recovered (2019-12-29, 2020-04-02], 95 days
+derived A: recovered (2020-04-02, 2020-06-12], 71 days
+statement group, 1 presentation(s): B recovered (2019-12-29, 2020-04-02]; A recovered (2020-04-02, 2020-06-12]
+class strip: O O | A R R
+* 2019-10-20 O | Current | Revised 10/07/2019 | availability: Next Delivery: October 2019; Estimated Recovery: Q2 2020 | related: Limited Supply Available. Please check with your wholesaler for available inventory | same text
+  2019-12-29 O | Current | Reverified 12/20/2019 | availability: Next Delivery: December 2019; Estimated Recovery: March 2020 | related: Limited Supply Available. Please check with your wholesaler for available inventory
+  2020-04-02 A | Current | Reverified 03/25/2020 | availability: Available | related:  | 95 days since the capture before
+  2020-06-12 R | Resolved | Revised 04/06/2020 | availability:  | related:  | change date: 04/06/2020
+  2020-07-08 R | Resolved | Revised 04/06/2020 | availability:  | related:  | change date: 04/06/2020
+
+=== Q708f7e29 (item 2 of 33)
+generic: Zolpidem Tartrate (Edluar) Sublingual Tablets
+company: Mylan Pharmaceuticals Inc.
+presentation: 10 mg (NDC 0037-6010-30)
+statement: 
+statement date 2018-11-21; c0 2019-10-20; followed to 2022-10-06
+derived B: not_at_risk
+derived A: not_at_risk
+statement group, 1 presentation(s): B not_at_risk; A not_at_risk
+class strip: R R
+* 2019-10-20 R | Resolved | Revised 11/21/2018 | availability:  | related:  | resolved note: Available | change date: 11/21/2018 | same text
+  2019-12-29 R | Resolved | Revised 11/21/2018 | availability:  | related:  | resolved note: Available | change date: 11/21/2018 | same text
+
+=== Qaa6d95ec (item 3 of 33)
+generic: Ketoprofen Capsules
+company: Avet Pharmaceuticals, Inc. (formerly Heritage Pharma)
+presentation: 75 mg, 100 count bottle (NDC 23155-022-01)
+statement: 
+statement date 2020-06-17; c0 2020-07-08; followed to 2022-10-06
+derived B: not_at_risk
+derived A: censored at 2022-10-06 (end_of_train)
+statement group, 2 presentation(s): B not_at_risk; A censored at 2022-10-06
+class strip: A A A A A A A A A A A A A A A A A A A A A A A A A | A A
+< 2020-04-02 . | absent; generic current | 95 days since the capture before
+< 2020-06-12 . | absent; generic current
+* 2020-07-08 A | Current | New 06/17/2020 | availability: Available | related:  | same text
+  2020-07-15 A | Current | New 06/17/2020 | availability: Available | related:  | same text
+  2020-08-15 A | Current | New 06/17/2020 | availability: Available | related:  | same text
+  2020-08-24 A | Current | New 06/17/2020 | availability: Available | related:  | same text
+  2020-09-15 A | Current | New 06/17/2020 | availability: Available | related:  | same text
+  2020-09-27 A | Current | New 06/17/2020 | availability: Available | related:  | same text
+  2020-09-30 A | Current | Reverified 09/28/2020 | availability: Available | related:  | same text
+  2020-10-11 A | Current | Reverified 09/28/2020 | availability: Available | related:  | same text
+  2020-10-17 A | Current | Reverified 09/28/2020 | availability: Available | related:  | same text
+  2020-10-26 A | Current | Reverified 09/28/2020 | availability: Available | related:  | same text
+  2020-10-30 A | Current | Reverified 09/28/2020 | availability: Available | related:  | same text
+  2020-10-30 A | Current | Reverified 09/28/2020 | availability: Available | related:  | same text
+  2020-11-10 A | Current | Reverified 09/28/2020 | availability: Available | related:  | same text
+  2020-11-19 A | Current | Reverified 09/28/2020 | availability: Available | related:  | same text
+  2020-11-21 A | Current | Reverified 09/28/2020 | availability: Available | related:  | same text
+  2021-01-17 A | Current | Reverified 09/28/2020 | availability: Available | related:  | same text
+  2021-03-18 A | Current | Revised 01/19/2021 | availability: Available | related:  | same text
+  2021-04-12 A | Current | Revised 01/19/2021 | availability: Available | related:  | same text
+  2021-05-12 A | Current | Revised 01/19/2021 | availability: Available | related:  | same text
+  2021-05-21 A | Current | Revised 01/19/2021 | availability: Available | related:  | same text
+  2021-08-02 A | Current | Revised 01/19/2021 | availability: Available | related:  | same text
+  2021-08-27 A | Current | Revised 01/19/2021 | availability: Available | related:  | same text
+  2021-10-06 A | Current | Revised 01/19/2021 | availability: Available | related:  | same text
+  2021-10-20 A | Current | Revised 01/19/2021 | availability: Available | related:  | same text
+  2021-11-30 A | Current | Revised 01/19/2021 | availability: Available | related:  | same text
+  2022-10-04 A | Current | Revised 01/19/2021 | availability: Available | related:  | same text | 308 days since the capture before
+  2022-10-06 A | Current | Revised 01/19/2021 | availability: Available | related:  | same text
+
+=== Q5fb611bf (item 4 of 33)
+generic: Ondansetron Hydrochloride Injection
+company: Hospira, Inc.
+presentation: 40 mg/20 mL (2 mg/mL); Multiple Dose Glass Fliptop Vial (NDC 00409-4759-01)
+statement: 
+statement date 2020-03-25; c0 2020-04-02; followed to 2022-10-06
+derived B: not_at_risk
+derived A: recovered (2021-11-30, 2022-10-04], 308 days
+statement group, 2 presentation(s): B discontinued (2021-10-06, 2021-10-20]; A recovered (2021-11-30, 2022-10-04]
+class strip: A A A A A A A A A A A A A A A A A A A A A A L L L O A | R R
+< 2019-10-20 O | Current | Revised 10/07/2019 | availability: Next Delivery: November 2019; Estimated Recovery: December 2019 | related: Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay
+< 2019-12-29 L | Current | Reverified 12/20/2019 | availability: Limited Supply Available. Next Delivery and Estimated Recovery: December 2019 | related: Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay
+* 2020-04-02 A | Current | Reverified 03/25/2020 | availability: Available | related:  | same text | 95 days since the capture before
+  2020-06-12 A | Current | Reverified 06/05/2020 | availability: Available | related:  | same text
+  2020-07-08 A | Current | Reverified 07/01/2020 | availability: Available | related:  | same text
+  2020-07-15 A | Current | Reverified 07/01/2020 | availability: Available | related:  | same text
+  2020-08-15 A | Current | Reverified 08/12/2020 | availability: Available | related:  | same text
+  2020-08-24 A | Current | Reverified 08/12/2020 | availability: Available | related:  | same text
+  2020-09-15 A | Current | Reverified 09/10/2020 | availability: Available | related:  | same text
+  2020-09-27 A | Current | Reverified 09/24/2020 | availability: Available | related:  | same text
+  2020-09-30 A | Current | Reverified 09/24/2020 | availability: Available | related:  | same text
+  2020-10-11 A | Current | Reverified 10/09/2020 | availability: Available | related:  | same text
+  2020-10-17 A | Current | Reverified 10/09/2020 | availability: Available | related:  | same text
+  2020-10-26 A | Current | Reverified 10/22/2020 | availability: Available | related:  | same text
+  2020-10-30 A | Current | Reverified 10/22/2020 | availability: Available | related:  | same text
+  2020-10-30 A | Current | Reverified 10/22/2020 | availability: Available | related:  | same text
+  2020-11-10 A | Current | Reverified 10/22/2020 | availability: Available | related:  | same text
+  2020-11-19 A | Current | Reverified 10/22/2020 | availability: Available | related:  | same text
+  2020-11-21 A | Current | Reverified 11/20/2020 | availability: Available | related:  | same text
+  2021-01-17 A | Current | Reverified 01/12/2021 | availability: Available | related:  | same text
+  2021-03-18 A | Current | Reverified 03/12/2021 | availability: Available | related:  | same text
+  2021-04-12 A | Current | Reverified 04/08/2021 | availability: Available | related:  | same text
+  2021-05-12 A | Current | Reverified 05/07/2021 | availability: Available | related:  | same text
+  2021-05-21 A | Current | Reverified 05/21/2021 | availability: Available | related:  | same text
+  2021-08-02 L | Current | Reverified 07/27/2021 | availability: Limited Supply Available. Next Delivery and Estimated Recovery: August 2021 | related: 
+  2021-08-27 L | Current | Reverified 08/12/2021 | availability: Limited Supply Available. Next Delivery and Estimated Recovery: August 2021 | related: 
+  2021-10-06 L | Current | Reverified 09/22/2021 | availability: Limited Supply Available. Next Delivery: September 2021; Estimated Recovery: October 2021 | related: 
+  2021-10-20 O | Current | Revised 10/08/2021 | availability: Next Delivery: October 2021; Estimated Recovery: November 2021 | related: 
+  2021-11-30 A | Current | Revised 11/18/2021 | availability: Available | related:  | same text
+  2022-10-04 R | Resolved | Revised 04/25/2022 | availability:  | related:  | same text | 308 days since the capture before
+  2022-10-06 R | Resolved | Revised 04/25/2022 | availability:  | related:  | same text
+
+=== Qfe726c2a (item 5 of 33)
+generic: Bupivacaine Hydrochloride and Epinephrine Injection, USP
+company: Fresenius Kabi USA, LLC
+presentation: Sensorcaine MPF w/EPI .25% (75 mg per 30 mL) (2.5 mg per mL) SDV (NDC 63323-468-37)
+statement: Backordered. Next release November 2020. || Check wholesalers for inventory.
+statement date 2020-09-15; c0 2020-09-27; followed to 2022-10-06
+derived B: censored at 2022-10-06 (end_of_train)
+derived A: censored at 2022-10-06 (end_of_train)
+statement group, 4 presentation(s): B censored at 2022-10-06; A censored at 2022-10-06
+class strip: U U U U U U U U U U U U U U U U U U U U | U U
+< 2020-08-24 U | Current | Revised 08/13/2020 | availability: Backordered. Next release September 2020. | related: Check wholesalers for inventory.
+< 2020-09-15 U | Current | Revised 08/13/2020 | availability: Backordered. Next release September 2020. | related: Check wholesalers for inventory.
+* 2020-09-27 U | Current | Revised 09/15/2020 | availability: Backordered. Next release November 2020. | related: Check wholesalers for inventory. | same text
+  2020-09-30 U | Current | Revised 09/15/2020 | availability: Backordered. Next release November 2020. | related: Check wholesalers for inventory. | same text
+  2020-10-11 U | Current | Revised 10/08/2020 | availability: Backordered. Next release November 2020. | related: Check wholesalers for inventory. | same text
+  2020-10-17 U | Current | Revised 10/08/2020 | availability: Backordered. Next release November 2020. | related: Check wholesalers for inventory. | same text
+  2020-10-26 U | Current | Revised 10/23/2020 | availability: Backordered. Next release December 2020. | related: Check wholesalers for inventory.
+  2020-10-30 U | Current | Revised 10/23/2020 | availability: Backordered. Next release December 2020. | related: Check wholesalers for inventory.
+  2020-10-30 U | Current | Revised 10/23/2020 | availability: Backordered. Next release December 2020. | related: Check wholesalers for inventory.
+  2020-11-10 U | Current | Revised 10/23/2020 | availability: Backordered. Next release December 2020. | related: Check wholesalers for inventory.
+  2020-11-19 U | Current | Revised 11/16/2020 | availability: Backordered. Next release November 2020. | related: Check wholesalers for inventory. | same text
+  2020-11-21 U | Current | Revised 11/16/2020 | availability: Backordered. Next release November 2020. | related: Check wholesalers for inventory. | same text
+  2021-01-17 U | Current | Revised 12/30/2020 | availability: Backordered. Next release January 2021. | related: Check wholesalers for inventory.
+  2021-03-18 U | Current | Revised 03/15/2021 | availability: Backordered. Next release March 2021. | related: Check wholesalers for inventory.
+  2021-04-12 U | Current | Revised 03/15/2021 | availability: Backordered. Next release March 2021. | related: Check wholesalers for inventory.
+  2021-05-12 U | Current | Revised 04/30/2021 | availability: Backordered. Next release May 2021. | related: Check wholesalers for inventory. | generic: Bupivacaine Hydrochloride and Epinephrine Injection | linked by NDC
+  2021-05-21 U | Current | Revised 05/19/2021 | availability: Backordered. Next release June 2021. | related: Check wholesalers for inventory. | generic: Bupivacaine Hydrochloride and Epinephrine Injection
+  2021-08-02 U | Current | Revised 07/22/2021 | availability: Backordered. Next release August 2021. | related: Check wholesalers for inventory. | generic: Bupivacaine Hydrochloride and Epinephrine Injection
+  2021-08-27 U | Current | Revised 08/25/2021 | availability: Backordered. Next release October 2021. | related: Check wholesalers for inventory. | generic: Bupivacaine Hydrochloride and Epinephrine Injection
+  2021-10-06 U | Current | Revised 09/23/2021 | availability: Backordered. Next release November 2021. | related: Check wholesalers for inventory. | generic: Bupivacaine Hydrochloride and Epinephrine Injection
+  2021-10-20 U | Current | Revised 10/08/2021 | availability: Backordered. Next release November 2021. | related: Check wholesalers for inventory. | generic: Bupivacaine Hydrochloride and Epinephrine Injection
+  2021-11-30 U | Current | Revised 11/23/2021 | availability: Backordered. Next release December 2021. | related: Check wholesalers for inventory. | generic: Bupivacaine Hydrochloride and Epinephrine Injection
+  2022-10-04 U | Current | Revised 09/14/2022 | availability: Backordered. Next release October 2022. | related: Check wholesalers for inventory. | generic: Bupivacaine Hydrochloride and Epinephrine Injection | 308 days since the capture before
+  2022-10-06 U | Current | Revised 09/14/2022 | availability: Backordered. Next release October 2022. | related: Check wholesalers for inventory. | generic: Bupivacaine Hydrochloride and Epinephrine Injection
+
+=== Q5a1468d4 (item 6 of 33)
+generic: Tobramycin Lyophilized Powder for Injection
+company: Fresenius Kabi USA, LLC
+presentation: 1.2 g, pharmacy bulk package, tray of 6 vials (NDC 63323-303-51)
+statement: Check wholesaler inventory
+statement date 2021-03-15; c0 2021-03-18; followed to 2022-10-06
+derived B: not_at_risk
+derived A: recovered (2021-03-18, 2021-04-12], 25 days
+statement group, 2 presentation(s): B not_at_risk; A recovered (2021-03-18, 2021-04-12]
+class strip: A R R R
+< 2020-11-21 U | Current | Reverified 11/16/2020 | availability: Backordered. Next release expected November 2020. | related: Delay in manufacturing
+< 2021-01-17 U | Current | Revised 12/11/2020 | availability: Backordered. Next release expected December 2020. | related: 
+* 2021-03-18 A | Current | Reverified 03/15/2021 | availability: Available | related: Check wholesaler inventory | same text
+  2021-04-12 R | Resolved | Revised 04/12/2021 | availability:  | related:  | change date: 04/12/2021
+  2021-05-12 R | Resolved | Revised 04/12/2021 | availability:  | related:  | change date: 04/12/2021
+  2021-05-21 R | Resolved | Revised 04/12/2021 | availability:  | related:  | change date: 04/12/2021
+
+=== Qe026011c (item 7 of 33)
+generic: Hydroxychloroquine Sulfate Tablets
+company: Alkaloida Chemical Co. Zrt.
+presentation: 200 mg, 500 count bottle (NDC 57664-761-13)
+statement: Distributed by Sun Pharmaceutical
+statement date 2020-03-31; c0 2020-04-02; followed to 2022-10-06
+derived B: recovered (2020-04-02, 2020-06-12], 71 days
+derived A: recovered (2020-06-12, 2020-07-08], 26 days
+statement group, 1 presentation(s): B recovered (2020-04-02, 2020-06-12]; A recovered (2020-06-12, 2020-07-08]
+class strip: L A r r r r
+< 2019-10-20 . | absent; generic unlisted
+< 2019-12-29 . | absent; generic unlisted
+* 2020-04-02 L | Current | New 03/31/2020 | availability: Limited availability | related: Distributed by Sun Pharmaceutical | same text | 95 days since the capture before
+  2020-06-12 A | Current | Revised 05/19/2020 | availability: Available | related: Distributed by Sun Pharmaceutical | same text
+  2020-07-08 r | absent; generic resolved
+             another thread with this NDC | Resolved | Revised 06/26/2020 | availability:  | related:  | resolved note: Distributed by Sun Pharmaceutical. Available | change date: 06/26/2020 | presentation: 200 mg, 100 count bottle (NDC 57664-761-88); 500 count bottle (NDC 57664-761-13)
+  2020-07-15 r | absent; generic resolved
+             another thread with this NDC | Resolved | Revised 06/26/2020 | availability:  | related:  | resolved note: Distributed by Sun Pharmaceutical. Available | change date: 06/26/2020 | presentation: 200 mg, 100 count bottle (NDC 57664-761-88); 500 count bottle (NDC 57664-761-13)
+  2020-08-15 r | absent; generic resolved
+             another thread with this NDC | Resolved | Revised 06/26/2020 | availability:  | related:  | resolved note: Distributed by Sun Pharmaceutical. Available | change date: 06/26/2020 | presentation: 200 mg, 100 count bottle (NDC 57664-761-88); 500 count bottle (NDC 57664-761-13)
+  2020-08-24 r | absent; generic resolved
+             another thread with this NDC | Resolved | Revised 06/26/2020 | availability:  | related:  | resolved note: Distributed by Sun Pharmaceutical. Available | change date: 06/26/2020 | presentation: 200 mg, 100 count bottle (NDC 57664-761-88); 500 count bottle (NDC 57664-761-13)
+
+=== Q2f70afba (item 8 of 33)
+generic: Propofol Injectable Emulsion
+company: Teva Pharmaceuticals
+presentation: 10MG/ML 25X20ML VL (NDC 0591-2136-95)
+statement: Limited supply available. Next Delivery ETA Late September 2021 and Estimated Recovery: TBD || Supply chain has been impacted by shipping delays due to COVID-19
+statement date 2021-09-20; c0 2021-10-06; followed to 2022-10-06
+derived B: discontinued (2021-11-30, 2022-10-04], 308 days
+derived A: discontinued (2021-11-30, 2022-10-04], 308 days
+statement group, 2 presentation(s): B discontinued (2021-11-30, 2022-10-04]; A discontinued (2021-11-30, 2022-10-04]
+class strip: L L L | D D
+< 2021-08-02 L | Current | Revised 07/20/2021 | availability: Limited supply available. Next Delivery ETA Mid August 2021 and Estimated Recovery: TBD | related: Supply chain has been impacted by shipping delays due to COVID-19
+< 2021-08-27 L | Current | Revised 08/19/2021 | availability: Limited supply available. Next Delivery ETA Mid September 2021 and Estimated Recovery: TBD | related: Supply chain has been impacted by shipping delays due to COVID-19
+* 2021-10-06 L | Current | Revised 09/20/2021 | availability: Limited supply available. Next Delivery ETA Late September 2021 and Estimated Recovery: TBD | related: Supply chain has been impacted by shipping delays due to COVID-19 | same text
+  2021-10-20 L | Current | Revised 10/07/2021 | availability: Limited supply available. Next Delivery ETA Mid October 2021 and Estimated Recovery: TBD | related: Supply chain has been impacted by shipping delays due to COVID-19
+  2021-11-30 L | Current | Revised 11/08/2021 | availability: Limited supply available. Next Delivery ETA Late November 2021 and Estimated Recovery: TBD | related: Supply chain has been impacted by shipping delays due to COVID-19
+  2022-10-04 D | Current | Revised 09/21/2022 | availability: Available | related: Market Exit - Estimated Run Out TBD | in the discontinuation listing () | 308 days since the capture before
+  2022-10-06 D | Current | Reverified 10/05/2022 | availability: Available | related: Market Exit - Estimated Run Out TBD | in the discontinuation listing ()
+
+=== Q61b9100f (item 9 of 33)
+generic: Semaglutide (Ozempic) Injection
+company: Novo Nordisk, Inc.
+presentation: 0.25 mg / 0.5mg (NDC 0169-4132-12)
+statement: Limited availability; Intermittent supply disruption will continue through November 2022 || Localized short term stock outages in pharmacies
+statement date 2022-10-03; c0 2022-10-04; followed to 2022-10-06
+derived B: censored at 2022-10-06 (end_of_train)
+derived A: censored at 2022-10-06 (end_of_train)
+statement group, 1 presentation(s): B censored at 2022-10-06; A censored at 2022-10-06
+class strip: L L
+< 2021-10-20 . | absent; generic unlisted
+< 2021-11-30 . | absent; generic unlisted
+* 2022-10-04 L | Current | Revised 10/03/2022 | availability: Limited availability; Intermittent supply disruption will continue through November 2022 | related: Localized short term stock outages in pharmacies | same text | 308 days since the capture before
+  2022-10-06 L | Current | Revised 10/03/2022 | availability: Limited availability; Intermittent supply disruption will continue through November 2022 | related: Localized short term stock outages in pharmacies | same text
+
+=== Q366442ae (item 10 of 33)
+generic: Gentamicin Sulfate Injection
+company: Fresenius Kabi USA, LLC
+presentation: 80 mg per 2 mL (40 mg per mL), MDV, (NDC 63323-010-02)
+statement: Backordered. Next release October 2022. || Check wholesaler inventory
+statement date 2022-09-14; c0 2022-10-04; followed to 2022-10-06
+derived B: censored at 2022-10-06 (end_of_train)
+derived A: censored at 2022-10-06 (end_of_train)
+statement group, 1 presentation(s): B censored at 2022-10-06; A censored at 2022-10-06
+class strip: U U
+< 2021-10-20 A | Current | Revised 10/08/2021 | availability: Available | related: Check wholesaler inventory
+< 2021-11-30 U | Current | Revised 11/23/2021 | availability: Backordered. Next release January 2022. | related: Check wholesaler inventory
+* 2022-10-04 U | Current | Revised 09/14/2022 | availability: Backordered. Next release October 2022. | related: Check wholesaler inventory | same text | 308 days since the capture before
+  2022-10-06 U | Current | Revised 09/14/2022 | availability: Backordered. Next release October 2022. | related: Check wholesaler inventory | same text
+
+=== Q1012e603 (item 11 of 33)
+generic: Ranitidine Tablets/Capsules
+company: Amneal Pharmaceutical
+presentation: 150 mg, 60 count (NDC 65162-253-06)
+statement: Unknown at this time || Ranitidine Tablets, USP, 150 mg and 300 mg, and Ranitidine Syrup (Ranitidine Oral Solution, USP), 15 mg/mL, are being recalled because of potential N-Nitrosodimethylamine (NDMA) amounts above levels established by the FDA.
+statement date 2020-01-07; c0 2020-04-02; followed to 2022-10-06
+derived B: discontinued (2020-04-02, 2020-06-12], 71 days
+derived A: discontinued (2020-04-02, 2020-06-12], 71 days
+statement group, 9 presentation(s): B discontinued (2020-04-02, 2020-06-12]; A discontinued (2020-04-02, 2020-06-12]
+class strip: O D D D D D
+< 2019-10-20 . | absent; generic unlisted
+< 2019-12-29 . | absent; generic unlisted
+* 2020-04-02 O | Current | New 01/07/2020 | availability: Unknown at this time | related: Ranitidine Tablets, USP, 150 mg and 300 mg, and Ranitidine Syrup (Ranitidine Oral Solution, USP), 15 mg/mL, are being recalled because of potential N-Nitrosodimethylamine (NDMA) amounts above levels established by the FDA. | same text | 95 days since the capture before
+  2020-06-12 D | absent; generic unlisted | in the discontinuation listing (04/03/2020)
+  2020-07-08 D | absent; generic unlisted | in the discontinuation listing (04/03/2020)
+  2020-07-15 D | absent; generic unlisted | in the discontinuation listing (04/03/2020)
+  2020-08-15 D | absent; generic unlisted | in the discontinuation listing (04/03/2020)
+  2020-08-24 D | absent; generic unlisted | in the discontinuation listing (04/03/2020)
+
+=== Qc1b5f871 (item 12 of 33)
+generic: Cefotetan Disodium Injection
+company: B. Braun Medical Inc.
+presentation: 1 gram/50 mL in DUPLEX (NDC 00264-3173-11)
+statement: Product not available; Expected recovery: December 2021
+statement date 2021-05-06; c0 2021-05-12; followed to 2022-10-06
+derived B: discontinued (2021-11-30, 2022-10-04], 308 days
+derived A: discontinued (2021-11-30, 2022-10-04], 308 days
+statement group, 2 presentation(s): B discontinued (2021-11-30, 2022-10-04]; A discontinued (2021-11-30, 2022-10-04]
+class strip: U U U U U U U | D D
+< 2021-03-18 U | Current | Revised 08/28/2020 | availability: Product not available | related: 
+< 2021-04-12 U | Current | Revised 03/22/2021 | availability: Product not available; Expected recovery: July 2021 | related: 
+* 2021-05-12 U | Current | Revised 05/06/2021 | availability: Product not available; Expected recovery: December 2021 | related:  | same text
+  2021-05-21 U | Current | Reverified 05/19/2021 | availability: Product not available; Expected recovery: December 2021 | related:  | same text
+  2021-08-02 U | Current | Reverified 05/19/2021 | availability: Product not available; Expected recovery: December 2021 | related:  | same text
+  2021-08-27 U | Current | Reverified 05/19/2021 | availability: Product not available; Expected recovery: December 2021 | related:  | same text
+  2021-10-06 U | Current | Reverified 05/19/2021 | availability: Product not available; Expected recovery: December 2021 | related:  | same text
+  2021-10-20 U | Current | Reverified 05/19/2021 | availability: Product not available; Expected recovery: December 2021 | related:  | same text
+  2021-11-30 U | Current | Reverified 05/19/2021 | availability: Product not available; Expected recovery: December 2021 | related:  | same text
+  2022-10-04 D | absent; generic current | in the discontinuation listing () | 308 days since the capture before
+  2022-10-06 D | absent; generic current | in the discontinuation listing ()
+
+=== Q94aee662 (item 13 of 33)
+generic: Calcium Chloride Injection, USP
+company: Hospira, Inc.
+presentation: 1 g/10 mL (100 mg/mL); LifeShield Abboject Glass Syringe (NDC 00409-4928-34)
+statement: Limited Supply Available. Next Delivery and Estimated Recovery: August 2020 || Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay
+statement date 2020-08-12; c0 2020-08-15; followed to 2022-10-06
+derived B: recovered (2020-09-30, 2020-10-11], 11 days
+derived A: recovered (2020-11-21, 2021-01-17], 57 days
+statement group, 1 presentation(s): B recovered (2020-09-30, 2020-10-11]; A recovered (2020-11-21, 2021-01-17]
+class strip: L L L L L A A A A A A A A R R
+< 2020-07-08 L | Current | Revised 07/01/2020 | availability: Limited Supply Available. Next Delivery: August 2020; Estimated Recovery: December 2020 | related: Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay
+< 2020-07-15 L | Current | Revised 07/01/2020 | availability: Limited Supply Available. Next Delivery: August 2020; Estimated Recovery: December 2020 | related: Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay
+* 2020-08-15 L | Current | Revised 08/12/2020 | availability: Limited Supply Available. Next Delivery and Estimated Recovery: August 2020 | related: Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay | same text
+  2020-08-24 L | Current | Revised 08/12/2020 | availability: Limited Supply Available. Next Delivery and Estimated Recovery: August 2020 | related: Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay | same text
+  2020-09-15 L | Current | Revised 09/10/2020 | availability: Limited Supply Available. Next Delivery and Estimated Recovery: October 2020 | related: Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay
+  2020-09-27 L | Current | Revised 09/24/2020 | availability: Limited Supply Available. Next Delivery: September 2020; Estimated Recovery: November 2020 | related: Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay
+  2020-09-30 L | Current | Revised 09/24/2020 | availability: Limited Supply Available. Next Delivery: September 2020; Estimated Recovery: November 2020 | related: Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay
+  2020-10-11 A | Current | Revised 10/09/2020 | availability: Available | related: 
+  2020-10-17 A | Current | Revised 10/09/2020 | availability: Available | related: 
+  2020-10-26 A | Current | Reverified 10/22/2020 | availability: Available | related: 
+  2020-10-30 A | Current | Reverified 10/22/2020 | availability: Available | related: 
+  2020-10-30 A | Current | Reverified 10/22/2020 | availability: Available | related: 
+  2020-11-10 A | Current | Reverified 10/22/2020 | availability: Available | related: 
+  2020-11-19 A | Current | Reverified 10/22/2020 | availability: Available | related: 
+  2020-11-21 A | Current | Reverified 11/20/2020 | availability: Available | related: 
+  2021-01-17 R | Resolved | Revised 12/14/2020 | availability:  | related:  | change date: 12/14/2020
+  2021-03-18 R | Resolved | Revised 12/14/2020 | availability:  | related:  | change date: 12/14/2020
+
+=== Q7d21bfff (item 14 of 33)
+generic: Sodium Bicarbonate Injection, USP
+company: Hospira, Inc.
+presentation: 50 mEq/50 mL (8.4%; 1 mEq/mL); LifeShield Abboject Glass Syringe (NDC 0409-6637-34)
+statement: Limited Supply Available. Next Delivery: March 2020; Estimated Recovery: December 2020 || Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay
+statement date 2020-03-25; c0 2020-04-02; followed to 2022-10-06
+derived B: recovered (2020-07-15, 2020-08-15], 31 days
+derived A: censored at 2021-01-17 (absent_generic_current)
+statement group, 3 presentation(s): B censored at 2021-03-18; A censored at 2022-10-06
+class strip: L L L L A A A A A A A L L L L L L B . . . . . . . . . | . .
+< 2019-10-20 O | Current | Revised 10/07/2019 | availability: Next Delivery: October 2019; Estimated Recovery: August 2020 | related: Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay | change date: 11/16/2016
+< 2019-12-29 O | Current | Revised 12/20/2019 | availability: Next Delivery: December 2019; Estimated Recovery: December 2020 | related: Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay | change date: 11/16/2016
+* 2020-04-02 L | Current | Reverified 03/25/2020 | availability: Limited Supply Available. Next Delivery: March 2020; Estimated Recovery: December 2020 | related: Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay | change date: 11/16/2016 | same text | 95 days since the capture before
+  2020-06-12 L | Current | Revised 06/05/2020 | availability: Limited Supply Available. Next Delivery: June 2020; Estimated Recovery: December 2020 | related: Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay | change date: 11/16/2016
+  2020-07-08 L | Current | Revised 07/01/2020 | availability: Limited Supply Available. Next Delivery: August 2020; Estimated Recovery: December 2020 | related: Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay | change date: 11/16/2016
+  2020-07-15 L | Current | Revised 07/01/2020 | availability: Limited Supply Available. Next Delivery: August 2020; Estimated Recovery: December 2020 | related: Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay | change date: 11/16/2016
+  2020-08-15 A | Current | Reverified 08/12/2020 | availability: Available | related:  | change date: 11/16/2016
+  2020-08-24 A | Current | Reverified 08/12/2020 | availability: Available | related:  | change date: 11/16/2016
+  2020-09-15 A | Current | Revised 09/10/2020 | availability: Available | related:  | change date: 11/16/2016
+  2020-09-27 A | Current | Reverified 09/24/2020 | availability: Available | related:  | change date: 11/16/2016
+  2020-09-30 A | Current | Reverified 09/24/2020 | availability: Available | related:  | change date: 11/16/2016
+  2020-10-11 A | Current | Revised 10/09/2020 | availability: Available | related:  | change date: 11/16/2016
+  2020-10-17 A | Current | Revised 10/09/2020 | availability: Available | related:  | change date: 11/16/2016
+  2020-10-26 L | Current | Revised 10/22/2020 | availability: Limited Supply Available. Next Delivery and Estimated Recovery: October 2020 | related:  | change date: 11/16/2016
+  2020-10-30 L | Current | Revised 10/22/2020 | availability: Limited Supply Available. Next Delivery and Estimated Recovery: October 2020 | related:  | change date: 11/16/2016
+  2020-10-30 L | Current | Revised 10/22/2020 | availability: Limited Supply Available. Next Delivery and Estimated Recovery: October 2020 | related:  | change date: 11/16/2016
+  2020-11-10 L | Current | Revised 10/22/2020 | availability: Limited Supply Available. Next Delivery and Estimated Recovery: October 2020 | related:  | change date: 11/16/2016
+  2020-11-19 L | Current | Revised 10/22/2020 | availability: Limited Supply Available. Next Delivery and Estimated Recovery: October 2020 | related:  | change date: 11/16/2016
+  2020-11-21 L | Current | Revised 11/20/2020 | availability: Limited Supply Available. Next Delivery: November 2020; Estimated Recovery: December 2020 | related:  | change date: 11/16/2016
+  2021-01-17 B | Current | Reverified 01/12/2021 | availability:  | related:  | change date: 11/16/2016
+  2021-03-18 . | absent; generic current
+  2021-04-12 . | absent; generic current
+             another thread with this NDC | status and text withheld: a thread of a labelling sample | generic: Sodium Bicarbonate Injection, USP | company: Hospira, Inc. | presentation: 50 mEq/50 mL (1 mEq/mL) LifeShield® ABBOJECT® Glass Syringe (8.4% Concentration) (NDC 0409-6637-14) (old NDC 0409-6637-34)
+  2021-05-12 . | absent; generic current
+             another thread with this NDC | status and text withheld: a thread of a labelling sample | generic: Sodium Bicarbonate Injection | company: Hospira, Inc. | presentation: 50 mEq/50 mL (1 mEq/mL) LifeShield® ABBOJECT® Glass Syringe (8.4% Concentration) (NDC 0409-6637-14) (old NDC 0409-6637-34)
+  2021-05-21 . | absent; generic current
+             another thread with this NDC | status and text withheld: a thread of a labelling sample | generic: Sodium Bicarbonate Injection | company: Hospira, Inc. | presentation: 50 mEq/50 mL (1 mEq/mL) LifeShield® ABBOJECT® Glass Syringe (8.4% Concentration) (NDC 0409-6637-14) (old NDC 0409-6637-34)
+  2021-08-02 . | absent; generic current
+             another thread with this NDC | status and text withheld: a thread of a labelling sample | generic: Sodium Bicarbonate Injection | company: Hospira, Inc. | presentation: 50 mEq/50 mL (1 mEq/mL) LifeShield® ABBOJECT® Glass Syringe (8.4% Concentration) (NDC 0409-6637-14) (old NDC 0409-6637-34)
+  2021-08-27 . | absent; generic current
+             another thread with this NDC | status and text withheld: a thread of a labelling sample | generic: Sodium Bicarbonate Injection | company: Hospira, Inc. | presentation: 50 mEq/50 mL (1 mEq/mL) LifeShield® ABBOJECT® Glass Syringe (8.4% Concentration) (NDC 0409-6637-14) (old NDC 0409-6637-34)
+  2021-10-06 . | absent; generic current
+             another thread with this NDC | status and text withheld: a thread of a labelling sample | generic: Sodium Bicarbonate Injection | company: Hospira, Inc. | presentation: 50 mEq/50 mL (1 mEq/mL) LifeShield® ABBOJECT® Glass Syringe (8.4% Concentration) (NDC 0409-6637-14) (old NDC 0409-6637-34)
+  2021-10-20 . | absent; generic current
+             another thread with this NDC | status and text withheld: a thread of a labelling sample | generic: Sodium Bicarbonate Injection | company: Hospira, Inc. | presentation: 50 mEq/50 mL (1 mEq/mL) LifeShield® ABBOJECT® Glass Syringe (8.4% Concentration) (NDC 0409-6637-14) (old NDC 0409-6637-34)
+  2021-11-30 . | absent; generic current
+             another thread with this NDC | status and text withheld: a thread of a labelling sample | generic: Sodium Bicarbonate Injection | company: Hospira, Inc. | presentation: 50 mEq/50 mL (1 mEq/mL) LifeShield® ABBOJECT® Glass Syringe (8.4% Concentration) (NDC 0409-6637-14) (old NDC 0409-6637-34)
+  2022-10-04 . | absent; generic current | 308 days since the capture before
+  2022-10-06 . | absent; generic current
+
+=== Qaa62bf8c (item 15 of 33)
+generic: Leucovorin Calcium Lyophilized Powder for Injection
+company: Fresenius Kabi USA, LLC
+presentation: 100 mg per 10 mL (10 mg per mL) Single dose amber vial, liquid (NDC 63323-631-10)
+statement: Backordered. Next release January 2022. || Check Wholesaler Inventory
+statement date 2021-09-23; c0 2021-10-06; followed to 2022-10-06
+derived B: censored at 2022-10-06 (end_of_train)
+derived A: censored at 2022-10-06 (end_of_train)
+statement group, 2 presentation(s): B censored at 2022-10-06; A censored at 2022-10-06
+class strip: U U U | U U
+< 2021-08-02 A | Current | Reverified 07/22/2021 | availability: Available | related: Check Wholesaler Inventory
+< 2021-08-27 A | Current | Reverified 08/25/2021 | availability: Available | related: Check Wholesaler Inventory
+* 2021-10-06 U | Current | Revised 09/23/2021 | availability: Backordered. Next release January 2022. | related: Check Wholesaler Inventory | same text
+  2021-10-20 U | Current | Reverified 10/08/2021 | availability: Backordered. Next release January 2022. | related: Check Wholesaler Inventory | same text
+  2021-11-30 U | Current | Revised 11/23/2021 | availability: Backordered. Next release January 2022. | related: Check Wholesaler Inventory | same text
+  2022-10-04 U | Current | Revised 09/14/2022 | availability: Backordered. Next release not available at this time. | related: Check Wholesaler Inventory | 308 days since the capture before
+  2022-10-06 U | Current | Revised 09/14/2022 | availability: Backordered. Next release not available at this time. | related: Check Wholesaler Inventory
+
+=== Q16c12e35 (item 16 of 33)
+generic: Capreomycin Injection, USP
+company: Akorn Pharmaceuticals
+presentation: Capastat Sulfate (Capreomycin for Injection USP) Eq to 1 g Capreomycin activity, 10mL (NDC 17478-080-50)
+statement: 
+statement date 2021-02-12; c0 2021-03-18; followed to 2022-10-06
+derived B: discontinued (2021-04-12, 2021-05-12], 30 days
+derived A: discontinued (2021-04-12, 2021-05-12], 30 days
+statement group, 1 presentation(s): B discontinued (2021-04-12, 2021-05-12]; A discontinued (2021-04-12, 2021-05-12]
+class strip: U U D D D
+< 2020-11-21 A | Current | Revised 07/15/2020 | availability: Available | related: Available until 2Q 2021. After that, no further supply will be available
+< 2021-01-17 A | Current | Reverified 12/08/2020 | availability: Available | related: Available until 2Q 2021. After that, no further supply will be available
+* 2021-03-18 U | Current | Revised 02/12/2021 | availability: Discontinued | related:  | same text
+  2021-04-12 U | Current | Revised 02/12/2021 | availability: Discontinued | related:  | same text
+  2021-05-12 D | absent; generic unlisted | in the discontinuation listing (05/05/2021)
+  2021-05-21 D | absent; generic unlisted | in the discontinuation listing (05/05/2021)
+  2021-08-02 D | absent; generic unlisted | in the discontinuation listing (05/05/2021)
+
+=== Q0fcc0d60 (item 17 of 33)
+generic: Diltiazem Hydrochloride
+company: Hospira, Inc.
+presentation: 25 mg/5 mL (5 mg/mL); Single Dose Glass Fliptop Vial (NDC 00409-1171-01)
+statement: Next Delivery and Estimated Recovery: September 2020 || Shortage per Manufacturer: Manufacturing Delay
+statement date 2020-09-10; c0 2020-09-15; followed to 2022-10-06
+derived B: recovered (2020-09-15, 2020-09-27], 12 days
+derived A: discontinued (2021-05-21, 2021-08-02], 73 days
+statement group, 1 presentation(s): B recovered (2020-09-15, 2020-09-27]; A discontinued (2021-05-21, 2021-08-02]
+class strip: O A A A A A A A A A A A L L L L D D
+< 2020-08-15 O | Current | Reverified 08/12/2020 | availability: Next Delivery and Estimated Recovery: August 2020 | related: Shortage per Manufacturer: Manufacturing Delay
+< 2020-08-24 O | Current | Reverified 08/12/2020 | availability: Next Delivery and Estimated Recovery: August 2020 | related: Shortage per Manufacturer: Manufacturing Delay
+* 2020-09-15 O | Current | Revised 09/10/2020 | availability: Next Delivery and Estimated Recovery: September 2020 | related: Shortage per Manufacturer: Manufacturing Delay | same text
+  2020-09-27 A | Current | Reverified 09/24/2020 | availability: Available | related:  | presentation: 50 mg/10 mL (5 mg/mL); Single Dose Glass Fliptop Vial (NDC 00409-1171-02) | linked by NDC
+  2020-09-30 A | Current | Reverified 09/24/2020 | availability: Available | related:  | presentation: 50 mg/10 mL (5 mg/mL); Single Dose Glass Fliptop Vial (NDC 00409-1171-02)
+  2020-10-11 A | Current | Revised 10/09/2020 | availability: Available | related:  | presentation: 50 mg/10 mL (5 mg/mL); Single Dose Glass Fliptop Vial (NDC 00409-1171-02)
+  2020-10-17 A | Current | Revised 10/09/2020 | availability: Available | related:  | presentation: 50 mg/10 mL (5 mg/mL); Single Dose Glass Fliptop Vial (NDC 00409-1171-02)
+  2020-10-26 A | Current | Reverified 10/22/2020 | availability: Available | related:  | presentation: 50 mg/10 mL (5 mg/mL); Single Dose Glass Fliptop Vial (NDC 00409-1171-02)
+  2020-10-30 A | Current | Reverified 10/22/2020 | availability: Available | related:  | presentation: 50 mg/10 mL (5 mg/mL); Single Dose Glass Fliptop Vial (NDC 00409-1171-02)
+  2020-10-30 A | Current | Reverified 10/22/2020 | availability: Available | related:  | presentation: 50 mg/10 mL (5 mg/mL); Single Dose Glass Fliptop Vial (NDC 00409-1171-02)
+  2020-11-10 A | Current | Reverified 10/22/2020 | availability: Available | related:  | presentation: 50 mg/10 mL (5 mg/mL); Single Dose Glass Fliptop Vial (NDC 00409-1171-02)
+  2020-11-19 A | Current | Reverified 10/22/2020 | availability: Available | related:  | presentation: 50 mg/10 mL (5 mg/mL); Single Dose Glass Fliptop Vial (NDC 00409-1171-02)
+  2020-11-21 A | Current | Reverified 11/20/2020 | availability: Available | related:  | presentation: 50 mg/10 mL (5 mg/mL); Single Dose Glass Fliptop Vial (NDC 00409-1171-02)
+  2021-01-17 A | Current | Revised 01/12/2021 | availability: Available | related:  | presentation: 50 mg/10 mL (5 mg/mL); Single Dose Glass Fliptop Vial (NDC 00409-1171-02)
+  2021-03-18 L | Current | Revised 03/12/2021 | availability: Limited Supply Available. Next Delivery and Estimated Recovery: August 2021 | related:  | generic: Diltiazem Hydrochloride Injection | presentation: 50 mg/10 mL (5 mg/mL); Single Dose Glass Fliptop Vial (NDC 00409-1171-02) | linked by NDC
+  2021-04-12 L | Current | Reverified 04/08/2021 | availability: Limited Supply Available. Next Delivery and Estimated Recovery: August 2021 | related:  | generic: Diltiazem Hydrochloride Injection | presentation: 50 mg/10 mL (5 mg/mL); Single Dose Glass Fliptop Vial (NDC 00409-1171-02)
+  2021-05-12 L | Current | Reverified 05/07/2021 | availability: Limited Supply Available. Next Delivery and Estimated Recovery: August 2021 | related:  | generic: Diltiazem Hydrochloride Injection | presentation: 50 mg/10 mL (5 mg/mL); Single Dose Glass Fliptop Vial (NDC 00409-1171-02)
+  2021-05-21 L | Current | Reverified 05/21/2021 | availability: Limited Supply Available. Next Delivery and Estimated Recovery: August 2021 | related:  | generic: Diltiazem Hydrochloride Injection | presentation: 50 mg/10 mL (5 mg/mL); Single Dose Glass Fliptop Vial (NDC 00409-1171-02)
+  2021-08-02 D | Current | Reverified 07/27/2021 | availability: Limited Supply Available. Next Delivery and Estimated Recovery: August 2021 | related:  | generic: Diltiazem Hydrochloride Injection | presentation: 50 mg/10 mL (5 mg/mL); Single Dose Glass Fliptop Vial (NDC 00409-1171-02) | in the discontinuation listing (06/08/2021)
+  2021-08-27 D | Current | Revised 08/12/2021 | availability: Next Delivery and Estimated Recovery: February 2023 | related: Shortage per Manufacturer: Manufacturing Delay | generic: Diltiazem Hydrochloride Injection | presentation: 50 mg/10 mL (5 mg/mL); Single Dose Glass Fliptop Vial (NDC 00409-1171-02) | in the discontinuation listing (06/08/2021)
+
+=== Q654758ad (item 18 of 33)
+generic: Buspirone HCl Tablets
+company: Accord Healthcare Inc.
+presentation: 30 mg, 60 count bottle (NDC 16729-289-12)
+statement: Stocks available to support current customer demand; Cannot support additional customers.
+statement date 2019-05-16; c0 2019-10-20; followed to 2022-10-06
+derived B: discontinued (2019-12-29, 2020-04-02], 95 days
+derived A: discontinued (2019-12-29, 2020-04-02], 95 days
+statement group, 8 presentation(s): B recovered (2019-12-29, 2020-04-02]; A recovered (2019-12-29, 2020-04-02]
+class strip: L L | R R
+* 2019-10-20 L | Current | Revised 05/16/2019 | availability: Product under allocation. More supplies inbound. | related: Stocks available to support current customer demand; Cannot support additional customers. | same text
+  2019-12-29 L | Current | Revised 12/11/2019 | availability: Sufficient stocks available to support customer demand; Product not on allocation effective Dec 1, 2019 | related: 
+  2020-04-02 R | Resolved | Revised 01/16/2020 | availability:  | related:  | resolved note: Available | change date: 01/16/2020 | 95 days since the capture before
+  2020-06-12 R | Resolved | Revised 01/16/2020 | availability:  | related:  | resolved note: Available | change date: 01/16/2020
+
+=== Q36c935cf (item 19 of 33)
+generic: Misoprostol Tablets
+company: Pfizer Pharmaceuticals
+presentation: 100 mcg tablets; Bottle of 120 (NDC 59762-5007-2)
+statement: 
+statement date 2021-01-12; c0 2021-01-17; followed to 2022-10-06
+derived B: not_at_risk
+derived A: recovered (2021-11-30, 2022-10-04], 308 days
+statement group, 4 presentation(s): B not_at_risk; A recovered (2021-11-30, 2022-10-04]
+class strip: A A O O O A A A O O | R R
+< 2020-11-19 . | absent; generic unlisted
+< 2020-11-21 . | absent; generic unlisted
+* 2021-01-17 A | Current | Reverified 01/12/2021 | availability: Available | related:  | same text
+  2021-03-18 A | Current | Revised 03/12/2021 | availability: Available | related:  | same text
+  2021-04-12 O | Current | Revised 04/08/2021 | availability: Next Delivery: June 2021; Estimated Recovery: September 2021 | related: 
+  2021-05-12 O | Current | Reverified 05/07/2021 | availability: Next Delivery: June 2021; Estimated Recovery: September 2021 | related: 
+  2021-05-21 O | Current | Revised 05/21/2021 | availability: Next Delivery: June 2021; Estimated Recovery: September 2021 | related: 
+  2021-08-02 A | Current | Reverified 07/27/2021 | availability: Available | related:  | same text
+  2021-08-27 A | Current | Revised 08/12/2021 | availability: Available | related:  | same text
+  2021-10-06 A | Current | Revised 09/22/2021 | availability: Available | related:  | same text
+  2021-10-20 O | Current | Revised 10/08/2021 | availability: Next Delivery: October 2021; Estimated Recovery: March 2022 | related: 
+  2021-11-30 O | Current | Reverified 11/18/2021 | availability: Next Delivery and Estimated Recovery: March 2022 | related: 
+  2022-10-04 R | Resolved | Revised 03/11/2022 | availability:  | related:  | resolved note: Available | same text | 308 days since the capture before
+  2022-10-06 R | Resolved | Revised 03/11/2022 | availability:  | related:  | resolved note: Available | same text
+
+=== Q1960d0a6 (item 20 of 33)
+generic: Bupivacaine Hydrochloride Injection, USP
+company: Hospira, Inc.
+presentation: 250 mg/50 mL (5 mg/mL); Multiple Dose Glass Fliptop Vial (NDC 00409-1163-01)
+statement: Limited Supply Available. Next Delivery: November 2019; Estimated Recovery: January 2020 || Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay
+statement date 2019-10-07; c0 2019-10-20; followed to 2022-10-06
+derived B: recovered (2019-12-29, 2020-04-02], 95 days
+derived A: censored at 2022-10-06 (end_of_train)
+statement group, 1 presentation(s): B recovered (2019-12-29, 2020-04-02]; A censored at 2022-10-06
+class strip: L L | A A A A A A A A A A A A A A A A A A L O O O O O A A A | L L
+* 2019-10-20 L | Current | Revised 10/07/2019 | availability: Limited Supply Available. Next Delivery: November 2019; Estimated Recovery: January 2020 | related: Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay | same text
+  2019-12-29 L | Current | Revised 12/20/2019 | availability: Limited Supply Available. Next Delivery: December 2019; Estimated Recovery: January 2020 | related: Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay
+  2020-04-02 A | Current | Revised 03/25/2020 | availability: Available | related:  | 95 days since the capture before
+  2020-06-12 A | Current | Revised 06/05/2020 | availability: Available | related: 
+  2020-07-08 A | Current | Revised 07/01/2020 | availability: Available | related: 
+  2020-07-15 A | Current | Revised 07/01/2020 | availability: Available | related: 
+  2020-08-15 A | Current | Reverified 08/12/2020 | availability: Available | related: 
+  2020-08-24 A | Current | Reverified 08/12/2020 | availability: Available | related: 
+  2020-09-15 A | Current | Revised 09/10/2020 | availability: Available | related: 
+  2020-09-27 A | Current | Revised 09/24/2020 | availability: Available | related: 
+  2020-09-30 A | Current | Revised 09/24/2020 | availability: Available | related: 
+  2020-10-11 A | Current | Revised 10/09/2020 | availability: Available | related: 
+  2020-10-17 A | Current | Revised 10/09/2020 | availability: Available | related: 
+  2020-10-26 A | Current | Revised 10/22/2020 | availability: Available | related: 
+  2020-10-30 A | Current | Revised 10/22/2020 | availability: Available | related: 
+  2020-10-30 A | Current | Revised 10/22/2020 | availability: Available | related: 
+  2020-11-10 A | Current | Revised 10/22/2020 | availability: Available | related: 
+  2020-11-19 A | Current | Revised 10/22/2020 | availability: Available | related: 
+  2020-11-21 A | Current | Revised 11/20/2020 | availability: Available | related: 
+  2021-01-17 A | Current | Revised 01/12/2021 | availability: Available | related: 
+  2021-03-18 L | Current | Revised 03/12/2021 | availability: Limited Supply Available. Next Delivery: May 2021; Estimated Recovery: June 2021 | related: 
+  2021-04-12 O | Current | Revised 04/08/2021 | availability: Next Delivery and Estimated Recovery: June 2021 | related: 
+  2021-05-12 O | Current | Reverified 05/11/2021 | availability: Next Delivery and Estimated Recovery: June 2021 | related:  | generic: Bupivacaine Hydrochloride Injection | linked by NDC
+  2021-05-21 O | Current | Revised 05/21/2021 | availability: Next Delivery and Estimated Recovery: June 2021 | related:  | generic: Bupivacaine Hydrochloride Injection
+  2021-08-02 O | Current | Revised 07/27/2021 | availability: Next Delivery: August 2021; Estimated Recovery: September 2021 | related:  | generic: Bupivacaine Hydrochloride Injection
+  2021-08-27 O | Current | Revised 08/12/2021 | availability: Next Delivery: August 2021; Estimated Recovery: September 2021 | related:  | generic: Bupivacaine Hydrochloride Injection
+  2021-10-06 A | Current | Revised 09/22/2021 | availability: Available | related:  | generic: Bupivacaine Hydrochloride Injection
+  2021-10-20 A | Current | Revised 10/08/2021 | availability: Available | related:  | generic: Bupivacaine Hydrochloride Injection
+  2021-11-30 A | Current | Revised 11/18/2021 | availability: Available | related:  | generic: Bupivacaine Hydrochloride Injection
+  2022-10-04 L | Current | Revised 09/12/2022 | availability: Limited Supply Available. Next Delivery: March 2023; Estimated Recovery: July 2023 | related:  | generic: Bupivacaine Hydrochloride Injection | 308 days since the capture before
+  2022-10-06 L | Current | Revised 09/12/2022 | availability: Limited Supply Available. Next Delivery: March 2023; Estimated Recovery: July 2023 | related:  | generic: Bupivacaine Hydrochloride Injection
+
+=== Q689f48d1 (item 21 of 33)
+generic: Piperacillin and Tazobactam (Zosyn) Injection
+company: Istituto Biochimico Italiano SpA
+presentation: 40.5 g, pharmacy bulk bottle (NDC 70860-123-99); distributed by Athenex
+statement: 
+statement date 2020-02-21; c0 2020-04-02; followed to 2022-10-06
+derived B: not_at_risk
+derived A: not_at_risk
+statement group, 10 presentation(s): B not_at_risk; A not_at_risk
+class strip: R R
+< 2019-10-20 A | Current | New 08/27/2019 | availability: Available | related: Marketed by Athenex Pharmaceutical Division, LLC | presentation: 40.5 g, pharmacy bulk bottle (NDC 70860-123-99)
+< 2019-12-29 A | Current | Reverified 12/16/2019 | availability: Available | related: To order, contact Athenex at 855-273-0154 | presentation: 40.5 g, pharmacy bulk bottle (NDC 70860-123-99)
+* 2020-04-02 R | Resolved | Revised 02/21/2020 | availability:  | related:  | resolved note: Available | change date: 02/21/2020 | linked by NDC | same text | 95 days since the capture before
+  2020-06-12 R | Resolved | Revised 02/21/2020 | availability:  | related:  | resolved note: Available | change date: 02/21/2020 | same text
+
+=== Qa3c07930 (item 22 of 33)
+generic: Sertraline Hydrochloride Oral Solution, USP
+company: Aurobindo Pharma
+presentation: 20mg/ml, 60ml (16714-601-01)
+statement: Northstar Rx label. Product Distributed by: McKesson (972-446-4800)
+statement date 2020-05-26; c0 2020-06-12; followed to 2022-10-06
+derived B: recovered (2021-01-17, 2021-05-12], 115 days
+derived A: recovered (2021-01-17, 2021-05-12], 115 days
+statement group, 1 presentation(s): B recovered (2021-01-17, 2021-05-12]; A recovered (2021-01-17, 2021-05-12]
+class strip: U U U U U U U U U U U U U U U U U . . r r r
+< 2019-12-29 . | absent; generic unlisted
+< 2020-04-02 . | absent; generic unlisted | 95 days since the capture before
+* 2020-06-12 U | Current | New 05/26/2020 | availability: Unavailable | related: Northstar Rx label. Product Distributed by: McKesson (972-446-4800) | same text
+  2020-07-08 U | Current | New 05/26/2020 | availability: Unavailable | related: Northstar Rx label. Product Distributed by: McKesson (972-446-4800) | same text
+  2020-07-15 U | Current | Revised 07/10/2020 | availability: Unavailable | related: Northstar Rx label. Product Distributed by: McKesson (972-446-4800) | presentation: 20mg/ml, 60ml (NDC 16714-601-01) | linked by NDC | same text
+  2020-08-15 U | Current | Revised 07/10/2020 | availability: Unavailable | related: Northstar Rx label. Product Distributed by: McKesson (972-446-4800) | presentation: 20mg/ml, 60ml (NDC 16714-601-01) | same text
+  2020-08-24 U | Current | Revised 07/10/2020 | availability: Unavailable | related: Northstar Rx label. Product Distributed by: McKesson (972-446-4800) | presentation: 20mg/ml, 60ml (NDC 16714-601-01) | same text
+  2020-09-15 U | Current | Revised 07/10/2020 | availability: Unavailable | related: Northstar Rx label. Product Distributed by: McKesson (972-446-4800) | presentation: 20mg/ml, 60ml (NDC 16714-601-01) | same text
+  2020-09-27 U | Current | Revised 07/10/2020 | availability: Unavailable | related: Northstar Rx label. Product Distributed by: McKesson (972-446-4800) | presentation: 20mg/ml, 60ml (NDC 16714-601-01) | same text
+  2020-09-30 U | Current | Revised 07/10/2020 | availability: Unavailable | related: Northstar Rx label. Product Distributed by: McKesson (972-446-4800) | presentation: 20mg/ml, 60ml (NDC 16714-601-01) | same text
+  2020-10-11 U | Current | Revised 07/10/2020 | availability: Unavailable | related: Northstar Rx label. Product Distributed by: McKesson (972-446-4800) | presentation: 20mg/ml, 60ml (NDC 16714-601-01) | same text
+  2020-10-17 U | Current | Revised 07/10/2020 | availability: Unavailable | related: Northstar Rx label. Product Distributed by: McKesson (972-446-4800) | presentation: 20mg/ml, 60ml (NDC 16714-601-01) | same text
+  2020-10-26 U | Current | Revised 07/10/2020 | availability: Unavailable | related: Northstar Rx label. Product Distributed by: McKesson (972-446-4800) | presentation: 20mg/ml, 60ml (NDC 16714-601-01) | same text
+  2020-10-30 U | Current | Revised 07/10/2020 | availability: Unavailable | related: Northstar Rx label. Product Distributed by: McKesson (972-446-4800) | presentation: 20mg/ml, 60ml (NDC 16714-601-01) | same text
+  2020-10-30 U | Current | Revised 07/10/2020 | availability: Unavailable | related: Northstar Rx label. Product Distributed by: McKesson (972-446-4800) | presentation: 20mg/ml, 60ml (NDC 16714-601-01) | same text
+  2020-11-10 U | Current | Revised 07/10/2020 | availability: Unavailable | related: Northstar Rx label. Product Distributed by: McKesson (972-446-4800) | presentation: 20mg/ml, 60ml (NDC 16714-601-01) | same text
+  2020-11-19 U | Current | Revised 07/10/2020 | availability: Unavailable | related: Northstar Rx label. Product Distributed by: McKesson (972-446-4800) | presentation: 20mg/ml, 60ml (NDC 16714-601-01) | same text
+  2020-11-21 U | Current | Revised 07/10/2020 | availability: Unavailable | related: Northstar Rx label. Product Distributed by: McKesson (972-446-4800) | presentation: 20mg/ml, 60ml (NDC 16714-601-01) | same text
+  2021-01-17 U | Current | Reverified 12/03/2020 | availability: Unavailable | related: Northstar Rx label. Product Distributed by: McKesson (972-446-4800) | presentation: 20mg/ml, 60ml (NDC 16714-601-01) | same text
+  2021-03-18 . | absent; generic current
+  2021-04-12 . | absent; generic current
+  2021-05-12 r | absent; generic resolved
+  2021-05-21 r | absent; generic resolved
+  2021-08-02 r | absent; generic resolved
+
+=== Q2423613a (item 23 of 33)
+generic: Methyldopa Tablets
+company: Mylan Pharmaceuticals Inc.
+presentation: 500 mg (NDC 0378-0421-01)
+statement: Unavailable. Estimated recovery TBD.
+statement date 2020-03-20; c0 2020-04-02; followed to 2022-10-06
+derived B: discontinued (2021-10-06, 2021-10-20], 14 days
+derived A: discontinued (2021-10-06, 2021-10-20], 14 days
+statement group, 2 presentation(s): B discontinued (2021-10-06, 2021-10-20]; A discontinued (2021-10-06, 2021-10-20]
+class strip: U U U U U U U U U U U U U U U U U U U U U U U U U D D
+< 2019-10-20 U | Current | Reverified 10/18/2019 | availability: Unavailable. Estimated recovery: Q1 2020 | related: 
+< 2019-12-29 U | Current | Reverified 11/26/2019 | availability: Unavailable. Estimated recovery: Q1 2020 | related: 
+* 2020-04-02 U | Current | Reverified 03/20/2020 | availability: Unavailable. Estimated recovery TBD. | related:  | same text | 95 days since the capture before
+  2020-06-12 U | Current | Reverified 05/01/2020 | availability: Unavailable. Estimated recovery TBD. | related:  | same text
+  2020-07-08 U | Current | Reverified 06/25/2020 | availability: Unavailable. Estimated recovery TBD. | related:  | same text
+  2020-07-15 U | Current | Reverified 07/10/2020 | availability: Unavailable. Estimated recovery TBD. | related:  | same text
+  2020-08-15 U | Current | Reverified 08/05/2020 | availability: Unavailable. Estimated recovery TBD. | related:  | same text
+  2020-08-24 U | Current | Reverified 08/19/2020 | availability: Unavailable. Estimated recovery TBD. | related:  | same text
+  2020-09-15 U | Current | Reverified 09/11/2020 | availability: Unavailable. Estimated recovery TBD. | related:  | same text
+  2020-09-27 U | Current | Reverified 09/16/2020 | availability: Unavailable. Estimated recovery TBD. | related:  | same text
+  2020-09-30 U | Current | Reverified 09/29/2020 | availability: Unavailable. Estimated recovery TBD. | related:  | same text
+  2020-10-11 U | Current | Reverified 09/29/2020 | availability: Unavailable. Estimated recovery TBD. | related:  | same text
+  2020-10-17 U | Current | Reverified 10/14/2020 | availability: Unavailable. Estimated recovery TBD. | related:  | same text
+  2020-10-26 U | Current | Reverified 10/14/2020 | availability: Unavailable. Estimated recovery TBD. | related:  | same text
+  2020-10-30 U | Current | Reverified 10/14/2020 | availability: Unavailable. Estimated recovery TBD. | related:  | same text
+  2020-10-30 U | Current | Reverified 10/14/2020 | availability: Unavailable. Estimated recovery TBD. | related:  | same text
+  2020-11-10 U | Current | Reverified 11/10/2020 | availability: Unavailable. Estimated recovery TBD. | related:  | same text
+  2020-11-19 U | Current | Reverified 11/10/2020 | availability: Unavailable. Estimated recovery TBD. | related:  | same text
+  2020-11-21 U | Current | Reverified 11/10/2020 | availability: Unavailable. Estimated recovery TBD. | related:  | same text
+  2021-01-17 U | Current | Reverified 01/08/2021 | availability: Unavailable. Estimated recovery TBD. | related:  | same text
+  2021-03-18 U | Current | Reverified 03/18/2021 | availability: Unavailable. Estimated recovery TBD. | related:  | same text
+  2021-04-12 U | Current | Reverified 03/31/2021 | availability: Unavailable. Estimated recovery TBD. | related:  | same text
+  2021-05-12 U | Current | Reverified 05/11/2021 | availability: Unavailable. Estimated recovery TBD. | related:  | company: Mylan Pharmaceuticals Inc., a Viatris Company | linked by NDC | same text
+  2021-05-21 U | Current | Reverified 05/11/2021 | availability: Unavailable. Estimated recovery TBD. | related:  | company: Mylan Pharmaceuticals Inc., a Viatris Company | same text
+  2021-08-02 U | Current | Reverified 07/20/2021 | availability: Unavailable | related:  | company: Mylan Pharmaceuticals Inc., a Viatris Company
+  2021-08-27 U | Current | Reverified 08/17/2021 | availability: Unavailable | related:  | company: Mylan Pharmaceuticals Inc., a Viatris Company
+  2021-10-06 U | Current | Reverified 09/28/2021 | availability: Unavailable | related:  | company: Mylan Pharmaceuticals Inc., a Viatris Company
+  2021-10-20 D | absent; generic current | in the discontinuation listing (10/08/2021)
+  2021-11-30 D | absent; generic current | in the discontinuation listing (10/08/2021)
+
+=== Q9397c7e1 (item 24 of 33)
+generic: Acetazolamide Injection
+company: Hikma Pharmaceuticals USA, Inc. (formerly West-Ward)
+presentation: 500 mg per vial (NDC 0143-9503-01)
+statement: Additional lots are scheduled to be manufactured. Product will be made available as it is released
+statement date 2020-12-09; c0 2021-01-17; followed to 2022-10-06
+derived B: recovered (2021-05-21, 2021-08-02], 73 days
+derived A: recovered (2021-11-30, 2022-10-04], 308 days
+statement group, 1 presentation(s): B recovered (2021-05-21, 2021-08-02]; A recovered (2021-11-30, 2022-10-04]
+class strip: U U U U U A A A A A | R R
+< 2020-11-19 . | absent; generic unlisted
+< 2020-11-21 . | absent; generic unlisted
+* 2021-01-17 U | Current | Revised 12/09/2020 | availability: Currently on backorder. | related: Additional lots are scheduled to be manufactured. Product will be made available as it is released | same text
+  2021-03-18 U | Current | Revised 02/05/2021 | availability: This presentation is temporarily on backorder. | related: Additional lots are scheduled for manufacturing and will be available in the February - March 2021 timeframe. Product will be made available as it is released.
+  2021-04-12 U | Current | Revised 04/08/2021 | availability: This presentation is temporarily on backorder. | related: Additional lots are scheduled for manufacturing and will be available in the April - May 2021 timeframe. Product will be made available as it is released.
+  2021-05-12 U | Current | Revised 04/08/2021 | availability: This presentation is temporarily on backorder. | related: Additional lots are scheduled for manufacturing and will be available in the April - May 2021 timeframe. Product will be made available as it is released.
+  2021-05-21 U | Current | Revised 04/08/2021 | availability: This presentation is temporarily on backorder. | related: Additional lots are scheduled for manufacturing and will be available in the April - May 2021 timeframe. Product will be made available as it is released.
+  2021-08-02 A | Current | Revised 07/06/2021 | availability: Inventory is currently available. | related: Product will be made available as it is released.
+  2021-08-27 A | Current | Revised 07/06/2021 | availability: Inventory is currently available. | related: Product will be made available as it is released.
+  2021-10-06 A | Current | Revised 07/06/2021 | availability: Inventory is currently available. | related: Product will be made available as it is released.
+  2021-10-20 A | Current | Reverified 10/12/2021 | availability: Inventory is currently available. | related: Product will be made available as it is released.
+  2021-11-30 A | Current | Reverified 10/12/2021 | availability: Inventory is currently available. | related: Product will be made available as it is released.
+  2022-10-04 R | Resolved | Revised 06/17/2022 | availability: This presentation is temporarily on backorder. | related:  | 308 days since the capture before
+  2022-10-06 R | Resolved | Revised 06/17/2022 | availability: This presentation is temporarily on backorder. | related: 
+
+=== Q8f44ae41 (item 25 of 33)
+generic: Dopamine Hydrochloride Injection
+company: Hospira, Inc.
+presentation: 400 mg/10 mL (40 mg/mL); Single Dose Glass Fliptop Vial (NDC 00409-9104-20)
+statement: Next Delivery and Estimated Recovery: June 2020 || Shortage per Manufacturer: Manufacturing Delay
+statement date 2019-10-07; c0 2019-10-20; followed to 2022-10-06
+derived B: recovered (2020-06-12, 2020-07-08], 26 days
+derived A: censored at 2022-10-06 (end_of_train)
+statement group, 1 presentation(s): B recovered (2020-06-12, 2020-07-08]; A censored at 2022-10-06
+class strip: O O | L L A A A A A A A A A A A A A A A L A A A A A A A A A | A A
+* 2019-10-20 O | Current | Revised 10/07/2019 | availability: Next Delivery and Estimated Recovery: June 2020 | related: Shortage per Manufacturer: Manufacturing Delay | same text
+  2019-12-29 O | Current | Revised 12/20/2019 | availability: Next Delivery and Estimated Recovery: June 2020 | related: Shortage per Manufacturer: Manufacturing Delay | same text
+  2020-04-02 L | Current | Revised 03/31/2020 | availability: Limited Supply Available. Next Delivery and Estimated Recovery: September 2020 | related: Shortage per Manufacturer: Manufacturing Delay | 95 days since the capture before
+  2020-06-12 L | Current | Revised 06/05/2020 | availability: Limited Supply Available. Next Delivery and Estimated Recovery: June 2020 | related: 
+  2020-07-08 A | Current | Revised 07/01/2020 | availability: Available | related: 
+  2020-07-15 A | Current | Revised 07/01/2020 | availability: Available | related: 
+  2020-08-15 A | Current | Reverified 08/12/2020 | availability: Available | related: 
+  2020-08-24 A | Current | Reverified 08/12/2020 | availability: Available | related: 
+  2020-09-15 A | Current | Revised 09/10/2020 | availability: Available | related: 
+  2020-09-27 A | Current | Revised 09/24/2020 | availability: Available | related: 
+  2020-09-30 A | Current | Revised 09/24/2020 | availability: Available | related: 
+  2020-10-11 A | Current | Revised 10/09/2020 | availability: Available | related: 
+  2020-10-17 A | Current | Revised 10/09/2020 | availability: Available | related: 
+  2020-10-26 A | Current | Revised 10/22/2020 | availability: Available | related: 
+  2020-10-30 A | Current | Revised 10/22/2020 | availability: Available | related: 
+  2020-10-30 A | Current | Revised 10/22/2020 | availability: Available | related: 
+  2020-11-10 A | Current | Revised 10/22/2020 | availability: Available | related: 
+  2020-11-19 A | Current | Revised 10/22/2020 | availability: Available | related: 
+  2020-11-21 A | Current | Revised 11/20/2020 | availability: Available | related: 
+  2021-01-17 L | Current | Reverified 01/12/2021 | availability: Limited Supply Available. Next Delivery: January 2021; Estimated Recovery: May 2021 | related: 
+  2021-03-18 A | Current | Revised 03/12/2021 | availability: Available | related: 
+  2021-04-12 A | Current | Revised 04/08/2021 | availability: Available | related: 
+  2021-05-12 A | Current | Revised 05/07/2021 | availability: Available | related: 
+  2021-05-21 A | Current | Revised 05/21/2021 | availability: Available | related: 
+  2021-08-02 A | Current | Reverified 07/27/2021 | availability: Available | related: 
+  2021-08-27 A | Current | Revised 08/12/2021 | availability: Available | related: 
+  2021-10-06 A | Current | Revised 09/29/2021 | availability: Available | related: 
+  2021-10-20 A | Current | Revised 10/08/2021 | availability: Available | related: 
+  2021-11-30 A | Current | Revised 11/18/2021 | availability: Available | related: 
+  2022-10-04 A | Current | Revised 09/12/2022 | availability: Available | related:  | 308 days since the capture before
+  2022-10-06 A | Current | Revised 09/12/2022 | availability: Available | related: 
+
+=== Q48daa733 (item 26 of 33)
+generic: Loxapine Capsules
+company: Teva Pharmaceuticals
+presentation: 25 mg, 100 count bottle (NDC 0591-0371-01)
+statement: On BO, (recovery expected Jan 2021) || Cannot support additional business currently.
+statement date 2020-09-17; c0 2020-09-27; followed to 2022-10-06
+derived B: recovered (2021-01-17, 2021-04-12], 85 days
+derived A: recovered (2021-11-30, 2022-10-04], 308 days
+statement group, 3 presentation(s): B recovered (2021-01-17, 2021-04-12]; A recovered (2021-11-30, 2022-10-04]
+class strip: O O O O O O O U U U U A A A A A A A A A | R R
+< 2020-08-24 U | Current | Reverified 08/20/2020 | availability: On backorder, estimated duration of supply interruption is unknown | related: Cannot support additional business currently.
+< 2020-09-15 U | Current | Reverified 09/04/2020 | availability: On backorder, estimated duration of supply interruption is unknown | related: Cannot support additional business currently.
+* 2020-09-27 O | Current | Revised 09/17/2020 | availability: On BO, (recovery expected Jan 2021) | related: Cannot support additional business currently. | same text
+  2020-09-30 O | Current | Revised 09/17/2020 | availability: On BO, (recovery expected Jan 2021) | related: Cannot support additional business currently. | same text
+  2020-10-11 O | Current | Reverified 10/01/2020 | availability: On BO, (recovery expected Jan 2021) | related: Cannot support additional business currently. | same text
+  2020-10-17 O | Current | Reverified 10/16/2020 | availability: On BO, (recovery expected Jan 2021) | related: Cannot support additional business currently. | same text
+  2020-10-26 O | Current | Reverified 10/16/2020 | availability: On BO, (recovery expected Jan 2021) | related: Cannot support additional business currently. | same text
+  2020-10-30 O | Current | Reverified 10/16/2020 | availability: On BO, (recovery expected Jan 2021) | related: Cannot support additional business currently. | same text
+  2020-10-30 O | Current | Reverified 10/16/2020 | availability: On BO, (recovery expected Jan 2021) | related: Cannot support additional business currently. | same text
+  2020-11-10 U | Current | Revised 11/09/2020 | availability: On backorder, (recovery expected Jan 2021) | related: Cannot support additional business currently.
+  2020-11-19 U | Current | Reverified 11/19/2020 | availability: On backorder, (recovery expected Jan 2021) | related: Cannot support additional business currently.
+  2020-11-21 U | Current | Reverified 11/19/2020 | availability: On backorder, (recovery expected Jan 2021) | related: Cannot support additional business currently.
+  2021-01-17 U | Current | Reverified 01/05/2021 | availability: On backorder, (recovery expected Feb 2021) | related: Cannot support additional business currently.
+  2021-03-18 A | Current | Reverified 03/18/2021 | availability: Available | related: Cannot support additional business currently.
+  2021-04-12 A | Current | Revised 03/30/2021 | availability: Available | related: Cannot support additional business currently.
+  2021-05-12 A | Current | Reverified 04/13/2021 | availability: Available | related: Cannot support additional business currently.
+  2021-05-21 A | Current | Revised 05/14/2021 | availability: Available | related: Cannot support additional business currently.
+  2021-08-02 A | Current | Reverified 07/20/2021 | availability: Available | related: Cannot support additional business currently.
+  2021-08-27 A | Current | Revised 08/19/2021 | availability: Available | related: 
+  2021-10-06 A | Current | Revised 09/20/2021 | availability: Available | related: 
+  2021-10-20 A | Current | Revised 10/07/2021 | availability: Available | related: 
+  2021-11-30 A | Current | Revised 11/08/2021 | availability: Available | related: 
+  2022-10-04 R | Resolved | Revised 06/14/2022 | availability:  | related:  | resolved note: Available | 308 days since the capture before
+  2022-10-06 R | Resolved | Revised 06/14/2022 | availability:  | related:  | resolved note: Available
+
+=== Q8caafe42 (item 27 of 33)
+generic: Hydromorphone Hydrochloride Injection, USP
+company: Hospira, Inc.
+presentation: 4 mg/1 mL (4 mg/mL); Carpuject Luer Lock Glass Syringe (NDC 00409-1304-31)
+statement: Next Delivery and Estimated Recovery: January 2020 || Shortage per Manufacturer: Manufacturing Delay
+statement date 2019-10-07; c0 2019-10-20; followed to 2022-10-06
+derived B: recovered (2020-04-02, 2020-06-12], 71 days
+derived A: censored at 2022-10-06 (end_of_train)
+statement group, 1 presentation(s): B recovered (2020-04-02, 2020-06-12]; A censored at 2022-10-06
+class strip: O O | O A A A A A A A A A A A A A A A A A A A A A A A A A A | A A
+* 2019-10-20 O | Current | Revised 10/07/2019 | availability: Next Delivery and Estimated Recovery: January 2020 | related: Shortage per Manufacturer: Manufacturing Delay | same text
+  2019-12-29 O | Current | Revised 12/20/2019 | availability: Next Delivery and Estimated Recovery: January 2020 | related: Shortage per Manufacturer: Manufacturing Delay | same text
+  2020-04-02 O | Current | Revised 03/25/2020 | availability: Next Delivery and Estimated Recovery: May 2020 | related: Shortage per Manufacturer: Manufacturing Delay | 95 days since the capture before
+  2020-06-12 A | Current | Revised 06/05/2020 | availability: Available | related: 
+  2020-07-08 A | Current | Revised 07/01/2020 | availability: Available | related: 
+  2020-07-15 A | Current | Revised 07/01/2020 | availability: Available | related: 
+  2020-08-15 A | Current | Revised 08/12/2020 | availability: Available | related: 
+  2020-08-24 A | Current | Revised 08/12/2020 | availability: Available | related: 
+  2020-09-15 A | Current | Reverified 09/10/2020 | availability: Available | related: 
+  2020-09-27 A | Current | Revised 09/24/2020 | availability: Available | related: 
+  2020-09-30 A | Current | Revised 09/24/2020 | availability: Available | related: 
+  2020-10-11 A | Current | Revised 10/09/2020 | availability: Available | related: 
+  2020-10-17 A | Current | Revised 10/09/2020 | availability: Available | related: 
+  2020-10-26 A | Current | Reverified 10/22/2020 | availability: Available | related: 
+  2020-10-30 A | Current | Reverified 10/22/2020 | availability: Available | related: 
+  2020-10-30 A | Current | Reverified 10/22/2020 | availability: Available | related: 
+  2020-11-10 A | Current | Reverified 10/22/2020 | availability: Available | related: 
+  2020-11-19 A | Current | Reverified 10/22/2020 | availability: Available | related: 
+  2020-11-21 A | Current | Revised 11/20/2020 | availability: Available | related: 
+  2021-01-17 A | Current | Reverified 01/12/2021 | availability: Available | related: 
+  2021-03-18 A | Current | Reverified 03/12/2021 | availability: Available | related: 
+  2021-04-12 A | Current | Revised 04/08/2021 | availability: Available | related: 
+  2021-05-12 A | Current | Revised 05/06/2021 | availability: Available | related:  | generic: Hydromorphone Hydrochloride Injection | linked by NDC
+  2021-05-21 A | Current | Revised 05/21/2021 | availability: Available | related:  | generic: Hydromorphone Hydrochloride Injection
+  2021-08-02 A | Current | Revised 07/27/2021 | availability: Available | related:  | generic: Hydromorphone Hydrochloride Injection
+  2021-08-27 A | Current | Revised 08/12/2021 | availability: Available | related:  | generic: Hydromorphone Hydrochloride Injection
+  2021-10-06 A | Current | Revised 09/22/2021 | availability: Available | related:  | generic: Hydromorphone Hydrochloride Injection
+  2021-10-20 A | Current | Revised 10/08/2021 | availability: Available | related:  | generic: Hydromorphone Hydrochloride Injection
+  2021-11-30 A | Current | Reverified 11/18/2021 | availability: Available | related:  | generic: Hydromorphone Hydrochloride Injection
+  2022-10-04 A | Current | Revised 09/12/2022 | availability: Available | related:  | generic: Hydromorphone Hydrochloride Injection | 308 days since the capture before
+  2022-10-06 A | Current | Revised 09/12/2022 | availability: Available | related:  | generic: Hydromorphone Hydrochloride Injection
+
+=== Q07269445 (item 28 of 33)
+generic: Timolol Maleate Ophthalmic Solution
+company: Sandoz
+presentation: Timolol Maleate Ophthalmic Solution, USP 0.5%, 15 mL bottle (NDC 61314-227-15)
+statement: Unavailable, Resupply TBD
+statement date 2020-05-29; c0 2020-06-12; followed to 2022-10-06
+derived B: recovered (2020-10-30, 2020-11-10], 11 days
+derived A: recovered (2021-04-12, 2021-05-12], 30 days
+statement group, 4 presentation(s): B recovered (2020-10-30, 2020-11-10]; A recovered (2021-04-12, 2021-05-12]
+class strip: U U U U U U U U U U U U U A A A A A A R R
+< 2019-12-29 . | absent; generic unlisted
+< 2020-04-02 . | absent; generic unlisted | 95 days since the capture before
+* 2020-06-12 U | Current | New 05/29/2020 | availability: Unavailable, Resupply TBD | related:  | same text
+  2020-07-08 U | Current | Reverified 06/30/2020 | availability: Unavailable, Resupply TBD | related:  | same text
+  2020-07-15 U | Current | Reverified 06/30/2020 | availability: Unavailable, Resupply TBD | related:  | same text
+  2020-08-15 U | Current | Reverified 07/31/2020 | availability: Unavailable, Resupply TBD | related:  | same text
+  2020-08-24 U | Current | Reverified 08/17/2020 | availability: Unavailable, Resupply TBD | related:  | same text
+  2020-09-15 U | Current | Reverified 09/08/2020 | availability: Unavailable, Resupply TBD | related:  | same text
+  2020-09-27 U | Current | Revised 09/15/2020 | availability: Unavailable, Resupply Anticipated End of October/Early November | related: 
+  2020-09-30 U | Current | Revised 09/15/2020 | availability: Unavailable, Resupply Anticipated End of October/Early November | related: 
+  2020-10-11 U | Current | Reverified 09/30/2020 | availability: Unavailable, Resupply Anticipated End of October/Early November | related: 
+  2020-10-17 U | Current | Reverified 09/30/2020 | availability: Unavailable, Resupply Anticipated End of October/Early November | related: 
+  2020-10-26 U | Current | Revised 10/20/2020 | availability: Unavailable, Fresh supply expected for delivery by end of October | related: 
+  2020-10-30 U | Current | Revised 10/20/2020 | availability: Unavailable, Fresh supply expected for delivery by end of October | related: 
+  2020-10-30 U | Current | Revised 10/20/2020 | availability: Unavailable, Fresh supply expected for delivery by end of October | related: 
+  2020-11-10 A | Current | Revised 11/02/2020 | availability: Supply Available | related: 
+  2020-11-19 A | Current | Revised 11/13/2020 | availability: Supply Available | related: 
+  2020-11-21 A | Current | Revised 11/13/2020 | availability: Supply Available | related: 
+  2021-01-17 A | Current | Reverified 01/05/2021 | availability: Supply Available | related: 
+  2021-03-18 A | Current | Reverified 03/17/2021 | availability: Supply Available | related: 
+  2021-04-12 A | Current | Reverified 03/31/2021 | availability: Supply Available | related: 
+  2021-05-12 R | Resolved | Revised 04/16/2021 | availability:  | related:  | change date: 04/16/2021
+  2021-05-21 R | Resolved | Revised 04/16/2021 | availability:  | related:  | change date: 04/16/2021
+
+=== Q9b3c6c78 (item 29 of 33)
+generic: Dobutamine Hydrochloride Injection
+company: Hospira, Inc.
+presentation: 500 mg/40 mL (12.5 mg/mL); Single Dose Glass Fliptop Vial (NDC 00409-2025-54)
+statement: Next Delivery and Estimated Recovery: December 2019 || Shortage per Manufacturer: Manufacturing Delay
+statement date 2019-10-07; c0 2019-10-20; followed to 2022-10-06
+derived B: discontinued (2020-04-02, 2020-06-12], 71 days
+derived A: discontinued (2020-04-02, 2020-06-12], 71 days
+statement group, 1 presentation(s): B discontinued (2020-04-02, 2020-06-12]; A discontinued (2020-04-02, 2020-06-12]
+class strip: O O | O D D D D D
+* 2019-10-20 O | Current | Revised 10/07/2019 | availability: Next Delivery and Estimated Recovery: December 2019 | related: Shortage per Manufacturer: Manufacturing Delay | same text
+  2019-12-29 O | Current | Reverified 12/20/2019 | availability: Next Delivery and Estimated Recovery: December 2019 | related: Shortage per Manufacturer: Manufacturing Delay | same text
+  2020-04-02 O | Current | Revised 03/27/2020 | availability: Next Delivery and Estimated Recovery: February 2023 | related: Shortage per Manufacturer: Manufacturing Delay | 95 days since the capture before
+  2020-06-12 D | Current | Revised 06/05/2020 | availability: Discontinued | related:  | in the discontinuation listing (04/03/2020)
+  2020-07-08 D | Current | Revised 07/01/2020 | availability: Discontinued | related:  | in the discontinuation listing (04/03/2020)
+  2020-07-15 D | Current | Revised 07/01/2020 | availability: Discontinued | related:  | in the discontinuation listing (04/03/2020)
+  2020-08-15 D | Current | Revised 08/12/2020 | availability: Discontinued | related:  | in the discontinuation listing (04/03/2020)
+  2020-08-24 D | Current | Revised 08/12/2020 | availability: Discontinued | related:  | in the discontinuation listing (04/03/2020)
+
+=== Q7cf55327 (item 30 of 33)
+generic: Ropivacaine Hydrochloride Injection
+company: Hospira, Inc.
+presentation: 150 mg/20 mL (7.5 mg/mL); Single Dose Glass Fliptop Vial (NDC 00409-9302-20)
+statement: Next Delivery and Estimated Recovery: December 2021
+statement date 2021-09-22; c0 2021-10-06; followed to 2022-10-06
+derived B: discontinued (2021-11-30, 2022-10-04], 308 days
+derived A: discontinued (2021-11-30, 2022-10-04], 308 days
+statement group, 1 presentation(s): B discontinued (2021-11-30, 2022-10-04]; A discontinued (2021-11-30, 2022-10-04]
+class strip: O O O | D D
+< 2021-08-02 A | Current | Reverified 07/27/2021 | availability: Available | related: 
+< 2021-08-27 A | Current | Revised 08/12/2021 | availability: Available | related: 
+* 2021-10-06 O | Current | Revised 09/22/2021 | availability: Next Delivery and Estimated Recovery: December 2021 | related:  | same text
+  2021-10-20 O | Current | Revised 10/08/2021 | availability: Next Delivery and Estimated Recovery: December 2021 | related:  | same text
+  2021-11-30 O | Current | Reverified 11/18/2021 | availability: Next Delivery and Estimated Recovery: December 2021 | related:  | same text
+  2022-10-04 D | absent; generic current | in the discontinuation listing (09/08/2022) | 308 days since the capture before
+  2022-10-06 D | absent; generic current | in the discontinuation listing (09/08/2022)
+
+=== Qfdbe99ba (item 31 of 33)
+generic: Fentanyl Citrate (Sublimaze) Injection
+company: Hospira, Inc.
+presentation: 2,500 mcg/50 mL (50 mcg/mL); Single Dose Glass Fliptop Vial (NDC 00409-9094-61)
+statement: Limited Supply Available. Next Delivery: September 2022; Estimated Recovery: January 2023 || Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay
+statement date 2022-09-12; c0 2022-10-04; followed to 2022-10-06
+derived B: censored at 2022-10-06 (end_of_train)
+derived A: censored at 2022-10-06 (end_of_train)
+statement group, 1 presentation(s): B censored at 2022-10-06; A censored at 2022-10-06
+class strip: L L
+< 2021-10-20 L | Current | Revised 10/08/2021 | availability: Limited Supply Available. Next Delivery: October 2021; Estimated Recovery: January 2022 | related: 
+< 2021-11-30 L | Current | Revised 11/18/2021 | availability: Limited Supply Available. Next Delivery: December 2021; Estimated Recovery: May 2022 | related: 
+* 2022-10-04 L | Current | Revised 09/12/2022 | availability: Limited Supply Available. Next Delivery: September 2022; Estimated Recovery: January 2023 | related: Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay | same text | 308 days since the capture before
+  2022-10-06 L | Current | Revised 09/12/2022 | availability: Limited Supply Available. Next Delivery: September 2022; Estimated Recovery: January 2023 | related: Check Wholesaler for Availability Shortage per Manufacturer: Manufacturing Delay | same text
+
+=== Qf651de42 (item 32 of 33)
+generic: Alogliptin Tablets
+company: Takeda Pharmaceuticals USA Inc.
+presentation: 25 mg, 30 Tablets (NDC 64764-250-30)
+statement: Current shortage duration is projected through mid-February 2020.
+statement date 2020-01-07; c0 2020-04-02; followed to 2022-10-06
+derived B: recovered (2020-04-02, 2020-06-12], 71 days
+derived A: recovered (2020-09-30, 2020-10-11], 11 days
+statement group, 2 presentation(s): B recovered (2020-04-02, 2020-06-12]; A recovered (2020-09-30, 2020-10-11]
+class strip: O A A A A A A A A R R
+< 2019-10-20 A | Current | New 08/15/2019 | availability: Product available. | related: 
+< 2019-12-29 A | Current | New 08/15/2019 | availability: Product available. | related: 
+* 2020-04-02 O | Current | Revised 01/07/2020 | availability: Current shortage duration is projected through mid-February 2020. | related:  | same text | 95 days since the capture before
+  2020-06-12 A | Current | Revised 04/28/2020 | availability: Available | related: 
+  2020-07-08 A | Current | Revised 04/28/2020 | availability: Available | related: 
+  2020-07-15 A | Current | Revised 04/28/2020 | availability: Available | related: 
+  2020-08-15 A | Current | Revised 04/28/2020 | availability: Available | related: 
+  2020-08-24 A | Current | Revised 04/28/2020 | availability: Available | related: 
+  2020-09-15 A | Current | Revised 04/28/2020 | availability: Available | related: 
+  2020-09-27 A | Current | Revised 04/28/2020 | availability: Available | related: 
+  2020-09-30 A | Current | Revised 04/28/2020 | availability: Available | related: 
+  2020-10-11 R | Resolved | Revised 10/05/2020 | availability:  | related:  | change date: 10/05/2020
+  2020-10-17 R | Resolved | Revised 10/05/2020 | availability:  | related:  | change date: 10/05/2020
+
+=== Qd11a08c3 (item 33 of 33)
+generic: Hydroxychloroquine Sulfate Tablets
+company: Zydus Pharmaceuticals USA Inc.
+presentation: 200 mg, 100 count bottle (NDC 68382-096-01); 500 count bottle (NDC 68382-096-05)
+statement: 
+statement date 2020-06-26; c0 2020-07-08; followed to 2022-10-06
+derived B: not_at_risk
+derived A: not_at_risk
+statement group, 2 presentation(s): B not_at_risk; A not_at_risk
+class strip: R R
+< 2020-04-02 L | Current | New 03/31/2020 | availability: Product is on allocation to committed customers. Shipping to historical demand based on previous customer purchase history | related: Large increase in demand - hospital/clinical support | change date: 03/30/2020 | 95 days since the capture before
+< 2020-06-12 L | Current | Reverified 05/13/2020 | availability: Product is on allocation to committed customers. Shipping to historical demand based on previous customer purchase history | related: Large increase in demand - hospital/clinical support | change date: 03/30/2020
+* 2020-07-08 R | Resolved | Revised 06/26/2020 | availability:  | related:  | resolved note: Available | change date: 06/26/2020 | same text
+  2020-07-15 R | Resolved | Revised 06/26/2020 | availability:  | related:  | resolved note: Available | change date: 06/26/2020 | same text

@@ -1,0 +1,98 @@
+{
+  "by_echo": {
+    "ok": 300
+  },
+  "by_status": {
+    "ok": 300
+  },
+  "complete": true,
+  "condition": "predictive-track-v1|det-v1|mask=0|shift=4|track=41648e5a49e7d296",
+  "expected_rows": 300,
+  "fallbacks": 0,
+  "git": {
+    "branch": "followup/coling-2027",
+    "f1": "a7dcb774a6c06e542d83077434ae35d71e9058be",
+    "read_py_modified": false,
+    "registration": "0c2579a6eb98d1ed844bea4f45cdb159283bb25f",
+    "sha": "3ed1308cb9ba45fa2f0f5170bdc41298df8b9a45"
+  },
+  "guard": {
+    "max_physical_calls": 20000,
+    "physical_calls_this_invocation": 300,
+    "physical_calls_total": 300,
+    "refusals_this_invocation": 0,
+    "retries_this_invocation": 0,
+    "spend_cap_usd": 0.2903,
+    "usd_this_invocation": 0.2600844,
+    "usd_total": 0.2600844
+  },
+  "item_ids_sha256": "7ed79fa3c0db7e72265c00d446073bd5f51638d0ea124c4c6a22798759638305",
+  "items": 300,
+  "items_in_file": 300,
+  "items_sha256": "f97b40237e29475fa49e948cb96b23d0b73392d7899fbe5bae9c34c4cd0e674f",
+  "ladder_rung": {
+    "model_id": "deepseek/deepseek-chat",
+    "name": "deepseek-v3",
+    "price_input_per_mtok": 0.257,
+    "price_output_per_mtok": 1.029,
+    "provider": "openrouter",
+    "released": "2024-12",
+    "served_as": [
+      "deepseek/deepseek-chat"
+    ],
+    "tier": "671B-MoE"
+  },
+  "limit": null,
+  "mask_names": false,
+  "model": "deepseek-v3",
+  "model_id": "deepseek/deepseek-chat",
+  "price_date": "2026-10-01",
+  "provider_object": {
+    "allow_fallbacks": false,
+    "order": [
+      "deepinfra/fp4"
+    ],
+    "quantizations": [
+      "fp4"
+    ]
+  },
+  "python": "3.12.11",
+  "read_py_sha256": "54d171783601e72994f960cbe7b5adba157f6061ba3c9a1da30fd23e23be244f",
+  "readings": 300,
+  "readings_sha256": "d4b34f617bda871ff6e72a28ebbd0a0ee2f385ba99f4706a99b7f90d744a2519",
+  "roots": {
+    "local_root": "/home/noctis/GitHub/COLLIE-coling/results/coling/read",
+    "out_root": "/home/noctis/GitHub/COLLIE-coling/analysis/coling/out/read"
+  },
+  "route": {
+    "also_served_as": [],
+    "also_served_by": [],
+    "model_id": "deepseek/deepseek-chat",
+    "price": [
+      0.32,
+      0.89,
+      "2026-10-01"
+    ],
+    "provider": "deepinfra/fp4",
+    "quantization": "fp4"
+  },
+  "run_name": "e4-2x2-shift-deepseek-v3",
+  "samples": 1,
+  "served_as": [
+    "deepseek/deepseek-chat"
+  ],
+  "shard": null,
+  "shift_years": 4,
+  "spend_cap_usd": 0.2903,
+  "status": "complete",
+  "temperature": 0.0,
+  "template": "predictive-track-v1",
+  "template_sha256": "d0384c1f860d734bd26fa197de0a99e1bcdf520392941b399ef9d0f7b3213483",
+  "track_record": "analysis/coling/out/items/track_fit_dev.json",
+  "track_record_sha256": "41648e5a49e7d296a3ca2c49b61d7df3607eb8fe43f9f01daa136d9b0c3dc098",
+  "track_record_split": "fit+dev",
+  "usd_per_mtok": [
+    0.32,
+    0.89
+  ]
+}

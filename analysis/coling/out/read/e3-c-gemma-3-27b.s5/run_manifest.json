@@ -1,0 +1,99 @@
+{
+  "by_echo": {
+    "ok": 313
+  },
+  "by_status": {
+    "ok": 311,
+    "repaired": 2
+  },
+  "complete": true,
+  "condition": "literal-v1|det-v1|mask=0|shift=0|track=-",
+  "expected_rows": 313,
+  "fallbacks": 0,
+  "git": {
+    "branch": "followup/coling-2027",
+    "f1": "a7dcb774a6c06e542d83077434ae35d71e9058be",
+    "read_py_modified": false,
+    "registration": "0c2579a6eb98d1ed844bea4f45cdb159283bb25f",
+    "sha": "3ed1308cb9ba45fa2f0f5170bdc41298df8b9a45"
+  },
+  "guard": {
+    "max_physical_calls": 20000,
+    "physical_calls_this_invocation": 315,
+    "physical_calls_total": 315,
+    "refusals_this_invocation": 0,
+    "retries_this_invocation": 0,
+    "spend_cap_usd": 0.097244,
+    "usd_this_invocation": 0.03443408000000002,
+    "usd_total": 0.03443408000000002
+  },
+  "item_ids_sha256": "3e1cbdcc51caf8145461b33e914bd9f326cf940bb7f987849fbc3c85ce4fae97",
+  "items": 313,
+  "items_in_file": 2593,
+  "items_sha256": "773707460d800e40c088b14807ff49ca33008710242ce68d078c8011e4f91a66",
+  "ladder_rung": {
+    "model_id": "google/gemma-3-27b-it",
+    "name": "gemma-3-27b",
+    "price_input_per_mtok": 0.08,
+    "price_output_per_mtok": 0.45,
+    "provider": "openrouter",
+    "released": "2025-03",
+    "served_as": [
+      "google/gemma-3-27b-it"
+    ],
+    "tier": "27B"
+  },
+  "limit": null,
+  "mask_names": false,
+  "model": "gemma-3-27b",
+  "model_id": "google/gemma-3-27b-it",
+  "price_date": "2026-10-01",
+  "provider_object": {
+    "allow_fallbacks": false,
+    "order": [
+      "deepinfra/fp8"
+    ],
+    "quantizations": [
+      "fp8"
+    ]
+  },
+  "python": "3.12.11",
+  "read_py_sha256": "54d171783601e72994f960cbe7b5adba157f6061ba3c9a1da30fd23e23be244f",
+  "readings": 313,
+  "readings_sha256": "90583523d3c91db0b2767f09dda9f3dc096f561cb4e51b4e6a48b0b5b6d31f99",
+  "roots": {
+    "local_root": "/home/noctis/GitHub/COLLIE-coling/results/coling/read",
+    "out_root": "/home/noctis/GitHub/COLLIE-coling/analysis/coling/out/read"
+  },
+  "route": {
+    "also_served_as": [],
+    "also_served_by": [],
+    "model_id": "google/gemma-3-27b-it",
+    "price": [
+      0.08,
+      0.16,
+      "2026-10-01"
+    ],
+    "provider": "deepinfra/fp8",
+    "quantization": "fp8"
+  },
+  "run_name": "e3-c-gemma-3-27b.s5",
+  "samples": 1,
+  "served_as": [
+    "google/gemma-3-27b-it"
+  ],
+  "shard": "5/8",
+  "shift_years": 0,
+  "spend_cap_usd": 0.097244,
+  "status": "complete",
+  "temperature": 0.0,
+  "template": "literal-v1",
+  "template_sha256": "855244013a7614501ebdd6fbb45c8998f102a877e1299a6d86f81e1359934b27",
+  "track_record": null,
+  "track_record_sha256": null,
+  "track_record_split": null,
+  "usd_per_mtok": [
+    0.08,
+    0.16
+  ]
+}

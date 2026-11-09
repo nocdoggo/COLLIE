@@ -1,0 +1,67 @@
+{
+  "captures": 110,
+  "captures_sha256": "93ddfc19574e217b3ca9169a4900e12c8f2e0f7808f2c71b5c172b944681b701",
+  "corpus_docstring": "sha256 deb2de56a85a6e5c",
+  "corpus_py": "sha256 a44cd27ccddad604",
+  "counts": {
+    "events": 8020,
+    "excluded_events": 3009,
+    "planted_drawn": 6,
+    "planted_wanted": 6,
+    "pool": 5011,
+    "real_drawn": 50,
+    "real_wanted": 50
+  },
+  "draw": "train",
+  "earlier_sample_ids_unknown": 0,
+  "excluded_threads": 795,
+  "exclusion_lists": [
+    {
+      "file": "analysis/coling/out/audit/samples/sample_check.csv",
+      "ids": 58,
+      "kind": "labelling",
+      "sha256": "eb80b0fc1ceb2485747d1fd5f303bf66ce01f053fda93eaf2617cc8b60b4903d"
+    },
+    {
+      "file": "analysis/coling/out/audit/samples/sample_literal.csv",
+      "ids": 353,
+      "kind": "labelling",
+      "sha256": "05fcaf84b77406d79812b9ace8238be78942705ea832eea0281d1966faced28c"
+    },
+    {
+      "file": "analysis/coling/out/audit/samples/sample_pilot.csv",
+      "ids": 60,
+      "kind": "labelling",
+      "sha256": "edd0c9c477b83f79f55e5823aa63484aff50d4407ef1830f7f185175502709f6"
+    },
+    {
+      "file": "analysis/coling/out/audit/samples/sample_reserve.csv",
+      "ids": 60,
+      "kind": "labelling",
+      "sha256": "6be05e4f1a000cbd4eae3dd72eed5e1adc39a614fda7482b47de14d78527e747"
+    }
+  ],
+  "files": {
+    "outcome_A1_train.csv": "adfc6ed95788ad6e3f1ba04de30313000b9b2a81cb60413b7cfdc54fb1fcb2a9",
+    "outcome_A1_train_items.txt": "79c60bd3445effbbaeeb8b9709598250973d859e01f6c76a3676f7b93dd9cc23",
+    "outcome_A2_train.csv": "6b44087ad4a4dbbb1084ffc73425715d2a16db0dbb6fb3bd7a70ce0b53f5e702",
+    "outcome_A2_train_items.txt": "c62c20081a298db2292e903fedcb9458c77ebd7663efeb2403a45578ef8458a5",
+    "outcome_train_key.csv": "ca7df5d34421865794e912d2c8707204fdd989826a1af0f5fe1bf7287bbc35f4",
+    "outcome_train_sample.csv": "53a1c2449c26a2331ad59ffe61ef9190beb819de18e86a3e48f2c2ba096f48d0",
+    "outcome_train_strata.csv": "0f1c7954d2f7728b5fceae7a050c75e49b9fe8037164a84aa63237e4173837d4",
+    "outcome_train_traces.csv": "e007c6c72db5ba277704f60f129a444f576435e28e393fb9b0d2d81573cfa16e"
+  },
+  "followed_to": "2022-10-06",
+  "guide": "v1 draft sha256 2758c375ef5b41a8",
+  "guide_examples": 58,
+  "guide_examples_unmatched": 0,
+  "half": "train",
+  "sample_list_ids_unknown": 0,
+  "seed": 20261001,
+  "sizes": {
+    "own": 20,
+    "planted_per_auditor": 3,
+    "shared": 10
+  },
+  "status": "final"
+}

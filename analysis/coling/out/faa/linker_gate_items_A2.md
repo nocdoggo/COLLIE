@@ -1,0 +1,7090 @@
+# E6 linker gate: hand check of links (A2)
+
+Development months only. For each link, read the source advisory and the later advisories, and
+decide whether the derived outcome follows the draft codebook below. Judge against the codebook
+as written, also where you would have chosen another rule: a rule you disagree with is a note,
+not an error. Write the verdict in `linker_gate_sheet_A2.csv`, column `verdict`: `ok`, `wrong` or `unclear`. For
+`wrong` or `unclear`, add one error code and a short note.
+
+Error codes:
+
+- `S`: source misread: the term, airport, initiative or window is not what the advisory says
+- `M`: missed advisory: a later advisory that changes the outcome was not used
+- `L`: wrong link: the linked advisory is another stop, route, airport or initiative
+- `R`: rule misapplied: the advisories are right but the outcome contradicts the codebook
+- `X`: exclusion wrong: excluded but should be scored, or scored but should be excluded
+- `D`: codebook gap: the codebook does not decide this case
+
+Each item gives the statement, the source advisory and the later advisories first, and the
+derived outcome last. Work out the outcome from the advisories before you read the derived
+one.
+
+Times are written day/hhmm. The first list under each item shows every ground-stop,
+delay-programme or route advisory the linker could see for the airport or route, up to two
+hours after the stated end (one hour after a plan line's window, and from six hours before the
+plan); check that none of them was missed. A second list, when there is one, gives the titles
+of the other advisories that name the airport in the same hours; the linker does not read
+them, and one that is a ground stop or a delay programme under another title is an `M`.
+
+Some rows are also on the other checker's sheet. They are not marked; do not confer on any
+row before both sheets are returned.
+
+## Draft codebook
+
+The full text is section 5 of `analysis/coling/plan/E6_NOTES.md`. All times are UTC.
+
+**Ground stops and routes (probability of extension).** The statement is the first advisory
+that states an end time for a stop or a route. It is EXTENDED when a later advisory of the same
+stop or route states a later end, by any amount.
+
+- The same stop: `CDM GROUND STOP` advisories for the airport, each sent with no `CDM GS CNX`
+  between it and the one before, and each with a stated start no later than the stated end of
+  the one before.
+- The same route: advisories with the same TMI ID and the same name (one name may extend the
+  other), with no `REROUTE CANCELLATION` of that name between them. A route is also carried
+  on, and so EXTENDED, by an advisory of the same name under another TMI ID (a new FCA number,
+  or the next day's advisory) when that advisory is sent no later than the stated end and
+  before any cancellation of the route, and states a start no later than the stated end and
+  an end later than it (flag `continued_new_id`).
+- Otherwise NOT EXTENDED: "cancelled" when a cancellation followed no later than the stated
+  end, "lapsed" when nothing followed. A wrong reason with the right outcome is still `ok`;
+  say so in the note.
+- Not extensions: the same end sent again; a shorter end; a new stop or route that starts
+  after the stated end or after a cancellation, even minutes later (flag `new_stop_30` on
+  stops); a delay programme that follows the stop (flag `gdp_followed`). A hand-written
+  `GROUND STOP CANCELLATION` does not close a CDM stop (flag `manual_release`).
+
+**Planned ground stops and delay programmes (operations plan).** The statement is the first
+plan that carries the line for that airport with that window. A line that names several
+airports gives one statement for each. A line with two estimates (`DEN GROUND DELAY PROGRAM
+EXPECTED, GROUND STOP POSSIBLE`) gives one statement for each estimate.
+
+- Window: `UNTIL hhmm` runs from the plan's send time to hhmm; `AFTER hhmm` runs from the
+  first hhmm after the plan was sent to the next 0800Z (a plan sent at 2327Z that says `AFTER
+  2300` means 2300Z of the next day); a range is used as written.
+- ISSUED when an actual advisory of a named initiative for the airport is sent after the plan
+  and no later than the window's end, and its stated period, cut at its own cancellation if
+  that came first, overlaps the window. Actual advisories are `CDM GROUND STOP`,
+  `CDM GROUND DELAY PROGRAM` and a hand-written `<airport> GROUND STOP` (flag `manual_stop`);
+  a `PROPOSED` programme is not one. A line that names both initiatives is met by either. An
+  advisory sent before the window opens counts when its period reaches into the window; one
+  cancelled before its stated start does not count.
+- Otherwise NOT ISSUED.
+
+**Excluded.** `already_active`: a named initiative was running for the airport when the plan
+was sent, with a stated end at or after the window's start; "running" is read from the send
+times of the advisories, not from the plan's `TERMINAL ACTIVE` lines. `unresolved_boundary`:
+the outcome could still change after the last development month (a window or a stated end
+that reaches past the month's last day, or a stated end in the last two hours of that day
+with nothing after it). Canadian airports give no statement.
+
+
+## 1. plan-20260525-012-TEB-gs+gdp-AFTER1700
+
+- Term: **POSSIBLE** (plan:POSSIBLE); written as: `AFTER 1700	-TEB GROUND STOP/DELAY PROGRAM POSSIBLE`
+- Element: TEB; initiative: gs/gdp; first issued 05/25 01:22Z in 20260525-012; window read as 25/1700Z - 26/0800Z
+- Repeated in: 20260525-024 20260525-033 20260525-051 20260525-064
+
+Source advisory:
+
+```
+ATCSCC ADVZY 012 DCC 05/25/2026 OPERATIONS PLAN
+EVENT TIME: 25/0200 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 0559	-SFO GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+AFTER 1100	-CLT GROUND STOP POSSIBLE
+AFTER 1100	-DCA GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1100	-LGA GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1100	-EWR GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1200	-PHL GROUND STOP POSSIBLE
+AFTER 1200	-ATL GROUND STOP POSSIBLE
+AFTER 1530	-SFO GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1600	-DCA GROUND STOP POSSIBLE
+AFTER 1700	-TEB GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1700	-BOS GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1800	-CLT GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1900	-ATL GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 2000	-DEN GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 2100	-TPA/MCO GROUND STOP POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260525-079  sent 05/25 18:15Z  TEB AIRPORT ARRIVAL DELAYS
+```
+
+**Derived outcome: NOT ISSUED = 0**. no gs or gdp advisory for TEB in the window.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 2. plan-20260531-038-TPA-gs-UNTIL2300
+
+- Term: **POSSIBLE** (plan:POSSIBLE); written as: `UNTIL 2300	-MCO/TPA GROUND STOP POSSIBLE`
+- Element: TPA; initiative: gs; first issued 05/31 15:38Z in 20260531-038; window read as 31/1538Z - 31/2300Z
+- Repeated in: 20260531-047 20260531-057
+
+Source advisory:
+
+```
+ATCSCC ADVZY 038 DCC 05/31/2026 OPERATIONS PLAN
+EVENT TIME: 31/1600 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 2059	-SFO GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+AFTER 1800	-ATL GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1800	-BOS GROUND STOP/DELAY PROGRAM POSSIBLE
+UNTIL 2300	-MCO/TPA GROUND STOP POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260531-045  sent 05/31 17:24Z  MIA / OPF / TMB / FLL / FXE / PBI / RSW / BCT / TPA / SRQ CDRS_FYI
+```
+
+**Derived outcome: NOT ISSUED = 0**. no gs advisory for TPA in the window.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 3. plan-20260507-062-TEB-gs+gdp-AFTER1900
+
+- Term: **PROBABLE** (plan:PROBABLE); written as: `AFTER 1900	-TEB GROUND STOP/DELAY PROGRAM PROBABLE`
+- Element: TEB; initiative: gs/gdp; first issued 05/07 17:59Z in 20260507-062; window read as 07/1900Z - 08/0800Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 062 DCC 05/07/2026 OPERATIONS PLAN
+EVENT TIME: 07/1800 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 2359	-SFO GROUND DELAY PROGRAM
+UNTIL 0459	-SAN GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+AFTER 1900	-TEB GROUND STOP/DELAY PROGRAM PROBABLE
+AFTER 2000	-CLT GROUND STOP/DELAY PROGRAM POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260507-067  sent 05/07 19:08Z  CDM GROUND STOP  TEB  GROUND STOP PERIOD 07/1854Z - 07/2015Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260507-074  sent 05/07 20:08Z  CDM GS CNX  TEB  GS CNX PERIOD 07/2008Z - 07/2042Z
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260507-075  sent 05/07 20:11Z  TEB AIRPORT ARRIVAL DELAYS
+```
+
+**Derived outcome: ISSUED = 1**. CDM GROUND STOP sent 07/1908Z, period 07/1854Z - 07/2008Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 067 TEB/ZNY 05/07/2026 CDM GROUND STOP
+CTL ELEMENT: TEB
+ELEMENT TYPE: APT
+ADL TIME: 1904Z
+GROUND STOP PERIOD: 07/1854Z - 07/2015Z
+DEP FACILITIES INCLUDED: (Internal) ZNY
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 0 / 0 / 0
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 266 / 59 / 44
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: VOLUME / VOLUME
+COMMENTS: INTERNAL TO ZNY ONLY
+```
+
+## 4. route-20260410-064
+
+- Term: **MODERATE** (route:MODERATE); written as: `PROBABILITY OF EXTENSION: MODERATE`
+- Element: MIDWEST_TO_HOUSTON; initiative: reroute; first issued 04/10 18:57Z in 20260410-064; window read as 10/1900Z - 10/2230Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 064 DCC 04/10/2026 ROUTE RQD /FL
+NAME: MIDWEST_TO_HOUSTON
+CONSTRAINED AREA: ZHU
+REASON: WEATHER
+INCLUDE TRAFFIC: KCLE/KCRW/KDTW/KLEX/KSDF/ZAU/ZFW/ZID/ZKC/ZME/ZMP/ZO
+B DEPARTURES TO KHOU/KIAH
+FACILITIES INCLUDED: ZAU/ZFW/ZHU/ZID/ZKC/ZME/ZMP/ZOB
+FLIGHT STATUS: NOT_AIRBORNE
+VALID: ETD 101900 TO 102230
+PROBABILITY OF EXTENSION: MODERATE
+REMARKS: CONVENTIONAL NAVIGATION AIRCRAFT LANDING IAH/HOU FROM THE
+WEST VIA SAT MUST BE AOA FL240 OR MUST FILE SAT CRP (STAR).
+IAH CONVENTIONAL DUUUK STAR // HOU CONVENTIONAL TCHDN STAR
+CONVENTIONAL NAVIGATION AIRCRAFT VIA SJI LANDING IAH
+FILE GILCO STAR.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC505
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260410-067  sent 04/10 19:06Z  REROUTE CANCELLATION  MIDWEST_TO_HOUSTON
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 10/1906Z; stated end 10/2230Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 067 DCC 04/10/2026 REROUTE CANCELLATION
+MIDWEST_TO_HOUSTON HAS BEEN CANCELLED.
+
+REMARKS: CANCELS ADVZY 064
+ASSOCIATED RESTRICTIONS:
+```
+
+## 5. plan-20260401-010-LGA-gs+gdp-AFTER1300
+
+- Term: **EXPECTED** (plan:EXPECTED); written as: `AFTER 1300	-LGA GROUND STOP/DELAY PROGRAM EXPECTED`
+- Element: LGA; initiative: gs/gdp; first issued 04/01 01:37Z in 20260401-010; window read as 01/1300Z - 02/0800Z
+- Repeated in: 20260401-012 20260401-023
+
+Source advisory:
+
+```
+ATCSCC ADVZY 010 DCC 04/01/2026 OPERATIONS PLAN
+EVENT TIME: 01/0200 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 0359	-CYYZ GROUND DELAY PROGRAM
+UNTIL 0459 	-LGA GROUND DELAY PROGRAM
+UNTIL 0759	-ORD GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+AFTER 1300	-LGA GROUND STOP/DELAY PROGRAM EXPECTED
+AFTER 1500	-BOS GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1500	-SFO GROUND STOP/DELAY PROGRAM PROBABLE
+AFTER 1900	-EWR GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1900	-IAH/HOU GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 2000	-IAD/DCA/BWI GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 2000	-ATL GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 2000	-DEN GROUND STOP/DELAY PROGRAM POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260401-002  sent 04/01 00:19Z  CDM GROUND STOP  LGA  GROUND STOP PERIOD 01/0005Z - 01/0115Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260401-006  sent 04/01 01:02Z  LGA GROUND STOP CANCELLATION  LGA  EVENT TIME 01/0102Z - ?
+20260401-018  sent 04/01 04:20Z  CDM GROUND DELAY PROGRAM CNX  LGA  GDP CNX PERIOD 01/0419Z - 01/0803Z
+20260401-027  sent 04/01 10:53Z  CDM PROPOSED GROUND DELAY PROGRAM  LGA  ANTICIPATED CUMULATIVE PROGRAM PERIOD 01/1300Z - 02/0359Z
+20260401-028  sent 04/01 11:08Z  CDM GROUND DELAY PROGRAM  LGA  CUMULATIVE PROGRAM PERIOD 01/1300Z - 02/0359Z
+20260401-078  sent 04/01 18:41Z  CDM PROPOSED GROUND DELAY PROGRAM  LGA  ANTICIPATED CUMULATIVE PROGRAM PERIOD 01/1300Z - 02/0559Z
+20260401-088  sent 04/01 19:03Z  CDM GROUND DELAY PROGRAM  LGA  CUMULATIVE PROGRAM PERIOD 01/1300Z - 02/0559Z
+20260402-001  sent 04/02 00:00Z  CDM GROUND STOP  LGA  GROUND STOP PERIOD 01/2348Z - 02/0100Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260402-003  sent 04/02 00:03Z  CDM GROUND STOP  LGA  GROUND STOP PERIOD 01/2348Z - 02/0100Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260402-010  sent 04/02 00:19Z  CDM GROUND STOP  LGA  GROUND STOP PERIOD 02/0003Z - 02/0100Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260402-017  sent 04/02 00:49Z  CDM GROUND STOP  LGA  GROUND STOP PERIOD 02/0033Z - 02/0200Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260402-027  sent 04/02 01:48Z  CDM GROUND STOP  LGA  GROUND STOP PERIOD 02/0134Z - 02/0300Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260402-031  sent 04/02 01:58Z  CDM GROUND DELAY PROGRAM CNX  LGA  GDP CNX PERIOD 02/0153Z - 02/0732Z
+20260402-032  sent 04/02 02:01Z  CDM GROUND STOP  LGA  GROUND STOP PERIOD 02/0000Z - 02/0300Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260402-037  sent 04/02 02:33Z  CDM GROUND DELAY PROGRAM  LGA  CUMULATIVE PROGRAM PERIOD 02/0100Z - 02/0659Z
+20260402-039  sent 04/02 02:38Z  CDM GROUND STOP  LGA  GROUND STOP PERIOD 02/0227Z - 02/0300Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260402-042  sent 04/02 02:54Z  CDM GROUND STOP  LGA  GROUND STOP PERIOD 02/0245Z - 02/0400Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260402-050  sent 04/02 03:39Z  CDM GROUND DELAY PROGRAM  LGA  CUMULATIVE PROGRAM PERIOD 02/0100Z - 02/0759Z
+20260402-055  sent 04/02 05:49Z  CDM GROUND DELAY PROGRAM CNX  LGA  GDP CNX PERIOD 02/0549Z - 02/1834Z
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260402-038  sent 04/02 02:37Z  LGA AIRPORT ARRIVAL DELAYS
+```
+
+**Derived outcome: ISSUED = 1**. CDM GROUND DELAY PROGRAM sent 01/1108Z, period 01/1300Z - 02/0158Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 028 LGA/ZNY 04/01/2026 CDM GROUND DELAY PROGRAM
+CTL ELEMENT: LGA
+ELEMENT TYPE: APT
+ADL TIME: 1104Z
+DELAY ASSIGNMENT MODE: UDP
+ARRIVALS ESTIMATED FOR: 01/1300Z - 02/0359Z
+CUMULATIVE PROGRAM PERIOD: 01/1300Z - 02/0359Z
+PROGRAM RATE: 30
+FLT INCL: ALL CONTIGUOUS US DEP
+DEP SCOPE: (ALL+CZY_AP) ZLA ZAU ZLC ZTL ZDC ZNY ZHU ZJX ZFW ZOB ZDV
+ZOA ZSE ZBW ZMA ZKC ZME ZID ZAB ZMP
+CANADIAN DEP ARPTS INCLUDED: CYHZ CYOW CYUL CYYZ CYTZ CYQB
+DELAY ASSIGNMENT TABLE APPLIES TO: ZNY
+MAXIMUM DELAY: 143
+AVERAGE DELAY: 54
+IMPACTING CONDITION: OTHER / OTHER
+COMMENTS: ILS 22 DEPT 13
+```
+
+## 6. route-20260523-091
+
+- Term: **MODERATE** (route:MODERATE); written as: `PROBABILITY OF EXTENSION: MODERATE`
+- Element: SOUTHEAST_TO_HOUSTON; initiative: reroute; first issued 05/23 19:26Z in 20260523-091; window read as 23/1405Z - 23/2200Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 091 DCC 05/23/2026 ROUTE RQD /FL
+NAME: SOUTHEAST_TO_HOUSTON
+CONSTRAINED AREA: ZHU ZFW
+REASON: WEATHER
+INCLUDE TRAFFIC: KJAX/KMCO/KORL/KSFB/ZMA/ZTL DEPARTURES TO KHOU/KIAH
+FACILITIES INCLUDED: ZFW/ZHU/ZJX/ZMA/ZME/ZTL
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: ETD 231405 TO 232200
+PROBABILITY OF EXTENSION: MODERATE
+REMARKS: REPLACES ADVZY 079. BASED ON FL TO TEXAS WITH ZTL ADDED
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS: TIME EXTENDED
+ROUTES: [route table not shown]
+TMI ID: RRDCC506
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+**Derived outcome: NOT EXTENDED (lapsed) = 0**. no later advisory moved the end past 23/2200Z.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 7. route-20260411-067
+
+- Term: **LOW** (route:LOW); written as: `PROBABILITY OF EXTENSION: LOW`
+- Element: NE_TO_FLORIDA_VIA_Q75_2_PARTIAL; initiative: reroute; first issued 04/11 20:07Z in 20260411-067; window read as 11/1920Z - 12/0200Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 067 DCC 04/11/2026 ROUTE RQD /FL
+NAME: NE_TO_FLORIDA_VIA_Q75_2_PARTIAL
+CONSTRAINED AREA: ZDC
+REASON: OTHER
+INCLUDE TRAFFIC: KBWI/KCDW/KDCA/KIAD/KJFK/KMMU/KPHL/KTEB/ZBW/ZNY
+DEPARTURES TO KMCO/KRSW
+FACILITIES INCLUDED: ZBW/ZDC/ZJX/ZMA/ZNY/ZTL
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: ETD 111920 TO 120200
+PROBABILITY OF EXTENSION: LOW
+REMARKS: REPLACES ADVZY 058.  AR / Y-ROUTES EXEMPT, WHEN AVAILABLE.
+DUE TO ZJX STAFFING.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS: END TIME EXTENDED. REASON CHANGED TO OTHER/STAFFING.
+ROUTES: [route table not shown]
+TMI ID: RRDCC058
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260412-005  sent 04/12 01:16Z  REROUTE CANCELLATION  NE_TO_FLORIDA_VIA_Q75_2_PARTIAL
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 12/0116Z; stated end 12/0200Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 005 DCC 04/12/2026 REROUTE CANCELLATION
+NE_TO_FLORIDA_VIA_Q75_2_PARTIAL HAS BEEN CANCELLED.
+
+REMARKS:
+ASSOCIATED RESTRICTIONS:
+```
+
+## 8. route-20260423-016
+
+- Term: **LOW** (route:LOW); written as: `PROBABILITY OF EXTENSION: LOW`
+- Element: FCA008:NO_Q34_2_PARTIAL; initiative: reroute; first issued 04/23 11:09Z in 20260423-016; window read as 23/1200Z - 23/2200Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 016 DCC 04/23/2026 FCA RQD
+NAME: FCA008:NO_Q34_2_PARTIAL
+CONSTRAINED AREA: ZDC
+REASON: OTHER
+INCLUDE TRAFFIC: KBNA/ZFW/ZHU/ZME DEPARTURES TO
+KEWR/KLGA/KMMU/KPHL/KTEB
+FACILITIES INCLUDED: ZDC/ZFW/ZHU/ZID/ZME/ZNY/ZOB
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 231200 TO 232200
+PROBABILITY OF EXTENSION: LOW
+REMARKS: ISSUED DUE TO SUA AIRSPACE.  SEE DYNAMIC LIST FOR UPDATES.
+ZHU AIRPORTS (HOUSTON TERMINAL AND WEST).  MSY AREA DEPTS
+ONLY:  USE PREF ROUTES FROM MGM
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC016
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+**Derived outcome: NOT EXTENDED (lapsed) = 0**. no later advisory moved the end past 23/2200Z.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 9. route-20260525-031
+
+- Term: **NONE** (route:NONE); written as: `PROBABILITY OF EXTENSION: NONE`
+- Element: FCA001:NO_AR_ATLANTIC_Y_RTES_TO_MCO_TPA_RSW_AREAS; initiative: reroute; first issued 05/25 11:20Z in 20260525-031; window read as 25/1056Z - 25/1231Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 031 DCC 05/25/2026 FCA RQD
+NAME: FCA001:NO_AR_ATLANTIC_Y_RTES_TO_MCO_TPA_RSW_AREAS
+CONSTRAINED AREA: ZJX/ZMA
+REASON: OTHER
+INCLUDE TRAFFIC: UNKN DEPARTURES TO
+KAPF/KFMY/KISM/KLAL/KMCF/KMCO/KMKY/KORL/KPGD/KPIE/K
+RSW/KSFB/KSPG/KSRQ/KTPA/KTPF
+FACILITIES INCLUDED: ZJX/ZMA/ZDC/ZOB/ZNY/ZBW/CZY
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 251056 TO 251231
+PROBABILITY OF EXTENSION: NONE
+REMARKS: REPLACES ADVZY027, ADJUSTS END TIME. SEE DYNAMIC LIST FOR
+UPDATES. IMPLEMENTED DUE TO ROCKET LAUNCH ACTIVITIES.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC027
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260525-034  sent 05/25 11:54Z  REROUTE CANCELLATION  FCA001:NO_AR_ATLANTIC_Y_RTES_TO_MCO_TPA_RSW_AREAS
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 25/1154Z; stated end 25/1231Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 034 DCC 05/25/2026 REROUTE CANCELLATION
+FCA001:NO_AR_ATLANTIC_Y_RTES_TO_MCO_TPA_RSW_AREAS HAS BEEN CANCELLED.
+
+REMARKS:
+ASSOCIATED RESTRICTIONS:
+```
+
+## 10. gs-20260522-108
+
+- Term: **LOW** (gs:LOW); written as: `PROBABILITY OF EXTENSION: LOW`
+- Element: ATL; initiative: gs; first issued 05/22 20:53Z in 20260522-108; window read as 22/1921Z - 22/2145Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 108 ATL/ZTL 05/22/2026 CDM GROUND STOP
+CTL ELEMENT: ATL
+ELEMENT TYPE: APT
+ADL TIME: 2046Z
+GROUND STOP PERIOD: 22/1921Z - 22/2145Z
+DEP FACILITIES INCLUDED: (Manual) ZTL ZJX ZMA ZDC ZNY ZBW
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 2024 / 84 / 29
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 4613 / 146 / 66
+PROBABILITY OF EXTENSION: LOW
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS: EAST COAST FACILITIES EXTENDED WITH NEW UPDATE TIME DUE TO
+EXTENSIVE IMPACTS ON ARRIVAL ROUTES. GDP TO EXIT STOP IS PROBABLE.
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260522-111  sent 05/22 21:16Z  CDM PROPOSED GROUND DELAY PROGRAM  ATL  ANTICIPATED CUMULATIVE PROGRAM PERIOD 22/2112Z - 23/0259Z
+20260522-113  sent 05/22 21:40Z  CDM GROUND DELAY PROGRAM  ATL  CUMULATIVE PROGRAM PERIOD 22/2130Z - 23/0259Z
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260522-115  sent 05/22 22:18Z  ATL CLT CDRS_FYI
+```
+
+**Derived outcome: NOT EXTENDED (lapsed) = 0**. no later advisory moved the end past 22/2145Z. Flags: gdp_followed.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 11. route-20260411-005
+
+- Term: **NONE** (route:NONE); written as: `PROBABILITY OF EXTENSION: NONE`
+- Element: FCA019:CAPE_LAUNCH_1_PARTIAL; initiative: reroute; first issued 04/11 00:45Z in 20260411-005; window read as 11/1131Z - 11/1234Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 005 DCC 04/11/2026 FCA RQD
+NAME: FCA019:CAPE_LAUNCH_1_PARTIAL
+CONSTRAINED AREA: ZJX/ZMA
+REASON: OTHER
+INCLUDE TRAFFIC: KBWI/KDCA/KIAD/KJFK/KPHL/UNKN/ZBW/ZDC/ZNY
+DEPARTURES TO KFLL/KFXE/KOPF
+FACILITIES INCLUDED: ZBW/ZDC/ZJX/ZMA/ZNY
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 111131 TO 111234
+PROBABILITY OF EXTENSION: NONE
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. IMPLEMENTED DUE TO ROCKET
+LAUNCH.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC509
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260411-036  sent 04/11 11:55Z  REROUTE CANCELLATION  FCA019:CAPE_LAUNCH_1_PARTIAL
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 11/1155Z; stated end 11/1234Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 036 DCC 04/11/2026 REROUTE CANCELLATION
+FCA019:CAPE_LAUNCH_1_PARTIAL HAS BEEN CANCELLED.
+
+REMARKS: CANCELS ADVZY 005.
+ASSOCIATED RESTRICTIONS:
+```
+
+## 12. route-20260523-056
+
+- Term: **HIGH** (route:HIGH); written as: `PROBABILITY OF EXTENSION: HIGH`
+- Element: NORTH_TO_DFW_DAL; initiative: reroute; first issued 05/23 14:40Z in 20260523-056; window read as 23/1000Z - 23/1900Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 056 DCC 05/23/2026 ROUTE RQD /FL
+NAME: NORTH_TO_DFW_DAL
+CONSTRAINED AREA: ZFW
+REASON: WEATHER
+INCLUDE TRAFFIC: ZAU/ZKC/ZMP DEPARTURES TO KDAL/KDFW
+FACILITIES INCLUDED: ZAU/ZFW/ZKC/ZMP
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: ETD 231000 TO 231900
+PROBABILITY OF EXTENSION: HIGH
+REMARKS: REPLACES ADZY 016.  EXTENDS TIME AND REMOVES ZOB/CZY/ZID
+DEPTS.  DFW NORTH FLOW ARRIVAL STARS
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC500
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260523-066  sent 05/23 15:58Z  REROUTE CANCELLATION  NORTH_TO_DFW_DAL
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 23/1558Z; stated end 23/1900Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 066 DCC 05/23/2026 REROUTE CANCELLATION
+NORTH_TO_DFW_DAL HAS BEEN CANCELLED.
+
+REMARKS: CANCELS ADVZY 056.  ROUTES AVAILABLE THROUGH ZME.
+ASSOCIATED RESTRICTIONS:
+```
+
+## 13. route-20260402-062
+
+- Term: **NONE** (route:NONE); written as: `PROBABILITY OF EXTENSION: NONE`
+- Element: FCA002:CAPE_LAUNCH_1; initiative: reroute; first issued 04/02 09:42Z in 20260402-062; window read as 02/1152Z - 02/1634Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 062 DCC 04/02/2026 FCA RQD
+NAME: FCA002:CAPE_LAUNCH_1
+CONSTRAINED AREA: ZMA/ZJX
+REASON: OTHER
+INCLUDE TRAFFIC: KBWI/KDCA/KIAD/KJFK/KPHL/ZBW/ZDC/ZNY DEPARTURES TO
+KFLL/KFXE/KOPF
+FACILITIES INCLUDED: ZBW/ZDC/ZJX/ZMA/ZNY
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 021152 TO 021634
+PROBABILITY OF EXTENSION: NONE
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. IMPLEMENTED DUE TO ROCKET
+LAUNCH.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC062
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260402-077  sent 04/02 12:03Z  REROUTE CANCELLATION  FCA002:CAPE_LAUNCH_1
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 02/1203Z; stated end 02/1634Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 077 DCC 04/02/2026 REROUTE CANCELLATION
+FCA002:CAPE_LAUNCH_1 HAS BEEN CANCELLED.
+
+REMARKS: LAUNCH ACTIVITIES COMPLETE
+ASSOCIATED RESTRICTIONS:
+```
+
+## 14. route-20260412-069
+
+- Term: **MODERATE** (route:MODERATE); written as: `PROBABILITY OF EXTENSION: MODERATE`
+- Element: DFW_VKTRY_PARTIAL; initiative: reroute; first issued 04/12 19:48Z in 20260412-069; window read as 12/2000Z - 12/2300Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 069 DCC 04/12/2026 ROUTE RQD /FL
+NAME: DFW_VKTRY_PARTIAL
+CONSTRAINED AREA: ZFW
+REASON: WEATHER
+INCLUDE TRAFFIC: KLAS/KPHX/KSAN/KTUS/ZAB/ZLA/ZOA DEPARTURES TO
+KDAL/KDFW
+FACILITIES INCLUDED: ZAB/ZDV/ZFW/ZLA/ZLC/ZOA
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: ETD 122000 TO 122300
+PROBABILITY OF EXTENSION: MODERATE
+REMARKS:
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC512
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+**Derived outcome: NOT EXTENDED (lapsed) = 0**. no later advisory moved the end past 12/2300Z.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 15. route-20260424-076
+
+- Term: **HIGH** (route:HIGH); written as: `PROBABILITY OF EXTENSION: HIGH`
+- Element: FCA013:GA_TO_MIA_AND_SATS_VIA_MOGAE; initiative: reroute; first issued 04/24 18:46Z in 20260424-076; window read as 24/2045Z - 25/0200Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 076 DCC 04/24/2026 FCA RQD
+NAME: FCA013:GA_TO_MIA_AND_SATS_VIA_MOGAE
+CONSTRAINED AREA: ZJX/ZMA
+REASON: OTHER
+INCLUDE TRAFFIC: CZU/CZY/KBWI/KCHO/KCLT/KDCA/KDET/KDTW/KFNT/KIAD/KJF
+K/KLAN/KMBS/KORF/KPHF/KPHL/KPTK/KRDU/KRIC/KYIP/ZAU/
+ZBW/ZDC/ZDV/ZID/ZJX/ZKC/ZME/ZMP/ZNY/ZOB/ZTL
+DEPARTURES TO 07FA/KHST/KMIA/KTMB/X51
+FACILITIES INCLUDED: CZU/CZY/ZAU/ZBW/ZDC/ZDV/ZID/ZJX/ZKC/ZMA/ZME/ZMP
+/ZNY/ZOB/ZTL
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 242045 TO 250200
+PROBABILITY OF EXTENSION: HIGH
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. THIS PLAYBOOK IS FOR JET
+AIRCRAFT EXCLUDING THESE TYPES:  EA50  E50P  SF50 C510 AND
+C525.     AIRCRAFT ON AR AND Y ROUTES ARE EXEMPT.  THIS
+ROUTE IS ISSUED DUE TO SPECIAL OPERATIONS.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS: AIRCRAFT CAN EXPECT VECTORS IN ZJX FOR STAVE
+AVOIDANCE.
+ROUTES: [route table not shown]
+TMI ID: RRDCC523
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260425-005  sent 04/25 00:42Z  FCA RQD  FCA022:GA_TO_MIA_AND_SATS_VIA_MOGAE  VALID 25/0200Z - 25/1900Z  [PROBABILITY OF EXTENSION: LOW]
+```
+
+**Derived outcome: EXTENDED = 1**. end 25/0200Z -> 25/1900Z (+1020 min), carried on as FCA022:GA_TO_MIA_AND_SATS_VIA_MOGAE under TMI ID RRDCC501. Flags: continued_new_id.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 005 DCC 04/25/2026 FCA RQD
+NAME: FCA022:GA_TO_MIA_AND_SATS_VIA_MOGAE
+CONSTRAINED AREA: ZJX/ZMA
+REASON: OTHER
+INCLUDE TRAFFIC: CZU/CZY/KBWI/KCHO/KCLT/KDCA/KDET/KDTW/KFNT/KIAD/KJF
+K/KLAN/KMBS/KORF/KPHF/KPHL/KPTK/KRDU/KRIC/KYIP/ZAU/
+ZBW/ZDC/ZDV/ZID/ZJX/ZKC/ZME/ZMP/ZNY/ZOB/ZTL
+DEPARTURES TO 07FA/KHST/KMIA/KTMB/X51
+FACILITIES INCLUDED: CZU/CZY/ZAU/ZBW/ZDC/ZDV/ZID/ZJX/ZKC/ZMA/ZME/ZMP
+/ZNY/ZOB/ZTL
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 250200 TO 251900
+PROBABILITY OF EXTENSION: LOW
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. THIS PLAYBOOK IS FOR JET
+AIRCRAFT EXCLUDING THESE TYPES:  EA50  E50P  SF50 C510 AND
+C525.     AIRCRAFT ON AR AND Y ROUTES ARE EXEMPT.  THIS
+ROUTE IS ISSUED DUE TO SPECIAL OPERATIONS.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC501
+```
+
+## 16. route-20260410-004
+
+- Term: **LOW** (route:LOW); written as: `PROBABILITY OF EXTENSION: LOW`
+- Element: FCA014:MASTERS_2026_AIK_DNL_HQU_ARVLS; initiative: reroute; first issued 04/10 01:25Z in 20260410-004; window read as 10/1000Z - 11/0200Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 004 DCC 04/10/2026 FCA RQD
+NAME: FCA014:MASTERS_2026_AIK_DNL_HQU_ARVLS
+CONSTRAINED AREA: ZTL
+REASON: OTHER
+INCLUDE TRAFFIC: CZU/CZY/KECP/KEWN/KILM/KOAJ/KORF/KPHF/KPIE/KPNS/KRD
+U/KSRQ/KTLH/KTPA/KVPS/ZAB/ZAU/ZBW/ZDC/ZDV/ZFW/ZHU/Z
+ID/ZJX/ZKC/ZLA/ZLC/ZMA/ZME/ZMP/ZNY/ZOA/ZOB/ZSE
+DEPARTURES TO KAIK/KDNL/KHQU
+FACILITIES INCLUDED: CZU/CZY/ZAB/ZAU/ZBW/ZDC/ZDV/ZFW/ZHU/ZID/ZJX/ZKC
+/ZLA/ZLC/ZMA/ZME/ZMP/ZNY/ZOA/ZOB/ZSE/ZTL
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 101000 TO 110200
+PROBABILITY OF EXTENSION: LOW
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. IMPLEMENTED DUE TO SPECIAL
+EVENT.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC004
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+**Derived outcome: NOT EXTENDED (lapsed) = 0**. no later advisory moved the end past 11/0200Z.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 17. route-20260527-120
+
+- Term: **NONE** (route:NONE); written as: `PROBABILITY OF EXTENSION: NONE`
+- Element: NORTH_TO_DFW_DAL; initiative: reroute; first issued 05/27 21:16Z in 20260527-120; window read as 27/1315Z - 28/0000Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 120 DCC 05/27/2026 ROUTE RQD /FL
+NAME: NORTH_TO_DFW_DAL
+CONSTRAINED AREA: ZFW
+REASON: WEATHER
+INCLUDE TRAFFIC: CZY/KBUF/KCLE/KDTW/KPIT/KROC/ZAU/ZBW/ZID/ZKC/ZMP/ZN
+Y DEPARTURES TO KDAL/KDFW
+FACILITIES INCLUDED: CZY/ZAU/ZBW/ZFW/ZID/ZKC/ZMP/ZNY/ZOB
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: ETD 271315 TO 280000
+PROBABILITY OF EXTENSION: NONE
+REMARKS: REPLACES ADVZY 085. BASED ON DFW_EAST_1_NORTH_FLOW
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS: EXTENDS END TIME...CAUSAL FACTOR IS WEATHER/TS
+ROUTES: [route table not shown]
+TMI ID: RRDCC507
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+**Derived outcome: NOT EXTENDED (lapsed) = 0**. no later advisory moved the end past 28/0000Z.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 18. gs-20260418-053
+
+- Term: **MEDIUM** (gs:MEDIUM); written as: `PROBABILITY OF EXTENSION: MEDIUM`
+- Element: LGA; initiative: gs; first issued 04/18 14:22Z in 20260418-053; window read as 18/1403Z - 18/1500Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 053 LGA/ZNY 04/18/2026 CDM GROUND STOP
+CTL ELEMENT: LGA
+ELEMENT TYPE: APT
+ADL TIME: 1418Z
+GROUND STOP PERIOD: 18/1403Z - 18/1500Z
+CUMULATIVE PROGRAM PERIOD: 18/1316Z - 19/0044Z
+DEP FACILITIES INCLUDED: (Manual) ZTL ZJX
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 861 / 169 / 123
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 975 / 178 / 139
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: VOLUME / VOLUME
+COMMENTS: 30 MIN STOP TO ASSIST ZDC WITH OVERHEAD STRAM CONGESTION.
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260418-057  sent 04/18 14:38Z  LGA GROUND STOP CANCELLATION  LGA  EVENT TIME 18/1418Z - 18/1439Z
+```
+
+**Derived outcome: NOT EXTENDED (lapsed) = 0**. no later advisory moved the end past 18/1500Z. Flags: manual_release.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 19. route-20260513-059
+
+- Term: **NONE** (route:NONE); written as: `PROBABILITY OF EXTENSION: NONE`
+- Element: FCA003:CAPE_LAUNCH_1B; initiative: reroute; first issued 05/13 19:31Z in 20260513-059; window read as 13/2240Z - 13/2330Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 059 DCC 05/13/2026 FCA RQD
+NAME: FCA003:CAPE_LAUNCH_1B
+CONSTRAINED AREA: ZJX/ZMA
+REASON: OTHER
+INCLUDE TRAFFIC: UNKN DEPARTURES TO UNKN
+FACILITIES INCLUDED: ALL + CANADA
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 132240 TO 132330
+PROBABILITY OF EXTENSION: NONE
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. IMPLEMENTED DUE TO ROCKET
+LAUNCH.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC502
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260513-079  sent 05/13 23:02Z  REROUTE CANCELLATION  FCA003:CAPE_LAUNCH_1B
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 13/2302Z; stated end 13/2330Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 079 DCC 05/13/2026 REROUTE CANCELLATION
+FCA003:CAPE_LAUNCH_1B HAS BEEN CANCELLED.
+
+REMARKS:
+ASSOCIATED RESTRICTIONS:
+```
+
+## 20. gs-20260531-033
+
+- Term: **LOW** (gs:LOW); written as: `PROBABILITY OF EXTENSION: LOW`
+- Element: LGA; initiative: gs; first issued 05/31 14:24Z in 20260531-033; window read as 31/1311Z - 31/1530Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 033 LGA/ZNY 05/31/2026 CDM GROUND STOP
+CTL ELEMENT: LGA
+ELEMENT TYPE: APT
+ADL TIME: 1419Z
+GROUND STOP PERIOD: 31/1311Z - 31/1530Z
+DEP FACILITIES INCLUDED: (1stTier) ZDC ZNY ZOB ZBW
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 225 / 60 / 12
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 932 / 120 / 49
+PROBABILITY OF EXTENSION: LOW
+IMPACTING CONDITION: RWY-TAXI / CONSTRUCTION
+COMMENTS:
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260531-036  sent 05/31 15:17Z  CDM GS CNX  LGA  GS CNX PERIOD 31/1514Z - 31/1651Z
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 31/1517Z; stated end 31/1530Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 036 LGA/ZNY 05/31/2026 CDM GS CNX
+CTL ELEMENT: LGA
+ELEMENT TYPE: APT
+ADL TIME: 1514Z
+GS CNX PERIOD: 31/1514Z - 31/1651Z
+COMMENTS: RWY 31 AVAILABLE FOR DEPARTURE MOMENTARILY
+```
+
+## 21. gs-20260505-068
+
+- Term: **LOW** (gs:LOW); written as: `PROBABILITY OF EXTENSION: LOW`
+- Element: DEN; initiative: gs; first issued 05/05 22:22Z in 20260505-068; window read as 05/2202Z - 05/2315Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 068 DEN/ZDV 05/05/2026 CDM GROUND STOP
+CTL ELEMENT: DEN
+ELEMENT TYPE: APT
+ADL TIME: 2217Z
+GROUND STOP PERIOD: 05/2202Z - 05/2315Z
+DEP FACILITIES INCLUDED: (1stTier) ZLA ZLC ZDV ZKC ZAB ZMP
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 0 / 0 / 0
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 999 / 63 / 36
+PROBABILITY OF EXTENSION: LOW
+IMPACTING CONDITION: WEATHER / LOW CEILINGS
+COMMENTS: TOWER NEEDS 6MIT RWY 34R DUE TO LOW CEILINGS/VISIBILITY.
+SCHEDULED AIRCRAFT ARE EXEMPT
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260505-071  sent 05/05 23:22Z  CDM GS CNX  DEN  GS CNX PERIOD 05/2322Z - 06/0125Z
+20260506-002  sent 05/06 00:07Z  CDM GROUND STOP  DEN  GROUND STOP PERIOD 05/2352Z - 06/0115Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260506-007  sent 05/06 00:47Z  CDM GS CNX  DEN  GS CNX PERIOD 06/0047Z - 06/0253Z
+```
+
+**Derived outcome: NOT EXTENDED (lapsed) = 0**. no later advisory moved the end past 05/2315Z.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 22. plan-20260520-075-BOS-gs+gdp-AFTER1800
+
+- Term: **POSSIBLE** (plan:POSSIBLE); written as: `AFTER 1800	-BOS GROUND STOP/DELAY PROGRAOM POSSIBLE`
+- Element: BOS; initiative: gs/gdp; first issued 05/20 15:43Z in 20260520-075; window read as 20/1800Z - 21/0800Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 075 DCC 05/20/2026 OPERATIONS PLAN
+EVENT TIME: 20/1600 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 2059	-SFO GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+AFTER 1800	-BOS GROUND STOP/DELAY PROGRAOM POSSIBLE
+AFTER 1800	-LGA/JFK GROUND STOP/DELAY PROGRAM PROBABLE
+AFTER 1800	-EWR/TEB GROUND STOP/DELAY PROGRAM PROBABLE
+AFTER 1900	-MCO/TPA GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1900	-ATL GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 2000	-PHL GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 2000	-IAD/DCA/BWI GROUND STOP/DELAY PROGRAM POSSIBLE
+UNTIL 0000	-BNA GROUND STOP POSSIBLE
+UNTIL 0100	-DEN GROUND STOP/DELAY PROGRAM POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260520-152  sent 05/20 21:28Z  CDM GROUND STOP  BOS  GROUND STOP PERIOD 20/2112Z - 20/2215Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260520-164  sent 05/20 22:05Z  CDM GS CNX  BOS  GS CNX PERIOD 20/2202Z - 21/0011Z
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260520-109  sent 05/20 18:41Z  BOS AIRPORT ARRIVAL DELAYS
+```
+
+**Derived outcome: ISSUED = 1**. CDM GROUND STOP sent 20/2128Z, period 20/2112Z - 20/2205Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 152 BOS/ZBW 05/20/2026 CDM GROUND STOP
+CTL ELEMENT: BOS
+ELEMENT TYPE: APT
+ADL TIME: 2122Z
+GROUND STOP PERIOD: 20/2112Z - 20/2215Z
+DEP FACILITIES INCLUDED: (1stTier+CZY_AP) ZDC ZNY ZOB ZBW  CYHZ CYOW
+CYUL CYYZ CYTZ CYQB
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 0 / 0 / 0
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 773 / 57 / 32
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS: LIMITED DEPARTURE ROUTES CAUSING SURFACE CONGESTION.
+```
+
+## 23. route-20260501-077
+
+- Term: **HIGH** (route:HIGH); written as: `PROBABILITY OF EXTENSION: HIGH`
+- Element: FCA009:GA_TO_MIA_AND_SATS_VIA_MOGAE; initiative: reroute; first issued 05/01 17:01Z in 20260501-077; window read as 01/2115Z - 02/0200Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 077 DCC 05/01/2026 FCA RQD
+NAME: FCA009:GA_TO_MIA_AND_SATS_VIA_MOGAE
+CONSTRAINED AREA: ZJX/ZMA
+REASON: OTHER
+INCLUDE TRAFFIC: CZU/CZY/KBWI/KCHO/KCLT/KDCA/KDET/KDTW/KFNT/KIAD/KJF
+K/KLAN/KMBS/KORF/KPHF/KPHL/KPTK/KRDU/KRIC/KYIP/ZAU/
+ZBW/ZDC/ZDV/ZID/ZJX/ZKC/ZME/ZMP/ZNY/ZOB/ZTL
+DEPARTURES TO 07FA/KHST/KMIA/KTMB/X51
+FACILITIES INCLUDED: CZU/CZY/ZAU/ZBW/ZDC/ZDV/ZID/ZJX/ZKC/ZMA/ZME/ZMP
+/ZNY/ZOB/ZTL
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 012115 TO 020200
+PROBABILITY OF EXTENSION: HIGH
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. THIS PLAYBOOK IS FOR JET
+AIRCRAFT EXCLUDING THESE TYPES:  EA50  E50P  SF50 C510 AND
+C525.     AIRCRAFT ON AR AND Y ROUTES ARE EXEMPT.  THIS
+ROUTE IS ISSUED DUE TO SPECIAL OPERATIONS.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC512
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260502-004  sent 05/02 00:05Z  FCA RQD  FCA025:GA_TO_MIA_AND_SATS_VIA_MOGAE  VALID 02/0200Z - 02/2315Z  [PROBABILITY OF EXTENSION: MODERATE]
+```
+
+**Derived outcome: EXTENDED = 1**. end 02/0200Z -> 02/2315Z (+1275 min), carried on as FCA025:GA_TO_MIA_AND_SATS_VIA_MOGAE under TMI ID RRDCC524. Flags: continued_new_id.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 004 DCC 05/02/2026 FCA RQD
+NAME: FCA025:GA_TO_MIA_AND_SATS_VIA_MOGAE
+CONSTRAINED AREA: ZJX/ZMA
+REASON: OTHER
+INCLUDE TRAFFIC: CZU/CZY/KBWI/KCHO/KCLT/KDCA/KDET/KDTW/KFNT/KIAD/KJF
+K/KLAN/KMBS/KORF/KPHF/KPHL/KPTK/KRDU/KRIC/KYIP/ZAU/
+ZBW/ZDC/ZDV/ZID/ZJX/ZKC/ZME/ZMP/ZNY/ZOB/ZTL
+DEPARTURES TO 07FA/KHST/KMIA/KTMB/X51
+FACILITIES INCLUDED: CZU/CZY/ZAU/ZBW/ZDC/ZDV/ZID/ZJX/ZKC/ZMA/ZME/ZMP
+/ZNY/ZOB/ZTL
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 020200 TO 022315
+PROBABILITY OF EXTENSION: MODERATE
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. AIRCRAFT ON ILM AREA
+AR/ATLANTIC Y ROUTES ARE EXEMPT. THIS PLAYBOOK IS FOR JET
+ACFT EXCLUDING THE FOLLOWING ACFT TYPES:
+EA50/E50P/SF50/C510/C525. IMPLEMENTED DUE TO SPECIAL
+OPERATIONS.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC524
+```
+
+## 24. plan-20260420-055-MIA-gs-UNTIL2300
+
+- Term: **POSSIBLE** (plan:POSSIBLE); written as: `UNTIL 2300	-MIA/FLL GROUND STOP POSSIBLE`
+- Element: MIA; initiative: gs; first issued 04/20 17:45Z in 20260420-055; window read as 20/1745Z - 20/2300Z
+- Repeated in: 20260420-067 20260420-073
+
+Source advisory:
+
+```
+ATCSCC ADVZY 055 DCC 04/20/2026 OPERATIONS PLAN
+EVENT TIME: 20/1800 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 1815	-LGA GROUND STOP
+UNTIL 0659	-SFO GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+AFTER 1900	-JFK GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 2100	-EWR GROUND STOP/DELAY PROGRAM POSSIBLE
+UNTIL 2300	-MIA/FLL GROUND STOP POSSIBLE
+UNTIL 0100	-LGA GROUND STOP/DELAY PROGRAM POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260420-048  sent 04/20 16:22Z  MIA PBI CDRS_FYI
+```
+
+**Derived outcome: NOT ISSUED = 0**. no gs advisory for MIA in the window.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 25. gs-20260421-015
+
+- Term: **LOW** (gs:LOW); written as: `PROBABILITY OF EXTENSION: LOW`
+- Element: SFO; initiative: gs; first issued 04/21 04:36Z in 20260421-015; window read as 21/0423Z - 21/0545Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 015 SFO/ZOA 04/21/2026 CDM GROUND STOP
+CTL ELEMENT: SFO
+ELEMENT TYPE: APT
+ADL TIME: 0433Z
+GROUND STOP PERIOD: 21/0423Z - 21/0545Z
+CUMULATIVE PROGRAM PERIOD: 20/1500Z - 21/0759Z
+DEP FACILITIES INCLUDED: (1stTier) ZLA ZLC ZOA ZSE
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 2098 / 485 / 123
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 2858 / 588 / 168
+PROBABILITY OF EXTENSION: LOW
+IMPACTING CONDITION: WEATHER / WIND
+COMMENTS: VOLUME HAS COMPACTED, GS TO BUILD ROOM FOR RECOVERY
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260421-018  sent 04/21 05:35Z  CDM GROUND DELAY PROGRAM CNX  SFO  GDP CNX PERIOD 21/0531Z - 21/1624Z
+```
+
+**Derived outcome: NOT EXTENDED (lapsed) = 0**. no later advisory moved the end past 21/0545Z.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 26. plan-20260418-005-SAT-gs-AFTER2000
+
+- Term: **POSSIBLE** (plan:POSSIBLE); written as: `AFTER 2000 	-AUS/SAT GROUND STOP POSSIBLE`
+- Element: SAT; initiative: gs; first issued 04/18 01:29Z in 20260418-005; window read as 18/2000Z - 19/0800Z
+- Repeated in: 20260418-018 20260418-031 20260418-050 20260418-060 20260418-067 20260418-072
+
+Source advisory:
+
+```
+ATCSCC ADVZY 005 DCC 04/18/2026 OPERATIONS PLAN
+EVENT TIME: 18/0200 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 0259 	-LGA GROUND DELAY PROGRAM
+UNTIL 0659 	-LAS GROUND DELAY PROGRAM
+UNTIL 0659 	-ORD GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+UNTIL 0300 	-MDW GROUND STOP PROBABLE
+AFTER 1100 	-DFW GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1100 	-DAL GROUND STOP POSSIBLE
+AFTER 2000 	-AUS/SAT GROUND STOP POSSIBLE
+AFTER 2000 	-HOU/IAH GROUND STOP POSSIBLE
+AFTER 2000 	-LGA GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 2000 	-EWR/PHL GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 2100 	-JFK GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 2100 	-BOS GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 2100 	-BWI/DCA/IAD GROUND STOP POSSIBLE
+AFTER 2100 	-SFO GROUND STOP/DELAY PROGRAM POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+**Derived outcome: NOT ISSUED = 0**. no gs advisory for SAT in the window.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 27. route-20260412-062
+
+- Term: **MODERATE** (route:MODERATE); written as: `PROBABILITY OF EXTENSION: MODERATE`
+- Element: IAH_KOBLE_PARTIAL; initiative: reroute; first issued 04/12 18:50Z in 20260412-062; window read as 12/1900Z - 12/2300Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 062 DCC 04/12/2026 ROUTE RQD /FL
+NAME: IAH_KOBLE_PARTIAL
+CONSTRAINED AREA: ZHU
+REASON: WEATHER
+INCLUDE TRAFFIC: ABQ/KLAS/KSAN/ZAB/ZDV/ZLA/ZLC/ZOA/ZSE DEPARTURES TO
+KHOU/KIAH
+FACILITIES INCLUDED: ZAB/ZDV/ZHU/ZLA/ZLC/ZOA/ZSE
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: ETD 121900 TO 122300
+PROBABILITY OF EXTENSION: MODERATE
+REMARKS:
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC506
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+**Derived outcome: NOT EXTENDED (lapsed) = 0**. no later advisory moved the end past 12/2300Z.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 28. plan-20260405-055-EWR-gs+gdp-AFTER1700
+
+- Term: **POSSIBLE** (plan:POSSIBLE); written as: `AFTER 1700	-EWR/EWR SATS GROUND STOP/DELAY PROGRAM POSSIBLE`
+- Element: EWR; initiative: gs/gdp; first issued 04/05 15:55Z in 20260405-055; window read as 05/1700Z - 06/0800Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 055 DCC 04/05/2026 OPERATIONS PLAN
+EVENT TIME: 05/1600 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 1700	-EWR GROUND STOP
+UNTIL 1700	-DCA GROUND STOP
+UNTIL 0159	-LGA GROUND DELAY PROGRAM
+UNTIL 0159	-IAH GROUND DELAY PROGRAM
+UNTIL 0659	-SFO GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+AFTER 1700	-JFK GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1700	-EWR/EWR SATS GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1700	-CLT GROUND STOP POSSIBLE
+AFTER 1800	-BOS GROUND STOP/DELAY PROGRAM POSSIBLE
+UNTIL 1900	-PHL GROUND STOP POSSIBLE
+AFTER 1900	-MCO GROUND STOP POSSIBLE
+UNTIL 2300	-DCA GROUND DELAY PROGRAM POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260405-054  sent 04/05 15:52Z  CDM GROUND STOP  EWR  GROUND STOP PERIOD 05/1538Z - 05/1700Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260405-061  sent 04/05 16:24Z  CDM GS CNX  EWR  GS CNX PERIOD 05/1622Z - 05/1930Z
+20260405-089  sent 04/05 21:57Z  CDM GROUND STOP  EWR  GROUND STOP PERIOD 05/2156Z - 05/2315Z  [PROBABILITY OF EXTENSION: LOW]
+20260405-093  sent 04/05 22:41Z  CDM GS CNX  EWR  GS CNX PERIOD 05/2237Z - 06/0124Z
+20260406-001  sent 04/06 00:05Z  CDM GROUND STOP  EWR  GROUND STOP PERIOD 05/2342Z - 06/0045Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260406-008  sent 04/06 00:44Z  CDM GS CNX  EWR  GS CNX PERIOD 06/0039Z - 06/0304Z
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260405-024  sent 04/05 11:01Z  EWR SATELLITE AIRPORTS ARRIVAL DELAYS
+20260405-025  sent 04/05 11:42Z  EWR SATELLITE AIRPORTS ARRIVAL DELAYS
+20260405-035  sent 04/05 13:20Z  LGA EWR AND METS AIRPORT DIVERSION RECOVERY ACTIVATED
+20260405-050  sent 04/05 15:25Z  EWR AIRPORT ARRIVAL DELAYS
+20260405-057  sent 04/05 15:58Z  EWR SATELLITE AIRPORTS ARRIVAL DELAYS
+20260405-058  sent 04/05 16:00Z  LGA EWR AND METS AIRPORT DIVERSION RECOVERY ACTIVATED
+```
+
+**Derived outcome: EXCLUDED (already_active)**. CDM GROUND STOP already running at 05/1555Z, until 05/1700Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 054 EWR/ZNY 04/05/2026 CDM GROUND STOP
+CTL ELEMENT: EWR
+ELEMENT TYPE: APT
+ADL TIME: 1548Z
+GROUND STOP PERIOD: 05/1538Z - 05/1700Z
+DEP FACILITIES INCLUDED: (2ndTier+CZY_AP) ZAU ZTL ZDC ZNY ZJX ZOB ZBW
+ZID ZMP  CYHZ CYOW CYUL CYYZ CYTZ CYQB
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 0 / 0 / 0
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 662 / 70 / 37
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: WEATHER / LOW CEILINGS
+COMMENTS:
+```
+
+## 29. route-20260401-060
+
+- Term: **NONE** (route:NONE); written as: `PROBABILITY OF EXTENSION: NONE`
+- Element: FCA010:CAPE_LAUNCH_1B_ARTEMIS; initiative: reroute; first issued 04/01 17:38Z in 20260401-060; window read as 01/2024Z - 02/0109Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 060 DCC 04/01/2026 FCA RQD /FL
+NAME: FCA010:CAPE_LAUNCH_1B_ARTEMIS
+CONSTRAINED AREA: ZJX/ZMA
+REASON: OTHER
+INCLUDE TRAFFIC: UNKN DEPARTURES TO UNKN
+FACILITIES INCLUDED: ALL+CANADA
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 012024 TO 020109
+PROBABILITY OF EXTENSION: NONE
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. IMPLEMENTED DUE TO ROCKET
+LAUNCH.  FILE UPT AFTER LAST FIX ON ROUTE.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC503
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260401-129  sent 04/01 22:52Z  REROUTE CANCELLATION  FCA010:CAPE_LAUNCH_1B_ARTEMIS
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 01/2252Z; stated end 02/0109Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 129 DCC 04/01/2026 REROUTE CANCELLATION
+FCA010:CAPE_LAUNCH_1B_ARTEMIS HAS BEEN CANCELLED.
+
+REMARKS:
+ASSOCIATED RESTRICTIONS:
+```
+
+## 30. plan-20260421-055-IAH-gs+gdp-UNTIL0000
+
+- Term: **POSSIBLE** (plan:POSSIBLE); written as: `UNTIL 0000	-IAH/HOU GROUND STOP/DELAY PROGRAM POSSIBLE`
+- Element: IAH; initiative: gs/gdp; first issued 04/21 19:33Z in 20260421-055; window read as 21/1933Z - 22/0000Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 055 DCC 04/21/2026 OPERATIONS PLAN
+EVENT TIME: 21/2000 - AND LATER
+TERMINAL ACTIVE:
+NONE
+TERMINAL PLANNED:
+UNTIL 0000	-IAH/HOU GROUND STOP/DELAY PROGRAM POSSIBLE
+UNTIL 0200	-ORD/MDW GROUND STOP POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260421-053  sent 04/21 17:42Z  IAH HOU CDRS_FYI
+```
+
+**Derived outcome: NOT ISSUED = 0**. no gs or gdp advisory for IAH in the window.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 31. route-20260404-058
+
+- Term: **MODERATE** (route:MODERATE); written as: `PROBABILITY OF EXTENSION: MODERATE`
+- Element: EAST_TO_DALLAS; initiative: reroute; first issued 04/04 11:38Z in 20260404-058; window read as 04/1145Z - 04/1500Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 058 DCC 04/04/2026 ROUTE RQD /FL
+NAME: EAST_TO_DALLAS
+CONSTRAINED AREA: ZFW
+REASON: WEATHER
+INCLUDE TRAFFIC: KATL/KCLT/KGSO/KMIA/KORF/KRDU/KRIC/KROA/KTPA/ZJX/ZM
+A/ZME/ZTL DEPARTURES TO KDAL/KDFW
+FACILITIES INCLUDED: ZDC/ZFW/ZHU/ZJX/ZMA/ZME/ZTL
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: ETA 041145 TO 041500
+PROBABILITY OF EXTENSION: MODERATE
+REMARKS: DFW LANDING NORTH. BASED ON DFW EAST 1 NORTH FLOW PARTIAL.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC501
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260404-077  sent 04/04 14:17Z  ROUTE RQD /FL  EAST_TO_DALLAS  VALID 04/1145Z - 04/1700Z  [PROBABILITY OF EXTENSION: MODERATE]
+20260404-078  sent 04/04 14:19Z  ROUTE RQD /FL  EAST_TO_DALLAS  VALID 04/1145Z - 04/1900Z  [PROBABILITY OF EXTENSION: MODERATE]
+20260404-096  sent 04/04 16:29Z  ROUTE RQD /FL  EAST_TO_DALLAS  VALID 04/1145Z - 04/2000Z  [PROBABILITY OF EXTENSION: MODERATE]
+```
+
+**Derived outcome: EXTENDED = 1**. end 04/1500Z -> 04/1700Z (+120 min).
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 077 DCC 04/04/2026 ROUTE RQD /FL
+NAME: EAST_TO_DALLAS
+CONSTRAINED AREA: ZFW
+REASON: WEATHER
+INCLUDE TRAFFIC: KATL/KCLT/KGSO/KMIA/KORF/KRDU/KRIC/KROA/KTPA/ZJX/ZM
+A/ZME/ZTL DEPARTURES TO KDAL/KDFW
+FACILITIES INCLUDED: ZDC/ZFW/ZHU/ZJX/ZMA/ZME/ZTL
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: ETA 041145 TO 041700
+PROBABILITY OF EXTENSION: MODERATE
+REMARKS: REPLACES ADVZY 058. DFW LANDING NORTH. BASED ON DFW EAST 1
+NORTH FLOW PARTIAL.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS: TIME EXTENDED
+ROUTES: [route table not shown]
+TMI ID: RRDCC501
+```
+
+## 32. gs-20260510-071
+
+- Term: **LOW** (gs:LOW); written as: `PROBABILITY OF EXTENSION: LOW`
+- Element: JFK; initiative: gs; first issued 05/10 19:35Z in 20260510-071; window read as 10/1917Z - 10/2015Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 071 JFK/ZNY 05/10/2026 CDM GROUND STOP
+CTL ELEMENT: JFK
+ELEMENT TYPE: APT
+ADL TIME: 1932Z
+GROUND STOP PERIOD: 10/1917Z - 10/2015Z
+DEP FACILITIES INCLUDED: (Manual) ZDC
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 0 / 0 / 0
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 45 / 45 / 45
+PROBABILITY OF EXTENSION: LOW
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS: HOLDING DUE TO WX ON FINAL
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260510-078  sent 05/10 19:59Z  CDM GS CNX  JFK  GS CNX PERIOD 10/1955Z - 10/2100Z
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 10/1959Z; stated end 10/2015Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 078 JFK/ZNY 05/10/2026 CDM GS CNX
+CTL ELEMENT: JFK
+ELEMENT TYPE: APT
+ADL TIME: 1955Z
+GS CNX PERIOD: 10/1955Z - 10/2100Z
+COMMENTS:
+```
+
+## 33. gs-20260502-059
+
+- Term: **HIGH** (gs:HIGH); written as: `PROBABILITY OF EXTENSION: HIGH`
+- Element: MCO; initiative: gs; first issued 05/02 15:55Z in 20260502-059; window read as 02/1540Z - 02/1715Z
+- Repeated in: 20260502-060 20260502-068 20260502-069
+
+Source advisory:
+
+```
+ATCSCC ADVZY 059 MCO/ZJX 05/02/2026 CDM GROUND STOP
+CTL ELEMENT: MCO
+ELEMENT TYPE: APT
+ADL TIME: 1550Z
+GROUND STOP PERIOD: 02/1540Z - 02/1715Z
+DEP FACILITIES INCLUDED: (Manual) ZJX ZTL ZDC ZHU
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 0 / 0 / 0
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 848 / 88 / 53
+PROBABILITY OF EXTENSION: HIGH
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS: LOSS OF ARRIVAL ROUTES.
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260502-060  sent 05/02 15:58Z  CDM GROUND STOP  MCO  GROUND STOP PERIOD 02/1540Z - 02/1715Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260502-068  sent 05/02 16:52Z  CDM GROUND STOP  MCO  GROUND STOP PERIOD 02/1638Z - 02/1715Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260502-069  sent 05/02 16:58Z  CDM GROUND STOP - CORRECTION  MCO  GROUND STOP PERIOD 02/1638Z - 02/1715Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260502-072  sent 05/02 17:09Z  CDM GS CNX  MCO  GS CNX PERIOD 02/1707Z - 02/1833Z
+20260502-078  sent 05/02 17:41Z  CDM GROUND STOP  MCO  GROUND STOP PERIOD 02/1717Z - 02/1845Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260502-082  sent 05/02 18:20Z  CDM GROUND STOP  MCO  GROUND STOP PERIOD 02/1806Z - 02/1945Z  [PROBABILITY OF EXTENSION: MEDIUM]
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260502-065  sent 05/02 16:28Z  MCO AIRPORT DIVERSION RECOVERY ACTIVATED
+20260502-079  sent 05/02 18:00Z  MCO AIRPORT ARRIVAL DELAYS
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 02/1709Z; stated end 02/1715Z. Flags: term_changed new_stop_30.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 072 MCO/ZJX 05/02/2026 CDM GS CNX
+CTL ELEMENT: MCO
+ELEMENT TYPE: APT
+ADL TIME: 1707Z
+GS CNX PERIOD: 02/1707Z - 02/1833Z
+FLIGHTS MAY RECEIVE NEW EDCTS DUE TO AN ACTIVE AFP
+COMMENTS:
+```
+
+## 34. route-20260527-042
+
+- Term: **MODERATE** (route:MODERATE); written as: `PROBABILITY OF EXTENSION: MODERATE`
+- Element: FL_TO_DFW_DAL; initiative: reroute; first issued 05/27 12:44Z in 20260527-042; window read as 27/1300Z - 27/1700Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 042 DCC 05/27/2026 ROUTE RQD /FL
+NAME: FL_TO_DFW_DAL
+CONSTRAINED AREA: ZFW/ZHU
+REASON: WEATHER
+INCLUDE TRAFFIC: KMCO/KORL/KSFB/ZMA DEPARTURES TO KDAL/KDFW
+FACILITIES INCLUDED: ZFW/ZJX/ZMA/ZME/ZTL
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: ETD 271300 TO 271700
+PROBABILITY OF EXTENSION: MODERATE
+REMARKS:
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC506
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260527-063  sent 05/27 15:26Z  REROUTE CANCELLATION  FL_TO_DFW_DAL
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 27/1526Z; stated end 27/1700Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 063 DCC 05/27/2026 REROUTE CANCELLATION
+FL_TO_DFW_DAL HAS BEEN CANCELLED.
+
+REMARKS: CANCELS ADVZY 042
+ASSOCIATED RESTRICTIONS:
+```
+
+## 35. gs-20260407-076
+
+- Term: **LOW** (gs:LOW); written as: `PROBABILITY OF EXTENSION: LOW`
+- Element: MIA; initiative: gs; first issued 04/07 22:36Z in 20260407-076; window read as 07/2230Z - 07/2345Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 076 MIA/ZMA 04/07/2026 CDM GROUND STOP
+CTL ELEMENT: MIA
+ELEMENT TYPE: APT
+ADL TIME: 2235Z
+GROUND STOP PERIOD: 07/2230Z - 07/2345Z
+DEP FACILITIES INCLUDED: (Manual) ZHU ZJX ZMA ZTL
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 0 / 0 / 0
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 2205 / 266 / 71
+PROBABILITY OF EXTENSION: LOW
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS: DVRSN AIRCRAFT ARE EXEMPT FROM GROUNDSTOP.
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260407-082  sent 04/07 23:23Z  CDM GS CNX  MIA  GS CNX PERIOD 07/2321Z - 08/0206Z
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 07/2323Z; stated end 07/2345Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 082 MIA/ZMA 04/07/2026 CDM GS CNX
+CTL ELEMENT: MIA
+ELEMENT TYPE: APT
+ADL TIME: 2321Z
+GS CNX PERIOD: 07/2321Z - 08/0206Z
+COMMENTS:
+```
+
+## 36. gs-20260415-082
+
+- Term: **LOW** (gs:LOW); written as: `PROBABILITY OF EXTENSION: LOW`
+- Element: DTW; initiative: gs; first issued 04/15 20:17Z in 20260415-082; window read as 15/2000Z - 15/2115Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 082 DTW/ZOB 04/15/2026 CDM GROUND STOP
+CTL ELEMENT: DTW
+ELEMENT TYPE: APT
+ADL TIME: 2010Z
+GROUND STOP PERIOD: 15/2000Z - 15/2115Z
+DEP FACILITIES INCLUDED: (Manual) ZDC ZNY ZOB ZBW  CYHZ CYOW CYUL
+CYYZ
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 0 / 0 / 0
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 297 / 71 / 37
+PROBABILITY OF EXTENSION: LOW
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS: GROUND STOP ISSUED TO ALLOW TIME TO PUBLISH ROUTE STRUCTURE
+INTO DTW.
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260415-090  sent 04/15 21:13Z  CDM GS CNX  DTW  GS CNX PERIOD 15/2112Z - 15/2307Z
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 15/2113Z; stated end 15/2115Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 090 DTW/ZOB 04/15/2026 CDM GS CNX
+CTL ELEMENT: DTW
+ELEMENT TYPE: APT
+ADL TIME: 2112Z
+GS CNX PERIOD: 15/2112Z - 15/2307Z
+COMMENTS:
+```
+
+## 37. gs-20260510-083
+
+- Term: **MEDIUM** (gs:MEDIUM); written as: `PROBABILITY OF EXTENSION: MEDIUM`
+- Element: EWR; initiative: gs; first issued 05/10 20:53Z in 20260510-083; window read as 10/2033Z - 10/2200Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 083 EWR/ZNY 05/10/2026 CDM GROUND STOP
+CTL ELEMENT: EWR
+ELEMENT TYPE: APT
+ADL TIME: 2048Z
+GROUND STOP PERIOD: 10/2033Z - 10/2200Z
+DEP FACILITIES INCLUDED: (Manual) ZDC
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 0 / 0 / 0
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 150 / 62 / 50
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS: NO ROUTES THROUGH ZDC.
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260510-090  sent 05/10 21:59Z  CDM GS CNX  EWR  GS CNX PERIOD 10/2158Z - 11/0002Z
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 10/2159Z; stated end 10/2200Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 090 EWR/ZNY 05/10/2026 CDM GS CNX
+CTL ELEMENT: EWR
+ELEMENT TYPE: APT
+ADL TIME: 2158Z
+GS CNX PERIOD: 10/2158Z - 11/0002Z
+COMMENTS:
+```
+
+## 38. gs-20260516-007
+
+- Term: **LOW** (gs:LOW); written as: `PROBABILITY OF EXTENSION: LOW`
+- Element: DFW; initiative: gs; first issued 05/16 01:10Z in 20260516-007; window read as 16/0053Z - 16/0215Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 007 DFW/ZFW 05/16/2026 CDM GROUND STOP
+CTL ELEMENT: DFW
+ELEMENT TYPE: APT
+ADL TIME: 0108Z
+GROUND STOP PERIOD: 16/0053Z - 16/0215Z
+DEP FACILITIES INCLUDED: (1stTier) ZHU ZFW ZKC ZME ZAB
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 0 / 0 / 0
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 762 / 66 / 38
+PROBABILITY OF EXTENSION: LOW
+IMPACTING CONDITION: WEATHER / WIND
+COMMENTS:
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260516-009  sent 05/16 01:39Z  CDM GS CNX  DFW  GS CNX PERIOD 16/0135Z - 16/0401Z
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 16/0139Z; stated end 16/0215Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 009 DFW/ZFW 05/16/2026 CDM GS CNX
+CTL ELEMENT: DFW
+ELEMENT TYPE: APT
+ADL TIME: 0135Z
+GS CNX PERIOD: 16/0135Z - 16/0401Z
+COMMENTS:
+```
+
+## 39. route-20260401-059
+
+- Term: **NONE** (route:NONE); written as: `PROBABILITY OF EXTENSION: NONE`
+- Element: FCA009:NO_AR_ATLANTIC_Y-RTES_TO_MCO_TPA_RSW_AREAS; initiative: reroute; first issued 04/01 17:38Z in 20260401-059; window read as 01/2139Z - 02/0109Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 059 DCC 04/01/2026 FCA RQD /FL
+NAME: FCA009:NO_AR_ATLANTIC_Y-RTES_TO_MCO_TPA_RSW_AREAS
+CONSTRAINED AREA: ZJX/ZMA
+REASON: OTHER
+INCLUDE TRAFFIC: UNKN DEPARTURES TO
+KAPF/KFMY/KISM/KLAL/KMCF/KMCO/KMKY/KORL/KPGD/KPIE/K
+RSW/KSFB/KSPG/KSRQ/KTPA/KTPF
+FACILITIES INCLUDED: ZJX/ZMA/ZDC/ZNY/ZBW/ZID/ZTL/ZOB/CZY
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 012139 TO 020109
+PROBABILITY OF EXTENSION: NONE
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. IMPLEMENTED DUE TO ROCKET
+LAUNCH ACTIVITIES.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC502
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260401-128  sent 04/01 22:51Z  REROUTE CANCELLATION  FCA009:NO_AR_ATLANTIC_Y-RTES_TO_MCO_TPA_RSW_AREAS
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 01/2251Z; stated end 02/0109Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 128 DCC 04/01/2026 REROUTE CANCELLATION
+FCA009:NO_AR_ATLANTIC_Y-RTES_TO_MCO_TPA_RSW_AREAS HAS BEEN CANCELLED.
+
+REMARKS:
+ASSOCIATED RESTRICTIONS:
+```
+
+## 40. plan-20260503-074-LAS-gdp-UNTIL0759
+
+- Term: **EXPECTED** (plan:EXPECTED); written as: `UNTIL 0759	-LAS GROUND DELAY PROGRAM EXPECTED`
+- Element: LAS; initiative: gdp; first issued 05/03 21:27Z in 20260503-074; window read as 03/2127Z - 04/0759Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 074 DCC 05/03/2026 OPERATIONS PLAN
+EVENT TIME: 03/2200 - AND LATER
+TERMINAL ACTIVE:
+NONE
+TERMINAL PLANNED:
+UNTIL 2300	-MIA/FLL/PBI GROUND STOP/DELAY PROGRAM POSSIBLE
+UNTIL 0000	-TEB GROUND DELAY PROGRAM POSSIBLE
+UNTIL 0759	-LAS GROUND DELAY PROGRAM EXPECTED
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260503-071  sent 05/03 21:24Z  CDM GROUND STOP  LAS  GROUND STOP PERIOD 03/2110Z - 03/2145Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260503-073  sent 05/03 21:27Z  CDM PROPOSED GROUND DELAY PROGRAM  LAS  ANTICIPATED CUMULATIVE PROGRAM PERIOD 03/2130Z - 04/0759Z
+20260503-077  sent 05/03 21:39Z  CDM GROUND DELAY PROGRAM  LAS  CUMULATIVE PROGRAM PERIOD 03/2130Z - 04/0759Z
+20260504-014  sent 05/04 06:57Z  CDM GROUND DELAY PROGRAM CNX  LAS  GDP CNX PERIOD 04/0654Z - 04/1518Z
+```
+
+**Derived outcome: ISSUED = 1**. CDM GROUND DELAY PROGRAM sent 03/2139Z, period 03/2130Z - 04/0657Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 077 LAS/ZLA 05/03/2026 CDM GROUND DELAY PROGRAM
+CTL ELEMENT: LAS
+ELEMENT TYPE: APT
+ADL TIME: 2134Z
+DELAY ASSIGNMENT MODE: UDP
+ARRIVALS ESTIMATED FOR: 03/2130Z - 04/0759Z
+CUMULATIVE PROGRAM PERIOD: 03/2130Z - 04/0759Z
+PROGRAM RATE: 44/44/44/44/44/44/28/28/28/28/28
+FLT INCL: ALL CONTIGUOUS US DEP
+DEP SCOPE: (ALL+CANADA) ZLA ZAU ZLC ZTL ZDC ZNY ZHU ZJX ZFW ZOB ZDV
+ZOA ZSE ZBW ZMA ZKC ZME ZID ZAB ZMP
+CANADIAN DEP ARPTS INCLUDED: CYHZ CYOW CYUL CYYZ CYTZ CYQB CYEG CYVR
+CYYC CYYJ CYLW
+DELAY ASSIGNMENT TABLE APPLIES TO: ZLA
+MAXIMUM DELAY: 310
+AVERAGE DELAY: 93
+IMPACTING CONDITION: STAFFING / STAFFING
+COMMENTS: L30 STAFFING TRIGGER. ARR 19R/26L. DEP19L/26R. LOW POP-UPS.
+FROM STATUS, CANCEL GROUND STOP.
+```
+
+## 41. gs-20260404-008
+
+- Term: **HIGH** (gs:HIGH); written as: `PROBABILITY OF EXTENSION: HIGH`
+- Element: ORD; initiative: gs; first issued 04/04 01:28Z in 20260404-008; window read as 04/0111Z - 04/0230Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 008 ORD/ZAU 04/04/2026 CDM GROUND STOP
+CTL ELEMENT: ORD
+ELEMENT TYPE: APT
+ADL TIME: 0126Z
+GROUND STOP PERIOD: 04/0111Z - 04/0230Z
+DEP FACILITIES INCLUDED: (1stTier) ZAU ZOB ZKC ZID ZMP
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 0 / 0 / 0
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 1073 / 69 / 45
+PROBABILITY OF EXTENSION: HIGH
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS:
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260404-010  sent 04/04 01:54Z  CDM PROPOSED GROUND DELAY PROGRAM  ORD  ANTICIPATED CUMULATIVE PROGRAM PERIOD 04/0126Z - 04/0659Z
+20260404-013  sent 04/04 02:14Z  CDM GROUND DELAY PROGRAM  ORD  CUMULATIVE PROGRAM PERIOD 04/0126Z - 04/0659Z
+20260404-019  sent 04/04 03:44Z  CDM GROUND STOP  ORD  GROUND STOP PERIOD 04/0328Z - 04/0445Z  [PROBABILITY OF EXTENSION: LOW]
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260404-011  sent 04/04 01:55Z  ORD AIRPORT DIVERSION RECOVERY ACTIVATED
+```
+
+**Derived outcome: NOT EXTENDED (lapsed) = 0**. no later advisory moved the end past 04/0230Z. Flags: gdp_followed.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 42. gs-20260405-066
+
+- Term: **MEDIUM** (gs:MEDIUM); written as: `PROBABILITY OF EXTENSION: MEDIUM`
+- Element: LGA; initiative: gs; first issued 04/05 17:04Z in 20260405-066; window read as 05/1650Z - 05/1800Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 066 LGA/ZNY 04/05/2026 CDM GROUND STOP
+CTL ELEMENT: LGA
+ELEMENT TYPE: APT
+ADL TIME: 1700Z
+GROUND STOP PERIOD: 05/1650Z - 05/1800Z
+CUMULATIVE PROGRAM PERIOD: 05/1530Z - 06/0159Z
+DEP FACILITIES INCLUDED: (Manual) ZDC ZNY ZOB ZBW  CYHZ CYOW CYUL
+CYYZ CYTZ CYQB
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 1437 / 224 / 57
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 2734 / 290 / 109
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: WEATHER / LOW CEILINGS
+COMMENTS:
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260405-068  sent 04/05 17:35Z  CDM GROUND STOP  LGA  GROUND STOP PERIOD 05/1650Z - 05/1900Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260405-074  sent 04/05 18:56Z  CDM GROUND DELAY PROGRAM  LGA  CUMULATIVE PROGRAM PERIOD 05/1530Z - 06/0359Z
+```
+
+**Derived outcome: EXTENDED = 1**. end 05/1800Z -> 05/1900Z (+60 min).
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 068 LGA/ZNY 04/05/2026 CDM GROUND STOP
+CTL ELEMENT: LGA
+ELEMENT TYPE: APT
+ADL TIME: 1734Z
+GROUND STOP PERIOD: 05/1650Z - 05/1900Z
+CUMULATIVE PROGRAM PERIOD: 05/1530Z - 06/0159Z
+DEP FACILITIES INCLUDED: (2ndTier+CZY_AP) ZAU ZTL ZDC ZNY ZJX ZOB ZBW
+ZID ZMP  CYHZ CYOW CYUL CYYZ CYTZ CYQB
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 3649 / 215 / 74
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 6252 / 277 / 128
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: WEATHER / LOW CEILINGS
+COMMENTS: EXPANDED TO 2ND TIER TO BUILD MORE RECOVERY ROOM AS WELL AS
+EXTENDED AN ADDITIONAL HOUR.
+```
+
+## 43. plan-20260406-016-FLL-gs-AFTER1800
+
+- Term: **POSSIBLE** (plan:POSSIBLE); written as: `AFTER 1800	-MIA/FLL/PBI GROUND STOP POSSIBLE`
+- Element: FLL; initiative: gs; first issued 04/06 01:20Z in 20260406-016; window read as 06/1800Z - 07/0800Z
+- Repeated in: 20260406-031 20260406-045 20260406-053 20260406-060
+
+Source advisory:
+
+```
+ATCSCC ADVZY 016 DCC 04/06/2026 OPERATIONS PLAN
+EVENT TIME: 06/0200 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 0359	-BOS GROUND DELAY PROGRAM
+UNTIL 0359	-LGA GROUND DELAY PROGRAM
+UNTIL 0659	-SFO GROUND DELAY PROGRAM
+UNTIL 0759	-LAS GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+AFTER 1500	-SFO GROUND STOP/DELAY PROGRAM PROBABLE
+AFTER 1800	-MCO GROUND STOP POSSIBLE
+AFTER 1800	-MIA/FLL/PBI GROUND STOP POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260406-057  sent 04/06 14:39Z  MIA FLL BCT RSW CDRS_FYI
+```
+
+**Derived outcome: NOT ISSUED = 0**. no gs advisory for FLL in the window.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 44. route-20260406-014
+
+- Term: **LOW** (route:LOW); written as: `PROBABILITY OF EXTENSION: LOW`
+- Element: FCA019:MASTERS_2026_AIK_DNL_HQU_ARVLS_; initiative: reroute; first issued 04/06 01:16Z in 20260406-014; window read as 06/1000Z - 07/0200Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 014 DCC 04/06/2026 FCA RQD
+NAME: FCA019:MASTERS_2026_AIK_DNL_HQU_ARVLS_
+CONSTRAINED AREA: ZTL
+REASON: OTHER
+INCLUDE TRAFFIC: CZU/CZY/KECP/KEWN/KILM/KOAJ/KORF/KPHF/KPIE/KPNS/KRD
+U/KSRQ/KTLH/KTPA/KVPS/ZAB/ZAU/ZBW/ZDC/ZDV/ZFW/ZHU/Z
+ID/ZJX/ZKC/ZLA/ZLC/ZMA/ZME/ZMP/ZNY/ZOA/ZOB/ZSE
+DEPARTURES TO KAIK/KDNL/KHQU
+FACILITIES INCLUDED: CZU/CZY/ZAB/ZAU/ZBW/ZDC/ZDV/ZFW/ZHU/ZID/ZJX/ZKC
+/ZLA/ZLC/ZMA/ZME/ZMP/ZNY/ZOA/ZOB/ZSE/ZTL
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 061000 TO 070200
+PROBABILITY OF EXTENSION: LOW
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. DUE TO SPECIAL EVENT
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC501
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260406-035  sent 04/06 09:22Z  REROUTE CANCELLATION  FCA019:MASTERS_2026_AIK_DNL_HQU_ARVLS_
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 06/0922Z; stated end 07/0200Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 035 DCC 04/06/2026 REROUTE CANCELLATION
+FCA019:MASTERS_2026_AIK_DNL_HQU_ARVLS_ HAS BEEN CANCELLED.
+
+REMARKS: CANCELS ADVZY 014. REPLACED BY ADVZY 033.
+ASSOCIATED RESTRICTIONS:
+```
+
+## 45. gs-20260405-089
+
+- Term: **LOW** (gs:LOW); written as: `PROBABILITY OF EXTENSION: LOW`
+- Element: EWR; initiative: gs; first issued 04/05 21:57Z in 20260405-089; window read as 05/2156Z - 05/2315Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 089 EWR/ZNY 04/05/2026 CDM GROUND STOP
+CTL ELEMENT: EWR
+ELEMENT TYPE: APT
+ADL TIME: 2156Z
+GROUND STOP PERIOD: 05/2156Z - 05/2315Z
+DEP FACILITIES INCLUDED: (Manual) ZTL ZDC ZNY ZJX ZOB ZBW
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 0 / 0 / 0
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 635 / 74 / 35
+PROBABILITY OF EXTENSION: LOW
+IMPACTING CONDITION: STAFFING / STAFFING
+COMMENTS: 1ST TIER + ZJX/ZTL DUE TO HIGH ARD VOLUME
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260405-093  sent 04/05 22:41Z  CDM GS CNX  EWR  GS CNX PERIOD 05/2237Z - 06/0124Z
+20260406-001  sent 04/06 00:05Z  CDM GROUND STOP  EWR  GROUND STOP PERIOD 05/2342Z - 06/0045Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260406-008  sent 04/06 00:44Z  CDM GS CNX  EWR  GS CNX PERIOD 06/0039Z - 06/0304Z
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 05/2241Z; stated end 05/2315Z. Flags: new_stop_30.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 093 EWR/ZNY 04/05/2026 CDM GS CNX
+CTL ELEMENT: EWR
+ELEMENT TYPE: APT
+ADL TIME: 2237Z
+GS CNX PERIOD: 05/2237Z - 06/0124Z
+FLIGHTS MAY RECEIVE NEW EDCTS DUE TO AN ACTIVE AFP
+COMMENTS:
+```
+
+## 46. route-20260423-039
+
+- Term: **HIGH** (route:HIGH); written as: `PROBABILITY OF EXTENSION: HIGH`
+- Element: FCA004:LAKE_ERIE_WEST_PARTIAL; initiative: reroute; first issued 04/23 16:18Z in 20260423-039; window read as 23/1400Z - 23/1800Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 039 DCC 04/23/2026 FCA RQD
+NAME: FCA004:LAKE_ERIE_WEST_PARTIAL
+CONSTRAINED AREA: CZY
+REASON: OTHER
+INCLUDE TRAFFIC: ZNY DEPARTURES TO
+KFNT/KMBS/KMKE/KMSP/KORD/ZAB/ZAU/ZDV/ZKC/ZLA/ZLC/ZM
+P/ZOA/ZSE
+FACILITIES INCLUDED: ZAB/ZAU/ZDV/ZKC/ZLA/ZLC/ZMP/ZNY/ZOA/ZOB/ZSE
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 231400 TO 231800
+PROBABILITY OF EXTENSION: HIGH
+REMARKS: REPLACES ADVZY 012.  SEE DYNAMIC LIST FOR UPDATES. DUE TO
+REDUCED SYSTEM CAPACITY IN CZY. EXPECT A SIMILAR
+RESTRICTION PAST 0300Z DUE TO CZY STAFFING. CURRENTLY
+SHORTENED TO 2000Z FOR FORECASTED WX.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS: TIMES ADJUSTED
+ROUTES: [route table not shown]
+TMI ID: RRDCC012
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260423-040  sent 04/23 16:21Z  FCA RQD  FCA012:LAKE_ERIE_WEST_PARTIAL  VALID 23/1800Z - 24/0300Z  [PROBABILITY OF EXTENSION: LOW]
+```
+
+**Derived outcome: EXTENDED = 1**. end 23/1800Z -> 24/0300Z (+540 min), carried on as FCA012:LAKE_ERIE_WEST_PARTIAL under TMI ID RRDCC040. Flags: continued_new_id.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 040 DCC 04/23/2026 FCA RQD
+NAME: FCA012:LAKE_ERIE_WEST_PARTIAL
+CONSTRAINED AREA: CZY
+REASON: OTHER
+INCLUDE TRAFFIC: KBUF/KIAG/KPHL/KROC/KSYR/ZBW/ZNY DEPARTURES TO
+KFNT/KMBS/KMKE/KORD/KPTK/KYIP/ZAB/ZAU/ZDV/ZKC/ZLA/Z
+LC/ZOA/ZSE
+FACILITIES INCLUDED: ZAB/ZAU/ZBW/ZDV/ZKC/ZLA/ZLC/ZNY/ZOA/ZOB/ZSE
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 231800 TO 240300
+PROBABILITY OF EXTENSION: LOW
+REMARKS: DUE TO STAFFING.  SEE DYNAMIC LIST FOR UPDATES.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC040
+```
+
+## 47. plan-20260521-017-SFO-gdp-AFTER1500
+
+- Term: **PROBABLE** (plan:PROBABLE); written as: `AFTER 1500	-SFO GROUND DELAY PROGRAM PROBABLE`
+- Element: SFO; initiative: gdp; first issued 05/21 01:30Z in 20260521-017; window read as 21/1500Z - 22/0800Z
+- Repeated in: 20260521-042 20260521-055
+
+Source advisory:
+
+```
+ATCSCC ADVZY 017 DCC 05/21/2026 OPERATIONS PLAN
+EVENT TIME: 21/0200 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 0200	-JFK GROUND STOP
+UNTIL 0230	-EWR GROUND STOP
+UNTIL 0230	-IAD GROUND STOP
+UNTIL 0230	-DCA GROUND STOP
+UNTIL 0459	-LGA GROUND DELAY PROGRAM
+UNTIL 0459	-JFK GROUND DELAY PROGRAM
+UNTIL 0459	-EWR GROUND DELAY PROGRAM
+UNTIL 0559	-SFO GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+AFTER 1100	-LGA GROUND STOP/DELAY PROGRAM PROBABLE
+AFTER 1200	-IAH/HOU GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1500	-SFO GROUND DELAY PROGRAM PROBABLE
+AFTER 1600	-DFW/DAL GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1800	-TPA/MCO GROUND STOP POSSIBLE
+AFTER 1900	-ATL GROUND STOP POSSIBLE
+AFTER 2000	-CLT GROUND STOP POSSIBLE
+AFTER 2000	-DEN GROUND STOP POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260520-123  sent 05/20 19:39Z  CDM GROUND DELAY PROGRAM CNX  SFO  GDP CNX PERIOD 20/1936Z - 20/2252Z
+20260520-191  sent 05/20 23:47Z  CDM GROUND DELAY PROGRAM  SFO  CUMULATIVE PROGRAM PERIOD 21/0200Z - 21/0559Z
+20260521-034  sent 05/21 04:21Z  CDM GROUND DELAY PROGRAM CNX  SFO  GDP CNX PERIOD 21/0417Z - 21/1910Z
+20260521-060  sent 05/21 12:37Z  CDM PROPOSED GROUND DELAY PROGRAM  SFO  ANTICIPATED CUMULATIVE PROGRAM PERIOD 21/1500Z - 22/0659Z
+20260521-061  sent 05/21 12:55Z  CDM GROUND DELAY PROGRAM  SFO  CUMULATIVE PROGRAM PERIOD 21/1500Z - 22/0659Z
+20260522-022  sent 05/22 03:55Z  CDM GROUND STOP  SFO  GROUND STOP PERIOD 22/0355Z - 22/0530Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260522-024  sent 05/22 05:27Z  CDM GROUND DELAY PROGRAM CNX  SFO  GDP CNX PERIOD 22/0525Z - 22/0759Z
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260520-124  sent 05/20 19:40Z  SFO AIRPORT SCHEDULING DELAYS
+20260521-114  sent 05/21 20:38Z  SFO AIRPORT ARRIVAL DELAYS
+```
+
+**Derived outcome: ISSUED = 1**. CDM GROUND DELAY PROGRAM sent 21/1255Z, period 21/1500Z - 22/0527Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 061 SFO/ZOA 05/21/2026 CDM GROUND DELAY PROGRAM
+CTL ELEMENT: SFO
+ELEMENT TYPE: APT
+ADL TIME: 1252Z
+DELAY ASSIGNMENT MODE: UDP
+ARRIVALS ESTIMATED FOR: 21/1500Z - 22/0659Z
+CUMULATIVE PROGRAM PERIOD: 21/1500Z - 22/0659Z
+PROGRAM RATE: 36/36/36/36/36/32/36/36/36/36/36/36/36/36/36/36
+FLT INCL: ALL CONTIGUOUS US DEP
+DEP SCOPE: (ALL+CZV_AP) ZLA ZAU ZLC ZTL ZDC ZNY ZHU ZJX ZFW ZOB ZDV
+ZOA ZSE ZBW ZMA ZKC ZME ZID ZAB ZMP
+CANADIAN DEP ARPTS INCLUDED: CYEG CYVR CYYC
+DELAY ASSIGNMENT TABLE APPLIES TO: ZOA
+MAXIMUM DELAY: 118
+AVERAGE DELAY: 35
+IMPACTING CONDITION: OTHER / OTHER
+COMMENTS: ARR28L DEPT 28L RWY CONSTRUCTION AND PROCEDURAL
+COMPLIANCE.
+```
+
+## 48. gs-20260417-007
+
+- Term: **MEDIUM** (gs:MEDIUM); written as: `PROBABILITY OF EXTENSION: MEDIUM`
+- Element: BNA; initiative: gs; first issued 04/17 01:16Z in 20260417-007; window read as 17/0110Z - 17/0230Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 007 BNA/ZME 04/17/2026 CDM GROUND STOP
+CTL ELEMENT: BNA
+ELEMENT TYPE: APT
+ADL TIME: 0113Z
+GROUND STOP PERIOD: 17/0110Z - 17/0230Z
+CUMULATIVE PROGRAM PERIOD: 16/2100Z - 17/0259Z
+DEP FACILITIES INCLUDED: (Manual) ZTL ZDC ZHU ZFW ZKC ZME ZID
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 301 / 51 / 16
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 1296 / 238 / 68
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS:
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260417-013  sent 04/17 02:22Z  CDM GROUND DELAY PROGRAM  BNA  CUMULATIVE PROGRAM PERIOD 16/2100Z - 17/0259Z
+20260417-015  sent 04/17 02:24Z  CDM GROUND STOP  BNA  GROUND STOP PERIOD 17/0212Z - 17/0300Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260417-017  sent 04/17 02:58Z  CDM GROUND DELAY PROGRAM CNX  BNA  GDP CNX PERIOD 17/0254Z - 17/0458Z
+```
+
+**Derived outcome: EXTENDED = 1**. end 17/0230Z -> 17/0300Z (+30 min). Flags: gdp_followed.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 015 BNA/ZME 04/17/2026 CDM GROUND STOP
+CTL ELEMENT: BNA
+ELEMENT TYPE: APT
+ADL TIME: 0222Z
+GROUND STOP PERIOD: 17/0212Z - 17/0300Z
+CUMULATIVE PROGRAM PERIOD: 16/2100Z - 17/0259Z
+DEP FACILITIES INCLUDED: (1stTier) ZTL ZHU ZFW ZKC ZME ZID
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 482 / 135 / 48
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 648 / 143 / 65
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS: CORRECTION TO REVISION
+```
+
+## 49. plan-20260524-093-DCA-gs+gdp-UNTIL0000
+
+- Term: **PROBABLE** (plan:PROBABLE); written as: `UNTIL 0000	-DCA GROUND STOP/DELAY PROGRAM PROBABLE`
+- Element: DCA; initiative: gs/gdp; first issued 05/24 19:48Z in 20260524-093; window read as 24/1948Z - 25/0000Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 093 DCC 05/24/2026 OPERATIONS PLAN
+EVENT TIME: 24/2000 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 2059	-SFO GROUND DELAY PROGRAM
+UNTIL 0059 	-BOS GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+AFTER 2200	-JFK GROUND STOP/DELAY PROGRAM POSSIBLE
+UNTIL 2300	-DEN GROUND STOP/DELAY PROGRAM POSSIBLE
+UNTIL 0000	-ATL GROUND STOP/DELAY PROGRAM POSSIBLE
+UNTIL 0000	-DCA GROUND STOP/DELAY PROGRAM PROBABLE
+UNTIL 0000	-PHL GROUND STOP POSSIBLE
+UNTIL 0000	-TPA/MCO GROUND STOP POSSIBLE
+UNTIL 0000	-CLT GROUND STOP/DELAY PROGRAM POSSIBLE
+UNTIL 0100	-DFW/DAL GROUND STOP/DELAY PROGRAM POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260524-097  sent 05/24 20:10Z  CDM PROPOSED GROUND DELAY PROGRAM  DCA  ANTICIPATED CUMULATIVE PROGRAM PERIOD 24/2230Z - 25/0259Z
+20260524-101  sent 05/24 20:31Z  CDM GROUND DELAY PROGRAM  DCA  CUMULATIVE PROGRAM PERIOD 24/2230Z - 25/0259Z
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260524-074  sent 05/24 17:26Z  DCA AIRPORT SCHEDULING DELAYS
+```
+
+**Derived outcome: ISSUED = 1**. CDM GROUND DELAY PROGRAM sent 24/2031Z, period 24/2230Z - 25/0108Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 101 DCA/ZDC 05/24/2026 CDM GROUND DELAY PROGRAM
+CTL ELEMENT: DCA
+ELEMENT TYPE: APT
+ADL TIME: 2025Z
+DELAY ASSIGNMENT MODE: UDP
+ARRIVALS ESTIMATED FOR: 24/2230Z - 25/0259Z
+CUMULATIVE PROGRAM PERIOD: 24/2230Z - 25/0259Z
+PROGRAM RATE: 28
+FLT INCL: ALL CONTIGUOUS US DEP
+DEP SCOPE: 1200
+CANADIAN DEP ARPTS INCLUDED: CYHZ CYOW CYUL CYYZ CYTZ CYQB
+DELAY ASSIGNMENT TABLE APPLIES TO: ZDC
+MAXIMUM DELAY: 56
+AVERAGE DELAY: 17
+IMPACTING CONDITION: WEATHER / LOW CEILINGS
+COMMENTS: ARR/DEP RWY1. MED POP-UPS. TIME +45.
+```
+
+## 50. route-20260522-076
+
+- Term: **HIGH** (route:HIGH); written as: `PROBABILITY OF EXTENSION: HIGH`
+- Element: FCA005:ZBW_CZU_TO_ZDC; initiative: reroute; first issued 05/22 17:24Z in 20260522-076; window read as 22/1700Z - 22/2200Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 076 DCC 05/22/2026 FCA RQD
+NAME: FCA005:ZBW_CZU_TO_ZDC
+CONSTRAINED AREA: ZDC/ZNY
+REASON: OTHER
+INCLUDE TRAFFIC: CZU/ZBW DEPARTURES TO KADW/KBWI/KDCA/KESN/KGAI/KMTN
+FACILITIES INCLUDED: CZU/ZBW/ZDC/ZNY/ZOB
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 221700 TO 222200
+PROBABILITY OF EXTENSION: HIGH
+REMARKS: REPLACES ADVZY052. SEE DYNAMIC LIST FOR UPDATES.
+IMPLEMENTED DUE TO SPECIAL OPERATIONS. AIRCRAFT LANDING
+KDCA AND KADW CAN EXPECT PUPPY WP AT FL280.  AIRCRAFT
+LANDING KBWI KMTN KGAI AND KESN CAN EXPECT PUPPY WP AT
+FL260
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC504
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+**Derived outcome: NOT EXTENDED (lapsed) = 0**. no later advisory moved the end past 22/2200Z.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 51. plan-20260520-094-TEB-gs+gdp-UNTIL0200
+
+- Term: **PROBABLE** (plan:PROBABLE); written as: `UNTIL 0200	-EWR/TEB GROUND STOP/DELAY PROGRAM PROBABLE`
+- Element: TEB; initiative: gs/gdp; first issued 05/20 17:35Z in 20260520-094; window read as 20/1735Z - 21/0200Z
+- Repeated in: 20260520-122 20260520-154
+
+Source advisory:
+
+```
+ATCSCC ADVZY 094 DCC 05/20/2026 OPERATIONS PLAN
+EVENT TIME: 20/1800 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 2059	-SFO GROUND DELAY PROGRAM
+UNTIL 0359	-LGA GROUND DELAY PROGRAM
+UNTIL 0359	-DCA GROUND DELAY PROGRAM
+UNTIL 0459	-EWR GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+AFTER 1900	-MCO/TPA GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1900	-ATL GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1900	-DEN GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 2000	-PHL GROUND DELAY PROGRAM EXPECTED
+AFTER 2000	-IAD/BWI GROUND STOP/DELAY PROGRAM POSSIBLE
+UNTIL 0000	-BNA GROUND STOP POSSIBLE
+UNTIL 0200	-BOS GROUND STOP/DELAY PROGRAOM POSSIBLE
+UNTIL 0200	-JFK GROUND STOP/DELAY PROGRAM PROBABLE
+UNTIL 0200	-EWR/TEB GROUND STOP/DELAY PROGRAM PROBABLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+**Derived outcome: NOT ISSUED = 0**. no gs or gdp advisory for TEB in the window.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 52. route-20260525-121
+
+- Term: **LOW** (route:LOW); written as: `PROBABILITY OF EXTENSION: LOW`
+- Element: FCA014:TEXAS_TO_DEN; initiative: reroute; first issued 05/25 21:38Z in 20260525-121; window read as 25/2230Z - 26/0230Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 121 DCC 05/25/2026 FCA RQD
+NAME: FCA014:TEXAS_TO_DEN
+CONSTRAINED AREA: ZDV
+REASON: WEATHER
+INCLUDE TRAFFIC: ZFW/ZHU DEPARTURES TO KDEN
+FACILITIES INCLUDED: ZAB/ZDV/ZFW/ZHU
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 252230 TO 260230
+PROBABILITY OF EXTENSION: LOW
+REMARKS: SEE DYNAMIC LIST FOR UPDATES.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS: BASED ON DEN_GCK_2
+ROUTES: [route table not shown]
+TMI ID: RRDCC506
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260526-009  sent 05/26 01:21Z  REROUTE CANCELLATION  FCA014:TEXAS_TO_DEN
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 26/0121Z; stated end 26/0230Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 009 DCC 05/26/2026 REROUTE CANCELLATION
+FCA014:TEXAS_TO_DEN HAS BEEN CANCELLED.
+
+REMARKS: CANCELS ADVZY 121
+ASSOCIATED RESTRICTIONS:
+```
+
+## 53. gs-20260512-063
+
+- Term: **LOW** (gs:LOW); written as: `PROBABILITY OF EXTENSION: LOW`
+- Element: TPA; initiative: gs; first issued 05/12 20:40Z in 20260512-063; window read as 12/1919Z - 12/2115Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 063 TPA/ZMA 05/12/2026 CDM GROUND STOP
+CTL ELEMENT: TPA
+ELEMENT TYPE: APT
+ADL TIME: 2037Z
+GROUND STOP PERIOD: 12/1919Z - 12/2115Z
+DEP FACILITIES INCLUDED: (Internal) ZMA
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 30 / 30 / 30
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 75 / 75 / 75
+PROBABILITY OF EXTENSION: LOW
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS: EXTENDED WHILE ZMA COORDINATES PATHFINDERS.
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260512-065  sent 05/12 21:03Z  CDM GS CNX  TPA  GS CNX PERIOD 12/2100Z - 12/2150Z
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 12/2103Z; stated end 12/2115Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 065 TPA/ZMA 05/12/2026 CDM GS CNX
+CTL ELEMENT: TPA
+ELEMENT TYPE: APT
+ADL TIME: 2100Z
+GS CNX PERIOD: 12/2100Z - 12/2150Z
+COMMENTS:
+```
+
+## 54. plan-20260429-092-IAH-gs+gdp-UNTIL0000
+
+- Term: **PROBABLE** (plan:PROBABLE); written as: `UNTIL 0000 	-IAH/HOU GROUND STOP/DELAY PROGRAM PROBABLE`
+- Element: IAH; initiative: gs/gdp; first issued 04/29 17:40Z in 20260429-092; window read as 29/1740Z - 30/0000Z
+- Repeated in: 20260429-107 20260429-121
+
+Source advisory:
+
+```
+ATCSCC ADVZY 092 DCC 04/29/2026 OPERATIONS PLAN
+EVENT TIME: 29/1800 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 2029	-SFO GROUND DELAY PROGRAM
+UNTIL 0359	-BOS GROUND DELAY PROGRAM
+UNTIL 0359	-DCA GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+UNTIL 0000 	-IAD/BWI GROUND STOP POSSIBLE
+UNTIL 0000 	-IAH/HOU GROUND STOP/DELAY PROGRAM PROBABLE
+UNTIL 0200 	-EWR/TEB/PHL GROUND STOP/DELAY PROGRAM POSSIBLE
+UNTIL 0300 	-LGA/JFK/HPN GROUND STOP/DELAY PROGRAM PROBABLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+**Derived outcome: NOT ISSUED = 0**. no gs or gdp advisory for IAH in the window. Flags: term_changed.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 55. route-20260501-076
+
+- Term: **HIGH** (route:HIGH); written as: `PROBABILITY OF EXTENSION: HIGH`
+- Element: FCA008:GA_TO_BCT_AREA; initiative: reroute; first issued 05/01 17:01Z in 20260501-076; window read as 01/2115Z - 02/0200Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 076 DCC 05/01/2026 FCA RQD
+NAME: FCA008:GA_TO_BCT_AREA
+CONSTRAINED AREA: ZJX/ZMA
+REASON: OTHER
+INCLUDE TRAFFIC: CZU/CZY/KBWI/KCLT/KDCA/KDET/KDTW/KFAY/KFNT/KIAD/KIL
+M/KLAN/KMBS/KOAJ/KPTK/KRIC/KROA/KSOP/KYIP/ZAB/ZAU/Z
+BW/ZDC/ZDV/ZFW/ZHU/ZID/ZJX/ZKC/ZLA/ZLC/ZME/ZMP/ZNY/
+ZOA/ZOB/ZSE/ZTL DEPARTURES TO KBCT/KFXE/KPMP
+FACILITIES INCLUDED: CZU/CZY/ZAB/ZAU/ZBW/ZDC/ZDV/ZFW/ZHU/ZID/ZJX/ZKC
+/ZLA/ZLC/ZMA/ZME/ZMP/ZNY/ZOA/ZOB/ZSE/ZTL
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 012115 TO 020200
+PROBABILITY OF EXTENSION: HIGH
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. THIS ROUTE IS ISSUED DUE TO
+SPECIAL OPERATIONS.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC511
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260502-003  sent 05/02 00:04Z  FCA RQD  FCA024:GA_TO_BCT_AREA  VALID 02/0200Z - 02/2315Z  [PROBABILITY OF EXTENSION: MODERATE]
+```
+
+**Derived outcome: EXTENDED = 1**. end 02/0200Z -> 02/2315Z (+1275 min), carried on as FCA024:GA_TO_BCT_AREA under TMI ID RRDCC523. Flags: continued_new_id.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 003 DCC 05/02/2026 FCA RQD
+NAME: FCA024:GA_TO_BCT_AREA
+CONSTRAINED AREA: ZJX/ZMA
+REASON: OTHER
+INCLUDE TRAFFIC: CZU/CZY/KBWI/KCLT/KDCA/KDET/KDTW/KFAY/KFNT/KIAD/KIL
+M/KLAN/KMBS/KOAJ/KPTK/KRIC/KROA/KSOP/KYIP/ZAB/ZAU/Z
+BW/ZDC/ZDV/ZFW/ZHU/ZID/ZJX/ZKC/ZLA/ZLC/ZME/ZMP/ZNY/
+ZOA/ZOB/ZSE/ZTL DEPARTURES TO KBCT/KFXE/KPMP
+FACILITIES INCLUDED: CZU/CZY/ZAB/ZAU/ZBW/ZDC/ZDV/ZFW/ZHU/ZID/ZJX/ZKC
+/ZLA/ZLC/ZMA/ZME/ZMP/ZNY/ZOA/ZOB/ZSE/ZTL
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 020200 TO 022315
+PROBABILITY OF EXTENSION: MODERATE
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. IMPLEMENTED DUE TO SPECIAL
+OPERATIONS.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC523
+```
+
+## 56. route-20260424-067
+
+- Term: **HIGH** (route:HIGH); written as: `PROBABILITY OF EXTENSION: HIGH`
+- Element: FCA015:GA_LIGHT_JETS_TO_MIA_AND_SATS; initiative: reroute; first issued 04/24 17:55Z in 20260424-067; window read as 24/2045Z - 25/0200Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 067 DCC 04/24/2026 FCA RQD
+NAME: FCA015:GA_LIGHT_JETS_TO_MIA_AND_SATS
+CONSTRAINED AREA: ZJX/ZMA
+REASON: OTHER
+INCLUDE TRAFFIC: CZU/CZY/KCDW/KCLT/KDET/KDTW/KFNT/KJFK/KLAN/KMBS/KMM
+U/KPHL/KPTK/KTEB/KYIP/ZAU/ZBW/ZDC/ZID/ZMP/ZNY/ZOB/Z
+TL DEPARTURES TO 07FA/KHST/KMIA/KTMB/X51
+FACILITIES INCLUDED: CZU/CZY/ZAU/ZBW/ZDC/ZID/ZJX/ZKC/ZMA/ZME/ZMP/ZNY
+/ZOB/ZTL
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 242045 TO 250200
+PROBABILITY OF EXTENSION: HIGH
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. THIS IS FOR GA VERY LIGHT
+JETS ONLY.  THIS ROUTE IS ISSUED DUE TO SPECIAL OPERATIONS.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC525
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260425-007  sent 04/25 00:43Z  FCA RQD  FCA024:GA_LIGHT_JETS_TO_MIA_AND_SATS  VALID 25/0200Z - 25/1900Z  [PROBABILITY OF EXTENSION: LOW]
+```
+
+**Derived outcome: EXTENDED = 1**. end 25/0200Z -> 25/1900Z (+1020 min), carried on as FCA024:GA_LIGHT_JETS_TO_MIA_AND_SATS under TMI ID RRDCC505. Flags: continued_new_id.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 007 DCC 04/25/2026 FCA RQD
+NAME: FCA024:GA_LIGHT_JETS_TO_MIA_AND_SATS
+CONSTRAINED AREA: ZJX/ZMA
+REASON: OTHER
+INCLUDE TRAFFIC: CZU/CZY/KCDW/KCLT/KDET/KDTW/KFNT/KJFK/KLAN/KMBS/KMM
+U/KPHL/KPTK/KTEB/KYIP/ZAU/ZBW/ZDC/ZID/ZMP/ZNY/ZOB/Z
+TL DEPARTURES TO 07FA/KHST/KMIA/KTMB/X51
+FACILITIES INCLUDED: CZU/CZY/ZAU/ZBW/ZDC/ZID/ZJX/ZKC/ZMA/ZME/ZMP/ZNY
+/ZOB/ZTL
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 250200 TO 251900
+PROBABILITY OF EXTENSION: LOW
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. THIS IS FOR GA VERY LIGHT
+JETS ONLY.  THIS ROUTE IS ISSUED DUE TO SPECIAL OPERATIONS.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC505
+```
+
+## 57. route-20260425-032
+
+- Term: **LOW** (route:LOW); written as: `PROBABILITY OF EXTENSION: LOW`
+- Element: NYSATS_TO_FL_MODIFIED; initiative: reroute; first issued 04/25 12:21Z in 20260425-032; window read as 25/1300Z - 25/1800Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 032 DCC 04/25/2026 ROUTE RQD /FL
+NAME: NYSATS_TO_FL_MODIFIED
+CONSTRAINED AREA: ZNY
+REASON: VOLUME
+INCLUDE TRAFFIC: KCDW/KHPN/KMMU/KTEB DEPARTURES TO
+KAPF/KFMY/KMCO/KMKY/KPBI/KPIE/KRSW/KSRQ/KTPA
+FACILITIES INCLUDED: ZDC/ZID/ZJX/ZMA/ZNY/ZTL
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: ETD 251300 TO 251800
+PROBABILITY OF EXTENSION: LOW
+REMARKS: GA FLIGHTS ONLY. AIR CARRIERS EXEMPT.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS: ALL LINES OVER J6.
+ROUTES: [route table not shown]
+TMI ID: RRDCC515
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+**Derived outcome: NOT EXTENDED (lapsed) = 0**. no later advisory moved the end past 25/1800Z.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 58. route-20260517-057
+
+- Term: **MODERATE** (route:MODERATE); written as: `PROBABILITY OF EXTENSION: MODERATE`
+- Element: FAM_MODIFIED; initiative: reroute; first issued 05/17 19:22Z in 20260517-057; window read as 17/2000Z - 18/0200Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 057 DCC 05/17/2026 ROUTE RQD /FL
+NAME: FAM_MODIFIED
+CONSTRAINED AREA: ZMP/ZKC
+REASON: WEATHER
+INCLUDE TRAFFIC: KJFK/ZBW/ZNY DEPARTURES TO KDEN/KLAS/KLAX/KPHX/KSAN
+FACILITIES INCLUDED: ZAB/ZBW/ZDV/ZID/ZKC/ZLA/ZNY/ZOB
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: ETD 172000 TO 180200
+PROBABILITY OF EXTENSION: MODERATE
+REMARKS:
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS: ROUTE IS MODIFIED PRIOR TO FAM
+ROUTES: [route table not shown]
+TMI ID: RRDCC057
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+**Derived outcome: NOT EXTENDED (lapsed) = 0**. no later advisory moved the end past 18/0200Z.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 59. gs-20260402-065
+
+- Term: **MEDIUM** (gs:MEDIUM); written as: `PROBABILITY OF EXTENSION: MEDIUM`
+- Element: ORD; initiative: gs; first issued 04/02 10:36Z in 20260402-065; window read as 02/1022Z - 02/1115Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 065 ORD/ZAU 04/02/2026 CDM GROUND STOP
+CTL ELEMENT: ORD
+ELEMENT TYPE: APT
+ADL TIME: 1032Z
+GROUND STOP PERIOD: 02/1022Z - 02/1115Z
+DEP FACILITIES INCLUDED: (Internal) ZAU
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 0 / 0 / 0
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 291 / 49 / 42
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS:
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260402-071  sent 04/02 11:14Z  CDM GS CNX  ORD  GS CNX PERIOD 02/1111Z - 02/1150Z
+20260402-075  sent 04/02 11:44Z  CDM GROUND STOP  ORD  GROUND STOP PERIOD 02/1131Z - 02/1245Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260402-087  sent 04/02 12:43Z  CDM GROUND STOP  ORD  GROUND STOP PERIOD 02/1131Z - 02/1330Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260402-090  sent 04/02 13:01Z  CDM PROPOSED GROUND DELAY PROGRAM  ORD  ANTICIPATED CUMULATIVE PROGRAM PERIOD 02/1253Z - 03/0259Z
+20260402-093  sent 04/02 13:10Z  CDM GROUND DELAY PROGRAM  ORD  CUMULATIVE PROGRAM PERIOD 02/1253Z - 03/0259Z
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260402-073  sent 04/02 11:41Z  ORD AIRPORT ARRIVAL DELAYS
+20260402-084  sent 04/02 12:21Z  ORD AIRPORT DIVERSION RECOVERY ACTIVATED
+20260402-089  sent 04/02 12:54Z  CHICAGO HOTLINE_FYI
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 02/1114Z; stated end 02/1115Z. Flags: new_stop_30.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 071 ORD/ZAU 04/02/2026 CDM GS CNX
+CTL ELEMENT: ORD
+ELEMENT TYPE: APT
+ADL TIME: 1111Z
+GS CNX PERIOD: 02/1111Z - 02/1150Z
+FLIGHTS MAY RECEIVE NEW EDCTS DUE TO AN ACTIVE AFP
+COMMENTS:
+```
+
+## 60. gs-20260414-027
+
+- Term: **MEDIUM** (gs:MEDIUM); written as: `PROBABILITY OF EXTENSION: MEDIUM`
+- Element: BED; initiative: gs; first issued 04/14 06:36Z in 20260414-027; window read as 14/0900Z - 14/1100Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 027 BED/ZBW 04/14/2026 CDM GROUND STOP
+CTL ELEMENT: BED
+ELEMENT TYPE: APT
+ADL TIME: 0631Z
+GROUND STOP PERIOD: 14/0900Z - 14/1100Z
+CUMULATIVE PROGRAM PERIOD: 14/1000Z - 14/1459Z
+DEP FACILITIES INCLUDED: (Manual) ZNY ZBW
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 0 / 0 / 0
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 81 / 81 / 81
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: WEATHER / LOW CEILINGS
+COMMENTS: TEST ONLY - IN SUPPORT OF TFMS TSS 1.1 AND SUSTAINMENT 3
+PATCH. PLEASE DISREGARD ANY EDCTS.
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260414-028  sent 04/14 06:41Z  CDM GROUND DELAY PROGRAM  BED  CUMULATIVE PROGRAM PERIOD 14/1000Z - 14/1459Z
+20260414-030  sent 04/14 07:22Z  CDM GROUND DELAY PROGRAM CNX  BED  GDP CNX PERIOD 14/0721Z - 14/1515Z
+```
+
+**Derived outcome: NOT EXTENDED (lapsed) = 0**. no later advisory moved the end past 14/1100Z. Flags: gdp_followed.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 61. plan-20260522-112-ATL-gdp-UNTIL0000
+
+- Term: **EXPECTED** (plan:EXPECTED); written as: `UNTIL 0000	-ATL GROUND DELAY PROGRAM EXPECTED`
+- Element: ATL; initiative: gdp; first issued 05/22 21:33Z in 20260522-112; window read as 22/2133Z - 23/0000Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 112 DCC 05/22/2026 OPERATIONS PLAN
+EVENT TIME: 22/2200 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 0359	-LGA GROUND DELAY PROGRAM
+UNTIL 0559	-SAN GROUND DELAY PROGRAM
+UNTIL 0659	-SFO GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+UNTIL 0000	-CLT GROUND STOP POSSIBLE
+UNTIL 0000	-ATL GROUND DELAY PROGRAM EXPECTED
+UNTIL 0200	-DCA GROUND STOP/DELAY PROGRAM PROBABLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260522-102  sent 05/22 19:29Z  CDM GROUND STOP  ATL  GROUND STOP PERIOD 22/1918Z - 22/2030Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260522-105  sent 05/22 19:41Z  CDM GROUND STOP  ATL  GROUND STOP PERIOD 22/1921Z - 22/2100Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260522-108  sent 05/22 20:53Z  CDM GROUND STOP  ATL  GROUND STOP PERIOD 22/1921Z - 22/2145Z  [PROBABILITY OF EXTENSION: LOW]
+20260522-111  sent 05/22 21:16Z  CDM PROPOSED GROUND DELAY PROGRAM  ATL  ANTICIPATED CUMULATIVE PROGRAM PERIOD 22/2112Z - 23/0259Z
+20260522-113  sent 05/22 21:40Z  CDM GROUND DELAY PROGRAM  ATL  CUMULATIVE PROGRAM PERIOD 22/2130Z - 23/0259Z
+20260523-003  sent 05/23 00:11Z  CDM GROUND DELAY PROGRAM CNX  ATL  GDP CNX PERIOD 23/0010Z - 23/0520Z
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260522-071  sent 05/22 16:54Z  ATL CLT CDRS_FYI
+20260522-085  sent 05/22 17:54Z  ATL AIRPORT ARRIVAL DELAYS
+20260522-103  sent 05/22 19:34Z  ATL AIRPORT DIVERSION RECOVERY ACTIVATED
+20260522-104  sent 05/22 19:35Z  ATL AIRPORT ARRIVAL DELAYS
+20260522-115  sent 05/22 22:18Z  ATL CLT CDRS_FYI
+```
+
+**Derived outcome: ISSUED = 1**. CDM GROUND DELAY PROGRAM sent 22/2140Z, period 22/2130Z - 23/0011Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 113 ATL/ZTL 05/22/2026 CDM GROUND DELAY PROGRAM
+CTL ELEMENT: ATL
+ELEMENT TYPE: APT
+ADL TIME: 2137Z
+DELAY ASSIGNMENT MODE: UDP
+ARRIVALS ESTIMATED FOR: 22/2130Z - 23/0259Z
+CUMULATIVE PROGRAM PERIOD: 22/2130Z - 23/0259Z
+PROGRAM RATE: 80
+FLT INCL: ALL CONTIGUOUS US DEP
+DEP SCOPE: 1200
+CANADIAN DEP ARPTS INCLUDED: NONE
+DELAY ASSIGNMENT TABLE APPLIES TO: ZTL
+MAXIMUM DELAY: 274
+AVERAGE DELAY: 69
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS: GROUND STOP CANCELLED. EXEMPTIONS BY STATUS. MEDIUM POP UP.
+5 INDIVIDUAL EXEMPTIONS GIVEN TO TBFM SCHEDULED A/C. ARR 26R/27L.
+DEP 26L/27R.
+```
+
+## 62. route-20260515-060
+
+- Term: **NONE** (route:NONE); written as: `PROBABILITY OF EXTENSION: NONE`
+- Element: FCA011:NE_TO_FLORIDA_VIA_Q75_2; initiative: reroute; first issued 05/15 18:37Z in 20260515-060; window read as 15/2155Z - 15/2245Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 060 DCC 05/15/2026 FCA RQD
+NAME: FCA011:NE_TO_FLORIDA_VIA_Q75_2
+CONSTRAINED AREA: ZJX/ZMA
+REASON: OTHER
+INCLUDE TRAFFIC: KACY/KCDW/KFAY/KILM/KJFK/KMMU/KORF/KPHL/KRDU/KSBY/K
+SOP/KTEB/ZBW/ZDC/ZNY DEPARTURES TO KFLL/KFXE/KOPF
+FACILITIES INCLUDED: ZBW/ZDC/ZJX/ZMA/ZNY/ZTL
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 152155 TO 152245
+PROBABILITY OF EXTENSION: NONE
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. IMPLEMENTED DUE TO ROCKET
+LAUNCH.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC508
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260515-078  sent 05/15 22:15Z  REROUTE CANCELLATION  FCA011:NE_TO_FLORIDA_VIA_Q75_2
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 15/2215Z; stated end 15/2245Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 078 DCC 05/15/2026 REROUTE CANCELLATION
+FCA011:NE_TO_FLORIDA_VIA_Q75_2 HAS BEEN CANCELLED.
+
+REMARKS:
+ASSOCIATED RESTRICTIONS:
+```
+
+## 63. route-20260522-054
+
+- Term: **HIGH** (route:HIGH); written as: `PROBABILITY OF EXTENSION: HIGH`
+- Element: FCA007:PHL_TO_ZBW_CZU_ZEU; initiative: reroute; first issued 05/22 14:16Z in 20260522-054; window read as 22/1700Z - 23/0200Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 054 DCC 05/22/2026 FCA RQD
+NAME: FCA007:PHL_TO_ZBW_CZU_ZEU
+CONSTRAINED AREA: ZDC/ZNY
+REASON: OTHER
+INCLUDE TRAFFIC: KPHL DEPARTURES TO
+CYOW/CYUL/KALB/KBDL/KBED/KBOS/KBTV/KBVY/KLWM/KMHT/K
+PWM/KSWF/ZEU
+FACILITIES INCLUDED: CZU/ZBW/ZDC/ZEU/ZNY
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 221700 TO 230200
+PROBABILITY OF EXTENSION: HIGH
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. IMPLEMENTED DUE TO SPECIAL
+OPERATIONS. ACFT TO ZEU- AFTER SHLEP FILE  VIA NATOTS
+ADVISORY
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC507
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260522-079  sent 05/22 17:26Z  FCA RQD  FCA007:PHL_TO_ZBW_CZU_ZEU  VALID 22/1700Z - 22/2200Z  [PROBABILITY OF EXTENSION: LOW]
+```
+
+**Derived outcome: NOT EXTENDED (lapsed) = 0**. no later advisory moved the end past 23/0200Z. Flags: shortened.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 64. gs-20260512-067
+
+- Term: **MEDIUM** (gs:MEDIUM); written as: `PROBABILITY OF EXTENSION: MEDIUM`
+- Element: MCO; initiative: gs; first issued 05/12 21:22Z in 20260512-067; window read as 12/2107Z - 12/2230Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 067 MCO/ZJX 05/12/2026 CDM GROUND STOP
+CTL ELEMENT: MCO
+ELEMENT TYPE: APT
+ADL TIME: 2117Z
+GROUND STOP PERIOD: 12/2107Z - 12/2230Z
+DEP FACILITIES INCLUDED: (Manual) ZMA
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 105 / 69 / 15
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 325 / 129 / 46
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS: LACK OF ROUTES.
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260512-072  sent 05/12 22:15Z  CDM GROUND STOP  MCO  GROUND STOP PERIOD 12/2107Z - 12/2315Z  [PROBABILITY OF EXTENSION: LOW]
+20260512-073  sent 05/12 23:10Z  CDM GS CNX  MCO  GS CNX PERIOD 12/2305Z - 13/0043Z
+```
+
+**Derived outcome: EXTENDED = 1**. end 12/2230Z -> 12/2315Z (+45 min).
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 072 MCO/ZJX 05/12/2026 CDM GROUND STOP
+CTL ELEMENT: MCO
+ELEMENT TYPE: APT
+ADL TIME: 2212Z
+GROUND STOP PERIOD: 12/2107Z - 12/2315Z
+DEP FACILITIES INCLUDED: (Manual) ZMA
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 234 / 129 / 33
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 533 / 174 / 76
+PROBABILITY OF EXTENSION: LOW
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS: ROUTES NOT AVAILABLE VIA ZMA
+```
+
+## 65. plan-20260503-086-SFO-gdp-UNTIL0200
+
+- Term: **PROBABLE** (plan:PROBABLE); written as: `UNTIL 0200	-SFO GROUND DELAY PROGRAM PROBABLE`
+- Element: SFO; initiative: gdp; first issued 05/03 23:28Z in 20260503-086; window read as 03/2328Z - 04/0200Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 086 DCC 05/03/2026 OPERATIONS PLAN
+EVENT TIME: 04/0000 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 0030	-DEN GROUND STOP
+UNTIL 0759	-LAS GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+UNTIL 0200	-SFO GROUND DELAY PROGRAM PROBABLE
+AFTER 1400	-MIA/FLL/PBI GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1500	-SFO GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 2000	-DEN GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 2100	-SFO GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 2100	-JFK GROUND STOP/DELAY PROGRAM POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260503-065  sent 05/03 19:46Z  CDM GROUND DELAY PROGRAM CNX  SFO  GDP CNX PERIOD 03/1941Z - 03/2121Z
+20260503-088  sent 05/03 23:36Z  CDM PROPOSED GROUND DELAY PROGRAM  SFO  ANTICIPATED CUMULATIVE PROGRAM PERIOD 04/0130Z - 04/0659Z
+20260503-089  sent 05/03 23:43Z  CDM GROUND DELAY PROGRAM  SFO  CUMULATIVE PROGRAM PERIOD 04/0130Z - 04/0659Z
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260503-055  sent 05/03 17:29Z  SFO AIRPORT SCHEDULING DELAYS
+```
+
+**Derived outcome: ISSUED = 1**. CDM GROUND DELAY PROGRAM sent 03/2343Z, period 04/0130Z - 04/0505Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 089 SFO/ZOA 05/03/2026 CDM GROUND DELAY PROGRAM
+CTL ELEMENT: SFO
+ELEMENT TYPE: APT
+ADL TIME: 2341Z
+DELAY ASSIGNMENT MODE: UDP
+ARRIVALS ESTIMATED FOR: 04/0130Z - 04/0659Z
+CUMULATIVE PROGRAM PERIOD: 04/0130Z - 04/0659Z
+PROGRAM RATE: 36/36/36/32/36/36
+FLT INCL: ALL CONTIGUOUS US DEP
+DEP SCOPE: (ALL+CZV_AP) ZLA ZAU ZLC ZTL ZDC ZNY ZHU ZJX ZFW ZOB ZDV
+ZOA ZSE ZBW ZMA ZKC ZME ZID ZAB ZMP
+CANADIAN DEP ARPTS INCLUDED: CYEG CYVR CYYC
+DELAY ASSIGNMENT TABLE APPLIES TO: ZOA
+MAXIMUM DELAY: 106
+AVERAGE DELAY: 46
+IMPACTING CONDITION: OTHER / OTHER
+COMMENTS: ARR / DEP 28L/R, LOW POP UP, TIME +45.
+```
+
+## 66. plan-20260420-012-SFO-gs+gdp-AFTER1500
+
+- Term: **PROBABLE** (plan:PROBABLE); written as: `AFTER 1500	-SFO GROUND STOP/DELAY PROGRAM PROBABLE`
+- Element: SFO; initiative: gs/gdp; first issued 04/20 01:19Z in 20260420-012; window read as 20/1500Z - 21/0800Z
+- Repeated in: 20260420-020 20260420-024
+
+Source advisory:
+
+```
+ATCSCC ADVZY 012 DCC 04/20/2026 OPERATIONS PLAN
+EVENT TIME: 20/0200 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 0359 	-LGA GROUND DELAY PROGRAM
+UNTIL 0659 	-SFO GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+AFTER 1500	-SFO GROUND STOP/DELAY PROGRAM PROBABLE
+AFTER 1600	-EWR GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1700	-MIA/FLL GROUND STOP POSSIBLE
+AFTER 1900	-JFK GROUND STOP/DELAY PROGRAM POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260420-006  sent 04/20 00:17Z  CDM GROUND DELAY PROGRAM  SFO  CUMULATIVE PROGRAM PERIOD 19/1500Z - 20/0659Z
+20260420-015  sent 04/20 05:11Z  CDM GROUND DELAY PROGRAM CNX  SFO  GDP CNX PERIOD 20/0507Z - 20/0744Z
+20260420-030  sent 04/20 12:40Z  CDM PROPOSED GROUND DELAY PROGRAM  SFO  ANTICIPATED CUMULATIVE PROGRAM PERIOD 20/1500Z - 21/0559Z
+20260420-031  sent 04/20 12:49Z  CDM GROUND DELAY PROGRAM  SFO  CUMULATIVE PROGRAM PERIOD 20/1500Z - 21/0659Z
+20260420-058  sent 04/20 18:10Z  CDM GROUND STOP  SFO  GROUND STOP PERIOD 20/1745Z - 20/1915Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260420-060  sent 04/20 18:18Z  CDM PROPOSED GROUND DELAY PROGRAM  SFO  ANTICIPATED CUMULATIVE PROGRAM PERIOD 20/1500Z - 21/0759Z
+20260420-061  sent 04/20 18:29Z  CDM GROUND DELAY PROGRAM  SFO  CUMULATIVE PROGRAM PERIOD 20/1500Z - 21/0759Z
+20260421-015  sent 04/21 04:36Z  CDM GROUND STOP  SFO  GROUND STOP PERIOD 21/0423Z - 21/0545Z  [PROBABILITY OF EXTENSION: LOW]
+20260421-018  sent 04/21 05:35Z  CDM GROUND DELAY PROGRAM CNX  SFO  GDP CNX PERIOD 21/0531Z - 21/1624Z
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260420-033  sent 04/20 13:26Z  SFO AIRPORT ARRIVAL DELAYS
+20260421-010  sent 04/21 01:10Z  SFO AIRPORT ARRIVAL DELAYS
+```
+
+**Derived outcome: ISSUED = 1**. CDM GROUND DELAY PROGRAM sent 20/1249Z, period 20/1500Z - 21/0535Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 031 SFO/ZOA 04/20/2026 CDM GROUND DELAY PROGRAM
+CTL ELEMENT: SFO
+ELEMENT TYPE: APT
+ADL TIME: 1247Z
+DELAY ASSIGNMENT MODE: UDP
+ARRIVALS ESTIMATED FOR: 20/1500Z - 21/0659Z
+CUMULATIVE PROGRAM PERIOD: 20/1500Z - 21/0659Z
+PROGRAM RATE: 25/25/25/25/25/25/25/25/25/25/36/36/36/36/36/50
+FLT INCL: ALL CONTIGUOUS US DEP
+DEP SCOPE: (ALL+CZV_AP) ZLA ZAU ZLC ZTL ZDC ZNY ZHU ZJX ZFW ZOB ZDV
+ZOA ZSE ZBW ZMA ZKC ZME ZID ZAB ZMP
+CANADIAN DEP ARPTS INCLUDED: CYEG CYVR CYYC
+DELAY ASSIGNMENT TABLE APPLIES TO: ZOA
+MAXIMUM DELAY: 283
+AVERAGE DELAY: 193
+IMPACTING CONDITION: RWY-TAXI / CONSTRUCTION
+COMMENTS: ARR: 10L/R DEP: 10L/R TIME BY STATUS LOW HIST POP UP
+```
+
+## 67. plan-20260507-070-SFO-gs+gdp-UNTIL0700
+
+- Term: **POSSIBLE** (plan:POSSIBLE); written as: `UNTIL 0700	-SFO GROUND STOP/DELAY PROGRAM POSSIBLE`
+- Element: SFO; initiative: gs/gdp; first issued 05/07 19:41Z in 20260507-070; window read as 07/1941Z - 08/0700Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 070 DCC 05/07/2026 OPERATIONS PLAN
+EVENT TIME: 07/2000 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 2015	-TEB GROUND STOP
+UNTIL 2359	-SFO GROUND DELAY PROGRAM
+UNTIL 0459	-SAN GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+UNTIL 0100	-TEB GROUND DELAY PROGRAM PROBABLE
+UNTIL 0100	-CLT GROUND STOP/DELAY PROGRAM POSSIBLE
+UNTIL 0700	-SFO GROUND STOP/DELAY PROGRAM POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260507-042  sent 05/07 13:50Z  CDM GROUND DELAY PROGRAM  SFO  CUMULATIVE PROGRAM PERIOD 07/1515Z - 07/2359Z
+20260507-069  sent 05/07 19:38Z  CDM PROPOSED GROUND DELAY PROGRAM  SFO  ANTICIPATED CUMULATIVE PROGRAM PERIOD 07/2200Z - 08/0659Z
+20260507-072  sent 05/07 19:49Z  CDM GROUND DELAY PROGRAM  SFO  CUMULATIVE PROGRAM PERIOD 07/2200Z - 08/0659Z
+20260508-006  sent 05/08 05:09Z  CDM GROUND DELAY PROGRAM CNX  SFO  GDP CNX PERIOD 08/0508Z - 08/0845Z
+```
+
+**Derived outcome: EXCLUDED (already_active)**. CDM GROUND DELAY PROGRAM already running at 07/1941Z, until 07/2359Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 042 SFO/ZOA 05/07/2026 CDM GROUND DELAY PROGRAM
+CTL ELEMENT: SFO
+ELEMENT TYPE: APT
+ADL TIME: 1344Z
+DELAY ASSIGNMENT MODE: UDP
+ARRIVALS ESTIMATED FOR: 07/1515Z - 07/2359Z
+CUMULATIVE PROGRAM PERIOD: 07/1515Z - 07/2359Z
+PROGRAM RATE: 36/36/36/32/36/36/36/36/36
+FLT INCL: ALL CONTIGUOUS US DEP
+DEP SCOPE: (MANUAL) ZLA ZAU ZLC ZTL ZDC ZNY ZHU ZJX ZFW ZOB ZDV ZOA
+ZSE ZBW ZMA ZKC ZME ZID ZAB ZMP
+CANADIAN DEP ARPTS INCLUDED: CYYJ CYVR CYLW CYYC CYEG
+DELAY ASSIGNMENT TABLE APPLIES TO: ZOA
+MAXIMUM DELAY: 137
+AVERAGE DELAY: 61
+IMPACTING CONDITION: WEATHER / LOW CEILINGS
+COMMENTS: ARRIVE AND DEPART 28L/28R. LOW POP UP. TIME PLUS 20.
+```
+
+## 68. route-20260414-010
+
+- Term: **NONE** (route:NONE); written as: `PROBABILITY OF EXTENSION: NONE`
+- Element: FCA009:CAPE_LAUNCH_1_PARTIAL; initiative: reroute; first issued 04/14 01:34Z in 20260414-010; window read as 14/1000Z - 14/1055Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 010 DCC 04/14/2026 FCA RQD
+NAME: FCA009:CAPE_LAUNCH_1_PARTIAL
+CONSTRAINED AREA: ZMA/ZJX
+REASON: OTHER
+INCLUDE TRAFFIC: KBWI/KDCA/KIAD/KJFK/KPHL/ZBW/ZDC/ZNY DEPARTURES TO
+KFLL/KFXE/KOPF
+FACILITIES INCLUDED: ZBW/ZDC/ZJX/ZMA/ZNY
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 141000 TO 141055
+PROBABILITY OF EXTENSION: NONE
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. IMPLEMENTED DUE TO ROCKET
+LAUNCH.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC010
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260414-038  sent 04/14 09:08Z  FCA RQD  FCA009:CAPE_LAUNCH_1_PARTIAL  VALID 14/1000Z - 14/1016Z  [PROBABILITY OF EXTENSION: NONE]
+20260414-043  sent 04/14 09:40Z  REROUTE CANCELLATION  FCA009:CAPE_LAUNCH_1_PARTIAL
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 14/0940Z; stated end 14/1055Z. Flags: shortened.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 043 DCC 04/14/2026 REROUTE CANCELLATION
+FCA009:CAPE_LAUNCH_1_PARTIAL HAS BEEN CANCELLED.
+
+REMARKS:
+ASSOCIATED RESTRICTIONS:
+```
+
+## 69. plan-20260504-059-DEN-gdp-AFTER2200
+
+- Term: **EXPECTED** (plan:EXPECTED); written as: `AFTER 2200	-DEN GROUND DELAY PROGRAM EXPECTED, GROUND STOP POSSIBLE`
+- Element: DEN; initiative: gdp; first issued 05/04 21:49Z in 20260504-059; window read as 04/2200Z - 05/0800Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 059 DCC 05/04/2026 OPERATIONS PLAN
+EVENT TIME: 04/2200 - AND LATER
+TERMINAL ACTIVE:
+NONE
+TERMINAL PLANNED:
+AFTER 2200	-ORD GROUND DELAY PROGRAM EXPECTED, ORD/MDW GROUND
+STOPS POSSIBLE
+AFTER 2200	-DEN GROUND DELAY PROGRAM EXPECTED, GROUND STOP
+POSSIBLE
+AFTER 0100	-SFO GROUND STOP/DELAY PROGRAM POSSIBLE
+UNTIL 0200	-MIA/FLL/PBI GROUND STOP POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260504-046  sent 05/04 20:23Z  CDM GROUND STOP  DEN  GROUND STOP PERIOD 04/2011Z - 04/2145Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260504-055  sent 05/04 21:42Z  CDM GROUND STOP  DEN  GROUND STOP PERIOD 04/2137Z - 04/2245Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260504-057  sent 05/04 21:45Z  CDM PROPOSED GROUND DELAY PROGRAM  DEN  ANTICIPATED CUMULATIVE PROGRAM PERIOD 04/2142Z - 05/0259Z
+20260504-060  sent 05/04 21:57Z  CDM GROUND DELAY PROGRAM  DEN  CUMULATIVE PROGRAM PERIOD 04/2151Z - 05/0259Z
+20260505-012  sent 05/05 01:59Z  CDM GROUND DELAY PROGRAM CNX  DEN  GDP CNX PERIOD 05/0157Z - 05/0706Z
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260504-043  sent 05/04 19:06Z  DEN AIRPORT SCHEDULING DELAYS
+20260504-047  sent 05/04 20:23Z  DEN AIRPORT DIVERSION RECOVERY ACTIVATED
+20260504-048  sent 05/04 20:24Z  DEN AIRPORT ARRIVAL DELAYS
+```
+
+**Derived outcome: ISSUED = 1**. CDM GROUND DELAY PROGRAM sent 04/2157Z, period 04/2151Z - 05/0159Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 060 DEN/ZDV 05/04/2026 CDM GROUND DELAY PROGRAM
+CTL ELEMENT: DEN
+ELEMENT TYPE: APT
+ADL TIME: 2151Z
+DELAY ASSIGNMENT MODE: UDP
+ARRIVALS ESTIMATED FOR: 04/2151Z - 05/0259Z
+CUMULATIVE PROGRAM PERIOD: 04/2151Z - 05/0259Z
+PROGRAM RATE: 80/75/72/68/68/68
+FLT INCL: ALL CONTIGUOUS US DEP
+DEP SCOPE: 1100
+CANADIAN DEP ARPTS INCLUDED: NONE
+DELAY ASSIGNMENT TABLE APPLIES TO: ZDV
+MAXIMUM DELAY: 173
+AVERAGE DELAY: 58
+IMPACTING CONDITION: WEATHER / WIND
+COMMENTS: GROUND STOP CANCELLED.  PLEASE RELEASE ON NEW EDCTS.  ARR
+35L/R.
+```
+
+## 70. route-20260429-028
+
+- Term: **LOW** (route:LOW); written as: `PROBABILITY OF EXTENSION: LOW`
+- Element: FCA018:NO_AR_Y-RTES_TO_RSW_VRB_SUA_FPR_AREA; initiative: reroute; first issued 04/29 08:31Z in 20260429-028; window read as 29/1300Z - 30/0030Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 028 DCC 04/29/2026 FCA RQD
+NAME: FCA018:NO_AR_Y-RTES_TO_RSW_VRB_SUA_FPR_AREA
+CONSTRAINED AREA: ZJX ZMA
+REASON: OTHER
+INCLUDE TRAFFIC: UNKN DEPARTURES TO APF/FMY/FPR/MKY/PGD/RSW/SUA/VRB
+FACILITIES INCLUDED: ZMA
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 291300 TO 300030
+PROBABILITY OF EXTENSION: LOW
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. AR/Y ROUTES, AND FIX-TO-FIX
+OVER WATER SOUTH OF ILM/DIW AREA ARE UNAVAILABLE TO THE RSW
+FMY APF MKY VRB SUA FPR PGD AREAS. DUE TO SUA ACTIVITY.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC028
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260429-046  sent 04/29 11:47Z  REROUTE CANCELLATION  FCA018:NO_AR_Y-RTES_TO_RSW_VRB_SUA_FPR_AREA
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 29/1147Z; stated end 30/0030Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 046 DCC 04/29/2026 REROUTE CANCELLATION
+FCA018:NO_AR_Y-RTES_TO_RSW_VRB_SUA_FPR_AREA HAS BEEN CANCELLED.
+
+REMARKS:
+ASSOCIATED RESTRICTIONS:
+```
+
+## 71. gs-20260427-091
+
+- Term: **LOW** (gs:LOW); written as: `PROBABILITY OF EXTENSION: LOW`
+- Element: ORD; initiative: gs; first issued 04/27 19:19Z in 20260427-091; window read as 27/1903Z - 27/2030Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 091 ORD/ZAU 04/27/2026 CDM GROUND STOP
+CTL ELEMENT: ORD
+ELEMENT TYPE: APT
+ADL TIME: 1913Z
+GROUND STOP PERIOD: 27/1903Z - 27/2030Z
+CUMULATIVE PROGRAM PERIOD: 27/1800Z - 28/0759Z
+DEP FACILITIES INCLUDED: (2ndTier+CZY_AP) ZAU ZLC ZTL ZDC ZNY ZFW ZOB
+ZDV ZBW ZKC ZME ZID ZAB ZMP  CYHZ CYOW CYUL CYYZ
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 3846 / 153 / 43
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 8079 / 252 / 90
+PROBABILITY OF EXTENSION: LOW
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS: WILL HAVE DISCUSSION FOR REVISION AFTER THE SPT.
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260427-097  sent 04/27 20:15Z  CDM GROUND DELAY PROGRAM  ORD  CUMULATIVE PROGRAM PERIOD 27/1800Z - 28/0759Z
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260427-101  sent 04/27 21:09Z  ORD/MDW AIRPORT ARRIVAL DELAYS
+```
+
+**Derived outcome: NOT EXTENDED (lapsed) = 0**. no later advisory moved the end past 27/2030Z. Flags: gdp_followed.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 72. plan-20260403-124-ORD-gs+gdp-AFTER0200
+
+- Term: **EXPECTED** (plan:EXPECTED); written as: `AFTER 0200	-ORD/MDW GROUND STOP/DELAY PROGRAM EXPECTED`
+- Element: ORD; initiative: gs/gdp; first issued 04/03 23:26Z in 20260403-124; window read as 04/0200Z - 04/0800Z
+- Repeated in: 20260404-007
+
+Source advisory:
+
+```
+ATCSCC ADVZY 124 DCC 04/03/2026 OPERATIONS PLAN
+EVENT TIME: 04/0000 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 0559	-SFO GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+AFTER 0200	-ORD/MDW GROUND STOP/DELAY PROGRAM EXPECTED
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260403-101  sent 04/03 19:42Z  CDM GROUND STOP  ORD  GROUND STOP PERIOD 03/1929Z - 03/2015Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260403-106  sent 04/03 19:55Z  CDM GS CNX  ORD  GS CNX PERIOD 03/1951Z - 03/2145Z
+20260404-008  sent 04/04 01:28Z  CDM GROUND STOP  ORD  GROUND STOP PERIOD 04/0111Z - 04/0230Z  [PROBABILITY OF EXTENSION: HIGH]
+20260404-010  sent 04/04 01:54Z  CDM PROPOSED GROUND DELAY PROGRAM  ORD  ANTICIPATED CUMULATIVE PROGRAM PERIOD 04/0126Z - 04/0659Z
+20260404-013  sent 04/04 02:14Z  CDM GROUND DELAY PROGRAM  ORD  CUMULATIVE PROGRAM PERIOD 04/0126Z - 04/0659Z
+20260404-019  sent 04/04 03:44Z  CDM GROUND STOP  ORD  GROUND STOP PERIOD 04/0328Z - 04/0445Z  [PROBABILITY OF EXTENSION: LOW]
+20260404-020  sent 04/04 04:33Z  CDM GROUND STOP  ORD  GROUND STOP PERIOD 04/0328Z - 04/0600Z  [PROBABILITY OF EXTENSION: LOW]
+20260404-022  sent 04/04 05:19Z  CDM GROUND DELAY PROGRAM CNX  ORD  GDP CNX PERIOD 04/0513Z - 04/1724Z
+20260404-023  sent 04/04 05:22Z  CDM GROUND STOP  ORD  GROUND STOP PERIOD 04/0509Z - 04/0615Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260404-025  sent 04/04 06:01Z  CDM GROUND STOP  ORD  GROUND STOP PERIOD 04/0547Z - 04/0700Z  [PROBABILITY OF EXTENSION: LOW]
+20260404-026  sent 04/04 06:15Z  CDM GS CNX  ORD  GS CNX PERIOD 04/0611Z - 04/0918Z
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260403-105  sent 04/03 19:51Z  CHICAGO HOTLINE_FYI
+20260403-107  sent 04/03 20:10Z  ORD AND MDW AIRPORT ARRIVAL DELAYS
+20260404-011  sent 04/04 01:55Z  ORD AIRPORT DIVERSION RECOVERY ACTIVATED
+```
+
+**Derived outcome: ISSUED = 1**. CDM GROUND STOP sent 04/0128Z, period 04/0111Z - 04/0230Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 008 ORD/ZAU 04/04/2026 CDM GROUND STOP
+CTL ELEMENT: ORD
+ELEMENT TYPE: APT
+ADL TIME: 0126Z
+GROUND STOP PERIOD: 04/0111Z - 04/0230Z
+DEP FACILITIES INCLUDED: (1stTier) ZAU ZOB ZKC ZID ZMP
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 0 / 0 / 0
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 1073 / 69 / 45
+PROBABILITY OF EXTENSION: HIGH
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS:
+```
+
+## 73. route-20260512-047
+
+- Term: **NONE** (route:NONE); written as: `PROBABILITY OF EXTENSION: NONE`
+- Element: FCA008:CAPE_LAUNCH_2A_PARTIAL; initiative: reroute; first issued 05/12 18:26Z in 20260512-047; window read as 12/2306Z - 12/2356Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 047 DCC 05/12/2026 FCA RQD
+NAME: FCA008:CAPE_LAUNCH_2A_PARTIAL
+CONSTRAINED AREA: ZJX/ZMA
+REASON: OTHER
+INCLUDE TRAFFIC: CZY/KATL/KBWI/KCDW/KCLT/KDCA/KDET/KDTW/KFNT/KIAD/KJ
+FK/KLAN/KMBS/KMMU/KPHL/KPTK/KTEB/KYIP/ZAU/ZBW/ZID/Z
+NY/ZOB DEPARTURES TO KFLL/KFXE/KOPF
+FACILITIES INCLUDED: CZY/ZAU/ZBW/ZDC/ZID/ZJX/ZMA/ZME/ZNY/ZOB/ZTL
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 122306 TO 122356
+PROBABILITY OF EXTENSION: NONE
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. IMPLEMENTED DUE TO ROCKET
+LAUNCH.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC504
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260512-057  sent 05/12 20:20Z  REROUTE CANCELLATION  FCA008:CAPE_LAUNCH_2A_PARTIAL
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 12/2020Z; stated end 12/2356Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 057 DCC 05/12/2026 REROUTE CANCELLATION
+FCA008:CAPE_LAUNCH_2A_PARTIAL HAS BEEN CANCELLED.
+
+REMARKS:
+ASSOCIATED RESTRICTIONS:
+```
+
+## 74. plan-20260518-010-MDW-gs-AFTER1200
+
+- Term: **PROBABLE** (plan:PROBABLE); written as: `AFTER 1200	-MDW GROUND STOP PROBABLE`
+- Element: MDW; initiative: gs; first issued 05/18 01:22Z in 20260518-010; window read as 18/1200Z - 19/0800Z
+- Repeated in: 20260518-028
+
+Source advisory:
+
+```
+ATCSCC ADVZY 010 DCC 05/18/2026 OPERATIONS PLAN
+EVENT TIME: 18/0200 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 0559 	-SFO GROUND DELAY PROGRAM
+UNTIL 0659	-LAS GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+AFTER 1200	-ORD GROUND STOP/DELAY PROGRAM PROBABLE
+AFTER 1200	-MDW GROUND STOP PROBABLE
+AFTER 1600	-DEN GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1700	-SFO GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1700	-MIA/FLL GROUND STOP POSSIBLE
+AFTER 2100	-DTW GROUND STOP POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260518-074  sent 05/18 15:55Z  CDM GROUND STOP  MDW  GROUND STOP PERIOD 18/1540Z - 18/1645Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260518-079  sent 05/18 16:46Z  CDM GS CNX  MDW  GS CNX PERIOD 18/1640Z - 18/1826Z
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260517-065  sent 05/17 20:12Z  ORD MDW CDRS_FYI
+20260518-031  sent 05/18 10:26Z  ORD MDW CDRS_FYI
+20260518-043  sent 05/18 12:38Z  ORD/MDW AIRPORT DIVERSION RECOVERY ACTIVATED
+20260518-078  sent 05/18 16:31Z  ORD MDW CDRS_FYI
+20260518-111  sent 05/18 19:39Z  ORD/MDW AIRPORT DIVERSION RECOVERY ACTIVATED
+20260519-005  sent 05/19 02:12Z  ORD MDW CDRS_FYI
+```
+
+**Derived outcome: ISSUED = 1**. CDM GROUND STOP sent 18/1555Z, period 18/1540Z - 18/1645Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 074 MDW/ZAU 05/18/2026 CDM GROUND STOP
+CTL ELEMENT: MDW
+ELEMENT TYPE: APT
+ADL TIME: 1550Z
+GROUND STOP PERIOD: 18/1540Z - 18/1645Z
+DEP FACILITIES INCLUDED: (Manual) ZAU ZOB ZKC ZID ZMP  CYHZ CYOW CYUL
+CYYZ
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 0 / 0 / 0
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 235 / 60 / 39
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS:
+```
+
+## 75. route-20260401-067
+
+- Term: **NONE** (route:NONE); written as: `PROBABILITY OF EXTENSION: NONE`
+- Element: FCA011:MIDWEST_TO_FLORIDA_PARTIAL; initiative: reroute; first issued 04/01 17:53Z in 20260401-067; window read as 01/2224Z - 02/0109Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 067 DCC 04/01/2026 FCA RQD /FL
+NAME: FCA011:MIDWEST_TO_FLORIDA_PARTIAL
+CONSTRAINED AREA: ZJX/ZMA
+REASON: OTHER
+INCLUDE TRAFFIC: CZY/KALN/KATL/KBHM/KBLV/KBMI/KDET/KDTW/KFNT/KLAN/KL
+ZU/KMBS/KMGM/KPDK/KPIA/KPTK/KRYY/KSPI/KSTL/KSUS/KYI
+P/ZAU/ZDV/ZID/ZKC/ZME/ZMP/ZOB DEPARTURES TO
+KAPF/KBCT/KFLL/KFMY/KFXE/KMIA/KMKY/KOPF/KPBI/KPIE/K
+RSW/KSRQ/KTPA
+FACILITIES INCLUDED: CZY/ZAU/ZDV/ZID/ZJX/ZKC/ZMA/ZME/ZMP/ZOB/ZTL
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 012224 TO 020109
+PROBABILITY OF EXTENSION: NONE
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. FLIGHTS FILED VIA
+Q100/Q102/Y280/Y290 ARE EXEMPT FROM THIS PLAYBOOK.
+IMPLEMENTED DUE TO ROCKET LAUNCH.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS: PROTECTED SEGMENTS MOVED SOUTH DUE TO WEATHER.
+ROUTES: [route table not shown]
+TMI ID: RRDCC504
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+**Derived outcome: NOT EXTENDED (lapsed) = 0**. no later advisory moved the end past 02/0109Z.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 76. route-20260518-071
+
+- Term: **MODERATE** (route:MODERATE); written as: `PROBABILITY OF EXTENSION: MODERATE`
+- Element: FCA004:ORD_NO_VEECK_WATSN_1_PARTIAL; initiative: reroute; first issued 05/18 15:47Z in 20260518-071; window read as 18/1700Z - 18/2000Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 071 DCC 05/18/2026 FCA RQD
+NAME: FCA004:ORD_NO_VEECK_WATSN_1_PARTIAL
+CONSTRAINED AREA: ZAU
+REASON: WEATHER
+INCLUDE TRAFFIC: KABE/KAPF/KATL/KAVP/KBWI/KCLT/KDCA/KFMY/KGSO/KIAD/K
+MDT/KMKY/KPHL/KRDU/KROA/KRSW/KSRQ/KTPA/KUNV/ZDC/ZJX
+/ZMA/ZTL DEPARTURES TO KORD
+FACILITIES INCLUDED: ZAU/ZDC/ZID/ZJX/ZMA/ZNY/ZOB/ZTL
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 181700 TO 182000
+PROBABILITY OF EXTENSION: MODERATE
+REMARKS: SEE DYNAMIC LIST FOR UPDATES.
+AS WEATHER MOVES EAST, TRAFFIC MAY GET MOVED FURTHER NORTH
+VIA FGHRN.MADII7
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC504
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+**Derived outcome: NOT EXTENDED (lapsed) = 0**. no later advisory moved the end past 18/2000Z.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 77. gs-20260519-123
+
+- Term: **MEDIUM** (gs:MEDIUM); written as: `PROBABILITY OF EXTENSION: MEDIUM`
+- Element: JFK; initiative: gs; first issued 05/19 21:38Z in 20260519-123; window read as 19/2100Z - 19/2245Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 123 JFK/ZNY 05/19/2026 CDM GROUND STOP
+CTL ELEMENT: JFK
+ELEMENT TYPE: APT
+ADL TIME: 2135Z
+GROUND STOP PERIOD: 19/2100Z - 19/2245Z
+DEP FACILITIES INCLUDED: (Manual) ZDC ZNY ZOB ZBW  CYHZ CYOW CYUL
+CYYZ CYTZ CYQB
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 0 / 0 / 0
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 257 / 71 / 51
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS:
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260519-128  sent 05/19 21:48Z  CDM PROPOSED GROUND DELAY PROGRAM  JFK  ANTICIPATED CUMULATIVE PROGRAM PERIOD 19/2143Z - 20/0259Z
+20260519-138  sent 05/19 22:07Z  CDM GROUND DELAY PROGRAM  JFK  CUMULATIVE PROGRAM PERIOD 19/2205Z - 20/0259Z
+20260519-156  sent 05/19 23:18Z  CDM GROUND STOP  JFK  GROUND STOP PERIOD 19/2300Z - 20/0100Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260519-161  sent 05/19 23:37Z  CDM GROUND STOP  JFK  GROUND STOP PERIOD 19/2322Z - 20/0100Z  [PROBABILITY OF EXTENSION: MEDIUM]
+```
+
+**Derived outcome: NOT EXTENDED (lapsed) = 0**. no later advisory moved the end past 19/2245Z. Flags: gdp_followed new_stop_30.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 78. route-20260427-090
+
+- Term: **MODERATE** (route:MODERATE); written as: `PROBABILITY OF EXTENSION: MODERATE`
+- Element: NE_TO_FLORIDA_VIA_Q97_1_PARTIAL; initiative: reroute; first issued 04/27 19:13Z in 20260427-090; window read as 27/2000Z - 27/2300Z
+- Repeated in: 20260427-096
+
+Source advisory:
+
+```
+ATCSCC ADVZY 090 DCC 04/27/2026 ROUTE RQD /FL
+NAME: NE_TO_FLORIDA_VIA_Q97_1_PARTIAL
+CONSTRAINED AREA: ZTL
+REASON: VOLUME
+INCLUDE TRAFFIC: KBWI/KDCA/KIAD/KJFK/KPHL/ZBW/ZNY DEPARTURES TO
+KFLL/KMCO/KMIA/KPBI
+FACILITIES INCLUDED: ZBW/ZDC/ZJX/ZMA/ZNY
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: ETD 272000 TO 272300
+PROBABILITY OF EXTENSION: MODERATE
+REMARKS: AR/Y RTES ARE EXEMPT WHEN AVAILABLE
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC090
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260427-096  sent 04/27 19:47Z  ROUTE RQD /FL  NE_TO_FLORIDA_VIA_Q97_1_PARTIAL  VALID 27/2000Z - 27/2300Z  [PROBABILITY OF EXTENSION: MODERATE]
+```
+
+**Derived outcome: NOT EXTENDED (lapsed) = 0**. no later advisory moved the end past 27/2300Z.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 79. route-20260428-074
+
+- Term: **MODERATE** (route:MODERATE); written as: `PROBABILITY OF EXTENSION: MODERATE`
+- Element: FCA001:DFW_VKTRY_PARTIAL; initiative: reroute; first issued 04/28 13:04Z in 20260428-074; window read as 28/1330Z - 28/1530Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 074 DCC 04/28/2026 FCA RQD
+NAME: FCA001:DFW_VKTRY_PARTIAL
+CONSTRAINED AREA: ZFW
+REASON: WEATHER
+INCLUDE TRAFFIC: CZE/CZV/KLAS/KPHX/KSAN/KTUS/ZAB/ZDV/ZLA/ZLC/ZOA/ZSE
+DEPARTURES TO KDAL/KDFW
+FACILITIES INCLUDED: CZE/CZV/ZAB/ZDV/ZFW/ZLA/ZLC/ZOA/ZSE
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 281330 TO 281530
+PROBABILITY OF EXTENSION: MODERATE
+REMARKS: SEE DYNAMIC LIST FOR UPDATES.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC503
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260428-086  sent 04/28 14:23Z  FCA RQD  FCA001:DFW_VKTRY_PARTIAL  VALID 28/1330Z - 28/1900Z  [PROBABILITY OF EXTENSION: MODERATE]
+```
+
+**Derived outcome: EXTENDED = 1**. end 28/1530Z -> 28/1900Z (+210 min).
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 086 DCC 04/28/2026 FCA RQD
+NAME: FCA001:DFW_VKTRY_PARTIAL
+CONSTRAINED AREA: ZFW
+REASON: WEATHER
+INCLUDE TRAFFIC: CZE/CZV/KLAS/KPHX/KSAN/KTUS/ZAB/ZDV/ZLA/ZLC/ZOA/ZSE
+DEPARTURES TO KDAL/KDFW
+FACILITIES INCLUDED: CZE/CZV/ZAB/ZDV/ZFW/ZLA/ZLC/ZOA/ZSE
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 281330 TO 281900
+PROBABILITY OF EXTENSION: MODERATE
+REMARKS: REPLACES ADVZY 074.  SEE DYNAMIC LIST FOR UPDATES.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS: EXTENDED
+ROUTES: [route table not shown]
+TMI ID: RRDCC503
+```
+
+## 80. gs-20260520-117
+
+- Term: **MEDIUM** (gs:MEDIUM); written as: `PROBABILITY OF EXTENSION: MEDIUM`
+- Element: PHL; initiative: gs; first issued 05/20 19:09Z in 20260520-117; window read as 20/1749Z - 20/2015Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 117 PHL/ZNY 05/20/2026 CDM GROUND STOP
+CTL ELEMENT: PHL
+ELEMENT TYPE: APT
+ADL TIME: 1905Z
+GROUND STOP PERIOD: 20/1749Z - 20/2015Z
+CUMULATIVE PROGRAM PERIOD: 20/2030Z - 21/0259Z
+DEP FACILITIES INCLUDED: (Manual) ZOB
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 20 / 19 / 10
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 110 / 61 / 55
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS: ZOB INTERNAL GROUND STOP DUE TO NO ROUTES.
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260520-133  sent 05/20 20:17Z  CDM GROUND STOP  PHL  GROUND STOP PERIOD 20/2004Z - 20/2115Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260520-142  sent 05/20 20:59Z  CDM GROUND STOP  PHL  GROUND STOP PERIOD 20/2041Z - 20/2215Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260520-161  sent 05/20 21:54Z  CDM GROUND STOP  PHL  GROUND STOP PERIOD 20/2041Z - 20/2300Z  [PROBABILITY OF EXTENSION: MEDIUM]
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260520-138  sent 05/20 20:43Z  NY METRO AIRPORTS ARRIVAL DELAYS
+```
+
+**Derived outcome: EXTENDED = 1**. end 20/2015Z -> 20/2115Z (+60 min).
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 133 PHL/ZNY 05/20/2026 CDM GROUND STOP
+CTL ELEMENT: PHL
+ELEMENT TYPE: APT
+ADL TIME: 2014Z
+GROUND STOP PERIOD: 20/2004Z - 20/2115Z
+CUMULATIVE PROGRAM PERIOD: 20/2030Z - 21/0259Z
+DEP FACILITIES INCLUDED: (Manual) ZOB
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 110 / 61 / 55
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 227 / 118 / 114
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS: LACK OF ROUTES
+```
+
+## 81. plan-20260410-088-SFO-gs+gdp-AFTER1500
+
+- Term: **PROBABLE** (plan:PROBABLE); written as: `AFTER 1500	-SFO GROUND STOP/DELAY PROGRAM PROBABLE`
+- Element: SFO; initiative: gs/gdp; first issued 04/10 23:54Z in 20260410-088; window read as 11/1500Z - 12/0800Z
+- Repeated in: 20260411-017 20260411-033 20260411-041
+
+Source advisory:
+
+```
+ATCSCC ADVZY 088 DCC 04/10/2026 OPERATIONS PLAN
+EVENT TIME: 11/0000 - AND LATER
+TERMINAL ACTIVE:
+NONE
+TERMINAL PLANNED:
+UNTIL 0200	-DEN GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1300	-AGS/AIK/DNL/HQU GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1500	-SFO GROUND STOP/DELAY PROGRAM PROBABLE
+AFTER 1600	-PBI/BCT/SUA GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1800 	-LGA GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1800	-DEN GROUND STOP/DELAY PROGRAM POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260410-084  sent 04/10 22:23Z  CDM GROUND DELAY PROGRAM CNX  SFO  GDP CNX PERIOD 10/2220Z - 11/0217Z
+20260411-003  sent 04/11 00:40Z  CDM PROPOSED GROUND DELAY PROGRAM  SFO  ANTICIPATED CUMULATIVE PROGRAM PERIOD 11/0230Z - 11/0559Z
+20260411-006  sent 04/11 00:54Z  CDM GROUND DELAY PROGRAM  SFO  CUMULATIVE PROGRAM PERIOD 11/0230Z - 11/0559Z
+20260411-012  sent 04/11 04:56Z  CDM GROUND DELAY PROGRAM CNX  SFO  GDP CNX PERIOD 11/0454Z - 11/0704Z
+20260411-059  sent 04/11 19:10Z  CDM PROPOSED GROUND DELAY PROGRAM  SFO  ANTICIPATED CUMULATIVE PROGRAM PERIOD 11/2130Z - 12/0659Z
+20260411-064  sent 04/11 19:34Z  CDM GROUND DELAY PROGRAM  SFO  CUMULATIVE PROGRAM PERIOD 11/2130Z - 12/0759Z
+20260411-071  sent 04/11 21:06Z  CDM GROUND STOP  SFO  GROUND STOP PERIOD 11/2053Z - 11/2215Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260411-075  sent 04/11 21:54Z  CDM GROUND DELAY PROGRAM  SFO  CUMULATIVE PROGRAM PERIOD 11/2130Z - 12/0759Z
+20260412-003  sent 04/12 00:31Z  CDM GROUND STOP  SFO  GROUND STOP PERIOD 12/0019Z - 12/0145Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260412-006  sent 04/12 01:19Z  CDM GROUND DELAY PROGRAM CNX  SFO  GDP CNX PERIOD 12/0116Z - 12/1030Z
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260410-086  sent 04/10 23:04Z  SFO AIRPORT ARRIVAL DELAYS
+20260411-037  sent 04/11 12:26Z  SFO AIRPORT SCHEDULING DELAYS
+20260411-061  sent 04/11 19:21Z  SFO AIRPORT ARRIVAL DELAYS
+```
+
+**Derived outcome: ISSUED = 1**. CDM GROUND DELAY PROGRAM sent 11/1934Z, period 11/2130Z - 12/0119Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 064 SFO/ZOA 04/11/2026 CDM GROUND DELAY PROGRAM
+CTL ELEMENT: SFO
+ELEMENT TYPE: APT
+ADL TIME: 1929Z
+DELAY ASSIGNMENT MODE: UDP
+ARRIVALS ESTIMATED FOR: 11/2130Z - 12/0759Z
+CUMULATIVE PROGRAM PERIOD: 11/2130Z - 12/0759Z
+PROGRAM RATE: 27
+FLT INCL: ALL CONTIGUOUS US DEP
+DEP SCOPE: (ALL+CZV_AP) ZLA ZAU ZLC ZTL ZDC ZNY ZHU ZJX ZFW ZOB ZDV
+ZOA ZSE ZBW ZMA ZKC ZME ZID ZAB ZMP
+CANADIAN DEP ARPTS INCLUDED: CYEG CYVR CYYC
+DELAY ASSIGNMENT TABLE APPLIES TO: ZOA
+MAXIMUM DELAY: 187
+AVERAGE DELAY: 95
+IMPACTING CONDITION: WEATHER / WIND
+COMMENTS: ARR 19L DEP 10L/10R. RWY 19R UNAVAILABLE DUE TO RUNWAY
+CONSTRUCTION. LOW POP-UPS. TIME +30.
+```
+
+## 82. gs-20260419-046
+
+- Term: **LOW** (gs:LOW); written as: `PROBABILITY OF EXTENSION: LOW`
+- Element: LGA; initiative: gs; first issued 04/19 13:36Z in 20260419-046; window read as 19/1300Z - 19/1430Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 046 LGA/ZNY 04/19/2026 CDM GROUND STOP
+CTL ELEMENT: LGA
+ELEMENT TYPE: APT
+ADL TIME: 1334Z
+GROUND STOP PERIOD: 19/1300Z - 19/1430Z
+DEP FACILITIES INCLUDED: (Manual) ZAU ZTL ZDC ZNY ZJX ZOB ZBW ZID ZMP
+CYHZ CYOW CYUL CYYZ CYTZ CYQB
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 0 / 0 / 0
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 610 / 61 / 25
+PROBABILITY OF EXTENSION: LOW
+IMPACTING CONDITION: RWY-TAXI / MAINTENANCE
+COMMENTS:
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260419-052  sent 04/19 14:20Z  CDM GROUND STOP  LGA  GROUND STOP PERIOD 19/1401Z - 19/1500Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260419-054  sent 04/19 14:59Z  CDM GS CNX  LGA  GS CNX PERIOD 19/1455Z - 19/1723Z
+20260419-060  sent 04/19 16:08Z  CDM GROUND STOP  LGA  GROUND STOP PERIOD 19/1555Z - 19/1700Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260419-062  sent 04/19 16:26Z  CDM PROPOSED GROUND DELAY PROGRAM  LGA  ANTICIPATED CUMULATIVE PROGRAM PERIOD 19/1605Z - 20/0359Z
+```
+
+**Derived outcome: EXTENDED = 1**. end 19/1430Z -> 19/1500Z (+30 min).
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 052 LGA/ZNY 04/19/2026 CDM GROUND STOP
+CTL ELEMENT: LGA
+ELEMENT TYPE: APT
+ADL TIME: 1416Z
+GROUND STOP PERIOD: 19/1401Z - 19/1500Z
+DEP FACILITIES INCLUDED: (Manual) ZAU ZTL ZDC ZNY ZJX ZOB ZBW ZID ZMP
+CYHZ CYOW CYUL CYYZ CYTZ CYQB
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 529 / 56 / 17
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 1295 / 86 / 40
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: RWY-TAXI / MAINTENANCE
+COMMENTS: GROUND STOP EXTENDED 30 MIN. RWY 04/22 EXPECTED TO OPEN BY
+16Z.
+```
+
+## 83. gs-20260410-089
+
+- Term: **LOW** (gs:LOW); written as: `PROBABILITY OF EXTENSION: LOW`
+- Element: DEN; initiative: gs; first issued 04/10 23:59Z in 20260410-089; window read as 11/0000Z - 11/0100Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 089 DEN/ZDV 04/10/2026 CDM GROUND STOP
+CTL ELEMENT: DEN
+ELEMENT TYPE: APT
+ADL TIME: 2354Z
+GROUND STOP PERIOD: 11/0000Z - 11/0100Z
+DEP FACILITIES INCLUDED: (2ndTier) ZLA ZAU ZLC ZHU ZFW ZOB ZDV ZOA
+ZSE ZKC ZME ZID ZAB ZMP
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 0 / 0 / 0
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 2305 / 60 / 35
+PROBABILITY OF EXTENSION: LOW
+IMPACTING CONDITION: STAFFING / STAFFING
+COMMENTS: DEN TOWER STAFFING. A/C WITH CURRENT SCHEDULING/CALL FOR
+RELEASE TIMES ARE EXEMPT FROM STOP.
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260411-007  sent 04/11 01:06Z  CDM GS CNX  DEN  GS CNX PERIOD 11/0104Z - 11/0624Z
+```
+
+**Derived outcome: NOT EXTENDED (lapsed) = 0**. no later advisory moved the end past 11/0100Z.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 84. gs-20260404-025
+
+- Term: **LOW** (gs:LOW); written as: `PROBABILITY OF EXTENSION: LOW`
+- Element: ORD; initiative: gs; first issued 04/04 06:01Z in 20260404-025; window read as 04/0547Z - 04/0700Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 025 ORD/ZAU 04/04/2026 CDM GROUND STOP
+CTL ELEMENT: ORD
+ELEMENT TYPE: APT
+ADL TIME: 0557Z
+GROUND STOP PERIOD: 04/0547Z - 04/0700Z
+DEP FACILITIES INCLUDED: (Internal) ZAU
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 419 / 58 / 30
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 1070 / 103 / 76
+PROBABILITY OF EXTENSION: LOW
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS: SCOPE REDUCED. ZAU MAY EXEMPT ACFT.
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260404-026  sent 04/04 06:15Z  CDM GS CNX  ORD  GS CNX PERIOD 04/0611Z - 04/0918Z
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 04/0615Z; stated end 04/0700Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 026 ORD/ZAU 04/04/2026 CDM GS CNX
+CTL ELEMENT: ORD
+ELEMENT TYPE: APT
+ADL TIME: 0611Z
+GS CNX PERIOD: 04/0611Z - 04/0918Z
+COMMENTS:
+```
+
+## 85. gs-20260404-020
+
+- Term: **LOW** (gs:LOW); written as: `PROBABILITY OF EXTENSION: LOW`
+- Element: ORD; initiative: gs; first issued 04/04 04:33Z in 20260404-020; window read as 04/0328Z - 04/0600Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 020 ORD/ZAU 04/04/2026 CDM GROUND STOP
+CTL ELEMENT: ORD
+ELEMENT TYPE: APT
+ADL TIME: 0429Z
+GROUND STOP PERIOD: 04/0328Z - 04/0600Z
+CUMULATIVE PROGRAM PERIOD: 04/0126Z - 04/0659Z
+DEP FACILITIES INCLUDED: (Manual) ZKC ZMP
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 278 / 178 / 70
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 592 / 239 / 148
+PROBABILITY OF EXTENSION: LOW
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS: ROUTES NOT AVAILABLE WEST OF ORD, GS SCOPE REDUCED
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260404-022  sent 04/04 05:19Z  CDM GROUND DELAY PROGRAM CNX  ORD  GDP CNX PERIOD 04/0513Z - 04/1724Z
+20260404-023  sent 04/04 05:22Z  CDM GROUND STOP  ORD  GROUND STOP PERIOD 04/0509Z - 04/0615Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260404-025  sent 04/04 06:01Z  CDM GROUND STOP  ORD  GROUND STOP PERIOD 04/0547Z - 04/0700Z  [PROBABILITY OF EXTENSION: LOW]
+20260404-026  sent 04/04 06:15Z  CDM GS CNX  ORD  GS CNX PERIOD 04/0611Z - 04/0918Z
+```
+
+**Derived outcome: EXTENDED = 1**. end 04/0600Z -> 04/0615Z (+15 min).
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 023 ORD/ZAU 04/04/2026 CDM GROUND STOP
+CTL ELEMENT: ORD
+ELEMENT TYPE: APT
+ADL TIME: 0519Z
+GROUND STOP PERIOD: 04/0509Z - 04/0615Z
+DEP FACILITIES INCLUDED: (Manual) ZAU ZKC ZMP
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 0 / 0 / 0
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 1723 / 258 / 66
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS: ZAU ADDED TO GROUND STOP
+```
+
+## 86. plan-20260512-075-BOS-gs+gdp-AFTER2200
+
+- Term: **POSSIBLE** (plan:POSSIBLE); written as: `AFTER 2200	-BOS GROUND STOP/DELAY PROGRAM POSSIBLE`
+- Element: BOS; initiative: gs/gdp; first issued 05/12 23:36Z in 20260512-075; window read as 13/2200Z - 14/0800Z
+- Repeated in: 20260513-014 20260513-021 20260513-031
+
+Source advisory:
+
+```
+ATCSCC ADVZY 075 DCC 05/12/2026 OPERATIONS PLAN
+EVENT TIME: 13/0000 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 0359	-TEB GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+AFTER 1300	-TEB GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1500	-SFO GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1500	-DCA GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 2000	-IAD GROUND STOP POSSIBLE
+AFTER 2000	-DEN GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 2200	-BOS GROUND STOP/DELAY PROGRAM POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260512-062  sent 05/12 20:36Z  CDM GROUND STOP  BOS  GROUND STOP PERIOD 12/2023Z - 12/2130Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260512-064  sent 05/12 20:59Z  CDM GS CNX  BOS  GS CNX PERIOD 12/2056Z - 12/2307Z
+20260513-041  sent 05/13 15:44Z  CDM PROPOSED GROUND DELAY PROGRAM  BOS  ANTICIPATED CUMULATIVE PROGRAM PERIOD 13/1700Z - 14/0059Z
+20260513-042  sent 05/13 15:59Z  CDM GROUND DELAY PROGRAM  BOS  CUMULATIVE PROGRAM PERIOD 13/1700Z - 14/0059Z
+20260513-052  sent 05/13 18:44Z  CDM GROUND DELAY PROGRAM CNX  BOS  GDP CNX PERIOD 13/1838Z - 14/0222Z
+```
+
+**Derived outcome: NOT ISSUED = 0**. no gs or gdp advisory for BOS in the window. Flags: outside_window proposed_only.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 87. plan-20260403-124-MDW-gs+gdp-AFTER0200
+
+- Term: **EXPECTED** (plan:EXPECTED); written as: `AFTER 0200	-ORD/MDW GROUND STOP/DELAY PROGRAM EXPECTED`
+- Element: MDW; initiative: gs/gdp; first issued 04/03 23:26Z in 20260403-124; window read as 04/0200Z - 04/0800Z
+- Repeated in: 20260404-007
+
+Source advisory:
+
+```
+ATCSCC ADVZY 124 DCC 04/03/2026 OPERATIONS PLAN
+EVENT TIME: 04/0000 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 0559	-SFO GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+AFTER 0200	-ORD/MDW GROUND STOP/DELAY PROGRAM EXPECTED
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260403-107  sent 04/03 20:10Z  ORD AND MDW AIRPORT ARRIVAL DELAYS
+```
+
+**Derived outcome: NOT ISSUED = 0**. no gs or gdp advisory for MDW in the window.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 88. route-20260430-042
+
+- Term: **MODERATE** (route:MODERATE); written as: `PROBABILITY OF EXTENSION: MODERATE`
+- Element: FLORIDA_TO_OHIO_VALLEY_1; initiative: reroute; first issued 04/30 13:28Z in 20260430-042; window read as 30/1330Z - 30/1630Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 042 DCC 04/30/2026 ROUTE RQD /FL
+NAME: FLORIDA_TO_OHIO_VALLEY_1
+CONSTRAINED AREA: EAST COAST
+REASON: WEATHER
+INCLUDE TRAFFIC: KAPF/KDAB/KISM/KJAX/KMCO/KMKY/KORL/KSFB/ZMA
+DEPARTURES TO
+CYYZ/KCLE/KCMH/KCVG/KDAY/KDTW/KIND/KLEX/KMDW/KMKE/K
+ORD/KPIT/KSDF
+FACILITIES INCLUDED: CZY/ZAU/ZID/ZJX/ZMA/ZOB/ZTL
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: ETD 301330 TO 301630
+PROBABILITY OF EXTENSION: MODERATE
+REMARKS:
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC042
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+**Derived outcome: NOT EXTENDED (lapsed) = 0**. no later advisory moved the end past 30/1630Z.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 89. gs-20260522-094
+
+- Term: **LOW** (gs:LOW); written as: `PROBABILITY OF EXTENSION: LOW`
+- Element: BNA; initiative: gs; first issued 05/22 18:46Z in 20260522-094; window read as 22/1830Z - 22/1930Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 094 BNA/ZME 05/22/2026 CDM GROUND STOP
+CTL ELEMENT: BNA
+ELEMENT TYPE: APT
+ADL TIME: 1845Z
+GROUND STOP PERIOD: 22/1830Z - 22/1930Z
+DEP FACILITIES INCLUDED: (1stTier) ZTL ZHU ZFW ZKC ZME ZID
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 0 / 0 / 0
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 577 / 51 / 30
+PROBABILITY OF EXTENSION: LOW
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS: AIRBORNE HOLDING AND CONGESTION ON LIMITED ARRIVAL ROUTES.
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260522-101  sent 05/22 19:27Z  CDM GS CNX  BNA  GS CNX PERIOD 22/1926Z - 22/2141Z
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 22/1927Z; stated end 22/1930Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 101 BNA/ZME 05/22/2026 CDM GS CNX
+CTL ELEMENT: BNA
+ELEMENT TYPE: APT
+ADL TIME: 1926Z
+GS CNX PERIOD: 22/1926Z - 22/2141Z
+COMMENTS:
+```
+
+## 90. plan-20260404-007-SFO-gdp-AFTER1500
+
+- Term: **PROBABLE** (plan:PROBABLE); written as: `AFTER 1500	-SFO GROUND DELAY PROGRAM PROBABLE`
+- Element: SFO; initiative: gdp; first issued 04/04 01:25Z in 20260404-007; window read as 04/1500Z - 05/0800Z
+- Repeated in: 20260404-035 20260404-057
+
+Source advisory:
+
+```
+ATCSCC ADVZY 007 DCC 04/04/2026 OPERATIONS PLAN
+EVENT TIME: 04/0200 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 0559	-SFO GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+AFTER 0200	-ORD/MDW GROUND STOP/DELAY PROGRAM EXPECTED
+AFTER 1100	-DFW/DAL GROUND STOP/DELAY PROGRAM PROBABLE
+AFTER 1500	-SFO GROUND DELAY PROGRAM PROBABLE
+AFTER 1600	-AUS GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1700	-DTW GROUND STOP POSSIBLE
+AFTER 1800	-ATL GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1800	-IAH/HOU GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 2000	-CLT GROUND STOP POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260404-021  sent 04/04 04:51Z  CDM GROUND DELAY PROGRAM CNX  SFO  GDP CNX PERIOD 04/0446Z - 04/1722Z
+20260404-063  sent 04/04 12:23Z  CDM PROPOSED GROUND DELAY PROGRAM  SFO  ANTICIPATED CUMULATIVE PROGRAM PERIOD 04/1500Z - 04/1829Z
+20260404-064  sent 04/04 12:34Z  CDM GROUND DELAY PROGRAM  SFO  CUMULATIVE PROGRAM PERIOD 04/1500Z - 04/1829Z
+20260404-100  sent 04/04 17:04Z  CDM GROUND DELAY PROGRAM CNX  SFO  GDP CNX PERIOD 04/1703Z - 04/2147Z
+```
+
+**Derived outcome: ISSUED = 1**. CDM GROUND DELAY PROGRAM sent 04/1234Z, period 04/1500Z - 04/1704Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 064 SFO/ZOA 04/04/2026 CDM GROUND DELAY PROGRAM
+CTL ELEMENT: SFO
+ELEMENT TYPE: APT
+ADL TIME: 1231Z
+DELAY ASSIGNMENT MODE: UDP
+ARRIVALS ESTIMATED FOR: 04/1500Z - 04/1829Z
+CUMULATIVE PROGRAM PERIOD: 04/1500Z - 04/1829Z
+PROGRAM RATE: 36
+FLT INCL: ALL CONTIGUOUS US DEP
+DEP SCOPE: 1000
+CANADIAN DEP ARPTS INCLUDED: CYVR CYYC
+DELAY ASSIGNMENT TABLE APPLIES TO: ZOA
+MAXIMUM DELAY: 123
+AVERAGE DELAY: 39
+IMPACTING CONDITION: OTHER / OTHER
+COMMENTS: ARR: 28L/R DEP: 28L/R TIME PLUS 45 LOW HIST POP
+```
+
+## 91. route-20260401-062
+
+- Term: **NONE** (route:NONE); written as: `PROBABILITY OF EXTENSION: NONE`
+- Element: FCA012:CAPE_1A_MODIFIED_ARTEMIS; initiative: reroute; first issued 04/01 17:40Z in 20260401-062; window read as 01/2224Z - 02/0109Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 062 DCC 04/01/2026 FCA RQD /FL
+NAME: FCA012:CAPE_1A_MODIFIED_ARTEMIS
+CONSTRAINED AREA: ZJX/ZMA
+REASON: OTHER
+INCLUDE TRAFFIC: CZU/KCLT/ZBW/ZDC/ZNY DEPARTURES TO
+KBCT/KMIA/KPBI/KSUA/KTMB
+FACILITIES INCLUDED: CZU/ZBW/ZDC/ZJX/ZMA/ZNY/ZTL
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 012224 TO 020109
+PROBABILITY OF EXTENSION: NONE
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. IMPLEMENTED DUE TO ROCKET
+LAUNCH
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC508
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260401-130  sent 04/01 22:52Z  REROUTE CANCELLATION  FCA012:CAPE_1A_MODIFIED_ARTEMIS
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 01/2252Z; stated end 02/0109Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 130 DCC 04/01/2026 REROUTE CANCELLATION
+FCA012:CAPE_1A_MODIFIED_ARTEMIS HAS BEEN CANCELLED.
+
+REMARKS:
+ASSOCIATED RESTRICTIONS:
+```
+
+## 92. plan-20260424-110-BWI-gs-AFTER1800
+
+- Term: **POSSIBLE** (plan:POSSIBLE); written as: `AFTER 1800	-IAD/BWI GROUND STOP POSSIBLE`
+- Element: BWI; initiative: gs; first issued 04/24 23:27Z in 20260424-110; window read as 25/1800Z - 26/0800Z
+- Repeated in: 20260425-020 20260425-026 20260425-035 20260425-043
+
+Source advisory:
+
+```
+ATCSCC ADVZY 110 DCC 04/24/2026 OPERATIONS PLAN
+EVENT TIME: 25/0000 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 0059	-CYYZ GROUND DELAY PROGRAM
+UNTIL 0259	-DCA GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+AFTER 0100 	-SFO GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1500	-SFO GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1600	-ATL GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1800	-DCA GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1800	-IAD/BWI GROUND STOP POSSIBLE
+AFTER 1900	-JFK GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 0330	-MCO GROUND STOP/DELAY PROGRAM POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+**Derived outcome: NOT ISSUED = 0**. no gs advisory for BWI in the window.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 93. route-20260529-049
+
+- Term: **NONE** (route:NONE); written as: `PROBABILITY OF EXTENSION: NONE`
+- Element: FCA003:CARIBBEAN_SOUTH_ULA_LAUNCH; initiative: reroute; first issued 05/29 16:53Z in 20260529-049; window read as 29/2333Z - 30/0103Z
+- Repeated in: 20260529-051
+
+Source advisory:
+
+```
+ATCSCC ADVZY 049 DCC 05/29/2026 FCA RQD
+NAME: FCA003:CARIBBEAN_SOUTH_ULA_LAUNCH
+CONSTRAINED AREA: ZNY/ZWY
+REASON: OTHER
+INCLUDE TRAFFIC: UNKN DEPARTURES TO UNKN
+FACILITIES INCLUDED: ZJX/ZMA/ZBW/ZNY/ZDC/ZOB/ZAU/ZID + CANADA
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 292333 TO 300103
+PROBABILITY OF EXTENSION: NONE
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. THIS ROUTE IS ONLY REQUIRED
+FOR FLIGHTS THAT FILE THROUGH THE ATTACHED FCA.  USERS FILE
+UPT AFTER LAST FIX ON ROUTE.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC502
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260529-051  sent 05/29 17:13Z  FCA RQD  FCA003:CARIBBEAN_SOUTH_ULA_LAUNCH  VALID 29/2333Z - 30/0103Z  [PROBABILITY OF EXTENSION: NONE]
+20260530-006  sent 05/30 00:11Z  REROUTE CANCELLATION  FCA003:CARIBBEAN_SOUTH_ULA_LAUNCH
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 30/0011Z; stated end 30/0103Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 006 DCC 05/30/2026 REROUTE CANCELLATION
+FCA003:CARIBBEAN_SOUTH_ULA_LAUNCH HAS BEEN CANCELLED.
+
+REMARKS:
+ASSOCIATED RESTRICTIONS:
+```
+
+## 94. route-20260424-064
+
+- Term: **HIGH** (route:HIGH); written as: `PROBABILITY OF EXTENSION: HIGH`
+- Element: FCA012:GA_TO_BCT_AREA; initiative: reroute; first issued 04/24 17:52Z in 20260424-064; window read as 24/2045Z - 25/0200Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 064 DCC 04/24/2026 FCA RQD
+NAME: FCA012:GA_TO_BCT_AREA
+CONSTRAINED AREA: ZJX/ZMA
+REASON: OTHER
+INCLUDE TRAFFIC: CZU/CZY/KBWI/KCLT/KDCA/KDET/KDTW/KFAY/KFNT/KIAD/KIL
+M/KLAN/KMBS/KOAJ/KPTK/KRIC/KROA/KSOP/KYIP/ZAB/ZAU/Z
+BW/ZDC/ZDV/ZFW/ZHU/ZID/ZJX/ZKC/ZLA/ZLC/ZME/ZMP/ZNY/
+ZOA/ZOB/ZSE/ZTL DEPARTURES TO KBCT/KFXE/KPMP
+FACILITIES INCLUDED: CZU/CZY/ZAB/ZAU/ZBW/ZDC/ZDV/ZFW/ZHU/ZID/ZJX/ZKC
+/ZLA/ZLC/ZMA/ZME/ZMP/ZNY/ZOA/ZOB/ZSE/ZTL
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 242045 TO 250200
+PROBABILITY OF EXTENSION: HIGH
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. THIS ROUTE IS ISSUED DUE TO
+SPECIAL OPERATIONS.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC522
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260425-003  sent 04/25 00:40Z  FCA RQD  FCA021:GA_TO_BCT_AREA  VALID 25/0200Z - 25/1900Z  [PROBABILITY OF EXTENSION: LOW]
+```
+
+**Derived outcome: EXTENDED = 1**. end 25/0200Z -> 25/1900Z (+1020 min), carried on as FCA021:GA_TO_BCT_AREA under TMI ID RRDCC500. Flags: continued_new_id.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 003 DCC 04/25/2026 FCA RQD
+NAME: FCA021:GA_TO_BCT_AREA
+CONSTRAINED AREA: ZJX/ZMA
+REASON: OTHER
+INCLUDE TRAFFIC: CZU/CZY/KBWI/KCLT/KDCA/KDET/KDTW/KFAY/KFNT/KIAD/KIL
+M/KLAN/KMBS/KOAJ/KPTK/KRIC/KROA/KSOP/KYIP/ZAB/ZAU/Z
+BW/ZDC/ZDV/ZFW/ZHU/ZID/ZJX/ZKC/ZLA/ZLC/ZME/ZMP/ZNY/
+ZOA/ZOB/ZSE/ZTL DEPARTURES TO KBCT/KFXE/KPMP
+FACILITIES INCLUDED: CZU/CZY/ZAB/ZAU/ZBW/ZDC/ZDV/ZFW/ZHU/ZID/ZJX/ZKC
+/ZLA/ZLC/ZMA/ZME/ZMP/ZNY/ZOA/ZOB/ZSE/ZTL
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 250200 TO 251900
+PROBABILITY OF EXTENSION: LOW
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. THIS ROUTE IS ISSUED DUE TO
+SPECIAL OPERATIONS.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC500
+```
+
+## 95. plan-20260420-067-BNA-gdp-AFTER2200
+
+- Term: **EXPECTED** (plan:EXPECTED); written as: `AFTER 2200	-BNA GROUND DELAY PROGRAM EXPECTED`
+- Element: BNA; initiative: gdp; first issued 04/20 19:31Z in 20260420-067; window read as 20/2200Z - 21/0800Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 067 DCC 04/20/2026 OPERATIONS PLAN
+EVENT TIME: 20/2000 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 0759	-SFO GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+AFTER 2200	-JFK GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 2200	-BNA GROUND DELAY PROGRAM EXPECTED
+UNTIL 2300	-MIA/FLL GROUND STOP POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260420-063  sent 04/20 19:13Z  CDM PROPOSED GROUND DELAY PROGRAM  BNA  ANTICIPATED CUMULATIVE PROGRAM PERIOD 20/2200Z - 21/0059Z
+```
+
+**Derived outcome: NOT ISSUED = 0**. no gdp advisory for BNA in the window.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 96. plan-20260514-012-SFO-gs+gdp-AFTER1500
+
+- Term: **POSSIBLE** (plan:POSSIBLE); written as: `AFTER 1500	-SFO GROUND STOP/DELAY PROGRAM POSSIBLE`
+- Element: SFO; initiative: gs/gdp; first issued 05/14 01:24Z in 20260514-012; window read as 14/1500Z - 15/0800Z
+- Repeated in: 20260514-031 20260514-037
+
+Source advisory:
+
+```
+ATCSCC ADVZY 012 DCC 05/14/2026 OPERATIONS PLAN
+EVENT TIME: 14/0200 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 0200	-BWI GROUND STOP
+UNTIL 0200	-DCA GROUND STOP
+UNTIL 0559	-SFO GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+AFTER 1500	-SFO GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1700	-BOS GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1700	-LGA/JFK GROUND STOP/DELAY PROGRAM POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260514-021  sent 05/14 02:53Z  CDM GROUND STOP  SFO  GROUND STOP PERIOD 14/0242Z - 14/0430Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260514-026  sent 05/14 04:02Z  CDM GROUND DELAY PROGRAM CNX  SFO  GDP CNX PERIOD 14/0358Z - 14/1639Z
+20260514-039  sent 05/14 12:28Z  CDM PROPOSED GROUND DELAY PROGRAM  SFO  ANTICIPATED CUMULATIVE PROGRAM PERIOD 14/1500Z - 14/2259Z
+20260514-040  sent 05/14 12:39Z  CDM GROUND DELAY PROGRAM  SFO  CUMULATIVE PROGRAM PERIOD 14/1500Z - 14/2259Z
+20260514-076  sent 05/14 19:38Z  CDM PROPOSED GROUND DELAY PROGRAM  SFO  ANTICIPATED CUMULATIVE PROGRAM PERIOD 14/2200Z - 15/0659Z
+20260514-077  sent 05/14 19:49Z  CDM GROUND DELAY PROGRAM  SFO  CUMULATIVE PROGRAM PERIOD 14/2200Z - 15/0659Z
+20260515-009  sent 05/15 03:14Z  CDM GROUND STOP  SFO  GROUND STOP PERIOD 15/0259Z - 15/0430Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260515-011  sent 05/15 04:02Z  CDM GROUND DELAY PROGRAM CNX  SFO  GDP CNX PERIOD 15/0359Z - 15/1921Z
+```
+
+**Derived outcome: ISSUED = 1**. CDM GROUND DELAY PROGRAM sent 14/1239Z, period 14/1500Z - 14/2259Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 040 SFO/ZOA 05/14/2026 CDM GROUND DELAY PROGRAM
+CTL ELEMENT: SFO
+ELEMENT TYPE: APT
+ADL TIME: 1233Z
+DELAY ASSIGNMENT MODE: UDP
+ARRIVALS ESTIMATED FOR: 14/1500Z - 14/2259Z
+CUMULATIVE PROGRAM PERIOD: 14/1500Z - 14/2259Z
+PROGRAM RATE: 36/36/36/32/36/36/36/36
+FLT INCL: ALL CONTIGUOUS US DEP
+DEP SCOPE: 1625
+CANADIAN DEP ARPTS INCLUDED: CYEG CYVR CYYC
+DELAY ASSIGNMENT TABLE APPLIES TO: ZOA
+MAXIMUM DELAY: 108
+AVERAGE DELAY: 63
+IMPACTING CONDITION: OTHER / OTHER
+COMMENTS: ARR: 28L/R DEP: 28LR TIME PLUS 45 LOW HIST. POP UP. DUE TO
+PROCEDURAL COMPLIANCE AND RUNWAY CONSTRUCTION
+```
+
+## 97. route-20260402-060
+
+- Term: **MODERATE** (route:MODERATE); written as: `PROBABILITY OF EXTENSION: MODERATE`
+- Element: TEXAS_AND_ZME_TO_NORTHEAST; initiative: reroute; first issued 04/02 09:03Z in 20260402-060; window read as 02/1300Z - 02/2200Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 060 DCC 04/02/2026 ROUTE RQD /FL
+NAME: TEXAS_AND_ZME_TO_NORTHEAST
+CONSTRAINED AREA: EAST COAST
+REASON: VOLUME
+INCLUDE TRAFFIC: KBNA/ZFW/ZHU/ZME DEPARTURES TO
+KBDL/KBED/KBOS/KBWI/KDCA/KEWR/KHPN/KIAD/KJFK/KLGA/K
+MMU/KPHL/KPVD/KTEB
+FACILITIES INCLUDED: ZBW/ZDC/ZFW/ZHU/ZID/ZME/ZNY/ZOB
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: ETD 021300 TO 022200
+PROBABILITY OF EXTENSION: MODERATE
+REMARKS: ZHU AIRPORTS (HOUSTON TERMINAL AND WEST).  MSY AREA DEPTS
+ONLY:  USE PREF ROUTES FROM MGM.  BNA TO DC METS FILE
+NORMAL RTES.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC060
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+**Derived outcome: NOT EXTENDED (lapsed) = 0**. no later advisory moved the end past 02/2200Z.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 98. plan-20260405-077-LAS-gdp-AFTER06.0300
+
+- Term: **EXPECTED** (plan:EXPECTED); written as: `AFTER 06/0300	-LAS GROUND DELAY PROGRAM EXPECTED`
+- Element: LAS; initiative: gdp; first issued 04/05 19:31Z in 20260405-077; window read as 06/0300Z - 06/0800Z
+- Repeated in: 20260405-085 20260405-097
+
+Source advisory:
+
+```
+ATCSCC ADVZY 077 DCC 04/05/2026 OPERATIONS PLAN
+EVENT TIME: 05/2000 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 0259	-DCA GROUND DELAY PROGRAM
+UNTIL 0359	-BOS GROUND DELAY PROGRAM
+UNTIL 0359	-LGA GROUND DELAY PROGRAM
+UNTIL 0659	-SFO GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+UNTIL 2100	-CLT GROUND STOP POSSIBLE
+UNTIL 2300	-MCO GROUND STOP POSSIBLE
+UNTIL 2300	-EWR/EWR SATS GROUND STOP/DELAY PROGRAM POSSIBLE
+UNTIL 0000	-PHL GROUND STOP PROBABLE
+AFTER 06/0300	-LAS GROUND DELAY PROGRAM EXPECTED
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260406-003  sent 04/06 00:22Z  CDM PROPOSED GROUND DELAY PROGRAM  LAS  ANTICIPATED CUMULATIVE PROGRAM PERIOD 06/0400Z - 06/0759Z
+20260406-009  sent 04/06 00:48Z  CDM GROUND DELAY PROGRAM  LAS  CUMULATIVE PROGRAM PERIOD 06/0400Z - 06/0759Z
+20260406-026  sent 04/06 06:29Z  CDM GROUND DELAY PROGRAM CNX  LAS  GDP CNX PERIOD 06/0628Z - 06/0842Z
+```
+
+**Derived outcome: ISSUED = 1**. CDM GROUND DELAY PROGRAM sent 06/0048Z, period 06/0400Z - 06/0629Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 009 LAS/ZLA 04/06/2026 CDM GROUND DELAY PROGRAM
+CTL ELEMENT: LAS
+ELEMENT TYPE: APT
+ADL TIME: 0045Z
+DELAY ASSIGNMENT MODE: UDP
+ARRIVALS ESTIMATED FOR: 06/0400Z - 06/0759Z
+CUMULATIVE PROGRAM PERIOD: 06/0400Z - 06/0759Z
+PROGRAM RATE: 28
+FLT INCL: ALL CONTIGUOUS US DEP
+DEP SCOPE: 1600
+CANADIAN DEP ARPTS INCLUDED: NONE
+DELAY ASSIGNMENT TABLE APPLIES TO: ZLA
+MAXIMUM DELAY: 112
+AVERAGE DELAY: 78
+IMPACTING CONDITION: STAFFING / STAFFING
+COMMENTS: L30 STAFFING. TIME +45. LOW POPUP.
+```
+
+## 99. gs-20260512-052
+
+- Term: **MEDIUM** (gs:MEDIUM); written as: `PROBABILITY OF EXTENSION: MEDIUM`
+- Element: TPA; initiative: gs; first issued 05/12 19:32Z in 20260512-052; window read as 12/1919Z - 12/2030Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 052 TPA/ZMA 05/12/2026 CDM GROUND STOP
+CTL ELEMENT: TPA
+ELEMENT TYPE: APT
+ADL TIME: 1929Z
+GROUND STOP PERIOD: 12/1919Z - 12/2030Z
+DEP FACILITIES INCLUDED: (Internal) ZMA
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 0 / 0 / 0
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 96 / 66 / 48
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS: LACK OF ROUTES
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260512-063  sent 05/12 20:40Z  CDM GROUND STOP  TPA  GROUND STOP PERIOD 12/1919Z - 12/2115Z  [PROBABILITY OF EXTENSION: LOW]
+20260512-065  sent 05/12 21:03Z  CDM GS CNX  TPA  GS CNX PERIOD 12/2100Z - 12/2150Z
+```
+
+**Derived outcome: EXTENDED = 1**. end 12/2030Z -> 12/2115Z (+45 min).
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 063 TPA/ZMA 05/12/2026 CDM GROUND STOP
+CTL ELEMENT: TPA
+ELEMENT TYPE: APT
+ADL TIME: 2037Z
+GROUND STOP PERIOD: 12/1919Z - 12/2115Z
+DEP FACILITIES INCLUDED: (Internal) ZMA
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 30 / 30 / 30
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 75 / 75 / 75
+PROBABILITY OF EXTENSION: LOW
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS: EXTENDED WHILE ZMA COORDINATES PATHFINDERS.
+```
+
+## 100. plan-20260531-070-ATL-gs+gdp-AFTER1800
+
+- Term: **POSSIBLE** (plan:POSSIBLE); written as: `AFTER 1800	-ATL GROUND STOP/DELAY PROGRAM POSSIBLE`
+- Element: ATL; initiative: gs/gdp; first issued 05/31 23:23Z in 20260531-070; window read as 01/1800Z - 02/0800Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 070 DCC 05/31/2026 OPERATIONS PLAN
+EVENT TIME: 01/0000 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 0030	-JFK GROUND STOP
+UNTIL 0559	-SFO GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+AFTER 1400	-SFO GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1700	-MIA/FLL/PBI GROUND STOP POSSIBLE
+AFTER 1800	-ATL GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1900	-CLT GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 2100	-MCO/TPA GROUND STOP POSSIBLE
+AFTER 2100	-DEN GROUND STOP/DELAY PROGRAM POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260531-049  sent 05/31 18:19Z  ATL CDRS_FYI
+```
+
+**Derived outcome: EXCLUDED (unresolved_boundary)**. window ends 02/0800Z, after the loaded months.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 101. plan-20260525-051-DCA-gdp-AFTER1600
+
+- Term: **EXPECTED** (plan:EXPECTED); written as: `AFTER 1600	-DCA GROUND DELAY PROGRAM EXPECTED`
+- Element: DCA; initiative: gdp; first issued 05/25 13:44Z in 20260525-051; window read as 25/1600Z - 26/0800Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 051 DCC 05/25/2026 OPERATIONS PLAN
+EVENT TIME: 25/1400 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 1400	-DCA GROUND STOP
+UNTIL 2059	-SFO GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+UNTIL 1500	-ATL GROUND STOP POSSIBLE
+UNTIL 1900	-JFK GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1600	-DCA GROUND DELAY PROGRAM EXPECTED
+AFTER 1700	-TEB GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1700	-BOS GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1800	-CLT GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1900	-ATL GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 2000	-DEN GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 2100	-TPA/MCO GROUND STOP POSSIBLE
+AFTER 2100	-SEA GROUND STOP/DELAY PROGRAM POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260525-042  sent 05/25 12:31Z  CDM GROUND STOP  DCA  GROUND STOP PERIOD 25/1211Z - 25/1330Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260525-046  sent 05/25 13:29Z  CDM GROUND STOP  DCA  GROUND STOP PERIOD 25/1326Z - 25/1400Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260525-049  sent 05/25 13:40Z  CDM PROPOSED GROUND DELAY PROGRAM  DCA  ANTICIPATED CUMULATIVE PROGRAM PERIOD 25/1334Z - 26/0259Z
+20260525-052  sent 05/25 13:49Z  CDM GROUND DELAY PROGRAM  DCA  CUMULATIVE PROGRAM PERIOD 25/1344Z - 26/0259Z
+20260525-072  sent 05/25 16:46Z  CDM GROUND STOP  DCA  GROUND STOP PERIOD 25/1639Z - 25/1745Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260525-073  sent 05/25 17:01Z  CDM GROUND DELAY PROGRAM  DCA  CUMULATIVE PROGRAM PERIOD 25/1344Z - 26/0359Z
+20260526-004  sent 05/26 00:22Z  CDM GROUND DELAY PROGRAM CNX  DCA  GDP CNX PERIOD 26/0021Z - 26/1228Z
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260525-036  sent 05/25 12:01Z  DCA AIRPORT BELOW USER MINS
+20260525-047  sent 05/25 13:32Z  DCA AIRPORT DIVERSION RECOVERY ACTIVATED
+```
+
+**Derived outcome: ISSUED = 1**. CDM GROUND DELAY PROGRAM sent 25/1349Z, period 25/1344Z - 26/0022Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 052 DCA/ZDC 05/25/2026 CDM GROUND DELAY PROGRAM
+CTL ELEMENT: DCA
+ELEMENT TYPE: APT
+ADL TIME: 1344Z
+DELAY ASSIGNMENT MODE: UDP
+ARRIVALS ESTIMATED FOR: 25/1344Z - 26/0259Z
+CUMULATIVE PROGRAM PERIOD: 25/1344Z - 26/0259Z
+PROGRAM RATE: 26/26/26/21/28/28/28/28/28/28/28/28/28/28
+FLT INCL: ALL CONTIGUOUS US DEP
+DEP SCOPE: (ALL+CZY_AP) ZLA ZAU ZLC ZTL ZDC ZNY ZHU ZJX ZFW ZOB ZDV
+ZOA ZSE ZBW ZMA ZKC ZME ZID ZAB ZMP
+CANADIAN DEP ARPTS INCLUDED: CYHZ CYOW CYUL CYYZ CYTZ CYQB
+DELAY ASSIGNMENT TABLE APPLIES TO: ZDC
+MAXIMUM DELAY: 137
+AVERAGE DELAY: 46
+IMPACTING CONDITION: WEATHER / LOW CEILINGS
+COMMENTS: GROUND STOP CANCELED. ARR/DEP 01, LOW POP UP, BY STATUS
+```
+
+## 102. route-20260501-078
+
+- Term: **HIGH** (route:HIGH); written as: `PROBABILITY OF EXTENSION: HIGH`
+- Element: FCA010:GA_PROPS_TO_MIA_AND_SATS; initiative: reroute; first issued 05/01 17:03Z in 20260501-078; window read as 01/2115Z - 02/0200Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 078 DCC 05/01/2026 FCA RQD
+NAME: FCA010:GA_PROPS_TO_MIA_AND_SATS
+CONSTRAINED AREA: ZJX/ZMA
+REASON: OTHER
+INCLUDE TRAFFIC: UNKN DEPARTURES TO
+07FA/KBCT/KFLL/KHST/KHWO/KMIA/KOPF/KTMB/X51
+FACILITIES INCLUDED: ZJX/ZMA/ZTL
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 012115 TO 020200
+PROBABILITY OF EXTENSION: HIGH
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. THIS ROUTE IS ISSUED DUE TO
+SPECIAL OPERATIONS.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC513
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260502-005  sent 05/02 00:05Z  FCA RQD  FCA026:GA_PROPS_TO_MIA_AND_SATS  VALID 02/0200Z - 02/2315Z  [PROBABILITY OF EXTENSION: MODERATE]
+```
+
+**Derived outcome: EXTENDED = 1**. end 02/0200Z -> 02/2315Z (+1275 min), carried on as FCA026:GA_PROPS_TO_MIA_AND_SATS under TMI ID RRDCC525. Flags: continued_new_id.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 005 DCC 05/02/2026 FCA RQD
+NAME: FCA026:GA_PROPS_TO_MIA_AND_SATS
+CONSTRAINED AREA: ZJX/ZMA
+REASON: OTHER
+INCLUDE TRAFFIC: UNKN DEPARTURES TO
+07FA/KBCT/KFLL/KHST/KHWO/KMIA/KOPF/KTMB/X51
+FACILITIES INCLUDED: ZJX/ZMA/ZTL/ZDC/ZID/ZME/ZFW/ZHU
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 020200 TO 022315
+PROBABILITY OF EXTENSION: MODERATE
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. IMPLEMENTED DUE TO SPECIAL
+OPERATIONS.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC525
+```
+
+## 103. route-20260415-028
+
+- Term: **MODERATE** (route:MODERATE); written as: `PROBABILITY OF EXTENSION: MODERATE`
+- Element: NORTHEAST_TO_ORD; initiative: reroute; first issued 04/15 09:50Z in 20260415-028; window read as 15/1015Z - 15/1300Z
+- Repeated in: 20260415-037
+
+Source advisory:
+
+```
+ATCSCC ADVZY 028 DCC 04/15/2026 ROUTE RQD /FL
+NAME: NORTHEAST_TO_ORD
+CONSTRAINED AREA: ZOB/ZAU
+REASON: WEATHER
+INCLUDE TRAFFIC: KABE/KAVP/KJFK/KMDT/KPHL/ZBW/ZNY DEPARTURES TO KORD
+FACILITIES INCLUDED: ZAU/ZBW/ZNY/ZOB
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: ETD 151015 TO 151300
+PROBABILITY OF EXTENSION: MODERATE
+REMARKS:
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC503
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260415-037  sent 04/15 11:31Z  ROUTE RQD /FL  NORTHEAST_TO_ORD  VALID 15/1015Z - 15/1300Z  [PROBABILITY OF EXTENSION: MODERATE]
+20260415-046  sent 04/15 12:25Z  REROUTE CANCELLATION  NORTHEAST_TO_ORD
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 15/1225Z; stated end 15/1300Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 046 DCC 04/15/2026 REROUTE CANCELLATION
+NORTHEAST_TO_ORD HAS BEEN CANCELLED.
+
+REMARKS:
+ASSOCIATED RESTRICTIONS:
+```
+
+## 104. route-20260414-035
+
+- Term: **LOW** (route:LOW); written as: `PROBABILITY OF EXTENSION: LOW`
+- Element: FCA016:MASTERS_2026_AIK_DNL_HQU_ARVLS; initiative: reroute; first issued 04/14 08:31Z in 20260414-035; window read as 14/1000Z - 15/0200Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 035 DCC 04/14/2026 FCA RQD
+NAME: FCA016:MASTERS_2026_AIK_DNL_HQU_ARVLS
+CONSTRAINED AREA: ZTL
+REASON: OTHER
+INCLUDE TRAFFIC: CZU/CZY/KECP/KEWN/KILM/KOAJ/KORF/KPHF/KPIE/KPNS/KRD
+U/KSRQ/KTLH/KTPA/KVPS/ZAB/ZAU/ZBW/ZDC/ZDV/ZFW/ZHU/Z
+ID/ZJX/ZKC/ZLA/ZLC/ZMA/ZME/ZMP/ZNY/ZOA/ZOB/ZSE
+DEPARTURES TO KAIK/KDNL/KHQU
+FACILITIES INCLUDED: CZU/CZY/ZAB/ZAU/ZBW/ZDC/ZDV/ZFW/ZHU/ZID/ZJX/ZKC
+/ZLA/ZLC/ZMA/ZME/ZMP/ZNY/ZOA/ZOB/ZSE/ZTL
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 141000 TO 150200
+PROBABILITY OF EXTENSION: LOW
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. DUE TO SPECIAL EVENT
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC035
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260414-040  sent 04/14 09:29Z  REROUTE CANCELLATION  FCA016:MASTERS_2026_AIK_DNL_HQU_ARVLS
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 14/0929Z; stated end 15/0200Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 040 DCC 04/14/2026 REROUTE CANCELLATION
+FCA016:MASTERS_2026_AIK_DNL_HQU_ARVLS HAS BEEN CANCELLED.
+
+REMARKS:
+ASSOCIATED RESTRICTIONS:
+```
+
+## 105. plan-20260510-070-SFO-gs+gdp-AFTER2200
+
+- Term: **EXPECTED** (plan:EXPECTED); written as: `AFTER 2200	-SFO GROUND STOP/DELAY PROGRAM EXPECTED`
+- Element: SFO; initiative: gs/gdp; first issued 05/10 19:34Z in 20260510-070; window read as 10/2200Z - 11/0800Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 070 DCC 05/10/2026 OPERATIONS PLAN
+EVENT TIME: 10/2000 - AND LATER
+TERMINAL ACTIVE:
+NONE
+TERMINAL PLANNED:
+UNTIL 2200 	-LGA/JFK GROUND STOP POSSIBLE
+UNTIL 2200	-DCA/IAD GROUND STOP POSSIBLE
+UNTIL 2200 	-EWR GROUND STOP POSSIBLE
+UNTIL 2200 	-PHL GROUND STOP POSSIBLE
+AFTER 2200	-SFO GROUND STOP/DELAY PROGRAM EXPECTED
+UNTIL 2300 	-DFW GROUND STOP/DELAY PROGRAM PROBABLE
+UNTIL 2300 	-MCO GROUND STOP POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260510-066  sent 05/10 18:59Z  CDM GROUND DELAY PROGRAM CNX  SFO  GDP CNX PERIOD 10/1855Z - 11/0243Z
+20260510-074  sent 05/10 19:57Z  CDM PROPOSED GROUND DELAY PROGRAM  SFO  ANTICIPATED CUMULATIVE PROGRAM PERIOD 10/2130Z - 11/0659Z
+20260510-080  sent 05/10 20:07Z  CDM GROUND DELAY PROGRAM  SFO  CUMULATIVE PROGRAM PERIOD 10/2130Z - 11/0659Z
+20260511-018  sent 05/11 03:10Z  CDM GROUND STOP  SFO  GROUND STOP PERIOD 11/0257Z - 11/0415Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260511-019  sent 05/11 03:12Z  CDM GROUND STOP  SFO  GROUND STOP PERIOD 11/0300Z - 11/0415Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260511-022  sent 05/11 04:06Z  SFO GROUND STOP CANCELLATION  SFO  EVENT TIME 11/0415Z - 11/0500Z
+20260511-025  sent 05/11 05:04Z  CDM GROUND DELAY PROGRAM CNX  SFO  GDP CNX PERIOD 11/0502Z - 11/0855Z
+```
+
+**Derived outcome: ISSUED = 1**. CDM GROUND DELAY PROGRAM sent 10/2007Z, period 10/2130Z - 11/0504Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 080 SFO/ZOA 05/10/2026 CDM GROUND DELAY PROGRAM
+CTL ELEMENT: SFO
+ELEMENT TYPE: APT
+ADL TIME: 2005Z
+DELAY ASSIGNMENT MODE: UDP
+ARRIVALS ESTIMATED FOR: 10/2130Z - 11/0659Z
+CUMULATIVE PROGRAM PERIOD: 10/2130Z - 11/0659Z
+PROGRAM RATE: 36/36/32/36/36/36/32/36/36/36
+FLT INCL: ALL CONTIGUOUS US DEP
+DEP SCOPE: (ALL+CZV_AP) ZLA ZAU ZLC ZTL ZDC ZNY ZHU ZJX ZFW ZOB ZDV
+ZOA ZSE ZBW ZMA ZKC ZME ZID ZAB ZMP
+CANADIAN DEP ARPTS INCLUDED: CYEG CYVR CYYC
+DELAY ASSIGNMENT TABLE APPLIES TO: ZOA
+MAXIMUM DELAY: 156
+AVERAGE DELAY: 59
+IMPACTING CONDITION: OTHER / OTHER
+COMMENTS: ARR/DEP 28L/R RATE 36.  PLEASE APPLY EDCTS
+```
+
+## 106. plan-20260429-092-JFK-gs+gdp-UNTIL0300
+
+- Term: **PROBABLE** (plan:PROBABLE); written as: `UNTIL 0300 	-LGA/JFK/HPN GROUND STOP/DELAY PROGRAM PROBABLE`
+- Element: JFK; initiative: gs/gdp; first issued 04/29 17:40Z in 20260429-092; window read as 29/1740Z - 30/0300Z
+- Repeated in: 20260429-107 20260429-121
+
+Source advisory:
+
+```
+ATCSCC ADVZY 092 DCC 04/29/2026 OPERATIONS PLAN
+EVENT TIME: 29/1800 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 2029	-SFO GROUND DELAY PROGRAM
+UNTIL 0359	-BOS GROUND DELAY PROGRAM
+UNTIL 0359	-DCA GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+UNTIL 0000 	-IAD/BWI GROUND STOP POSSIBLE
+UNTIL 0000 	-IAH/HOU GROUND STOP/DELAY PROGRAM PROBABLE
+UNTIL 0200 	-EWR/TEB/PHL GROUND STOP/DELAY PROGRAM POSSIBLE
+UNTIL 0300 	-LGA/JFK/HPN GROUND STOP/DELAY PROGRAM PROBABLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+**Derived outcome: NOT ISSUED = 0**. no gs or gdp advisory for JFK in the window. Flags: term_changed.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 107. gs-20260518-136
+
+- Term: **LOW** (gs:LOW); written as: `PROBABILITY OF EXTENSION: LOW`
+- Element: BNA; initiative: gs; first issued 05/18 21:31Z in 20260518-136; window read as 18/2130Z - 18/2245Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 136 BNA/ZME 05/18/2026 CDM GROUND STOP
+CTL ELEMENT: BNA
+ELEMENT TYPE: APT
+ADL TIME: 2129Z
+GROUND STOP PERIOD: 18/2130Z - 18/2245Z
+DEP FACILITIES INCLUDED: (Manual) ZAU ZTL ZNY ZHU ZFW ZKC ZME ZID
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 0 / 0 / 0
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 901 / 75 / 39
+PROBABILITY OF EXTENSION: LOW
+IMPACTING CONDITION: STAFFING / STAFFING
+COMMENTS:
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260518-148  sent 05/18 22:41Z  CDM GS CNX  BNA  GS CNX PERIOD 18/2236Z - 19/0050Z
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 18/2241Z; stated end 18/2245Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 148 BNA/ZME 05/18/2026 CDM GS CNX
+CTL ELEMENT: BNA
+ELEMENT TYPE: APT
+ADL TIME: 2236Z
+GS CNX PERIOD: 18/2236Z - 19/0050Z
+COMMENTS:
+```
+
+## 108. route-20260522-051
+
+- Term: **HIGH** (route:HIGH); written as: `PROBABILITY OF EXTENSION: HIGH`
+- Element: FCA004:GA_TO_EWR_AND_SATS; initiative: reroute; first issued 05/22 14:14Z in 20260522-051; window read as 22/1730Z - 23/0200Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 051 DCC 05/22/2026 FCA RQD
+NAME: FCA004:GA_TO_EWR_AND_SATS
+CONSTRAINED AREA: ZDC/ZNY
+REASON: OTHER
+INCLUDE TRAFFIC: KAVL/KBWI/KCJR/KCLT/KCMH/KDCA/KDMW/KESN/KFDK/KGAI/K
+GSO/KGSP/KHEF/KHGR/KIAD/KJYO/KMRB/KMTN/KOKV/KPIE/KS
+RQ/KTPA/KTRI/UNKN/ZAB/ZAU/ZDC/ZDV/ZFW/ZHU/ZID/ZJX/Z
+KC/ZLA/ZLC/ZMA/ZME/ZMP/ZOA/ZOB/ZSE/ZTL DEPARTURES
+TO KCDW/KEWR/KMMU/KTEB
+FACILITIES INCLUDED: ZAB/ZAU/ZBW/ZDC/ZDV/ZFW/ZHU/ZID/ZJX/ZKC/ZLA/ZLC
+/ZMA/ZME/ZMP/ZNY/ZOA/ZOB/ZSE/ZTL
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 221730 TO 230200
+PROBABILITY OF EXTENSION: HIGH
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. THESE ROUTES ARE FOR GA
+AIRCRAFT ONLY. IMPLEMENTED DUE TO SPECIAL OPERATIONS.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC503
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260522-077  sent 05/22 17:25Z  REROUTE CANCELLATION  FCA004:GA_TO_EWR_AND_SATS
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 22/1725Z; stated end 23/0200Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 077 DCC 05/22/2026 REROUTE CANCELLATION
+FCA004:GA_TO_EWR_AND_SATS HAS BEEN CANCELLED.
+
+REMARKS:
+ASSOCIATED RESTRICTIONS:
+```
+
+## 109. route-20260405-022
+
+- Term: **MODERATE** (route:MODERATE); written as: `PROBABILITY OF EXTENSION: MODERATE`
+- Element: FCA001:MASTERS_2026_AGS_ARVLS; initiative: reroute; first issued 04/05 09:06Z in 20260405-022; window read as 05/1000Z - 06/0200Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 022 DCC 04/05/2026 FCA RQD
+NAME: FCA001:MASTERS_2026_AGS_ARVLS
+CONSTRAINED AREA: ZTL
+REASON: OTHER
+INCLUDE TRAFFIC: CZU/CZY/KDTS/KECP/KEWN/KILM/KOAJ/KORF/KPHF/KPIE/KPN
+S/KRDU/KSRQ/KTLH/KTPA/KVPS/ZAB/ZAU/ZBW/ZDC/ZDV/ZFW/
+ZHU/ZID/ZJX/ZKC/ZLA/ZLC/ZMA/ZME/ZMP/ZNY/ZOA/ZOB/ZSE
+DEPARTURES TO KAGS
+FACILITIES INCLUDED: CZU/CZY/ZAB/ZAU/ZBW/ZDC/ZDV/ZFW/ZHU/ZID/ZJX/ZKC
+/ZLA/ZLC/ZMA/ZME/ZMP/ZNY/ZOA/ZOB/ZSE/ZTL
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 051000 TO 060200
+PROBABILITY OF EXTENSION: MODERATE
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. DUE TO SPECIAL EVENT
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC022
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260406-017  sent 04/06 01:23Z  REROUTE CANCELLATION  FCA001:MASTERS_2026_AGS_ARVLS
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 06/0123Z; stated end 06/0200Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 017 DCC 04/06/2026 REROUTE CANCELLATION
+FCA001:MASTERS_2026_AGS_ARVLS HAS BEEN CANCELLED.
+
+REMARKS: CANCELS ADVZY 022. OBJECTIVES MET
+ASSOCIATED RESTRICTIONS:
+```
+
+## 110. route-20260404-107
+
+- Term: **MODERATE** (route:MODERATE); written as: `PROBABILITY OF EXTENSION: MODERATE`
+- Element: MEX_OBGIY_WEST_2_PARTIAL; initiative: reroute; first issued 04/04 18:56Z in 20260404-107; window read as 04/1530Z - 04/2300Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 107 DCC 04/04/2026 ROUTE RQD /FL
+NAME: MEX_OBGIY_WEST_2_PARTIAL
+CONSTRAINED AREA: ZHU
+REASON: WEATHER
+INCLUDE TRAFFIC: KAUS/KHOU/KIAH/KSAT DEPARTURES TO
+KLAS/KLAX/KLGB/KOAK/KPHX/KSAN/KSFO/KSJC/KSNA
+FACILITIES INCLUDED: ZAB/ZHU/ZLA/ZMX/ZOA
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: ETD 041530 TO 042300
+PROBABILITY OF EXTENSION: MODERATE
+REMARKS: REPLACES ADVZY 086
+ASSOCIATED RESTRICTIONS: 40 MIT FROM ZHU TO MEXICO.
+MODIFICATIONS: END TIME EXTENDED
+ROUTES: [route table not shown]
+TMI ID: RRDCC511
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+**Derived outcome: NOT EXTENDED (lapsed) = 0**. no later advisory moved the end past 04/2300Z.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 111. plan-20260407-072-DEN-gs+gdp-UNTIL0200
+
+- Term: **POSSIBLE** (plan:POSSIBLE); written as: `UNTIL 0200	-DEN GROUND STOP/DELAY PROGRAM POSSIBLE`
+- Element: DEN; initiative: gs/gdp; first issued 04/07 21:31Z in 20260407-072; window read as 07/2131Z - 08/0200Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 072 DCC 04/07/2026 OPERATIONS PLAN
+EVENT TIME: 07/2200 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 2245	-MIA GROUND STOP
+UNTIL 2245	-FLL GROUND STOP
+UNTIL 2259	-MIA GROUND DELAY PROGRAM
+UNTIL 0359	-DCA GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+UNTIL 0000	-PBI GROUND STOP POSSIBLE
+UNTIL 0200	-LGA GROUND STOP/DELAY PROGRAM POSSIBLE
+UNTIL 0200	-DEN GROUND STOP/DELAY PROGRAM POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260407-073  sent 04/07 21:54Z  CDM GROUND STOP  DEN  GROUND STOP PERIOD 07/2200Z - 07/2315Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260407-077  sent 04/07 22:38Z  CDM GS CNX  DEN  GS CNX PERIOD 07/2233Z - 08/0150Z
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260407-068  sent 04/07 21:14Z  DEN AIRPORT ARRIVAL DELAYS
+```
+
+**Derived outcome: ISSUED = 1**. CDM GROUND STOP sent 07/2154Z, period 07/2200Z - 07/2238Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 073 DEN/ZDV 04/07/2026 CDM GROUND STOP
+CTL ELEMENT: DEN
+ELEMENT TYPE: APT
+ADL TIME: 2147Z
+GROUND STOP PERIOD: 07/2200Z - 07/2315Z
+DEP FACILITIES INCLUDED: (Manual) ZLA ZLC ZDV ZKC ZAB ZMP ZOA ZAU ZFW
+
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 0 / 0 / 0
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 1733 / 70 / 43
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: WEATHER / WIND
+COMMENTS:
+```
+
+## 112. gs-20260507-076
+
+- Term: **LOW** (gs:LOW); written as: `PROBABILITY OF EXTENSION: LOW`
+- Element: AUS; initiative: gs; first issued 05/07 20:45Z in 20260507-076; window read as 07/2034Z - 07/2145Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 076 AUS/ZHU 05/07/2026 CDM GROUND STOP
+CTL ELEMENT: AUS
+ELEMENT TYPE: APT
+ADL TIME: 2042Z
+GROUND STOP PERIOD: 07/2034Z - 07/2145Z
+DEP FACILITIES INCLUDED: (Internal) ZHU
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 0 / 0 / 0
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 448 / 69 / 50
+PROBABILITY OF EXTENSION: LOW
+IMPACTING CONDITION: WEATHER / LOW CEILINGS
+COMMENTS:
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260507-079  sent 05/07 21:15Z  CDM GS CNX  AUS  GS CNX PERIOD 07/2110Z - 07/2313Z
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 07/2115Z; stated end 07/2145Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 079 AUS/ZHU 05/07/2026 CDM GS CNX
+CTL ELEMENT: AUS
+ELEMENT TYPE: APT
+ADL TIME: 2110Z
+GS CNX PERIOD: 07/2110Z - 07/2313Z
+COMMENTS: CEILINGS IMPROVED INCREASING THE RATE
+```
+
+## 113. plan-20260505-036-MMU-gs+gdp-UNTIL0200
+
+- Term: **POSSIBLE** (plan:POSSIBLE); written as: `UNTIL 0200	-EWR/TEB/MMU/CDW GROUND STOP/DELAY PROGRAM POSSIBLE`
+- Element: MMU; initiative: gs/gdp; first issued 05/05 13:26Z in 20260505-036; window read as 05/1326Z - 06/0200Z
+- Repeated in: 20260505-046 20260505-055
+
+Source advisory:
+
+```
+ATCSCC ADVZY 036 DCC 05/05/2026 OPERATIONS PLAN
+EVENT TIME: 05/1400 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 2059	-SFO GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+AFTER 1600	-JFK GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1700	-LGA GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 2100	-DEN GROUND STOP/DELAY PROGRAM PROBABLE
+UNTIL 0200	-EWR/TEB/MMU/CDW GROUND STOP/DELAY PROGRAM POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+**Derived outcome: NOT ISSUED = 0**. no gs or gdp advisory for MMU in the window.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 114. plan-20260417-009-DEN-gs+gdp-AFTER1400
+
+- Term: **POSSIBLE** (plan:POSSIBLE); written as: `AFTER 1400 	-DEN GROUND STOP/DELAY PROGRAM POSSIBLE`
+- Element: DEN; initiative: gs/gdp; first issued 04/17 01:36Z in 20260417-009; window read as 17/1400Z - 18/0800Z
+- Repeated in: 20260417-023 20260417-032 20260417-046
+
+Source advisory:
+
+```
+ATCSCC ADVZY 009 DCC 04/17/2026 OPERATIONS PLAN
+EVENT TIME: 17/0200 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 0230 	-BNA GROUND STOP
+UNTIL 0259 	-BNA GROUND DELAY PROGRAM
+UNTIL 0359	-BOS GROUND DELAY PROGRAM
+UNTIL 0659 	-SFO GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+AFTER 1400 	-DEN GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1500 	-SFO GROUND DELAY PROGRAM PROBABLE
+AFTER 1500 	-LAS GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1600 	-MSP GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1800 	-BOS GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 2200 	-JFK GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 2200 	-ORD/MDW GROUND STOP/DELAY PROGRAM POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260417-089  sent 04/17 19:46Z  DEN GROUND STOP  DEN  EVENT TIME 17/1944Z - 17/2030Z
+20260417-100  sent 04/17 20:26Z  DEN GROUND STOP CANCELLATION  DEN  EVENT TIME 17/2030Z - 17/2045Z
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260417-051  sent 04/17 15:10Z  DEN AIRPORT ARRIVAL DELAYS
+20260417-058  sent 04/17 17:22Z  DEN AIRPORT ARRIVAL DELAYS
+```
+
+**Derived outcome: ISSUED = 1**. DEN GROUND STOP sent 17/1946Z, period 17/1944Z - 17/2026Z. Flags: manual_stop.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 089 DEN/ZDV 04/17/2026 DEN GROUND STOP
+EVENT TIME: 17/1944 - 17/2030
+CONSTRAINED FACILITIES: ZDV
+DESTINATION AIRPORT: DEN
+FACILITIES INCLUDED: 2ND TIER
+EXPECT UPDATE: 2030Z
+REASON: COMPANY REQUEST
+REMARKS: UAL EXPRESS AIRCRAFT ONLY (SKW CALLSIGN)
+```
+
+## 115. gs-20260402-016
+
+- Term: **MEDIUM** (gs:MEDIUM); written as: `PROBABILITY OF EXTENSION: MEDIUM`
+- Element: EWR; initiative: gs; first issued 04/02 00:48Z in 20260402-016; window read as 02/0034Z - 02/0200Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 016 EWR/ZNY 04/02/2026 CDM GROUND STOP
+CTL ELEMENT: EWR
+ELEMENT TYPE: APT
+ADL TIME: 0044Z
+GROUND STOP PERIOD: 02/0034Z - 02/0200Z
+CUMULATIVE PROGRAM PERIOD: 01/2100Z - 02/0259Z
+DEP FACILITIES INCLUDED: (Manual) ZDC
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 525 / 164 / 105
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 805 / 224 / 161
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS:
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260402-029  sent 04/02 01:49Z  CDM GROUND STOP  EWR  GROUND STOP PERIOD 02/0138Z - 02/0300Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260402-043  sent 04/02 02:56Z  CDM GROUND STOP  EWR  GROUND STOP PERIOD 02/0244Z - 02/0400Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260402-051  sent 04/02 03:58Z  CDM GROUND STOP  EWR  GROUND STOP PERIOD 02/0340Z - 02/0530Z  [PROBABILITY OF EXTENSION: MEDIUM]
+```
+
+**Derived outcome: EXTENDED = 1**. end 02/0200Z -> 02/0300Z (+60 min).
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 029 EWR/ZNY 04/02/2026 CDM GROUND STOP
+CTL ELEMENT: EWR
+ELEMENT TYPE: APT
+ADL TIME: 0148Z
+GROUND STOP PERIOD: 02/0138Z - 02/0300Z
+CUMULATIVE PROGRAM PERIOD: 01/2100Z - 02/0259Z
+DEP FACILITIES INCLUDED: (Manual) ZDC
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 614 / 224 / 88
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 1046 / 284 / 149
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS: LACK OF ROUTE
+```
+
+## 116. plan-20260505-010-DEN-gs+gdp-AFTER1300
+
+- Term: **PROBABLE** (plan:PROBABLE); written as: `AFTER 1300	-DEN GROUND STOP/DELAY PROGRAM PROBABLE`
+- Element: DEN; initiative: gs/gdp; first issued 05/05 01:23Z in 20260505-010; window read as 05/1300Z - 06/0800Z
+- Repeated in: 20260505-021 20260505-027
+
+Source advisory:
+
+```
+ATCSCC ADVZY 010 DCC 05/05/2026 OPERATIONS PLAN
+EVENT TIME: 05/0200 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 0259	-DEN GROUND DELAY PROGRAM
+UNTIL 0559	-SFO GROUND DELAY PROGRAM
+UNTIL 0759	-ORD GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+AFTER 1300	-DEN GROUND STOP/DELAY PROGRAM PROBABLE
+AFTER 1330	-TEB/MMU/CDW GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1400	-EWR GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1500	-SFO GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1600	-JFK GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1700	-LGA GROUND STOP/DELAY PROGRAM POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260504-046  sent 05/04 20:23Z  CDM GROUND STOP  DEN  GROUND STOP PERIOD 04/2011Z - 04/2145Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260504-055  sent 05/04 21:42Z  CDM GROUND STOP  DEN  GROUND STOP PERIOD 04/2137Z - 04/2245Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260504-057  sent 05/04 21:45Z  CDM PROPOSED GROUND DELAY PROGRAM  DEN  ANTICIPATED CUMULATIVE PROGRAM PERIOD 04/2142Z - 05/0259Z
+20260504-060  sent 05/04 21:57Z  CDM GROUND DELAY PROGRAM  DEN  CUMULATIVE PROGRAM PERIOD 04/2151Z - 05/0259Z
+20260505-012  sent 05/05 01:59Z  CDM GROUND DELAY PROGRAM CNX  DEN  GDP CNX PERIOD 05/0157Z - 05/0706Z
+20260505-068  sent 05/05 22:22Z  CDM GROUND STOP  DEN  GROUND STOP PERIOD 05/2202Z - 05/2315Z  [PROBABILITY OF EXTENSION: LOW]
+20260505-071  sent 05/05 23:22Z  CDM GS CNX  DEN  GS CNX PERIOD 05/2322Z - 06/0125Z
+20260506-002  sent 05/06 00:07Z  CDM GROUND STOP  DEN  GROUND STOP PERIOD 05/2352Z - 06/0115Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260506-007  sent 05/06 00:47Z  CDM GS CNX  DEN  GS CNX PERIOD 06/0047Z - 06/0253Z
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260504-047  sent 05/04 20:23Z  DEN AIRPORT DIVERSION RECOVERY ACTIVATED
+20260504-048  sent 05/04 20:24Z  DEN AIRPORT ARRIVAL DELAYS
+20260505-034  sent 05/05 13:00Z  DEN AIRPORT SCHEDULING DELAYS
+20260505-037  sent 05/05 13:29Z  DEN AIRPORT ARRIVAL DELAYS
+20260505-059  sent 05/05 19:01Z  DEN AIRPORT SCHEDULING DELAYS
+```
+
+**Derived outcome: ISSUED = 1**. CDM GROUND STOP sent 05/2222Z, period 05/2202Z - 05/2315Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 068 DEN/ZDV 05/05/2026 CDM GROUND STOP
+CTL ELEMENT: DEN
+ELEMENT TYPE: APT
+ADL TIME: 2217Z
+GROUND STOP PERIOD: 05/2202Z - 05/2315Z
+DEP FACILITIES INCLUDED: (1stTier) ZLA ZLC ZDV ZKC ZAB ZMP
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 0 / 0 / 0
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 999 / 63 / 36
+PROBABILITY OF EXTENSION: LOW
+IMPACTING CONDITION: WEATHER / LOW CEILINGS
+COMMENTS: TOWER NEEDS 6MIT RWY 34R DUE TO LOW CEILINGS/VISIBILITY.
+SCHEDULED AIRCRAFT ARE EXEMPT
+```
+
+## 117. plan-20260523-007-TPA-gs-AFTER2000
+
+- Term: **POSSIBLE** (plan:POSSIBLE); written as: `AFTER 2000	-MCO/TPA GROUND STOP POSSIBLE`
+- Element: TPA; initiative: gs; first issued 05/23 01:31Z in 20260523-007; window read as 23/2000Z - 24/0800Z
+- Repeated in: 20260523-013 20260523-032 20260523-047 20260523-064 20260523-075 20260523-093
+
+Source advisory:
+
+```
+ATCSCC ADVZY 007 DCC 05/23/2026 OPERATIONS PLAN
+EVENT TIME: 23/0200 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 0559	-SAN GROUND DELAY PROGRAM
+UNTIL 0659	-SFO GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+AFTER 1200	-DFW/DAL GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1400	-ATL GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1400	-IAH/HOU GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1500	-SFO GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1700	-JFK GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1700	-DCA GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1800	-CLT GROUND STOP POSSIBLE
+AFTER 1800	-AUS/SAT GROUND STOP POSSIBLE
+AFTER 1900	-LGA GROUND STOP/DELAY PROGRAM PROBABLE
+AFTER 2000	-MCO/TPA GROUND STOP POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+**Derived outcome: NOT ISSUED = 0**. no gs advisory for TPA in the window.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 118. gs-20260514-002
+
+- Term: **MEDIUM** (gs:MEDIUM); written as: `PROBABILITY OF EXTENSION: MEDIUM`
+- Element: DCA; initiative: gs; first issued 05/14 00:22Z in 20260514-002; window read as 13/2307Z - 14/0130Z
+- Repeated in: 20260514-007
+
+Source advisory:
+
+```
+ATCSCC ADVZY 002 DCA/ZDC 05/14/2026 CDM GROUND STOP
+CTL ELEMENT: DCA
+ELEMENT TYPE: APT
+ADL TIME: 0017Z
+GROUND STOP PERIOD: 13/2307Z - 14/0130Z
+DEP FACILITIES INCLUDED: (Manual) ZOB ZID
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 257 / 67 / 37
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 699 / 134 / 100
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS: LACK OF ROUTES.
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260514-007  sent 05/14 00:31Z  CDM GROUND STOP  DCA  GROUND STOP PERIOD 13/2307Z - 14/0130Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260514-009  sent 05/14 01:09Z  CDM GROUND STOP  DCA  GROUND STOP PERIOD 14/0056Z - 14/0200Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260514-015  sent 05/14 01:57Z  CDM GROUND STOP  DCA  GROUND STOP PERIOD 14/0145Z - 14/0245Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260514-020  sent 05/14 02:44Z  CDM GROUND STOP  DCA  GROUND STOP PERIOD 14/0232Z - 14/0345Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260514-023  sent 05/14 03:15Z  CDM GS CNX  DCA  GS CNX PERIOD 14/0313Z - 14/0520Z
+```
+
+**Derived outcome: EXTENDED = 1**. end 14/0130Z -> 14/0200Z (+30 min).
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 009 DCA/ZDC 05/14/2026 CDM GROUND STOP
+CTL ELEMENT: DCA
+ELEMENT TYPE: APT
+ADL TIME: 0106Z
+GROUND STOP PERIOD: 14/0056Z - 14/0200Z
+DEP FACILITIES INCLUDED: (1stTier) ZTL ZDC ZNY ZJX ZOB ZBW ZID
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 1057 / 134 / 39
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 1781 / 164 / 66
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS: WAITING FOR STORM CELLS TO CLEAR
+```
+
+## 119. route-20260525-032
+
+- Term: **NONE** (route:NONE); written as: `PROBABILITY OF EXTENSION: NONE`
+- Element: FCA002:CAPE_LAUNCH_1A_PARTIAL; initiative: reroute; first issued 05/25 11:21Z in 20260525-032; window read as 25/1141Z - 25/1231Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 032 DCC 05/25/2026 FCA RQD
+NAME: FCA002:CAPE_LAUNCH_1A_PARTIAL
+CONSTRAINED AREA: ZJX/ZMA
+REASON: OTHER
+INCLUDE TRAFFIC: CYYZ/CZU/CZY/KCLT/ZBW/ZDC/ZID/ZNY/ZOB/ZTL
+DEPARTURES TO KFLL/KOPF
+FACILITIES INCLUDED: CZU/CZY/ZBW/ZDC/ZID/ZJX/ZMA/ZNY/ZOB/ZTL
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 251141 TO 251231
+PROBABILITY OF EXTENSION: NONE
+REMARKS: REPLACES ADVZY028, ADJUSTS END TIME. SEE DYNAMIC LIST FOR
+UPDATES. IMPLEMENTED DUE TO ROCKET LAUNCH.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC028
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260525-035  sent 05/25 11:55Z  REROUTE CANCELLATION  FCA002:CAPE_LAUNCH_1A_PARTIAL
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 25/1155Z; stated end 25/1231Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 035 DCC 05/25/2026 REROUTE CANCELLATION
+FCA002:CAPE_LAUNCH_1A_PARTIAL HAS BEEN CANCELLED.
+
+REMARKS:
+ASSOCIATED RESTRICTIONS:
+```
+
+## 120. route-20260502-005
+
+- Term: **MODERATE** (route:MODERATE); written as: `PROBABILITY OF EXTENSION: MODERATE`
+- Element: FCA026:GA_PROPS_TO_MIA_AND_SATS; initiative: reroute; first issued 05/02 00:05Z in 20260502-005; window read as 02/0200Z - 02/2315Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 005 DCC 05/02/2026 FCA RQD
+NAME: FCA026:GA_PROPS_TO_MIA_AND_SATS
+CONSTRAINED AREA: ZJX/ZMA
+REASON: OTHER
+INCLUDE TRAFFIC: UNKN DEPARTURES TO
+07FA/KBCT/KFLL/KHST/KHWO/KMIA/KOPF/KTMB/X51
+FACILITIES INCLUDED: ZJX/ZMA/ZTL/ZDC/ZID/ZME/ZFW/ZHU
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 020200 TO 022315
+PROBABILITY OF EXTENSION: MODERATE
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. IMPLEMENTED DUE TO SPECIAL
+OPERATIONS.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC525
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+**Derived outcome: NOT EXTENDED (lapsed) = 0**. no later advisory moved the end past 02/2315Z.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 121. plan-20260504-059-DEN-gs-AFTER2200
+
+- Term: **POSSIBLE** (plan:POSSIBLE); written as: `AFTER 2200	-DEN GROUND DELAY PROGRAM EXPECTED, GROUND STOP POSSIBLE`
+- Element: DEN; initiative: gs; first issued 05/04 21:49Z in 20260504-059; window read as 04/2200Z - 05/0800Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 059 DCC 05/04/2026 OPERATIONS PLAN
+EVENT TIME: 04/2200 - AND LATER
+TERMINAL ACTIVE:
+NONE
+TERMINAL PLANNED:
+AFTER 2200	-ORD GROUND DELAY PROGRAM EXPECTED, ORD/MDW GROUND
+STOPS POSSIBLE
+AFTER 2200	-DEN GROUND DELAY PROGRAM EXPECTED, GROUND STOP
+POSSIBLE
+AFTER 0100	-SFO GROUND STOP/DELAY PROGRAM POSSIBLE
+UNTIL 0200	-MIA/FLL/PBI GROUND STOP POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260504-046  sent 05/04 20:23Z  CDM GROUND STOP  DEN  GROUND STOP PERIOD 04/2011Z - 04/2145Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260504-055  sent 05/04 21:42Z  CDM GROUND STOP  DEN  GROUND STOP PERIOD 04/2137Z - 04/2245Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260504-057  sent 05/04 21:45Z  CDM PROPOSED GROUND DELAY PROGRAM  DEN  ANTICIPATED CUMULATIVE PROGRAM PERIOD 04/2142Z - 05/0259Z
+20260504-060  sent 05/04 21:57Z  CDM GROUND DELAY PROGRAM  DEN  CUMULATIVE PROGRAM PERIOD 04/2151Z - 05/0259Z
+20260505-012  sent 05/05 01:59Z  CDM GROUND DELAY PROGRAM CNX  DEN  GDP CNX PERIOD 05/0157Z - 05/0706Z
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260504-043  sent 05/04 19:06Z  DEN AIRPORT SCHEDULING DELAYS
+20260504-047  sent 05/04 20:23Z  DEN AIRPORT DIVERSION RECOVERY ACTIVATED
+20260504-048  sent 05/04 20:24Z  DEN AIRPORT ARRIVAL DELAYS
+```
+
+**Derived outcome: EXCLUDED (already_active)**. CDM GROUND STOP already running at 04/2149Z, until 04/2245Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 055 DEN/ZDV 05/04/2026 CDM GROUND STOP
+CTL ELEMENT: DEN
+ELEMENT TYPE: APT
+ADL TIME: 2137Z
+GROUND STOP PERIOD: 04/2137Z - 04/2245Z
+DEP FACILITIES INCLUDED: (Manual) ZLA ZDV ZKC ZAB ZMP
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 1106 / 81 / 16
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 3860 / 171 / 56
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: WEATHER / WIND
+COMMENTS: EXPECT A GDP PROPOSAL AND CONFERENCE IN 10 MINUTES.
+```
+
+## 122. route-20260518-129
+
+- Term: **LOW** (route:LOW); written as: `PROBABILITY OF EXTENSION: LOW`
+- Element: WEST_TO_ORD; initiative: reroute; first issued 05/18 20:37Z in 20260518-129; window read as 18/2045Z - 19/0200Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 129 DCC 05/18/2026 ROUTE RQD /FL
+NAME: WEST_TO_ORD
+CONSTRAINED AREA: ZKC
+REASON: WEATHER
+INCLUDE TRAFFIC: ZAB/ZDV/ZLA/ZOA DEPARTURES TO KORD
+FACILITIES INCLUDED: ZAB/ZAU/ZDV/ZLA/ZLC/ZMP/ZOA
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: ETD 182045 TO 190200
+PROBABILITY OF EXTENSION: LOW
+REMARKS: AD HOC RTE
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC515
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+**Derived outcome: NOT EXTENDED (lapsed) = 0**. no later advisory moved the end past 19/0200Z.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 123. gs-20260412-090
+
+- Term: **LOW** (gs:LOW); written as: `PROBABILITY OF EXTENSION: LOW`
+- Element: MSP; initiative: gs; first issued 04/12 22:25Z in 20260412-090; window read as 12/2207Z - 12/2315Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 090 MSP/ZMP 04/12/2026 CDM GROUND STOP
+CTL ELEMENT: MSP
+ELEMENT TYPE: APT
+ADL TIME: 2222Z
+GROUND STOP PERIOD: 12/2207Z - 12/2315Z
+DEP FACILITIES INCLUDED: (1stTier+CZY_AP) ZAU ZLC ZOB ZDV ZKC ZMP
+CYHZ CYOW CYUL CYYZ
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 0 / 0 / 0
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 596 / 56 / 33
+PROBABILITY OF EXTENSION: LOW
+IMPACTING CONDITION: WEATHER / WIND
+COMMENTS: GROUND STOP EXIT INTO GDP PROBABLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260412-099  sent 04/12 23:15Z  CDM GS CNX  MSP  GS CNX PERIOD 12/2310Z - 13/0222Z
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 12/2315Z; stated end 12/2315Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 099 MSP/ZMP 04/12/2026 CDM GS CNX
+CTL ELEMENT: MSP
+ELEMENT TYPE: APT
+ADL TIME: 2310Z
+GS CNX PERIOD: 12/2310Z - 13/0222Z
+FLIGHTS MAY RECEIVE NEW EDCTS DUE TO AN ACTIVE AFP
+COMMENTS:
+```
+
+## 124. route-20260404-003
+
+- Term: **HIGH** (route:HIGH); written as: `PROBABILITY OF EXTENSION: HIGH`
+- Element: FCA024:ORD_NO_BENKY_CHMPN_PARTIAL; initiative: reroute; first issued 04/04 00:18Z in 20260404-003; window read as 03/2030Z - 04/0400Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 003 DCC 04/04/2026 FCA RQD
+NAME: FCA024:ORD_NO_BENKY_CHMPN_PARTIAL
+CONSTRAINED AREA: ZKC/ZAU/ZMP
+REASON: WEATHER
+INCLUDE TRAFFIC: GPI/GTF/HLN/MSO/ZAB/ZDV/ZLA/ZLC/ZOA/ZSE DEPARTURES
+TO KORD
+FACILITIES INCLUDED: ZAB/ZAU/ZDV/ZLA/ZLC/ZMP/ZOA/ZSE
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 032030 TO 040400
+PROBABILITY OF EXTENSION: HIGH
+REMARKS: REPLACES ADVZY 115. SEE DYNAMIC LIST FOR UPDATES.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS: END TIME EXTENDED.
+STAR MODIFIED TO WYNDE.
+ROUTES: [route table not shown]
+TMI ID: RRDCC517
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+**Derived outcome: NOT EXTENDED (lapsed) = 0**. no later advisory moved the end past 04/0400Z.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 125. plan-20260504-059-ORD-gdp-AFTER2200
+
+- Term: **EXPECTED** (plan:EXPECTED); written as: `AFTER 2200	-ORD GROUND DELAY PROGRAM EXPECTED, ORD/MDW GROUND STOPS POSSIBLE`
+- Element: ORD; initiative: gdp; first issued 05/04 21:49Z in 20260504-059; window read as 04/2200Z - 05/0800Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 059 DCC 05/04/2026 OPERATIONS PLAN
+EVENT TIME: 04/2200 - AND LATER
+TERMINAL ACTIVE:
+NONE
+TERMINAL PLANNED:
+AFTER 2200	-ORD GROUND DELAY PROGRAM EXPECTED, ORD/MDW GROUND
+STOPS POSSIBLE
+AFTER 2200	-DEN GROUND DELAY PROGRAM EXPECTED, GROUND STOP
+POSSIBLE
+AFTER 0100	-SFO GROUND STOP/DELAY PROGRAM POSSIBLE
+UNTIL 0200	-MIA/FLL/PBI GROUND STOP POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260504-054  sent 05/04 21:39Z  CDM PROPOSED GROUND DELAY PROGRAM  ORD  ANTICIPATED CUMULATIVE PROGRAM PERIOD 04/2300Z - 05/0359Z
+20260504-061  sent 05/04 22:01Z  CDM GROUND DELAY PROGRAM  ORD  CUMULATIVE PROGRAM PERIOD 04/2300Z - 05/0359Z
+20260504-064  sent 05/04 22:48Z  CDM GROUND STOP  ORD  GROUND STOP PERIOD 04/2115Z - 05/0000Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260504-069  sent 05/04 23:43Z  CDM GROUND DELAY PROGRAM  ORD  CUMULATIVE PROGRAM PERIOD 04/2300Z - 05/0559Z
+20260505-007  sent 05/05 00:39Z  CDM GROUND STOP  ORD  GROUND STOP PERIOD 05/0027Z - 05/0145Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260505-009  sent 05/05 00:58Z  CDM GROUND DELAY PROGRAM  ORD  CUMULATIVE PROGRAM PERIOD 04/2300Z - 05/0759Z
+20260505-011  sent 05/05 01:55Z  CDM GROUND STOP  ORD  GROUND STOP PERIOD 05/0138Z - 05/0300Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260505-014  sent 05/05 02:58Z  CDM GROUND DELAY PROGRAM  ORD  CUMULATIVE PROGRAM PERIOD 04/2300Z - 05/0759Z
+20260505-019  sent 05/05 05:31Z  CDM GROUND DELAY PROGRAM CNX  ORD  GDP CNX PERIOD 05/0527Z - 05/2050Z
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260504-050  sent 05/04 20:45Z  ORD/MDW AIRPORT ARRIVAL DELAYS
+20260504-051  sent 05/04 20:46Z  ORD MDW CDRS_FYI
+20260504-053  sent 05/04 21:03Z  CHICAGO AREA AIRPORTS DIVERSION RECOVERY ACTIVATED
+20260505-015  sent 05/05 03:18Z  ORD AIRPORT DIVERSION RECOVERY EXTENDED
+```
+
+**Derived outcome: ISSUED = 1**. CDM GROUND DELAY PROGRAM sent 04/2201Z, period 04/2300Z - 05/0359Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 061 ORD/ZAU 05/04/2026 CDM GROUND DELAY PROGRAM
+CTL ELEMENT: ORD
+ELEMENT TYPE: APT
+ADL TIME: 2155Z
+DELAY ASSIGNMENT MODE: UDP
+ARRIVALS ESTIMATED FOR: 04/2300Z - 05/0359Z
+CUMULATIVE PROGRAM PERIOD: 04/2300Z - 05/0359Z
+PROGRAM RATE: 64/64/72/72/92
+FLT INCL: ALL CONTIGUOUS US DEP
+DEP SCOPE: (ALL+CZY_AP) ZLA ZAU ZLC ZTL ZDC ZNY ZHU ZJX ZFW ZOB ZDV
+ZOA ZSE ZBW ZMA ZKC ZME ZID ZAB ZMP
+CANADIAN DEP ARPTS INCLUDED: CYHZ CYOW CYUL CYYZ
+DELAY ASSIGNMENT TABLE APPLIES TO: ZAU
+MAXIMUM DELAY: 108
+AVERAGE DELAY: 62
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS: WEST CONFIG. LOW HIST POP UP TIME BY STATUS
+```
+
+## 126. route-20260529-058
+
+- Term: **NONE** (route:NONE); written as: `PROBABILITY OF EXTENSION: NONE`
+- Element: FCA006:NE_TO_FLORIDA_VIA_Q97_1_PARTIAL; initiative: reroute; first issued 05/29 18:47Z in 20260529-058; window read as 29/2333Z - 30/0054Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 058 DCC 05/29/2026 FCA RQD
+NAME: FCA006:NE_TO_FLORIDA_VIA_Q97_1_PARTIAL
+CONSTRAINED AREA: ZJX/ZMA
+REASON: OTHER
+INCLUDE TRAFFIC: KBWI/KDCA/KIAD/KJFK/KPHL/ZBW/ZNY DEPARTURES TO
+KBCT/KFXE/KMIA/KPBI/KTMB
+FACILITIES INCLUDED: ZBW/ZDC/ZJX/ZMA/ZNY
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 292333 TO 300054
+PROBABILITY OF EXTENSION: NONE
+REMARKS: SEE DYNAMIC LIST FOR UPDATES.  IMPL DUE TO ROCKET LAUNCH
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC505
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260530-002  sent 05/30 00:09Z  REROUTE CANCELLATION  FCA006:NE_TO_FLORIDA_VIA_Q97_1_PARTIAL
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 30/0009Z; stated end 30/0054Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 002 DCC 05/30/2026 REROUTE CANCELLATION
+FCA006:NE_TO_FLORIDA_VIA_Q97_1_PARTIAL HAS BEEN CANCELLED.
+
+REMARKS:
+ASSOCIATED RESTRICTIONS:
+```
+
+## 127. plan-20260411-047-SFO-gs+gdp-AFTER2000
+
+- Term: **PROBABLE** (plan:PROBABLE); written as: `AFTER 2000	-SFO GROUND STOP/DELAY PROGRAM PROBABLE`
+- Element: SFO; initiative: gs/gdp; first issued 04/11 15:23Z in 20260411-047; window read as 11/2000Z - 12/0800Z
+- Repeated in: 20260411-052
+
+Source advisory:
+
+```
+ATCSCC ADVZY 047 DCC 04/11/2026 OPERATIONS PLAN
+EVENT TIME: 11/1600 - AND LATER
+TERMINAL ACTIVE:
+NONE
+TERMINAL PLANNED:
+AFTER 1800	-DEN GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 2000	-SFO GROUND STOP/DELAY PROGRAM PROBABLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260411-059  sent 04/11 19:10Z  CDM PROPOSED GROUND DELAY PROGRAM  SFO  ANTICIPATED CUMULATIVE PROGRAM PERIOD 11/2130Z - 12/0659Z
+20260411-064  sent 04/11 19:34Z  CDM GROUND DELAY PROGRAM  SFO  CUMULATIVE PROGRAM PERIOD 11/2130Z - 12/0759Z
+20260411-071  sent 04/11 21:06Z  CDM GROUND STOP  SFO  GROUND STOP PERIOD 11/2053Z - 11/2215Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260411-075  sent 04/11 21:54Z  CDM GROUND DELAY PROGRAM  SFO  CUMULATIVE PROGRAM PERIOD 11/2130Z - 12/0759Z
+20260412-003  sent 04/12 00:31Z  CDM GROUND STOP  SFO  GROUND STOP PERIOD 12/0019Z - 12/0145Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260412-006  sent 04/12 01:19Z  CDM GROUND DELAY PROGRAM CNX  SFO  GDP CNX PERIOD 12/0116Z - 12/1030Z
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260411-037  sent 04/11 12:26Z  SFO AIRPORT SCHEDULING DELAYS
+20260411-061  sent 04/11 19:21Z  SFO AIRPORT ARRIVAL DELAYS
+```
+
+**Derived outcome: ISSUED = 1**. CDM GROUND DELAY PROGRAM sent 11/1934Z, period 11/2130Z - 12/0119Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 064 SFO/ZOA 04/11/2026 CDM GROUND DELAY PROGRAM
+CTL ELEMENT: SFO
+ELEMENT TYPE: APT
+ADL TIME: 1929Z
+DELAY ASSIGNMENT MODE: UDP
+ARRIVALS ESTIMATED FOR: 11/2130Z - 12/0759Z
+CUMULATIVE PROGRAM PERIOD: 11/2130Z - 12/0759Z
+PROGRAM RATE: 27
+FLT INCL: ALL CONTIGUOUS US DEP
+DEP SCOPE: (ALL+CZV_AP) ZLA ZAU ZLC ZTL ZDC ZNY ZHU ZJX ZFW ZOB ZDV
+ZOA ZSE ZBW ZMA ZKC ZME ZID ZAB ZMP
+CANADIAN DEP ARPTS INCLUDED: CYEG CYVR CYYC
+DELAY ASSIGNMENT TABLE APPLIES TO: ZOA
+MAXIMUM DELAY: 187
+AVERAGE DELAY: 95
+IMPACTING CONDITION: WEATHER / WIND
+COMMENTS: ARR 19L DEP 10L/10R. RWY 19R UNAVAILABLE DUE TO RUNWAY
+CONSTRUCTION. LOW POP-UPS. TIME +30.
+```
+
+## 128. route-20260519-083
+
+- Term: **MODERATE** (route:MODERATE); written as: `PROBABILITY OF EXTENSION: MODERATE`
+- Element: SOUTHEAST_TO_DFW_DAL; initiative: reroute; first issued 05/19 19:09Z in 20260519-083; window read as 19/1900Z - 19/2245Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 083 DCC 05/19/2026 ROUTE RQD /FL
+NAME: SOUTHEAST_TO_DFW_DAL
+CONSTRAINED AREA: ZFW/ZME
+REASON: WEATHER
+INCLUDE TRAFFIC: KATL/KCLT/KGSO/KMIA/KORF/KRDU/KRIC/KROA/KTPA/ZJX/ZM
+A/ZTL DEPARTURES TO KDAL/KDFW
+FACILITIES INCLUDED: ZDC/ZFW/ZHU/ZJX/ZMA/ZTL
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: ETD 191900 TO 192245
+PROBABILITY OF EXTENSION: MODERATE
+REMARKS: BASED ON DFW_EAST_2_NORTH_FLOW
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC502
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260519-131  sent 05/19 21:53Z  ROUTE RQD /FL  SOUTHEAST_TO_DFW_DAL  VALID 19/1900Z - 20/0100Z  [PROBABILITY OF EXTENSION: MODERATE]
+```
+
+**Derived outcome: EXTENDED = 1**. end 19/2245Z -> 20/0100Z (+135 min).
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 131 DCC 05/19/2026 ROUTE RQD /FL
+NAME: SOUTHEAST_TO_DFW_DAL
+CONSTRAINED AREA: ZFW/ZME
+REASON: WEATHER
+INCLUDE TRAFFIC: KATL/KCLT/KGSO/KMIA/KORF/KRDU/KRIC/KROA/KTPA/ZJX/ZM
+A/ZTL DEPARTURES TO KDAL/KDFW
+FACILITIES INCLUDED: ZDC/ZFW/ZHU/ZJX/ZMA/ZTL
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: ETD 191900 TO 200100
+PROBABILITY OF EXTENSION: MODERATE
+REMARKS: EXTENDS ADVZY 083.  BASED ON DFW_EAST_2_NORTH_FLOW
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC502
+```
+
+## 129. plan-20260427-051-ORD-gs+gdp-UNTIL2300
+
+- Term: **PROBABLE** (plan:PROBABLE); written as: `UNTIL 2300 	-ORD GROUND STOP/DELAY PROGRAM PROBABLE`
+- Element: ORD; initiative: gs/gdp; first issued 04/27 13:33Z in 20260427-051; window read as 27/1333Z - 27/2300Z
+- Repeated in: 20260427-072
+
+Source advisory:
+
+```
+ATCSCC ADVZY 051 DCC 04/27/2026 OPERATIONS PLAN
+EVENT TIME: 27/1400 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 2059 	-SFO GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+AFTER 1600 	-MSP GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 2100 	-DEN GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 2200 	-SFO GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 2200 	-JFK GROUND STOP/DELAY PROGRAM POSSIBLE
+UNTIL 2300 	-MDW GROUND STOP PROBABLE
+UNTIL 2300 	-ORD GROUND STOP/DELAY PROGRAM PROBABLE
+AFTER 0200 	-MEM GROUND STOP POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260427-075  sent 04/27 16:50Z  CDM PROPOSED GROUND DELAY PROGRAM  ORD  ANTICIPATED CUMULATIVE PROGRAM PERIOD 27/1800Z - 28/0759Z
+20260427-078  sent 04/27 17:15Z  CDM GROUND DELAY PROGRAM  ORD  CUMULATIVE PROGRAM PERIOD 27/1800Z - 28/0759Z
+20260427-083  sent 04/27 18:33Z  CDM GROUND STOP  ORD  GROUND STOP PERIOD 27/1820Z - 27/1930Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260427-091  sent 04/27 19:19Z  CDM GROUND STOP  ORD  GROUND STOP PERIOD 27/1903Z - 27/2030Z  [PROBABILITY OF EXTENSION: LOW]
+20260427-097  sent 04/27 20:15Z  CDM GROUND DELAY PROGRAM  ORD  CUMULATIVE PROGRAM PERIOD 27/1800Z - 28/0759Z
+20260427-108  sent 04/27 23:07Z  CDM GROUND STOP  ORD  GROUND STOP PERIOD 27/2249Z - 28/0015Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260427-113  sent 04/27 23:52Z  CDM GROUND STOP  ORD  GROUND STOP PERIOD 27/2249Z - 28/0100Z  [PROBABILITY OF EXTENSION: MEDIUM]
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260427-053  sent 04/27 13:47Z  ORD AND MDW AIRPORT ARRIVAL DELAYS
+20260427-069  sent 04/27 15:00Z  ORD MDW CDRS_FYI
+20260427-087  sent 04/27 18:46Z  ORD AIRPORT DIVERSION RECOVERY ACTIVATED
+20260427-101  sent 04/27 21:09Z  ORD/MDW AIRPORT ARRIVAL DELAYS
+20260427-116  sent 04/27 23:59Z  CHICAGO HOTLINE_FYI
+```
+
+**Derived outcome: ISSUED = 1**. CDM GROUND DELAY PROGRAM sent 27/1715Z, period 27/1800Z - 28/0743Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 078 ORD/ZAU 04/27/2026 CDM GROUND DELAY PROGRAM
+CTL ELEMENT: ORD
+ELEMENT TYPE: APT
+ADL TIME: 1710Z
+DELAY ASSIGNMENT MODE: UDP
+ARRIVALS ESTIMATED FOR: 27/1800Z - 28/0759Z
+CUMULATIVE PROGRAM PERIOD: 27/1800Z - 28/0759Z
+PROGRAM RATE: 72/72/72/72/72/72/72/54/36/36/36/36/36/36
+FLT INCL: ALL CONTIGUOUS US DEP
+DEP SCOPE: (ALL+CZY_AP) ZLA ZAU ZLC ZTL ZDC ZNY ZHU ZJX ZFW ZOB ZDV
+ZOA ZSE ZBW ZMA ZKC ZME ZID ZAB ZMP
+CANADIAN DEP ARPTS INCLUDED: CYHZ CYOW CYUL CYYZ
+DELAY ASSIGNMENT TABLE APPLIES TO: ZAU
+MAXIMUM DELAY: 407
+AVERAGE DELAY: 167
+IMPACTING CONDITION: STAFFING / STAFFING
+COMMENTS: EAST CONFIG. LOW HIST POP UP TIME PLUS 20. DUE TO ORD TOWER
+STAFFING
+```
+
+## 130. route-20260525-027
+
+- Term: **NONE** (route:NONE); written as: `PROBABILITY OF EXTENSION: NONE`
+- Element: FCA001:NO_AR_ATLANTIC_Y_RTES_TO_MCO_TPA_RSW_AREAS; initiative: reroute; first issued 05/25 09:00Z in 20260525-027; window read as 25/1056Z - 25/1623Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 027 DCC 05/25/2026 FCA RQD
+NAME: FCA001:NO_AR_ATLANTIC_Y_RTES_TO_MCO_TPA_RSW_AREAS
+CONSTRAINED AREA: ZJX/ZMA
+REASON: OTHER
+INCLUDE TRAFFIC: UNKN DEPARTURES TO
+KAPF/KFMY/KISM/KLAL/KMCF/KMCO/KMKY/KORL/KPGD/KPIE/K
+RSW/KSFB/KSPG/KSRQ/KTPA/KTPF
+FACILITIES INCLUDED: ZJX/ZMA/ZDC/ZOB/ZNY/ZBW/CZY
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 251056 TO 251623
+PROBABILITY OF EXTENSION: NONE
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. IMPLEMENTED DUE TO ROCKET
+LAUNCH ACTIVITIES.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC027
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260525-031  sent 05/25 11:20Z  FCA RQD  FCA001:NO_AR_ATLANTIC_Y_RTES_TO_MCO_TPA_RSW_AREAS  VALID 25/1056Z - 25/1231Z  [PROBABILITY OF EXTENSION: NONE]
+20260525-034  sent 05/25 11:54Z  REROUTE CANCELLATION  FCA001:NO_AR_ATLANTIC_Y_RTES_TO_MCO_TPA_RSW_AREAS
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 25/1154Z; stated end 25/1623Z. Flags: shortened.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 034 DCC 05/25/2026 REROUTE CANCELLATION
+FCA001:NO_AR_ATLANTIC_Y_RTES_TO_MCO_TPA_RSW_AREAS HAS BEEN CANCELLED.
+
+REMARKS:
+ASSOCIATED RESTRICTIONS:
+```
+
+## 131. gs-20260404-121
+
+- Term: **MEDIUM** (gs:MEDIUM); written as: `PROBABILITY OF EXTENSION: MEDIUM`
+- Element: JFK; initiative: gs; first issued 04/04 19:58Z in 20260404-121; window read as 04/1946Z - 04/2100Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 121 JFK/ZNY 04/04/2026 CDM GROUND STOP
+CTL ELEMENT: JFK
+ELEMENT TYPE: APT
+ADL TIME: 1956Z
+GROUND STOP PERIOD: 04/1946Z - 04/2100Z
+DEP FACILITIES INCLUDED: (Manual) ZDC ZNY ZOB ZBW  CYHZ CYOW CYUL
+CYYZ CYTZ CYQB
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 0 / 0 / 0
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 227 / 56 / 28
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: WEATHER / WIND
+COMMENTS: EXPECT GDP TO FOLLOW.
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260404-122  sent 04/04 20:13Z  CDM PROPOSED GROUND DELAY PROGRAM  JFK  ANTICIPATED CUMULATIVE PROGRAM PERIOD 04/2012Z - 05/0359Z
+20260404-125  sent 04/04 20:35Z  CDM GROUND DELAY PROGRAM  JFK  CUMULATIVE PROGRAM PERIOD 04/2032Z - 05/0359Z
+20260404-130  sent 04/04 21:08Z  CDM GROUND STOP  JFK  GROUND STOP PERIOD 04/2022Z - 04/2230Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260404-132  sent 04/04 21:38Z  CDM GROUND DELAY PROGRAM  JFK  CUMULATIVE PROGRAM PERIOD 04/2032Z - 05/0559Z
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260404-128  sent 04/04 21:06Z  JFK AIRPORT DIVERSION RECOVERY ACTIVATED
+```
+
+**Derived outcome: EXTENDED = 1**. end 04/2100Z -> 04/2230Z (+90 min). Flags: gdp_followed.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 130 JFK/ZNY 04/04/2026 CDM GROUND STOP
+CTL ELEMENT: JFK
+ELEMENT TYPE: APT
+ADL TIME: 2105Z
+GROUND STOP PERIOD: 04/2022Z - 04/2230Z
+CUMULATIVE PROGRAM PERIOD: 04/2032Z - 05/0359Z
+DEP FACILITIES INCLUDED: (2ndTier+CZY_AP) ZAU ZTL ZDC ZNY ZJX ZOB ZBW
+ZID ZMP  CYHZ CYOW CYUL CYYZ CYTZ CYQB
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 480 / 91 / 34
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 1105 / 136 / 79
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: WEATHER / WIND
+COMMENTS:
+```
+
+## 132. gs-20260405-063
+
+- Term: **MEDIUM** (gs:MEDIUM); written as: `PROBABILITY OF EXTENSION: MEDIUM`
+- Element: DCA; initiative: gs; first issued 04/05 16:47Z in 20260405-063; window read as 05/1535Z - 05/1730Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 063 DCA/ZDC 04/05/2026 CDM GROUND STOP
+CTL ELEMENT: DCA
+ELEMENT TYPE: APT
+ADL TIME: 1643Z
+GROUND STOP PERIOD: 05/1535Z - 05/1730Z
+DEP FACILITIES INCLUDED: (Manual) ZTL ZDC ZNY ZJX ZOB ZBW ZID  CYHZ
+CYOW CYUL CYYZ CYTZ CYQB
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 721 / 76 / 26
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 1453 / 106 / 52
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: WEATHER / LOW CEILINGS
+COMMENTS: STOP EXTENDED. GDP PROPOSAL AND EXIT DISCUSSION PRIOR TO
+1715Z SPT.
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260405-064  sent 04/05 16:48Z  CDM PROPOSED GROUND DELAY PROGRAM  DCA  ANTICIPATED CUMULATIVE PROGRAM PERIOD 05/1645Z - 05/2159Z
+20260405-067  sent 04/05 17:09Z  CDM GROUND DELAY PROGRAM  DCA  CUMULATIVE PROGRAM PERIOD 05/1700Z - 06/0259Z
+```
+
+**Derived outcome: NOT EXTENDED (lapsed) = 0**. no later advisory moved the end past 05/1730Z. Flags: gdp_followed.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 133. gs-20260525-081
+
+- Term: **MEDIUM** (gs:MEDIUM); written as: `PROBABILITY OF EXTENSION: MEDIUM`
+- Element: JFK; initiative: gs; first issued 05/25 18:21Z in 20260525-081; window read as 25/1809Z - 25/1930Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 081 JFK/ZNY 05/25/2026 CDM GROUND STOP
+CTL ELEMENT: JFK
+ELEMENT TYPE: APT
+ADL TIME: 1819Z
+GROUND STOP PERIOD: 25/1809Z - 25/1930Z
+DEP FACILITIES INCLUDED: (1stTier) ZDC ZNY ZOB ZBW
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 0 / 0 / 0
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 308 / 63 / 44
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: VOLUME / COMPACTED DEMAND
+COMMENTS:
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260525-089  sent 05/25 19:15Z  CDM GS CNX  JFK  GS CNX PERIOD 25/1910Z - 25/2044Z
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 25/1915Z; stated end 25/1930Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 089 JFK/ZNY 05/25/2026 CDM GS CNX
+CTL ELEMENT: JFK
+ELEMENT TYPE: APT
+ADL TIME: 1910Z
+GS CNX PERIOD: 25/1910Z - 25/2044Z
+COMMENTS:
+```
+
+## 134. route-20260415-010
+
+- Term: **NONE** (route:NONE); written as: `PROBABILITY OF EXTENSION: NONE`
+- Element: DC_METRO_NATS_ESCAPE_VIA_GOATR; initiative: reroute; first issued 04/15 01:41Z in 20260415-010; window read as 15/0100Z - 15/0400Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 010 DCC 04/15/2026 ROUTE RMD /FL
+NAME: DC_METRO_NATS_ESCAPE_VIA_GOATR
+CONSTRAINED AREA: ZDC
+REASON: WEATHER
+INCLUDE TRAFFIC: KADW/KBWI/KIAD DEPARTURES TO ZEU
+FACILITIES INCLUDED: ZBW/ZDC/ZEU/ZOB
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: ETD 150100 TO 150400
+PROBABILITY OF EXTENSION: NONE
+REMARKS: AIRCRAFT FILED TUSKY OR SOUTH PLEASE FILE APPROPRIATE ROUTE
+TO GOATR THEN DIRECT ALLEX THEN DIRECT OEP.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC502
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+**Derived outcome: NOT EXTENDED (lapsed) = 0**. no later advisory moved the end past 15/0400Z.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 135. plan-20260430-032-BOS-gs+gdp-AFTER1700
+
+- Term: **EXPECTED** (plan:EXPECTED); written as: `AFTER 1700	-BOS GROUND STOP/DELAY PROGRAM EXPECTED`
+- Element: BOS; initiative: gs/gdp; first issued 04/30 11:51Z in 20260430-032; window read as 30/1700Z - 01/0800Z
+- Repeated in: 20260430-033 20260430-046
+
+Source advisory:
+
+```
+ATCSCC ADVZY 032 DCC 04/30/2026 OPERATIONS PLAN
+EVENT TIME: 30/1200 - AND LATER
+TERMINAL ACTIVE:
+NONE
+TERMINAL PLANNED:
+AFTER 1300	-LGA/HPN GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1500	-SFO GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1700	-BOS GROUND STOP/DELAY PROGRAM EXPECTED
+AFTER 1700	-EWR GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1900	-DCA GROUND STOP POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260430-052  sent 04/30 14:04Z  CDM PROPOSED GROUND DELAY PROGRAM  BOS  ANTICIPATED CUMULATIVE PROGRAM PERIOD 30/1700Z - 01/0359Z
+20260430-054  sent 04/30 14:18Z  CDM GROUND DELAY PROGRAM  BOS  CUMULATIVE PROGRAM PERIOD 30/1700Z - 01/0359Z
+20260430-121  sent 04/30 22:31Z  CDM GROUND DELAY PROGRAM CNX  BOS  GDP CNX PERIOD 30/2228Z - 01/0510Z
+```
+
+**Derived outcome: ISSUED = 1**. CDM GROUND DELAY PROGRAM sent 30/1418Z, period 30/1700Z - 30/2231Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 054 BOS/ZBW 04/30/2026 CDM GROUND DELAY PROGRAM
+CTL ELEMENT: BOS
+ELEMENT TYPE: APT
+ADL TIME: 1416Z
+DELAY ASSIGNMENT MODE: UDP
+ARRIVALS ESTIMATED FOR: 30/1700Z - 01/0359Z
+CUMULATIVE PROGRAM PERIOD: 30/1700Z - 01/0359Z
+PROGRAM RATE: 38
+FLT INCL: ALL CONTIGUOUS US DEP
+DEP SCOPE: (ALL+CZY_AP) ZLA ZAU ZLC ZTL ZDC ZNY ZHU ZJX ZFW ZOB ZDV
+ZOA ZSE ZBW ZMA ZKC ZME ZID ZAB ZMP
+CANADIAN DEP ARPTS INCLUDED: CYHZ CYOW CYUL CYYZ CYTZ CYQB
+DELAY ASSIGNMENT TABLE APPLIES TO: ZBW
+MAXIMUM DELAY: 405
+AVERAGE DELAY: 67
+IMPACTING CONDITION: WEATHER / LOW CEILINGS
+COMMENTS: ARR: 4R DEP: 9 MED HIST POP UP. TIME PLUS 45
+```
+
+## 136. route-20260423-077
+
+- Term: **NONE** (route:NONE); written as: `PROBABILITY OF EXTENSION: NONE`
+- Element: FCA024:STAVE_2_FLORIDA_ARVLS; initiative: reroute; first issued 04/23 20:54Z in 20260423-077; window read as 24/0000Z - 24/0500Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 077 DCC 04/23/2026 FCA RQD
+NAME: FCA024:STAVE_2_FLORIDA_ARVLS
+CONSTRAINED AREA: ZJX/ZMA
+REASON: OTHER
+INCLUDE TRAFFIC: CLT/CZU/CZY/KCDW/KJFK/KMMU/KPHL/KTEB/UNKN/ZBW/ZDC/Z
+NY DEPARTURES TO
+KAPF/KBCT/KFLL/KFMY/KFPR/KFXE/KMIA/KMKY/KOPF/KPBI/K
+PMP/KRSW/KSUA/KTMB/KVRB
+FACILITIES INCLUDED: ALL+CANADA
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 240000 TO 240500
+PROBABILITY OF EXTENSION: NONE
+REMARKS: IMPLEMENTED DUE TO SUA ACTIVITY. FILE ROUTES TO AVOID THE
+ATTACHED FCA. SEE DYNAMIC LIST FOR UPDATES.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC077
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260423-081  sent 04/23 21:13Z  REROUTE CANCELLATION  FCA024:STAVE_2_FLORIDA_ARVLS
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 23/2113Z; stated end 24/0500Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 081 DCC 04/23/2026 REROUTE CANCELLATION
+FCA024:STAVE_2_FLORIDA_ARVLS HAS BEEN CANCELLED.
+
+REMARKS: CANCELS ADVZY 077
+ASSOCIATED RESTRICTIONS:
+```
+
+## 137. plan-20260504-068-ORD-gs-UNTIL0200
+
+- Term: **POSSIBLE** (plan:POSSIBLE); written as: `UNTIL 0200      -ORD/MDW GROUND STOPS POSSIBLE`
+- Element: ORD; initiative: gs; first issued 05/04 23:40Z in 20260504-068; window read as 04/2340Z - 05/0200Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 068 DCC 05/04/2026 OPERATIONS PLAN
+EVENT TIME: 05/0000 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 0259	-DEN GROUND DELAY PROGRAM
+UNTIL 0359	-ORD GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+AFTER 0100	-SFO GROUND STOP/DELAY PROGRAM PROBABLE
+UNTIL 0200      -ORD/MDW GROUND STOPS POSSIBLE
+UNTIL 0200	-DEN GROUND STOP POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260504-054  sent 05/04 21:39Z  CDM PROPOSED GROUND DELAY PROGRAM  ORD  ANTICIPATED CUMULATIVE PROGRAM PERIOD 04/2300Z - 05/0359Z
+20260504-061  sent 05/04 22:01Z  CDM GROUND DELAY PROGRAM  ORD  CUMULATIVE PROGRAM PERIOD 04/2300Z - 05/0359Z
+20260504-064  sent 05/04 22:48Z  CDM GROUND STOP  ORD  GROUND STOP PERIOD 04/2115Z - 05/0000Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260504-069  sent 05/04 23:43Z  CDM GROUND DELAY PROGRAM  ORD  CUMULATIVE PROGRAM PERIOD 04/2300Z - 05/0559Z
+20260505-007  sent 05/05 00:39Z  CDM GROUND STOP  ORD  GROUND STOP PERIOD 05/0027Z - 05/0145Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260505-009  sent 05/05 00:58Z  CDM GROUND DELAY PROGRAM  ORD  CUMULATIVE PROGRAM PERIOD 04/2300Z - 05/0759Z
+20260505-011  sent 05/05 01:55Z  CDM GROUND STOP  ORD  GROUND STOP PERIOD 05/0138Z - 05/0300Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260505-014  sent 05/05 02:58Z  CDM GROUND DELAY PROGRAM  ORD  CUMULATIVE PROGRAM PERIOD 04/2300Z - 05/0759Z
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260504-050  sent 05/04 20:45Z  ORD/MDW AIRPORT ARRIVAL DELAYS
+20260504-051  sent 05/04 20:46Z  ORD MDW CDRS_FYI
+20260504-053  sent 05/04 21:03Z  CHICAGO AREA AIRPORTS DIVERSION RECOVERY ACTIVATED
+```
+
+**Derived outcome: EXCLUDED (already_active)**. CDM GROUND STOP already running at 04/2340Z, until 05/0000Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 064 ORD/ZAU 05/04/2026 CDM GROUND STOP
+CTL ELEMENT: ORD
+ELEMENT TYPE: APT
+ADL TIME: 2246Z
+GROUND STOP PERIOD: 04/2115Z - 05/0000Z
+CUMULATIVE PROGRAM PERIOD: 04/2300Z - 05/0359Z
+DEP FACILITIES INCLUDED: (2ndTier) ZAU ZLC ZTL ZDC ZNY ZFW ZOB ZDV
+ZBW ZKC ZME ZID ZAB ZMP
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 2266 / 104 / 41
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 4136 / 188 / 75
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS:
+```
+
+## 138. plan-20260529-008-SFO-gs+gdp-AFTER1500
+
+- Term: **PROBABLE** (plan:PROBABLE); written as: `AFTER 1500	-SFO GROUND STOP/DELAY PROGRAM PROBABLE`
+- Element: SFO; initiative: gs/gdp; first issued 05/29 01:25Z in 20260529-008; window read as 29/1500Z - 30/0800Z
+- Repeated in: 20260529-015 20260529-023
+
+Source advisory:
+
+```
+ATCSCC ADVZY 008 DCC 05/29/2026 OPERATIONS PLAN
+EVENT TIME: 29/0200 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 0759	-SFO GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+AFTER 1400	-ATL GROUND STOP POSSIBLE
+AFTER 1500	-SFO GROUND STOP/DELAY PROGRAM PROBABLE
+AFTER 1800	-MIA/FLL GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1800	-BNA GROUND STOP POSSIBLE
+AFTER 1900	-MCO GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 2000	-ATL GROUND STOP POSSIBLE
+AFTER 1400	-DEN GROUND STOP POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260528-080  sent 05/28 20:16Z  CDM GROUND DELAY PROGRAM  SFO  CUMULATIVE PROGRAM PERIOD 28/1500Z - 29/0759Z
+20260529-013  sent 05/29 05:57Z  CDM GROUND DELAY PROGRAM CNX  SFO  GDP CNX PERIOD 29/0555Z - 29/1017Z
+20260529-031  sent 05/29 12:54Z  CDM PROPOSED GROUND DELAY PROGRAM  SFO  ANTICIPATED CUMULATIVE PROGRAM PERIOD 29/1500Z - 30/0659Z
+20260529-034  sent 05/29 13:08Z  CDM GROUND DELAY PROGRAM  SFO  CUMULATIVE PROGRAM PERIOD 29/1500Z - 30/0659Z
+20260530-015  sent 05/30 03:10Z  CDM GROUND STOP  SFO  GROUND STOP PERIOD 30/0300Z - 30/0400Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260530-017  sent 05/30 03:50Z  CDM GROUND DELAY PROGRAM  SFO  CUMULATIVE PROGRAM PERIOD 29/1500Z - 30/0729Z
+20260530-019  sent 05/30 05:57Z  CDM GROUND DELAY PROGRAM CNX  SFO  GDP CNX PERIOD 30/0555Z - 30/0841Z
+```
+
+**Derived outcome: ISSUED = 1**. CDM GROUND DELAY PROGRAM sent 29/1308Z, period 29/1500Z - 30/0557Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 034 SFO/ZOA 05/29/2026 CDM GROUND DELAY PROGRAM
+CTL ELEMENT: SFO
+ELEMENT TYPE: APT
+ADL TIME: 1305Z
+DELAY ASSIGNMENT MODE: UDP
+ARRIVALS ESTIMATED FOR: 29/1500Z - 30/0659Z
+CUMULATIVE PROGRAM PERIOD: 29/1500Z - 30/0659Z
+PROGRAM RATE: 36/36/36/32/36/36/36/36/36/36/36/36/36/36/36/36
+FLT INCL: ALL CONTIGUOUS US DEP
+DEP SCOPE: (MANUAL) ZLA ZAU ZLC ZTL ZDC ZNY ZHU ZJX ZFW ZOB ZDV ZOA
+ZSE ZBW ZMA ZKC ZME ZID ZAB ZMP
+CANADIAN DEP ARPTS INCLUDED: CYYJ CYVR CYYC CYEG CYLW CYYZ CYTZ CYOW
+CYUL CYQB
+DELAY ASSIGNMENT TABLE APPLIES TO: ZOA
+MAXIMUM DELAY: 148
+AVERAGE DELAY: 65
+IMPACTING CONDITION: WEATHER / LOW CEILINGS
+COMMENTS: PLEASE RELEASE ON EDCTS.  ARR 28L/R.
+```
+
+## 139. route-20260427-098
+
+- Term: **NONE** (route:NONE); written as: `PROBABILITY OF EXTENSION: NONE`
+- Element: FCA017:NO_AR_ATLANTIC_Y-RTES_TO_MCO_TPA_RSW_AREAS; initiative: reroute; first issued 04/27 20:26Z in 20260427-098; window read as 28/0007Z - 28/0212Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 098 DCC 04/27/2026 FCA RQD
+NAME: FCA017:NO_AR_ATLANTIC_Y-RTES_TO_MCO_TPA_RSW_AREAS
+CONSTRAINED AREA: ZJX/ZMA
+REASON: OTHER
+INCLUDE TRAFFIC: UNKN DEPARTURES TO
+KAPF/KFMY/KISM/KLAL/KMCF/KMCO/KMKY/KORL/KPGD/KPIE/K
+RSW/KSFB/KSPG/KSRQ/KTPA/KTPF
+FACILITIES INCLUDED: ALL+CANADA
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 280007 TO 280212
+PROBABILITY OF EXTENSION: NONE
+REMARKS: SEE DYNAMIC LIST FOR UPDATES. IMPLEMENTED DUE TO ROCKET
+LAUNCH ACTIVITIES.
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC098
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260428-017  sent 04/28 01:08Z  REROUTE CANCELLATION  FCA017:NO_AR_ATLANTIC_Y-RTES_TO_MCO_TPA_RSW_AREAS
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 28/0108Z; stated end 28/0212Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 017 DCC 04/28/2026 REROUTE CANCELLATION
+FCA017:NO_AR_ATLANTIC_Y-RTES_TO_MCO_TPA_RSW_AREAS HAS BEEN CANCELLED.
+
+REMARKS: LAUNCH ACTIVITIES COMPLETE
+ASSOCIATED RESTRICTIONS:
+```
+
+## 140. gs-20260426-099
+
+- Term: **MEDIUM** (gs:MEDIUM); written as: `PROBABILITY OF EXTENSION: MEDIUM`
+- Element: MIA; initiative: gs; first issued 04/26 21:46Z in 20260426-099; window read as 26/2045Z - 26/2300Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 099 MIA/ZMA 04/26/2026 CDM GROUND STOP
+CTL ELEMENT: MIA
+ELEMENT TYPE: APT
+ADL TIME: 2142Z
+GROUND STOP PERIOD: 26/2045Z - 26/2300Z
+DEP FACILITIES INCLUDED: (Manual) ZTL ZJX ZMA
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 413 / 66 / 19
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 1272 / 126 / 58
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS:
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260426-102  sent 04/26 22:56Z  CDM GS CNX  MIA  GS CNX PERIOD 26/2251Z - 27/0100Z
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 26/2256Z; stated end 26/2300Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 102 MIA/ZMA 04/26/2026 CDM GS CNX
+CTL ELEMENT: MIA
+ELEMENT TYPE: APT
+ADL TIME: 2251Z
+GS CNX PERIOD: 26/2251Z - 27/0100Z
+COMMENTS: OBJECTIVES MET.
+```
+
+## 141. route-20260401-008
+
+- Term: **NONE** (route:NONE); written as: `PROBABILITY OF EXTENSION: NONE`
+- Element: FCA014:SW_WEST_TO_ORD; initiative: reroute; first issued 04/01 01:11Z in 20260401-008; window read as 31/2200Z - 01/0300Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 008 DCC 04/01/2026 FCA RQD
+NAME: FCA014:SW_WEST_TO_ORD
+CONSTRAINED AREA: ZAU
+REASON: EQUIPMENT
+INCLUDE TRAFFIC: KAUS/KHOU/KIAH/KSAT/ZAB/ZDV/ZFW/ZLA/ZLC/ZOA/ZSE
+DEPARTURES TO KORD
+FACILITIES INCLUDED: ZAB/ZAU/ZDV/ZFW/ZHU/ZKC/ZLA/ZLC/ZMP/ZOA/ZSE
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: FCA ENTRY TIME FROM 312200 TO 010300
+PROBABILITY OF EXTENSION: NONE
+REMARKS: REPLACES ADVZY070, EXTENDS TIME. SEE DYNAMIC LIST FOR
+UPDATES. BASED ON ORD OXI ROYKO 2 PARTIAL
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS:
+ROUTES: [route table not shown]
+TMI ID: RRDCC506
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+**Derived outcome: NOT EXTENDED (lapsed) = 0**. no later advisory moved the end past 01/0300Z.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 142. route-20260527-085
+
+- Term: **NONE** (route:NONE); written as: `PROBABILITY OF EXTENSION: NONE`
+- Element: NORTH_TO_DFW_DAL; initiative: reroute; first issued 05/27 18:17Z in 20260527-085; window read as 27/1315Z - 27/2200Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 085 DCC 05/27/2026 ROUTE RQD /FL
+NAME: NORTH_TO_DFW_DAL
+CONSTRAINED AREA: ZFW
+REASON: EQUIPMENT
+INCLUDE TRAFFIC: CZY/KBUF/KCLE/KDTW/KPIT/KROC/ZAU/ZBW/ZID/ZKC/ZMP/ZN
+Y DEPARTURES TO KDAL/KDFW
+FACILITIES INCLUDED: CZY/ZAU/ZBW/ZFW/ZID/ZKC/ZMP/ZNY/ZOB
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: ETD 271315 TO 272200
+PROBABILITY OF EXTENSION: NONE
+REMARKS: REPLACES ADVZY 046. BASED ON DFW_EAST_1_SOUTH_FLOW
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS: EXTENDS END TIME.
+ROUTES: [route table not shown]
+TMI ID: RRDCC507
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260527-120  sent 05/27 21:16Z  ROUTE RQD /FL  NORTH_TO_DFW_DAL  VALID 27/1315Z - 28/0000Z  [PROBABILITY OF EXTENSION: NONE]
+```
+
+**Derived outcome: EXTENDED = 1**. end 27/2200Z -> 28/0000Z (+120 min).
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 120 DCC 05/27/2026 ROUTE RQD /FL
+NAME: NORTH_TO_DFW_DAL
+CONSTRAINED AREA: ZFW
+REASON: WEATHER
+INCLUDE TRAFFIC: CZY/KBUF/KCLE/KDTW/KPIT/KROC/ZAU/ZBW/ZID/ZKC/ZMP/ZN
+Y DEPARTURES TO KDAL/KDFW
+FACILITIES INCLUDED: CZY/ZAU/ZBW/ZFW/ZID/ZKC/ZMP/ZNY/ZOB
+FLIGHT STATUS: ALL_FLIGHTS
+VALID: ETD 271315 TO 280000
+PROBABILITY OF EXTENSION: NONE
+REMARKS: REPLACES ADVZY 085. BASED ON DFW_EAST_1_NORTH_FLOW
+ASSOCIATED RESTRICTIONS:
+MODIFICATIONS: EXTENDS END TIME...CAUSAL FACTOR IS WEATHER/TS
+ROUTES: [route table not shown]
+TMI ID: RRDCC507
+```
+
+## 143. gs-20260426-105
+
+- Term: **MEDIUM** (gs:MEDIUM); written as: `PROBABILITY OF EXTENSION: MEDIUM`
+- Element: DFW; initiative: gs; first issued 04/26 23:18Z in 20260426-105; window read as 26/2255Z - 27/0015Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 105 DFW/ZFW 04/26/2026 CDM GROUND STOP
+CTL ELEMENT: DFW
+ELEMENT TYPE: APT
+ADL TIME: 2315Z
+GROUND STOP PERIOD: 26/2255Z - 27/0015Z
+DEP FACILITIES INCLUDED: (Manual) ZHU ZFW ZKC ZME ZAB ZDV
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 0 / 0 / 0
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 1137 / 66 / 37
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: EQUIPMENT / OUTAGE
+COMMENTS: INTERMITTENT LANDLINE, COMMS, AUTOMATION ISSUES
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260426-113  sent 04/26 23:46Z  CDM GS CNX  DFW  GS CNX PERIOD 26/2342Z - 27/0212Z
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 26/2346Z; stated end 27/0015Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 113 DFW/ZFW 04/26/2026 CDM GS CNX
+CTL ELEMENT: DFW
+ELEMENT TYPE: APT
+ADL TIME: 2342Z
+GS CNX PERIOD: 26/2342Z - 27/0212Z
+COMMENTS:
+```
+
+## 144. plan-20260406-068-MIA-gs-UNTIL2300
+
+- Term: **POSSIBLE** (plan:POSSIBLE); written as: `UNTIL 2300	-MIA/FLL/PBI GROUND STOP POSSIBLE`
+- Element: MIA; initiative: gs; first issued 04/06 17:30Z in 20260406-068; window read as 06/1730Z - 06/2300Z
+- Repeated in: 20260406-082 20260406-088
+
+Source advisory:
+
+```
+ATCSCC ADVZY 068 DCC 04/06/2026 OPERATIONS PLAN
+EVENT TIME: 06/1800 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 0659	-SFO GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+AFTER 2300	-DEN GROUND STOP/DELAY PROGRAM POSSIBLE
+UNTIL 2300	-MCO/TPA GROUND STOP POSSIBLE
+UNTIL 2300	-MIA/FLL/PBI GROUND STOP POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260406-057  sent 04/06 14:39Z  MIA FLL BCT RSW CDRS_FYI
+```
+
+**Derived outcome: NOT ISSUED = 0**. no gs advisory for MIA in the window.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 145. gs-20260413-083
+
+- Term: **LOW** (gs:LOW); written as: `PROBABILITY OF EXTENSION: LOW`
+- Element: DTW; initiative: gs; first issued 04/13 23:55Z in 20260413-083; window read as 14/0000Z - 14/0115Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 083 DTW/ZOB 04/13/2026 CDM GROUND STOP
+CTL ELEMENT: DTW
+ELEMENT TYPE: APT
+ADL TIME: 2352Z
+GROUND STOP PERIOD: 14/0000Z - 14/0115Z
+DEP FACILITIES INCLUDED: (Manual) ZAU ZDC ZNY ZOB ZBW ZID ZMP
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 0 / 0 / 0
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 596 / 76 / 40
+PROBABILITY OF EXTENSION: LOW
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS:
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260414-004  sent 04/14 00:56Z  CDM GS CNX  DTW  GS CNX PERIOD 14/0050Z - 14/0537Z
+```
+
+**Derived outcome: NOT EXTENDED (cancelled) = 0**. cancelled at 14/0056Z; stated end 14/0115Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 004 DTW/ZOB 04/14/2026 CDM GS CNX
+CTL ELEMENT: DTW
+ELEMENT TYPE: APT
+ADL TIME: 0050Z
+GS CNX PERIOD: 14/0050Z - 14/0537Z
+COMMENTS: STORMS MOVING OFF THE THE EAST OF FIELD
+```
+
+## 146. gs-20260524-117
+
+- Term: **LOW** (gs:LOW); written as: `PROBABILITY OF EXTENSION: LOW`
+- Element: ATL; initiative: gs; first issued 05/24 21:39Z in 20260524-117; window read as 24/2035Z - 24/2245Z
+- Repeated in: no later advisory
+
+Source advisory:
+
+```
+ATCSCC ADVZY 117 ATL/ZTL 05/24/2026 CDM GROUND STOP
+CTL ELEMENT: ATL
+ELEMENT TYPE: APT
+ADL TIME: 2133Z
+GROUND STOP PERIOD: 24/2035Z - 24/2245Z
+DEP FACILITIES INCLUDED: (Manual) ZTL ZDC ZJX ZID
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 592 / 60 / 13
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 2419 / 114 / 53
+PROBABILITY OF EXTENSION: LOW
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS: ZME, ZHU RELEASED. STOP EXTENDED. ZTL HOPES TO CANCEL STOP
+BEFORE 2245Z
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260524-120  sent 05/24 22:00Z  CDM GROUND DELAY PROGRAM  ATL  CUMULATIVE PROGRAM PERIOD 24/2153Z - 25/0159Z
+20260524-121  sent 05/24 22:19Z  CDM GROUND STOP  ATL  GROUND STOP PERIOD 24/2204Z - 24/2315Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260524-130  sent 05/24 22:54Z  ATL GROUND STOP CANCELLATION  ATL  EVENT TIME 24/2254Z - 24/2300Z
+20260525-001  sent 05/25 00:02Z  CDM GROUND DELAY PROGRAM CNX  ATL  GDP CNX PERIOD 24/2359Z - 25/0405Z
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260524-122  sent 05/24 22:20Z  ATL AIRPORT ARRIVAL DELAYS
+20260524-124  sent 05/24 22:20Z  ATL AIRPORT DIVERSION RECOVERY ACTIVATED
+```
+
+**Derived outcome: EXTENDED = 1**. end 24/2245Z -> 24/2315Z (+30 min). Flags: gdp_followed.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 121 ATL/ZTL 05/24/2026 CDM GROUND STOP
+CTL ELEMENT: ATL
+ELEMENT TYPE: APT
+ADL TIME: 2214Z
+GROUND STOP PERIOD: 24/2204Z - 24/2315Z
+CUMULATIVE PROGRAM PERIOD: 24/2153Z - 25/0159Z
+DEP FACILITIES INCLUDED: (Manual) ZDC ZNY
+PREVIOUS TOTAL, MAXIMUM, AVERAGE DELAYS: 516 / 108 / 30
+NEW TOTAL, MAXIMUM, AVERAGE DELAYS: 935 / 128 / 55
+PROBABILITY OF EXTENSION: MEDIUM
+IMPACTING CONDITION: WEATHER / THUNDERSTORMS
+COMMENTS: NORTH EAST ARRIVAL GATE SHUTOFF. ZTL IS WORKING ON POSSIBLE
+REROUTES.
+```
+
+## 147. plan-20260422-074-SFO-gs+gdp-AFTER1500
+
+- Term: **POSSIBLE** (plan:POSSIBLE); written as: `AFTER 1500	-SFO GROUND STOP/DELAY PROGRAM POSSIBLE`
+- Element: SFO; initiative: gs/gdp; first issued 04/22 23:30Z in 20260422-074; window read as 23/1500Z - 24/0800Z
+- Repeated in: 20260423-009 20260423-018
+
+Source advisory:
+
+```
+ATCSCC ADVZY 074 DCC 04/22/2026 OPERATIONS PLAN
+EVENT TIME: 23/0000 - AND LATER
+TERMINAL ACTIVE:
+NONE
+TERMINAL PLANNED:
+AFTER 0300	-DEN GROUND STOP POSSIBLE
+AFTER 1500	-SFO GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1800	-LGA GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1800	-MSP GROUND STOP/DELAY PROGRAM POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+20260422-046  sent 04/22 18:17Z  CDM GROUND STOP  SFO  GROUND STOP PERIOD 22/1802Z - 22/1915Z  [PROBABILITY OF EXTENSION: MEDIUM]
+20260422-052  sent 04/22 19:08Z  CDM GROUND DELAY PROGRAM CNX  SFO  GDP CNX PERIOD 22/1907Z - 23/0056Z
+20260423-022  sent 04/23 12:37Z  CDM PROPOSED GROUND DELAY PROGRAM  SFO  ANTICIPATED CUMULATIVE PROGRAM PERIOD 23/1500Z - 23/2059Z
+20260423-024  sent 04/23 12:52Z  CDM GROUND DELAY PROGRAM  SFO  CUMULATIVE PROGRAM PERIOD 23/1500Z - 23/2059Z
+20260423-057  sent 04/23 19:11Z  CDM GROUND DELAY PROGRAM CNX  SFO  GDP CNX PERIOD 23/1907Z - 24/0002Z
+20260423-072  sent 04/23 20:12Z  CDM PROPOSED GROUND DELAY PROGRAM  SFO  ANTICIPATED CUMULATIVE PROGRAM PERIOD 23/2030Z - 24/0659Z
+20260423-075  sent 04/23 20:18Z  CDM GROUND DELAY PROGRAM  SFO  CUMULATIVE PROGRAM PERIOD 23/2030Z - 24/0659Z
+20260424-003  sent 04/24 00:52Z  CDM GROUND DELAY PROGRAM  SFO  CUMULATIVE PROGRAM PERIOD 23/2030Z - 24/0659Z
+20260424-012  sent 04/24 05:37Z  CDM GROUND DELAY PROGRAM CNX  SFO  GDP CNX PERIOD 24/0532Z - 24/1003Z
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260422-073  sent 04/22 23:09Z  SFO AIRPORT SCHEDULING DELAYS
+20260423-045  sent 04/23 18:04Z  SFO AIRPORT SCHEDULING DELAYS
+20260423-059  sent 04/23 19:12Z  SFO AIRPORT SCHEDULING DELAYS
+```
+
+**Derived outcome: ISSUED = 1**. CDM GROUND DELAY PROGRAM sent 23/1252Z, period 23/1500Z - 23/1911Z.
+
+Advisory that decides the outcome:
+
+```
+ATCSCC ADVZY 024 SFO/ZOA 04/23/2026 CDM GROUND DELAY PROGRAM
+CTL ELEMENT: SFO
+ELEMENT TYPE: APT
+ADL TIME: 1247Z
+DELAY ASSIGNMENT MODE: UDP
+ARRIVALS ESTIMATED FOR: 23/1500Z - 23/2059Z
+CUMULATIVE PROGRAM PERIOD: 23/1500Z - 23/2059Z
+PROGRAM RATE: 36
+FLT INCL: ALL CONTIGUOUS US DEP
+DEP SCOPE: 1400
+CANADIAN DEP ARPTS INCLUDED: CYYJ CYVR CYLW CYYC CYEG
+DELAY ASSIGNMENT TABLE APPLIES TO: ZOA
+MAXIMUM DELAY: 104
+AVERAGE DELAY: 44
+IMPACTING CONDITION: OTHER / OTHER
+COMMENTS: ARR/DEPT 28L/28R. PROCEDURAL COMPLIANCE.
+```
+
+## 148. plan-20260521-017-ATL-gs-AFTER1900
+
+- Term: **POSSIBLE** (plan:POSSIBLE); written as: `AFTER 1900	-ATL GROUND STOP POSSIBLE`
+- Element: ATL; initiative: gs; first issued 05/21 01:30Z in 20260521-017; window read as 21/1900Z - 22/0800Z
+- Repeated in: 20260521-042 20260521-055 20260521-068 20260521-080
+
+Source advisory:
+
+```
+ATCSCC ADVZY 017 DCC 05/21/2026 OPERATIONS PLAN
+EVENT TIME: 21/0200 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 0200	-JFK GROUND STOP
+UNTIL 0230	-EWR GROUND STOP
+UNTIL 0230	-IAD GROUND STOP
+UNTIL 0230	-DCA GROUND STOP
+UNTIL 0459	-LGA GROUND DELAY PROGRAM
+UNTIL 0459	-JFK GROUND DELAY PROGRAM
+UNTIL 0459	-EWR GROUND DELAY PROGRAM
+UNTIL 0559	-SFO GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+AFTER 1100	-LGA GROUND STOP/DELAY PROGRAM PROBABLE
+AFTER 1200	-IAH/HOU GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1500	-SFO GROUND DELAY PROGRAM PROBABLE
+AFTER 1600	-DFW/DAL GROUND STOP/DELAY PROGRAM POSSIBLE
+AFTER 1800	-TPA/MCO GROUND STOP POSSIBLE
+AFTER 1900	-ATL GROUND STOP POSSIBLE
+AFTER 2000	-CLT GROUND STOP POSSIBLE
+AFTER 2000	-DEN GROUND STOP POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+Other advisories that name the element (not read by the linker):
+
+```
+20260520-171  sent 05/20 22:26Z  ATL CDRS_FYI
+20260521-059  sent 05/21 12:11Z  ATL CDRS_FYI
+20260521-093  sent 05/21 18:20Z  ATL CLT CDRS_FYI
+20260521-125  sent 05/21 22:06Z  ATL CDRS_FYI
+20260521-127  sent 05/21 22:12Z  ATL CLT CDRS_FYI
+```
+
+**Derived outcome: NOT ISSUED = 0**. no gs advisory for ATL in the window.
+
+No advisory decides the outcome (nothing qualifying was found).
+
+## 149. plan-20260521-090-TPA-gs-UNTIL0000
+
+- Term: **POSSIBLE** (plan:POSSIBLE); written as: `UNTIL 0000	-TPA/MCO GROUND STOP POSSIBLE`
+- Element: TPA; initiative: gs; first issued 05/21 17:51Z in 20260521-090; window read as 21/1751Z - 22/0000Z
+- Repeated in: 20260521-108 20260521-122
+
+Source advisory:
+
+```
+ATCSCC ADVZY 090 DCC 05/21/2026 OPERATIONS PLAN
+EVENT TIME: 21/1800 - AND LATER
+TERMINAL ACTIVE:
+UNTIL 0159	-LGA GROUND DELAY PROGRAM
+UNTIL 0659	-SFO GROUND DELAY PROGRAM
+TERMINAL PLANNED:
+AFTER 2000	-DEN GROUND STOP POSSIBLE
+AFTER 2100	-JFK GROUND DELAY PROGRAM PROBABLE
+UNTIL 0000	-TPA/MCO GROUND STOP POSSIBLE
+UNTIL 0200	-DFW/DAL GROUND STOP/DELAY PROGRAM POSSIBLE
+UNTIL 0200	-IAH/HOU GROUND STOP/DELAY PROGRAM POSSIBLE
+```
+
+Every advisory the linker could see for this element in the horizon:
+
+```
+(none)
+```
+
+**Derived outcome: NOT ISSUED = 0**. no gs advisory for TPA in the window.
+
+No advisory decides the outcome (nothing qualifying was found).

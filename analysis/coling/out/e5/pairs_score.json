@@ -1,0 +1,128 @@
+{
+ "by_factor": {
+  "certainty": {
+   "free_of_confirmed_errors": 17,
+   "n": 17,
+   "wilson95": [
+    0.8157,
+    1.0
+   ]
+  },
+  "distractor": {
+   "free_of_confirmed_errors": 17,
+   "n": 17,
+   "wilson95": [
+    0.8157,
+    1.0
+   ]
+  },
+  "granularity": {
+   "free_of_confirmed_errors": 17,
+   "n": 17,
+   "wilson95": [
+    0.8157,
+    1.0
+   ]
+  },
+  "silent": {
+   "free_of_confirmed_errors": 16,
+   "n": 16,
+   "wilson95": [
+    0.8064,
+    1.0
+   ]
+  },
+  "stale": {
+   "free_of_confirmed_errors": 16,
+   "n": 16,
+   "wilson95": [
+    0.8064,
+    1.0
+   ]
+  },
+  "surface_form": {
+   "free_of_confirmed_errors": 17,
+   "n": 17,
+   "wilson95": [
+    0.8157,
+    1.0
+   ]
+  }
+ },
+ "confirmed_checks": {},
+ "confirmed_errors": {},
+ "double_audited": {
+  "kappa": null,
+  "n": 10,
+  "raw_agreement": 1.0
+ },
+ "earlier_passes": [],
+ "free_of_confirmed_errors": 100,
+ "minutes": {
+  "A1": 40,
+  "A2": 42
+ },
+ "needed": 95,
+ "passed": true,
+ "planted": {
+  "A1": {
+   "caught": 5,
+   "caught_on_the_corrupted_field": 5,
+   "missed": [],
+   "n": 5,
+   "recheck_own_items": false
+  },
+  "A2": {
+   "caught": 5,
+   "caught_on_the_corrupted_field": 5,
+   "missed": [],
+   "n": 5,
+   "recheck_own_items": false
+  }
+ },
+ "planted_items": 10,
+ "real_items": 100,
+ "reported": {
+  "A1": {
+   "failed_checks": {
+    "attested": 0,
+    "minimal": 0,
+    "ok_certainty": 0,
+    "ok_distractors": 0,
+    "ok_interval": 0,
+    "ok_stale": 0,
+    "ok_type": 0
+   },
+   "items_marked_error": 0,
+   "natural_0": 0
+  },
+  "A2": {
+   "failed_checks": {
+    "attested": 0,
+    "minimal": 0,
+    "ok_certainty": 0,
+    "ok_distractors": 0,
+    "ok_interval": 0,
+    "ok_stale": 0,
+    "ok_type": 0
+   },
+   "items_marked_error": 0,
+   "natural_0": 0
+  }
+ },
+ "seconds_per_item": {
+  "A1": 40.0,
+  "A2": 42.0
+ },
+ "share": 1.0,
+ "sheets_sha256": {
+  "A1": "e169120f65ac74edc5cedc07bfe3135fa495313208be53ea017302304caa6150",
+  "A2": "6b40c02263407a103f58167d0be54ab6bfd3af25479140cea7a475883562640d"
+ },
+ "status": "scored",
+ "unresolved": [],
+ "wilson95": [
+  0.963,
+  1.0
+ ]
+}

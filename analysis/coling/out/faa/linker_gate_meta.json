@@ -1,0 +1,27 @@
+{
+ "seed": 20261001,
+ "draw": 1,
+ "months": [
+  "2026-04",
+  "2026-05"
+ ],
+ "families": [
+  "gs",
+  "plan",
+  "route"
+ ],
+ "per_term": 30,
+ "minimum": 150,
+ "grace_minutes": 0,
+ "scored_links_in_frame": 2367,
+ "rows": 269,
+ "double_checked": 30,
+ "rows_per_checker": {
+  "A1": 150,
+  "A2": 149
+ },
+ "sha256": {
+  "faa.py": "dc0ebdd83d6dfcd40231b688f57fc4298838fbdc36ad20542bdf3ddc1d8f2b18",
+  "faa_links.py": "0e9eb75e7fd24aee81dfb61649ae2c28f3d5fce0406f63d673851949ef971544"
+ }
+}

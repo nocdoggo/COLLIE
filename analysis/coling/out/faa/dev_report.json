@@ -1,0 +1,211 @@
+{
+ "months": [
+  "2026-04",
+  "2026-05"
+ ],
+ "days_with_advisories": 61,
+ "advisories": 6389,
+ "advisories_per_day": {
+  "min": 62,
+  "median": 99,
+  "max": 197
+ },
+ "advisories_by_kind": {
+  "other": 3057,
+  "reroute": 832,
+  "gs": 644,
+  "ops_plan": 533,
+  "gdp": 292,
+  "gs_cnx": 234,
+  "reroute_cnx": 232,
+  "gdp_cnx": 224,
+  "gdp_proposed": 206,
+  "gs_manual_cnx": 38,
+  "afp": 31,
+  "afp_cnx": 29,
+  "afp_proposed": 26,
+  "gs_manual": 11
+ },
+ "probability_of_extension_as_written": {
+  "gs:HIGH": 8,
+  "gs:LOW": 52,
+  "gs:MEDIUM": 584,
+  "gs_manual:MEDIUM": 4,
+  "reroute:HIGH": 25,
+  "reroute:LOW": 359,
+  "reroute:MODERATE": 368,
+  "reroute:NONE": 80
+ },
+ "plan_lines": {
+  "other section: AIRSPACE FLOW PROGRAM(S) PLANNED": 106,
+  "other section: EN ROUTE PLANNED": 3879,
+  "other section: ENROUTE PLANNED": 71,
+  "terminal, no known term": 5,
+  "terminal, used": 2422
+ },
+ "plan_line_terms_as_written": {
+  "POSSIBLE": 2204,
+  "PROBABLE": 184,
+  "EXPECTED": 34,
+  "(no known term)": 5
+ },
+ "terminal_planned_lines_not_used": {
+  "AFTER 2200 -SFO GROUND DELAY PROGRAM": 2,
+  "AFTER 0200 -SFO GROUND STOP/DELAY PROGRAM": 1,
+  "UNTIL 1800 -AUS GROUND STOP": 1,
+  "UNTIL 0000 -SAN GROUND STOP/DELAY PROGRAM POSSIBL": 1
+ },
+ "lead_minutes_quartiles": {
+  "gs": [
+   57,
+   65,
+   71
+  ],
+  "route": [
+   215,
+   303,
+   475
+  ],
+  "plan": [
+   0,
+   307,
+   938
+  ]
+ },
+ "days_by_family": {
+  "gs": 60,
+  "route": 61,
+  "plan": 61
+ },
+ "statements": 2413,
+ "terms": [
+  {
+   "term": "gs:HIGH",
+   "statements": 8,
+   "excluded": 0,
+   "scored": 8,
+   "yes": 3,
+   "days": 7
+  },
+  {
+   "term": "gs:LOW",
+   "statements": 52,
+   "excluded": 1,
+   "scored": 51,
+   "yes": 9,
+   "days": 32
+  },
+  {
+   "term": "gs:MEDIUM",
+   "statements": 536,
+   "excluded": 1,
+   "scored": 535,
+   "yes": 214,
+   "days": 60
+  },
+  {
+   "term": "plan:EXPECTED",
+   "statements": 18,
+   "excluded": 1,
+   "scored": 17,
+   "yes": 15,
+   "days": 15
+  },
+  {
+   "term": "plan:POSSIBLE",
+   "statements": 974,
+   "excluded": 40,
+   "scored": 934,
+   "yes": 317,
+   "days": 61
+  },
+  {
+   "term": "plan:PROBABLE",
+   "statements": 75,
+   "excluded": 2,
+   "scored": 73,
+   "yes": 51,
+   "days": 36
+  },
+  {
+   "term": "route:HIGH",
+   "statements": 24,
+   "excluded": 0,
+   "scored": 24,
+   "yes": 16,
+   "days": 7
+  },
+  {
+   "term": "route:LOW",
+   "statements": 324,
+   "excluded": 0,
+   "scored": 324,
+   "yes": 29,
+   "days": 58
+  },
+  {
+   "term": "route:MODERATE",
+   "statements": 327,
+   "excluded": 1,
+   "scored": 326,
+   "yes": 84,
+   "days": 53
+  },
+  {
+   "term": "route:NONE",
+   "statements": 75,
+   "excluded": 0,
+   "scored": 75,
+   "yes": 1,
+   "days": 26
+  }
+ ],
+ "codes": {
+  "gs:cancelled": 213,
+  "gs:extended": 226,
+  "gs:lapsed": 155,
+  "gs:unresolved_boundary": 2,
+  "plan:already_active": 29,
+  "plan:issued": 383,
+  "plan:not_issued": 641,
+  "plan:unresolved_boundary": 14,
+  "route:cancelled": 243,
+  "route:extended": 130,
+  "route:lapsed": 376,
+  "route:unresolved_boundary": 1
+ },
+ "flags": {
+  "continued_new_id": 16,
+  "gdp_followed": 92,
+  "manual_release": 29,
+  "manual_stop": 2,
+  "new_stop_30": 26,
+  "outside_window": 23,
+  "proposed_only": 3,
+  "shortened": 21,
+  "term_changed": 38
+ },
+ "statements_repeated_in_later_advisories": 892,
+ "airport_days_plan": 627,
+ "titles_naming_a_programme_but_not_classified": {
+  "SFO CDM GROUND DELAY PROGRAM CORRECTION": 1
+ },
+ "advisories_for_canadian_airports_by_kind": {
+  "gdp": 14,
+  "gdp_cnx": 13,
+  "gs": 6,
+  "gs_manual": 4,
+  "gs_cnx": 4,
+  "gs_manual_cnx": 2
+ },
+ "outcomes_changed_by": {
+  "a new stop within 30 minutes of the stated end counted as an extension": 26,
+  "a route carried on under a new TMI ID not counted as an extension": 16,
+  "an extension of under 15 minutes not counted": 0,
+  "grace 15 minutes instead of 0": 3,
+  "grace 30 minutes instead of 0": 9,
+  "hand-written stops not counted as issued": 3,
+  "operating day ends 0600Z instead of 0800Z": 0,
+  "operating day ends 1000Z instead of 0800Z": 0
+ }
+}

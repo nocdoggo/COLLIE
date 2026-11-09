@@ -1,0 +1,815 @@
+{
+ "about": "The registered pattern of PLAN.md section 13, read on the result files of E2 and E5 for the two primary models. It decides one sentence of the paper and nothing else. No reading, no gold and no outcome is read.",
+ "registered": {
+  "seed": 20261001,
+  "draws": 10000,
+  "alpha": 0.05,
+  "iou_correct": 0.5,
+  "positive_result_bars": {
+   "iou_lead": 0.15,
+   "false_commitment": 0.05
+  },
+  "gee": {
+   "tolerance": "1e-10",
+   "steps": 100,
+   "variance_floor": "1e-10"
+  },
+  "primaries": [
+   "llama-3.3-70b",
+   "deepseek-v3"
+  ],
+  "e2": {
+   "lines": {
+    "literal-v1": "e2-literal",
+    "literal-free-v1": "e2-literal-free"
+   },
+   "models": [
+    "llama-3.3-70b",
+    "deepseek-v3",
+    "qwen-2.5-7b",
+    "gemma-3-27b",
+    "gpt-oss-20b",
+    "gpt-4o-mini",
+    "gemini-3.8-flash",
+    "grok-4.20"
+   ],
+   "test_template": "literal-v1"
+  },
+  "e5": {
+   "line": "e5",
+   "template": "literal-v1",
+   "models": [
+    "llama-3.3-70b",
+    "deepseek-v3",
+    "qwen-2.5-7b",
+    "gemma-3-27b",
+    "gpt-oss-20b",
+    "gpt-4o-mini",
+    "grok-4.20"
+   ],
+   "cut_seeds": 50
+  },
+  "pattern": {
+   "letter_factors": [
+    "surface_form",
+    "granularity"
+   ],
+   "standing_factors": [
+    "certainty",
+    "stale",
+    "distractor",
+    "silent"
+   ],
+   "letter_margin": 0.1,
+   "standing_floor": 0.1,
+   "own_error_floor": 0.1
+  },
+  "templates_sha256": {
+   "literal-v1": "855244013a7614501ebdd6fbb45c8998f102a877e1299a6d86f81e1359934b27",
+   "literal-free-v1": "ab87cd7525a49965763f78f55d6f8c47f4ca1476f49216a525635f97d6ef2555"
+  }
+ },
+ "inputs": {
+  "e2": "analysis/coling/out/e2_scores.json",
+  "e2_sha256": "8169a95640413807f3b58bbc2adcbb93a00b985cd3614d5e437c83d7ef1c2402",
+  "e5": "analysis/coling/out/e5_scores.json",
+  "e5_sha256": "af0d8c232148b701d396ec2b999b34bbcb1f1965abad49322932864735aa02d3",
+  "plan_sha256": "2bf32748015d21d891b661da1149aef5dd7aa7dce7af61b83a70b30d4da7ffd4",
+  "gold_sha256": {
+   "e2": "dba50d884c20b13842dd40cc29f6e1654f22c3c614074e7e8859568106847be4",
+   "e5": "0c165a7604f848410f62c00e925fe64759a673491bb0734a7ab672f7c42eff32"
+  },
+  "code_of_the_results": {
+   "e2": "18c51c79e90627ce8061d729ca4c88dd896771c9798accef419fa8ee85403fe2",
+   "e5": "18c51c79e90627ce8061d729ca4c88dd896771c9798accef419fa8ee85403fe2"
+  },
+  "code": {
+   "literal_scores.py": "18c51c79e90627ce8061d729ca4c88dd896771c9798accef419fa8ee85403fe2",
+   "rules.py": "6a810bcb1ae277b9f4f02e0cfcedc80c5011f902cf679012174a6047bec1b28a",
+   "read.py": "54d171783601e72994f960cbe7b5adba157f6061ba3c9a1da30fd23e23be244f",
+   "audit_sample.py": "67ddfa330cf441d435ce79db54f50d0153c6d3dbb3db2f11e4f9deaf87f852c0",
+   "evaluate.py": "efa033ae67dff7fb8bc9c13dd4a5e047c4c42e9cda92f9d373b09eb9c868cb93",
+   "forms.py": "b99502d348ea82bece639ef2da62ebc90914b6d04dc185d6bfcb805b6bab69fd",
+   "corpus.py": "a44cd27ccddad6047f1d92aceadb2f026957f92ab8461a25579c9adc45a035d7",
+   "predictors.py": "452254cac0cb7817327ec82f9f555c81ba8c13e7c327dae8c5e55fe3245b3438"
+  }
+ },
+ "e2": {
+  "item_set": "all",
+  "items": 120
+ },
+ "e5": {
+  "scored": true,
+  "item_set": {
+   "cut": false,
+   "items_in_the_item_file": 800,
+   "items": 800,
+   "item_ids_sha256": "ef7120124b1b671eb01e893e2d6fcc9c119733dec37d3861004dc5a6295a20e5"
+  },
+  "items": 800,
+  "seeds": 100,
+  "method_in_force": "the GEE with its robust variance"
+ },
+ "primaries": {
+  "llama-3.3-70b": {
+   "has_pattern": true,
+   "declared_not_run": [],
+   "letter": {
+    "e2": {
+     "items": 70,
+     "first": 0.642857,
+     "second": 1.0,
+     "difference": -0.357143,
+     "ci90": {
+      "low": -0.444444,
+      "high": -0.269231,
+      "draws": 10000
+     },
+     "ci95": {
+      "low": -0.459459,
+      "high": -0.25,
+      "draws": 10000
+     },
+     "margin": 0.1,
+     "lower_end_above_minus_margin": false,
+     "met": false
+    },
+    "e5": {
+     "surface_form": {
+      "evaluable": true,
+      "holds": false,
+      "p_holm": 0.0970806,
+      "p_from": "gee",
+      "edited": {
+       "items": 147,
+       "errors": 32,
+       "rate": 0.217687
+      },
+      "unedited": {
+       "items": 100,
+       "errors": 29,
+       "rate": 0.29
+      },
+      "difference": -0.072313,
+      "higher_on_edited": false,
+      "withholds": false
+     },
+     "granularity": {
+      "evaluable": true,
+      "holds": false,
+      "p_holm": 1.0,
+      "p_from": "gee",
+      "edited": {
+       "items": 124,
+       "errors": 28,
+       "rate": 0.225806
+      },
+      "unedited": {
+       "items": 100,
+       "errors": 29,
+       "rate": 0.29
+      },
+      "difference": -0.064194,
+      "higher_on_edited": false,
+      "withholds": false
+     },
+     "met": true
+    },
+    "holds": false,
+    "withheld_by": [
+     "(a): the lower end of the 90% interval of the difference in letter accuracy, model minus rule reader, does not lie above -0.10"
+    ]
+   },
+   "standing": {
+    "certainty": {
+     "a": {
+      "evaluable": true,
+      "holds": false,
+      "p_holm": 0.169773,
+      "p_from": "gee",
+      "edited": {
+       "items": 94,
+       "errors": 49,
+       "rate": 0.521277
+      },
+      "unedited": {
+       "items": 100,
+       "errors": 36,
+       "rate": 0.36
+      },
+      "difference": 0.161277,
+      "higher_on_edited": true,
+      "met": false
+     },
+     "b": {
+      "floor": 0.1,
+      "above_seed": {
+       "difference": 0.161277,
+       "met": true
+      },
+      "above_letter": {
+       "items": 271,
+       "errors": 87,
+       "rate": 0.321033,
+       "difference": 0.200243,
+       "met": true
+      },
+      "met": true
+     },
+     "c": {
+      "floor": 0.1,
+      "items": 73,
+      "errors": 10,
+      "rate": 0.136986,
+      "met": true
+     },
+     "errors_of_another_kind": {
+      "errors": 39,
+      "share": 0.795918
+     },
+     "counts": false
+    },
+    "stale": {
+     "a": {
+      "evaluable": true,
+      "holds": false,
+      "p_holm": 1.0,
+      "p_from": "gee",
+      "edited": {
+       "items": 80,
+       "errors": 29,
+       "rate": 0.3625
+      },
+      "unedited": {
+       "items": 100,
+       "errors": 30,
+       "rate": 0.3
+      },
+      "difference": 0.0625,
+      "higher_on_edited": true,
+      "met": false
+     },
+     "b": {
+      "floor": 0.1,
+      "above_seed": {
+       "difference": 0.0625,
+       "met": false
+      },
+      "above_letter": {
+       "items": 271,
+       "errors": 62,
+       "rate": 0.228782,
+       "difference": 0.133718,
+       "met": true
+      },
+      "met": false
+     },
+     "c": {
+      "floor": 0.1,
+      "items": 80,
+      "errors": 17,
+      "rate": 0.2125,
+      "met": true
+     },
+     "errors_of_another_kind": {
+      "errors": 12,
+      "share": 0.413793
+     },
+     "counts": false
+    },
+    "distractor": {
+     "a": {
+      "evaluable": true,
+      "holds": true,
+      "p_holm": 1.22328e-06,
+      "p_from": "gee",
+      "edited": {
+       "items": 163,
+       "errors": 92,
+       "rate": 0.564417
+      },
+      "unedited": {
+       "items": 100,
+       "errors": 29,
+       "rate": 0.29
+      },
+      "difference": 0.274417,
+      "higher_on_edited": true,
+      "met": true
+     },
+     "b": {
+      "floor": 0.1,
+      "above_seed": {
+       "difference": 0.274417,
+       "met": true
+      },
+      "above_letter": {
+       "items": 271,
+       "errors": 60,
+       "rate": 0.221402,
+       "difference": 0.343015,
+       "met": true
+      },
+      "met": true
+     },
+     "c": {
+      "floor": 0.1,
+      "items": 163,
+      "errors": 63,
+      "rate": 0.386503,
+      "met": true
+     },
+     "errors_of_another_kind": {
+      "errors": 29,
+      "share": 0.315217
+     },
+     "counts": true
+    },
+    "silent": {
+     "a": {
+      "evaluable": true,
+      "holds": true,
+      "p_holm": 0.00249863,
+      "p_from": "gee",
+      "edited": {
+       "items": 92,
+       "errors": 1,
+       "rate": 0.01087
+      },
+      "unedited": {
+       "items": 100,
+       "errors": 29,
+       "rate": 0.29
+      },
+      "difference": -0.27913,
+      "higher_on_edited": false,
+      "met": false
+     },
+     "b": {
+      "floor": 0.1,
+      "above_seed": {
+       "difference": -0.27913,
+       "met": false
+      },
+      "above_letter": {
+       "items": 271,
+       "errors": 60,
+       "rate": 0.221402,
+       "difference": -0.210533,
+       "met": false
+      },
+      "met": false
+     },
+     "c": {
+      "floor": 0.1,
+      "items": 92,
+      "errors": 1,
+      "rate": 0.01087,
+      "met": false
+     },
+     "errors_of_another_kind": {
+      "errors": 0,
+      "share": 0.0
+     },
+     "counts": false
+    },
+    "factors_that_count": [
+     "distractor"
+    ],
+    "holds": true,
+    "withheld_by": []
+   },
+   "holds": false,
+   "e5_tests_that_hold": [
+    {
+     "factor": "distractor",
+     "kind": "standing",
+     "higher_error_rate_on": "the edited items",
+     "edited": {
+      "items": 163,
+      "errors": 92,
+      "rate": 0.564417
+     },
+     "unedited": {
+      "items": 100,
+      "errors": 29,
+      "rate": 0.29
+     },
+     "difference": 0.274417,
+     "log_odds_difference": 1.154493,
+     "p_holm": 1.22328e-06,
+     "p_from": "gee"
+    },
+    {
+     "factor": "silent",
+     "kind": "standing",
+     "higher_error_rate_on": "the unedited seed items",
+     "edited": {
+      "items": 92,
+      "errors": 1,
+      "rate": 0.01087
+     },
+     "unedited": {
+      "items": 100,
+      "errors": 29,
+      "rate": 0.29
+     },
+     "difference": -0.27913,
+     "log_odds_difference": -3.615475,
+     "p_holm": 0.00249863,
+     "p_from": "gee"
+    }
+   ]
+  },
+  "deepseek-v3": {
+   "has_pattern": true,
+   "declared_not_run": [],
+   "letter": {
+    "e2": {
+     "items": 70,
+     "first": 0.6,
+     "second": 1.0,
+     "difference": -0.4,
+     "ci90": {
+      "low": -0.487179,
+      "high": -0.305556,
+      "draws": 10000
+     },
+     "ci95": {
+      "low": -0.505882,
+      "high": -0.287879,
+      "draws": 10000
+     },
+     "margin": 0.1,
+     "lower_end_above_minus_margin": false,
+     "met": false
+    },
+    "e5": {
+     "surface_form": {
+      "evaluable": true,
+      "holds": false,
+      "p_holm": 1.0,
+      "p_from": "gee",
+      "edited": {
+       "items": 147,
+       "errors": 58,
+       "rate": 0.394558
+      },
+      "unedited": {
+       "items": 100,
+       "errors": 37,
+       "rate": 0.37
+      },
+      "difference": 0.024558,
+      "higher_on_edited": true,
+      "withholds": false
+     },
+     "granularity": {
+      "evaluable": true,
+      "holds": false,
+      "p_holm": 1.0,
+      "p_from": "gee",
+      "edited": {
+       "items": 124,
+       "errors": 44,
+       "rate": 0.354839
+      },
+      "unedited": {
+       "items": 100,
+       "errors": 37,
+       "rate": 0.37
+      },
+      "difference": -0.015161,
+      "higher_on_edited": false,
+      "withholds": false
+     },
+     "met": true
+    },
+    "holds": false,
+    "withheld_by": [
+     "(a): the lower end of the 90% interval of the difference in letter accuracy, model minus rule reader, does not lie above -0.10"
+    ]
+   },
+   "standing": {
+    "certainty": {
+     "a": {
+      "evaluable": true,
+      "holds": false,
+      "p_holm": 1.0,
+      "p_from": "gee",
+      "edited": {
+       "items": 94,
+       "errors": 33,
+       "rate": 0.351064
+      },
+      "unedited": {
+       "items": 100,
+       "errors": 42,
+       "rate": 0.42
+      },
+      "difference": -0.068936,
+      "higher_on_edited": false,
+      "met": false
+     },
+     "b": {
+      "floor": 0.1,
+      "above_seed": {
+       "difference": -0.068936,
+       "met": false
+      },
+      "above_letter": {
+       "items": 271,
+       "errors": 115,
+       "rate": 0.424354,
+       "difference": -0.07329,
+       "met": false
+      },
+      "met": false
+     },
+     "c": {
+      "floor": 0.1,
+      "items": 73,
+      "errors": 10,
+      "rate": 0.136986,
+      "met": true
+     },
+     "errors_of_another_kind": {
+      "errors": 23,
+      "share": 0.69697
+     },
+     "counts": false
+    },
+    "stale": {
+     "a": {
+      "evaluable": true,
+      "holds": true,
+      "p_holm": 0.00627946,
+      "p_from": "gee",
+      "edited": {
+       "items": 80,
+       "errors": 46,
+       "rate": 0.575
+      },
+      "unedited": {
+       "items": 100,
+       "errors": 38,
+       "rate": 0.38
+      },
+      "difference": 0.195,
+      "higher_on_edited": true,
+      "met": true
+     },
+     "b": {
+      "floor": 0.1,
+      "above_seed": {
+       "difference": 0.195,
+       "met": true
+      },
+      "above_letter": {
+       "items": 271,
+       "errors": 102,
+       "rate": 0.376384,
+       "difference": 0.198616,
+       "met": true
+      },
+      "met": true
+     },
+     "c": {
+      "floor": 0.1,
+      "items": 80,
+      "errors": 17,
+      "rate": 0.2125,
+      "met": true
+     },
+     "errors_of_another_kind": {
+      "errors": 29,
+      "share": 0.630435
+     },
+     "counts": true
+    },
+    "distractor": {
+     "a": {
+      "evaluable": true,
+      "holds": true,
+      "p_holm": 1.22328e-06,
+      "p_from": "gee",
+      "edited": {
+       "items": 163,
+       "errors": 111,
+       "rate": 0.680982
+      },
+      "unedited": {
+       "items": 100,
+       "errors": 37,
+       "rate": 0.37
+      },
+      "difference": 0.310982,
+      "higher_on_edited": true,
+      "met": true
+     },
+     "b": {
+      "floor": 0.1,
+      "above_seed": {
+       "difference": 0.310982,
+       "met": true
+      },
+      "above_letter": {
+       "items": 271,
+       "errors": 102,
+       "rate": 0.376384,
+       "difference": 0.304598,
+       "met": true
+      },
+      "met": true
+     },
+     "c": {
+      "floor": 0.1,
+      "items": 163,
+      "errors": 78,
+      "rate": 0.478528,
+      "met": true
+     },
+     "errors_of_another_kind": {
+      "errors": 33,
+      "share": 0.297297
+     },
+     "counts": true
+    },
+    "silent": {
+     "a": {
+      "evaluable": true,
+      "holds": true,
+      "p_holm": 8.61521e-05,
+      "p_from": "gee",
+      "edited": {
+       "items": 92,
+       "errors": 2,
+       "rate": 0.021739
+      },
+      "unedited": {
+       "items": 100,
+       "errors": 37,
+       "rate": 0.37
+      },
+      "difference": -0.348261,
+      "higher_on_edited": false,
+      "met": false
+     },
+     "b": {
+      "floor": 0.1,
+      "above_seed": {
+       "difference": -0.348261,
+       "met": false
+      },
+      "above_letter": {
+       "items": 271,
+       "errors": 102,
+       "rate": 0.376384,
+       "difference": -0.354645,
+       "met": false
+      },
+      "met": false
+     },
+     "c": {
+      "floor": 0.1,
+      "items": 92,
+      "errors": 0,
+      "rate": 0.0,
+      "met": false
+     },
+     "errors_of_another_kind": {
+      "errors": 2,
+      "share": 1.0
+     },
+     "counts": false
+    },
+    "factors_that_count": [
+     "stale",
+     "distractor"
+    ],
+    "holds": true,
+    "withheld_by": []
+   },
+   "holds": false,
+   "e5_tests_that_hold": [
+    {
+     "factor": "stale",
+     "kind": "standing",
+     "higher_error_rate_on": "the edited items",
+     "edited": {
+      "items": 80,
+      "errors": 46,
+      "rate": 0.575
+     },
+     "unedited": {
+      "items": 100,
+      "errors": 38,
+      "rate": 0.38
+     },
+     "difference": 0.195,
+     "log_odds_difference": 0.791829,
+     "p_holm": 0.00627946,
+     "p_from": "gee"
+    },
+    {
+     "factor": "distractor",
+     "kind": "standing",
+     "higher_error_rate_on": "the edited items",
+     "edited": {
+      "items": 163,
+      "errors": 111,
+      "rate": 0.680982
+     },
+     "unedited": {
+      "items": 100,
+      "errors": 37,
+      "rate": 0.37
+     },
+     "difference": 0.310982,
+     "log_odds_difference": 1.290503,
+     "p_holm": 1.22328e-06,
+     "p_from": "gee"
+    },
+    {
+     "factor": "silent",
+     "kind": "standing",
+     "higher_error_rate_on": "the unedited seed items",
+     "edited": {
+      "items": 92,
+      "errors": 2,
+      "rate": 0.021739
+     },
+     "unedited": {
+      "items": 100,
+      "errors": 37,
+      "rate": 0.37
+     },
+     "difference": -0.348261,
+     "log_odds_difference": -3.274446,
+     "p_holm": 8.61521e-05,
+     "p_from": "gee"
+    }
+   ]
+  }
+ },
+ "sentence": {
+  "sentence": "models read the letter of a notice but not its pragmatics",
+  "case": "neither primary",
+  "stated_for": [],
+  "paper": "the pattern holds for neither primary: the paper does not state the sentence and reports each part for each primary",
+  "beside": [
+   "llama-3.3-70b: the letter part does not hold; it is not read as its opposite, and the paper says which condition withheld it: (a): the lower end of the 90% interval of the difference in letter accuracy, model minus rule reader, does not lie above -0.10",
+   "deepseek-v3: the letter part does not hold; it is not read as its opposite, and the paper says which condition withheld it: (a): the lower end of the 90% interval of the difference in letter accuracy, model minus rule reader, does not lie above -0.10",
+   "llama-3.3-70b, distractor: this test of the E5 family, on a standing factor, holds with the higher error rate on the edited items; it is reported as that family's result, with its size, also when a floor or the other part withholds the sentence, and the paper then does not write that no effect was detected on the factors of that test's kind, letter or standing (section 5, E5, \"Negative result\")",
+   "llama-3.3-70b, silent: this test of the E5 family, on a standing factor, holds with the higher error rate on the unedited seed items; it is reported as that family's result, with its size, also when a floor or the other part withholds the sentence, and the paper then does not write that no effect was detected on the factors of that test's kind, letter or standing (section 5, E5, \"Negative result\")",
+   "deepseek-v3, stale: this test of the E5 family, on a standing factor, holds with the higher error rate on the edited items; it is reported as that family's result, with its size, also when a floor or the other part withholds the sentence, and the paper then does not write that no effect was detected on the factors of that test's kind, letter or standing (section 5, E5, \"Negative result\")",
+   "deepseek-v3, distractor: this test of the E5 family, on a standing factor, holds with the higher error rate on the edited items; it is reported as that family's result, with its size, also when a floor or the other part withholds the sentence, and the paper then does not write that no effect was detected on the factors of that test's kind, letter or standing (section 5, E5, \"Negative result\")",
+   "deepseek-v3, silent: this test of the E5 family, on a standing factor, holds with the higher error rate on the unedited seed items; it is reported as that family's result, with its size, also when a floor or the other part withholds the sentence, and the paper then does not write that no effect was detected on the factors of that test's kind, letter or standing (section 5, E5, \"Negative result\")",
+   "llama-3.3-70b, distractor: the paper gives the rate of its own error in the sentence that names it, and the share of the factor's errors that are of another kind",
+   "deepseek-v3, stale: the paper gives the rate of its own error in the sentence that names it, and the share of the factor's errors that are of another kind",
+   "deepseek-v3, distractor: the paper gives the rate of its own error in the sentence that names it, and the share of the factor's errors that are of another kind",
+   "the paper states the sentence for no secondary model and uses no plural that includes one"
+  ]
+ },
+ "as_the_plan_says": [
+  "the registered pattern decides the sentence \"models read the letter of a notice but not its pragmatics\" and nothing else; it reads E2 and E5 for the two primary models only, and no outcome and none of H1 to H3 enters it (section 13, \"The registered pattern\")",
+  "in E5, surface form and granularity are the letter factors, and certainty marker, stale, distractor date and silent are the standing factors; in E2, the letter items are the gold items whose gold gives an interval and carries no distractor date, and letter accuracy is the share of them read correctly by the E2 rule (section 13, \"Terms\"; section 7.1)",
+  "the letter part: (a) under literal-v1, over all gold letter items pooled without weights (the item set of every gold item), the lower end of the 90% percentile interval of the difference in letter accuracy, model minus rule reader, lies above -0.10 (10,000 draws of shortage episodes, seed 20261001); condition (a) sets no upper limit and is read on the interval alone; (b) neither of the model's E5 tests on a letter factor holds with the higher error rate on the edited items; (b) can only withhold (section 13, \"The letter part\"; section 5, E2, \"Test\")",
+  "the standing part: for at least one standing factor, (a) the model's E5 test of the factor holds, under Holm over the twelve tests, with the higher error rate on the edited items; (b) the model's error rate on the items of the factor is at least 0.10 above its error rate on the unedited seed items, and at least 0.10 above its error rate on the items of the two letter factors taken together, every rate under the criterion of the factor; (c) the factor's own error occurs on at least 0.10 of the items of the factor on which it can occur; (b) and (c) can only withhold (section 13, \"The standing part\"; section 5, E5, \"Target\")",
+  "the own error is a period given where the gold gives none (certainty marker and silent), the distractor's period taken (distractor date), or a period given without the stale flag on an item whose gold is stale (stale); a wrong statement type, a wrong interval or a wrong certainty class does not make a factor count by itself, and each is reported (section 13, \"The standing part\"; section 7.1)",
+  "the pattern holds for a model when both parts hold; the paper states the sentence for the two primary models, for one by name, or not at all; a part that does not hold is not read as its opposite, and the paper says which condition withheld it; a test of the E5 family that holds is reported as that family's result, with its size, also when a floor or the other part withholds the sentence; the paper then does not write that no effect was detected on the factors of that test's kind, letter or standing; a primary whose E2 or E5 run is declared not run has no pattern; if E5 is cut (section 12, cut 4) the pattern is read on those items with the same floors, and if E5 is not scored the sentence is not stated (section 13, \"The sentence\"; section 5, E5, \"Negative result\")",
+  "the standing part reads rejections of the E5 family and adds no test to it; the letter part adds one one-sided reading for each primary, outside the Holm rule of E2's two tests; the E5 contrasts of the secondary models are outside the family of twelve, so no pattern is computed for them; for each standing factor that counts, the paper gives the rate of its own error and the share of the factor's errors that are of another kind (section 13, \"Error control\" and \"Support, not the rule\")",
+  "the E2 run of the pattern is the primary's literal-v1 run, and the pattern is read from one E2 and one E5 result of the same plan of the runs; the lower end of the interval of the letter part must lie above -0.10: an end of exactly -0.10 does not meet (a), and without a gold letter item (a) is not met (section 13, \"Small points of the reading\")",
+  "a difference or a share of exactly 0.10 meets a floor of the standing part, and a floor whose rate has no item is not met; the items on which a factor's own error can occur are, for the certainty marker and for silent, the items whose gold gives no period, for the distractor date, the items whose gold carries a distractor date, and for stale, the items whose gold is stale; a factor with no such item does not meet (c) (section 13, \"Small points of the reading\")",
+  "a test of E5 holds by Holm's rule on the p-value of the procedure in force (under the fallback, the centred bootstrap p-value); its direction is the sign of the difference of the two error rates; a test that is not evaluable does not hold (section 13, \"Small points of the reading\")",
+  "when the standing part does not hold: if no test of a standing factor holds with the higher error rate on the edited items, it is withheld by (a); otherwise the paper names the floor or the condition (c) that each factor with such a test misses; when the pattern holds for one primary and the other has no pattern, the paper states the sentence for the first by name and says that the other has none; when neither primary has a pattern, the sentence is not stated (section 13, \"Small points of the reading\")",
+  "a percentile of B draws is taken by linear interpolation between the two order statistics around position (B - 1) q, the smallest draw being at position 0: so the ends of every percentile interval, and the lower end of the 90% interval that the letter part reads (section 6, \"Intervals\")",
+  "a cut of E5 keeps the unedited seed item and every edit of the first 50 seeds of the seed list in its draw order (the 50 lowest draw_rank of sample_pair_seeds.csv), the same for every reader, fixed before any E5 call; the cut item file holds the registered rows of those seeds unchanged (section 12, cut 4)"
+ ],
+ "where_the_plan_is_silent": [
+  "a reading that failed or was refused, an abstention by section 4, has the stale flag false, no statement type and no certainty class: it is wrong on both and never correct by the E2 rule; Cohen's kappa of the certainty class runs over the parsed readings",
+  "IoU counts days with both end days; it is defined where the gold gives an interval, and a reader that abstains there scores 0; endpoint errors run over the items where reader and gold both give an interval, as the mean absolute and the mean signed difference",
+  "the quoted words of a distractor may hold several time expressions: each one that the rule reader finds there, at the item's Date of update, is an interval of the distractor, and uptake is counted against any of them; a gold item carries a distractor date when one of its quotes gives an interval",
+  "the intervals of E2 are percentile intervals over the 10,000 draws of shortage episodes with seed 20261001: for every metric and under each weighting the 95% one that section 6 keeps for the secondaries, with the weight of an item fixed over the draws; a statement with no episode is a cluster of its generic, as in the sampler; no interval is given per stratum",
+  "the frame of the two weights of section 7.1 is counted by the sampler's code on the events table given; a stratum with no scored item gives its frame no weight, so a weighted figure of an item set that empties a stratum describes the other strata",
+  "with two annotators the leave-one-out ceiling of section 8 is each annotator scored against the other one's labels, with the same metrics, on every item both labelled; the same on the gold items of each item set stands in that set, because the margins of the models over an annotator need the items the models are scored on; an annotator's letter accuracy is read on the letter items of the gold, by the E2 rule against the other one's label",
+  "the list of convention items is held to a sha256 given on the command line, the audit manifest having no record of it; a line of the list that starts with # is skipped, and so are quotes around an id; an item set with no gold item left is named as not computed; the tests on each of the two other item sets carry a Holm of their own, as descriptions",
+  "the exact McNemar test is two-sided: twice the smaller binomial tail of the discordant pairs at one half, at most 1, and 1 with no discordant pair; the sensitivity analysis of section 4 is the same test on the registered pooling, with a p-value outside Holm's rule",
+  "a run declared not run (a model, or for E2 one template of a model) is checked like the others and not scored; a primary whose literal-v1 run is declared not run keeps its tests in the family with p = 1; a declaration for runs that are complete on the registered item list, route and template is refused",
+  "the rule reading of an item is made here, by the frozen rules.py at the item's Date of update, from the statement text that the corpus code builds of the two text fields of the item file, and is put into the answer schema of literal-v1 by the rule reader's own mapping",
+  "the two bars of the positive result (0.15 IoU, 5% false commitment) are read on the sample figures, model by model, the lead on each of its four places apart (three strata, and the two distractor rows together); the lead is also given for each distractor row alone and over the gold items with a distractor date whatever their stratum, as descriptions",
+  "the letter reading of E2 is given for every model and template and on each item set, with the same difference under the two weightings beside it; its 90% interval runs from the 5th to the 95th percentile of the difference over the draws that hold a letter item",
+  "E5: the GEE is the logistic fit with the sandwich of the seed sums of the scores, with no small-sample factor; the contrast of a factor is the difference of the log odds of error between its items and the seed rows under its criterion, in the same model; Wald p-values are two-sided normal ones",
+  "E5: the GEE is fitted reader by reader, without the cells whose error rate is 0 or 1 (such a cell has no finite coefficient), so that a contrast whose two cells have one keeps its Wald result on display when the twelve come from the bootstrap; the three sets of seed rows of a reader are three cells; a robust variance of 1e-10 or less counts as zero; in both bootstrap p-values B is the number of draws that hold an item on each side; a contrast of one of the five other models takes its own Wald p-value where it has one, whatever the procedure of the twelve, and the centred bootstrap p-value where it has none, as a description",
+  "E5: a test that is not evaluable keeps its place in the family with p = 1: one with no item of its factor or no unedited seed item, and one whose edited items, or whose unedited items, lie on fewer than two seeds; the seeds of a contrast are counted on each of its sides, since a side on one seed is the same in every draw that holds it, and the two counts stand with the test",
+  "E5: the metrics of section 7.1 are given per model, with intervals from draws of seeds, and per model and factor without, all unweighted; the pairs have no frame to weigh by",
+  "E5: beside the own error of a standing factor and its errors of another kind, the error rate on the items of the two letter factors under the criterion of the factor is given for every model, as a description; the floors stand with the twelve tests alone",
+  "the pattern: every decision is taken on whole numbers, before any rounding: a floor on the counts of its two cells, the direction of a test on the counts of its two sides, and the lower end of the letter part, in e2, as an exact fraction: the fifth percentile of the ratios of the two sums of each draw; a draw that holds no letter item is left out, so that the draws of that percentile are those that hold one (with a letter item and no such draw, (a) is not met); a result file holds the decisions, and its figures at six decimals decide nothing",
+  "E5, cut (section 12): the seed list is held to a sha256 given on the command line; a seed among the first 50 with no item in the item file adds none, and the seeds with items are counted; the item file given stays the registered one and the gold stays whole; the rows of the cut item file may stand in any order, and each is compared with the registered row as written, byte for byte, without its line end; the runs must have read that file; the number of items kept is recorded and held to no figure; a seed list with 50 seeds or fewer, or without a seed of the item file, is refused",
+  "the pattern: that E5 is not scored is declared on the command line (--e5-not-scored), and no pattern is then read; the three conditions of every standing factor are given whether or not its part holds, and a floor whose rate has no item is named as such",
+  "the pattern: both results must be written under this scorer's registered record, and each must score the two primaries on one item set: in E2 the ids of every gold item, each once; in E5 the ids that the result records, whole or cut; the figures of a result are taken as its file holds them, and a file that cannot be read whole is refused",
+  "E5: the gold of the minimal pairs is held to the sha256 given on the command line and, row by row, to the seed, the factor and the level of the item file; the manifest of the generator is not read",
+  "the coverage of the rule reader per form (section 8) is, among the items of a stratum whose gold gives an interval, the share on which the reader gives one; it is given for every reader; the sample is drawn on the rule reader's own form classes, so its figure per stratum says little, and the pooled and weighted figures are the informative ones",
+  "beside the rates that section 13 lists as support, the scorer gives the difference of a model's figure and a comparator's (the rule reader's, or an annotator's against the other one's labels) for false commitment (on every gold-ABSTAIN item, and on those of the TBD and silent strata) and for distractor uptake, under each weighting, with a 95% percentile interval over the same draws of episodes; each of the two readers is scored on its own denominator and the two are paired by the draw alone; on the TBD and silent strata the rule reader abstains by construction, so that margin over the rules is the model's own rate; the exact binomial interval of those rates is the Clopper-Pearson one at 95%, on the unweighted counts of the sample"
+ ]
+}

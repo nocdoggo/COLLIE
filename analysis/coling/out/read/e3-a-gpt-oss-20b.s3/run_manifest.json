@@ -1,0 +1,100 @@
+{
+  "by_echo": {
+    "ok": 91
+  },
+  "by_status": {
+    "failed": 1,
+    "ok": 86,
+    "repaired": 4
+  },
+  "complete": false,
+  "condition": "predictive-v1|det-v1|mask=0|shift=0|track=-",
+  "expected_rows": 312,
+  "fallbacks": 1,
+  "git": {
+    "branch": "followup/coling-2027",
+    "f1": "a7dcb774a6c06e542d83077434ae35d71e9058be",
+    "read_py_modified": false,
+    "registration": "0c2579a6eb98d1ed844bea4f45cdb159283bb25f",
+    "sha": "606fe326e716e2a868be34fe4e54c232266f9c29"
+  },
+  "guard": {
+    "max_physical_calls": 20000,
+    "physical_calls_this_invocation": 52,
+    "physical_calls_total": 96,
+    "refusals_this_invocation": 0,
+    "retries_this_invocation": 0,
+    "spend_cap_usd": 0.154261,
+    "usd_this_invocation": 0.08053870000000005,
+    "usd_total": 0.15386029000000004
+  },
+  "item_ids_sha256": "914122e0367c820d1d1f571804b03fc7a5bb361bb98f050326c1dccadd4c6bb7",
+  "items": 312,
+  "items_in_file": 2593,
+  "items_sha256": "773707460d800e40c088b14807ff49ca33008710242ce68d078c8011e4f91a66",
+  "ladder_rung": {
+    "model_id": "openai/gpt-oss-20b",
+    "name": "gpt-oss-20b",
+    "price_input_per_mtok": 0.018,
+    "price_output_per_mtok": 0.09,
+    "provider": "openrouter",
+    "released": "2025-08",
+    "served_as": [
+      "openai/gpt-oss-20b"
+    ],
+    "tier": "21B-MoE"
+  },
+  "limit": null,
+  "mask_names": false,
+  "model": "gpt-oss-20b",
+  "model_id": "openai/gpt-oss-20b",
+  "price_date": "2026-10-01",
+  "provider_object": {
+    "allow_fallbacks": false,
+    "order": [
+      "deepinfra/bf16"
+    ],
+    "quantizations": [
+      "bf16"
+    ]
+  },
+  "python": "3.12.11",
+  "read_py_sha256": "54d171783601e72994f960cbe7b5adba157f6061ba3c9a1da30fd23e23be244f",
+  "readings": 91,
+  "readings_sha256": "a94b8ff43d5f924e521980bf700d411c81fb178f669d9679c80116285d18e71c",
+  "roots": {
+    "local_root": "/home/noctis/GitHub/COLLIE-coling/results/coling/read",
+    "out_root": "/home/noctis/GitHub/COLLIE-coling/analysis/coling/out/read"
+  },
+  "route": {
+    "also_served_as": [],
+    "also_served_by": [],
+    "model_id": "openai/gpt-oss-20b",
+    "price": [
+      0.03,
+      0.14,
+      "2026-10-01"
+    ],
+    "provider": "deepinfra/bf16",
+    "quantization": "bf16"
+  },
+  "run_name": "e3-a-gpt-oss-20b.s3",
+  "samples": 1,
+  "served_as": [
+    "openai/gpt-oss-20b"
+  ],
+  "shard": "3/8",
+  "shift_years": 0,
+  "spend_cap_usd": 0.154261,
+  "status": "aborted: recorded spend $0.1539 plus this call's projected $0.0004 would pass the $0.15 cap",
+  "temperature": 0.0,
+  "template": "predictive-v1",
+  "template_sha256": "c0732a5b2d109c60a94e56cd0820a4aa5851786bd01fd31acd3b12c9d47534ed",
+  "track_record": null,
+  "track_record_sha256": null,
+  "track_record_split": null,
+  "usd_per_mtok": [
+    0.03,
+    0.14
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "by_echo": {
+    "ok": 2593
+  },
+  "by_status": {
+    "failed": 10,
+    "ok": 2405,
+    "repaired": 178
+  },
+  "complete": true,
+  "condition": "predictive-v1|det-v1|mask=0|shift=0|track=-",
+  "expected_rows": 2593,
+  "fallbacks": 10,
+  "git": {
+    "branch": "followup/coling-2027",
+    "f1": "a7dcb774a6c06e542d83077434ae35d71e9058be",
+    "read_py_modified": false,
+    "registration": "0c2579a6eb98d1ed844bea4f45cdb159283bb25f",
+    "sha": "3ed1308cb9ba45fa2f0f5170bdc41298df8b9a45"
+  },
+  "guard": {
+    "max_physical_calls": 20000,
+    "physical_calls_this_invocation": 2781,
+    "physical_calls_total": 2781,
+    "refusals_this_invocation": 0,
+    "retries_this_invocation": 27,
+    "spend_cap_usd": 4.2884,
+    "usd_this_invocation": 3.0762912499999944,
+    "usd_total": 3.0762912499999944
+  },
+  "item_ids_sha256": "a65983839e361c6e309709930b16d80f4ad0c0cd6a3fc4ce2d841879b25988cf",
+  "items": 2593,
+  "items_in_file": 2593,
+  "items_sha256": "773707460d800e40c088b14807ff49ca33008710242ce68d078c8011e4f91a66",
+  "ladder_rung": {
+    "model_id": "grok-4.20-0309-non-reasoning",
+    "name": "grok-4.20",
+    "price_input_per_mtok": 1.25,
+    "price_output_per_mtok": 2.5,
+    "provider": "grok",
+    "released": "2026-03",
+    "served_as": [
+      "grok-4.20-0309-non-reasoning"
+    ],
+    "tier": "mid"
+  },
+  "limit": null,
+  "mask_names": false,
+  "model": "grok-4.20",
+  "model_id": "grok-4.20-0309-non-reasoning",
+  "price_date": "2026-10-01",
+  "provider_object": null,
+  "python": "3.12.11",
+  "read_py_sha256": "54d171783601e72994f960cbe7b5adba157f6061ba3c9a1da30fd23e23be244f",
+  "readings": 2593,
+  "readings_sha256": "f9b22fac464afe154d37bda59adca6a747e740052e212661bc13a6e0f355bbfb",
+  "roots": {
+    "local_root": "/home/noctis/GitHub/COLLIE-coling/results/coling/read",
+    "out_root": "/home/noctis/GitHub/COLLIE-coling/analysis/coling/out/read"
+  },
+  "route": {
+    "also_served_as": [],
+    "also_served_by": [],
+    "model_id": "grok-4.20-0309-non-reasoning",
+    "price": [
+      1.25,
+      2.5,
+      "2026-10-01"
+    ],
+    "provider": "direct",
+    "quantization": null
+  },
+  "run_name": "e3-a-grok-4.20",
+  "samples": 1,
+  "served_as": [
+    "grok-4.20-0309-non-reasoning"
+  ],
+  "shard": null,
+  "shift_years": 0,
+  "spend_cap_usd": 4.2884,
+  "status": "complete",
+  "temperature": 0.0,
+  "template": "predictive-v1",
+  "template_sha256": "c0732a5b2d109c60a94e56cd0820a4aa5851786bd01fd31acd3b12c9d47534ed",
+  "track_record": null,
+  "track_record_sha256": null,
+  "track_record_split": null,
+  "usd_per_mtok": [
+    1.25,
+    2.5
+  ]
+}

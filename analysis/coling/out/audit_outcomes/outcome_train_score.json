@@ -1,0 +1,132 @@
+{
+  "A": {
+    "agreement_rate": 0.98,
+    "agreement_rate_reweighted": 0.9804929155857114,
+    "agreement_wilson95": [
+      0.895045563061035,
+      0.9964607407674952
+    ],
+    "codes": {
+      "O1": 1
+    },
+    "confirmed": [
+      {
+        "audit_id": "Q7d21bfff",
+        "cause": "NDC renumbered: the row continues under a re-formatted presentation with a new NDC, and the thread was not re-linked",
+        "codes": [
+          "O1"
+        ]
+      }
+    ],
+    "confirmed_errors": 1,
+    "errors_by_stratum": {
+      "recovered/le31/single": 1
+    },
+    "pass": true,
+    "pass_if_unresolved_count": true,
+    "unresolved": 0
+  },
+  "B": {
+    "agreement_rate": 1.0,
+    "agreement_rate_reweighted": 1.0,
+    "agreement_wilson95": [
+      0.9286523998213858,
+      0.9999999999999998
+    ],
+    "codes": {},
+    "confirmed": [],
+    "confirmed_errors": 0,
+    "errors_by_stratum": {},
+    "pass": true,
+    "pass_if_unresolved_count": true,
+    "unresolved": 0
+  },
+  "adjudicated": true,
+  "allowed_errors": 2,
+  "auditor_flagged": {
+    "A1": {
+      "cannot_tell_A": 1,
+      "cannot_tell_B": 0,
+      "error_A": 0,
+      "error_B": 0,
+      "real_items": 30
+    },
+    "A2": {
+      "cannot_tell_A": 0,
+      "cannot_tell_B": 0,
+      "error_A": 0,
+      "error_B": 0,
+      "real_items": 30
+    }
+  },
+  "corpus_py": "sha256 a44cd27ccddad604",
+  "corpus_py_unchanged": true,
+  "counts": {
+    "events": 8020,
+    "excluded_events": 3009,
+    "planted_drawn": 6,
+    "planted_wanted": 6,
+    "pool": 5011,
+    "real_drawn": 50,
+    "real_wanted": 50
+  },
+  "half": "train",
+  "minutes": {
+    "A1": {
+      "items": 33,
+      "minutes": 300,
+      "minutes_per_item": 9.09
+    },
+    "A2": {
+      "items": 33,
+      "minutes": 300,
+      "minutes_per_item": 9.09
+    }
+  },
+  "note_codes": {
+    "N1": 20,
+    "N2": 1,
+    "N3": 1,
+    "N4": 11,
+    "N6": 1
+  },
+  "pass": true,
+  "planted": {
+    "A1": {
+      "caught": 3,
+      "caught_with_expected_code": 3,
+      "planted": 3,
+      "recheck_own_items": false
+    },
+    "A2": {
+      "caught": 3,
+      "caught_with_expected_code": 3,
+      "planted": 3,
+      "recheck_own_items": false
+    }
+  },
+  "real_items": 50,
+  "repeated_causes": [],
+  "rule_fix_required": false,
+  "sha256": {
+    "A1": "8f5a9b9a4dab71aeb0bfdc3d2ea28d704276ac3409b7c1e662edf7c16d3c0a25",
+    "A2": "55da2448f7053a0b7242ab38c0be61b2c9ae86c2abb9d5eb2910f2fdc6249c0b",
+    "adjudication": "63ebd2182ab482a3bc8effa6c23ae534042f95c75f929dd093cba03957a60c7c",
+    "key": "ca7df5d34421865794e912d2c8707204fdd989826a1af0f5fe1bf7287bbc35f4"
+  },
+  "shared_items": {
+    "A": {
+      "items": 10,
+      "kappa_ok_error": null,
+      "same_verdict": 10,
+      "with_cannot_tell": 0
+    },
+    "B": {
+      "items": 10,
+      "kappa_ok_error": null,
+      "same_verdict": 10,
+      "with_cannot_tell": 0
+    }
+  },
+  "status": "final"
+}

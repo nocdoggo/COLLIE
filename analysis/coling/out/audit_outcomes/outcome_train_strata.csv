@@ -1,0 +1,17 @@
+stratum,events,excluded,pool,quota,drawn
+censored/none/reconfirmed,452,180,272,3,3
+censored/none/single,1314,495,819,5,5
+discontinued/32to90/reconfirmed,17,0,17,2,2
+discontinued/32to90/single,33,4,29,2,2
+discontinued/gt90/reconfirmed,30,1,29,2,2
+discontinued/gt90/single,33,1,32,2,2
+discontinued/le31/reconfirmed,23,4,19,2,2
+discontinued/le31/single,15,14,1,1,1
+not_at_risk/none/reconfirmed,1735,566,1169,6,6
+not_at_risk/none/single,1724,555,1169,6,6
+recovered/32to90/reconfirmed,369,155,214,3,3
+recovered/32to90/single,742,353,389,4,4
+recovered/gt90/reconfirmed,189,91,98,2,2
+recovered/gt90/single,431,228,203,3,3
+recovered/le31/reconfirmed,264,104,160,3,3
+recovered/le31/single,649,258,391,4,4

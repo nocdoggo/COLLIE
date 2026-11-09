@@ -1,0 +1,1379 @@
+{
+ "abstain": {
+  "alpha_nominal": 1.0,
+  "kappa": 1.0,
+  "marginal_shares": {
+   "A1": {
+    "no": 0.65,
+    "yes": 0.35
+   },
+   "A2": {
+    "no": 0.65,
+    "yes": 0.35
+   }
+  },
+  "n": 20,
+  "raw_agreement": 1.0
+ },
+ "alpha_end_offset_d": 1.0,
+ "alpha_end_offset_m": 1.0,
+ "alpha_start_offset_d": 1.0,
+ "alpha_start_offset_m": 1.0,
+ "any_distractor": {
+  "alpha_nominal": 1.0,
+  "kappa": 1.0,
+  "marginal_shares": {
+   "A1": {
+    "no": 0.9,
+    "yes": 0.1
+   },
+   "A2": {
+    "no": 0.9,
+    "yes": 0.1
+   }
+  },
+  "n": 20,
+  "raw_agreement": 1.0
+ },
+ "by_period": {
+  "train": {
+   "abstain": {
+    "alpha_nominal": 1.0,
+    "kappa": 1.0,
+    "marginal_shares": {
+     "A1": {
+      "no": 0.65,
+      "yes": 0.35
+     },
+     "A2": {
+      "no": 0.65,
+      "yes": 0.35
+     }
+    },
+    "n": 20,
+    "raw_agreement": 1.0
+   },
+   "alpha_end_offset_d": 1.0,
+   "alpha_end_offset_m": 1.0,
+   "alpha_start_offset_d": 1.0,
+   "alpha_start_offset_m": 1.0,
+   "any_distractor": {
+    "alpha_nominal": 1.0,
+    "kappa": 1.0,
+    "marginal_shares": {
+     "A1": {
+      "no": 0.9,
+      "yes": 0.1
+     },
+     "A2": {
+      "no": 0.9,
+      "yes": 0.1
+     }
+    },
+    "n": 20,
+    "raw_agreement": 1.0
+   },
+   "certainty": {
+    "alpha_nominal": 1.0,
+    "kappa": 1.0,
+    "marginal_shares": {
+     "A1": {
+      "asserted": 0.35,
+      "estimated": 0.35,
+      "no_statement": 0.05,
+      "undetermined": 0.25
+     },
+     "A2": {
+      "asserted": 0.35,
+      "estimated": 0.35,
+      "no_statement": 0.05,
+      "undetermined": 0.25
+     }
+    },
+    "n": 20,
+    "raw_agreement": 1.0
+   },
+   "identical_intervals": 1.0,
+   "interval_pairs": 13,
+   "n": 20,
+   "stale": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 20,
+    "raw_agreement": 1.0
+   },
+   "statement_type": {
+    "alpha_nominal": 0.915767,
+    "kappa": 0.913793,
+    "marginal_shares": {
+     "A1": {
+      "discontinuation": 0.05,
+      "next_delivery": 0.55,
+      "none": 0.05,
+      "recovery": 0.35
+     },
+     "A2": {
+      "discontinuation": 0.05,
+      "next_delivery": 0.5,
+      "none": 0.05,
+      "recovery": 0.4
+     }
+    },
+    "n": 20,
+    "raw_agreement": 0.95
+   }
+  }
+ },
+ "by_stratum": {
+  "dated_distractor": {
+   "abstain": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "alpha_end_offset_d": null,
+   "alpha_end_offset_m": null,
+   "alpha_start_offset_d": null,
+   "alpha_start_offset_m": null,
+   "any_distractor": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "yes": 1.0
+     },
+     "A2": {
+      "yes": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "certainty": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "asserted": 1.0
+     },
+     "A2": {
+      "asserted": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "identical_intervals": 1.0,
+   "interval_pairs": 1,
+   "n": 1,
+   "stale": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "statement_type": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "next_delivery": 1.0
+     },
+     "A2": {
+      "next_delivery": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   }
+  },
+  "discontinuation": {
+   "abstain": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "yes": 1.0
+     },
+     "A2": {
+      "yes": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "alpha_end_offset_d": null,
+   "alpha_end_offset_m": null,
+   "alpha_start_offset_d": null,
+   "alpha_start_offset_m": null,
+   "any_distractor": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "certainty": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "undetermined": 1.0
+     },
+     "A2": {
+      "undetermined": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "identical_intervals": 1.0,
+   "interval_pairs": 0,
+   "n": 1,
+   "stale": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "statement_type": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "discontinuation": 1.0
+     },
+     "A2": {
+      "discontinuation": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   }
+  },
+  "distractor": {
+   "abstain": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "yes": 1.0
+     },
+     "A2": {
+      "yes": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "alpha_end_offset_d": null,
+   "alpha_end_offset_m": null,
+   "alpha_start_offset_d": null,
+   "alpha_start_offset_m": null,
+   "any_distractor": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "yes": 1.0
+     },
+     "A2": {
+      "yes": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "certainty": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no_statement": 1.0
+     },
+     "A2": {
+      "no_statement": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "identical_intervals": 1.0,
+   "interval_pairs": 0,
+   "n": 1,
+   "stale": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "statement_type": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "none": 1.0
+     },
+     "A2": {
+      "none": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   }
+  },
+  "exact_day": {
+   "abstain": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 2,
+    "raw_agreement": 1.0
+   },
+   "alpha_end_offset_d": null,
+   "alpha_end_offset_m": null,
+   "alpha_start_offset_d": null,
+   "alpha_start_offset_m": null,
+   "any_distractor": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 2,
+    "raw_agreement": 1.0
+   },
+   "certainty": {
+    "alpha_nominal": 1.0,
+    "kappa": 1.0,
+    "marginal_shares": {
+     "A1": {
+      "asserted": 0.5,
+      "estimated": 0.5
+     },
+     "A2": {
+      "asserted": 0.5,
+      "estimated": 0.5
+     }
+    },
+    "n": 2,
+    "raw_agreement": 1.0
+   },
+   "identical_intervals": 1.0,
+   "interval_pairs": 2,
+   "n": 2,
+   "stale": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 2,
+    "raw_agreement": 1.0
+   },
+   "statement_type": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "recovery": 1.0
+     },
+     "A2": {
+      "recovery": 1.0
+     }
+    },
+    "n": 2,
+    "raw_agreement": 1.0
+   }
+  },
+  "month_no_year": {
+   "abstain": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 2,
+    "raw_agreement": 1.0
+   },
+   "alpha_end_offset_d": null,
+   "alpha_end_offset_m": null,
+   "alpha_start_offset_d": null,
+   "alpha_start_offset_m": null,
+   "any_distractor": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 2,
+    "raw_agreement": 1.0
+   },
+   "certainty": {
+    "alpha_nominal": 1.0,
+    "kappa": 1.0,
+    "marginal_shares": {
+     "A1": {
+      "asserted": 0.5,
+      "estimated": 0.5
+     },
+     "A2": {
+      "asserted": 0.5,
+      "estimated": 0.5
+     }
+    },
+    "n": 2,
+    "raw_agreement": 1.0
+   },
+   "identical_intervals": 1.0,
+   "interval_pairs": 2,
+   "n": 2,
+   "stale": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 2,
+    "raw_agreement": 1.0
+   },
+   "statement_type": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "next_delivery": 1.0
+     },
+     "A2": {
+      "next_delivery": 1.0
+     }
+    },
+    "n": 2,
+    "raw_agreement": 1.0
+   }
+  },
+  "month_year": {
+   "abstain": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "alpha_end_offset_d": null,
+   "alpha_end_offset_m": null,
+   "alpha_start_offset_d": null,
+   "alpha_start_offset_m": null,
+   "any_distractor": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "certainty": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "estimated": 1.0
+     },
+     "A2": {
+      "estimated": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "identical_intervals": 1.0,
+   "interval_pairs": 1,
+   "n": 1,
+   "stale": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "statement_type": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "recovery": 1.0
+     },
+     "A2": {
+      "recovery": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   }
+  },
+  "no_date": {
+   "abstain": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "yes": 1.0
+     },
+     "A2": {
+      "yes": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "alpha_end_offset_d": null,
+   "alpha_end_offset_m": null,
+   "alpha_start_offset_d": null,
+   "alpha_start_offset_m": null,
+   "any_distractor": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "certainty": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "undetermined": 1.0
+     },
+     "A2": {
+      "undetermined": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "identical_intervals": 1.0,
+   "interval_pairs": 0,
+   "n": 1,
+   "stale": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "statement_type": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "next_delivery": 1.0
+     },
+     "A2": {
+      "next_delivery": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   }
+  },
+  "part_of_month": {
+   "abstain": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 2,
+    "raw_agreement": 1.0
+   },
+   "alpha_end_offset_d": null,
+   "alpha_end_offset_m": null,
+   "alpha_start_offset_d": null,
+   "alpha_start_offset_m": null,
+   "any_distractor": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 2,
+    "raw_agreement": 1.0
+   },
+   "certainty": {
+    "alpha_nominal": 1.0,
+    "kappa": 1.0,
+    "marginal_shares": {
+     "A1": {
+      "asserted": 0.5,
+      "estimated": 0.5
+     },
+     "A2": {
+      "asserted": 0.5,
+      "estimated": 0.5
+     }
+    },
+    "n": 2,
+    "raw_agreement": 1.0
+   },
+   "identical_intervals": 1.0,
+   "interval_pairs": 2,
+   "n": 2,
+   "stale": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 2,
+    "raw_agreement": 1.0
+   },
+   "statement_type": {
+    "alpha_nominal": 1.0,
+    "kappa": 1.0,
+    "marginal_shares": {
+     "A1": {
+      "next_delivery": 0.5,
+      "recovery": 0.5
+     },
+     "A2": {
+      "next_delivery": 0.5,
+      "recovery": 0.5
+     }
+    },
+    "n": 2,
+    "raw_agreement": 1.0
+   }
+  },
+  "quarter": {
+   "abstain": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 2,
+    "raw_agreement": 1.0
+   },
+   "alpha_end_offset_d": null,
+   "alpha_end_offset_m": null,
+   "alpha_start_offset_d": null,
+   "alpha_start_offset_m": null,
+   "any_distractor": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 2,
+    "raw_agreement": 1.0
+   },
+   "certainty": {
+    "alpha_nominal": 1.0,
+    "kappa": 1.0,
+    "marginal_shares": {
+     "A1": {
+      "asserted": 0.5,
+      "estimated": 0.5
+     },
+     "A2": {
+      "asserted": 0.5,
+      "estimated": 0.5
+     }
+    },
+    "n": 2,
+    "raw_agreement": 1.0
+   },
+   "identical_intervals": 1.0,
+   "interval_pairs": 2,
+   "n": 2,
+   "stale": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 2,
+    "raw_agreement": 1.0
+   },
+   "statement_type": {
+    "alpha_nominal": 1.0,
+    "kappa": 1.0,
+    "marginal_shares": {
+     "A1": {
+      "next_delivery": 0.5,
+      "recovery": 0.5
+     },
+     "A2": {
+      "next_delivery": 0.5,
+      "recovery": 0.5
+     }
+    },
+    "n": 2,
+    "raw_agreement": 1.0
+   }
+  },
+  "range": {
+   "abstain": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 2,
+    "raw_agreement": 1.0
+   },
+   "alpha_end_offset_d": null,
+   "alpha_end_offset_m": null,
+   "alpha_start_offset_d": null,
+   "alpha_start_offset_m": null,
+   "any_distractor": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 2,
+    "raw_agreement": 1.0
+   },
+   "certainty": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "asserted": 1.0
+     },
+     "A2": {
+      "asserted": 1.0
+     }
+    },
+    "n": 2,
+    "raw_agreement": 1.0
+   },
+   "identical_intervals": 1.0,
+   "interval_pairs": 2,
+   "n": 2,
+   "stale": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 2,
+    "raw_agreement": 1.0
+   },
+   "statement_type": {
+    "alpha_nominal": 0.0,
+    "kappa": 0.0,
+    "marginal_shares": {
+     "A1": {
+      "next_delivery": 1.0
+     },
+     "A2": {
+      "next_delivery": 0.5,
+      "recovery": 0.5
+     }
+    },
+    "n": 2,
+    "raw_agreement": 0.5
+   }
+  },
+  "relative": {
+   "abstain": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "alpha_end_offset_d": null,
+   "alpha_end_offset_m": null,
+   "alpha_start_offset_d": null,
+   "alpha_start_offset_m": null,
+   "any_distractor": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "certainty": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "estimated": 1.0
+     },
+     "A2": {
+      "estimated": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "identical_intervals": 1.0,
+   "interval_pairs": 1,
+   "n": 1,
+   "stale": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "statement_type": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "recovery": 1.0
+     },
+     "A2": {
+      "recovery": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   }
+  },
+  "silent": {
+   "abstain": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "yes": 1.0
+     },
+     "A2": {
+      "yes": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "alpha_end_offset_d": null,
+   "alpha_end_offset_m": null,
+   "alpha_start_offset_d": null,
+   "alpha_start_offset_m": null,
+   "any_distractor": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "certainty": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "undetermined": 1.0
+     },
+     "A2": {
+      "undetermined": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "identical_intervals": 1.0,
+   "interval_pairs": 0,
+   "n": 1,
+   "stale": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "statement_type": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "next_delivery": 1.0
+     },
+     "A2": {
+      "next_delivery": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   }
+  },
+  "tbd": {
+   "abstain": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "yes": 1.0
+     },
+     "A2": {
+      "yes": 1.0
+     }
+    },
+    "n": 2,
+    "raw_agreement": 1.0
+   },
+   "alpha_end_offset_d": null,
+   "alpha_end_offset_m": null,
+   "alpha_start_offset_d": null,
+   "alpha_start_offset_m": null,
+   "any_distractor": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 2,
+    "raw_agreement": 1.0
+   },
+   "certainty": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "undetermined": 1.0
+     },
+     "A2": {
+      "undetermined": 1.0
+     }
+    },
+    "n": 2,
+    "raw_agreement": 1.0
+   },
+   "identical_intervals": 1.0,
+   "interval_pairs": 0,
+   "n": 2,
+   "stale": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 2,
+    "raw_agreement": 1.0
+   },
+   "statement_type": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "next_delivery": 1.0
+     },
+     "A2": {
+      "next_delivery": 1.0
+     }
+    },
+    "n": 2,
+    "raw_agreement": 1.0
+   }
+  },
+  "vague": {
+   "abstain": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "yes": 1.0
+     },
+     "A2": {
+      "yes": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "alpha_end_offset_d": null,
+   "alpha_end_offset_m": null,
+   "alpha_start_offset_d": null,
+   "alpha_start_offset_m": null,
+   "any_distractor": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "certainty": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "estimated": 1.0
+     },
+     "A2": {
+      "estimated": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "identical_intervals": 1.0,
+   "interval_pairs": 0,
+   "n": 1,
+   "stale": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "no": 1.0
+     },
+     "A2": {
+      "no": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   },
+   "statement_type": {
+    "alpha_nominal": null,
+    "kappa": null,
+    "marginal_shares": {
+     "A1": {
+      "recovery": 1.0
+     },
+     "A2": {
+      "recovery": 1.0
+     }
+    },
+    "n": 1,
+    "raw_agreement": 1.0
+   }
+  }
+ },
+ "certainty": {
+  "alpha_nominal": 1.0,
+  "kappa": 1.0,
+  "marginal_shares": {
+   "A1": {
+    "asserted": 0.35,
+    "estimated": 0.35,
+    "no_statement": 0.05,
+    "undetermined": 0.25
+   },
+   "A2": {
+    "asserted": 0.35,
+    "estimated": 0.35,
+    "no_statement": 0.05,
+    "undetermined": 0.25
+   }
+  },
+  "n": 20,
+  "raw_agreement": 1.0
+ },
+ "guide": {
+  "A1": "v1 draft sha256 2758c375ef5b41a8",
+  "A2": "v1 draft sha256 2758c375ef5b41a8"
+ },
+ "hard": {
+  "A1": 4,
+  "A2": 0
+ },
+ "identical_intervals": 1.0,
+ "interval_pairs": 13,
+ "intervals_95": {
+  "alpha_end_offset_d": {
+   "draws": 2000,
+   "high": 1.0,
+   "low": 1.0
+  },
+  "alpha_end_offset_m": {
+   "draws": 2000,
+   "high": 1.0,
+   "low": 1.0
+  },
+  "alpha_start_offset_d": {
+   "draws": 2000,
+   "high": 1.0,
+   "low": 1.0
+  },
+  "alpha_start_offset_m": {
+   "draws": 2000,
+   "high": 1.0,
+   "low": 1.0
+  },
+  "identical_intervals": {
+   "draws": 2000,
+   "high": 1.0,
+   "low": 1.0
+  },
+  "kappa_abstain": {
+   "draws": 2000,
+   "high": 1.0,
+   "low": 1.0
+  },
+  "kappa_any_distractor": {
+   "draws": 1757,
+   "high": 1.0,
+   "low": 1.0
+  },
+  "kappa_certainty": {
+   "draws": 2000,
+   "high": 1.0,
+   "low": 1.0
+  },
+  "kappa_stale": null,
+  "kappa_statement_type": {
+   "draws": 2000,
+   "high": 1.0,
+   "low": 0.692308
+  }
+ },
+ "n": 20,
+ "seconds_per_item": {
+  "A1": 360.0,
+  "A2": 900.0
+ },
+ "sheets_sha256": {
+  "A1": "efea7ec22465b9537363566a7413c65f1db6272383ae5cfbc81325134f4788ad",
+  "A2": "66da9e436ff06bc3002ae1bc88b4f4ff6f0121bd53bf6005595c1a33cb2a399b"
+ },
+ "stale": {
+  "alpha_nominal": null,
+  "kappa": null,
+  "marginal_shares": {
+   "A1": {
+    "no": 1.0
+   },
+   "A2": {
+    "no": 1.0
+   }
+  },
+  "n": 20,
+  "raw_agreement": 1.0
+ },
+ "statement_type": {
+  "alpha_nominal": 0.915767,
+  "kappa": 0.913793,
+  "marginal_shares": {
+   "A1": {
+    "discontinuation": 0.05,
+    "next_delivery": 0.55,
+    "none": 0.05,
+    "recovery": 0.35
+   },
+   "A2": {
+    "discontinuation": 0.05,
+    "next_delivery": 0.5,
+    "none": 0.05,
+    "recovery": 0.4
+   }
+  },
+  "n": 20,
+  "raw_agreement": 0.95
+ },
+ "task": "pilot",
+ "to_adjudication": 1
+}

@@ -1,0 +1,12 @@
+term,available,sampled,required
+gs:HIGH,8,8,8
+gs:LOW,51,30,30
+gs:MEDIUM,535,30,30
+plan:EXPECTED,17,17,17
+plan:POSSIBLE,934,30,30
+plan:PROBABLE,73,30,30
+route:HIGH,24,24,24
+route:LOW,324,30,30
+route:MODERATE,326,30,30
+route:NONE,75,30,30
+excluded,46,10,0

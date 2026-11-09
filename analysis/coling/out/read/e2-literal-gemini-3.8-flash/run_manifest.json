@@ -1,0 +1,90 @@
+{
+  "by_echo": {
+    "ok": 120
+  },
+  "by_status": {
+    "ok": 120
+  },
+  "complete": true,
+  "condition": "literal-v1|det-v1|mask=0|shift=0|track=-",
+  "expected_rows": 120,
+  "fallbacks": 0,
+  "git": {
+    "branch": "followup/coling-2027",
+    "f1": "a7dcb774a6c06e542d83077434ae35d71e9058be",
+    "read_py_modified": false,
+    "registration": "0c2579a6eb98d1ed844bea4f45cdb159283bb25f",
+    "sha": "3ed1308cb9ba45fa2f0f5170bdc41298df8b9a45"
+  },
+  "guard": {
+    "max_physical_calls": 20000,
+    "physical_calls_this_invocation": 120,
+    "physical_calls_total": 120,
+    "refusals_this_invocation": 0,
+    "retries_this_invocation": 0,
+    "spend_cap_usd": 1.6264,
+    "usd_this_invocation": 0.6713677499999999,
+    "usd_total": 0.6713677499999999
+  },
+  "item_ids_sha256": "0707d836e05867fde429c74dce4522b54bd764615d69c69df6fd9496ea643788",
+  "items": 120,
+  "items_in_file": 120,
+  "items_sha256": "9c6639a46323197952d3992418207cd0b5cb406657c530845501c1813630e935",
+  "ladder_rung": {
+    "model_id": "gemini-3.8-flash",
+    "name": "gemini-3.8-flash",
+    "price_input_per_mtok": 0.75,
+    "price_output_per_mtok": 3.75,
+    "provider": "gemini",
+    "released": "2026-09",
+    "served_as": [
+      "gemini-3.8-flash"
+    ],
+    "tier": "mid"
+  },
+  "limit": null,
+  "mask_names": false,
+  "model": "gemini-3.8-flash",
+  "model_id": "gemini-3.8-flash",
+  "price_date": "2026-10-01",
+  "provider_object": null,
+  "python": "3.12.11",
+  "read_py_sha256": "54d171783601e72994f960cbe7b5adba157f6061ba3c9a1da30fd23e23be244f",
+  "readings": 120,
+  "readings_sha256": "3e2605cfe44ce2009bb73fb2f0cba41d10d4c854eaf36624b0749654190e47a5",
+  "roots": {
+    "local_root": "/home/noctis/GitHub/COLLIE-coling/results/coling/read",
+    "out_root": "/home/noctis/GitHub/COLLIE-coling/analysis/coling/out/read"
+  },
+  "route": {
+    "also_served_as": [],
+    "also_served_by": [],
+    "model_id": "gemini-3.8-flash",
+    "price": [
+      0.75,
+      3.75,
+      "2026-10-01"
+    ],
+    "provider": "direct",
+    "quantization": null
+  },
+  "run_name": "e2-literal-gemini-3.8-flash",
+  "samples": 1,
+  "served_as": [
+    "gemini-3.8-flash"
+  ],
+  "shard": null,
+  "shift_years": 0,
+  "spend_cap_usd": 1.6264,
+  "status": "complete",
+  "temperature": 0.0,
+  "template": "literal-v1",
+  "template_sha256": "855244013a7614501ebdd6fbb45c8998f102a877e1299a6d86f81e1359934b27",
+  "track_record": null,
+  "track_record_sha256": null,
+  "track_record_split": null,
+  "usd_per_mtok": [
+    0.75,
+    3.75
+  ]
+}

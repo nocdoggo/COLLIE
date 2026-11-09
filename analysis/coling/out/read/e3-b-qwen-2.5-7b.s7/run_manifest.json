@@ -1,0 +1,97 @@
+{
+  "by_echo": {
+    "ok": 341
+  },
+  "by_status": {
+    "failed": 1,
+    "ok": 334,
+    "repaired": 6
+  },
+  "complete": true,
+  "condition": "predictive-track-v1|det-v1|mask=0|shift=0|track=41648e5a49e7d296",
+  "expected_rows": 341,
+  "fallbacks": 1,
+  "git": {
+    "branch": "followup/coling-2027",
+    "f1": "a7dcb774a6c06e542d83077434ae35d71e9058be",
+    "read_py_modified": false,
+    "registration": "0c2579a6eb98d1ed844bea4f45cdb159283bb25f",
+    "sha": "3ed1308cb9ba45fa2f0f5170bdc41298df8b9a45"
+  },
+  "guard": {
+    "max_physical_calls": 20000,
+    "physical_calls_this_invocation": 348,
+    "physical_calls_total": 348,
+    "refusals_this_invocation": 0,
+    "retries_this_invocation": 0,
+    "spend_cap_usd": 0.181468,
+    "usd_this_invocation": 0.10926759999999988,
+    "usd_total": 0.10926759999999988
+  },
+  "item_ids_sha256": "95898335100164a0f1bce382ebdf25676b72ec38f1a6bfcc71aebdf8d2589782",
+  "items": 341,
+  "items_in_file": 2593,
+  "items_sha256": "773707460d800e40c088b14807ff49ca33008710242ce68d078c8011e4f91a66",
+  "ladder_rung": {
+    "model_id": "qwen/qwen-2.5-7b-instruct",
+    "name": "qwen-2.5-7b",
+    "price_input_per_mtok": 0.1,
+    "price_output_per_mtok": 0.2,
+    "provider": "openrouter",
+    "released": "2024-10",
+    "served_as": [
+      "qwen/qwen-2.5-7b-instruct"
+    ],
+    "tier": "7B"
+  },
+  "limit": null,
+  "mask_names": false,
+  "model": "qwen-2.5-7b",
+  "model_id": "qwen/qwen-2.5-7b-instruct",
+  "price_date": "2026-10-01",
+  "provider_object": {
+    "allow_fallbacks": false,
+    "order": [
+      "phala"
+    ]
+  },
+  "python": "3.12.11",
+  "read_py_sha256": "54d171783601e72994f960cbe7b5adba157f6061ba3c9a1da30fd23e23be244f",
+  "readings": 341,
+  "readings_sha256": "0e25ad0f46b9e1952e2b9235aeb421f43fe181d5c0514c9371ec28eea1d85f41",
+  "roots": {
+    "local_root": "/home/noctis/GitHub/COLLIE-coling/results/coling/read",
+    "out_root": "/home/noctis/GitHub/COLLIE-coling/analysis/coling/out/read"
+  },
+  "route": {
+    "also_served_as": [],
+    "also_served_by": [],
+    "model_id": "qwen/qwen-2.5-7b-instruct",
+    "price": [
+      0.1,
+      0.2,
+      "2026-10-01"
+    ],
+    "provider": "phala",
+    "quantization": null
+  },
+  "run_name": "e3-b-qwen-2.5-7b.s7",
+  "samples": 1,
+  "served_as": [
+    "qwen/qwen-2.5-7b-instruct"
+  ],
+  "shard": "7/8",
+  "shift_years": 0,
+  "spend_cap_usd": 0.181468,
+  "status": "complete",
+  "temperature": 0.0,
+  "template": "predictive-track-v1",
+  "template_sha256": "d0384c1f860d734bd26fa197de0a99e1bcdf520392941b399ef9d0f7b3213483",
+  "track_record": "analysis/coling/out/items/track_fit_dev.json",
+  "track_record_sha256": "41648e5a49e7d296a3ca2c49b61d7df3607eb8fe43f9f01daa136d9b0c3dc098",
+  "track_record_split": "fit+dev",
+  "usd_per_mtok": [
+    0.1,
+    0.2
+  ]
+}
