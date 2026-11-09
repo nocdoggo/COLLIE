@@ -4180,3 +4180,73 @@ original runs remain byte-identical to the A3 snapshot.
 - Batch source SHA256: `328169a893ecc4c597541b70a355c81f57337bab209da92af1842a09b1381252`
 - Batch fixture tests SHA256: `ecce1cafe22e64f05f3ecfc0384f8c6767ade5f4f55b39395b9242be02d8bade`
 - Batch selection SHA256: `f439cccb8f1be11e807105965a8a55afafa131c6ecb2f9eb5a7db2cef069ca7a`
+
+### A20. The repaired scorer applied: integration triage, three repairs, and a fresh review (9 November 2026)
+
+The first honest integration measurement did not reproduce the recorded 81-failed/92-error
+result. The historical test files had already been updated for the candidate's lexical guard
+(commit `b64b65c`) while the sources were reverted to the F1 bytes, and the recorded figures came
+from a mismatched application. On the same command in a fresh `TMPDIR`, the F1 bytes give 17
+failed / 498 passed / 51 xfailed and the v4 bytes give 2 failed / 511 passed / 53 xfailed; both v4
+failures are also failures on the F1 bytes, so v4 introduced no new failure, and the F1-only
+failures are exactly the tests that encode the guard the amendment applies. The two shared
+failures were real defects against the candidate's own guarantees, and are repaired here rather
+than shipped as residuals:
+
+R1 - the result file and the table beside it are one output. `write_new_pair` stages both as
+exclusive no-follow temporaries, fsyncs both, links both, and takes back the name the pair already
+kept when the second link fails; v4 wrote the two files one after the other, so a refusal on the
+table left the result file behind. `baselines` had the same hole once `output_paths` stopped
+statting the output, and now writes its report and its table through the same pair.
+
+R2 - a stored run file that is, or is reached through, a symbolic link is refused before anything
+of the run is read. v4's documented tradeoff said a clean-spelled alias is stopped by the checked
+readers' registered hash gates; that is true of the plan and the item files but false for the
+frozen readings reader (`analysis/coling/read.py` `_read_jsonl`, hash-pinned, no hash gate), which
+read a linked sealed file and failed as a decode error. This is a correction of residual 2's
+premise, not a restatement of it.
+
+R3 - a selection file that does not match the frozen hash and is a symbolic link withholds its own
+hash from the refusal (its bytes may be the sealed bytes); an ordinary file still prints both
+hashes at the length given, as F1 did.
+
+A fresh-context model-session review of the repair (delegated reviewer role; the
+family-independence limit is disclosed in `SCORER_V5_REVIEW_2026-11-09.md`) returned APPROVE WITH
+RESIDUALS and found two further defects and one narrowed claim. Its finding that `write_new_pair`
+unlinked a temporary it had not created (a stale `.partial.<pid>.<name>`) is fixed with a
+created-flag; its finding that `baselines` still leaked its report is fixed by R1 above; its
+finding that `stored_in_sealed` tested only the leaf name is fixed by resolving every component,
+and the claim that no folder entry is inspected on the read path is removed from the text; its
+suggestion to drop the early slice refusal in `evaluate()` is declined and recorded below; its
+lint finding (unused loop names) is fixed. The reviewer's own first version of the pair writer was
+caught by the suites themselves - `confirmatory.json` held the markdown - and the writer is now
+verified by content, not by length.
+
+Results on the applied bytes: the two historical suites are 513 passed, 53 xfailed, 0 failed; the
+repository-wide integrated suite is 2,251 passed; the private candidate package (`scorer_candidate_v5/`,
+hashes below) passes its 37 structural tests and its patch reverse-applies to the exact F1 hashes
+`efa033ae...` and `95448fa3...`. The four residuals of the v4 final review that this amendment does
+not repair are quoted here as the review requires: (1) `read_plan`'s docstring still says "or
+through a symbolic link"; (3) the dead `LINK_HOPS` constants keep link-following docstrings in both
+files; (4) `hash_required`'s phrasing ("is, or leads into, a sealed path") is v2-era; (5)
+`secondary_scores` `kept_from_sealed_paths` keeps one contradictory symlink sentence although the
+function is unreachable; (6) the secondary module docstring and its `WHERE_THE_PLAN_IS_SILENT`
+entry carry the same v2-era claim; (7) plan validation still calls `Path.resolve()`
+post-admission, so the "lexical" claim is bounded. Residual 2 is repaired by R2. New residuals
+recorded rather than fixed: a filesystem without hard links, or a symbolic link among the ancestors
+of an output path, now refuses every write this evaluator makes (`O_NOFOLLOW` component walk and
+`os.link` were v4's mechanism, now load-bearing); a stale partial is refused and never reclaimed;
+R3 withholds on links but a hard link still prints the observed hash; and the confirmatory
+command parses the sealed file before it learns that `--out` is taken (pinned by
+`test_an_output_that_exists_or_has_no_folder_is_refused_by_the_write`). The early slice refusal in
+`evaluate()` is kept: `gather` already refuses it for the CLI, but direct callers see the refusal,
+and removing it would change a contract the suite pins.
+
+This amendment applies the scorer. It does NOT authorise reading any sealed outcome: the
+registered evaluator was not rerun, the secondary withholding default stands, and a separate dated
+amendment remains the precondition for any sealed read under these bytes. Nothing was written under
+`reports/`.
+- Evaluator source SHA256: `682272d697d2cfda7fe8e5f6800070e8a80b824289ac8864a8afb9ee72f8c69d`
+- Secondary scorer source SHA256: `30d4e2090f79983aeaf522da26fe5a79ebfece90e188c01386458e8e2bcb1935`
+- Evaluator fixture tests SHA256: `98a0511a7bd15fb3d8e634d6caccec51aff69b4ab90547b0f4c06f06a05774ec`
+- Secondary fixture tests SHA256: `cf9e5a97478e9a96e5b65e402cc9385aebf6dbaedb28924c97d78ecd9b374aba`

@@ -117,7 +117,12 @@ when nothing is missing, 3 otherwise.
 of hash are those the registration and the freeze amendment record: the sealed file, the
 eligible list, the model-free predictions (as ``baselines`` prints them) and the selection file
 of each primary (as written by ``dev``). All are required, a selection hash for every primary
-that is not declared not evaluable; each is checked before the sealed file is read.
+that is not declared not evaluable; each is checked before the sealed file is read. ``--sealed``
+must spell the registered outcome path without parent traversal; a relative registered path is
+anchored at the installed evaluator's repository root. The sealed bytes are gated by their
+registered hash when they are read. A changed scorer is not authorised to read
+outcomes until the standing plan's dated amendment has been pushed; this code does not enforce
+the separate operational prohibition on rerunning the already-recorded evaluator.
 ``--not-evaluable MODEL=REASON`` declares that a primary's confirmatory runs could not be
 completed on its registered route (PLAN section 6, "Confirmatory runs"): its runs are not read
 and its three tests stay in the family with p = 1. Without it a missing or partial run is a
@@ -148,8 +153,10 @@ ready when:
 
 * the plan names no path in a sealed folder (its output root, its item files, its track
   records): the check hashes the files a plan names, so such a plan is not followed at all;
-  nor does the plan itself, a file it names or a stored file of a run lead into one through a
-  symbolic link (``is_sealed``, ``stored_in_sealed``): none of them is read then;
+  nor does the plan itself, a file it names or a stored file of a run carry the sealed
+  folder's registered name as a path component or spell the sealed file (``is_sealed``,
+  ``stored_in_sealed``): none of them is read then. Admission is lexical - no file, folder
+  entry or link target is inspected to classify a path;
 * no two of the sets a primary can be tested on (the eligible list, and the post-cutoff slice
   of each primary whose runs are read) differ by 1 to 4 statements (``slice_problems``): the
   six tests are never withheld, and the same figures on both would give those few back;
@@ -363,9 +370,10 @@ Where the plan is silent, this file decides as follows, and the result file says
 Refusals (status 1, the reason alone on the error stream, nothing written). A missing or wrong
 hash (of the sealed file no character of its own hash is printed: ``hash_required``); an output
 that exists or lies in a sealed folder; an open input in a sealed folder; a stored file whose
-path leads into a sealed folder through a symbolic link (the plan, a file it names, the readings
-or the manifest of a run, a selection file: ``is_sealed`` resolves the path part by part and
-asks the file system nothing about a sealed path); item sets that differ by 1 to 4 statements;
+path carries the sealed folder's registered name or spells the sealed file (the plan, a file
+it names, the readings or the manifest of a run, a selection file: ``is_sealed`` decides by
+spelling alone, with no filesystem call); an outcome path other than the registered one;
+item sets that differ by 1 to 4 statements;
 files of different builds; a declaration
 ``--not-evaluable`` whose reason is not printable text on one line; anything the completeness
 check finds; a selection file that is missing, not the one hashed at the freeze, of another
@@ -439,6 +447,7 @@ Usage (from the repository root)::
 from __future__ import annotations
 
 import argparse
+import contextlib
 import io
 import json
 import os
@@ -718,14 +727,14 @@ WHERE_THE_PLAN_IS_SILENT = (
     "statements from a set the same contrast is written on; the count of undetermined events "
     "in a record over so few statements, which holds their number alone; the counts of the six "
     "tests themselves stay as they are",
-    "a path leads into a sealed folder when, as given or where a symbolic link on its way "
-    "leads, it is the sealed file or lies in a folder named as the sealed one: it is resolved "
-    "part by part, and each part is compared as text before the file system is asked about it, "
-    "so that nothing is asked about a sealed path; links in a circle count as sealed; the plan "
-    "of the runs, the files it names, the readings and the manifest of a run and a selection "
-    "file are not read through such a path, and an output is not written through one; the "
-    "refusal of the sealed file for its hash, or of a file that leads to a sealed path, prints "
-    "no character of that hash",
+    "the path guard decides by spelling alone, with no filesystem call: restricted path "
+    "classes, the sealed folder's registered name as a component, the declared or configured "
+    "sealed file, and parent traversal are refused. Alias spellings without those components "
+    "rely on the writes' no-follow component walk and the checked readers' registered hash "
+    "gates. Hard links, bind mounts, privilege and filesystem mutation between a check and "
+    "an open are not ruled out. Only the registered outcome path is a read target, under its "
+    "registered hash; the standing rules still govern its "
+    "read. A refusal of a sealed file for its hash prints no character of that hash",
 )
 """The decisions every result file carries as ``where_the_plan_is_silent`` (see the module
 docstring)."""
@@ -1232,34 +1241,91 @@ def table_of(data: bytes, gzipped: bool) -> pd.DataFrame:
     )
 
 
-def output_paths(path: Path | None, table: bool = False) -> tuple[Path, Path | None]:
+def output_paths(
+    path: Path | None, table: bool = False, *, sealed: Any = None
+) -> tuple[Path, Path | None]:
     """The file ``--out`` names and, with ``table``, the Markdown file beside it. Refused when
-    one is not given, lies in a sealed folder, exists already, or its folder does not exist."""
+    one is not given, its spelling is not admitted (a sealed or restricted component, parent
+    traversal), or it would end in .md beside a table. Whether the file or its folder is
+    already there is decided by the write itself, which creates exclusively and never
+    overwrites; no metadata is asked of the output here."""
     if path is None or not path.name:
         refuse("--out is required: the file to write, which must not exist yet")
     beside = path.with_suffix(".md") if table else None
     for target in (path, *([beside] if beside is not None else [])):
-        if is_sealed(target) or sealed_counts.in_sealed_folder(target):
+        if is_sealed(target, sealed):
             refuse("--out lies in a sealed folder; results are written outside it")
-        if target.exists() or target.is_symlink():
-            refuse(f"the output is already there, and nothing is overwritten: {target.as_posix()}")
     if beside == path:
         refuse("--out cannot end in .md: the table is written beside it under that name")
-    if not path.parent.is_dir():
-        refuse(f"the folder of the output does not exist: {path.parent.as_posix()}")
     return path, beside
 
 
 def write_new(path: Path, text: str) -> None:
-    """Write a file that must not exist yet."""
-    stopped = ""
+    """Write a file that must not exist yet, whole or not at all (``_exclusive_write``)."""
+    _exclusive_write(path, text)
+
+
+def write_new_pair(first: Path, first_text: str, second: Path, second_text: str) -> None:
+    """Write two files that must both be new, or neither keeps a name.
+
+    The result file and the table beside it are one output: both are staged aside as
+    exclusive no-follow temporaries, both are fsynced, and only then does either take
+    its final name through a hard link. A link that fails (the name is taken) takes
+    back the name the pair already kept, so a refusal leaves nothing of the pair
+    behind - the table no more than the result file. No existing file is opened,
+    unlinked or replaced: only a name this call created is taken back.
+    """
+    staged: list[tuple[str, int, str, str, bool]] = []
     try:
-        with path.open("x", encoding="utf-8") as handle:
-            handle.write(text)
-    except OSError as error:
-        stopped = type(error).__name__
-    if stopped:
-        refuse(f"the output cannot be written ({stopped}): {path.as_posix()}")
+        for path, text in ((first, first_text), (second, second_text)):
+            given = _guard_absolute(path)
+            if given is None or is_sealed(given):
+                refuse(f"the output is not an admitted open spelling: {path!r}")
+            parts = [part for part in given.split(os.sep) if part]
+            if len(parts) < 2 or parts[-1] in {".", ".."} or os.sep in parts[-1]:
+                refuse("the output must name a file inside an existing folder")
+            try:
+                fd = _open_dir_walk(parts[:-1])
+            except OSError as error:
+                refuse(f"the output cannot be written ({type(error).__name__}): {given}")
+            partial = f".partial.{os.getpid()}.{parts[-1]}"
+            created = False
+            try:
+                handle = os.open(
+                    partial, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW | os.O_CLOEXEC,
+                    dir_fd=fd, mode=0o644)
+                created = True
+                with os.fdopen(handle, "wb") as stream:
+                    stream.write(text.encode("utf-8"))
+                    stream.flush()
+                    os.fsync(stream.fileno())
+            except (OSError, ValueError) as error:
+                # Only a temporary this call created is ever removed: a stale one left by a
+                # killed run of the same pid is a foreign name, and is left alone.
+                if created:
+                    with contextlib.suppress(OSError):
+                        os.unlink(partial, dir_fd=fd)
+                os.close(fd)
+                refuse(f"the output cannot be written ({type(error).__name__}): {given}")
+            staged.append((given, fd, parts[-1], partial, created))
+        linked: list[tuple[int, str]] = []
+        for given, fd, name, partial, _created in staged:
+            try:
+                os.link(partial, name, src_dir_fd=fd, dst_dir_fd=fd)
+            except OSError as error:
+                for done_fd, done_name in linked:
+                    with contextlib.suppress(OSError):
+                        os.unlink(done_name, dir_fd=done_fd)
+                refuse(f"the output cannot be written ({type(error).__name__}): {given}")
+            linked.append((fd, name))
+    finally:
+        for _given, fd, _name, partial, created in staged:
+            if created:
+                with contextlib.suppress(OSError):
+                    os.unlink(partial, dir_fd=fd)
+            with contextlib.suppress(OSError):
+                os.fsync(fd)
+            os.close(fd)
 
 
 def code_record() -> dict[str, str]:
@@ -1310,61 +1376,161 @@ class Group:
     problems: tuple[str, ...]
 
 
-def is_sealed(path: Any, sealed: Any = None) -> bool:
-    """Whether a path is the sealed file (``sealed``, or ``SEALED``), its folder, or anything
-    in a folder named as the sealed one: the path as given, or the one that a symbolic link on
-    its way leads to. The path is resolved here, part by part, and each step is compared as
-    text before the file system is asked whether it is a link: nothing is asked about the
-    sealed file, about its folder, or about a folder named as the sealed one. The sealed file
-    is known by its path as given, as text, and by that path with the way to its folder
-    resolved (a link and a step back on that way are followed in their order, not cancelled
-    as text); a sealed path whose folder is itself reached by a step back is known as text
-    alone. Another file in its folder is sealed only when the folder is named as the
-    registered one. Links that lead in a circle, or that cannot be read, count as sealed:
-    nothing is read through them."""
-    written = os.path.join(os.getcwd(), os.fspath(sealed or SEALED))
-    target = os.path.abspath(written)
-    folder, name = os.path.split(written)
-    above = os.path.dirname(folder)
-    if sealed_counts.SEALED_FOLDER not in above.split(os.sep):
-        above = os.path.realpath(above)  # the way to the folder, never the folder itself
-    targets = {target, os.path.join(above, os.path.basename(folder), name)}
-    folders = {os.path.dirname(one) for one in targets}
+def _guard_absolute(value: Any) -> str | None:
+    """An absolute path with dots removed; explicit parent traversal is never accepted."""
     try:
-        given = os.fspath(path)
-    except TypeError:
-        return False
-    if not isinstance(given, str) or "\0" in given:
-        return False
-    if os.path.abspath(given) == target:  # the same path as text, however it is spelled
+        text = os.fspath(value)
+        if not isinstance(text, str) or not text or "\0" in text:
+            return None
+        if ".." in text.split(os.sep):
+            return None
+        return os.path.abspath(text)
+    except (OSError, TypeError, ValueError):
+        return None
+
+
+def _registered_outcome_location() -> str | None:
+    """Anchor a relative registered path at the installed evaluator's repository root."""
+    try:
+        registered = os.fspath(SEALED)
+        if not isinstance(registered, str) or not registered:
+            return None
+        if not os.path.isabs(registered):
+            source = _guard_absolute(__file__)
+            if source is None:
+                return None
+            root = os.path.dirname(os.path.dirname(os.path.dirname(source)))
+            registered = os.path.join(root, registered)
+        return _guard_absolute(registered)
+    except (OSError, TypeError, ValueError):
+        return None
+
+
+def _restricted_path(path: str, *, reject_sealed: bool) -> bool:
+    """Reject restricted names as text, before asking the filesystem about them."""
+    parts = [part for part in path.split(os.sep) if part]
+    return (
+        any(part in {"keys", "cloud_endpoint", "reports"} or part.endswith(".key") for part in parts)
+        or (reject_sealed and sealed_counts.SEALED_FOLDER in parts)
+        or parts[-5:] == ["collie", "data", "alerts", "templates", "test.yaml"]
+    )
+
+
+def _sealed_component(path: str) -> bool:
+    """Whether the sealed folder's registered name is a component of the path, as text."""
+    return any(part == sealed_counts.SEALED_FOLDER for part in path.split(os.sep) if part)
+
+
+def is_sealed(path: Any, sealed: Any = None) -> bool:
+    """Whether an open path must be refused under the conservative lexical path guard.
+
+    Admission is by spelling alone: classifying a path asks nothing of the filesystem —
+    nothing is statted, resolved, listed, accessed or opened here. A path is refused when
+    it is not a usable absolute spelling, names a restricted entry, is the declared or
+    configured sealed file, or carries the sealed folder's registered name as a
+    component. Symbolic-link, hard-link and bind-mount aliases of an admitted spelling
+    are not resolved in advance: this candidate's writes are enforced at open time by
+    the no-follow component walk, so a link on the way to an output fails the open
+    instead of being classified. The guard is not a sandbox, does not bind direct
+    callers that obtained bytes elsewhere, and is not race-free against a concurrent
+    rename onto a component of an admitted path.
+    """
+    given = _guard_absolute(path)
+    registered = _registered_outcome_location()
+    configured = registered if sealed is None else _guard_absolute(sealed)
+    if given is None or registered is None or configured is None:
         return True
-    pending = [part for part in os.path.join(os.getcwd(), given).split(os.sep) if part]
-    current, hops = os.sep, 0
-    while pending:
-        part = pending.pop(0)
-        if part == ".":
-            continue
-        if part == "..":
-            current = os.path.dirname(current)
-            continue
-        current = os.path.join(current, part)
-        if current in targets or part == sealed_counts.SEALED_FOLDER:
-            return True
-        if current in folders:  # the folder of the sealed file: nothing is asked about it
-            if not pending:
-                return True
-            continue
-        if os.path.islink(current):
-            hops += 1
-            if hops > LINK_HOPS:
-                return True
-            try:
-                link = os.readlink(current)
-            except OSError:
-                return True
-            current = os.sep if os.path.isabs(link) else os.path.dirname(current)
-            pending = [step for step in link.split(os.sep) if step] + pending
-    return False
+    if _restricted_path(given, reject_sealed=True) or any(
+        _restricted_path(value, reject_sealed=False) for value in (registered, configured)
+    ):
+        return True
+    if given in {registered, configured}:
+        return True
+    return _sealed_component(given)
+
+
+def registered_outcome_path(path: Any) -> bool:
+    """Only the registered outcome path, as text, may be an evaluator read target."""
+    given, registered = _guard_absolute(path), _registered_outcome_location()
+    return (
+        given is not None
+        and registered is not None
+        and given == registered
+        and not _restricted_path(given, reject_sealed=False)
+    )
+
+
+def readable_registered_outcome(path: Any) -> bool:
+    """The same lexical admission as ``registered_outcome_path``; no metadata is asked.
+
+    Enforcement moved to the open: the separately authorised evaluator read keeps its
+    checked reader and registered hash, and this candidate's writes go through the
+    no-follow component walk, so a symlink that would make another spelling alias an
+    output target fails the open rather than being pre-classified. The standing plan
+    still governs whether the sealed file may be read at all.
+    """
+    return registered_outcome_path(path)
+
+
+def _open_dir_walk(folder: Sequence[str]) -> int:
+    """Open a folder through its components with no symbolic link on the way."""
+    fd = os.open(os.sep, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC)
+    for part in folder:
+        try:
+            child = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC, dir_fd=fd)
+        except OSError:
+            os.close(fd)
+            raise
+        os.close(fd)
+        fd = child
+    return fd
+
+
+def _exclusive_write(path: Any, text: str) -> None:
+    """Write a file that must not exist yet, touching nothing that does.
+
+    The bytes go to an exclusive no-follow temporary beside the final name, are
+    flushed and fsynced, and take the final name only through a hard link, which
+    fails when that name is taken: an existing file is never opened, unlinked or
+    replaced. The temporary is removed again whether or not the link kept it, and
+    the folder entry is fsynced, so a stopped write leaves nothing behind.
+    """
+    given = _guard_absolute(path)
+    if given is None or is_sealed(given):
+        refuse(f"the output is not an admitted open spelling: {path!r}")
+    parts = [part for part in given.split(os.sep) if part]
+    if len(parts) < 2 or parts[-1] in {".", ".."} or os.sep in parts[-1]:
+        refuse("the output must name a file inside an existing folder")
+    folder, name = parts[:-1], parts[-1]
+    partial = f".partial.{os.getpid()}.{name}"
+    stopped = ""
+    created = False
+    try:
+        fd = _open_dir_walk(folder)
+    except OSError as error:
+        refuse(f"the output cannot be written ({type(error).__name__}): {given}")
+    try:
+        try:
+            handle = os.open(
+                partial, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW | os.O_CLOEXEC,
+                dir_fd=fd, mode=0o644)
+            created = True
+            with os.fdopen(handle, "wb") as stream:
+                stream.write(text.encode("utf-8"))
+                stream.flush()
+                os.fsync(stream.fileno())
+            os.link(partial, name, src_dir_fd=fd, dst_dir_fd=fd)
+        except (OSError, ValueError) as error:
+            stopped = type(error).__name__
+    finally:
+        if created:
+            with contextlib.suppress(OSError):
+                os.unlink(partial, dir_fd=fd)
+        with contextlib.suppress(OSError):
+            os.fsync(fd)
+        os.close(fd)
+    if stopped:
+        refuse(f"the output cannot be written ({stopped}): {given}")
 
 
 def stored_in_sealed(
@@ -1375,6 +1541,17 @@ def stored_in_sealed(
     Looked at before any of them is read: a file that is a symbolic link to a sealed one would
     otherwise be read, and hashed, as an open one. The names are those of the runs."""
     roots = dict.fromkeys((Path(out_root), Path(str(plan["options"]["out_root"]))))
+
+    def through_a_link(file: Path) -> bool:
+        """Whether the file, or any folder on its way, is a symbolic link.
+
+        Leaf-only ``is_symlink`` was too narrow: a link at ``<root>`` or ``<root>/<run>``
+        leaves four ordinary names that the lexical guard admits, and the frozen readings
+        reader has no hash gate, so the linked bytes would be read. ``realpath`` resolves
+        every component and asks nothing of the sealed file's own spelling.
+        """
+        return file.is_symlink() or os.path.realpath(file) != os.path.abspath(file)
+
     found = []
     for run in runs:
         files = [root / run["run"] / name for root in roots for name in STORED_FILES]
@@ -1382,6 +1559,14 @@ def stored_in_sealed(
             found.append(
                 f"a stored file of run {run['run']} leads into a sealed folder; none of the "
                 "files of the run is read"
+            )
+        elif any(through_a_link(file) for file in files):
+            # A link of its own clean spelling is not classified by the lexical guard, and the
+            # frozen readings reader has no hash gate, so its bytes cannot be shown to be open
+            # data without being read: refused here, before anything of the run is read.
+            found.append(
+                f"a stored file of run {run['run']} is, or is reached through, a symbolic link, "
+                "whose bytes cannot be shown to be open data; none of the files of the run is read"
             )
     return found
 
@@ -1525,6 +1710,7 @@ def read_group(
     line: str,
     expected: Iterable[str],
     first: pd.DataFrame | None = None,
+    sealed: Any = None,
 ) -> Group:
     """The readings of ``model`` on ``line``, from the runs the plan lists for it in ``phase``
     and from no other run (``read.collect_readings`` with the run filter), with everything that
@@ -1539,7 +1725,7 @@ def read_group(
     if any(run["template"] != template for run in runs) or template not in rd.TEMPLATES:
         why = f"{name}: the plan holds runs under several templates, or one the harness lacks"
         return Group(model, line, template, {}, {"runs": len(runs)}, (why,))
-    in_sealed = stored_in_sealed(plan, out_root, runs)
+    in_sealed = stored_in_sealed(plan, out_root, runs, sealed)
     if in_sealed:  # before any stored file of the runs is looked at
         why = tuple(f"{name}: {reason}" for reason in in_sealed)
         return Group(model, line, template, {}, {"runs": len(runs)}, why)
@@ -2399,9 +2585,15 @@ def read_selection(
     sha = sealed_counts.sha256(data)
     problems = []
     if expected is not None and not sha.startswith(expected):
+        shown = (
+            "its own sha256 is withheld because the file is a symbolic link, whose bytes may "
+            "be those of a sealed file"
+            if path.is_symlink()
+            else f"its sha256 starts with {sha[: len(expected)]}"
+        )
         problems.append(
-            f"{model}: {path.name} is not the selection file hashed at the freeze (its sha256 "
-            f"starts with {sha[: len(expected)]}, expected {expected})"
+            f"{model}: {path.name} is not the selection file hashed at the freeze ({shown}, "
+            f"expected {expected})"
         )
     try:
         record = json.loads(data)
@@ -2527,7 +2719,7 @@ def gather(
             continue
         found.groups[model] = {
             condition: read_group(
-                plan, out_root, "confirmatory", model, line, expected[condition], first
+                plan, out_root, "confirmatory", model, line, expected[condition], first, sealed
             )
             for condition, line in LINES["confirmatory"].items()
         }
@@ -2976,6 +3168,9 @@ def evaluate(
     for the sensitivity analyses."""
     first, predictions = study.first, study.predictions
     models = [model for model in PRIMARIES if model not in study.not_evaluable]
+    problems = slice_problems(first, models)
+    if problems:
+        refuse("; ".join(problems))
 
     # E4 first: the item set of each primary is fixed by its probe, before any test.
     probes = {model: probe_test(model, study, rows, draws, seed, source) for model in models}
@@ -3539,8 +3734,8 @@ def summary_lines(report: Mapping[str, Any]) -> list[str]:
 
 def open_paths(args: argparse.Namespace, names: Sequence[str]) -> None:
     """Refuse an open input or folder that lies in a sealed folder or is the sealed file: a
-    sealed file is read only as ``--sealed``, behind its hash. The sealed path itself is
-    compared as text; nothing on disk is looked at for it."""
+    sealed file is read only as ``--sealed``, behind its hash. The refusal is decided by
+    spelling alone; no folder entry is inspected and nothing is opened by this guard."""
     sealed = getattr(args, "sealed", None)
     for name in names:
         if is_sealed(getattr(args, name), sealed):
@@ -3680,11 +3875,13 @@ def run_baselines(args: argparse.Namespace) -> int:
         "probe_statements": len(probe_ids),
         "predictions_sha256": baseline_hash(predictions, probe_base),
     }
-    write_new(out, report_text(report))
     if args.table is not None:
-        write_new(
-            args.table, predictions_text({name: predictions[name] for name in gbm.PREDICTORS})
+        write_new_pair(
+            out, report_text(report), args.table,
+            predictions_text({name: predictions[name] for name in gbm.PREDICTORS}),
         )
+    else:
+        write_new(out, report_text(report))
     print(f"model-free predictions on {len(ids)} eligible statements")
     print(f"sha256 of the predictions: {report['predictions_sha256']}")
     print(f"wrote {out.as_posix()}")
@@ -3775,6 +3972,8 @@ def run_check(args: argparse.Namespace) -> int:
 
 
 def run_confirmatory(args: argparse.Namespace) -> int:
+    if not registered_outcome_path(args.sealed):
+        refuse("--sealed must name the registered outcome file without parent traversal")
     want_sealed = sealed_counts.expected_hash(args.expect_sha256, "--expect-sha256")
     want_eligible = sealed_counts.expected_hash(
         args.expect_eligible_sha256, "--expect-eligible-sha256"
@@ -3786,7 +3985,7 @@ def run_confirmatory(args: argparse.Namespace) -> int:
     wrong = constants_problem()
     if wrong:
         refuse(wrong)
-    out, beside = output_paths(args.out, table=True)
+    out, beside = output_paths(args.out, table=True, sealed=args.sealed)
     skipped = skipped_models(args.not_evaluable)
     if set(skipped) >= set(PRIMARIES):
         refuse(
@@ -3848,6 +4047,11 @@ def run_confirmatory(args: argparse.Namespace) -> int:
             f"starts with {baselines_sha[: len(want_baselines)]}, expected {want_baselines}"
         )
 
+    # Only after the open-data checks: the target must still be the exact registered
+    # spelling (lexical identity; the bytes themselves are gated by the hash below).
+    if not readable_registered_outcome(args.sealed):
+        refuse("the sealed read target is not the registered outcome path")
+
     # the sealed file: hashed as bytes, parsed only when the hash is the expected one
     sealed = sealed_counts.file_bytes(args.sealed, "the sealed file")
     sealed_sha = hash_required(
@@ -3894,9 +4098,8 @@ def run_confirmatory(args: argparse.Namespace) -> int:
             f"the evaluation stopped on the sealed rows ({stopped}); the message is withheld "
             "because it may quote a sealed value"
         )
-    write_new(out, record)
     assert beside is not None
-    write_new(beside, table)
+    write_new_pair(out, record, beside, table)
     print(printed)
     print(f"wrote {out.as_posix()} and {beside.as_posix()}")
     return 0

@@ -1,4 +1,27 @@
-"""The secondary scorer of the COLING 2027 study: registered secondary analyses that need the
+"""Private fallback: the test-period secondary score is disabled, not completed.
+
+The ``score`` command refuses before opening an outcome file and writes no result.
+Direct ``score()`` returns only constant withheld statuses for ``items`` and each
+requested section; it does not inspect its arguments or compute the registered
+figures. A caller may already have obtained the bytes it passes. All selected
+sections are withheld as whole blocks, including their outcome-independent parts.
+They must be described as not run and not released, not as completed estimates.
+
+The open-data ``train-descriptives`` command and individual computation helpers
+remain available; the helpers are not a coordinated release policy. This fallback
+does not change outcome definitions, repair existing confirmatory output, or prove
+the safety of earlier releases. A dated, pushed amendment is required before any
+newly governed sealed read. Path checks have hard-link, bind-mount, privilege and
+check-then-open limitations; resolving the registered and configured folders
+inspects their directory entries and canonical entries, not their contents or
+the outcome file.
+
+Historical F1 documentation follows. Its descriptions of the ``score`` command,
+its outcome reads, results and sections describe the frozen scorer, not this
+candidate's disabled command. The descriptions of the unchanged helpers and the
+open-data train command remain useful as background.
+
+The secondary scorer of the COLING 2027 study: registered secondary analyses that need the
 sealed test-period outcomes and that the registered evaluator does not compute (PLAN.md, standing
 rules on sealing; section 6, "Evaluator"; ``evaluate.NOT_COMPUTED_HERE``). It computes those of
 ``SECTIONS``. The others are named in every result file, under ``not_computed_here``: those that
@@ -528,8 +551,8 @@ AS_THE_PLAN_SAYS = (
     "quantities for the base rate by listing age on the same events (section 7.2, "
     '"Calibration in the large")',
 )
-"""What this file does as the plan states it, each point with its section: no choice of the
-code. Every result file carries the list."""
+"""The historical F1 scoring rules, each with its plan section. The open-data train command
+keeps its relevant descriptives; the test-period score command is disabled."""
 WHERE_THE_PLAN_IS_SILENT = (
     "the probe test of a secondary model is reported beside its numbers without changing the "
     "item set: the exclusion of E4 for a model that beats the base rate is applied from that "
@@ -788,8 +811,8 @@ WHERE_THE_PLAN_IS_SILENT = (
     "section 2.5 withholds for a set with so few, which beside those of the list would be the "
     "figures of that set",
 )
-"""The choices of this file where the plan gives no rule, and how it applies the standing rule
-of withholding where the plan names no case. Every result file carries the list."""
+"""The historical F1 choices and withholding rules. They are not a joint release policy for
+test-period outcomes; the test-period score command is disabled."""
 COMPUTED_BY_ANOTHER_SCRIPT = (
     "E2 and E5: they read no sealed file and have a scorer of their own (literal_scores.py)",
     "the accuracy of the rule reading on the 100-statement check, beside H2: from the "
@@ -802,8 +825,8 @@ COMPUTED_BY_NO_SCRIPT = (
     "the full-follow-up refit of every train-fitted component (it needs the second sealed file)",
     "E7 (the next in the cut order of PLAN section 12)",
 )
-"""Registered secondary analyses over a sealed file that no script of the study computes at
-this version of the code: what this file does not compute yet."""
+"""The F1 list of analyses then computed by no script. The disabled test-period score now
+computes none of its requested sections."""
 STILL_NOT_COMPUTED = (
     "a secondary analysis that is still not computed by the freeze of numbers is named in the "
     "paper as not run (PLAN section 6; section 12)"
@@ -837,12 +860,13 @@ def checked_group(
     line: str,
     expected: Iterable[str],
     first: pd.DataFrame | None,
+    sealed: Any = None,
     **where: Any,
 ) -> ev.Group:
     """``evaluate.read_group`` on the runs of ``runs_of``: complete, of the registered route,
     template and item set, with the track record of fit and dev."""
     shown = as_checked(plan, runs_of(plan, model, line, **where))
-    group = ev.read_group(shown, out_root, CHECKED_AS, model, line, expected, first)
+    group = ev.read_group(shown, out_root, CHECKED_AS, model, line, expected, first, sealed)
     return replace(group, problems=(*group.problems, *rule_problems(plan, model, line, **where)))
 
 
@@ -914,6 +938,7 @@ def decoded_group(
     line: str,
     expected: Iterable[str],
     first: pd.DataFrame,
+    sealed: Any = None,
     **where: Any,
 ) -> tuple[ev.Group, dict[tuple[str, int], dict]]:
     """A run with its own decoding: the group of ``checked_group`` and every stored row by
@@ -924,7 +949,7 @@ def decoded_group(
     registered one; every stored row of every sample is then held to it, to the evaluator's
     other row checks and to the registered horizons."""
     runs = runs_of(plan, model, line, **where)
-    group = checked_group(plan, out_root, model, line, expected, first, **where)
+    group = checked_group(plan, out_root, model, line, expected, first, sealed=sealed, **where)
     if not runs or not group.rows:
         return group, {}
     name, run = f"{model} {line}", runs[0]
@@ -1012,6 +1037,7 @@ def gather_more(
     sections: Sequence[str],
     models: Sequence[str],
     primaries: Sequence[str],
+    sealed: Any = None,
 ) -> More:
     """The completeness check on every run the ``sections`` score: the three conditions (and
     the probe) of the secondary ``models``, and the secondary lists, the 20 samples, the
@@ -1046,12 +1072,12 @@ def gather_more(
         registered(*E3_LINES.values(), *([PROBE_LINE] if probed else []))
         for model in models:
             more.models[model] = {
-                condition: keep("", checked_group(plan, out_root, model, line, ids, first))
+                condition: keep("", checked_group(plan, out_root, model, line, ids, first, sealed))
                 for condition, line in E3_LINES.items()
             }
             if model in probed:
                 more.models[model][ev.PROBE] = keep(
-                    "", checked_group(plan, out_root, model, PROBE_LINE, probe_ids, first)
+                    "", checked_group(plan, out_root, model, PROBE_LINE, probe_ids, first, sealed)
                 )
     if "secondary_lists" in sections:
         registered(*LIST_LINES.values())
@@ -1071,7 +1097,9 @@ def gather_more(
                 for condition, line in LIST_LINES.items():
                     group = keep(
                         f"{key} list, ",
-                        checked_group(plan, out_root, model, line, more.ids[key], None, list=key),
+                        checked_group(
+                            plan, out_root, model, line, more.ids[key], None, sealed, list=key
+                        ),
                     )
                     more.lists[model][key][condition] = group
                     predictive = group.template in rd.TEMPLATES and (
@@ -1088,7 +1116,7 @@ def gather_more(
         chosen = subset("samples")
         for model in primaries:
             group, more.samples[model] = decoded_group(
-                plan, out_root, model, SAMPLES_LINE, chosen, first.loc[chosen]
+                plan, out_root, model, SAMPLES_LINE, chosen, first.loc[chosen], sealed
             )
             status = [row.get("status") for row in more.samples[model].values()]
             more.records.setdefault(model, {})[SAMPLES_LINE] = {
@@ -1104,7 +1132,7 @@ def gather_more(
             more.cells[model] = {}
             for cell, decoding in CELLS.items():
                 group, _ = decoded_group(
-                    plan, out_root, model, CELLS_LINE, chosen, first.loc[chosen], **decoding
+                    plan, out_root, model, CELLS_LINE, chosen, first.loc[chosen], sealed, **decoding
                 )
                 more.cells[model][cell] = keep(f"{cell}, ", group)
     if "prompt_variance" in sections:
@@ -1127,6 +1155,7 @@ def gather_more(
                         PARAPHRASE_LINE,
                         chosen,
                         first.loc[chosen],
+                        sealed,
                         template=template,
                     ),
                 )
@@ -1142,6 +1171,7 @@ def left_out_findings(
     first: pd.DataFrame,
     sections: Sequence[str],
     left_out: Iterable[str],
+    sealed: Any = None,
 ) -> dict[str, list[str]]:
     """What the completeness check finds wrong with the runs of each secondary model that is
     declared left out: the runs this command would read of it (``gather_more``), its three
@@ -1160,7 +1190,9 @@ def left_out_findings(
         out[model] = []
         for line, expected in lines:
             try:
-                out[model] += checked_group(plan, out_root, model, line, expected, first).problems
+                out[model] += checked_group(
+                    plan, out_root, model, line, expected, first, sealed
+                ).problems
             except Exception as error:
                 stopped = type(error).__name__
                 out[model].append(
@@ -1169,11 +1201,11 @@ def left_out_findings(
     return out
 
 
-def gathered_more(*args: Any) -> More:
+def gathered_more(*args: Any, **kwargs: Any) -> More:
     """``gather_more``, for the command. A stop inside it is one more thing the check finds,
     named by the type of the error alone: its message may quote a stored row."""
     try:
-        return gather_more(*args)
+        return gather_more(*args, **kwargs)
     except Exception as error:
         stopped = type(error).__name__
     why = (
@@ -1189,7 +1221,8 @@ def gathered_more(*args: Any) -> More:
 
 
 def confirmatory_record(
-    path: Path | None, hashes: Mapping[str, str], want_sealed: str, want_baselines: str
+    path: Path | None, hashes: Mapping[str, str], want_sealed: str, want_baselines: str,
+    sealed: Any = None,
 ) -> tuple[dict[str, Any], str]:
     """The result file of ``evaluate.py confirmatory`` and its sha256. Refused unless it is
     there, holds the six tests with their Holm-adjusted p-values under the constants in force,
@@ -1198,6 +1231,8 @@ def confirmatory_record(
     of ``hashes``. The secondaries are computed after the six tests, never before."""
     if path is None or not path.name:
         ev.refuse("--confirmatory is required: the result file of the registered evaluator")
+    if ev.is_sealed(path, sealed):
+        ev.refuse("--confirmatory leads into a protected folder; it is not read")
     if not path.is_file():
         ev.refuse(
             "no secondary score before the six tests: the result file of the registered "
@@ -4323,48 +4358,8 @@ def descriptives(
 
 
 def leads_to_sealed(path: Any, sealed: Any) -> bool:
-    """Whether ``path`` is the sealed file, its folder, or anything in a folder named as the
-    registered sealed one: the path as given, or the one a symbolic link on its way leads to.
-    The path is walked part by part, and each step is compared as text before the file system
-    is asked whether it is a link: nothing is asked about the sealed file, about its folder
-    or about a folder named as the sealed one. ``sealed`` is compared as given. Another file
-    in the folder of ``sealed`` is sealed only when that folder is named as the registered
-    one. Links that lead in a circle count as sealed: nothing is read through them."""
-    target = os.path.abspath(sealed)
-    folder = os.path.dirname(target)
-    try:
-        text = os.fspath(path)
-    except TypeError:
-        return False
-    if not isinstance(text, str) or "\0" in text:
-        return False
-    pending = [part for part in os.path.join(os.getcwd(), text).split(os.sep) if part]
-    current, hops = os.sep, 0
-    while pending:
-        part = pending.pop(0)
-        if part == ".":
-            continue
-        if part == "..":
-            current = os.path.dirname(current)
-            continue
-        current = os.path.join(current, part)
-        if current == target or part == sealed_counts.SEALED_FOLDER:
-            return True
-        if current == folder:  # the folder itself, or the way to a file in it: not asked about
-            if not pending:
-                return True
-            continue
-        if os.path.islink(current):
-            hops += 1
-            if hops > LINK_HOPS:
-                return True
-            try:
-                link = os.readlink(current)
-            except OSError:
-                return True
-            current = os.sep if os.path.isabs(link) else os.path.dirname(current)
-            pending = [part for part in link.split(os.sep) if part] + pending
-    return False
+    """Use the evaluator's shared, conservative protected-path guard."""
+    return ev.is_sealed(path, sealed)
 
 
 def strings_of(value: Any) -> Iterable[str]:
@@ -4380,15 +4375,16 @@ def strings_of(value: Any) -> Iterable[str]:
 
 
 def kept_from_sealed_paths(args: argparse.Namespace, names: Sequence[str]) -> None:
-    """Refuse, before any file is opened and before the file system is asked anything about
-    a sealed path, when something this command would read leads to the sealed file or into a
+    """Refuse before opening a protected file when something this command would read leads to
+    the sealed file or into a
     sealed folder (``leads_to_sealed``): an input of the command line
     (``names``), the selection file of a primary, the plan of the runs, any path the plan
     names (every string it holds is looked at, wherever it stands: an item file, a track
     record, the field of a single run), and every file stored in the folder of a run of the
     plan, whether or not its model is scored. A stored file that is a symbolic link to the
     sealed file would otherwise be read, and hashed, as an open one. A plan that is not there,
-    or is no plan, is left to the completeness check."""
+    or is no plan, is left to the completeness check. Admission is by spelling alone: no
+    folder entry or link target is inspected to classify a path."""
     sealed = args.sealed
 
     def held(path: Any, what: str) -> None:
@@ -4437,30 +4433,21 @@ def kept_from_sealed_paths(args: argparse.Namespace, names: Sequence[str]) -> No
 
 def output_path(path: Path | None, sealed: Any) -> Path:
     """The file ``--out`` names (``evaluate.output_paths``: given, outside a sealed folder,
-    not there yet, in a folder that is). A name that leads into a sealed folder through a
-    link is refused first, in the same words, before the file system is asked about it."""
+    not there yet, in a folder that is). Admission is by spelling alone: no sealed or
+    restricted component. Whether the file is already there is decided by the exclusive
+    write itself, which never overwrites; no folder entry is inspected here."""
     if path is not None and path.name and leads_to_sealed(path, sealed):
         ev.refuse("--out lies in a sealed folder; results are written outside it")
-    return ev.output_paths(path)[0]
+    return ev.output_paths(path, sealed=sealed)[0]
 
 
 def write_result(path: Path, text: str) -> None:
-    """Write a result file, which must not exist yet, whole or not at all: under another name
-    in the same folder first, then given its own by a link, which fails when the name is
-    taken (nothing is overwritten). A write that stops half way (a disk that is full) leaves
-    nothing behind."""
-    partial = path.with_name(f".partial.{os.getpid()}.{path.name}")
-    stopped = ""
-    try:
-        with partial.open("x", encoding="utf-8") as handle:
-            handle.write(text)
-        os.link(partial, path)
-    except OSError as error:
-        stopped = type(error).__name__
-    with contextlib.suppress(OSError):
-        partial.unlink()
-    if stopped:
-        ev.refuse(f"the output cannot be written ({stopped}): {path.as_posix()}")
+    """Write a result file, which must not exist yet, whole or not at all, through the
+    evaluator's exclusive no-follow writer (``evaluate._exclusive_write``): the bytes go
+    to a temporary beside the final name and take it by a link, which fails when the
+    name is taken, so nothing existing is opened, unlinked or replaced and a stopped
+    write leaves nothing behind."""
+    ev._exclusive_write(path, text)
 
 
 def print_summary(out: Path, lines: Sequence[str]) -> int:
@@ -4531,55 +4518,16 @@ def score(
     slip_draws: int | None = None,
     seed: int = ev.SEED,
 ) -> dict[str, Any]:
-    """Every section asked for, from the sealed bytes: the eligible list through
-    ``evaluate.unseal``, the wider population through the same checked reader. The item set of
-    each primary is worked out from its probe first (``fixed_sets``), whatever is asked for:
-    a result file of the evaluator that records another one stands behind no section."""
-    rows, outcome_variants = ev.unseal(sealed, events, listed)
-    everything, variants = unseal_population(sealed, events, prepared.population)
-    first = prepared.population.set_index("statement_group_id")
-    scoreable = rows[rows["scoreable"]]
-    out: dict[str, Any] = {
-        "items": {
-            "eligible_statements": len(rows),
-            "eligible_episodes": int(rows["episode_id"].nunique()),
-            "scoreable_statements": len(scoreable),
-            "scoreable_episodes": int(scoreable["episode_id"].nunique()),
-            "test_split_statements_at_risk": len(everything),
-        }
-    }
-    sets = fixed_sets(confirmatory, rows, prepared.study)
-    definitions = {**outcome_variants, **variants}
-    known = known_sets(prepared.study, rows, sets, prepared.reading_days, more.subsets)
-    for name in sections:
-        if name == "secondary_models":
-            out[name] = secondary_models(
-                prepared, rows, outcome_variants, models, draws, seed, definitions, known
-            )
-        elif name == "secondary_lists":
-            out[name] = secondary_lists(prepared, everything, more, sets, draws, seed)
-        elif name == "sampled_quantiles":
-            out[name] = sampled_quantiles(prepared, rows, more, sets, draws, seed)
-        elif name == "prompt_variance":
-            out[name] = prompt_variance(prepared, rows, more, sets, draws, seed)
-        elif name == "name_date_2x2":
-            out[name] = name_date_2x2(prepared, rows, more, sets, draws, seed)
-        elif name == "descriptives":
-            out[name] = descriptives(
-                everything, first, draws, slip_draws, seed, beside=sets_beside_the_tables(known)
-            )
-        elif name == "selective_prediction":
-            out[name] = selective_prediction(prepared, rows, sets, models, draws, seed)
-        elif name == "recovery_rule":
-            out[name] = recovery_rule(
-                prepared, rows, variants, sets, models, draws, seed, outcome_variants
-            )
-        elif name == "by_statement_type":
-            out[name] = by_statement_type(prepared, rows, sets, draws, seed, known)
-        elif name == "beside_the_overconfidence_criterion":
-            turns = SLIP_DRAWS if slip_draws is None else slip_draws
-            out[name] = beside_the_criterion(prepared, rows, sets, turns, seed)
-    return out
+    """Withhold items and every requested test section without inspecting outcome or study inputs.
+
+    This conservative candidate avoids all cross-section reconstruction until a
+    coordinated release policy has been established. Only the requested section
+    names are inspected; registered figures are not computed and this must not
+    be reported as a completed score.
+    """
+    names = chosen_sections(sections)
+    withheld = {"withheld": True, "reason": "joint disclosure protection not established"}
+    return {"items": dict(withheld), **{name: dict(withheld) for name in names}}
 
 
 def summary_lines(report: Mapping[str, Any]) -> list[str]:
@@ -4600,198 +4548,11 @@ def summary_lines(report: Mapping[str, Any]) -> list[str]:
 
 
 def run_score(args: argparse.Namespace) -> int:
-    want_sealed = sealed_counts.expected_hash(args.expect_sha256, "--expect-sha256")
-    want_eligible = sealed_counts.expected_hash(
-        args.expect_eligible_sha256, "--expect-eligible-sha256"
+    """Refuse the test-period command before reading inputs or writing a result."""
+    ev.refuse(
+        "outcome-based secondary sections are withheld pending a jointly validated disclosure "
+        "policy; no sealed outcome file is opened and no secondary score is computed"
     )
-    want_baselines = sealed_counts.expected_hash(
-        args.expect_baselines_sha256, "--expect-baselines-sha256"
-    )
-    want_selections = ev.selection_hashes(args.expect_selection_sha256)
-    wrong = ev.constants_problem()
-    if wrong:
-        ev.refuse(wrong)
-    out = output_path(args.out, args.sealed)
-    sections = chosen_sections(args.section)
-    left_out = left_out_models(args.left_out)
-    skipped = ev.skipped_models(args.not_evaluable)
-    if set(skipped) >= set(ev.PRIMARIES):
-        ev.refuse(
-            "every primary is declared not evaluable: no test of the family can have been "
-            "computed, and the sealed file is not opened for the secondaries alone"
-        )
-    unhashed = [
-        model for model in ev.PRIMARIES if model not in skipped and model not in want_selections
-    ]
-    if unhashed:
-        ev.refuse(
-            f"--expect-selection-sha256 is required for {unhashed}: the H3 selections are held "
-            "to the hashes of the freeze"
-        )
-    if args.confirmatory is None:
-        ev.refuse("--confirmatory is required: the result file of the registered evaluator")
-    names = ("statements", "eligible", "events", "counts", "out_root", "selections", "confirmatory")
-    kept_from_sealed_paths(args, names)
-    ev.open_paths(args, names)
-
-    # open inputs, the evaluator's result, the completeness checks and every prediction
-    data, hashes = ev.open_tables(args, want_eligible)
-    confirmatory, confirmatory_sha = confirmatory_record(
-        args.confirmatory, hashes, want_sealed, want_baselines
-    )
-    said, recorded_selections = declared(confirmatory, skipped, want_selections)
-    stopped = ""
-    try:
-        table = ev.table_of(data["the statement table"], True)
-        eligible = ev.table_of(data["the eligible list"], False)
-        events = ev.table_of(data["the events table"], args.events.suffix == ".gz")
-    except Exception as error:
-        stopped = type(error).__name__
-    if stopped:
-        ev.refuse(f"the open inputs are not as the builders write them ({stopped})")
-    listed = sealed_counts.listed_statements(table, eligible)
-    counts = json.loads(data["the counts file"])
-    found = ev.gathered(
-        args.out_root,
-        eligible,
-        listed.set_index("statement_group_id"),
-        counts,
-        args.selections,
-        hashes["the statement table"],
-        skipped,
-        recorded_selections,
-        args.sealed,
-    )
-    if found.problems:
-        ev.refuse(
-            "no secondary score before every confirmatory run is complete (PLAN, standing "
-            "rules): " + "; ".join(found.problems)
-        )
-    held_to_the_runs(confirmatory, said, found, listed.set_index("statement_group_id"))
-    plan, _, problems = ev.read_plan(args.out_root, args.sealed)
-    if plan is None or problems:
-        ev.refuse("; ".join(problems))
-    left_out_check = left_out_findings(
-        plan, args.out_root, eligible, table.set_index("statement_group_id"), sections, left_out
-    )
-    complete = [model for model, findings in left_out_check.items() if not findings]
-    if complete:
-        ev.refuse(
-            "--left-out names a secondary model whose runs pass the completeness check "
-            f"({', '.join(complete)}): a model is left out only when its runs are not complete "
-            "(PLAN sections 9 and 12)"
-        )
-    models = [model for model in SECONDARY_MODELS if model not in left_out]
-    primaries = [model for model in ev.PRIMARIES if model not in skipped]
-    more = gathered_more(
-        plan,
-        args.out_root,
-        table,
-        eligible,
-        table.set_index("statement_group_id"),
-        counts,
-        sections,
-        models,
-        primaries,
-    )
-    if more.problems:
-        ev.refuse(
-            "no secondary score before every run it scores is complete: " + "; ".join(more.problems)
-        )
-    try:
-        prepared = prepare(table, listed, found, more, skipped)
-    except Exception as error:
-        stopped = type(error).__name__  # its message may name an item
-    if stopped:
-        ev.refuse(f"the readings could not be turned into predictions ({stopped})")
-    if prepared.problems:
-        ev.refuse("the readings cannot be scored: " + "; ".join(prepared.problems))
-    if not prepared.baselines_sha256.startswith(want_baselines):
-        ev.refuse(
-            "the model-free predictions are not those hashed at the freeze: their sha256 "
-            f"starts with {prepared.baselines_sha256[:16]}, expected {want_baselines[:16]}"
-        )
-
-    # the sealed file: hashed as bytes, parsed only when the hash is the expected one; a file
-    # refused for its hash has no character of that hash printed (PLAN, standing rules)
-    sealed = sealed_counts.file_bytes(args.sealed, "the sealed file")
-    sealed_sha = ev.hash_required(
-        sealed, want_sealed, "the sealed file", args.sealed, args.sealed, of_sealed=True
-    )
-    try:
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")  # a warning may quote a cell
-            results = score(
-                prepared,
-                more,
-                sealed,
-                events,
-                listed,
-                confirmatory,
-                sections,
-                models,
-                slip_draws=SLIP_DRAWS,
-            )
-        report = {
-            "about": ABOUT,
-            "command": "PYTHONPATH=. python -m analysis.coling.secondary_scores score "
-            "--expect-sha256 <sealed file> --expect-eligible-sha256 <eligible list> "
-            "--expect-baselines-sha256 <model-free predictions> --expect-selection-sha256 "
-            "<model>=<selection file> (one for each primary) --confirmatory <result file of "
-            "the evaluator> --out <file>",
-            "registered": ev.registered_record(),
-            "inputs": {
-                "sealed_outcomes_sha256": sealed_sha,
-                "eligible_sha256": hashes["the eligible list"],
-                "statements_sha256": hashes["the statement table"],
-                "events_sha256": hashes["the events table"],
-                "dataset_counts_sha256": hashes["the counts file"],
-                "plan_sha256": found.plan_sha256,
-                "plan_sha256_of_the_confirmatory_result": part_of(confirmatory, "inputs").get(
-                    "plan_sha256"
-                ),
-                "baseline_predictions_sha256": prepared.baselines_sha256,
-                "selection_sha256": recorded_selections,
-                "confirmatory_result_sha256": confirmatory_sha,
-                "code_sha256": code_record(),
-                "code_sha256_of_the_confirmatory_result": part_of(confirmatory, "inputs").get(
-                    "code_sha256"
-                ),
-            },
-            "sections": list(sections),
-            "secondary_models_scored": models,
-            "secondary_models_left_out": left_out,
-            "secondary_models_left_out_check": left_out_check,
-            "primaries_not_evaluable_by_declaration": skipped,
-            "h3_comparator": prepared.study.comparator,
-            "bootstrap": {
-                "draws": ev.DRAWS,
-                "draws_of_a_turnbull_estimate": SLIP_DRAWS,
-                "seed": ev.SEED,
-                "clusters": "shortage episodes",
-            },
-            "refit": prepared.study.refit,
-            **results,
-            "as_the_plan_says": list(AS_THE_PLAN_SAYS),
-            "where_the_plan_is_silent": list(WHERE_THE_PLAN_IS_SILENT),
-            "not_computed_here": {
-                "computed_by_another_script": list(COMPUTED_BY_ANOTHER_SCRIPT),
-                "computed_by_no_script": list(COMPUTED_BY_NO_SCRIPT),
-                "if_no_script_computes_it": STILL_NOT_COMPUTED,
-            },
-        }
-        # every text is made before a file exists: a stop here must leave nothing behind
-        text, printed = ev.report_text(report), "\n".join(summary_lines(report))
-        text.encode("utf-8")  # what cannot be written stops here too
-    except Exception as error:
-        stopped = type(error).__name__  # the error itself, and its message, go no further
-    if stopped:
-        ev.refuse(
-            f"the scoring stopped on the sealed rows ({stopped}); the message is withheld "
-            "because it may quote a sealed value"
-        )
-    write_result(out, text)
-    return print_summary(out, [printed])
 
 
 def of_the_descriptives(lines: Iterable[str]) -> list[str]:
@@ -4882,7 +4643,9 @@ def arguments(argv: Sequence[str] | None) -> argparse.Namespace:
     common(train, "statements", "counts")
     train.set_defaults(run=run_train)
 
-    final = commands.add_parser("score", allow_abbrev=False, help="the secondary analyses")
+    final = commands.add_parser(
+        "score", allow_abbrev=False, help="disabled: test-period secondary analyses are not run"
+    )
     final.add_argument("--expect-sha256", help="sha256 of the sealed file")
     final.add_argument("--expect-eligible-sha256", help="sha256 of the eligible list")
     final.add_argument("--expect-baselines-sha256", help="sha256 the baselines command printed")
