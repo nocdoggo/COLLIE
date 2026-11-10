@@ -4250,3 +4250,42 @@ amendment remains the precondition for any sealed read under these bytes. Nothin
 - Secondary scorer source SHA256: `30d4e2090f79983aeaf522da26fe5a79ebfece90e188c01386458e8e2bcb1935`
 - Evaluator fixture tests SHA256: `98a0511a7bd15fb3d8e634d6caccec51aff69b4ab90547b0f4c06f06a05774ec`
 - Secondary fixture tests SHA256: `cf9e5a97478e9a96e5b65e402cc9385aebf6dbaedb28924c97d78ecd9b374aba`
+
+### A21. The track-condition dispatch repair (10 November 2026)
+
+Dispatch ten finished the language condition and stopped on the first track-condition run.
+`e3-a-gpt-oss-20b.s7.dk` closed complete at 297 of 297 target pairs, with 251 physical calls
+in this invocation, $0.168863 spent in it and $0.187702 logged over the run. The next run,
+`e3-b-gpt-oss-20b.s0.dk`, then failed before its first send with `raised TypeError: expected
+str, bytes or os.PathLike object, not NoneType`; the journal row carries no guard, no readings
+and no return code, so the failure sat in the wrapper's setup and never reached the reader's
+transport.
+
+Diagnosis. The A11 hook `pinned_track` looked the requested path up in `track_paths` (built
+with the untracked specs filtered out), then compared the bytes against
+`next(spec.track_sha for spec in specs if os.path.abspath(spec.track_path) == key)`. That
+generator walks all seventeen specs, and the nine untracked runs carry `track_path = None`, so
+`os.path.abspath(None)` raised before the comparison could filter. Every `e3-a` run has no
+`--track-record` and never called the hook, which is why the defect survived the whole language
+condition and all 2,251 tests: every existing fixture spec carried `track_path=None`. An
+instrumented capture installed the real hooks, stubbed the innermost HTTP transport (no socket,
+no key, no inference) and reproduced the exact traceback; after the repair the same capture
+reaches the stub once, so the whole track-record setup path is now proven end to end.
+
+Repair. The lookup selects the owning spec among the specs that carry a track, refuses a path
+that no spec pins, and compares the bytes against that spec's pinned digest. A regression test
+builds one tracked and one untracked spec together and asserts both the acceptance and the
+refusal; the two batch suites pass 132 tests.
+
+Selection. The capture re-declared `e3-b-gpt-oss-20b.s0.dk`, adding one ledger row and a first
+(failed) invocation record under the run directory, so the ledger moved; the selection record
+was regenerated changing only `ledger_sha256`, its prior
+contents archived as `.attempt10.json`, and the new digest pinned in the module. All seventeen
+targets, caps and projections are unchanged. Next status GET is attempt 17 of the 36 registered
+in A17.
+
+- Batch transport source SHA256: `2915cfbecbfec03a47b46cfc923c481c89912361f76e00953f1478bc2fa1c03d`
+- Batch transport fixture tests SHA256: `ad4c4121b5bcc8988efb373494e9f11769f186a4df0b691b63a4f4f198e00b76`
+- Batch source SHA256: `b0b620f650d5f4aad72022cd94363a463ffb5b40385baa1cbf43c307f0aac0c7`
+- Batch fixture tests SHA256: `7cb291cd2e6cb3788a44807c087bd386e9a26ec66f2c7440c013c3edc4919b42`
+- Batch selection SHA256: `f31e9d5f494f75d99c17f007e06787cc4d55eb3c889df3d72f08b353eb46b191`

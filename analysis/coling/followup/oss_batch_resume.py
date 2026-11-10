@@ -60,7 +60,7 @@ _ROUTE = {
     "price_date": "2026-10-30",
 }
 _PRICE = (0.029, 0.14, "2026-10-30")
-_BATCH_SELECTION_SHA = "f439cccb8f1be11e807105965a8a55afafa131c6ecb2f9eb5a7db2cef069ca7a"
+_BATCH_SELECTION_SHA = "f31e9d5f494f75d99c17f007e06787cc4d55eb3c889df3d72f08b353eb46b191"
 _TEMPLATES = ("probe-v1", "predictive-v1", "predictive-track-v1")
 _MAX_RUNS = 64
 _BATCH_FILES = (
@@ -637,9 +637,15 @@ def _install_batch_hooks(read_module, endpoints_module, openai_module, httpx_mod
         key = os.path.abspath(os.fspath(path))
         if key not in track_paths:
             raise BatchStop("F1 requested an unregistered track path")
+        # A21: only specs that carry a track may be compared. The A11 generator below ran
+        # os.path.abspath over every spec, and the untracked runs carry track_path None, so the
+        # first track-condition run (e3-b.s0, 10 November 2026) stopped before its first send.
+        owner = next((spec for spec in specs if spec.track_path is not None
+                      and os.path.abspath(spec.track_path) == key), None)
+        if owner is None:
+            raise BatchStop("F1 requested an unregistered track path")
         raw = Path(key).read_bytes()
-        if sha256(raw).hexdigest() != next(spec.track_sha for spec in specs
-                                           if os.path.abspath(spec.track_path) == key):
+        if sha256(raw).hexdigest() != owner.track_sha:
             raise BatchStop("a track file changed after verification")
         return original_track(Path(key))
 

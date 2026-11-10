@@ -477,6 +477,29 @@ def spec_pair(never_invoked=False):
                          never_invoked=never_invoked, prior_calls=0)
 
 
+def test_pinned_track_skips_specs_that_carry_no_track(tmp_path, monkeypatch):
+    """10 November 2026: the first track-condition run stopped before its first send with
+    TypeError, because the pinned-track hash lookup called os.path.abspath over every spec's
+    track_path and the untracked runs carry None. The lookup must consider only specs with a
+    track, and must still refuse a path that no spec pins."""
+    import dataclasses
+    from hashlib import sha256 as sha256_file
+    track = tmp_path / 'track.json'
+    track.write_bytes(b'{"schema": "synth"}\n')
+    digest = sha256_file(track.read_bytes()).hexdigest()
+    tracked = dataclasses.replace(spec_pair(), track_path=str(track), track_sha=digest)
+    untracked = dataclasses.replace(spec_pair(), new_run='synth-b.dk')
+    read, client, physical, state, fd = installed(tmp_path, monkeypatch,
+                                                  specs=[untracked, tracked])
+    try:
+        assert read.load_track_record(Path(track)).synthetic is True
+        with pytest.raises(batch.BatchStop, match='unregistered track path'):
+            read.load_track_record(tmp_path / 'other.json')
+    finally:
+        client.close()
+        os.close(fd)
+
+
 def test_release_redeclares_blocked_runs_at_their_recorded_spend():
     read = FakeReadForRelease({'synth-a': {'model': 'gpt-oss-20b', 'open': True, 'spent_usd': 0.12,
                                             'cap_usd': 0.50, 'held_usd': 0.50}})
