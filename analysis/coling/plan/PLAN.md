@@ -4289,3 +4289,53 @@ in A17.
 - Batch source SHA256: `b0b620f650d5f4aad72022cd94363a463ffb5b40385baa1cbf43c307f0aac0c7`
 - Batch fixture tests SHA256: `7cb291cd2e6cb3788a44807c087bd386e9a26ec66f2c7440c013c3edc4919b42`
 - Batch selection SHA256: `f31e9d5f494f75d99c17f007e06787cc4d55eb3c889df3d72f08b353eb46b191`
+
+### A22. The first sealed reads under the applied scorer bytes (10 November 2026)
+
+A20 applied the repaired scorer and withheld authority in the same breath: it did not authorise
+reading any sealed outcome, and made a separate dated amendment the precondition for any sealed
+read under its bytes. This is that amendment. It authorises exactly one purpose, the study's
+third model family.
+
+The condition. `gpt-oss-20b` is a registered secondary model (PLAN section 5, E3,
+"Secondaries"), and it is the model named in the paper as the forecast replication. Dispatch 11
+completes it: the probe, the eight `e3-a` shards of the language condition (all closed,
+including the shard the item-58 refusal formerly blocked at 297 of 297), and the eight `e3-b`
+shards of the track condition. Under the sealing rule no sealed file is read before every
+confirmatory run has finished; F2 establishes that finish by the F4 rule, per run and before
+any read here.
+
+What is authorised. The registered evaluator (`evaluate.py`) and the registered secondary
+scorer (`secondary_scores.py`) may read the sealed outcome files for the figures of this one
+model: the `secondary_models` block of E3 for `gpt-oss-20b` in its three conditions and its
+contrast against the H3 comparator, with the scores that block lists, and the E4 probe test for
+the probed models as it applies to this model. Nothing else is authorised: the evaluator is not
+rerun and the two primaries' stored figures stand as written; no test-period audit sheet is read
+again; no other script reads a sealed file; no secondary figure outside this model's block is
+computed.
+
+Pooling. The continuation runs are pooled with their originals under A11's first-complete-read
+rule: for a given model, condition, item and sample the first complete reading wins, and the
+cache's route tag keeps an answer served on one route from being counted on another. Four
+historical pairs remain unasked under the A4 rule and appear in no table. The condition is
+reported with the served-endpoint disclosure: the originals were served by
+`deepinfra/bf16` and the continuations by `dekallm/bf16`, same model identifier, template,
+prompts and decoding, and an endpoint alias is not proof of an unchanged checkpoint.
+
+What remains withheld. The secondary withholding default stands without exception for this
+model: a figure resting on 1 to 4 statements is withheld, as is one whose set differs by 1 to 4
+statements from a set written beside it, and a count is withheld where it would give such a
+number by itself or by subtraction. The six confirmatory contrasts are never withheld and are
+not touched here; this model is not among them. No value of a single statement is printed.
+
+Sequence and record. The reads happen after F2, the scorer writes to its registered output
+paths, and its run is recorded with counts, statuses and hashes. Nothing is written under
+`reports/`, and no sealed value appears in any status record. The bytes this amendment
+authorises are the ones A20 pinned, repeated here so the authorisation is self-contained.
+- Evaluator source SHA256: `682272d697d2cfda7fe8e5f6800070e8a80b824289ac8864a8afb9ee72f8c69d`
+- Secondary scorer source SHA256: `30d4e2090f79983aeaf522da26fe5a79ebfece90e188c01386458e8e2bcb1935`
+- Batch source SHA256: `b0b620f650d5f4aad72022cd94363a463ffb5b40385baa1cbf43c307f0aac0c7`
+- Batch fixture tests SHA256: `7cb291cd2e6cb3788a44807c087bd386e9a26ec66f2c7440c013c3edc4919b42`
+- Batch transport source SHA256: `2915cfbecbfec03a47b46cfc923c481c89912361f76e00953f1478bc2fa1c03d`
+- Batch transport fixture tests SHA256: `ad4c4121b5bcc8988efb373494e9f11769f186a4df0b691b63a4f4f198e00b76`
+- Batch selection SHA256: `f31e9d5f494f75d99c17f007e06787cc4d55eb3c889df3d72f08b353eb46b191`
