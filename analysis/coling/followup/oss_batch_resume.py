@@ -60,7 +60,7 @@ _ROUTE = {
     "price_date": "2026-10-30",
 }
 _PRICE = (0.029, 0.14, "2026-10-30")
-_BATCH_SELECTION_SHA = "f31e9d5f494f75d99c17f007e06787cc4d55eb3c889df3d72f08b353eb46b191"
+_BATCH_SELECTION_SHA = "924c1c06d003f55edcf150b6cd5086c8b0238a79a0ad0806c0e8cdfc8199c4fa"
 _TEMPLATES = ("probe-v1", "predictive-v1", "predictive-track-v1")
 _MAX_RUNS = 64
 _BATCH_FILES = (
@@ -550,6 +550,32 @@ def _check_batch_budget(read_module, specs: list[RunSpec]) -> None:
             raise BatchStop("a continuation run cap is below its recorded spend")
 
 
+def _track_from_verified_bytes(raw: bytes, name: str):
+    """Parse the exact bytes whose digest was pinned (A24), never a second path read.
+
+    This mirrors the frozen reader's ``load_track_record`` validation without reopening the
+    file: a replacement between the hash read and a parse read must not change the record
+    that reaches a prompt. The frozen reader itself is not edited.
+    """
+    from analysis.coling import read as frozen_read
+
+    try:
+        data = json.loads(raw.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ValueError(f"{name} is not a UTF-8 JSON file: {exc}") from None
+    found = frozen_read.track_file_errors(data)
+    if found:
+        raise ValueError(f"{name} is not a valid track record: " + "; ".join(found))
+    track = frozen_read.TrackRecord(
+        through=data["through"],
+        slip_table=tuple(frozen_read.SlipRow(**row) for row in data["slip_table"]),
+        examples=tuple(frozen_read.ResolvedExample(**ex) for ex in data["examples"]),
+        since=data["since"], split=data["split"], min_cell=data["min_cell"],
+        sha256=sha256(raw).hexdigest())
+    track.check()
+    return track
+
+
 def _install_batch_hooks(read_module, endpoints_module, openai_module, httpx_module, cache_module,
                          batch_transport_module, specs: list[RunSpec], *, send_journal_fd: int,
                          stop_after_utc: datetime) -> tuple[object, object, dict]:
@@ -563,7 +589,6 @@ def _install_batch_hooks(read_module, endpoints_module, openai_module, httpx_mod
     original_guard = read_module.GuardedTransport
     original_openai = openai_module.OpenAI
     original_sha = read_module._sha256_file
-    original_track = read_module.load_track_record
     # The frozen harness passes the plan's RELATIVE roots while the module constants are
     # absolute (the one-shot wrapper hit the same trap); every pinned-key comparison is
     # therefore made on the normalized absolute spelling, which asks nothing of the
@@ -647,7 +672,9 @@ def _install_batch_hooks(read_module, endpoints_module, openai_module, httpx_mod
         raw = Path(key).read_bytes()
         if sha256(raw).hexdigest() != owner.track_sha:
             raise BatchStop("a track file changed after verification")
-        return original_track(Path(key))
+        # A24: parse these verified bytes; a second read of the path could return a
+        # replacement that was never hash-checked.
+        return _track_from_verified_bytes(raw, Path(key).name)
 
     def pinned_sha(path):
         key = os.path.abspath(os.fspath(path))

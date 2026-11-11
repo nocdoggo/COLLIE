@@ -4339,3 +4339,38 @@ authorises are the ones A20 pinned, repeated here so the authorisation is self-c
 - Batch transport source SHA256: `2915cfbecbfec03a47b46cfc923c481c89912361f76e00953f1478bc2fa1c03d`
 - Batch transport fixture tests SHA256: `ad4c4121b5bcc8988efb373494e9f11769f186a4df0b691b63a4f4f198e00b76`
 - Batch selection SHA256: `f31e9d5f494f75d99c17f007e06787cc4d55eb3c889df3d72f08b353eb46b191`
+
+### A24. The stopped-batch recovery and track-pin repair (11 November 2026)
+
+Dispatch 11 stopped after thirteen of the seventeen continuation runs had closed complete.
+The last journal row is the `run_intent` for `e3-b-gpt-oss-20b.s4.dk`; there is no final
+`run_result`, no traceback and no `execution_summary.json`. The driver and its watcher are
+gone. The cause of the stop is not established by the available records; this amendment does
+not invent one. It repairs a confirmed track-pin defect found by the 11 November audit and
+resumes the same registered batch under a fresh selection and a fresh key-status GET.
+
+Confirmed defect. `pinned_track` read the track file once to compare its SHA256 with the
+selection pin, then called the frozen reader's `load_track_record`, which read the same path
+again. A replacement between those two reads could therefore be parsed without ever being
+hash-checked. The repair parses the exact bytes whose digest was verified, using the frozen
+reader's own schema and record validation, and never reopens the path. The frozen reader and
+launcher sources are not edited. A regression test replaces the file after the first read and
+asserts that the returned record is the verified one and that the path is read exactly once;
+the existing mixed tracked/untracked acceptance and refusal test now uses a schema-valid
+invented record and also checks equality with the frozen parser.
+
+Selection. Dispatch 11 appended continuation declarations to the study ledger, so the A21
+selection's ledger pin is stale. The selection was regenerated changing only `ledger_sha256`
+to `2c5e3317ab6ab4370389b6bffefb0cfcecafdfe8128446b5ee1cfb38934c5942`; its prior contents
+are archived as `OSS_BATCH_SELECTION_PRIVATE.attempt11.json`. All seventeen targets, caps,
+projections and original-file pins are unchanged, and a read-only preflight rebuilt all
+seventeen specs from the current tree without a send, a key read or a sealed-outcome read.
+Next status GET is attempt 18 of the 36 registered in A17. The batch resumes under the same
+paced transport, route pin, orphan rule and stop-and-report contract; cached answers are not
+re-asked. No sealed outcome is read by this amendment.
+
+- Batch transport source SHA256: `2915cfbecbfec03a47b46cfc923c481c89912361f76e00953f1478bc2fa1c03d`
+- Batch transport fixture tests SHA256: `ad4c4121b5bcc8988efb373494e9f11769f186a4df0b691b63a4f4f198e00b76`
+- Batch source SHA256: `dd674288fad0b96f66c08980cfbf7e6a7cca3d5c1a296dd3472a951e1698b630`
+- Batch fixture tests SHA256: `7a2e373bbe98bce6007ed05eaa76414965130a75e716678368ebfc79cfa69323`
+- Batch selection SHA256: `924c1c06d003f55edcf150b6cd5086c8b0238a79a0ad0806c0e8cdfc8199c4fa`

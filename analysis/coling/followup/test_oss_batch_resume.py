@@ -477,24 +477,70 @@ def spec_pair(never_invoked=False):
                          never_invoked=never_invoked, prior_calls=0)
 
 
+def synthetic_track_raw(through='2022-12-31'):
+    """An invented, schema-valid track record; no real corpus content is used."""
+    return (json.dumps({
+        'schema': 'coling-track-record-v1', 'split': 'fit+dev', 'since': '2019-10-01',
+        'through': through, 'seed': 20261001, 'min_cell': 1, 'source': {'synthetic': '1'},
+        'slip_table': [{'form': 'Synthetic Form', 'revision': 'first', 'statements': 1,
+                        'basis': 'cell', 'share_by_stated_end': 0.25,
+                        'share_by_stated_end_90': 0.5, 'median_days_to_recovery': 30}],
+        'examples': []}, sort_keys=True) + '\n').encode()
+
+
 def test_pinned_track_skips_specs_that_carry_no_track(tmp_path, monkeypatch):
     """10 November 2026: the first track-condition run stopped before its first send with
     TypeError, because the pinned-track hash lookup called os.path.abspath over every spec's
     track_path and the untracked runs carry None. The lookup must consider only specs with a
     track, and must still refuse a path that no spec pins."""
     import dataclasses
-    from hashlib import sha256 as sha256_file
+    from analysis.coling import read as frozen_read
     track = tmp_path / 'track.json'
-    track.write_bytes(b'{"schema": "synth"}\n')
-    digest = sha256_file(track.read_bytes()).hexdigest()
+    raw = synthetic_track_raw()
+    track.write_bytes(raw)
+    digest = sha256(raw).hexdigest()
     tracked = dataclasses.replace(spec_pair(), track_path=str(track), track_sha=digest)
     untracked = dataclasses.replace(spec_pair(), new_run='synth-b.dk')
     read, client, physical, state, fd = installed(tmp_path, monkeypatch,
                                                   specs=[untracked, tracked])
     try:
-        assert read.load_track_record(Path(track)).synthetic is True
+        record = read.load_track_record(Path(track))
+        assert record.sha256 == digest
+        assert record == frozen_read.load_track_record(track)
         with pytest.raises(batch.BatchStop, match='unregistered track path'):
             read.load_track_record(tmp_path / 'other.json')
+    finally:
+        client.close()
+        os.close(fd)
+
+
+def test_pinned_track_parses_the_verified_bytes_not_a_later_replacement(tmp_path, monkeypatch):
+    """A24: the hash read and the parse must use the same bytes. A replacement written after
+    the first read must not reach the prompt, and the path must not be read a second time."""
+    import dataclasses
+    track = tmp_path / 'track.json'
+    verified = synthetic_track_raw('2022-12-31')
+    replacement = synthetic_track_raw('2022-11-30')
+    track.write_bytes(verified)
+    digest = sha256(verified).hexdigest()
+    tracked = dataclasses.replace(spec_pair(), track_path=str(track), track_sha=digest)
+    read, client, physical, state, fd = installed(tmp_path, monkeypatch, specs=[tracked])
+    reads = []
+    real_read_bytes = Path.read_bytes
+
+    def replaced_read_bytes(path):
+        raw = real_read_bytes(path)
+        reads.append(raw)
+        if len(reads) == 1:
+            track.write_bytes(replacement)
+        return raw
+
+    try:
+        monkeypatch.setattr(Path, 'read_bytes', replaced_read_bytes)
+        record = read.load_track_record(track)
+        assert record.through == '2022-12-31'
+        assert record.sha256 == digest
+        assert reads == [verified]
     finally:
         client.close()
         os.close(fd)
