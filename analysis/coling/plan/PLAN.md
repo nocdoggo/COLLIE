@@ -4467,3 +4467,27 @@ The four remaining runs are `e3-b-gpt-oss-20b.s4.dk` (resume from its recorded r
 - Batch source SHA256: `26080cf9367c6fae88be1a803375ea8c18350d12698cf0c7a2f39a41f14a40f5`
 - Batch fixture tests SHA256: `7a2e373bbe98bce6007ed05eaa76414965130a75e716678368ebfc79cfa69323`
 - Batch selection SHA256: `54425b827a7cb43cb8d5e1f5636124057fe577fb6f5fcef64aa530c782f4c966`
+
+### A28. Re-dispatch the continuation batch after a transient transport hang (11 November 2026)
+
+The A27 dispatch (GET-19) resumed the batch on the renewed credential, re-verified the thirteen
+complete runs from cache (zero new physical calls) and sent three new readings for
+`e3-b-gpt-oss-20b.s4.dk` (HTTP 200), then stalled on an idle upstream connection whose response
+body read did not complete and whose read timeout did not clear it. The driver was stopped; no
+sealed outcome was read and no run closed on that dispatch. The A27 dispatch appended its
+continuation declarations to the study ledger, so the A27 selection's ledger pin is stale.
+
+Selection. The selection was regenerated changing only `ledger_sha256` to
+`1e0ae37d757eec2c69a844faaa302d60a40f1e0c82529acc3683ffa2dc4d31b9`; its prior contents are archived as
+`OSS_BATCH_SELECTION_PRIVATE.attempt13.json`. `_BATCH_SELECTION_SHA` is re-pinned to the new
+selection digest. All seventeen targets, caps, projections and original-file pins are unchanged.
+Next status GET is attempt 20 of the 36 registered in A17. The batch re-dispatches under the same
+paced transport, route pin, orphan rule and stop-and-report contract on fresh connections; cached
+answers are not re-asked. The authorized gpt-oss E3/E4 computation remains gated on F4 under
+A22/A25.
+
+- Batch transport source SHA256: `2915cfbecbfec03a47b46cfc923c481c89912361f76e00953f1478bc2fa1c03d`
+- Batch transport fixture tests SHA256: `ad4c4121b5bcc8988efb373494e9f11769f186a4df0b691b63a4f4f198e00b76`
+- Batch source SHA256: `884f8cf9853d4df53c2728e65ef8fa936ecbada1f3eea240879e8a02245c7f54`
+- Batch fixture tests SHA256: `7a2e373bbe98bce6007ed05eaa76414965130a75e716678368ebfc79cfa69323`
+- Batch selection SHA256: `372b81ccf8f8a58eac662ef3c1ad0c4e2d2591d7c36002b79b86cbdfe3dead03`

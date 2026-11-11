@@ -60,7 +60,7 @@ _ROUTE = {
     "price_date": "2026-10-30",
 }
 _PRICE = (0.029, 0.14, "2026-10-30")
-_BATCH_SELECTION_SHA = "54425b827a7cb43cb8d5e1f5636124057fe577fb6f5fcef64aa530c782f4c966"
+_BATCH_SELECTION_SHA = "372b81ccf8f8a58eac662ef3c1ad0c4e2d2591d7c36002b79b86cbdfe3dead03"
 _TEMPLATES = ("probe-v1", "predictive-v1", "predictive-track-v1")
 _MAX_RUNS = 64
 _BATCH_FILES = (
