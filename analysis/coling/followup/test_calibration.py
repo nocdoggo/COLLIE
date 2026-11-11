@@ -17,6 +17,8 @@ from analysis.coling.followup.calibration import (
     VerifiedCalibration, baseline_digest, fit_on_open_train, forecast_reading, forecast_reference,
     omitted_field_control, shifted_reading, snapshot_calibrator, verify_f1_baseline,
     verified_forecast, verified_reference_forecast,
+    CalibrationProvenance, RecomputedCalibration, recompute_open_calibration,
+    recomputed_forecast, recomputed_reference_forecast,
 )
 from analysis.coling.followup.measurement_sensitivity import exact_brier_perturbation_bounds
 from analysis.coling.followup.records import (
@@ -361,3 +363,65 @@ def test_fit_refuses_duplicate_split_columns_before_calling_fit(monkeypatch):
     frame = pd.DataFrame([["train", "fit", "dev"]], columns=["period", "split", "split"], index=["invented"])
     with pytest.raises(ValueError, match="unique columns"):
         fit_on_open_train(frame)
+
+
+# --- A26 governed recomputed-state path -------------------------------------------------------
+
+def _open_frame():
+    return pd.DataFrame({"period": ["train", "train"], "split": ["fit", "dev"],
+                         "analysis_set": ["dated", "stale"]},
+                        index=["invented-a", "invented-b"])
+
+
+def _recompute(monkeypatch, frame=None):
+    import analysis.coling.followup.calibration as module
+    monkeypatch.setattr(module.gbm, "fit_all", lambda data: models())
+    monkeypatch.setattr(module.predictors, "fit_calibrator", lambda data: synthetic_calibrator())
+    return recompute_open_calibration(
+        _open_frame() if frame is None else frame, baseline_inputs(), ["invented-b"],
+        statements_sha256="a" * 64, eligible_sha256="b" * 64,
+        code_sha256={"predictors.py": "c" * 64}, versions={"numpy": "synthetic"})
+
+
+def test_recomputed_state_binds_provenance_and_forecasts(monkeypatch):
+    verified = _recompute(monkeypatch)
+    record = verified.state_record()
+    assert record["state_sha256"] == verified.snapshot.state_sha256
+    assert record["baseline_sha256"] == baseline_digest(models(), baseline_inputs(), ["invented-b"])
+    assert record["refit_counts"] == {"dated": 1, "stale": 1}
+    assert record["procedure"] == "recomputed-open-fit-dev-v1"
+    ctx = context(snapshot=verified.snapshot, item_id="invented")
+    forecast = recomputed_forecast(verified, reading(), statement_date=ctx.statement_date,
+                                   context=ctx, listing_age_days=ctx.listing_age_days)
+    assert forecast.probabilities == forecast_reading(
+        verified.snapshot, reading(), statement_date=ctx.statement_date,
+        context=ctx, listing_age_days=ctx.listing_age_days).probabilities
+    reference = NaturalReference("invented", "v1", (reading(),), True)
+    assert recomputed_reference_forecast(
+        verified, reference, statement_date=ctx.statement_date,
+        context=ctx, listing_age_days=ctx.listing_age_days).probabilities == forecast.probabilities
+
+
+def test_recomputed_state_cannot_be_certified_by_hash_strings_alone(monkeypatch):
+    verified = _recompute(monkeypatch)
+    with pytest.raises(CalibrationProvenanceUnavailable, match="recompute_open_calibration"):
+        RecomputedCalibration(verified.snapshot, verified.baseline_sha256,
+                              verified.provenance, object())
+
+
+def test_recomputed_state_refuses_sealed_fitting_rows(monkeypatch):
+    import analysis.coling.followup.calibration as module
+    monkeypatch.setattr(module.gbm, "fit_all", lambda data: pytest.fail("must not fit sealed data"))
+    sealed = _open_frame().assign(period=["test", "train"])
+    with pytest.raises(ValueError, match="open fit/dev"):
+        _recompute(monkeypatch, frame=sealed)
+
+
+def test_recomputed_state_refuses_malformed_hashes(monkeypatch):
+    import analysis.coling.followup.calibration as module
+    monkeypatch.setattr(module.gbm, "fit_all", lambda data: models())
+    monkeypatch.setattr(module.predictors, "fit_calibrator", lambda data: synthetic_calibrator())
+    with pytest.raises(ValueError, match="SHA256"):
+        recompute_open_calibration(_open_frame(), baseline_inputs(), ["invented-b"],
+                                   statements_sha256="short", eligible_sha256="b" * 64,
+                                   code_sha256={}, versions={})

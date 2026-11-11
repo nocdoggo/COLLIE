@@ -10,6 +10,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import re
 from dataclasses import dataclass, field
 from datetime import date, timedelta
 from math import isfinite
@@ -317,6 +318,126 @@ def verify_f1_baseline(
     establish these identities. No evaluator or protected input is opened here.
     """
     raise CalibrationProvenanceUnavailable("F1 verification is disabled: actual input and fit provenance is unavailable")
+
+
+_RECOMPUTED_PROCEDURE = "recomputed-open-fit-dev-v1"
+_RECOMPUTED_PROOF = object()
+
+
+def _hash64(value: object, name: str) -> str:
+    if type(value) is not str or re.fullmatch(r"[0-9a-f]{64}", value) is None:
+        raise ValueError(f"{name} must be a lowercase SHA256 hex digest")
+    return value
+
+
+@dataclass(frozen=True, slots=True)
+class CalibrationProvenance:
+    """The open inputs, code and runtime a recomputed state was fitted from.
+
+    This records a governed recomputation, not historical full-precision equality with the
+    original F1 fit. The hashes are supplied by a caller that has already read the open
+    bytes; no protected input is opened here.
+    """
+
+    statements_sha256: str
+    eligible_sha256: str
+    code_sha256: Mapping[str, str]
+    versions: Mapping[str, str]
+    refit_counts: Mapping[str, int]
+    procedure: str = _RECOMPUTED_PROCEDURE
+
+
+@dataclass(frozen=True, slots=True)
+class RecomputedCalibration:
+    """A fitted state bound to its open-input provenance by ``recompute_open_calibration``.
+
+    Construction outside that procedure is refused: a caller cannot certify a state by
+    supplying hash strings alone. This is distinct from the disabled historical F1
+    ``VerifiedCalibration`` capability.
+    """
+
+    snapshot: CalibrationSnapshot
+    baseline_sha256: str
+    provenance: CalibrationProvenance
+    _proof: object = field(repr=False, compare=False)
+
+    def __post_init__(self) -> None:
+        if self._proof is not _RECOMPUTED_PROOF:
+            raise CalibrationProvenanceUnavailable(
+                "a recomputed calibration state must be built by recompute_open_calibration")
+        if type(self.snapshot) is not CalibrationSnapshot:
+            raise TypeError("an immutable calibration snapshot is required")
+        _hash64(self.baseline_sha256, "baseline_sha256")
+        if type(self.provenance) is not CalibrationProvenance:
+            raise TypeError("calibration provenance is required")
+
+    def state_record(self) -> dict[str, Any]:
+        """The disclosable identity of the recomputed state and its provenance."""
+        return {
+            "procedure": self.provenance.procedure,
+            "state_sha256": self.snapshot.state_sha256,
+            "baseline_sha256": self.baseline_sha256,
+            "statements_sha256": self.provenance.statements_sha256,
+            "eligible_sha256": self.provenance.eligible_sha256,
+            "code_sha256": dict(self.provenance.code_sha256),
+            "versions": dict(self.provenance.versions),
+            "refit_counts": dict(self.provenance.refit_counts),
+        }
+
+
+def recompute_open_calibration(
+    frame: pd.DataFrame, eligible: pd.DataFrame, probe_ids: Sequence[str], *,
+    statements_sha256: str, eligible_sha256: str,
+    code_sha256: Mapping[str, str], versions: Mapping[str, str],
+) -> RecomputedCalibration:
+    """Fit the slip calibrator and model-free baselines on open fit/dev data only.
+
+    The caller binds the open statement and eligible bytes by hash; this procedure checks
+    that the fitting frame is open train fit/dev, fits the supported state, snapshots it,
+    and records the six-decimal baseline digest. It opens no file and reads no outcome.
+    """
+    statements_sha256 = _hash64(statements_sha256, "statements_sha256")
+    eligible_sha256 = _hash64(eligible_sha256, "eligible_sha256")
+    if type(code_sha256) is not dict or not all(
+            type(k) is str and type(v) is str for k, v in code_sha256.items()):
+        raise ValueError("code_sha256 must map names to hash strings")
+    if type(versions) is not dict or not all(
+            type(k) is str and type(v) is str for k, v in versions.items()):
+        raise ValueError("versions must map names to version strings")
+    fitted = fit_on_open_train(frame)
+    calibrator = predictors.fit_calibrator(frame)
+    snapshot = snapshot_calibrator(calibrator)
+    baseline = baseline_digest(fitted, eligible, probe_ids)
+    refit_counts: dict[str, int] = {}
+    if "analysis_set" in frame.columns:
+        open_rows = frame["period"].eq("train") & frame["split"].isin(("fit", "dev"))
+        refit_counts = {str(k): int(v) for k, v in
+                        frame.loc[open_rows, "analysis_set"].value_counts().items()}
+    provenance = CalibrationProvenance(statements_sha256, eligible_sha256, dict(code_sha256),
+                                       dict(versions), refit_counts)
+    return RecomputedCalibration(snapshot, baseline, provenance, _RECOMPUTED_PROOF)
+
+
+def recomputed_forecast(
+    verified: RecomputedCalibration, reading: NaturalReading, *,
+    statement_date: date, context: CalibrationContext, listing_age_days: Real | None,
+) -> Forecast:
+    """Map a reading through a governed recomputed state."""
+    if type(verified) is not RecomputedCalibration:
+        raise TypeError("a recomputed calibration state is required")
+    return forecast_reading(verified.snapshot, reading, statement_date=statement_date,
+                            context=context, listing_age_days=listing_age_days)
+
+
+def recomputed_reference_forecast(
+    verified: RecomputedCalibration, reference: NaturalReference, *,
+    statement_date: date, context: CalibrationContext, listing_age_days: Real | None,
+) -> Forecast:
+    """Map an adjudicated reference through a governed recomputed state."""
+    if type(verified) is not RecomputedCalibration:
+        raise TypeError("a recomputed calibration state is required")
+    return forecast_reference(verified.snapshot, reference, statement_date=statement_date,
+                              context=context, listing_age_days=listing_age_days)
 
 
 def forecast_reading(

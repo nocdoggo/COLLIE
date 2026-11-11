@@ -1,25 +1,22 @@
-"""Private fallback: the test-period secondary score is disabled, not completed.
+"""The test-period secondary scorer, restored under A25 from the pre-A20 computation.
 
-The ``score`` command refuses before opening an outcome file and writes no result.
-Direct ``score()`` returns only constant withheld statuses for ``items`` and each
-requested section; it does not inspect its arguments or compute the registered
-figures. A caller may already have obtained the bytes it passes. All selected
-sections are withheld as whole blocks, including their outcome-independent parts.
-They must be described as not run and not released, not as completed estimates.
+A20 had disabled the ``score`` command (withholding every section pending a coordinated
+release policy). A25 restores the registered computation and adds ``--authorized-model``:
+the command reads sealed outcomes only for the secondary models a dated amendment names
+(A22 names gpt-oss-20b), and refuses any model the amendment does not cover before a sealed
+byte is read. With no ``--authorized-model`` the command is unrestricted, which only the
+synthetic checks use; a governed real run must name the authorized models.
 
-The open-data ``train-descriptives`` command and individual computation helpers
-remain available; the helpers are not a coordinated release policy. This fallback
-does not change outcome definitions, repair existing confirmatory output, or prove
-the safety of earlier releases. A dated, pushed amendment is required before any
-newly governed sealed read. Path checks have hard-link, bind-mount, privilege and
-check-then-open limitations; resolving the registered and configured folders
-inspects their directory entries and canonical entries, not their contents or
-the outcome file.
+The command still reads no sealed byte until every confirmatory run and every run it scores
+is complete, the open inputs and the evaluator's result match their hashes, and the
+model-free predictions are those of the freeze. The open-data ``train-descriptives`` command
+is unchanged. Path checks have hard-link, bind-mount, privilege and check-then-open
+limitations; resolving the registered and configured folders inspects their directory
+entries and canonical entries, not their contents or the outcome file. A dated, pushed
+amendment is required before any newly governed sealed read.
 
-Historical F1 documentation follows. Its descriptions of the ``score`` command,
-its outcome reads, results and sections describe the frozen scorer, not this
-candidate's disabled command. The descriptions of the unchanged helpers and the
-open-data train command remain useful as background.
+Historical F1 documentation follows, describing the registered scorer's outcome reads,
+results and sections.
 
 The secondary scorer of the COLING 2027 study: registered secondary analyses that need the
 sealed test-period outcomes and that the registered evaluator does not compute (PLAN.md, standing
@@ -853,6 +850,53 @@ def as_checked(plan: Mapping[str, Any], runs: Iterable[Mapping[str, Any]]) -> di
     return {**plan, "runs": [{**run, "phase": CHECKED_AS} for run in runs]}
 
 
+def continuation_specs(
+    plan: Mapping[str, Any], selection: Mapping[str, Any], out_root: Path
+) -> dict[tuple[str, str], list[dict[str, Any]]]:
+    """The private continuation selection as pooling specs keyed by ``(model, line)``.
+
+    A25. The selection (``OSS_BATCH_SELECTION_PRIVATE.json``) names each original partial run
+    (``run``) and its ``.dk`` completion (``new_run``) with the completion target (``target_pairs``)
+    and the original route (``route_provider``); the disclosed continuation route is the
+    selection's top-level ``route``. The manifests are read from the output root, the line and
+    template from the original run's plan cell, so the pooled group is held to the same registered
+    rule as a complete run. A model/line absent here is read whole by ``evaluate.read_group``.
+    """
+    by_name = {run["run"]: run for run in plan.get("runs", [])}
+    continuation_provider = selection["route"]["provider"]
+    specs: dict[tuple[str, str], list[dict[str, Any]]] = {}
+    for entry in selection.get("runs", []):
+        original = str(entry["run"])
+        cell = by_name.get(original)
+        if cell is None:
+            ev.refuse(f"the continuation selection names an unknown original run {original!r}")
+        continuation = str(entry["new_run"])
+        line, template = cell["line"], cell["template"]
+        original_path = out_root / original / "run_manifest.json"
+        continuation_path = out_root / continuation / "run_manifest.json"
+        if not original_path.is_file() or not continuation_path.is_file():
+            ev.refuse(
+                f"the continuation run {continuation} has no stored manifest: the batch has not "
+                "closed it complete, so no secondary score is computed (F4)"
+            )
+        original_manifest = json.loads(original_path.read_text(encoding="utf-8"))
+        continuation_manifest = json.loads(continuation_path.read_text(encoding="utf-8"))
+        specs.setdefault((cell["model"], line), []).append(
+            {
+                "original_run": original,
+                "continuation_run": continuation,
+                "original_manifest": original_manifest,
+                "continuation_manifest": continuation_manifest,
+                "continuation_target": int(entry["target_pairs"]),
+                "original_provider": entry["route_provider"],
+                "continuation_provider": continuation_provider,
+                "template": template,
+                "track": cell.get("track"),
+            }
+        )
+    return specs
+
+
 def checked_group(
     plan: Mapping[str, Any],
     out_root: Path,
@@ -861,12 +905,42 @@ def checked_group(
     expected: Iterable[str],
     first: pd.DataFrame | None,
     sealed: Any = None,
+    continuations: Mapping[tuple[str, str], Sequence[Mapping[str, Any]]] | None = None,
     **where: Any,
 ) -> ev.Group:
     """``evaluate.read_group`` on the runs of ``runs_of``: complete, of the registered route,
-    template and item set, with the track record of fit and dev."""
+    template and item set, with the track record of fit and dev.
+
+    A25: when a continuation selection pools this model/line, the original partial runs and
+    their ``.dk`` completions are read by ``evaluate.continuation_group`` instead, first complete
+    reading winning per item, the continuation readings held complete at their selection target.
+    """
     shown = as_checked(plan, runs_of(plan, model, line, **where))
-    group = ev.read_group(shown, out_root, CHECKED_AS, model, line, expected, first, sealed)
+    specs = (continuations or {}).get((model, line))
+    if specs:
+        pairs = [
+            {
+                "original_run": spec["original_run"],
+                "continuation_run": spec["continuation_run"],
+                "original_manifest": spec["original_manifest"],
+                "continuation_manifest": spec["continuation_manifest"],
+                "continuation_target": spec["continuation_target"],
+            }
+            for spec in specs
+        ]
+        group = ev.continuation_group(
+            model,
+            line,
+            specs[0]["template"],
+            out_root,
+            pairs,
+            expected,
+            original_provider=specs[0]["original_provider"],
+            continuation_provider=specs[0]["continuation_provider"],
+            first=first,
+        )
+    else:
+        group = ev.read_group(shown, out_root, CHECKED_AS, model, line, expected, first, sealed)
     return replace(group, problems=(*group.problems, *rule_problems(plan, model, line, **where)))
 
 
@@ -1038,6 +1112,7 @@ def gather_more(
     models: Sequence[str],
     primaries: Sequence[str],
     sealed: Any = None,
+    continuations: Mapping[tuple[str, str], Sequence[Mapping[str, Any]]] | None = None,
 ) -> More:
     """The completeness check on every run the ``sections`` score: the three conditions (and
     the probe) of the secondary ``models``, and the secondary lists, the 20 samples, the
@@ -1072,12 +1147,20 @@ def gather_more(
         registered(*E3_LINES.values(), *([PROBE_LINE] if probed else []))
         for model in models:
             more.models[model] = {
-                condition: keep("", checked_group(plan, out_root, model, line, ids, first, sealed))
+                condition: keep(
+                    "",
+                    checked_group(
+                        plan, out_root, model, line, ids, first, sealed, continuations
+                    ),
+                )
                 for condition, line in E3_LINES.items()
             }
             if model in probed:
                 more.models[model][ev.PROBE] = keep(
-                    "", checked_group(plan, out_root, model, PROBE_LINE, probe_ids, first, sealed)
+                    "",
+                    checked_group(
+                        plan, out_root, model, PROBE_LINE, probe_ids, first, sealed, continuations
+                    ),
                 )
     if "secondary_lists" in sections:
         registered(*LIST_LINES.values())
@@ -1172,6 +1255,7 @@ def left_out_findings(
     sections: Sequence[str],
     left_out: Iterable[str],
     sealed: Any = None,
+    continuations: Mapping[tuple[str, str], Sequence[Mapping[str, Any]]] | None = None,
 ) -> dict[str, list[str]]:
     """What the completeness check finds wrong with the runs of each secondary model that is
     declared left out: the runs this command would read of it (``gather_more``), its three
@@ -1191,7 +1275,7 @@ def left_out_findings(
         for line, expected in lines:
             try:
                 out[model] += checked_group(
-                    plan, out_root, model, line, expected, first, sealed
+                    plan, out_root, model, line, expected, first, sealed, continuations
                 ).problems
             except Exception as error:
                 stopped = type(error).__name__
@@ -4496,6 +4580,23 @@ def left_out_models(values: Sequence[str]) -> dict[str, str]:
     return out
 
 
+def authorized_models(values: Sequence[str]) -> frozenset[str] | None:
+    """``--authorized-model MODEL`` (several times): the secondary models a dated amendment
+    authorizes this command to read sealed outcomes for (A22 names gpt-oss-20b). None when none
+    is named, which the synthetic checks use; otherwise a model not named is refused before any
+    sealed byte is read, so the command cannot score a model the amendment does not cover."""
+    if not values:
+        return None
+    out: set[str] = set()
+    for model in values:
+        if model not in SECONDARY_MODELS:
+            ev.refuse(
+                f"--authorized-model takes a secondary model of {list(SECONDARY_MODELS)}"
+            )
+        out.add(model)
+    return frozenset(out)
+
+
 def chosen_sections(values: Sequence[str]) -> list[str]:
     """``--section NAME`` (several times) as the sections to compute, in the order of
     ``SECTIONS``; all of them when none is named."""
@@ -4518,16 +4619,59 @@ def score(
     slip_draws: int | None = None,
     seed: int = ev.SEED,
 ) -> dict[str, Any]:
-    """Withhold items and every requested test section without inspecting outcome or study inputs.
+    """Every section asked for, from the sealed bytes: the eligible list through
+    ``evaluate.unseal``, the wider population through the same checked reader. The item set of
+    each primary is worked out from its probe first (``fixed_sets``), whatever is asked for:
+    a result file of the evaluator that records another one stands behind no section.
 
-    This conservative candidate avoids all cross-section reconstruction until a
-    coordinated release policy has been established. Only the requested section
-    names are inspected; registered figures are not computed and this must not
-    be reported as a completed score.
-    """
-    names = chosen_sections(sections)
-    withheld = {"withheld": True, "reason": "joint disclosure protection not established"}
-    return {"items": dict(withheld), **{name: dict(withheld) for name in names}}
+    Restored under A25 from the pre-A20 computation; A20 had withheld every section pending a
+    coordinated release policy. The authority to read sealed bytes for a given model is granted
+    by a dated amendment (A22 for gpt-oss-20b) and enforced by the command, not here."""
+    rows, outcome_variants = ev.unseal(sealed, events, listed)
+    everything, variants = unseal_population(sealed, events, prepared.population)
+    first = prepared.population.set_index("statement_group_id")
+    scoreable = rows[rows["scoreable"]]
+    out: dict[str, Any] = {
+        "items": {
+            "eligible_statements": len(rows),
+            "eligible_episodes": int(rows["episode_id"].nunique()),
+            "scoreable_statements": len(scoreable),
+            "scoreable_episodes": int(scoreable["episode_id"].nunique()),
+            "test_split_statements_at_risk": len(everything),
+        }
+    }
+    sets = fixed_sets(confirmatory, rows, prepared.study)
+    definitions = {**outcome_variants, **variants}
+    known = known_sets(prepared.study, rows, sets, prepared.reading_days, more.subsets)
+    for name in sections:
+        if name == "secondary_models":
+            out[name] = secondary_models(
+                prepared, rows, outcome_variants, models, draws, seed, definitions, known
+            )
+        elif name == "secondary_lists":
+            out[name] = secondary_lists(prepared, everything, more, sets, draws, seed)
+        elif name == "sampled_quantiles":
+            out[name] = sampled_quantiles(prepared, rows, more, sets, draws, seed)
+        elif name == "prompt_variance":
+            out[name] = prompt_variance(prepared, rows, more, sets, draws, seed)
+        elif name == "name_date_2x2":
+            out[name] = name_date_2x2(prepared, rows, more, sets, draws, seed)
+        elif name == "descriptives":
+            out[name] = descriptives(
+                everything, first, draws, slip_draws, seed, beside=sets_beside_the_tables(known)
+            )
+        elif name == "selective_prediction":
+            out[name] = selective_prediction(prepared, rows, sets, models, draws, seed)
+        elif name == "recovery_rule":
+            out[name] = recovery_rule(
+                prepared, rows, variants, sets, models, draws, seed, outcome_variants
+            )
+        elif name == "by_statement_type":
+            out[name] = by_statement_type(prepared, rows, sets, draws, seed, known)
+        elif name == "beside_the_overconfidence_criterion":
+            turns = SLIP_DRAWS if slip_draws is None else slip_draws
+            out[name] = beside_the_criterion(prepared, rows, sets, turns, seed)
+    return out
 
 
 def summary_lines(report: Mapping[str, Any]) -> list[str]:
@@ -4548,11 +4692,223 @@ def summary_lines(report: Mapping[str, Any]) -> list[str]:
 
 
 def run_score(args: argparse.Namespace) -> int:
-    """Refuse the test-period command before reading inputs or writing a result."""
-    ev.refuse(
-        "outcome-based secondary sections are withheld pending a jointly validated disclosure "
-        "policy; no sealed outcome file is opened and no secondary score is computed"
+    """Score the authorized test-period secondary sections from the sealed outcomes.
+
+    Restored under A25 from the pre-A20 command, keeping A20's sealed-path guards. The command
+    reads no sealed byte until every confirmatory run and every run it scores is complete, the
+    open inputs and the evaluator's result match their hashes, and the model-free predictions
+    are those of the freeze. Authority to read a given model's sealed outcomes is granted by a
+    dated amendment and enforced by ``--authorized-model``."""
+    want_sealed = sealed_counts.expected_hash(args.expect_sha256, "--expect-sha256")
+    want_eligible = sealed_counts.expected_hash(
+        args.expect_eligible_sha256, "--expect-eligible-sha256"
     )
+    want_baselines = sealed_counts.expected_hash(
+        args.expect_baselines_sha256, "--expect-baselines-sha256"
+    )
+    want_selections = ev.selection_hashes(args.expect_selection_sha256)
+    wrong = ev.constants_problem()
+    if wrong:
+        ev.refuse(wrong)
+    out = output_path(args.out, args.sealed)
+    sections = chosen_sections(args.section)
+    left_out = left_out_models(args.left_out)
+    authorized = authorized_models(getattr(args, "authorized_model", []))
+    skipped = ev.skipped_models(args.not_evaluable)
+    if set(skipped) >= set(ev.PRIMARIES):
+        ev.refuse(
+            "every primary is declared not evaluable: no test of the family can have been "
+            "computed, and the sealed file is not opened for the secondaries alone"
+        )
+    unhashed = [
+        model for model in ev.PRIMARIES if model not in skipped and model not in want_selections
+    ]
+    if unhashed:
+        ev.refuse(
+            f"--expect-selection-sha256 is required for {unhashed}: the H3 selections are held "
+            "to the hashes of the freeze"
+        )
+    if args.confirmatory is None:
+        ev.refuse("--confirmatory is required: the result file of the registered evaluator")
+    names = ("statements", "eligible", "events", "counts", "out_root", "selections", "confirmatory")
+    kept_from_sealed_paths(args, names)
+    ev.open_paths(args, names)
+
+    # open inputs, the evaluator's result, the completeness checks and every prediction
+    data, hashes = ev.open_tables(args, want_eligible)
+    confirmatory, confirmatory_sha = confirmatory_record(
+        args.confirmatory, hashes, want_sealed, want_baselines, args.sealed
+    )
+    said, recorded_selections = declared(confirmatory, skipped, want_selections)
+    stopped = ""
+    try:
+        table = ev.table_of(data["the statement table"], True)
+        eligible = ev.table_of(data["the eligible list"], False)
+        events = ev.table_of(data["the events table"], args.events.suffix == ".gz")
+    except Exception as error:
+        stopped = type(error).__name__
+    if stopped:
+        ev.refuse(f"the open inputs are not as the builders write them ({stopped})")
+    listed = sealed_counts.listed_statements(table, eligible)
+    counts = json.loads(data["the counts file"])
+    found = ev.gathered(
+        args.out_root,
+        eligible,
+        listed.set_index("statement_group_id"),
+        counts,
+        args.selections,
+        hashes["the statement table"],
+        skipped,
+        recorded_selections,
+        args.sealed,
+    )
+    if found.problems:
+        ev.refuse(
+            "no secondary score before every confirmatory run is complete (PLAN, standing "
+            "rules): " + "; ".join(found.problems)
+        )
+    held_to_the_runs(confirmatory, said, found, listed.set_index("statement_group_id"))
+    plan, _, problems = ev.read_plan(args.out_root, args.sealed)
+    if plan is None or problems:
+        ev.refuse("; ".join(problems))
+    continuations: dict[tuple[str, str], list[dict[str, Any]]] = {}
+    if args.continuation_selection is not None:
+        selection = json.loads(Path(args.continuation_selection).read_text(encoding="utf-8"))
+        continuations = continuation_specs(plan, selection, args.out_root)
+    left_out_check = left_out_findings(
+        plan, args.out_root, eligible, table.set_index("statement_group_id"), sections, left_out,
+        args.sealed, continuations,
+    )
+    complete = [model for model, findings in left_out_check.items() if not findings]
+    if complete:
+        ev.refuse(
+            "--left-out names a secondary model whose runs pass the completeness check "
+            f"({', '.join(complete)}): a model is left out only when its runs are not complete "
+            "(PLAN sections 9 and 12)"
+        )
+    models = [model for model in SECONDARY_MODELS if model not in left_out]
+    if authorized is not None:
+        unauthorized = [model for model in models if model not in authorized]
+        if unauthorized:
+            ev.refuse(
+                "the amendment authorizes only " + ", ".join(sorted(authorized))
+                + "; no sealed outcome of " + ", ".join(unauthorized) + " is read"
+            )
+        models = [model for model in models if model in authorized]
+    primaries = [model for model in ev.PRIMARIES if model not in skipped]
+    more = gathered_more(
+        plan,
+        args.out_root,
+        table,
+        eligible,
+        table.set_index("statement_group_id"),
+        counts,
+        sections,
+        models,
+        primaries,
+        sealed=args.sealed,
+        continuations=continuations,
+    )
+    if more.problems:
+        ev.refuse(
+            "no secondary score before every run it scores is complete: " + "; ".join(more.problems)
+        )
+    try:
+        prepared = prepare(table, listed, found, more, skipped)
+    except Exception as error:
+        stopped = type(error).__name__  # its message may name an item
+    if stopped:
+        ev.refuse(f"the readings could not be turned into predictions ({stopped})")
+    if prepared.problems:
+        ev.refuse("the readings cannot be scored: " + "; ".join(prepared.problems))
+    if not prepared.baselines_sha256.startswith(want_baselines):
+        ev.refuse(
+            "the model-free predictions are not those hashed at the freeze: their sha256 "
+            f"starts with {prepared.baselines_sha256[:16]}, expected {want_baselines[:16]}"
+        )
+
+    # the sealed file: hashed as bytes, parsed only when the hash is the expected one; a file
+    # refused for its hash has no character of that hash printed (PLAN, standing rules)
+    sealed = sealed_counts.file_bytes(args.sealed, "the sealed file")
+    sealed_sha = ev.hash_required(
+        sealed, want_sealed, "the sealed file", args.sealed, args.sealed, of_sealed=True
+    )
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")  # a warning may quote a cell
+            results = score(
+                prepared,
+                more,
+                sealed,
+                events,
+                listed,
+                confirmatory,
+                sections,
+                models,
+                slip_draws=SLIP_DRAWS,
+            )
+        report = {
+            "about": ABOUT,
+            "command": "PYTHONPATH=. python -m analysis.coling.secondary_scores score "
+            "--expect-sha256 <sealed file> --expect-eligible-sha256 <eligible list> "
+            "--expect-baselines-sha256 <model-free predictions> --expect-selection-sha256 "
+            "<model>=<selection file> (one for each primary) --confirmatory <result file of "
+            "the evaluator> --out <file>",
+            "registered": ev.registered_record(),
+            "inputs": {
+                "sealed_outcomes_sha256": sealed_sha,
+                "eligible_sha256": hashes["the eligible list"],
+                "statements_sha256": hashes["the statement table"],
+                "events_sha256": hashes["the events table"],
+                "dataset_counts_sha256": hashes["the counts file"],
+                "plan_sha256": found.plan_sha256,
+                "plan_sha256_of_the_confirmatory_result": part_of(confirmatory, "inputs").get(
+                    "plan_sha256"
+                ),
+                "baseline_predictions_sha256": prepared.baselines_sha256,
+                "selection_sha256": recorded_selections,
+                "confirmatory_result_sha256": confirmatory_sha,
+                "code_sha256": code_record(),
+                "code_sha256_of_the_confirmatory_result": part_of(confirmatory, "inputs").get(
+                    "code_sha256"
+                ),
+            },
+            "sections": list(sections),
+            "secondary_models_scored": models,
+            "secondary_models_authorized": sorted(authorized) if authorized is not None else None,
+            "continuation_lines": sorted({line for (_model, line) in continuations}),
+            "secondary_models_left_out": left_out,
+            "secondary_models_left_out_check": left_out_check,
+            "primaries_not_evaluable_by_declaration": skipped,
+            "h3_comparator": prepared.study.comparator,
+            "bootstrap": {
+                "draws": ev.DRAWS,
+                "draws_of_a_turnbull_estimate": SLIP_DRAWS,
+                "seed": ev.SEED,
+                "clusters": "shortage episodes",
+            },
+            "refit": prepared.study.refit,
+            **results,
+            "as_the_plan_says": list(AS_THE_PLAN_SAYS),
+            "where_the_plan_is_silent": list(WHERE_THE_PLAN_IS_SILENT),
+            "not_computed_here": {
+                "computed_by_another_script": list(COMPUTED_BY_ANOTHER_SCRIPT),
+                "computed_by_no_script": list(COMPUTED_BY_NO_SCRIPT),
+                "if_no_script_computes_it": STILL_NOT_COMPUTED,
+            },
+        }
+        # every text is made before a file exists: a stop here must leave nothing behind
+        text, printed = ev.report_text(report), "\n".join(summary_lines(report))
+        text.encode("utf-8")  # what cannot be written stops here too
+    except Exception as error:
+        stopped = type(error).__name__  # the error itself, and its message, go no further
+    if stopped:
+        ev.refuse(
+            f"the scoring stopped on the sealed rows ({stopped}); the message is withheld "
+            "because it may quote a sealed value"
+        )
+    write_result(out, text)
+    return print_summary(out, [printed])
 
 
 def of_the_descriptives(lines: Iterable[str]) -> list[str]:
@@ -4644,7 +5000,8 @@ def arguments(argv: Sequence[str] | None) -> argparse.Namespace:
     train.set_defaults(run=run_train)
 
     final = commands.add_parser(
-        "score", allow_abbrev=False, help="disabled: test-period secondary analyses are not run"
+        "score", allow_abbrev=False,
+        help="test-period secondary analyses for the models a dated amendment authorizes",
     )
     final.add_argument("--expect-sha256", help="sha256 of the sealed file")
     final.add_argument("--expect-eligible-sha256", help="sha256 of the eligible list")
@@ -4670,6 +5027,20 @@ def arguments(argv: Sequence[str] | None) -> argparse.Namespace:
     )
     final.add_argument("--section", action="append", default=[], metavar="NAME")
     final.add_argument("--left-out", action="append", default=[], metavar="MODEL=REASON")
+    final.add_argument(
+        "--authorized-model",
+        action="append",
+        default=[],
+        metavar="MODEL",
+        help="a secondary model a dated amendment authorizes sealed reads for (A22: gpt-oss-20b)",
+    )
+    final.add_argument(
+        "--continuation-selection",
+        default=None,
+        metavar="PATH",
+        help="the private continuation selection (A25): pools each named original partial run "
+        "with its .dk completion, first complete reading winning per item",
+    )
     common(final, "statements", "eligible", "events", "counts", "out-root", "selections")
     final.set_defaults(run=run_score)
     return ap.parse_args(None if argv is None else list(argv))

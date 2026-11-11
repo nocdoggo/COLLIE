@@ -4374,3 +4374,72 @@ re-asked. No sealed outcome is read by this amendment.
 - Batch source SHA256: `dd674288fad0b96f66c08980cfbf7e6a7cca3d5c1a296dd3472a951e1698b630`
 - Batch fixture tests SHA256: `7a2e373bbe98bce6007ed05eaa76414965130a75e716678368ebfc79cfa69323`
 - Batch selection SHA256: `924c1c06d003f55edcf150b6cd5086c8b0238a79a0ad0806c0e8cdfc8199c4fa`
+
+### A25. The secondary scorer restored and the continuation pooling wired (11 November 2026)
+
+A20 withheld the test-period secondary scorer behind refusal stubs (`score` and `run_score`)
+pending a governed repair. This amendment restores the registered computation from the pre-A20
+bytes and adds the authority and continuation controls the gpt-oss-20b replication needs. It
+reads no sealed outcome; the gpt-oss E3/E4 computation remains gated on F2/F4 (every run
+complete) under the A22 sealed-read authority.
+
+Restored computation. `score` and `run_score` again compute every section from the sealed bytes
+through the A20 hardened guards: `confirmatory_record`, `left_out_findings` and `gathered_more`
+all thread the sealed path, and the writer refinements below stand. The primaries' `read_group`
+path and the frozen reader and launcher sources are unchanged.
+
+Model authority. `--authorized-model MODEL` (repeatable) restricts sealed reads to the secondary
+models a dated amendment names; A22 names gpt-oss-20b. A model the amendment does not cover is
+refused before any sealed byte is read. With no `--authorized-model` the command is unrestricted,
+which only the synthetic checks use; a governed real run must name the authorized models. The
+result file records `secondary_models_authorized`.
+
+Continuation pooling. `evaluate.continuation_group` pools each original partial run with its
+disclosed `.dk` completion: first-complete-read wins, every original is read before any
+continuation, duplicates across the whole line are refused, and each row is held to the provider
+of the run that stored it (`row_faults` takes a `provider_pin`). It is shard-ready (a sequence of
+pairs). The F4 completion rule is enforced on the continuation's `readings.jsonl` line count
+equal to the selection's `target_pairs` — never `planned_rows` and never the manifest complete
+flag. `secondary_scores.continuation_specs` reads the private selection (`run`, `new_run`,
+`target_pairs`, `route_provider`, and the top-level disclosed `route`), loads the manifests from
+the output root, and keys the pooling specs by `(model, line)` with the line/template/track of the
+original run's plan cell. `checked_group` dispatches a pooled model/line to `continuation_group`
+and every other to `read_group`; `--continuation-selection PATH` wires this into the command. A
+missing continuation manifest is a clean refusal: the batch has not closed that run complete.
+
+Writer refinements. `write_new_pair` rolls back by identity (`_inode`, `_unlink_if_unchanged`) so
+a foreign stale partial is never unlinked, and propagates a sync failure; `_exclusive_write`
+propagates its fsync failure. These extend the A20 stage-then-link writer.
+
+Validation. The registered gate suite is green at 2,257 passed. The secondary scorer suite runs
+the restored command on the synthetic study (the strict figure tests now execute and pass); the
+continuation pooling and F4 line-count tests pass, and `continuation_specs` parses the real
+private selection into shard specs and refuses cleanly while the batch is incomplete. Six
+non-gate historical fixtures remain non-strict xfail (A20 disabled-refusal wording and writer
+fixtures), documented in the test module.
+
+- Scorer evaluator source SHA256: `7d6c21fa58757af51b44fc3cf2d0fe49e3e400fccfb7c6acd9cee41c2bb1e4c6`
+- Scorer evaluator fixture tests SHA256: `6d66567b8ba96a8f18e388b72c42fa154b15410cd34f953608c3f78f60f5e4ab`
+- Secondary scorer source SHA256: `095b0828ffbc9a9892eb2949bd09ef589bfdad604d3518edd877ad7e2da20415`
+- Secondary scorer fixture tests SHA256: `982080f927b790a991387ecd659d4c652964d8d0c933fccc3096f2abd26dee60`
+
+### A26. The governed open-calibration recompute path (11 November 2026)
+
+No calibration state file exists on disk (the schema id `collie-slip-calibrator-state-v1` appears
+only in code), so a diagnostic needing the fitted state must refit through a governed path rather
+than read a stored one. This amendment adds that path; it opens no protected input and writes no
+sealed outcome.
+
+`followup.calibration.recompute_open_calibration` refits the calibrator on the open fit/dev track
+record and binds the fitted state to its provenance: `CalibrationProvenance` records the open
+input hashes, code hashes, runtime versions and refit counts (supplied by a caller that has
+already read the open bytes), and `RecomputedCalibration` construction is proof-gated so a caller
+cannot certify a state by supplying hash strings alone. This is a governed recomputation, not
+historical full-precision equality with the original F1 fit, and is distinct from the disabled
+historical F1 `VerifiedCalibration` capability. `state_record` discloses only the state identity
+and provenance hashes, never items.
+
+Validation. The calibration fixture tests pass within the registered gate suite (2,257 passed).
+
+- Calibration source SHA256: `22733c46d4f65cac66e473953199471aa941335b189f5a32b777357debe3221b`
+- Calibration fixture tests SHA256: `9c9df97ac7a7519d5bc8ffeb35f65390f2f034e69cb0fdc63654b6db2380fd8f`

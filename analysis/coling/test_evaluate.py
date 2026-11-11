@@ -8995,3 +8995,190 @@ def test_dev_command_on_the_open_data_with_stand_in_readings(
         == written["dev"]["scoreable_by_E_end_and_E_end90"]
     )
     assert got["dev"]["scoreable_statements"] == written["dev"]["scoreable_statements"]
+
+
+# --- A25 writer durability and rollback identity ---------------------------------------------
+
+def test_pair_rollback_leaves_a_foreign_replacement(tmp_path, monkeypatch):
+    """A replacement of the first final name written after its link is foreign: the rollback
+    of a failed second link must not delete it."""
+    import errno
+    first, second = tmp_path / "a.json", tmp_path / "b.md"
+    real_link = os.link
+    links = {"n": 0}
+
+    def hooked(src, dst, *, src_dir_fd=None, dst_dir_fd=None, follow_symlinks=True):
+        links["n"] += 1
+        if links["n"] == 2:
+            raise OSError(errno.EEXIST, "taken")
+        real_link(src, dst, src_dir_fd=src_dir_fd, dst_dir_fd=dst_dir_fd,
+                  follow_symlinks=follow_symlinks)
+        if links["n"] == 1:
+            os.unlink(dst, dir_fd=dst_dir_fd)
+            fd = os.open(dst, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW,
+                         dir_fd=dst_dir_fd, mode=0o644)
+            with os.fdopen(fd, "wb") as stream:
+                stream.write(b"foreign")
+
+    monkeypatch.setattr(os, "link", hooked)
+    with pytest.raises(SystemExit):
+        ev.write_new_pair(first, "{}", second, "table")
+    assert first.read_bytes() == b"foreign"
+    assert not second.exists()
+    assert not list(tmp_path.glob(".partial.*"))
+
+
+def _fail_directory_fsync(monkeypatch):
+    import errno
+    import stat as stat_module
+    real_fsync = os.fsync
+
+    def hooked(fd):
+        if stat_module.S_ISDIR(os.fstat(fd).st_mode):
+            raise OSError(errno.EIO, "synthetic directory sync failure")
+        return real_fsync(fd)
+
+    monkeypatch.setattr(os, "fsync", hooked)
+
+
+def test_pair_refuses_when_the_folder_fsync_fails(tmp_path, monkeypatch):
+    first, second = tmp_path / "a.json", tmp_path / "b.md"
+    _fail_directory_fsync(monkeypatch)
+    with pytest.raises(SystemExit, match="synced"):
+        ev.write_new_pair(first, "{}", second, "table")
+    assert not first.exists() and not second.exists()
+    assert not list(tmp_path.glob(".partial.*"))
+
+
+def test_exclusive_write_refuses_when_the_folder_fsync_fails(tmp_path, monkeypatch):
+    path = tmp_path / "a.json"
+    _fail_directory_fsync(monkeypatch)
+    with pytest.raises(SystemExit, match="synced"):
+        ev.write_new(path, "{}")
+    assert not path.exists()
+    assert not list(tmp_path.glob(".partial.*"))
+
+
+# --- A25 continuation-aware pooling -----------------------------------------------------------
+
+def _continuation_row(item_id, model, template, provider):
+    return {
+        "item_id": item_id, "sample": 0, "model": model,
+        "model_id": rd.ROUTES[model].model_id, "provider_pin": provider,
+        "template": template, "template_sha256": rd.FROZEN_SHA256[template],
+        "mask_names": False, "shift_years": 0, "temperature": 0,
+        "status": "ok", "reading": {"p_a": 0.5, "p_b": 0.6}, "fallback": None,
+        "attempts": [], "warnings": [], "echo": "ok",
+        "condition": f"{template}|synthetic",
+    }
+
+
+def _write_continuation_run(out_root, run, rows, complete, model):
+    folder = out_root / run
+    folder.mkdir(parents=True, exist_ok=True)
+    raw = b"".join((json.dumps(row, sort_keys=True) + "\n").encode() for row in rows)
+    (folder / "readings.jsonl").write_bytes(raw)
+    manifest = {"complete": complete, "readings": len(rows), "model": model,
+                "readings_sha256": hashlib.sha256(raw).hexdigest()}
+    (folder / "run_manifest.json").write_text(json.dumps(manifest, sort_keys=True))
+    return manifest
+
+
+def _continuation_group(tmp_path, monkeypatch, *, continuation_rows=None, complete=True):
+    monkeypatch.setattr(ev, "reading_accepted", lambda reading, kind: True)
+    model = rd.PRIMARIES[0]
+    template = "predictive-v1"
+    original_provider = rd.ROUTES[model].provider
+    out_root = tmp_path / "read"
+    original = _write_continuation_run(
+        out_root, "orig", [_continuation_row("A", model, template, original_provider)],
+        False, model)
+    continuation = _write_continuation_run(
+        out_root, "orig.dk",
+        [_continuation_row("B", model, template, "dekallm/bf16")] if continuation_rows is None
+        else continuation_rows, complete, model)
+    pairs = [{"original_run": "orig", "continuation_run": "orig.dk",
+              "original_manifest": original, "continuation_manifest": continuation,
+              "continuation_target": 1}]
+    return ev.continuation_group(
+        model, "e3-a", template, out_root, pairs, ["A", "B"],
+        original_provider=original_provider, continuation_provider="dekallm/bf16")
+
+
+def test_continuation_group_pools_original_and_dk_first_complete(tmp_path, monkeypatch):
+    group = _continuation_group(tmp_path, monkeypatch)
+    assert group.problems == ()
+    assert set(group.rows) == {"A", "B"}
+    assert group.record["runs"] == 2
+    assert group.record["continuation_runs"] == ["orig.dk"]
+    assert group.record["continuation_provider"] == "dekallm/bf16"
+
+
+def test_continuation_group_pools_multiple_shards(tmp_path, monkeypatch):
+    """A line of several shards pools every original before any continuation, and the item
+    set is the union across shards."""
+    monkeypatch.setattr(ev, "reading_accepted", lambda reading, kind: True)
+    model = rd.PRIMARIES[0]
+    template = "predictive-v1"
+    original_provider = rd.ROUTES[model].provider
+    out_root = tmp_path / "read"
+    pairs = []
+    for shard, (orig_item, dk_item) in enumerate([("A", "B"), ("C", "D")]):
+        original = _write_continuation_run(
+            out_root, f"orig.s{shard}",
+            [_continuation_row(orig_item, model, template, original_provider)], False, model)
+        continuation = _write_continuation_run(
+            out_root, f"orig.s{shard}.dk",
+            [_continuation_row(dk_item, model, template, "dekallm/bf16")], True, model)
+        pairs.append({"original_run": f"orig.s{shard}", "continuation_run": f"orig.s{shard}.dk",
+                      "original_manifest": original, "continuation_manifest": continuation,
+                      "continuation_target": 1})
+    group = ev.continuation_group(
+        model, "e3-a", template, out_root, pairs, ["A", "B", "C", "D"],
+        original_provider=original_provider, continuation_provider="dekallm/bf16")
+    assert group.problems == ()
+    assert set(group.rows) == {"A", "B", "C", "D"}
+    assert group.record["runs"] == 4
+    assert group.record["continuation_runs"] == ["orig.s0.dk", "orig.s1.dk"]
+
+
+def test_continuation_group_refuses_duplicate_and_incomplete(tmp_path, monkeypatch):
+    model = rd.PRIMARIES[0]
+    duplicate = _continuation_row("A", model, "predictive-v1", "dekallm/bf16")
+    group = _continuation_group(tmp_path, monkeypatch, continuation_rows=[duplicate])
+    assert any("answered twice" in problem for problem in group.problems)
+    group = _continuation_group(tmp_path, monkeypatch, complete=False)
+    assert any("not complete" in problem for problem in group.problems)
+
+
+def test_continuation_group_holds_each_row_to_its_own_provider(tmp_path, monkeypatch):
+    model = rd.PRIMARIES[0]
+    wrong = _continuation_row("B", model, "predictive-v1", rd.ROUTES[model].provider)
+    group = _continuation_group(tmp_path, monkeypatch, continuation_rows=[wrong])
+    assert any("provider pin" in problem for problem in group.problems)
+
+
+def test_continuation_group_f4_counts_readings_lines_not_the_manifest(tmp_path, monkeypatch):
+    """F4: a .dk run is complete iff its readings.jsonl line count equals target_pairs. A
+    manifest that claims the target while the file holds fewer lines is refused."""
+    monkeypatch.setattr(ev, "reading_accepted", lambda reading, kind: True)
+    model = rd.PRIMARIES[0]
+    template = "predictive-v1"
+    original_provider = rd.ROUTES[model].provider
+    out_root = tmp_path / "read"
+    original = _write_continuation_run(
+        out_root, "orig", [_continuation_row("A", model, template, original_provider)],
+        False, model)
+    continuation = _write_continuation_run(
+        out_root, "orig.dk", [_continuation_row("B", model, template, "dekallm/bf16")],
+        True, model)
+    # the manifest claims two readings (the target) but the file holds only one line
+    continuation["readings"] = 2
+    (out_root / "orig.dk" / "run_manifest.json").write_text(json.dumps(continuation, sort_keys=True))
+    pairs = [{"original_run": "orig", "continuation_run": "orig.dk",
+              "original_manifest": original, "continuation_manifest": continuation,
+              "continuation_target": 2}]
+    group = ev.continuation_group(
+        model, "e3-a", template, out_root, pairs, ["A", "B"],
+        original_provider=original_provider, continuation_provider="dekallm/bf16")
+    assert any("F4 rule requires its target of 2" in problem for problem in group.problems)

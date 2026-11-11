@@ -1265,6 +1265,26 @@ def write_new(path: Path, text: str) -> None:
     _exclusive_write(path, text)
 
 
+def _inode(fd: int, name: str) -> tuple[int, int] | None:
+    """The identity of a folder entry, without following a link; None when it is gone."""
+    try:
+        info = os.stat(name, dir_fd=fd, follow_symlinks=False)
+    except OSError:
+        return None
+    return (info.st_dev, info.st_ino)
+
+
+def _unlink_if_unchanged(fd: int, name: str, inode: tuple[int, int] | None) -> None:
+    """Take back a name this call created only while it still points at that same file.
+
+    A replacement written by another process after the link is a foreign file: it is
+    left alone, never unlinked (A25).
+    """
+    if inode is not None and _inode(fd, name) == inode:
+        with contextlib.suppress(OSError):
+            os.unlink(name, dir_fd=fd)
+
+
 def write_new_pair(first: Path, first_text: str, second: Path, second_text: str) -> None:
     """Write two files that must both be new, or neither keeps a name.
 
@@ -1273,9 +1293,13 @@ def write_new_pair(first: Path, first_text: str, second: Path, second_text: str)
     its final name through a hard link. A link that fails (the name is taken) takes
     back the name the pair already kept, so a refusal leaves nothing of the pair
     behind - the table no more than the result file. No existing file is opened,
-    unlinked or replaced: only a name this call created is taken back.
+    unlinked or replaced: only a name this call created is taken back, and only while
+    it still points at the file this call staged. A folder fsync failure is reported,
+    never swallowed as a successful write (A25).
     """
-    staged: list[tuple[str, int, str, str, bool]] = []
+    staged: list[tuple[str, int, str, str, bool, tuple[int, int] | None]] = []
+    linked: list[tuple[int, str, tuple[int, int] | None]] = []
+    sync_failed = False
     try:
         for path, text in ((first, first_text), (second, second_text)):
             given = _guard_absolute(path)
@@ -1307,25 +1331,31 @@ def write_new_pair(first: Path, first_text: str, second: Path, second_text: str)
                         os.unlink(partial, dir_fd=fd)
                 os.close(fd)
                 refuse(f"the output cannot be written ({type(error).__name__}): {given}")
-            staged.append((given, fd, parts[-1], partial, created))
-        linked: list[tuple[int, str]] = []
-        for given, fd, name, partial, _created in staged:
+            staged.append((given, fd, parts[-1], partial, created, _inode(fd, partial)))
+        for given, fd, name, partial, _created, inode in staged:
             try:
                 os.link(partial, name, src_dir_fd=fd, dst_dir_fd=fd)
             except OSError as error:
-                for done_fd, done_name in linked:
-                    with contextlib.suppress(OSError):
-                        os.unlink(done_name, dir_fd=done_fd)
+                for done_fd, done_name, done_inode in linked:
+                    _unlink_if_unchanged(done_fd, done_name, done_inode)
                 refuse(f"the output cannot be written ({type(error).__name__}): {given}")
-            linked.append((fd, name))
+            linked.append((fd, name, inode))
     finally:
-        for _given, fd, _name, partial, created in staged:
+        for _given, fd, _name, partial, created, _identity in staged:
             if created:
                 with contextlib.suppress(OSError):
                     os.unlink(partial, dir_fd=fd)
-            with contextlib.suppress(OSError):
+            try:
                 os.fsync(fd)
+            except OSError:
+                sync_failed = True
+        if sync_failed:
+            for done_fd, done_name, done_inode in linked:
+                _unlink_if_unchanged(done_fd, done_name, done_inode)
+        for _given, fd, _name, _partial, _created, _identity in staged:
             os.close(fd)
+    if sync_failed:
+        refuse("the output folder could not be synced (OSError)")
 
 
 def code_record() -> dict[str, str]:
@@ -1505,6 +1535,8 @@ def _exclusive_write(path: Any, text: str) -> None:
     partial = f".partial.{os.getpid()}.{name}"
     stopped = ""
     created = False
+    sync_failed = False
+    inode = None
     try:
         fd = _open_dir_walk(folder)
     except OSError as error:
@@ -1519,6 +1551,7 @@ def _exclusive_write(path: Any, text: str) -> None:
                 stream.write(text.encode("utf-8"))
                 stream.flush()
                 os.fsync(stream.fileno())
+            inode = _inode(fd, partial)
             os.link(partial, name, src_dir_fd=fd, dst_dir_fd=fd)
         except (OSError, ValueError) as error:
             stopped = type(error).__name__
@@ -1526,11 +1559,17 @@ def _exclusive_write(path: Any, text: str) -> None:
         if created:
             with contextlib.suppress(OSError):
                 os.unlink(partial, dir_fd=fd)
-        with contextlib.suppress(OSError):
+        try:
             os.fsync(fd)
+        except OSError:
+            sync_failed = True
+        if sync_failed and not stopped:
+            _unlink_if_unchanged(fd, name, inode)
         os.close(fd)
     if stopped:
         refuse(f"the output cannot be written ({stopped}): {given}")
+    if sync_failed:
+        refuse(f"the output folder could not be synced (OSError): {given}")
 
 
 def stored_in_sealed(
@@ -1647,14 +1686,20 @@ def reading_accepted(reading: Any, kind: str) -> bool:
     return not errors
 
 
-def row_faults(row: Mapping[str, Any], model: str, template: str) -> list[str]:
+def row_faults(row: Mapping[str, Any], model: str, template: str,
+               provider_pin: str | None = None) -> list[str]:
     """What makes a stored row unusable: another route, template or decoding than the
     registered ones, flags that contradict one another, a reading that the harness's parser
     would have rejected (``reading_accepted``: the harness stores none, so such a row was not
     written by this harness), an answer served as another model or, by the provider names
     stored with it, by another provider than the pinned one (``read.provider_problem``), or a
-    track record in context that is not wholly before the item (the harness's own warning)."""
+    track record in context that is not wholly before the item (the harness's own warning).
+
+    ``provider_pin`` overrides the registered provider for a disclosed continuation route
+    (A25); the model id, template and decoding checks are unchanged."""
     route, kind = rd.ROUTES[model], rd.TEMPLATES[template].kind
+    if provider_pin is not None:
+        route = rd.Route(route.model_id, provider_pin, route.quantization, route.price)
     found = []
     served = (row.get("model"), row.get("model_id"), row.get("provider_pin"))
     if served != (model, route.model_id, route.provider):
@@ -1794,6 +1839,139 @@ def read_group(
         "rows": len(rows),
         "by_status": dict(status),
         "by_echo": dict(group["by_echo"]),
+        "parse_failure_rate": status.get("failed", 0) / len(rows) if rows else None,
+        "refusal_rate": status.get("refused", 0) / len(rows) if rows else None,
+    }
+    return Group(model, line, template, rows, record, tuple(problems))
+
+
+def continuation_group(
+    model: str,
+    line: str,
+    template: str,
+    out_root: Path,
+    pairs: Sequence[Mapping[str, Any]],
+    expected: Iterable[str],
+    *,
+    original_provider: str,
+    continuation_provider: str,
+    first: pd.DataFrame | None = None,
+) -> Group:
+    """Pool original partial runs with their disclosed ``.dk`` continuations (A25).
+
+    ``pairs`` is one entry per shard, each a mapping with ``original_run``,
+    ``continuation_run``, ``original_manifest``, ``continuation_manifest`` and
+    ``continuation_target``. Each original keeps its partial manifest; each continuation must
+    be complete at its registered target count. Readings are pooled first-complete-read wins
+    (every original is read before any continuation), duplicates across the whole line are
+    refused, and each row is held to the provider of the run that stored it. No sealed outcome
+    is read. This is the continuation-aware read path the gpt-oss replication scorer uses; the
+    primary ``read_group`` path is unchanged.
+    """
+    name = f"{model} {line}"
+    if template not in rd.TEMPLATES:
+        return Group(model, line, template, {}, {}, (f"{name}: the harness lacks {template}",))
+    problems: list[str] = []
+    hashes: dict[str, str | None] = {}
+    original_runs: list[str] = []
+    continuation_runs: list[str] = []
+    ordered: list[str] = []
+    for pair in pairs:
+        original_run = pair["original_run"]
+        continuation_run = pair["continuation_run"]
+        original_manifest = pair["original_manifest"]
+        continuation_manifest = pair["continuation_manifest"]
+        target = pair["continuation_target"]
+        original_runs.append(original_run)
+        continuation_runs.append(continuation_run)
+        ordered.extend((original_run, continuation_run))
+        if original_manifest.get("complete") is not False:
+            problems.append(f"{name}: original run {original_run} is not partial at its recorded count")
+        if continuation_manifest.get("complete") is not True:
+            problems.append(f"{name}: continuation run {continuation_run} is not complete")
+        if continuation_manifest.get("readings") != target:
+            problems.append(
+                f"{name}: continuation run {continuation_run} did not reach its target pair count"
+            )
+        # F4 completion rule: a .dk run is complete iff its readings.jsonl line count equals the
+        # selection's target_pairs -- never planned_rows and never the manifest complete flag.
+        continuation_stored = out_root / continuation_run / "readings.jsonl"
+        continuation_lines = (
+            sum(1 for line in continuation_stored.read_bytes().splitlines() if line.strip())
+            if continuation_stored.is_file()
+            else 0
+        )
+        if continuation_lines != target:
+            problems.append(
+                f"{name}: continuation run {continuation_run} holds {continuation_lines} readings "
+                f"where the F4 rule requires its target of {target}"
+            )
+        for run, manifest in ((original_run, original_manifest), (continuation_run, continuation_manifest)):
+            if manifest.get("model") != model:
+                problems.append(f"{name}: run {run} is of another model")
+            stored = out_root / run / "readings.jsonl"
+            written = sealed_counts.sha256(stored.read_bytes()) if stored.is_file() else None
+            hashes[run] = written
+            if manifest.get("readings_sha256") != written:
+                problems.append(f"{name}: the readings of run {run} are not those of its manifest")
+    originals = set(original_runs)
+    pooled: dict[tuple[str, int], dict] = {}
+    row_run: dict[tuple[str, int], str] = {}
+    duplicates: list[tuple[str, int]] = []
+    for run in ordered:
+        stored = out_root / run / "readings.jsonl"
+        if not stored.is_file():
+            continue
+        for row in rd._read_jsonl(stored):
+            key = (row["item_id"], row["sample"])
+            if key in pooled:
+                duplicates.append(key)
+            else:
+                pooled[key] = row
+                row_run[key] = run
+    samples = 1 + max((sample for _, sample in pooled), default=0)
+    if samples != 1:
+        problems.append(f"{name}: {samples} samples per item where one is planned")
+    if duplicates:
+        problems.append(f"{name}: {len(duplicates)} items were answered twice")
+    item_ids = {item_id for item_id, _ in pooled}
+    wanted = set(expected)
+    missing, extra = len(wanted - item_ids), len(item_ids - wanted)
+    if missing or extra:
+        problems.append(
+            f"{name}: the item set is not the registered list ({missing} items missing, "
+            f"{extra} not on the list)"
+        )
+    rows = {item_id: row for (item_id, sample), row in pooled.items() if sample == 0}
+    faults: dict[str, int] = {}
+    for key, row in pooled.items():
+        provider = original_provider if row_run[key] in originals else continuation_provider
+        for fault in row_faults(row, model, template, provider):
+            faults[fault] = faults.get(fault, 0) + 1
+    problems += [f"{name}: {n} rows with {fault}" for fault, n in sorted(faults.items())]
+    asked = rd.TEMPLATES[template]
+    if first is not None and asked.kind == "predictive":
+        wrong = asked_elsewhere(rows, first, asked.probe)
+        if wrong:
+            problems.append(f"{name}: {wrong} rows asked about other horizons than the registered")
+    status: dict[str, int] = {}
+    echo: dict[str, int] = {}
+    for row in rows.values():
+        status[row["status"]] = status.get(row["status"], 0) + 1
+        echo[row["echo"]] = echo.get(row["echo"], 0) + 1
+    refused_echo = sum(n for value, n in echo.items() if not rd.echo_acceptable(value))
+    if refused_echo:
+        problems.append(f"{name}: {refused_echo} rows whose served model or provider is not ok")
+    record = {
+        "runs": len(ordered),
+        "original_runs": original_runs,
+        "continuation_runs": continuation_runs,
+        "continuation_provider": continuation_provider,
+        "readings_sha256": hashes,
+        "template": template,
+        "rows": len(rows),
+        "by_status": status,
+        "by_echo": echo,
         "parse_failure_rate": status.get("failed", 0) / len(rows) if rows else None,
         "refusal_rate": status.get("refused", 0) / len(rows) if rows else None,
     }
