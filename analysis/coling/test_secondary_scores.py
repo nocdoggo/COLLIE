@@ -8520,3 +8520,31 @@ def test_checked_group_pools_continuation_when_selected(tmp_path, monkeypatch):
     monkeypatch.setattr(ev, "read_group", lambda *a, **k: sentinel)
     whole = sc.checked_group(plan, out_root, model, "e3-a", ["A", "B", "C", "D"], None)
     assert whole.problems == ("read_group was called",)
+
+
+@figures_the_fallback_withholds
+def test_authorized_model_restricts_the_computation_without_left_out(
+    study: SimpleNamespace,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    base: SimpleNamespace,
+) -> None:
+    # A22/A25: --authorized-model restricts the secondary_models computation to the named
+    # model. The other secondaries' runs are complete, so they cannot be declared --left-out;
+    # the authorization alone excludes them, and no sealed outcome of theirs is read.
+    report, _ = scored(
+        study, tmp_path, capsys, section=["secondary_models"], authorized_model=[INFORMED]
+    )
+    assert report["secondary_models_scored"] == [INFORMED]
+    assert report["secondary_models_authorized"] == [INFORMED]
+    assert NOISY not in report["secondary_models_scored"]
+    assert set(report["secondary_models"]["models"]) == {INFORMED}
+    assert (
+        report["secondary_models"]["models"][INFORMED]
+        == base.report["secondary_models"]["models"][INFORMED]
+    )
+    # a name outside the registered secondaries is still refused (fail closed on a misspelling)
+    why = refused(
+        study, tmp_path, capsys, section=["secondary_models"], authorized_model=["not-a-model"]
+    )
+    assert "secondary model" in why

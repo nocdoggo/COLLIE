@@ -4583,8 +4583,10 @@ def left_out_models(values: Sequence[str]) -> dict[str, str]:
 def authorized_models(values: Sequence[str]) -> frozenset[str] | None:
     """``--authorized-model MODEL`` (several times): the secondary models a dated amendment
     authorizes this command to read sealed outcomes for (A22 names gpt-oss-20b). None when none
-    is named, which the synthetic checks use; otherwise a model not named is refused before any
-    sealed byte is read, so the command cannot score a model the amendment does not cover."""
+    is named, which the synthetic checks use; otherwise the computation is restricted to the
+    named models and a model not named is excluded before any sealed byte is read, so the
+    command cannot score a model the amendment does not cover. A name outside SECONDARY_MODELS
+    is refused."""
     if not values:
         return None
     out: set[str] = set()
@@ -4788,12 +4790,11 @@ def run_score(args: argparse.Namespace) -> int:
         )
     models = [model for model in SECONDARY_MODELS if model not in left_out]
     if authorized is not None:
-        unauthorized = [model for model in models if model not in authorized]
-        if unauthorized:
-            ev.refuse(
-                "the amendment authorizes only " + ", ".join(sorted(authorized))
-                + "; no sealed outcome of " + ", ".join(unauthorized) + " is read"
-            )
+        # A22/A25: the amendment names the models this command may read sealed outcomes for. A
+        # model it does not name is left out of this computation entirely -- no sealed read, no
+        # figure -- whether or not its runs are complete (the other secondaries' runs are
+        # complete, so they cannot be declared --left-out). authorized_models has already
+        # validated the named models against SECONDARY_MODELS, so a misspelling is still refused.
         models = [model for model in models if model in authorized]
     primaries = [model for model in ev.PRIMARIES if model not in skipped]
     more = gathered_more(

@@ -4491,3 +4491,23 @@ A22/A25.
 - Batch source SHA256: `884f8cf9853d4df53c2728e65ef8fa936ecbada1f3eea240879e8a02245c7f54`
 - Batch fixture tests SHA256: `7a2e373bbe98bce6007ed05eaa76414965130a75e716678368ebfc79cfa69323`
 - Batch selection SHA256: `372b81ccf8f8a58eac662ef3c1ad0c4e2d2591d7c36002b79b86cbdfe3dead03`
+
+### A29. The model-authority gate filters to the authorized models (11 November 2026)
+
+A25 added `--authorized-model` but made it refuse any secondary model the amendment does not
+name. The other five secondaries' runs are complete, so they cannot be declared `--left-out`
+(the scorer refuses a left-out model whose runs pass the completeness check), and that refusal
+made the A22 gpt-oss-only computation impossible. This amendment corrects the gate to FILTER the
+computation to the named models: a model the amendment does not name is excluded entirely -- no
+sealed read, no figure -- whether or not its runs are complete. A name outside `SECONDARY_MODELS`
+is still refused by `authorized_models`, so a misspelling fails closed. The primaries'
+`read_group` path, the continuation pooling and the frozen reader/launcher are unchanged.
+
+Validation. The synthetic test `test_authorized_model_restricts_the_computation_without_left_out`
+covers the filter (the named model's block equals the unrestricted run's block for that model,
+the other secondaries are absent) and the misspelling refusal. Secondary suite: 178 passed /
+21 xpassed / 6 xfailed / 0 failed. Registered gate: 2,257 passed. No sealed outcome is read by
+this amendment; the authorized gpt-oss E3/E4 computation remains gated on F4 under A22/A25.
+
+- Secondary scorer source SHA256: `bd2ba94bc893cd2884e5d80602d8d7f36f335022a821b7f20a8a5d2ea1dbf197`
+- Secondary scorer fixture tests SHA256: `ba326bede882796e4b40d8410e658053be0631f91006c379ad7d2a092ce7ced7`
