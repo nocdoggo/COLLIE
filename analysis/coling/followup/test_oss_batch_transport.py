@@ -430,3 +430,45 @@ def test_journal_mode_is_owner_only(tmp_path):
     assert stat.S_IMODE(os.stat(path).st_mode) == 0o600
     transport.close()
     os.close(fd)
+
+
+# --- A30: the read timeout is pinned and a stalled body read raises -------------------------
+
+def test_a_send_pins_the_read_timeout_and_consumes_the_body(tmp_path):
+    inner = MockInner()
+    transport, fd, path = make_transport(tmp_path, inner)
+    transport.set_run('synth-run.dk')
+    request = make_request()
+    response = transport.handle_request(request)
+    assert request.extensions['timeout'] == {
+        'connect': 30.0, 'read': 180.0, 'write': 30.0, 'pool': 30.0}
+    assert response.is_closed  # the body was consumed under the timeout, not left to hang
+    rows = journal_rows(path)
+    assert any(r.get('event') == 'send_status' and r.get('http_status') == 200 for r in rows)
+    transport.close()
+
+
+def test_a_stalled_body_read_raises_and_is_journaled(tmp_path):
+    class StallBodyInner(httpx.BaseTransport):
+        def handle_request(self, request):
+            resp = httpx.Response(200, json={'synthetic': True})
+
+            def boom():
+                raise httpx.ReadTimeout('synthetic stalled body')
+
+            resp.read = boom
+            return resp
+
+        def close(self):
+            pass
+
+    transport, fd, path = make_transport(tmp_path, StallBodyInner())
+    transport.set_run('synth-run.dk')
+    request = make_request()
+    with pytest.raises(httpx.ReadTimeout):
+        transport.handle_request(request)
+    rows = journal_rows(path)
+    assert any(r.get('event') == 'send_failure' and r.get('error_type') == 'ReadTimeout'
+               for r in rows)
+    assert request.extensions['timeout']['read'] == 180.0
+    transport.close()

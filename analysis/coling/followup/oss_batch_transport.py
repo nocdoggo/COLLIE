@@ -268,6 +268,13 @@ class CountedPacedTransport(httpx.BaseTransport):
             self._journal_size = _journal(self._journal_fd, self._journal_identity, self._journal_size,
                                           {"event": "send_intent", "ordinal": ordinal, "run": label})
             mark = self._clock()
+            # A30: pin the per-chunk read timeout on the request itself. The upstream can send
+            # 200 headers and then stall before the body; without an enforced read timeout the
+            # body read blocks forever and the batch hangs. The timeout is per read, so a
+            # legitimately streaming reasoning answer (chunks arriving within the window) is
+            # not cut off; only an idle upstream raises.
+            request.extensions["timeout"] = {
+                "connect": 30.0, "read": 180.0, "write": 30.0, "pool": 30.0}
             try:
                 response = self._inner.handle_request(request)
             except Exception as exc:
@@ -292,6 +299,21 @@ class CountedPacedTransport(httpx.BaseTransport):
                 except Exception:
                     pass
                 raise BatchRefusal("returned transport response is invalid; charge is unknown") from None
+            try:
+                # A30: consume the body here, under the read timeout, so a stalled body read
+                # raises (and is journaled) instead of hanging the caller forever.
+                response.read()
+            except Exception as exc:
+                self._last_send = mark
+                self._consecutive_refusals += 1
+                try:
+                    self._journal_size = _journal(
+                        self._journal_fd, self._journal_identity, self._journal_size,
+                        {"event": "send_failure", "ordinal": ordinal, "run": label,
+                         "error_type": type(exc).__name__, "charge": "unknown"})
+                except Exception:
+                    pass
+                raise
             self._last_send = mark
             if response.status_code == 429:
                 self._consecutive_refusals += 1

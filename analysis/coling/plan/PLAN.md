@@ -4511,3 +4511,35 @@ this amendment; the authorized gpt-oss E3/E4 computation remains gated on F4 und
 
 - Secondary scorer source SHA256: `bd2ba94bc893cd2884e5d80602d8d7f36f335022a821b7f20a8a5d2ea1dbf197`
 - Secondary scorer fixture tests SHA256: `ba326bede882796e4b40d8410e658053be0631f91006c379ad7d2a092ce7ced7`
+
+### A30. Enforce the read timeout so a stalled upstream cannot hang the batch (11 November 2026)
+
+The A27 and A28 dispatches each stalled on an upstream that sent 200 headers and then withheld
+the response body: the body read blocked indefinitely (0 CPU, idle socket, retransmit timer
+running) because the per-chunk read timeout was not enforced on the request, so the batch hung
+instead of stopping. This amendment pins the timeout extension on every request
+(connect 30 s, read 180 s, write 30 s, pool 30 s) and consumes the response body inside the
+counted transport under that timeout. A stalled body read now raises `ReadTimeout`, is journaled
+as `send_failure`, and propagates to the stop-and-report contract instead of hanging the caller.
+The timeout is per read, so a legitimately streaming reasoning answer (chunks arriving within
+the window) is not cut off; only an idle upstream raises. The send budget, route pin, address
+fence, orphan rule and journal format are unchanged.
+
+Validation. Two synthetic tests cover the pinned timeout plus body consumption and the
+stalled-body refusal (`test_a_send_pins_the_read_timeout_and_consumes_the_body`,
+`test_a_stalled_body_read_raises_and_is_journaled`). Transport and batch-resume suites: 135
+passed. Registered gate: 2,259 passed.
+
+Selection. The A28 dispatch appended its declarations to the study ledger, so the selection's
+ledger pin is stale. The selection was regenerated changing only `ledger_sha256` to
+`9f41ba334bf4b80088b7c2b52283be9dfc169d54b4dcd9f6b51a43dd460fbf89`; its prior contents are archived as
+`OSS_BATCH_SELECTION_PRIVATE.attempt14.json`. `_BATCH_SELECTION_SHA` is re-pinned. All seventeen
+targets, caps, projections and original-file pins are unchanged. Next status GET is attempt 21
+of the 36 registered in A17. No sealed outcome is read; the authorized gpt-oss E3/E4 computation
+remains gated on F4 under A22/A25/A29.
+
+- Batch transport source SHA256: `3edfde9c285f365e8f730ea495ced1aad9cd038bae9eec15f2cf75644e491435`
+- Batch transport fixture tests SHA256: `13308dca44c8ccfd91fa5ec5489bcb8a5461a3140f75ccd2f4991821dd66a9e6`
+- Batch source SHA256: `77cddc5e3962b54904ba302a4f96a7b2206c7054ba3a4629a53ab65a3c0c95b7`
+- Batch fixture tests SHA256: `7a2e373bbe98bce6007ed05eaa76414965130a75e716678368ebfc79cfa69323`
+- Batch selection SHA256: `43ca3320422c289a243167e31bfd3b8f9be9c79d349c1a94dc1b42fbf6af90a5`
