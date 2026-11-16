@@ -4613,6 +4613,58 @@ amendment; the authorized gpt-oss E3/E4 computation remains gated on F4 under A2
 - Secondary scorer source SHA256: `f105c2f23ac2dabf9b2240b0022e8ad03ddb6be8ef4c5e76c2983f1ee5a496a1`
 - Secondary scorer fixture tests SHA256: `ad1399b2d322902605a94ed3bb01932027cfb9495eb49512603c28481b11c124`
 
+### A23. The two registered measurement diagnostics (16 November 2026)
+
+This amendment, reserved since 9 November (A24--A33 were registered while it waited), fixes
+the two diagnostics the IJCNN
+measurement section promises: the flat share of the calibrated interface (P1) and the paired
+per-horizon difference vector of the equivalence contrasts (P2). Both are descriptive: neither
+enters the six-test family, neither adds or changes any p-value, and the registered evaluator
+is not rerun. `followup/diagnostics.py` implements them behind the scorer's own guard chain
+(hash-pinned open inputs and confirmatory record, completeness of every run it reads, the
+continuation pooling of A25/A31/A32/A33 for the replication model).
+
+P1, outcome-free. On the literal readings of each scored condition (the two primaries and the
+pooled replication model) through the registered slip calibrator refitted on the open train
+fit/dev frame by the frozen fitting code (the A26 governed-recompute provenance is recorded;
+the state schema is `collie-slip-calibrator-state-v1`): an evaluable (item, horizon) pair is
+flat when its slip argument falls at or before the support's left corner, beyond its right
+corner, or on a bracket with no mass. Reported per condition, horizon and basis: flat counts
+and shares, the exact zero and reached saturation counts, and the reading tolerance the
+registered 0.02 margin of the AVERAGED two-horizon loss implies on the steepest bracket --
+`eps / (m_k/w_k)` when one horizon moves and `eps / (2 m_k/w_k)` when both move, the averaging
+being the registered `primary_loss`. No sealed byte is opened: `--p1-only` stops here, and the
+dry run of 16 November wrote aggregates only.
+
+P2, the sealed read this amendment authorizes. For the H2 contrast (the rule reader against
+the literal reading) of each primary and of the pooled replication model, on exactly the
+scoreable set that contrast is registered on -- rebuilt through the shared preparation path
+(`fixed_sets`, which re-derives the probe-fixed item set and refuses a mismatch with the
+evaluator's record, for the primaries; the eligible scoreable statements, as the authorized
+computation scores them, for the replication) -- the per-horizon differences
+
+    D_a = mean_i[(p_a^rule - Y_a)^2 - (p_a^model - Y_a)^2],  D_b likewise,  D = (D_a + D_b)/2,
+
+with a descriptive 95% percentile interval over an episode-cluster bootstrap of 10,000 draws,
+seed 20261001. Two exactness gates refuse rather than approximate: the rebuilt set must match
+the contrast's recorded statement count, and `D` must reproduce the recorded contrast delta
+(the evaluator's family record for the primaries; the A22 outcome file
+`GPT_OSS_E3_E4_SCORES_2026-11-16.json`, sha256
+`ba8f6b6d8ccf92496c2b7c019e9c50c3fdaf7d81e17408b31c1b91a9a15b848f`, for the replication) to
+the registered six-decimal rounding. Outputs are aggregates only: counts, shares,
+differences, interval endpoints, the state digest, the scoreable-set digests and the input
+hashes; no item identity, reading text or outcome value is written.
+
+Validation. The fixture tests cover the flat mask and saturation of a known curve, the
+averaged-loss tolerance with its scope, the per-horizon decomposition with the cancelling
+construction, the interval's episode structure, and both exactness refusals (five tests).
+Registered gate: 2,264 passed (the gate list now includes `followup/test_diagnostics.py`).
+The frozen reader and launcher are untouched; the scorer sources stand at their A33 bytes.
+
+- Diagnostics source SHA256: `c2c10b008793d0003b333b5e9f8ef7ca62904080484a02db60dda7a929141609`
+- Diagnostics fixture tests SHA256: `6426367ceb7a3b003ea38e5717eb549bc37fc6404df2cb6b20af52dc4f798b07`
+- Bootstrap draws: 10000; seed: 20261001; margin: 0.02 on the averaged two-horizon loss
+
 ### A33. The orphaned pairs of a pooled line enter no figure as readings (16 November 2026)
 
 Under A32 the authorized gpt-oss E3/E4 computation passed every completeness gate and stopped
