@@ -1865,7 +1865,12 @@ def continuation_group(
     be complete at its registered target count. A pair whose original never ran carries
     ``original_manifest`` ``None`` (A31): the selection records that original as never invoked
     and it stored no files, so the pool is the continuation alone, still held to the full
-    target by the F4 rule. Readings are pooled first-complete-read wins
+    target by the F4 rule. A32: a continuation completes by the F4 rule alone -- its
+    ``readings.jsonl`` line count equals ``continuation_target`` and its manifest agrees on the
+    stored count -- never by the manifest ``complete`` flag, which carries the original's
+    ``expected_rows``; and the pooled item set may miss exactly the pairs the selection records
+    as ``orphaned_pairs`` (the disclosed A4 rule keeps them unasked). Readings are pooled
+    first-complete-read wins
     (every original is read before any continuation), duplicates across the whole line are
     refused, and each row is held to the provider of the run that stored it. No sealed outcome
     is read. This is the continuation-aware read path the gpt-oss replication scorer uses; the
@@ -1904,8 +1909,6 @@ def continuation_group(
             hashes[original_run] = written
             if original_manifest.get("readings_sha256") != written:
                 problems.append(f"{name}: the readings of run {original_run} are not those of its manifest")
-        if continuation_manifest.get("complete") is not True:
-            problems.append(f"{name}: continuation run {continuation_run} is not complete")
         if continuation_manifest.get("readings") != target:
             problems.append(
                 f"{name}: continuation run {continuation_run} did not reach its target pair count"
@@ -1952,11 +1955,14 @@ def continuation_group(
         problems.append(f"{name}: {len(duplicates)} items were answered twice")
     item_ids = {item_id for item_id, _ in pooled}
     wanted = set(expected)
+    # A32: the disclosed A4 rule keeps the selection's orphaned pairs unasked, so the pooled
+    # line may miss exactly that many items of the registered list and no more.
+    orphans = sum(int(pair.get("orphaned_pairs", 0)) for pair in pairs)
     missing, extra = len(wanted - item_ids), len(item_ids - wanted)
-    if missing or extra:
+    if missing != orphans or extra:
         problems.append(
-            f"{name}: the item set is not the registered list ({missing} items missing, "
-            f"{extra} not on the list)"
+            f"{name}: the item set is not the registered list less its {orphans} disclosed "
+            f"orphaned pair(s) ({missing} items missing, {extra} not on the list)"
         )
     rows = {item_id: row for (item_id, sample), row in pooled.items() if sample == 0}
     faults: dict[str, int] = {}
@@ -1984,6 +1990,7 @@ def continuation_group(
         "continuation_runs": continuation_runs,
         "continuation_provider": continuation_provider,
         "never_invoked_originals": never_invoked,
+        "orphaned_pairs": orphans,
         "readings_sha256": hashes,
         "template": template,
         "rows": len(rows),

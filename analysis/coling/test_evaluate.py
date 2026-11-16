@@ -9147,8 +9147,11 @@ def test_continuation_group_refuses_duplicate_and_incomplete(tmp_path, monkeypat
     duplicate = _continuation_row("A", model, "predictive-v1", "dekallm/bf16")
     group = _continuation_group(tmp_path, monkeypatch, continuation_rows=[duplicate])
     assert any("answered twice" in problem for problem in group.problems)
-    group = _continuation_group(tmp_path, monkeypatch, complete=False)
-    assert any("not complete" in problem for problem in group.problems)
+    # A32: completion is the F4 rule alone -- a continuation short of its target is refused on
+    # its stored line count and manifest count, not on the manifest complete flag.
+    group = _continuation_group(tmp_path, monkeypatch, continuation_rows=[])
+    assert any("F4 rule requires its target" in problem for problem in group.problems)
+    assert any("did not reach its target pair count" in problem for problem in group.problems)
 
 
 def test_continuation_group_holds_each_row_to_its_own_provider(tmp_path, monkeypatch):
@@ -9210,3 +9213,59 @@ def test_continuation_group_pools_a_never_invoked_original_as_the_continuation_a
     assert group.record["runs"] == 2
     assert group.record["never_invoked_originals"] == ["orig"]
     assert group.record["readings_sha256"]["orig"] is None
+
+
+def test_continuation_group_completes_by_the_f4_rule_not_the_manifest_flag(tmp_path, monkeypatch):
+    """A32: a .dk run whose manifest says complete False -- its expected_rows carries the
+    original's planned count -- still pools clean when its readings line count equals the
+    selection target; the F4 rule alone decides completion."""
+    monkeypatch.setattr(ev, "reading_accepted", lambda reading, kind: True)
+    model = rd.PRIMARIES[0]
+    template = "predictive-v1"
+    original_provider = rd.ROUTES[model].provider
+    out_root = tmp_path / "read"
+    original = _write_continuation_run(
+        out_root, "orig", [_continuation_row("A", model, template, original_provider)],
+        False, model)
+    continuation = _write_continuation_run(
+        out_root, "orig.dk", [_continuation_row("B", model, template, "dekallm/bf16")],
+        False, model)  # the wrapper leaves complete False at the original's expected_rows
+    pairs = [{"original_run": "orig", "continuation_run": "orig.dk",
+              "original_manifest": original, "continuation_manifest": continuation,
+              "continuation_target": 1}]
+    group = ev.continuation_group(
+        model, "e3-a", template, out_root, pairs, ["A", "B"],
+        original_provider=original_provider, continuation_provider="dekallm/bf16")
+    assert group.problems == ()
+    assert set(group.rows) == {"A", "B"}
+
+
+def test_continuation_group_allows_exactly_the_disclosed_orphans(tmp_path, monkeypatch):
+    """A32: the pooled line may miss exactly the selection's orphaned_pairs of the registered
+    list and no more; a line missing items beyond the orphans, or with zero orphans recorded,
+    is refused."""
+    monkeypatch.setattr(ev, "reading_accepted", lambda reading, kind: True)
+    model = rd.PRIMARIES[0]
+    template = "predictive-v1"
+    original_provider = rd.ROUTES[model].provider
+    out_root = tmp_path / "read"
+    original = _write_continuation_run(
+        out_root, "orig", [], False, model)
+    continuation = _write_continuation_run(
+        out_root, "orig.dk",
+        [_continuation_row(item, model, template, "dekallm/bf16") for item in ("A", "B")],
+        True, model)
+
+    def group_of(expected, orphans):
+        pairs = [{"original_run": "orig", "continuation_run": "orig.dk",
+                  "original_manifest": original, "continuation_manifest": continuation,
+                  "continuation_target": 2, "orphaned_pairs": orphans}]
+        return ev.continuation_group(
+            model, "e3-a", template, out_root, pairs, expected,
+            original_provider=original_provider, continuation_provider="dekallm/bf16")
+
+    group = group_of(["A", "B", "C"], 1)  # C is the disclosed orphan, never asked
+    assert group.problems == ()
+    assert group.record["orphaned_pairs"] == 1
+    assert any("1 items missing" in problem for problem in group_of(["A", "B", "C"], 0).problems)
+    assert any("2 items missing" in problem for problem in group_of(["A", "B", "C", "D"], 1).problems)

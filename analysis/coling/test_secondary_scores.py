@@ -8449,14 +8449,14 @@ def test_continuation_specs_maps_selection_to_model_line(tmp_path):
                 "e3-b-m.s0", "e3-b-m.s0.dk"):
         TE._write_continuation_run(out_root, run, [], run.endswith(".dk"), "m")
 
-    def entry(original, continuation, target):
+    def entry(original, continuation, target, orphans=0):
         return {"run": original, "new_run": continuation, "target_pairs": target,
-                "route_provider": "deepinfra/bf16"}
+                "route_provider": "deepinfra/bf16", "orphaned_pairs": orphans}
 
     selection = {"route": {"provider": "dekallm/bf16", "model_id": "openai/gpt-oss-20b"},
                  "runs": [
                      entry("e3-a-m.s0", "e3-a-m.s0.dk", 5),
-                     entry("e3-a-m.s1", "e3-a-m.s1.dk", 7),
+                     entry("e3-a-m.s1", "e3-a-m.s1.dk", 7, orphans=1),
                      entry("e3-b-m.s0", "e3-b-m.s0.dk", 3),
                  ]}
     specs = sc.continuation_specs(plan, selection, out_root)
@@ -8464,6 +8464,7 @@ def test_continuation_specs_maps_selection_to_model_line(tmp_path):
     assert [s["continuation_run"] for s in specs[("m", "e3-a")]] == [
         "e3-a-m.s0.dk", "e3-a-m.s1.dk"]
     assert [s["continuation_target"] for s in specs[("m", "e3-a")]] == [5, 7]
+    assert [s["orphaned_pairs"] for s in specs[("m", "e3-a")]] == [0, 1]
     assert specs[("m", "e3-b")][0]["template"] == "predictive-track-v1"
     assert specs[("m", "e3-b")][0]["track"] == "fit+dev"
     assert specs[("m", "e3-a")][0]["original_provider"] == "deepinfra/bf16"

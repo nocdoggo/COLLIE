@@ -864,7 +864,8 @@ def continuation_specs(
     A31: an original the selection records as ``never_invoked`` stored no files at all, so its
     spec carries ``original_manifest`` ``None`` and the pool is the continuation alone; a
     never-invoked record that nevertheless has files on disk is refused, and a missing original
-    manifest without that record is refused as before.
+    manifest without that record is refused as before. A32: each spec also carries the entry's
+    ``orphaned_pairs`` count, the disclosed A4 pairs the line may legitimately miss.
     """
     by_name = {run["run"]: run for run in plan.get("runs", [])}
     continuation_provider = selection["route"]["provider"]
@@ -910,6 +911,7 @@ def continuation_specs(
                 "original_manifest": original_manifest,
                 "continuation_manifest": continuation_manifest,
                 "continuation_target": int(entry["target_pairs"]),
+                "orphaned_pairs": int(entry.get("orphaned_pairs", 0)),
                 "original_provider": entry["route_provider"],
                 "continuation_provider": continuation_provider,
                 "template": template,
@@ -947,6 +949,7 @@ def checked_group(
                 "original_manifest": spec["original_manifest"],
                 "continuation_manifest": spec["continuation_manifest"],
                 "continuation_target": spec["continuation_target"],
+                "orphaned_pairs": spec.get("orphaned_pairs", 0),
             }
             for spec in specs
         ]

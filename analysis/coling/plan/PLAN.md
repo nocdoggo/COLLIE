@@ -4578,3 +4578,37 @@ gpt-oss E3/E4 computation remains gated on F4 under A22/A25/A29.
 - Scorer evaluator fixture tests SHA256: `415f6d49f7d3baa3f164f73a6b7bfa0eb11f7ed1573d89843fede2c1ff286a32`
 - Secondary scorer source SHA256: `7f0e111c4664cce0dc01b1a1b29eb54d215f8f46ccd2df037c66611239754fd5`
 - Secondary scorer fixture tests SHA256: `9d84c17c997ee12cd71758d7472c09b6435bf59418997887c59d603da443a18a`
+
+### A32. The pooled line completes by the F4 rule and the disclosed orphans (16 November 2026)
+
+Under A31 the authorized gpt-oss E3/E4 computation again refused, on two points where the A25
+implementation fell short of its own registered rule. First, every `.dk` manifest except
+`e3-b-gpt-oss-20b.s7.dk` carries `complete: false`, because the manifest's `expected_rows`
+holds the original run's planned count and only the never-invoked-original shard reaches its
+own full expected count; the code demanded `complete: true` although the registered F4 rule
+(and the A25 text itself) makes completion the `readings.jsonl` line count equal to the
+selection's `target_pairs` -- never `planned_rows` and never the manifest `complete` flag.
+Second, the pooled item-set check allowed no misses, but the disclosed A4 rule keeps the
+selection's four orphaned pairs unasked (one in e3-a.s2, three in e3-b s1/s2/s6), which is
+exactly the 1 + 3 the refusal reported.
+
+Repair. `evaluate.continuation_group` no longer consults the continuation manifest's
+`complete` flag; completion is the F4 line-count rule plus the manifest's stored-count
+agreement with the target, and the pooled item set may miss exactly the sum of the pair's
+`orphaned_pairs` (recorded in the group record) and no more. `secondary_scores`
+`continuation_specs` carries each selection entry's `orphaned_pairs` into the spec and
+`checked_group` into the pooling pair. The primaries' `read_group` path, the frozen reader
+and launcher, the writer refinements, the batch sources and the selection pins are unchanged.
+
+Validation. `test_continuation_group_completes_by_the_f4_rule_not_the_manifest_flag` and
+`test_continuation_group_allows_exactly_the_disclosed_orphans` cover the flag-independence
+and the exact-orphan allowance in both directions; the duplicate/incomplete test now refuses
+through the F4 line count and stored-count messages, and the specs test carries the orphan
+counts. Scorer suites (test_evaluate + test_secondary_scores): 552 passed / 6 xfailed /
+21 xpassed / 0 failed. Registered gate: 2,259 passed. No sealed outcome is read by this
+amendment; the authorized gpt-oss E3/E4 computation remains gated on F4 under A22/A25/A29/A31.
+
+- Scorer evaluator source SHA256: `a325f5e22976cdedb72e61b252c2a452ab0e7b562ae07b5ad46df4be731ac2d5`
+- Scorer evaluator fixture tests SHA256: `3821fbbf17e54717643e2b6385d0664d66f3ddcccc52789f0a472b076688eeb8`
+- Secondary scorer source SHA256: `f105c2f23ac2dabf9b2240b0022e8ad03ddb6be8ef4c5e76c2983f1ee5a496a1`
+- Secondary scorer fixture tests SHA256: `ad1399b2d322902605a94ed3bb01932027cfb9495eb49512603c28481b11c124`
