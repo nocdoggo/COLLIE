@@ -9269,3 +9269,76 @@ def test_continuation_group_allows_exactly_the_disclosed_orphans(tmp_path, monke
     assert group.record["orphaned_pairs"] == 1
     assert any("1 items missing" in problem for problem in group_of(["A", "B", "C"], 0).problems)
     assert any("2 items missing" in problem for problem in group_of(["A", "B", "C", "D"], 1).problems)
+
+
+def test_predictive_and_literal_days_treat_disclosed_orphans_as_unrecorded():
+    """A33: an orphan statement a pooled line never asked holds no stored row; like a failed
+    reading it takes the base-rate output (predictive) or no period (literal days), parses to
+    False, and is counted apart as orphaned_not_asked -- never as a failure."""
+    index = ["A", "B", "C"]
+    base = pd.DataFrame(
+        {column: [0.1, 0.2, 0.3] for column in P.PREDICTION_COLUMNS}, index=index)
+    days = {"q10": 1.0, "q50": 2.0, "q80": 3.0, "q90": 4.0, "q95": 5.0}
+    rows = {
+        item: {"reading": {"p_by_horizon_a": 0.7, "p_by_horizon_b": 0.8,
+                           "days_to_recovery": days}}
+        for item in ("A", "B")
+    }
+    first = pd.DataFrame({"event_date": ["2026-01-01"] * 3}, index=index)
+
+    frame, parsed, counts = ev.predictive(rows, first, base, orphans=("C",))
+    assert list(frame.index) == index and not frame.isna().any().any()
+    assert not parsed.loc["C"]
+    assert counts == {"replaced_by_base_rate": 0, "p_b_below_p_a": 0, "orphaned_not_asked": 1}
+    assert frame.loc["C"].tolist() == base.loc["C"].tolist()
+
+    literal = {"A": {"reading": {"interval": {"end": "2026-02-01"},
+                                "statement_type": "recovery"}}}
+    series, literal_parsed, literal_counts = ev.literal_days(
+        literal, first, orphans=("B", "C"))
+    assert literal_parsed.loc["A"] and not literal_parsed.loc["B"] and not literal_parsed.loc["C"]
+    assert literal_counts["orphaned_not_asked"] == 2
+    assert literal_counts["failed_counted_as_abstain"] == 0
+    assert series.loc["B"] != series.loc["B"]  # NaN: no period, like an abstain
+
+
+def test_model_predictions_covers_the_orphans_of_a_pooled_group(tmp_path, monkeypatch):
+    """A33: model_predictions turns a pooled group that is short exactly its disclosed orphans
+    into complete prediction frames -- the orphans take the base-rate output -- instead of
+    failing the lookup."""
+    monkeypatch.setattr(ev, "reading_accepted", lambda reading, kind: True)
+    model = rd.PRIMARIES[0]
+    template = "predictive-v1"
+    original_provider = rd.ROUTES[model].provider
+    out_root = tmp_path / "read"
+    days = {"q10": 1.0, "q50": 2.0, "q80": 3.0, "q90": 4.0, "q95": 5.0}
+
+    def full_row(item, provider):
+        row = _continuation_row(item, model, template, provider)
+        row["reading"] = {"p_by_horizon_a": 0.7, "p_by_horizon_b": 0.8, "days_to_recovery": days}
+        return row
+
+    original = _write_continuation_run(out_root, "orig", [], False, model)
+    continuation = _write_continuation_run(
+        out_root, "orig.dk", [full_row("A", "dekallm/bf16")], True, model)
+    pairs = [{"original_run": "orig", "continuation_run": "orig.dk",
+              "original_manifest": original, "continuation_manifest": continuation,
+              "continuation_target": 1, "orphaned_pairs": 1}]
+    pooled = ev.continuation_group(
+        model, "e3-a", template, out_root, pairs, ["A", "B"],
+        original_provider=original_provider, continuation_provider="dekallm/bf16")
+    assert pooled.problems == ()
+    plain = ev.Group(model, "e3-c", "literal-v1",
+                     {"A": {"reading": None}, "B": {"reading": None}}, {}, ())
+    groups = {"a": pooled, "b": pooled, "c": plain}
+    base = pd.DataFrame(
+        {column: [0.25] * 2 for column in P.PREDICTION_COLUMNS}, index=["A", "B"])
+    first = pd.DataFrame({"event_date": ["2026-01-01"] * 2}, index=["A", "B"])
+    fitted = {ev.RULES: type(
+        "Rules", (), {"predict": staticmethod(lambda rows, days: base.copy())})()}
+    made, parsed, counts, problems = ev.model_predictions(groups, fitted, first, first, base)
+    assert problems == []
+    assert list(made["a"].index) == ["A", "B"]
+    assert counts["a"]["orphaned_not_asked"] == 1
+    assert not parsed["a"].loc["B"]
+    assert made["a"].loc["B"].tolist() == base.loc["B"].tolist()

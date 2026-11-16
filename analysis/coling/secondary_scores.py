@@ -1682,7 +1682,9 @@ def prepare(
             groups, fitted, rows, study.first, base
         )
         out.problems += [f"{model} {problem}" for problem in problems]
-        out.reading_days[model] = ev.literal_days(groups["c"].rows, study.first)[0]
+        out.reading_days[model] = ev.literal_days(
+            groups["c"].rows, study.first, ev.orphan_ids(groups["c"], study.first)
+        )[0]
         out.literal_rows[model] = groups["c"].rows
         for condition in ev.CONDITIONS:
             study.predictions[f"{model}:{condition}"] = made[condition]

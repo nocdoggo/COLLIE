@@ -4612,3 +4612,38 @@ amendment; the authorized gpt-oss E3/E4 computation remains gated on F4 under A2
 - Scorer evaluator fixture tests SHA256: `3821fbbf17e54717643e2b6385d0664d66f3ddcccc52789f0a472b076688eeb8`
 - Secondary scorer source SHA256: `f105c2f23ac2dabf9b2240b0022e8ad03ddb6be8ef4c5e76c2983f1ee5a496a1`
 - Secondary scorer fixture tests SHA256: `ad1399b2d322902605a94ed3bb01932027cfb9495eb49512603c28481b11c124`
+
+### A33. The orphaned pairs of a pooled line enter no figure as readings (16 November 2026)
+
+Under A32 the authorized gpt-oss E3/E4 computation passed every completeness gate and stopped
+turning the pooled readings into predictions: `evaluate.predictive` requires a stored row for
+every statement of the eligible list, and the four disclosed orphaned pairs hold none. The
+registered treatment of a statement with no recorded reading is the base-rate output with a
+false parse flag (the failed-reading path); the orphans were answered in a lost journal and
+never recorded, so for the pooled condition they are exactly statements with no recorded
+reading, and A11 reports them as absent.
+
+Repair. `evaluate.orphan_ids` reads a pooled group's disclosed `orphaned_pairs` (A32) and
+names the statements of the line it covers but the pool does not, refusing any other gap.
+`predictive` and `literal_days` take those statements as an optional argument: like a failed
+reading they take the base-rate output (predictive) or no period (literal days) and parse to
+False, but are counted apart as `orphaned_not_asked`, so no failure is mislabeled and every
+figure that filters on the parse flag excludes them. `model_predictions` threads each
+condition's orphans through, and the secondary scorer's `prepare` passes condition (c)'s. The
+prediction frames stay complete over the eligible list, so every paired contrast, scoreable-set
+construction and cross-model denominator of the section is unchanged; the primaries'
+`read_group` path, the frozen reader and launcher, the writer refinements, the batch sources
+and the selection pins are untouched.
+
+Validation. `test_predictive_and_literal_days_treat_disclosed_orphans_as_unrecorded` and
+`test_model_predictions_covers_the_orphans_of_a_pooled_group` cover the base-rate substitution,
+the false parse flag, the apart count and the complete frames; the historical wrapper that
+plants a NaN prediction takes the widened `predictive` call. Scorer suites (test_evaluate +
+test_secondary_scores): 554 passed / 6 xfailed / 21 xpassed / 0 failed. Registered gate:
+2,259 passed. No sealed outcome is read by this amendment; the authorized gpt-oss E3/E4
+computation remains gated on F4 under A22/A25/A29/A31/A32.
+
+- Scorer evaluator source SHA256: `116f2b104bd42098c67900519ed68c3b1b51701c7d6cff545c9e6fc9ad5e99ab`
+- Scorer evaluator fixture tests SHA256: `8f62b72db185ad6ecaf4b1a5b031459b63af96c68c6c861dc326cc353fcdb338`
+- Secondary scorer source SHA256: `f5a7a29c413817ca2f1e98836f15f45b35e376e272354bf707c4dd14692ef2e7`
+- Secondary scorer fixture tests SHA256: `f9decbfe458401c1bb2590376c85f2844906ace27ec88874a858237590760a08`

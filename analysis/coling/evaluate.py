@@ -2057,15 +2057,28 @@ def asked_elsewhere(rows: Mapping[str, dict], first: pd.DataFrame, probe: bool =
 
 
 def predictive(
-    rows: Mapping[str, dict], first: pd.DataFrame, base: pd.DataFrame
+    rows: Mapping[str, dict], first: pd.DataFrame, base: pd.DataFrame,
+    orphans: Iterable[str] = (),
 ) -> tuple[pd.DataFrame, pd.Series, dict[str, int]]:
     """The predictions of a predictive condition for the statements of ``first`` (first-sight
     cells, indexed by statement id): each stored answer as given, and the base-rate output of
-    ``base`` where the reading failed. Returns the predictions, which statements were parsed,
-    and counts: readings replaced, and answers that put ``P(E_end90)`` below ``P(E_end)``."""
+    ``base`` where the reading failed. ``orphans`` (A33) names the statements a pooled
+    continuation line never asked -- its disclosed orphaned pairs: they hold no stored row, so
+    like a failed reading they take the base-rate output and parse to False, counted apart as
+    ``orphaned_not_asked`` so no failure is mislabeled. Returns the predictions, which
+    statements were parsed, and counts: readings replaced, and answers that put ``P(E_end90)``
+    below ``P(E_end)``."""
     values, parsed = [], []
     counts = {"replaced_by_base_rate": 0, "p_b_below_p_a": 0}
+    orphans = set(orphans)
+    if orphans:
+        counts["orphaned_not_asked"] = 0
     for item_id in first.index:
+        if item_id in orphans:
+            parsed.append(False)
+            counts["orphaned_not_asked"] += 1
+            values.append(base.loc[item_id, list(P.PREDICTION_COLUMNS)].tolist())
+            continue
         row = rows[item_id]
         reading = row["reading"]
         parsed.append(reading is not None)
@@ -2081,15 +2094,38 @@ def predictive(
     return frame, pd.Series(parsed, index=first.index, dtype=bool), counts
 
 
+def orphan_ids(group: Group, first: pd.DataFrame) -> tuple[str, ...]:
+    """The disclosed orphaned statements of a pooled group (A33): a complete group covers every
+    statement of ``first``, and a pooled continuation group may miss exactly the count its
+    record discloses (``orphaned_pairs``, A32). Any other gap stays a lookup failure."""
+    count = int((group.record or {}).get("orphaned_pairs", 0))
+    if not count:
+        return ()
+    absent = first.index.difference(group.rows.keys())
+    if len(absent) != count:
+        raise KeyError(f"pooled group is short {len(absent)} statements, {count} disclosed")
+    return tuple(absent)
+
+
 def literal_days(
-    rows: Mapping[str, dict], first: pd.DataFrame
+    rows: Mapping[str, dict], first: pd.DataFrame, orphans: Iterable[str] = ()
 ) -> tuple[pd.Series, pd.Series, dict[str, int]]:
     """The end of each literal reading's period in days from the statement date (missing for a
     reading that gives no stated period: ABSTAIN, a failed reading, or an interval of another
-    statement type than recovery or next delivery), which statements were parsed, and counts."""
+    statement type than recovery or next delivery), which statements were parsed, and counts.
+    An ``orphans`` statement (A33) was never asked, so it has no period and no stored row,
+    counted apart as ``orphaned_not_asked``."""
     days, parsed = [], []
     counts = {"failed_counted_as_abstain": 0, "abstain": 0, "period_of_another_statement_type": 0}
+    orphans = set(orphans)
+    if orphans:
+        counts["orphaned_not_asked"] = 0
     for item_id, day in zip(first.index, first["event_date"], strict=True):
+        if item_id in orphans:
+            parsed.append(False)
+            counts["orphaned_not_asked"] += 1
+            days.append(float("nan"))
+            continue
         reading = rows[item_id]["reading"]
         parsed.append(reading is not None)
         end = float("nan")
@@ -2115,13 +2151,17 @@ def model_predictions(
 ) -> tuple[dict[str, pd.DataFrame], dict[str, pd.Series], dict[str, dict], list[str]]:
     """The predictions of conditions (a), (b) and (c) of one model on ``rows`` (the typed
     first-sight rows; ``first`` holds the same statements as text): by condition, the
-    predictions, the parsed flags and the counts, and the reasons to refuse the readings."""
+    predictions, the parsed flags and the counts, and the reasons to refuse the readings. A
+    pooled condition short of exactly its disclosed orphans (A33) takes the base-rate output
+    for them, parsed False, counted apart as ``orphaned_not_asked``."""
     predictions, parsed, counts, problems = {}, {}, {}, []
     for condition in ("a", "b"):
         predictions[condition], parsed[condition], counts[condition] = predictive(
-            groups[condition].rows, first, base
+            groups[condition].rows, first, base, orphan_ids(groups[condition], first)
         )
-    days, parsed["c"], counts["c"] = literal_days(groups["c"].rows, first)
+    days, parsed["c"], counts["c"] = literal_days(
+        groups["c"].rows, first, orphan_ids(groups["c"], first)
+    )
     predictions["c"] = fitted[RULES].predict(rows, days)
     for condition, frame in predictions.items():
         if frame.isna().any().any():

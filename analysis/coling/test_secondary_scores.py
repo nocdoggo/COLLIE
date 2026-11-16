@@ -6940,7 +6940,7 @@ def test_readings_that_cannot_be_turned_into_predictions_name_no_item(
     # evaluator's own check finds the gap, and nothing is scored
     real = ev.predictive
 
-    def with_a_gap(rows: Any, first: Any, base: Any) -> Any:
+    def with_a_gap(rows: Any, first: Any, base: Any, *args: Any, **kwargs: Any) -> Any:
         frame, parsed, counts = real(rows, first, base)
         frame = frame.copy()
         frame.iloc[0, 0] = float("nan")
