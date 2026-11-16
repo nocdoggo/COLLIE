@@ -1862,7 +1862,10 @@ def continuation_group(
     ``pairs`` is one entry per shard, each a mapping with ``original_run``,
     ``continuation_run``, ``original_manifest``, ``continuation_manifest`` and
     ``continuation_target``. Each original keeps its partial manifest; each continuation must
-    be complete at its registered target count. Readings are pooled first-complete-read wins
+    be complete at its registered target count. A pair whose original never ran carries
+    ``original_manifest`` ``None`` (A31): the selection records that original as never invoked
+    and it stored no files, so the pool is the continuation alone, still held to the full
+    target by the F4 rule. Readings are pooled first-complete-read wins
     (every original is read before any continuation), duplicates across the whole line are
     refused, and each row is held to the provider of the run that stored it. No sealed outcome
     is read. This is the continuation-aware read path the gpt-oss replication scorer uses; the
@@ -1876,6 +1879,7 @@ def continuation_group(
     original_runs: list[str] = []
     continuation_runs: list[str] = []
     ordered: list[str] = []
+    never_invoked: list[str] = []
     for pair in pairs:
         original_run = pair["original_run"]
         continuation_run = pair["continuation_run"]
@@ -1885,8 +1889,21 @@ def continuation_group(
         original_runs.append(original_run)
         continuation_runs.append(continuation_run)
         ordered.extend((original_run, continuation_run))
-        if original_manifest.get("complete") is not False:
-            problems.append(f"{name}: original run {original_run} is not partial at its recorded count")
+        if original_manifest is None:
+            # A31: the selection records this original as never invoked; it stored nothing, so
+            # there is no partial manifest to hold and the pool is the continuation alone.
+            never_invoked.append(original_run)
+            hashes[original_run] = None
+        else:
+            if original_manifest.get("complete") is not False:
+                problems.append(f"{name}: original run {original_run} is not partial at its recorded count")
+            if original_manifest.get("model") != model:
+                problems.append(f"{name}: run {original_run} is of another model")
+            stored = out_root / original_run / "readings.jsonl"
+            written = sealed_counts.sha256(stored.read_bytes()) if stored.is_file() else None
+            hashes[original_run] = written
+            if original_manifest.get("readings_sha256") != written:
+                problems.append(f"{name}: the readings of run {original_run} are not those of its manifest")
         if continuation_manifest.get("complete") is not True:
             problems.append(f"{name}: continuation run {continuation_run} is not complete")
         if continuation_manifest.get("readings") != target:
@@ -1906,14 +1923,13 @@ def continuation_group(
                 f"{name}: continuation run {continuation_run} holds {continuation_lines} readings "
                 f"where the F4 rule requires its target of {target}"
             )
-        for run, manifest in ((original_run, original_manifest), (continuation_run, continuation_manifest)):
-            if manifest.get("model") != model:
-                problems.append(f"{name}: run {run} is of another model")
-            stored = out_root / run / "readings.jsonl"
-            written = sealed_counts.sha256(stored.read_bytes()) if stored.is_file() else None
-            hashes[run] = written
-            if manifest.get("readings_sha256") != written:
-                problems.append(f"{name}: the readings of run {run} are not those of its manifest")
+        if continuation_manifest.get("model") != model:
+            problems.append(f"{name}: run {continuation_run} is of another model")
+        stored = out_root / continuation_run / "readings.jsonl"
+        written = sealed_counts.sha256(stored.read_bytes()) if stored.is_file() else None
+        hashes[continuation_run] = written
+        if continuation_manifest.get("readings_sha256") != written:
+            problems.append(f"{name}: the readings of run {continuation_run} are not those of its manifest")
     originals = set(original_runs)
     pooled: dict[tuple[str, int], dict] = {}
     row_run: dict[tuple[str, int], str] = {}
@@ -1967,6 +1983,7 @@ def continuation_group(
         "original_runs": original_runs,
         "continuation_runs": continuation_runs,
         "continuation_provider": continuation_provider,
+        "never_invoked_originals": never_invoked,
         "readings_sha256": hashes,
         "template": template,
         "rows": len(rows),

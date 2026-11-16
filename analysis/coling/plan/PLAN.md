@@ -4543,3 +4543,38 @@ remains gated on F4 under A22/A25/A29.
 - Batch source SHA256: `77cddc5e3962b54904ba302a4f96a7b2206c7054ba3a4629a53ab65a3c0c95b7`
 - Batch fixture tests SHA256: `7a2e373bbe98bce6007ed05eaa76414965130a75e716678368ebfc79cfa69323`
 - Batch selection SHA256: `43ca3320422c289a243167e31bfd3b8f9be9c79d349c1a94dc1b42fbf6af90a5`
+
+### A31. The never-invoked original pools as its continuation alone (16 November 2026)
+
+The A22 gpt-oss E3/E4 computation was prepared and its gates held (T3 precheck: A3 snapshot
+identity intact, 80 files 78 identical + 2 prefix, orphan gap shapes unchanged, and all
+seventeen continuation runs complete by the F4 readings-line rule), but the scorer refused at
+`continuation_specs`: the selection entry `e3-b-gpt-oss-20b.s7` records `never_invoked` with
+zero recorded readings, empty-file digests and zero logged calls -- that original was never
+dispatched before the endpoint change, so no original run directory exists. The A25 pooling
+required an original manifest unconditionally and reported the miss as a continuation F4
+failure, a misattribution: the continuation `e3-b-gpt-oss-20b.s7.dk` is complete at 341/341.
+
+Repair. `secondary_scores.continuation_specs` admits an original with no files only when the
+selection records it as never invoked AND its `recorded_readings` are zero; a never-invoked
+record with files on disk, or with recorded readings, is refused, and a missing original
+manifest without that record is refused as before (the message now names the original rather
+than the continuation). The spec carries `original_manifest` `None`.
+`evaluate.continuation_group` holds a `None` original to no partial-manifest check, records
+its readings hash as absent, discloses it through a `never_invoked_originals` record field,
+and pools the continuation alone -- still held to the full selection target by the F4
+line-count rule, still first-complete-read wins, still provider-pinned per row. The primaries'
+`read_group` path, the frozen reader and launcher, the writer refinements, and the batch
+sources and selection pins are unchanged.
+
+Validation. `test_continuation_group_pools_a_never_invoked_original_as_the_continuation_alone`
+and `test_continuation_specs_pools_a_never_invoked_original` cover the pooling, both
+inconsistency refusals, and the preserved missing-manifest refusal. Scorer suites
+(test_evaluate + test_secondary_scores): 550 passed / 6 xfailed / 21 xpassed / 0 failed.
+Registered gate: 2,259 passed. No sealed outcome is read by this amendment; the authorized
+gpt-oss E3/E4 computation remains gated on F4 under A22/A25/A29.
+
+- Scorer evaluator source SHA256: `a156a746ece79fe07c6eb1305766ff79f1de4c508750f51ac200cb1667f111f4`
+- Scorer evaluator fixture tests SHA256: `415f6d49f7d3baa3f164f73a6b7bfa0eb11f7ed1573d89843fede2c1ff286a32`
+- Secondary scorer source SHA256: `7f0e111c4664cce0dc01b1a1b29eb54d215f8f46ccd2df037c66611239754fd5`
+- Secondary scorer fixture tests SHA256: `9d84c17c997ee12cd71758d7472c09b6435bf59418997887c59d603da443a18a`

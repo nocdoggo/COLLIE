@@ -9182,3 +9182,31 @@ def test_continuation_group_f4_counts_readings_lines_not_the_manifest(tmp_path, 
         model, "e3-a", template, out_root, pairs, ["A", "B"],
         original_provider=original_provider, continuation_provider="dekallm/bf16")
     assert any("F4 rule requires its target of 2" in problem for problem in group.problems)
+
+
+def test_continuation_group_pools_a_never_invoked_original_as_the_continuation_alone(
+        tmp_path, monkeypatch):
+    """A31: a pair whose original never ran carries ``original_manifest`` ``None`` -- the
+    selection records it as never invoked and it stored no files -- so the pool is the
+    continuation alone, the original contributes no rows, and its readings hash is None."""
+    monkeypatch.setattr(ev, "reading_accepted", lambda reading, kind: True)
+    model = rd.PRIMARIES[0]
+    template = "predictive-v1"
+    original_provider = rd.ROUTES[model].provider
+    out_root = tmp_path / "read"
+    assert not (out_root / "orig").exists()  # the never-invoked original stored nothing
+    continuation = _write_continuation_run(
+        out_root, "orig.dk",
+        [_continuation_row(item, model, template, "dekallm/bf16") for item in ("A", "B")],
+        True, model)
+    pairs = [{"original_run": "orig", "continuation_run": "orig.dk",
+              "original_manifest": None, "continuation_manifest": continuation,
+              "continuation_target": 2}]
+    group = ev.continuation_group(
+        model, "e3-a", template, out_root, pairs, ["A", "B"],
+        original_provider=original_provider, continuation_provider="dekallm/bf16")
+    assert group.problems == ()
+    assert set(group.rows) == {"A", "B"}
+    assert group.record["runs"] == 2
+    assert group.record["never_invoked_originals"] == ["orig"]
+    assert group.record["readings_sha256"]["orig"] is None

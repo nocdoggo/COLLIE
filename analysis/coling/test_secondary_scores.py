@@ -8475,6 +8475,50 @@ def test_continuation_specs_maps_selection_to_model_line(tmp_path):
                                      "runs": [entry("unknown", "unknown.dk", 1)]}, out_root)
 
 
+def test_continuation_specs_pools_a_never_invoked_original(tmp_path):
+    """A31: an original the selection records as ``never_invoked`` stored no files and no
+    readings, so its spec carries ``original_manifest`` ``None`` and the pool is the
+    continuation alone; the same record with files on disk, or with recorded readings, or a
+    missing original manifest without the record, is refused."""
+    out_root = tmp_path / "read"
+    plan = {"runs": [
+        {"run": "e3-b-m.s7", "model": "m", "line": "e3-b", "template": "predictive-track-v1",
+         "track": "fit+dev", "phase": "rest"},
+        {"run": "e3-b-m.s6", "model": "m", "line": "e3-b", "template": "predictive-track-v1",
+         "track": "fit+dev", "phase": "rest"},
+    ]}
+    TE._write_continuation_run(out_root, "e3-b-m.s7.dk", [], True, "m")
+    entry = {"run": "e3-b-m.s7", "new_run": "e3-b-m.s7.dk", "target_pairs": 3,
+             "route_provider": "deepinfra/bf16", "never_invoked": True,
+             "recorded_readings": 0}
+    specs = sc.continuation_specs(
+        plan, {"route": {"provider": "dekallm/bf16"}, "runs": [dict(entry)]}, out_root)
+    spec = specs[("m", "e3-b")][0]
+    assert spec["original_manifest"] is None
+    assert spec["continuation_manifest"]["complete"] is True
+    assert spec["continuation_target"] == 3
+    # a never-invoked record with files on disk is inconsistent and refused
+    TE._write_continuation_run(out_root, "e3-b-m.s7", [], False, "m")
+    with pytest.raises(SystemExit):
+        sc.continuation_specs(
+            plan, {"route": {"provider": "dekallm/bf16"}, "runs": [dict(entry)]}, out_root)
+    # a never-invoked record with recorded readings is refused even with no files
+    (out_root / "e3-b-m.s7" / "run_manifest.json").unlink()
+    (out_root / "e3-b-m.s7" / "readings.jsonl").unlink()
+    (out_root / "e3-b-m.s7").rmdir()
+    with pytest.raises(SystemExit):
+        sc.continuation_specs(
+            plan, {"route": {"provider": "dekallm/bf16"},
+                   "runs": [dict(entry, recorded_readings=44)]}, out_root)
+    # a missing original manifest without the never-invoked record is refused as before
+    TE._write_continuation_run(out_root, "e3-b-m.s6.dk", [], True, "m")
+    plain = {"run": "e3-b-m.s6", "new_run": "e3-b-m.s6.dk", "target_pairs": 3,
+             "route_provider": "deepinfra/bf16"}
+    with pytest.raises(SystemExit):
+        sc.continuation_specs(
+            plan, {"route": {"provider": "dekallm/bf16"}, "runs": [plain]}, out_root)
+
+
 def test_checked_group_pools_continuation_when_selected(tmp_path, monkeypatch):
     """checked_group reads a model/line through continuation_group when the selection pools it,
     and through read_group otherwise; the pooled group covers the union of the shards."""

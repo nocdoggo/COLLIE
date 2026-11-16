@@ -861,6 +861,10 @@ def continuation_specs(
     selection's top-level ``route``. The manifests are read from the output root, the line and
     template from the original run's plan cell, so the pooled group is held to the same registered
     rule as a complete run. A model/line absent here is read whole by ``evaluate.read_group``.
+    A31: an original the selection records as ``never_invoked`` stored no files at all, so its
+    spec carries ``original_manifest`` ``None`` and the pool is the continuation alone; a
+    never-invoked record that nevertheless has files on disk is refused, and a missing original
+    manifest without that record is refused as before.
     """
     by_name = {run["run"]: run for run in plan.get("runs", [])}
     continuation_provider = selection["route"]["provider"]
@@ -874,12 +878,30 @@ def continuation_specs(
         line, template = cell["line"], cell["template"]
         original_path = out_root / original / "run_manifest.json"
         continuation_path = out_root / continuation / "run_manifest.json"
-        if not original_path.is_file() or not continuation_path.is_file():
+        if not continuation_path.is_file():
             ev.refuse(
                 f"the continuation run {continuation} has no stored manifest: the batch has not "
                 "closed it complete, so no secondary score is computed (F4)"
             )
-        original_manifest = json.loads(original_path.read_text(encoding="utf-8"))
+        if entry.get("never_invoked"):
+            if (out_root / original).exists():
+                ev.refuse(
+                    f"the selection records the original run {original!r} as never invoked, but "
+                    "it stored files; no secondary score is computed"
+                )
+            if int(entry.get("recorded_readings", 0)) != 0:
+                ev.refuse(
+                    f"the selection records the original run {original!r} as never invoked with "
+                    "recorded readings; no secondary score is computed"
+                )
+            original_manifest = None
+        else:
+            if not original_path.is_file():
+                ev.refuse(
+                    f"the original run {original} has no stored manifest and the selection does "
+                    "not record it as never invoked, so no secondary score is computed (F4)"
+                )
+            original_manifest = json.loads(original_path.read_text(encoding="utf-8"))
         continuation_manifest = json.loads(continuation_path.read_text(encoding="utf-8"))
         specs.setdefault((cell["model"], line), []).append(
             {
